@@ -1,0 +1,392 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Container ──────────────────────────────────── */
+.certificate-page-container {
+    background-color: #f0f2f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px 40px;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ── A4 Paper ───────────────────────────────────── */
+.certificate-paper {
+    width: 210mm;
+    height: 297mm;
+    background: #ffffff;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.15);
+    margin: 40px auto;
+    position: relative;
+    overflow: hidden;
+    color: #1a2a3a;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border: 0.5mm solid #002147;
+    /* Formal outer border */
+}
+
+/* Security Watermark Backdrop */
+.cert-watermark-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 80pt;
+    color: rgba(48, 145, 157, 0.02);
+    pointer-events: none;
+    user-select: none;
+    text-transform: uppercase;
+    transform: rotate(-25deg);
+    white-space: nowrap;
+}
+
+/* Texture/Security layering */
+.certificate-paper::after {
+    content: "";
+    position: absolute;
+    inset: 4mm;
+    pointer-events: none;
+    border: 0.2mm solid rgba(184, 134, 11, 0.3);
+    /* Inner gold pinstripe */
+    background-image:
+        radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.01) 0%, transparent 5%),
+        radial-gradient(circle at 90% 90%, rgba(48, 145, 157, 0.01) 0%, transparent 5%);
+    background-size: 100px 100px;
+    z-index: 10;
+}
+
+/* ── Content Body ───────────────────────────────── */
+.cert-content {
+    position: relative;
+    z-index: 5;
+    height: 100%;
+    padding: 18mm 20mm;
+    /* Balanced padding */
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Header ── */
+.cert-header {
+    text-align: center;
+    margin-bottom: 8mm;
+    /* Drastically reduced from 15mm */
+}
+
+.institute-name {
+    font-family: 'Cinzel', serif;
+    font-size: 28pt;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #002147;
+    margin-bottom: 5mm;
+    /* Increased gap */
+    line-height: 1;
+}
+
+.credential-label {
+    font-size: 8.5pt;
+    /* Slightly larger */
+    font-weight: 700;
+    letter-spacing: 0.4em;
+    /* Increased spacing for premium look */
+    color: #b8860b;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+/* ── Main Titles ── */
+.cert-main-title {
+    text-align: center;
+    margin-bottom: 8mm;
+    /* Drastically reduced from 14mm */
+}
+
+.cert-main-title h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 28pt;
+    /* Reduced from 32pt */
+    font-weight: 700;
+    color: #002147;
+    line-height: 1.05;
+    margin-bottom: 3mm;
+    letter-spacing: -0.01em;
+}
+
+.cert-main-title .subtitle {
+    font-size: 10pt;
+    color: #4a5568;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+/* ── Recipient ── */
+.recipient-block {
+    text-align: center;
+    margin-bottom: 8mm;
+    /* Reduced from 12mm */
+}
+
+.this-certifies {
+    font-family: 'Inter', sans-serif;
+    font-size: 12pt;
+    color: #64748b;
+    font-style: italic;
+    margin-bottom: 6mm;
+    letter-spacing: 0.03em;
+}
+
+.recipient-name {
+    font-family: 'Cinzel', serif;
+    font-size: 34pt;
+    /* Reduced from 38pt */
+    font-weight: 700;
+    color: #000;
+    line-height: 1;
+    padding: 2mm 0;
+    display: inline-block;
+    min-width: 55%;
+    border-bottom: 1px solid rgba(0, 33, 71, 0.1);
+}
+
+/* ── Statement ── */
+.cert-statement {
+    text-align: center;
+    font-size: 10pt;
+    /* Slightly smaller */
+    line-height: 1.5;
+    color: #2d3748;
+    max-width: 92%;
+    margin: 0 auto 10mm;
+    /* Reduced from 16mm */
+    font-weight: 400;
+}
+
+.cert-statement strong {
+    color: #002147;
+}
+
+/* ── Skills Panel ── */
+.skills-panel {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 8mm;
+    /* Tighter gap */
+    margin-bottom: 12mm;
+    /* Reduced from 18mm */
+}
+
+.panel-title {
+    font-size: 9pt;
+    color: #002147;
+    margin-bottom: 4mm;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1pt solid #f1f5f9;
+    padding-bottom: 1.5mm;
+}
+
+.skills-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.skills-list li {
+    font-size: 9pt;
+    margin-bottom: 2.5pt;
+    /* Using pt for tighter vertical consistency */
+    color: #4a5568;
+    display: block;
+}
+
+
+
+.readiness-content {
+    background: #fcfdfe;
+    padding: 3.5mm;
+    border-radius: 1.5mm;
+    border: 1px solid #eef2f7;
+}
+
+.readiness-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5mm 0;
+    border-bottom: 0.5pt dashed #e2e8f0;
+}
+
+.readiness-stat:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-size: 7.5pt;
+    color: #94a3b8;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.stat-value {
+    font-size: 9pt;
+    color: #002147;
+    font-weight: 700;
+}
+
+.band {
+    color: #b8860b;
+}
+
+/* ── Footer ── */
+.cert-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 5mm;
+    border-top: 1px solid #f1f5f9;
+    /* Formal subtle separator */
+    padding-top: 10mm;
+    margin-top: auto;
+    /* Push to bottom naturally */
+}
+
+.signature-zone {
+    text-align: left;
+}
+
+.signature-line {
+    width: 240px;
+    height: 1pt;
+    background: #002147;
+    margin-bottom: 4mm;
+}
+
+.signature-name {
+    font-family: 'Cinzel', serif;
+    font-size: 13pt;
+    font-weight: 700;
+    color: #002147;
+    margin-bottom: 0.5mm;
+}
+
+.signature-title,
+.signature-org {
+    font-size: 9pt;
+    color: #64748b;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.issue-date {
+    font-size: 10pt;
+    color: #475569;
+    margin-top: 6mm;
+    font-weight: 600;
+    font-style: italic;
+}
+
+.verification-zone {
+    display: flex;
+    align-items: center;
+    gap: 6mm;
+    text-align: right;
+}
+
+.qr-code {
+    width: 28mm;
+    height: 28mm;
+    padding: 1.5mm;
+    background: white;
+    border: 1px solid #edf2f7;
+}
+
+.verify-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.verify-label {
+    font-size: 8pt;
+    color: #94a3b8;
+    margin-bottom: 1.5mm;
+    font-weight: 500;
+}
+
+.verify-url {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #002147;
+    margin-bottom: 2mm;
+}
+
+.cert-id-tag {
+    font-size: 8pt;
+    color: #64748b;
+    font-family: 'Inter', monospace;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* ── Legal Disclaimer ── */
+.legal-disclaimer {
+    text-align: center;
+    font-size: 7.5pt;
+    color: #94a3b8;
+    margin-top: 10mm;
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.8;
+}
+
+.teal-accent span {
+    color: #30919D;
+    font-weight: 700;
+}
+
+/* ── Print Overrides ── */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body,
+    .certificate-page-container {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .certificate-paper {
+        margin: 0 auto !important;
+        box-shadow: none !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        border: 0.5mm solid #002147 !important;
+        page-break-after: avoid;
+        page-break-before: avoid;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .cert-content {
+        border: none !important;
+    }
+
+    .cert-watermark-overlay {
+        opacity: 0.03 !important;
+    }
+}
