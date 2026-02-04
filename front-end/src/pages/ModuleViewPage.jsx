@@ -601,59 +601,41 @@ const ModuleViewPage = () => {
     return defaultDuration;
   };
 
+  const checkSessionCompletion = (mId, session) => {
+    if (!session) return false;
+    // Multi-step session
+    if (session.steps && session.steps.length > 0) {
+      const completedSteps = session.steps.filter(s => 
+        videoCompletionMap[`${mId}-${session.id}-${s.id}`] === true
+      ).length;
+      return completedSteps === session.steps.length;
+    }
+    // Legacy session with video
+    if (session.videoUrl) {
+      const key = `${mId}-${session.id}-1`;
+      return videoCompletionMap[key] === true;
+    }
+    // Empty session: If no stairs to climb, you're already at the top.
+    // We count empty sessions as done so they don't block progression.
+    return true;
+  };
+
   const isDayUnlocked = (moduleId, dayIndex, moduleObj) => {
     if (dayIndex === 0) return true; // First day always unlocked
     const mod = moduleObj || modules.find(m => m.id === moduleId);
     if (!mod || !mod.days) return false;
     
-    // Check previous day
-    const prevDay = mod.days[dayIndex - 1];
-    
-    // NEW: Check if ALL steps in previous day are complete
-    const prevDaySteps = prevDay.steps || [];
-    let allStepsComplete = true;
-    
-    if (prevDaySteps.length > 0) {
-      for (const step of prevDaySteps) {
-        const stepKey = `${moduleId}-${prevDay.id}-${step.id}`;
-        const stepMaxWatched = videoProgressMap[stepKey] || 0;
-        const stepDuration = videoDurationMap[stepKey] || 0;
-        const stepCompleted = videoCompletionMap[stepKey] === true;
-        
-        // Check if step is done (completed flag OR watched threshold)
-        const stepDone = stepCompleted || (stepDuration > 0 && (stepMaxWatched >= stepDuration - 5));
-        
-        // Debugging for Session Unlock issues
-        console.log(`[Progression] S${dayIndex} Step ${step.id}:`, { 
-          done: stepDone, 
-          completed: stepCompleted, 
-          watched: stepMaxWatched, 
-          duration: stepDuration 
-        });
-
-        if (!stepDone) {
-          allStepsComplete = false;
-          break;
-        }
+    // STRICT SEQUENTIAL LOCK: Current session is unlocked ONLY if 
+    // ALL previous sessions are completed.
+    for (let i = 0; i < dayIndex; i++) {
+      if (!checkSessionCompletion(moduleId, mod.days[i])) {
+        // Find if a previous session is not complete
+        console.log(`[Progression] S${dayIndex + 1} is LOCKED because S${i + 1} is incomplete.`);
+        return false;
       }
-    } else {
-      // Fallback for sessions without steps (legacy)
-      const prevKey = `${moduleId}-${prevDay.id}-1`;
-      const prevDayMaxWatched = videoProgressMap[prevKey] || 0;
-      const prevDayDuration = videoDurationMap[prevKey] || 0;
-      const isCompletedFlag = videoCompletionMap[prevKey] === true;
-      allStepsComplete = isCompletedFlag || (prevDayDuration > 0 && prevDayMaxWatched >= prevDayDuration - 5) || !prevDay.videoUrl;
     }
-
-    // Tasks are no longer required for progression (steps only)
-    const unlocked = allStepsComplete;
-
-    // Debug log for production-lite monitoring
-    if (dayIndex > 0 && !unlocked) {
-      console.log(`[Progression] Session ${dayIndex + 1} locked. Previous Session (${dayIndex}) incomplete.`);
-    }
-
-    return unlocked;
+    
+    return true;
   };
 
   // Show loading state while fetching modules
@@ -718,7 +700,9 @@ const ModuleViewPage = () => {
     }
 
     const completedCount = (day.steps || []).filter(s => videoCompletionMap[`${selectedModule}-${selectedDay}-${s.id}`]).length;
-    const progressPercent = Math.round((completedCount / (day.steps || []).length) * 100);
+    const progressPercent = (day.steps && day.steps.length > 0) 
+      ? Math.round((completedCount / day.steps.length) * 100) 
+      : 0;
 
     // Determine the default active step (first incomplete step, or last step if all complete)
     const defaultActiveStep = (day.steps || []).find((step, idx) => {
@@ -930,7 +914,7 @@ const ModuleViewPage = () => {
                       <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1 -mr-2">
                         {module.days.map((d, idx) => {
                           const isCurrent = d.id === day.id;
-                          const isCompletedDay = (d.steps || []).filter(s => videoCompletionMap[`${selectedModule}-${d.id}-${s.id}`]).length === (d.steps || []).length;
+                          const isCompletedDay = checkSessionCompletion(selectedModule, d);
                           const isDayUnlockedStatus = isDayUnlocked(selectedModule, idx, module);
 
                           return (
@@ -1074,8 +1058,7 @@ const ModuleViewPage = () => {
               {/* Day Cards Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {module.days.map((day, index) => {
-                  const dayCompletedCount = (day.steps || []).filter(s => videoCompletionMap[`${selectedModule}-${day.id}-${s.id}`]).length;
-                  const isDayCompleted = dayCompletedCount === (day.steps || []).length;
+                  const isDayCompleted = checkSessionCompletion(selectedModule, day);
                   const unlocked = isDayUnlocked(selectedModule, index, module);
 
                   return (
