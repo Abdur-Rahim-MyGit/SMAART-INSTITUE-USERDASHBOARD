@@ -46,6 +46,7 @@ const AdminTickets = lazy(() => import('@/pages/AdminTickets'));
 const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
+const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
 
 // Auth guard component
 import AssessmentFlowGuard from '@/components/AssessmentFlowGuard';
@@ -80,6 +81,8 @@ const AnimatedRoutes = () => {
                     <Route path="/institution/:id" element={<Institution />} />
                     <Route path="/verify-certificate" element={<VerifyCertificate />} />
                     <Route path="/verify-certificate/:certificateId" element={<VerifyCertificate />} />
+                    <Route path="/verify-badge" element={<VerifyBadge />} />
+                    <Route path="/verify-badge/:badgeId" element={<VerifyBadge />} />
 
                     {/* Signup Flow */}
                     <Route path="/signup-initial" element={<SignupInitial />} />

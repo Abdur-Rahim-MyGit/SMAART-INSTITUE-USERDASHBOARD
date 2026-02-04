@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Download, Award, CheckCircle2, ShieldCheck, Brain, Activity, Target, Users, Zap, Cpu, Scale } from 'lucide-react';
+import { Download, Award, CheckCircle2, ShieldCheck, Brain, Activity, Target, Users, Zap, Cpu, Scale, Trophy, Medal } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
+import { BadgeGallery } from "@/components/badges";
 import './Certificate.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -48,6 +49,7 @@ const skills = [
 const Certificate = () => {
     const certificateRef = useRef(null);
     const [selectedType, setSelectedType] = useState(null);
+    const [activeTab, setActiveTab] = useState('certificates'); // 'certificates' or 'badges'
     const [userData, setUserData] = useState({ fullName: 'Ms. Rehana Ameer', gender: 'Female' });
     const [issueDate] = useState(new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }));
     const [certId, setCertId] = useState('');
@@ -213,56 +215,111 @@ const Certificate = () => {
                 <div className="min-h-screen transition-all duration-300">
                     <DashboardHeader />
 
-                    <main className="w-full relative py-12 px-4 md:px-6 flex flex-col items-center justify-center min-h-[calc(100vh-80px)]">
-                        <div className="text-center mb-12">
+                    <main className="w-full relative py-12 px-4 md:px-6">
+                        {/* Header */}
+                        <div className="text-center mb-8">
                             <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#daa520] to-[#b8860b] flex items-center justify-center shadow-lg shadow-amber-500/20">
                                 <ShieldCheck className="w-10 h-10 text-[#002147]" />
                             </div>
-                            <h1 className="text-3xl font-bold text-[#002147] dark:text-white mb-3 tracking-tight">Professional Credentials</h1>
-                            <p className="text-slate-500 dark:text-slate-400 max-w-md">Access your verified SMAART Institute certifications</p>
+                            <h1 className="text-3xl font-bold text-[#002147] dark:text-white mb-3 tracking-tight">Credentials & Achievements</h1>
+                            <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Access your verified SMAART Institute certifications and badges</p>
                         </div>
 
-                        <div className="grid gap-4 w-full max-w-2xl">
-                            {certificateTypes.map((cert) => (
+                        {/* Tab Navigation */}
+                        <div className="flex justify-center mb-8">
+                            <div className="inline-flex bg-white dark:bg-slate-800 rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-slate-700">
                                 <button
-                                    key={cert.id}
-                                    onClick={() => setSelectedType(cert)}
-                                    className="group relative w-full p-6 rounded-2xl bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-slate-700 hover:border-[#30919D] dark:hover:border-[#30919D] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
+                                    onClick={() => setActiveTab('certificates')}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                                        activeTab === 'certificates'
+                                            ? 'bg-[#002147] text-white shadow-md'
+                                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                    }`}
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-[#30919D]/10 text-[#30919D] transition-colors">
-                                            <Award className="w-6 h-6" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-bold text-[#002147] dark:text-white">
-                                                {cert.title}
-                                            </h3>
-                                            <p className="text-slate-400 text-sm mt-0.5 flex items-center gap-1.5 font-medium">
-                                                <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                                                Verified Level 1 Credential
-                                            </p>
-                                        </div>
-                                        <div className="text-[#30919D] font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                                            VIEW SECURE <span className="text-lg">→</span>
-                                        </div>
-                                    </div>
+                                    <Award className="w-5 h-5" />
+                                    Certificates
                                 </button>
-                            ))}
+                                <button
+                                    onClick={() => setActiveTab('badges')}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                                        activeTab === 'badges'
+                                            ? 'bg-[#002147] text-white shadow-md'
+                                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                    }`}
+                                >
+                                    <Trophy className="w-5 h-5" />
+                                    Badges & Achievements
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Verify Certificate Link */}
-                        <div className="mt-8 text-center">
-                            <a
-                                href="/verify-certificate"
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#30919D] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#30919D] text-white font-bold shadow-lg hover:shadow-xl transition-all"
-                            >
-                                <ShieldCheck className="w-5 h-5" />
-                                Verify a Certificate
-                            </a>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
-                                Have a certificate ID? Verify its authenticity here
-                            </p>
-                        </div>
+                        {/* Certificates Tab */}
+                        {activeTab === 'certificates' && (
+                            <div className="flex flex-col items-center">
+                                <div className="grid gap-4 w-full max-w-2xl">
+                                    {certificateTypes.map((cert) => (
+                                        <button
+                                            key={cert.id}
+                                            onClick={() => setSelectedType(cert)}
+                                            className="group relative w-full p-6 rounded-2xl bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-slate-700 hover:border-[#30919D] dark:hover:border-[#30919D] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-[#30919D]/10 text-[#30919D] transition-colors">
+                                                    <Award className="w-6 h-6" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="text-lg font-bold text-[#002147] dark:text-white">
+                                                        {cert.title}
+                                                    </h3>
+                                                    <p className="text-slate-400 text-sm mt-0.5 flex items-center gap-1.5 font-medium">
+                                                        <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                                                        Verified Level 1 Credential
+                                                    </p>
+                                                </div>
+                                                <div className="text-[#30919D] font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                                    VIEW SECURE <span className="text-lg">→</span>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Verify Certificate Link */}
+                                <div className="mt-8 text-center">
+                                    <a
+                                        href="/verify-certificate"
+                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#30919D] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#30919D] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+                                    >
+                                        <ShieldCheck className="w-5 h-5" />
+                                        Verify a Certificate
+                                    </a>
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
+                                        Have a certificate ID? Verify its authenticity here
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Badges Tab */}
+                        {activeTab === 'badges' && (
+                            <div className="max-w-6xl mx-auto">
+                                <BadgeGallery userName={userData.fullName} />
+                                
+                                {/* Verify Badge Link */}
+                                <div className="mt-8 text-center">
+                                    <a
+                                        href="/verify-badge"
+                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#30919D] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#30919D] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+                                    >
+                                        <Medal className="w-5 h-5" />
+                                        Verify a Badge
+                                    </a>
+                                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
+                                        Have a badge ID? Verify its authenticity here
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </main>
                 </div>
             </div>
