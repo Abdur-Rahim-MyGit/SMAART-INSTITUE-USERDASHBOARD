@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Award, Target, X, Lock, CheckCircle2 } from "lucide-react";
+import { Award, Target, X, Lock, CheckCircle2, Download } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import AssessmentBanner from "@/components/AssessmentBanner";
 import { assessmentApi } from "@/services/assessmentApi";
+import { generateAssessmentReport } from "@/utils/reportGenerator";
 
 // Theme colors: Navy (#002147), Teal (#30919D), White
 const THEME = {
@@ -35,6 +36,7 @@ const MyAssessments = () => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFirstLogin, setIsFirstLogin] = useState(false);
   const [userName, setUserName] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
 
   const [baseLineAssessmentDetails, setBaseLineAssessmentDetails] = useState(null);
 
@@ -63,6 +65,7 @@ const MyAssessments = () => {
       try {
         const user = JSON.parse(userData);
         setUserName(user.fullName || "");
+        setCurrentUser(user);
       } catch (e) {
         console.error("Error parsing user data:", e);
       }
@@ -137,9 +140,14 @@ const MyAssessments = () => {
 
           if (baseLineRes.success && baseLineRes.data) {
              newResults.baseline = {
+                // Keep backward compatible fields just in case
                 score: baseLineRes.data.score || 0,
                 totalScore: baseLineRes.data.totalScore || 300,
-                percentage: baseLineRes.data.percentage || 0
+                percentage: baseLineRes.data.percentage || 0,
+                // Add full report data
+                baselineScore: baseLineRes.data.baselineScore,
+                stageBand: baseLineRes.data.stageBand,
+                t1Profile: baseLineRes.data.t1Profile
              };
           } else {
              newResults.baseline = null;
@@ -329,12 +337,12 @@ const MyAssessments = () => {
                       <div className="p-3 rounded-lg border border-cyan-400/50 text-cyan-400 bg-transparent">
                         <selectedAssessment.icon className="w-6 h-6" />
                       </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-[#002147]">{selectedAssessment.title}</h2>
+                       <div>
+                        <h2 className="text-2xl font-bold text-white">{selectedAssessment.title}</h2>
                         <p className="text-cyan-400/70 text-sm">Detailed Results</p>
                       </div>
                     </div>
-                    <button onClick={() => setSelectedAssessment(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-[#002147]">
+                    <button onClick={() => setSelectedAssessment(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
                       <X className="w-6 h-6" />
                     </button>
                   </div>
@@ -343,16 +351,23 @@ const MyAssessments = () => {
                      {selectedAssessment.id === 'baseline' && selectedAssessment.data && (
                         <div className="space-y-6">
                           <div className="p-8 rounded-xl bg-gradient-to-b from-[#002845] to-[#001730] border border-cyan-500/30 text-center">
-                            <h3 className="text-cyan-400/80 uppercase tracking-wider text-sm font-bold mb-2">Total Score</h3>
-                            <div className="text-6xl font-bold text-[#002147] mb-4">
-                              {selectedAssessment.data.score} <span className="text-2xl font-normal text-gray-500">/ {selectedAssessment.data.totalScore}</span>
-                            </div>
-                            <div className="inline-block px-4 py-1 rounded-full bg-cyan-950/50 text-cyan-300 font-medium text-sm border border-cyan-500/30 backdrop-blur-md">
-                              {selectedAssessment.data.percentage}% Accuracy
+                            <h3 className="text-cyan-400/80 uppercase tracking-wider text-sm font-bold mb-4">Readiness Profile</h3>
+                            <div className="inline-block px-8 py-3 rounded-full bg-cyan-500/10 text-cyan-400 font-bold text-lg border border-cyan-500/30 backdrop-blur-md uppercase tracking-widest">
+                              Current Band: {selectedAssessment.data.stageBand || 'Emerging'}
                             </div>
                           </div>
+
+                          {/* DOWNLOAD REPORT BUTTON */}
+                          <button
+                            onClick={() => generateAssessmentReport(currentUser, selectedAssessment.data)}
+                            className="w-full py-4 mt-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:translate-y-[-2px] hover:shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/30"
+                          >
+                            <Download className="w-5 h-5" />
+                            Download Detailed PDF Report
+                          </button>
+
                           <div className="bg-[#001e3c] p-6 rounded-xl border border-white/10">
-                             <h4 className="text-lg font-bold text-[#002147] mb-3">Assessment Summary</h4>
+                             <h4 className="text-lg font-bold text-white mb-3">Assessment Summary</h4>
                              <p className="text-gray-300">You have completed the Base Line Test - T1. This assessment measures your fundamental understanding and provides a baseline for your growth journey.</p>
                           </div>
                         </div>

@@ -56,7 +56,7 @@ const DashboardSidebar = () => {
   return (
     <>
       {/* Top Navigation Bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 shadow-sm transition-all duration-300">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#002147]/90 backdrop-blur-2xl border-b border-gray-100/50 dark:border-white/10 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] transition-all duration-300">
         <div className="flex items-center justify-between px-6 lg:px-10 h-16">
           {/* Left: Logo, Skills Passport & Mobile Menu */}
           <div className="flex items-center gap-2">
@@ -70,7 +70,7 @@ const DashboardSidebar = () => {
 
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#002147] to-[#30919D] shadow-lg group-hover:scale-105 transition-transform duration-300">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#002147] to-[#30919D] shadow-[0_4px_15px_-3px_rgba(48,145,157,0.4)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
                 <span className="font-bold text-lg text-white">S</span>
               </div>
               <span className="font-bold text-xl tracking-tight text-[#002147] dark:text-white hidden md:block">
@@ -88,9 +88,9 @@ const DashboardSidebar = () => {
           <div className="flex items-center gap-4">
 
             {/* Notification Badge */}
-            <button className="p-2 mr-1 rounded-full text-gray-400 hover:text-[#30919D] hover:bg-[#30919D]/5 transition-all relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#002147]" />
+            <button className="p-2 mr-1 rounded-full text-gray-400 hover:text-[#30919D] hover:bg-[#30919D]/5 transition-all relative group/nav">
+              <Bell className="w-5 h-5 group-hover/nav:animate-bounce" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#002147] shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
             </button>
 
             {/* Profile */}
