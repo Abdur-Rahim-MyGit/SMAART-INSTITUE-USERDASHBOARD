@@ -113,6 +113,23 @@ const daySchema = new mongoose.Schema({
     duration: Number, // in minutes
     transcription: String
   },
+  VideoContent: [{
+    videoUrl: String,
+    title: String,
+    description: String,
+    duration: Number,
+    transcription: String
+  }],
+  steps: [{
+    stepNumber: Number,
+    title: String,
+    type: {
+      type: String,
+      enum: ['video', 'quiz', 'text', 'assignment', 'reflection', 'flashcards', 'assessment']
+    },
+    content: mongoose.Schema.Types.Mixed,
+    isRequired: { type: Boolean, default: true }
+  }],
   keyTakeaways: [String],
   status: {
     type: String,
