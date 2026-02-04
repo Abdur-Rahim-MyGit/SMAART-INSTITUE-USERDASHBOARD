@@ -1,0 +1,94 @@
+{"level":"info","message":"🚀 Server running on http://localhost:5000","service":"smaart-minds-api","timestamp":"2026-01-24 20:56:53"}
+{"level":"info","message":"📱 Mobile access available on local network","service":"smaart-minds-api","timestamp":"2026-01-24 20:56:53"}
+{"level":"info","message":"Environment: development","service":"smaart-minds-api","timestamp":"2026-01-24 20:56:53"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-24 20:56:53"}
+{"level":"info","message":"🚀 Server running on http://localhost:5000","service":"smaart-minds-api","timestamp":"2026-01-25 16:58:33"}
+{"level":"info","message":"📱 Mobile access available on local network","service":"smaart-minds-api","timestamp":"2026-01-25 16:58:33"}
+{"level":"info","message":"Environment: development","service":"smaart-minds-api","timestamp":"2026-01-25 16:58:33"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 16:58:34"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"╔══════════════════════════════════════════════════════════╗","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"║                   SMAART MINDS SERVER                    ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"╠══════════════════════════════════════════════════════════╣","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"║  🚀 Status:   Online                                     ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"║  🔌 Port:     5001                                       ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"║  🏠 Local:    http://localhost:5001                      ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"║  📱 Network:  On your local network IP                   ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"║  🌍 Mode:     development                        ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"╚══════════════════════════════════════════════════════════╝","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:07"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:02:09"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"╔══════════════════════════════════════════════════════════╗","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"║                   SMAART MINDS SERVER                    ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"╠══════════════════════════════════════════════════════════╣","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"║  🚀 Status:   Online                                     ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"║  🔌 Port:     5000                                       ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"║  🏠 Local:    http://localhost:5000                      ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"║  📱 Network:  On your local network IP                   ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"║  🌍 Mode:     development                        ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"╚══════════════════════════════════════════════════════════╝","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:37"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:07:39"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"╔══════════════════════════════════════════════════════════╗","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"║                   SMAART MINDS SERVER                    ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"╠══════════════════════════════════════════════════════════╣","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"║  🚀 Status:   Online                                     ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"║  🔌 Port:     5000                                       ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"║  🏠 Local:    http://localhost:5000                      ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"║  📱 Network:  On your local network IP                   ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"║  🌍 Mode:     development                        ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"╚══════════════════════════════════════════════════════════╝","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:11"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:12"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"╔══════════════════════════════════════════════════════════╗","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"║                   SMAART MINDS SERVER                    ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"╠══════════════════════════════════════════════════════════╣","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"║  🚀 Status:   Online                                     ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"║  🔌 Port:     5000                                       ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"║  🏠 Local:    http://localhost:5000                      ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"║  📱 Network:  On your local network IP                   ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"║  🌍 Mode:     development                        ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"╚══════════════════════════════════════════════════════════╝","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:50"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:09:51"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"╔══════════════════════════════════════════════════════════╗","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"║                   SMAART MINDS SERVER                    ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"╠══════════════════════════════════════════════════════════╣","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"║  🚀 Status:   Online                                     ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"║  🔌 Port:     5001                                       ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"║  🏠 Local:    http://localhost:5001                      ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"║  📱 Network:  On your local network IP                   ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"║  🌍 Mode:     development                        ║","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"╚══════════════════════════════════════════════════════════╝","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:31"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:10:33"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:11:54"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:12:45"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-01-25 17:16:34"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:16:35"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-01-25 17:17:26"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:17:27"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:19:06"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:21:07"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-01-25 17:24:27"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:24:28"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-01-25 17:24:49"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:24:49"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 17:26:11"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-25 19:22:59"}
+{"ip":"127.0.0.1","level":"error","message":"Request Timeout","method":"POST","service":"smaart-minds-api","timestamp":"2026-01-25 21:48:22","url":"/api/upload"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-26 22:24:29"}
+{"level":"warn","message":"Route / not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-01-26 22:24:45","url":"/"}
+{"level":"warn","message":"Route /favicon.ico not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-01-26 22:24:45","url":"/favicon.ico"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-26 22:25:55"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-27 11:44:16"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-27 13:19:05"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-27 13:30:29"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-01-28 15:44:04"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-03 11:05:21"}
