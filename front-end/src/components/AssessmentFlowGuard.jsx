@@ -1,0 +1,248 @@
+import { useState, useEffect, useCallback } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { assessmentApi } from "@/services/assessmentApi";
+import { Loader2 } from "lucide-react";
+import DashboardLoader from "@/components/DashboardLoader";
+
+/**
+ * AssessmentFlowGuard component
+ * Enforces authentication AND a strict order of assessments before allowing access to the dashboard.
+ * Order: Big5 -> VAK -> EQ -> CQ -> ARQ -> AIQ -> SQ
+ * 
+ * Developer bypass: Set sessionStorage.setItem('devSkipAssessments', 'true') to skip
+ */
+const AssessmentFlowGuard = ({ children }) => {
+  const [loading, setLoading] = useState(true);
+  const [nextPath, setNextPath] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [showDevSkip, setShowDevSkip] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Configuration for assessment order - Only Base Line Test required
+  const assessmentOrder = [
+    { code: "ASM00001", path: "/dashboard/assessments/baseline", key: "baseline" }
+  ];
+
+  const LOCK_DURATION = 60 * 1000; // 1 minute in milliseconds
+
+  // Check for developer bypass flag
+  const isDevBypass = () => {
+    return sessionStorage.getItem('devSkipAssessments') === 'true';
+  };
+
+  // Auth check function - can be called on visibility change
+  const checkAuth = useCallback(() => {
+    const userData = sessionStorage.getItem("user");
+    if (!userData) {
+      setIsAuthenticated(false);
+      navigate("/", { replace: true });
+      return false;
+    }
+    return true;
+  }, [navigate]);
+
+  // Listen for page visibility changes (catches back button from cached pages)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkAuth();
+      }
+    };
+
+    // Also check on popstate (back/forward button)
+    const handlePopState = () => {
+      checkAuth();
+    };
+
+    // Check on page show (bfcache restore)
+    const handlePageShow = (event) => {
+      if (event.persisted) {
+        checkAuth();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('pageshow', handlePageShow);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [checkAuth]);
+
+  // Cache assessment data in state so we don't re-fetch on every route change
+  const [assessmentData, setAssessmentData] = useState(null);
+  const [splashComplete, setSplashComplete] = useState(false);
+
+  // Initial Data Fetch - Runs once on mount
+  useEffect(() => {
+    const fetchAssessmentData = async () => {
+      try {
+        if (isDevBypass()) {
+          setAssessmentData({ skipped: true });
+          setLoading(false);
+          return;
+        }
+
+        const userData = sessionStorage.getItem("user");
+        if (!userData) {
+          setLoading(false);
+          return;
+        }
+
+        const parsedUser = JSON.parse(userData);
+        const userId = parsedUser.id || parsedUser._id;
+
+        // NEW: Check if registration is completed
+        // If user is a STUDENT and has NOT completed registration, force redirect
+        if (parsedUser.role === 'student' && !parsedUser.hasRegistration) {
+          // Allow access ONLY to registration pages
+          const isRegistrationPage = location.pathname === '/complete-registration' ||
+            location.pathname === '/signup' ||
+            location.pathname === '/signup-initial';
+
+          if (!isRegistrationPage) {
+            console.log("Redirecting to completion registration");
+            navigate('/complete-registration', { replace: true });
+            return;
+          }
+        }
+
+        // Skip for non-students
+        if (parsedUser.role !== 'student') {
+          setAssessmentData({ skipped: true });
+          setLoading(false);
+          return;
+        }
+
+        // Fetch data
+        const [userResultsResponse, baseLineRes] = await Promise.all([
+          assessmentApi.getUserResults(userId, 'completed'),
+          assessmentApi.getBaseLineResults(userId).catch(() => ({ success: false }))
+        ]);
+
+        const completedMap = {};
+        if (baseLineRes.success && baseLineRes.data) {
+          completedMap.baseline = {
+            status: true,
+            startedAt: baseLineRes.data.createdAt ? new Date(baseLineRes.data.createdAt) : null,
+            submittedAt: baseLineRes.data.createdAt ? new Date(baseLineRes.data.createdAt) : null
+          };
+        }
+
+        setAssessmentData(completedMap);
+      } catch (err) {
+        console.error("Error fetching assessment data:", err);
+        // On error, allow access to prevent blocking
+        setAssessmentData({ error: true });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAssessmentData();
+  }, [location.pathname]); // Re-run on route change to check registration status
+
+
+  // Logic to determine redirection based on location and cached data
+  useEffect(() => {
+    if (!assessmentData) return; // Wait for data
+
+    if (assessmentData.skipped || assessmentData.error) {
+      setNextPath(null);
+      return;
+    }
+
+    // Determine next path
+    let requiredPath = null;
+    let isLocked = false;
+    const nextAssessmentIndex = assessmentOrder.findIndex(item => !assessmentData[item.key]);
+
+    if (nextAssessmentIndex !== -1) {
+      const nextAssessment = assessmentOrder[nextAssessmentIndex];
+      const isVisitingAssessment = assessmentOrder.some(a => location.pathname.startsWith(a.path));
+
+      // Strict enforcement: User must complete this assessment before accessing anything else
+      requiredPath = nextAssessment.path;
+    }
+
+    setNextPath(requiredPath);
+
+  }, [location.pathname, assessmentData]);
+
+
+  // Developer skip handler
+  const handleDevSkip = () => {
+    sessionStorage.setItem('devSkipAssessments', 'true');
+    console.log('🚀 DEV SKIP: Assessment flow bypassed');
+    setNextPath(null);
+    setShowDevSkip(false);
+    navigate('/dashboard', { replace: true });
+  };
+
+  // Combine initial loading state with splash screen duration
+  if (loading || !splashComplete) {
+    return (
+      <>
+        {!splashComplete && <DashboardLoader onComplete={() => setSplashComplete(true)} />}
+
+        {/* Fallback loader if splash finishes but data is still fetching */}
+        {splashComplete && loading && (
+          <div className="flex flex-col items-center justify-center min-h-screen bg-[#001229]">
+            <div className="flex items-center">
+              <Loader2 className="w-12 h-12 text-[#30919D] animate-spin" />
+              <p className="ml-4 text-white font-medium">Finalizing setup...</p>
+            </div>
+            {/* Developer Skip Button */}
+            <button
+              onClick={handleDevSkip}
+              className="mt-8 text-[10px] text-white/30 hover:text-white/60 uppercase tracking-widest font-bold transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded"
+            >
+              ⚡ DEV: Skip to Dashboard
+            </button>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  // If there's a required assessment path
+  if (nextPath) {
+    // If we are NOT currently at the required path, redirect
+    if (location.pathname !== nextPath) {
+      // Show dev skip option before redirecting
+      if (showDevSkip) {
+        return (
+          <div className="flex flex-col items-center justify-center min-h-screen bg-[#001229]">
+            <p className="text-white font-medium mb-4">Redirecting to required assessment...</p>
+            <p className="text-white/60 text-sm mb-6">Next: {nextPath}</p>
+            {/* Developer Skip Button */}
+            <button
+              onClick={handleDevSkip}
+              className="text-xs text-white/40 hover:text-white bg-white/5 hover:bg-white/10 px-6 py-3 rounded-lg uppercase tracking-widest font-bold transition-colors border border-white/10"
+            >
+              ⚡ DEV: Skip All Assessments
+            </button>
+            {/* Auto redirect after a short delay if not skipped */}
+            <Navigate to={nextPath} replace />
+          </div>
+        );
+      }
+      return <Navigate to={nextPath} replace />;
+    }
+  }
+
+  // If NOT authenticated (logged out user pressing back button), redirect to login
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  // If no required path (all done) OR we are already at the required path, render children
+  return children;
+};
+
+export default AssessmentFlowGuard;
+

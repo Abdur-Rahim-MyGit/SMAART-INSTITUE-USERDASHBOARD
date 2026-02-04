@@ -1,0 +1,525 @@
+const express = require('express');
+const { body, validationResult, query, param } = require('express-validator');
+const rateLimit = require('express-rate-limit');
+const SupportTicket = require('../models/SupportTicket');
+const { protect, authorize } = require('../middleware/auth');
+const upload = require('../middleware/upload');
+
+const router = express.Router();
+
+// Rate limiter for ticket creation (10 tickets per user per hour)
+// Note: This limiter is applied AFTER the protect middleware, so req.user will always be available
+const ticketCreationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10,
+  message: {
+    success: false,
+    error: 'Too many tickets created. Please try again after an hour.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  // keyGenerator: (req) => req.user?._id?.toString(), // keyGenerator causing validation error in v8
+  validate: {
+    xForwardedForHeader: false,
+  }
+});
+
+// Validation middleware
+const ticketValidation = [
+  body('title')
+    .trim()
+    .isLength({ min: 5, max: 100 })
+    .withMessage('Title must be between 5 and 100 characters'),
+  body('description')
+    .trim()
+    .isLength({ min: 10, max: 2000 })
+    .withMessage('Description must be between 10 and 2000 characters'),
+  body('category')
+    .isIn(['technical', 'billing', 'account', 'content', 'feedback', 'other'])
+    .withMessage('Invalid category'),
+  body('priority')
+    .optional()
+    .isIn(['low', 'medium', 'high'])
+    .withMessage('Invalid priority')
+];
+
+const responseValidation = [
+  body('message')
+    .trim()
+    .isLength({ min: 1, max: 1000 })
+    .withMessage('Response message must be between 1 and 1000 characters')
+];
+
+// Helper function to handle validation errors
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      success: false,
+      error: 'Validation failed',
+      details: errors.array()
+    });
+  }
+  next();
+};
+
+/**
+ * @route   POST /api/tickets
+ * @desc    Create a new support ticket
+ * @access  Private (Authenticated users)
+ */
+router.post('/',
+  protect,
+  ticketCreationLimiter,
+  upload.array('attachments', 3), // Max 3 attachments
+  ticketValidation,
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { title, description, category, priority } = req.body;
+
+      // Process uploaded files
+      const attachments = req.files ? req.files.map(file => ({
+        filename: file.filename,
+        originalName: file.originalname,
+        path: file.path,
+        mimetype: file.mimetype,
+        size: file.size
+      })) : [];
+
+      const ticket = new SupportTicket({
+        userId: req.user._id,
+        title,
+        description,
+        category,
+        priority: priority || 'medium',
+        attachments
+      });
+
+      await ticket.save();
+
+      // Populate user info for response
+      await ticket.populate('userId', 'fullName email userId');
+
+      res.status(201).json({
+        success: true,
+        message: 'Ticket created successfully',
+        data: ticket
+      });
+    } catch (error) {
+      console.error('Error creating ticket:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create ticket',
+        message: error.message
+      });
+    }
+  }
+);
+
+/**
+ * @route   GET /api/tickets
+ * @desc    Get all tickets for the authenticated user
+ * @access  Private (Authenticated users)
+ */
+router.get('/',
+  protect,
+  async (req, res) => {
+    try {
+      const { status, priority, category, page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
+
+      // Build query
+      const query = { userId: req.user._id };
+      if (status) query.status = status;
+      if (priority) query.priority = priority;
+      if (category) query.category = category;
+
+      // Pagination
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+      const sortOptions = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
+
+      const [tickets, total] = await Promise.all([
+        SupportTicket.find(query)
+          .sort(sortOptions)
+          .skip(skip)
+          .limit(parseInt(limit))
+          .select('-__v'),
+        SupportTicket.countDocuments(query)
+      ]);
+
+      res.json({
+        success: true,
+        data: tickets,
+        pagination: {
+          total,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          totalPages: Math.ceil(total / parseInt(limit))
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch tickets',
+        message: error.message
+      });
+    }
+  }
+);
+
+/**
+ * @route   GET /api/tickets/all
+ * @desc    Get all tickets (Admin only)
+ * @access  Private (Admin)
+ */
+router.get('/all',
+  protect,
+  authorize('admin'),
+  async (req, res) => {
+    try {
+      const {
+        status,
+        priority,
+        category,
+        search,
+        userId,
+        page = 1,
+        limit = 20,
+        sortBy = 'createdAt',
+        sortOrder = 'desc'
+      } = req.query;
+
+      // Build query
+      const query = {};
+      if (status) query.status = status;
+      if (priority) query.priority = priority;
+      if (category) query.category = category;
+      if (userId) query.userId = userId;
+
+      // Search by ticketId or title
+      if (search) {
+        query.$or = [
+          { ticketId: { $regex: search, $options: 'i' } },
+          { title: { $regex: search, $options: 'i' } }
+        ];
+      }
+
+      // Pagination
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+      const sortOptions = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
+
+      const [tickets, total, stats] = await Promise.all([
+        SupportTicket.find(query)
+          .populate('userId', 'fullName email userId profileImage')
+          .sort(sortOptions)
+          .skip(skip)
+          .limit(parseInt(limit))
+          .select('-__v'),
+        SupportTicket.countDocuments(query),
+        SupportTicket.aggregate([
+          {
+            $group: {
+              _id: '$status',
+              count: { $sum: 1 }
+            }
+          }
+        ])
+      ]);
+
+      // Format stats
+      const statusCounts = {
+        open: 0,
+        'in-progress': 0,
+        resolved: 0,
+        closed: 0
+      };
+      stats.forEach(s => {
+        statusCounts[s._id] = s.count;
+      });
+
+      res.json({
+        success: true,
+        data: tickets,
+        stats: statusCounts,
+        pagination: {
+          total,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          totalPages: Math.ceil(total / parseInt(limit))
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching all tickets:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch tickets',
+        message: error.message
+      });
+    }
+  }
+);
+
+/**
+ * @route   GET /api/tickets/:id
+ * @desc    Get a specific ticket by ID
+ * @access  Private (Owner or Admin)
+ */
+router.get('/:id',
+  protect,
+  async (req, res) => {
+    try {
+      const ticket = await SupportTicket.findById(req.params.id)
+        .populate('userId', 'fullName email userId profileImage')
+        .populate('responses.respondedBy', 'fullName email role');
+
+      if (!ticket) {
+        return res.status(404).json({
+          success: false,
+          error: 'Ticket not found'
+        });
+      }
+
+      // Check if user is owner or admin
+      const isOwner = ticket.userId._id.toString() === req.user._id.toString();
+      const isAdmin = req.user.role === 'admin';
+
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({
+          success: false,
+          error: 'Not authorized to view this ticket'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: ticket
+      });
+    } catch (error) {
+      console.error('Error fetching ticket:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch ticket',
+        message: error.message
+      });
+    }
+  }
+);
+
+/**
+ * @route   PUT /api/tickets/:id
+ * @desc    Update ticket status or add response (Admin only)
+ * @access  Private (Admin)
+ */
+router.put('/:id',
+  protect,
+  authorize('admin'),
+  async (req, res) => {
+    try {
+      const { status, response } = req.body;
+
+      const ticket = await SupportTicket.findById(req.params.id);
+
+      if (!ticket) {
+        return res.status(404).json({
+          success: false,
+          error: 'Ticket not found'
+        });
+      }
+
+      // Update status if provided
+      if (status && ['open', 'in-progress', 'resolved', 'closed'].includes(status)) {
+        ticket.status = status;
+      }
+
+      // Add response if provided
+      if (response && response.trim().length > 0) {
+        ticket.responses.push({
+          message: response.trim(),
+          respondedBy: req.user._id,
+          respondedAt: new Date()
+        });
+
+        // Auto-update status to in-progress if still open
+        if (ticket.status === 'open') {
+          ticket.status = 'in-progress';
+        }
+      }
+
+      await ticket.save();
+
+      // Populate for response
+      await ticket.populate([
+        { path: 'userId', select: 'fullName email userId profileImage' },
+        { path: 'responses.respondedBy', select: 'fullName email role' }
+      ]);
+
+      res.json({
+        success: true,
+        message: 'Ticket updated successfully',
+        data: ticket
+      });
+    } catch (error) {
+      console.error('Error updating ticket:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update ticket',
+        message: error.message
+      });
+    }
+  }
+);
+
+/**
+ * @route   POST /api/tickets/:id/response
+ * @desc    Add a response to ticket (Admin only)
+ * @access  Private (Admin)
+ */
+router.post('/:id/response',
+  protect,
+  authorize('admin'),
+  responseValidation,
+  handleValidationErrors,
+  async (req, res) => {
+    try {
+      const { message } = req.body;
+
+      const ticket = await SupportTicket.findById(req.params.id);
+
+      if (!ticket) {
+        return res.status(404).json({
+          success: false,
+          error: 'Ticket not found'
+        });
+      }
+
+      ticket.responses.push({
+        message: message.trim(),
+        respondedBy: req.user._id,
+        respondedAt: new Date()
+      });
+
+      // Auto-update status to in-progress if still open
+      if (ticket.status === 'open') {
+        ticket.status = 'in-progress';
+      }
+
+      await ticket.save();
+
+      // Populate for response
+      await ticket.populate([
+        { path: 'userId', select: 'fullName email userId profileImage' },
+        { path: 'responses.respondedBy', select: 'fullName email role' }
+      ]);
+
+      res.json({
+        success: true,
+        message: 'Response added successfully',
+        data: ticket
+      });
+    } catch (error) {
+      console.error('Error adding response:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to add response',
+        message: error.message
+      });
+    }
+  }
+);
+
+/**
+ * @route   DELETE /api/tickets/:id
+ * @desc    Delete a ticket (Admin only)
+ * @access  Private (Admin)
+ */
+router.delete('/:id',
+  protect,
+  authorize('admin'),
+  async (req, res) => {
+    try {
+      const ticket = await SupportTicket.findByIdAndDelete(req.params.id);
+
+      if (!ticket) {
+        return res.status(404).json({
+          success: false,
+          error: 'Ticket not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Ticket deleted successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting ticket:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete ticket',
+        message: error.message
+      });
+    }
+  }
+);
+
+/**
+ * @route   GET /api/tickets/stats/summary
+ * @desc    Get ticket statistics (Admin only)
+ * @access  Private (Admin)
+ */
+router.get('/stats/summary',
+  protect,
+  authorize('admin'),
+  async (req, res) => {
+    try {
+      const [statusStats, priorityStats, categoryStats, recentActivity] = await Promise.all([
+        // Status breakdown
+        SupportTicket.aggregate([
+          { $group: { _id: '$status', count: { $sum: 1 } } }
+        ]),
+        // Priority breakdown
+        SupportTicket.aggregate([
+          { $group: { _id: '$priority', count: { $sum: 1 } } }
+        ]),
+        // Category breakdown
+        SupportTicket.aggregate([
+          { $group: { _id: '$category', count: { $sum: 1 } } }
+        ]),
+        // Recent tickets (last 7 days)
+        SupportTicket.aggregate([
+          {
+            $match: {
+              createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+            }
+          },
+          {
+            $group: {
+              _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { _id: 1 } }
+        ])
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          byStatus: statusStats,
+          byPriority: priorityStats,
+          byCategory: categoryStats,
+          recentActivity
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch statistics',
+        message: error.message
+      });
+    }
+  }
+);
+
+module.exports = router;
