@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Lock, Mail, ArrowRight, Building2, Loader2 } from "lucide-react";
+import { Lock, Mail, ArrowRight, Building2, Loader2, Eye, EyeOff } from "lucide-react";
 import InstitutionSelector from "./InstitutionSelector";
 import { API_BASE_URL, apiCall } from "@/services/api";
 import LoginOtpModal from "./auth/LoginOtpModal";
@@ -22,6 +22,7 @@ const LoginCard = () => {
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Signup form state
   const [signupName, setSignupName] = useState("");
@@ -397,15 +398,27 @@ const LoginCard = () => {
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#30919D] transition-colors" aria-hidden="true" />
               <Input
                 id="login-password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••••••"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
                 aria-required="true"
                 autoComplete="current-password"
-                className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 focus:border-[#30919D] focus:ring-4 focus:ring-[#30919D]/10 text-[#002147] dark:text-white pl-11 h-12 rounded-xl transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 font-medium text-sm"
+                className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 focus:border-[#30919D] focus:ring-4 focus:ring-[#30919D]/10 text-[#002147] dark:text-white pl-11 pr-11 h-12 rounded-xl transition-all placeholder:text-gray-400 dark:placeholder:text-gray-600 font-medium text-sm"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#30919D] transition-colors focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </motion.div>
 

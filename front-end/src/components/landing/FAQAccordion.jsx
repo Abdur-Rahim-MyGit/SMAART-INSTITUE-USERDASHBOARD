@@ -6,11 +6,11 @@ const FAQAccordion = () => {
   const faqs = [
     {
       question: "What is the SMAART Score?",
-      answer: "The SMAART Score is a composite metric derived from our 8-Quotient assessment framework. It provides a holistic view of a student's capabilities, combining cognitive intelligence (IQ), emotional intelligence (EQ), and other key performance indicators."
+      answer: "The SMAART Score is a composite metric derived from our T1 Baseline Assessment. It provides a holistic view of a student's capabilities across 6 key career readiness dimensions."
     },
     {
-      question: "How do I unlock the ICAS Passport?",
-      answer: "To unlock your ICAS Passport, you need to complete the mandatory assessments (Big 5, VAK, EQ) and finish your personalized learning pathway. Once verified, your passport is automatically generated."
+      question: "How do I unlock the Skills Passport?",
+      answer: "To unlock your Skills Passport, you need to complete the mandatory T1 Baseline Assessment and finish your personalized learning pathway. Once verified, your passport is automatically generated."
     },
     {
       question: "Is SMAART Minds free for students?",

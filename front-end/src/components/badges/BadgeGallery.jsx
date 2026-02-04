@@ -3,96 +3,8 @@ import { motion } from 'framer-motion';
 import { FaTrophy, FaStar, FaFire, FaMedal, FaCrown, FaChartLine, FaFilter } from 'react-icons/fa';
 import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
-
-// Sample badge data - In production, this would come from your API
-const sampleBadges = [
-    {
-        id: 'BADGE-CRQ-2026-001',
-        title: 'Cognitive Champion',
-        description: 'Mastered cognitive reasoning assessments with exceptional performance',
-        tier: 'gold',
-        xp: 500,
-        percentile: 5,
-        category: 'assessment',
-        earnedDate: '2026-01-15',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-EQ-2026-002',
-        title: 'Emotional Intelligence Master',
-        description: 'Demonstrated outstanding emotional quotient skills',
-        tier: 'silver',
-        xp: 350,
-        percentile: 15,
-        category: 'assessment',
-        earnedDate: '2026-01-20',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-LRN-2026-003',
-        title: 'Quick Learner',
-        description: 'Completed 5 courses in record time',
-        tier: 'bronze',
-        xp: 200,
-        percentile: 25,
-        category: 'learning',
-        earnedDate: '2026-01-10',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-SOC-2026-004',
-        title: 'Community Leader',
-        description: 'Actively contributed to community discussions',
-        tier: 'silver',
-        xp: 300,
-        percentile: 20,
-        category: 'community',
-        earnedDate: '2026-01-25',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-STREAK-2026-005',
-        title: '30-Day Streak',
-        description: 'Maintained a 30-day learning streak',
-        tier: 'gold',
-        xp: 450,
-        percentile: 10,
-        category: 'streak',
-        earnedDate: '2026-02-01',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-PRO-2026-006',
-        title: 'Professional Ready',
-        description: 'Completed all professional readiness assessments',
-        tier: 'gold',
-        xp: 600,
-        percentile: 3,
-        category: 'certification',
-        isEarned: false,
-    },
-    {
-        id: 'BADGE-AI-2026-007',
-        title: 'AI Literacy Pioneer',
-        description: 'Demonstrated advanced AI & Digital literacy',
-        tier: 'bronze',
-        xp: 250,
-        percentile: 30,
-        category: 'assessment',
-        earnedDate: '2026-01-28',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-ETHICS-2026-008',
-        title: 'Ethics Guardian',
-        description: 'Mastered ethical and sustainability judgement assessments',
-        tier: 'silver',
-        xp: 350,
-        percentile: 15,
-        category: 'assessment',
-        isEarned: false,
-    },
-];
+import { API_BASE_URL } from '@/services/api';
+import { Loader2 } from 'lucide-react';
 
 const categories = [
     { id: 'all', label: 'All Badges', icon: FaTrophy },
@@ -103,11 +15,52 @@ const categories = [
     { id: 'certification', label: 'Certification', icon: FaCrown },
 ];
 
-const BadgeGallery = ({ badges = sampleBadges, userName = 'Student' }) => {
+const BadgeGallery = ({ userName = 'Student' }) => {
+    const [badges, setBadges] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
     const [showEarnedOnly, setShowEarnedOnly] = useState(false);
+
+    useEffect(() => {
+        const fetchBadges = async () => {
+            try {
+                const userStr = sessionStorage.getItem('user');
+                if (!userStr) {
+                    setIsLoading(false);
+                    return;
+                }
+                const user = JSON.parse(userStr);
+                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Transform API data to match component expectations
+                    const formattedBadges = data.data.map(userBadge => ({
+                        id: userBadge.badge._id,
+                        badgeId: userBadge.badge.badgeId,
+                        title: userBadge.badge.title,
+                        description: userBadge.badge.description,
+                        tier: userBadge.badge.tier,
+                        xp: userBadge.badge.xp,
+                        category: userBadge.badge.category,
+                        earnedDate: userBadge.earnedDate,
+                        isEarned: userBadge.isEarned,
+                        progress: userBadge.progress,
+                        icon: userBadge.badge.icon
+                    }));
+                    setBadges(formattedBadges);
+                }
+            } catch (error) {
+                console.error('Error fetching badges:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBadges();
+    }, []);
 
     // Calculate stats
     const earnedBadges = badges.filter((b) => b.isEarned);
@@ -129,6 +82,14 @@ const BadgeGallery = ({ badges = sampleBadges, userName = 'Student' }) => {
             setIsModalOpen(true);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <Loader2 className="w-8 h-8 animate-spin text-teal" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -207,10 +168,9 @@ const BadgeGallery = ({ badges = sampleBadges, userName = 'Student' }) => {
                                 className={`
                                     flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
                                     transition-all duration-200
-                                    ${
-                                        activeCategory === category.id
-                                            ? 'bg-[#002147] text-white shadow-md'
-                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                    ${activeCategory === category.id
+                                        ? 'bg-[#002147] text-white shadow-md'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                                     }
                                 `}
                             >
