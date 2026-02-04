@@ -24,6 +24,7 @@ const ModuleViewPage = () => {
   const [courseData, setCourseData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedStepId, setSelectedStepId] = useState(null); // Track user-selected step
 
   // Badge notification state
   const [earnedBadge, setEarnedBadge] = useState(null);
@@ -61,6 +62,11 @@ const ModuleViewPage = () => {
       setCurrentUser(JSON.parse(userData));
     }
   }, []);
+
+  // Reset selected step when session changes
+  useEffect(() => {
+    setSelectedStepId(null);
+  }, [selectedDay]);
 
   // Fetch course data and enrollment progress
   useEffect(() => {
@@ -176,7 +182,7 @@ const ModuleViewPage = () => {
 
               // --- DUMMY DATA GENERATOR (if day is missing) ---
               if (!day) {
-                const dayTitle = `Day ${id}: ${['Core Foundations', 'Advanced Concepts', 'Strategic Analysis', 'Practical Lab', 'Mastery Review'][dayIndex % 5]}`;
+                const dayTitle = `Session ${id}: ${['Core Foundations', 'Advanced Concepts', 'Strategic Analysis', 'Practical Lab', 'Mastery Review'][dayIndex % 5]}`;
                 return {
                   id,
                   _id: `dummy-${id}`,
@@ -186,7 +192,7 @@ const ModuleViewPage = () => {
                   duration: "45 mins",
                   dayType: 'course',
                   videoUrl: null, // No video if day doesn't exist
-                  videoTitle: `Day ${id} Lesson`,
+                  videoTitle: `Session ${id} Lesson`,
                   videoDescription: "Content not yet available. Please contact your instructor.",
                   videoTranscription: "Transcription unavailable for this placeholder session.",
                   tasks: generateTasksForTitle(dayTitle).map((t, idx) => ({
@@ -289,24 +295,62 @@ const ModuleViewPage = () => {
                 return url;
               };
 
-              // Extract and transform video URL
+              // --- STEP GENERATION (Unified Steps Array) ---
+              let steps = [];
+
+              // Priority 1: Use database 'steps' if available (Multi-step model)
+              if (day.steps && Array.isArray(day.steps) && day.steps.length > 0) {
+                steps = day.steps
+                  .filter(s => s.type === 'video')
+                  .map((s, idx) => ({
+                    id: idx + 1, // Simple 1-based index for step ID
+                    dbId: s._id,
+                    title: s.title || s.content?.title || `Step ${idx + 1}`,
+                    type: 'video',
+                    videoUrl: transformVideoUrl(s.content?.videoUrl || s.content?.url),
+                    duration: s.content?.duration || 0,
+                    description: s.content?.description || s.description,
+                    transcription: s.content?.transcription,
+                    isCompleted: false
+                  }));
+              }
+
+              // Priority 2: Fallback to Legacy VideoContent/videoContent mapping (Single Step)
+              if (steps.length === 0) {
+                let legacyUrl = videoExtractor('videoUrl');
+                if (legacyUrl) {
+                  steps.push({
+                    id: 1,
+                    title: videoExtractor('title') || day.moduleDetails?.title || day.title,
+                    type: 'video',
+                    videoUrl: transformVideoUrl(legacyUrl),
+                    duration: day.duration, // Use day duration as fallback
+                    description: videoExtractor('description') || day.description,
+                    transcription: videoExtractor('transcription'),
+                    isCompleted: false
+                  });
+                }
+              }
+
+              // Extract and transform video URL (Legacy fallback for other components if needed)
               let extractedVideoUrl = videoExtractor('videoUrl');
               extractedVideoUrl = transformVideoUrl(extractedVideoUrl);
 
-              console.log(`Module ${index + 1}, Day ${dayIndex + 1} - Video URL:`, extractedVideoUrl);
+              console.log(`Module ${index + 1}, Day ${dayIndex + 1} - Steps:`, steps);
 
               return {
                 id: dayIndex + 1,
                 _id: day._id,
                 dayNumber: day.dayNumber || dayIndex + 1,
-                title: day.moduleDetails?.title || day.title || `Day ${day.dayNumber || dayIndex + 1}`,
+                title: day.moduleDetails?.title || day.title || `Session ${day.dayNumber || dayIndex + 1}`,
                 description: day.moduleDetails?.description || day.description || 'No description available',
                 duration: durationStr,
                 dayType: day.dayType || 'course',
-                videoUrl: extractedVideoUrl, // ONLY backend data, no hardcoded URLs
-                videoTitle: videoExtractor('title') || day.moduleDetails?.title || day.title || `Day ${dayIndex + 1}`,
+                videoUrl: extractedVideoUrl, // Keep for legacy fallback
+                videoTitle: videoExtractor('title') || day.moduleDetails?.title || day.title || `Session ${dayIndex + 1}`,
                 videoDescription: videoExtractor('description') || day.moduleDetails?.description || day.description || 'Watch this video to master the concepts for today.',
                 videoTranscription: videoExtractor('transcription') || '',
+                steps: steps, // NEW steps array
                 tasks: generateTasksForTitle(day.title || day.moduleDetails?.title).map((t, idx) => ({
                   ...t,
                   id: idx + 1,
@@ -349,9 +393,12 @@ const ModuleViewPage = () => {
 
                       if (mp.videoProgress) {
                         mp.videoProgress.forEach(vp => {
-                          videoProg[`${modId}-${vp.dayId}`] = vp.maxWatchedTime;
-                          videoComp[`${modId}-${vp.dayId}`] = vp.isCompleted;
-                          videoDur[`${modId}-${vp.dayId}`] = vp.videoDuration || 0;
+                          // Support both legacy (day-level) and new (step-level) progress
+                          const stepId = vp.stepId || 1; // Default to step 1 for legacy data
+                          const key = `${modId}-${vp.dayId}-${stepId}`;
+                          videoProg[key] = vp.maxWatchedTime;
+                          videoComp[key] = vp.isCompleted;
+                          videoDur[key] = vp.videoDuration || 0;
                         });
                       }
                     }
@@ -397,10 +444,11 @@ const ModuleViewPage = () => {
     const isActuallyUnlocked = isDayUnlocked(selectedModule, dayIndex, mod);
 
     if (!isActuallyUnlocked) {
-      console.warn(`[RouteGuard] Access denied to Module ${selectedModule}, Day ${selectedDay}. Redirecting...`);
-      toast.error("Finish previous day's video and tasks to unlock!");
-      // Redirect to the module overview page instead of allowing access to details
+      console.warn(`[RouteGuard] Blocking access to M${selectedModule} S${selectedDay}: Day is LOCKED.`);
+      toast.error("Finish previous session's videos to unlock!");
       navigateToDays(selectedModule);
+    } else {
+      console.log(`[RouteGuard] Access GRANTED to M${selectedModule} S${selectedDay}.`);
     }
   }, [selectedModule, selectedDay, modules, loading, videoProgressMap, videoDurationMap, videoCompletionMap, completedTasks]);
 
@@ -415,12 +463,12 @@ const ModuleViewPage = () => {
       days: Array.from({ length: 7 }, (_, j) => ({
         id: j + 1,
         dayNumber: j + 1,
-        title: `Day ${j + 1}`,
+        title: `Session ${j + 1}`,
         description: `Topic for Day ${j + 1}`,
         duration: "45 minutes",
         dayType: j < 5 ? 'course' : 'catchup',
         videoUrl: null, // No video for placeholder data
-        videoTitle: `Day ${j + 1} Lesson`,
+        videoTitle: `Session ${j + 1} Lesson`,
         videoDescription: "Content not yet available. Please contact your instructor.",
         tasks: Array.from({ length: 5 }, (_, k) => ({
           id: k + 1,
@@ -485,8 +533,8 @@ const ModuleViewPage = () => {
 
   const isVideoLoading = !modules || modules.length === 0;
 
-  const handleVideoProgressUpdate = async (moduleId, dayId, maxTime, isCompleted, duration) => {
-    const key = `${moduleId}-${dayId}`;
+  const handleVideoProgressUpdate = async (moduleId, dayId, stepId, maxTime, isCompleted, duration) => {
+    const key = `${moduleId}-${dayId}-${stepId}`;
 
     // Update local state
     setVideoProgressMap(prev => ({
@@ -517,6 +565,7 @@ const ModuleViewPage = () => {
           courseCode: courseCode,
           moduleId: moduleId,
           dayId: dayId,
+          stepId: stepId, // NEW: Include stepId
           maxWatchedTime: maxTime,
           videoDuration: duration,
           isCompleted: isCompleted
@@ -556,17 +605,15 @@ const ModuleViewPage = () => {
   };
 
   const getDayCompletedCount = (moduleId, dayId) => {
-    const module = modules.find(m => m.id === moduleId);
-    if (!module || !module.days) {
-      return 0;
-    }
-    const day = module.days.find(d => d.id === dayId);
-    if (!day || !day.tasks) {
-      return 0;
-    }
-    return day.tasks.filter(
-      (task) => completedTasks[`${moduleId}-${dayId}-${task.id}`]
-    ).length;
+    const mod = modules.find(m => m.id === moduleId);
+    if (!mod || !mod.days) return 0;
+    const day = mod.days.find(d => d.id === dayId);
+    if (!day || !day.steps) return 0;
+
+    return day.steps.filter(step => {
+      const key = `${moduleId}-${dayId}-${step.id}`;
+      return videoCompletionMap[key] === true;
+    }).length;
   };
 
   const getModuleCompletedCount = (moduleId) => {
@@ -574,13 +621,13 @@ const ModuleViewPage = () => {
     if (!module || !module.days) {
       return { completed: 0, total: 0 };
     }
-    let totalTasks = 0;
+    let totalSteps = 0;
     let completed = 0;
     module.days.forEach(day => {
-      totalTasks += day.tasks.length;
+      totalSteps += (day.steps || []).length;
       completed += getDayCompletedCount(moduleId, day.id);
     });
-    return { completed, total: totalTasks };
+    return { completed, total: totalSteps };
   };
 
   const getDisplayDuration = (moduleId, dayId, defaultDuration) => {
@@ -594,40 +641,41 @@ const ModuleViewPage = () => {
     return defaultDuration;
   };
 
+  const checkSessionCompletion = (mId, session) => {
+    if (!session) return false;
+    // Multi-step session
+    if (session.steps && session.steps.length > 0) {
+      const completedSteps = session.steps.filter(s =>
+        videoCompletionMap[`${mId}-${session.id}-${s.id}`] === true
+      ).length;
+      return completedSteps === session.steps.length;
+    }
+    // Legacy session with video
+    if (session.videoUrl) {
+      const key = `${mId}-${session.id}-1`;
+      return videoCompletionMap[key] === true;
+    }
+    // Empty session: If no stairs to climb, you're already at the top.
+    // We count empty sessions as done so they don't block progression.
+    return true;
+  };
+
   const isDayUnlocked = (moduleId, dayIndex, moduleObj) => {
     if (dayIndex === 0) return true; // First day always unlocked
     const mod = moduleObj || modules.find(m => m.id === moduleId);
     if (!mod || !mod.days) return false;
 
-    // Check previous day
-    const prevDay = mod.days[dayIndex - 1];
-    const dayTasks = prevDay.tasks || [];
-    const completedTasksCount = getDayCompletedCount(moduleId, prevDay.id);
-    const prevDayTasksCompleted = completedTasksCount >= dayTasks.length && dayTasks.length > 0;
-
-    const prevKey = `${moduleId}-${prevDay.id}`;
-    const prevDayMaxWatched = videoProgressMap[prevKey] || 0;
-    const prevDayDuration = videoDurationMap[prevKey] || 0;
-    const isCompletedFlag = videoCompletionMap[prevKey] === true;
-
-    // Strict video completion: either the flag is true, or max watched is roughly equal to duration
-    const prevVideoDone = isCompletedFlag || (prevDayDuration > 0 && prevDayMaxWatched >= (prevDayDuration - 2));
-    const prevDayHadNoVideo = !prevDay.videoUrl;
-
-    const unlocked = prevDayTasksCompleted && (prevVideoDone || prevDayHadNoVideo);
-
-    // Debug log for production-lite monitoring
-    if (dayIndex > 0 && !unlocked) {
-      console.log(`[Progression] Day ${dayIndex + 1} locked. Previous Day (${dayIndex}) status:`, {
-        tasks: `${completedTasksCount}/${dayTasks.length}`,
-        videoWatched: prevDayMaxWatched,
-        videoDuration: prevDayDuration,
-        videoDone: prevVideoDone,
-        noVideo: prevDayHadNoVideo
-      });
+    // STRICT SEQUENTIAL LOCK: Current session is unlocked ONLY if 
+    // ALL previous sessions are completed.
+    for (let i = 0; i < dayIndex; i++) {
+      if (!checkSessionCompletion(moduleId, mod.days[i])) {
+        // Find if a previous session is not complete
+        console.log(`[Progression] S${dayIndex + 1} is LOCKED because S${i + 1} is incomplete.`);
+        return false;
+      }
     }
 
-    return unlocked;
+    return true;
   };
 
   // Show loading state while fetching modules
@@ -691,15 +739,29 @@ const ModuleViewPage = () => {
       );
     }
 
-    const completedCount = getDayCompletedCount(selectedModule, selectedDay);
-    const progressPercent = Math.round((completedCount / day.tasks.length) * 100);
+    const completedCount = (day.steps || []).filter(s => videoCompletionMap[`${selectedModule}-${selectedDay}-${s.id}`]).length;
+    const progressPercent = (day.steps && day.steps.length > 0)
+      ? Math.round((completedCount / day.steps.length) * 100)
+      : 0;
 
-    const currentKey = `${selectedModule}-${selectedDay}`;
-    const maxWatchedTime = videoProgressMap[currentKey] || 0;
-    const videoDuration = videoDurationMap[currentKey] || 0;
-    const isVideoCompleted = videoCompletionMap[currentKey] === true || (videoDuration > 0 && maxWatchedTime >= videoDuration - 1);
-    const hasVideo = day?.videoUrl;
-    const isLocked = hasVideo && !isVideoCompleted;
+    // Determine the default active step (first incomplete step, or last step if all complete)
+    const defaultActiveStep = (day.steps || []).find((step, idx) => {
+      const stepKey = `${selectedModule}-${selectedDay}-${step.id}`;
+      const isStepComplete = videoCompletionMap[stepKey] === true;
+      return !isStepComplete;
+    }) || (day.steps || [])[((day.steps || []).length - 1)] || null;
+
+    // Use manually selected step if it exists and belongs to this day, else use default
+    const activeStep = (selectedStepId && (day.steps || []).some(s => s.id === selectedStepId))
+      ? (day.steps || []).find(s => s.id === selectedStepId)
+      : defaultActiveStep;
+
+    const activeStepKey = `${selectedModule}-${selectedDay}-${activeStep?.id || 1}`;
+    const maxWatchedTime = videoProgressMap[activeStepKey] || 0;
+    const videoDuration = videoDurationMap[activeStepKey] || activeStep?.duration || 0;
+    const isVideoCompleted = videoCompletionMap[activeStepKey] === true || (videoDuration > 0 && maxWatchedTime >= videoDuration - 1);
+    const hasVideo = activeStep?.videoUrl;
+    const isLocked = false; // Steps handle their own locking
 
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#001229] transition-colors duration-300 text-slate-900 dark:text-slate-200">
@@ -737,12 +799,12 @@ const ModuleViewPage = () => {
               <div className="lg:col-span-8 space-y-6">
                 <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-black shadow-2xl aspect-video group">
                   <CustomVideoPlayer
-                    videoUrl={day.videoUrl}
-                    title={day.videoTitle || day.title}
-                    duration={getDisplayDuration(selectedModule, selectedDay, day.duration)}
+                    videoUrl={activeStep?.videoUrl || day.videoUrl}
+                    title={activeStep?.title || day.videoTitle || day.title}
+                    duration={getDisplayDuration(selectedModule, selectedDay, activeStep?.duration || day.duration)}
                     initialMaxTime={maxWatchedTime}
                     initialCompleted={isVideoCompleted}
-                    onProgressUpdate={(time, completed, dur) => handleVideoProgressUpdate(selectedModule, selectedDay, time, completed, dur)}
+                    onProgressUpdate={(time, completed, dur) => handleVideoProgressUpdate(selectedModule, selectedDay, activeStep?.id || 1, time, completed, dur)}
                   />
                 </div>
 
@@ -812,50 +874,65 @@ const ModuleViewPage = () => {
                     </p>
                   </div>
 
-                  {/* Tasks List */}
+                  {/* Session Steps List */}
                   <div className="flex-1 relative z-10">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-slate-900 dark:text-white font-bold text-sm">Tasks Required</h3>
+                      <h3 className="text-slate-900 dark:text-white font-bold text-sm">Session Steps</h3>
                       <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-300 px-2 py-0.5 rounded-full">
-                        {completedCount}/{day.tasks.length}
+                        {(day.steps || []).filter(s => videoCompletionMap[`${selectedModule}-${selectedDay}-${s.id}`]).length}/{(day.steps || []).length}
                       </span>
                     </div>
 
-                    {/* Lock Overlay for tasks */}
-                    {isLocked && (
-                      <div className="mb-4 p-3 bg-amber-50 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20 rounded-lg flex items-center gap-3 text-amber-600 dark:text-amber-500 text-xs">
-                        <Clock className="shrink-0" size={14} />
-                        <span>Finish watching video to unlock tasks.</span>
-                      </div>
-                    )}
+                    <ul className="space-y-3">
+                      {(day.steps || []).map((step, stepIndex) => {
+                        const stepKey = `${selectedModule}-${selectedDay}-${step.id}`;
+                        const isStepCompleted = videoCompletionMap[stepKey] === true;
+                        const stepProgress = videoProgressMap[stepKey] || 0;
+                        const stepDuration = videoDurationMap[stepKey] || step.duration || 0;
+                        const progressPercent = stepDuration > 0 ? Math.min(100, (stepProgress / stepDuration) * 100) : 0;
 
-                    <ul className={`space-y-3 ${isLocked ? 'opacity-50 pointer-events-none' : ''}`}>
-                      {day.tasks.map((task) => {
-                        const isCompleted = completedTasks[`${selectedModule}-${selectedDay}-${task.id}`];
                         return (
-                          <li key={task.id} className="group">
+                          <li key={step.id} className="group">
                             <button
-                              onClick={() => toggleTask(selectedModule, selectedDay, task.id)}
-                              className="flex items-start gap-3 w-full text-left"
+                              onClick={() => setSelectedStepId(step.id)}
+                              className={`flex items-start gap-3 w-full text-left p-2 rounded-xl transition-all duration-200 ${activeStep?.id === step.id
+                                  ? 'bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 shadow-sm'
+                                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/30 border border-transparent'
+                                }`}
                             >
-                              <div className={`mt-0.5 shrink-0 transition-colors ${isCompleted ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600 group-hover:text-slate-400 dark:group-hover:text-slate-400'
+                              <div className={`mt-0.5 shrink-0 transition-colors ${isStepCompleted ? 'text-emerald-500' :
+                                  'text-blue-500'
                                 }`}>
-                                {isCompleted ? <CheckCircle2 size={18} /> : <div className="w-[18px] h-[18px] rounded-full border-2 border-slate-300 dark:border-slate-600 group-hover:border-slate-400 dark:group-hover:border-slate-500" />}
+                                {isStepCompleted ? (
+                                  <CheckCircle2 size={18} />
+                                ) : (
+                                  <Video size={18} />
+                                )}
                               </div>
                               <div className="flex-1 pt-0.5">
-                                <span className={`text-sm font-medium transition-colors ${isCompleted ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'
+                                <span className={`text-sm font-medium transition-colors ${isStepCompleted ? 'text-slate-400 dark:text-slate-500' :
+                                    'text-slate-700 dark:text-slate-300'
                                   }`}>
-                                  {task.question}
+                                  {step.title}
                                 </span>
-                                {isCompleted && (
-                                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-2 text-xs text-emerald-600 dark:text-emerald-500/80 pl-1 border-l-2 border-emerald-500/20">
+                                {isStepCompleted && (
+                                  <div className="mt-1 text-[10px] text-emerald-600 dark:text-emerald-500/80 flex items-center gap-1">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-500"></span>
                                     Completed
-                                  </motion.div>
+                                  </div>
                                 )}
-                                {!isCompleted && !isLocked && (
-                                  <div className="mt-2 hidden group-hover:block">
-                                    {/* Render Task Question Helper/Input if needed inline, or just keep simple list per image */}
-                                    <span className="text-[10px] text-blue-400">Click to start</span>
+                                {!isStepCompleted && progressPercent > 0 && (
+                                  <div className="mt-2">
+                                    <div className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                      <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${progressPercent}%` }}
+                                        className="h-full bg-blue-500"
+                                      />
+                                    </div>
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">
+                                      {Math.round(progressPercent)}% watched
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -863,26 +940,18 @@ const ModuleViewPage = () => {
                           </li>
                         );
                       })}
-
-                      {/* Static placeholder tasks if list is empty (for visuals) */}
-                      {day.tasks.length === 0 && (
-                        <>
-                          <li className="flex items-start gap-3 opacity-50"><div className="w-[18px] h-[18px] rounded-full border-2 border-slate-700"></div><span className="text-sm text-slate-500">Review Summary</span></li>
-                          <li className="flex items-start gap-3 opacity-50"><div className="w-[18px] h-[18px] rounded-full border-2 border-slate-700"></div><span className="text-sm text-slate-500">Complete Quiz</span></li>
-                        </>
-                      )}
                     </ul>
 
-                    {/* Session Schedule / Day 1-5 List */}
+                    {/* Session Schedule / Session 1-5 List */}
                     <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 relative z-10">
                       <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4 flex justify-between items-center">
                         <span>Session Schedule</span>
-                        <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Day {day.id} of {module.days.length}</span>
+                        <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">Session {day.id} of {module.days.length}</span>
                       </h3>
                       <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-1 -mr-2">
                         {module.days.map((d, idx) => {
                           const isCurrent = d.id === day.id;
-                          const isCompletedDay = getDayCompletedCount(selectedModule, d.id) === d.tasks.length && d.tasks.length > 0;
+                          const isCompletedDay = checkSessionCompletion(selectedModule, d);
                           const isDayUnlockedStatus = isDayUnlocked(selectedModule, idx, module);
 
                           return (
@@ -892,7 +961,7 @@ const ModuleViewPage = () => {
                                 if (isDayUnlockedStatus) {
                                   navigateToDay(selectedModule, d.id);
                                 } else {
-                                  toast.error("Finish previous day's video and tasks to unlock!");
+                                  toast.error("Finish previous session's videos to unlock!");
                                 }
                               }}
                               className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between group ${isCurrent
@@ -926,8 +995,8 @@ const ModuleViewPage = () => {
                         })}
                       </div>
                     </div>
-
                   </div>
+
                 </div>
               </div>
             </div>
@@ -1026,8 +1095,7 @@ const ModuleViewPage = () => {
               {/* Day Cards Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {module.days.map((day, index) => {
-                  const dayCompletedCount = getDayCompletedCount(selectedModule, day.id);
-                  const isDayCompleted = dayCompletedCount === day.tasks.length;
+                  const isDayCompleted = checkSessionCompletion(selectedModule, day);
                   const unlocked = isDayUnlocked(selectedModule, index, module);
 
                   return (
@@ -1042,7 +1110,7 @@ const ModuleViewPage = () => {
                           if (unlocked) {
                             navigateToDay(selectedModule, day.id);
                           } else {
-                            toast.error("Finish previous day's video and tasks to unlock!");
+                            toast.error("Finish previous session's videos to unlock!");
                           }
                         }}
                         className={`w-full text-left group relative h-full flex flex-col ${!unlocked ? 'cursor-not-allowed' : ''}`}
@@ -1099,7 +1167,7 @@ const ModuleViewPage = () => {
                               </div>
                               <div className="flex items-center gap-1.5">
                                 <FileText size={14} />
-                                <span>{day.tasks.length} Tasks</span>
+                                <span>{(day.steps || []).length} Steps</span>
                               </div>
                             </div>
                           </div>
