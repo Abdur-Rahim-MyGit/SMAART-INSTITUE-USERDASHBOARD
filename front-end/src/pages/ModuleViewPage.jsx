@@ -8,6 +8,7 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import TaskQuestion from "@/components/TaskQuestion";
+import BadgeModal from "@/components/badges/BadgeModal";
 
 const ModuleViewPage = () => {
   const { courseId, moduleId, dayId } = useParams();
@@ -24,6 +25,35 @@ const ModuleViewPage = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedStepId, setSelectedStepId] = useState(null); // Track user-selected step
+
+  // Badge notification state
+  const [earnedBadge, setEarnedBadge] = useState(null);
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+
+  const handleBadgesEarned = (newBadges) => {
+    if (newBadges && newBadges.length > 0) {
+      // Use the first new badge for now
+      const badgeData = newBadges[0];
+
+      const formattedBadge = {
+        id: badgeData.badge._id,
+        title: badgeData.badge.title,
+        description: badgeData.badge.description,
+        tier: badgeData.badge.tier,
+        xp: badgeData.badge.xp,
+        category: badgeData.badge.category,
+        earnedDate: badgeData.earnedDate,
+        percentile: 10, // Default or mock value
+        isEarned: true
+      };
+
+      setEarnedBadge(formattedBadge);
+      setShowBadgeModal(true);
+
+      // Play a sound or trigger confetti here if desired
+      toast.success(`Badge Unlocked: ${formattedBadge.title}!`);
+    }
+  };
 
   // Get current user
   useEffect(() => {
@@ -93,7 +123,7 @@ const ModuleViewPage = () => {
               // --- Task Generator Helper ---
               const generateTasksForTitle = (title) => {
                 const t = (title || "").toLowerCase();
-                
+
                 // 1. Critical Thinking / Analysis
                 if (t.includes('critical') || t.includes('thinking') || t.includes('analysis')) {
                   return [
@@ -270,36 +300,36 @@ const ModuleViewPage = () => {
 
               // Priority 1: Use database 'steps' if available (Multi-step model)
               if (day.steps && Array.isArray(day.steps) && day.steps.length > 0) {
-                 steps = day.steps
-                    .filter(s => s.type === 'video')
-                    .map((s, idx) => ({
-                       id: idx + 1, // Simple 1-based index for step ID
-                       dbId: s._id,
-                       title: s.title || s.content?.title || `Step ${idx + 1}`,
-                       type: 'video',
-                       videoUrl: transformVideoUrl(s.content?.videoUrl || s.content?.url),
-                       duration: s.content?.duration || 0,
-                       description: s.content?.description || s.description,
-                       transcription: s.content?.transcription,
-                       isCompleted: false
-                    }));
+                steps = day.steps
+                  .filter(s => s.type === 'video')
+                  .map((s, idx) => ({
+                    id: idx + 1, // Simple 1-based index for step ID
+                    dbId: s._id,
+                    title: s.title || s.content?.title || `Step ${idx + 1}`,
+                    type: 'video',
+                    videoUrl: transformVideoUrl(s.content?.videoUrl || s.content?.url),
+                    duration: s.content?.duration || 0,
+                    description: s.content?.description || s.description,
+                    transcription: s.content?.transcription,
+                    isCompleted: false
+                  }));
               }
 
               // Priority 2: Fallback to Legacy VideoContent/videoContent mapping (Single Step)
               if (steps.length === 0) {
-                 let legacyUrl = videoExtractor('videoUrl');
-                 if (legacyUrl) {
-                    steps.push({
-                       id: 1,
-                       title: videoExtractor('title') || day.moduleDetails?.title || day.title,
-                       type: 'video',
-                       videoUrl: transformVideoUrl(legacyUrl),
-                       duration: day.duration, // Use day duration as fallback
-                       description: videoExtractor('description') || day.description,
-                       transcription: videoExtractor('transcription'),
-                       isCompleted: false
-                    });
-                 }
+                let legacyUrl = videoExtractor('videoUrl');
+                if (legacyUrl) {
+                  steps.push({
+                    id: 1,
+                    title: videoExtractor('title') || day.moduleDetails?.title || day.title,
+                    type: 'video',
+                    videoUrl: transformVideoUrl(legacyUrl),
+                    duration: day.duration, // Use day duration as fallback
+                    description: videoExtractor('description') || day.description,
+                    transcription: videoExtractor('transcription'),
+                    isCompleted: false
+                  });
+                }
               }
 
               // Extract and transform video URL (Legacy fallback for other components if needed)
@@ -322,12 +352,12 @@ const ModuleViewPage = () => {
                 videoTranscription: videoExtractor('transcription') || '',
                 steps: steps, // NEW steps array
                 tasks: generateTasksForTitle(day.title || day.moduleDetails?.title).map((t, idx) => ({
-                    ...t,
-                    id: idx + 1,
-                    type: 'mcq',
-                    points: 10,
-                    completed: false
-                  }))
+                  ...t,
+                  id: idx + 1,
+                  type: 'mcq',
+                  points: 10,
+                  completed: false
+                }))
               };
             }),
           }));
@@ -474,7 +504,7 @@ const ModuleViewPage = () => {
         });
 
         const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
-        await courseEnrollmentAPI.updateTaskProgress({
+        const response = await courseEnrollmentAPI.updateTaskProgress({
           studentId: currentUser._id || currentUser.id,
           courseCode: courseCode,
           moduleId: moduleId,
@@ -483,6 +513,11 @@ const ModuleViewPage = () => {
           completed: isCompleted
         });
         console.log('Task progress saved successfully');
+
+        // Check for new badges
+        if (response.badgesEarned && response.badgesEarned.length > 0) {
+          handleBadgesEarned(response.badgesEarned);
+        }
       } catch (error) {
         console.error("Failed to save task progress:", error);
         // Revert on error
@@ -525,7 +560,7 @@ const ModuleViewPage = () => {
     if (currentUser && courseData) {
       try {
         const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
-        await courseEnrollmentAPI.updateVideoProgress({
+        const response = await courseEnrollmentAPI.updateVideoProgress({
           studentId: currentUser._id || currentUser.id,
           courseCode: courseCode,
           moduleId: moduleId,
@@ -535,6 +570,11 @@ const ModuleViewPage = () => {
           videoDuration: duration,
           isCompleted: isCompleted
         });
+
+        // Check for new badges
+        if (response.badgesEarned && response.badgesEarned.length > 0) {
+          handleBadgesEarned(response.badgesEarned);
+        }
       } catch (error) {
         console.error("Failed to save video progress:", error);
       }
@@ -569,7 +609,7 @@ const ModuleViewPage = () => {
     if (!mod || !mod.days) return 0;
     const day = mod.days.find(d => d.id === dayId);
     if (!day || !day.steps) return 0;
-    
+
     return day.steps.filter(step => {
       const key = `${moduleId}-${dayId}-${step.id}`;
       return videoCompletionMap[key] === true;
@@ -605,7 +645,7 @@ const ModuleViewPage = () => {
     if (!session) return false;
     // Multi-step session
     if (session.steps && session.steps.length > 0) {
-      const completedSteps = session.steps.filter(s => 
+      const completedSteps = session.steps.filter(s =>
         videoCompletionMap[`${mId}-${session.id}-${s.id}`] === true
       ).length;
       return completedSteps === session.steps.length;
@@ -624,7 +664,7 @@ const ModuleViewPage = () => {
     if (dayIndex === 0) return true; // First day always unlocked
     const mod = moduleObj || modules.find(m => m.id === moduleId);
     if (!mod || !mod.days) return false;
-    
+
     // STRICT SEQUENTIAL LOCK: Current session is unlocked ONLY if 
     // ALL previous sessions are completed.
     for (let i = 0; i < dayIndex; i++) {
@@ -634,7 +674,7 @@ const ModuleViewPage = () => {
         return false;
       }
     }
-    
+
     return true;
   };
 
@@ -700,8 +740,8 @@ const ModuleViewPage = () => {
     }
 
     const completedCount = (day.steps || []).filter(s => videoCompletionMap[`${selectedModule}-${selectedDay}-${s.id}`]).length;
-    const progressPercent = (day.steps && day.steps.length > 0) 
-      ? Math.round((completedCount / day.steps.length) * 100) 
+    const progressPercent = (day.steps && day.steps.length > 0)
+      ? Math.round((completedCount / day.steps.length) * 100)
       : 0;
 
     // Determine the default active step (first incomplete step, or last step if all complete)
@@ -850,60 +890,57 @@ const ModuleViewPage = () => {
                         const stepProgress = videoProgressMap[stepKey] || 0;
                         const stepDuration = videoDurationMap[stepKey] || step.duration || 0;
                         const progressPercent = stepDuration > 0 ? Math.min(100, (stepProgress / stepDuration) * 100) : 0;
-                        
-                          return (
-                            <li key={step.id} className="group">
-                              <button
-                                onClick={() => setSelectedStepId(step.id)}
-                                className={`flex items-start gap-3 w-full text-left p-2 rounded-xl transition-all duration-200 ${
-                                  activeStep?.id === step.id 
-                                    ? 'bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 shadow-sm' 
-                                    : 'hover:bg-slate-50 dark:hover:bg-slate-800/30 border border-transparent'
+
+                        return (
+                          <li key={step.id} className="group">
+                            <button
+                              onClick={() => setSelectedStepId(step.id)}
+                              className={`flex items-start gap-3 w-full text-left p-2 rounded-xl transition-all duration-200 ${activeStep?.id === step.id
+                                  ? 'bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/20 shadow-sm'
+                                  : 'hover:bg-slate-50 dark:hover:bg-slate-800/30 border border-transparent'
                                 }`}
-                              >
-                                <div className={`mt-0.5 shrink-0 transition-colors ${
-                                  isStepCompleted ? 'text-emerald-500' : 
+                            >
+                              <div className={`mt-0.5 shrink-0 transition-colors ${isStepCompleted ? 'text-emerald-500' :
                                   'text-blue-500'
                                 }`}>
-                                  {isStepCompleted ? (
-                                    <CheckCircle2 size={18} />
-                                  ) : (
-                                    <Video size={18} />
-                                  )}
-                                </div>
-                                <div className="flex-1 pt-0.5">
-                                  <span className={`text-sm font-medium transition-colors ${
-                                    isStepCompleted ? 'text-slate-400 dark:text-slate-500' : 
+                                {isStepCompleted ? (
+                                  <CheckCircle2 size={18} />
+                                ) : (
+                                  <Video size={18} />
+                                )}
+                              </div>
+                              <div className="flex-1 pt-0.5">
+                                <span className={`text-sm font-medium transition-colors ${isStepCompleted ? 'text-slate-400 dark:text-slate-500' :
                                     'text-slate-700 dark:text-slate-300'
                                   }`}>
-                                    {step.title}
-                                  </span>
-                                  {isStepCompleted && (
-                                    <div className="mt-1 text-[10px] text-emerald-600 dark:text-emerald-500/80 flex items-center gap-1">
-                                      <span className="w-1 h-1 rounded-full bg-emerald-500"></span>
-                                      Completed
+                                  {step.title}
+                                </span>
+                                {isStepCompleted && (
+                                  <div className="mt-1 text-[10px] text-emerald-600 dark:text-emerald-500/80 flex items-center gap-1">
+                                    <span className="w-1 h-1 rounded-full bg-emerald-500"></span>
+                                    Completed
+                                  </div>
+                                )}
+                                {!isStepCompleted && progressPercent > 0 && (
+                                  <div className="mt-2">
+                                    <div className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                      <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${progressPercent}%` }}
+                                        className="h-full bg-blue-500"
+                                      />
                                     </div>
-                                  )}
-                                  {!isStepCompleted && progressPercent > 0 && (
-                                    <div className="mt-2">
-                                      <div className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                        <motion.div 
-                                          initial={{ width: 0 }}
-                                          animate={{ width: `${progressPercent}%` }}
-                                          className="h-full bg-blue-500"
-                                        />
-                                      </div>
-                                      <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">
-                                        {Math.round(progressPercent)}% watched
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">
+                                      {Math.round(progressPercent)}% watched
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
 
                     {/* Session Schedule / Session 1-5 List */}
                     <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 relative z-10">
@@ -1082,8 +1119,8 @@ const ModuleViewPage = () => {
                             relative flex-1 bg-white dark:bg-[#1e293b] rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col
                             ${!unlocked ? 'border-slate-200 dark:border-slate-800 opacity-60 grayscale-[0.5]' :
                             isDayCompleted
-                            ? 'border-emerald-500/30 shadow-[0_4px_20px_-12px_rgba(16,185,129,0.3)]'
-                            : 'border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-blue-500/30 hover:-translate-y-1'
+                              ? 'border-emerald-500/30 shadow-[0_4px_20px_-12px_rgba(16,185,129,0.3)]'
+                              : 'border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-blue-500/30 hover:-translate-y-1'
                           }
                          `}>
                           {/* Status Stripe */}
@@ -1104,7 +1141,7 @@ const ModuleViewPage = () => {
                                   Done
                                 </span>
                               )}
-                              
+
                               {!unlocked && (
                                 <span className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
                                   Locked
@@ -1325,7 +1362,15 @@ const ModuleViewPage = () => {
           </motion.div>
         </main>
       </div>
-    </div>
+
+      {/* Badge Notification Modal */}
+      <BadgeModal
+        isOpen={showBadgeModal}
+        onClose={() => setShowBadgeModal(false)}
+        badge={earnedBadge}
+        userName={currentUser?.fullName || 'Student'}
+      />
+    </div >
   );
 };
 
