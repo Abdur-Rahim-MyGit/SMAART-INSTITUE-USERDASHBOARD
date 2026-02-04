@@ -5,8 +5,8 @@ import DashboardHeader from "@/components/DashboardHeader";
 import { assessmentApi } from "@/services/assessmentApi";
 import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase } from "lucide-react";
 import { toast } from "sonner";
+import { generateAssessmentReport } from "@/utils/reportGenerator";
 
-// Helper function to get band colors matching Final Minds theme
 // Helper function to get band colors - MINIMAL MONOCHROME THEME
 const getBandColor = (level) => {
   // Uniform professional styling with Brand Colors
@@ -39,87 +39,58 @@ const quotientInfo = {
   DAQ: { name: 'Digital & AI Literacy', fullName: 'Digital & AI Literacy Quotient', icon: <Monitor className="w-8 h-8" />, desc: 'Tech proficiency & AI readiness' }
 };
 
-// Download report function
+// Helper: Get feedback based on level (Simulated AI Response)
+const getFeedback = (quotient, level) => {
+  const feedbacks = {
+    CRQ: {
+      Advanced: "Demonstrates exceptional critical thinking and logical reasoning capabilities. You can deconstruct complex problems efficiently and identify nuanced patterns that others might miss. Your cognitive processing speed and accuracy are extremely high.",
+      Strong: "Shows strong analytical skills and solid reasoning ability. You can handle most complex situations effectively and make sound decisions based on logic. Continue to challenge yourself with multi-faceted problems.",
+      Progressing: "Your reasoning skills are developing well. You can handle standard problems but may need more time or structure for highly complex scenarios. Focus on breaking down problems into smaller components.",
+      Developing: "You are in the early stages of developing structured reasoning. You may find complex logical puzzles challenging. Practice deliberate problem-solving techniques to build this muscle.",
+      Emerging: "Foundational reasoning skills are present but require significant nurturing. You may rely more on intuition than logic. Structured exercises in logic and pattern recognition will be very beneficial."
+    },
+    SRQ: {
+      Advanced: "Exhibits outstanding emotional control and drive. You stay calm under extreme pressure and are self-motivated to a rarely seen degree. You are a natural anchor for others during turbulent times.",
+      Strong: "Very good self-regualtion and motivation. You bounce back from setbacks quickly and generally maintain focus on your goals. Occasional high-stress situations may still test you, but you handle them well.",
+      Progressing: "You are learning to manage your emotions and drive. While you have good days, stress can sometimes derail your focus. Building consistent daily habits will help stabilize your performance.",
+      Developing: "You struggle somewhat with self-motivation or emotional regulation. Setbacks might discourage you easily. Focus on small wins to build confidence and resilience.",
+      Emerging: "Significant challenges with motivation or emotional control detected. You may often feel overwhelmed. Priority should be placed on stress-management techniques and setting very achievable micro-goals."
+    },
+    LQ: {
+      Advanced: "A voracious and agile learner. You adapt to new information instantly and seek out knowledge proactively. Your ability to unlearn and relearn is a major competitive advantage.",
+      Strong: "Good learning agility. You are open to new ideas and adapt reasonably well to change. You are willing to learn new skills when required by the situation.",
+      Progressing: "You can learn new things but prefer structured environments. Rapid change might feel uncomfortable. Try to push your comfort zone by exploring unfamiliar topics proactively.",
+      Developing: "Learning new skills takes effort and time for you. You may value tradition over novelty. To grow, try to adopt a 'beginner's mindset' more often.",
+      Emerging: "You may be resistant to new learning or change. This rigidity can hinder growth. Focus on curiosity and asking 'why' to spark the learning process."
+    },
+    SIQ: {
+      Advanced: "Masterful social intelligence. You read rooms instantly, empathize deeply, and communicate with high impact. You can build consensus and lead diverse groups effortlessly.",
+      Strong: "Strong collaborator and communicator. You work well in team settings and can resolve standard conflicts. You are generally liked and trusted by peers.",
+      Progressing: "You are developing your social radar. You communicate clearly but may miss subtle non-verbal cues. Practice active listening to deepen your connections.",
+      Developing: "Social situations may drain you or feel confusing. You might prefer solitary work. Developing a few key communication scripts can help you navigate teamwork more comfortably.",
+      Emerging: "Social interaction is a significant challenge. You may struggle to understand others' perspectives. tailored coaching in communication and empathy is recommended."
+    },
+    PEQ: {
+      Advanced: "The epitome of reliability and professional excellence. You deliver high-quality work consistently and ethically. Your reputation is likely one of your strongest assets.",
+      Strong: "Highly reliable and professional. You meet deadlines and maintain good standards of quality. You are a dependable team member who takes ownership of tasks.",
+      Progressing: "You are building your professional identity. You usually deliver, but consistency might vary. Focus on time management and attention to detail to level up.",
+      Developing: "You are still learning professional norms. Deadlines or quality standards might occasionally slip. mentorship on workplace expectations would be valuable.",
+      Emerging: "Significant gaps in professional execution. Reliability or quality issues needs addressing immediately. Focus on the basics: punctuality, honesty, and finishing what you start."
+    },
+    DAQ: {
+      Advanced: "A digital native with high AI readiness. You leverage technology to multiply your output and are comfortable with cutting-edge tools. You see technology as an extension of your mind.",
+      Strong: "Competent with digital tools and modern workflows. You can use AI and tech effectively for work. You adapt to new software with relative ease.",
+      Progressing: "You are comfortable with standard tools but may hesitate with advanced tech or AI. Training in specific modern digital tools will boost your confidence.",
+      Developing: "You might find new technology intimidating. You stick to what you know. Guided exploration of user-friendly AI tools can help demystify tech for you.",
+      Emerging: "Digital literacy is a hurdle. You may avoid technology where possible. Fundamental training in digital basics is the first step."
+    }
+  };
+  return feedbacks[quotient]?.[level] || "Analysis pending further data.";
+};
+
+// Download report function (PDF)
 const downloadReport = (user, testResults) => {
-  const reportData = {
-    studentName: user?.fullName || 'Student',
-    studentId: user?.studentId || user?.email || 'N/A',
-    date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-    baselineScore: testResults?.baselineScore || 0,
-    stageBand: testResults?.stageBand || 'Emerging',
-    quotients: testResults?.t1Profile || {}
-  };
-
-  const icons = {
-    CRQ: '🧠', SRQ: '❤️', LQ: '📚', SIQ: '🤝', PEQ: '💼', DAQ: '💻'
-  };
-
-  let report = `+-------------------------------------------------------------------+\n`;
-  report += `|                                                                   |\n`;
-  report += `|              FINAL MINDS - BASELINE ASSESSMENT REPORT             |\n`;
-  report += `|                      T1 BASELINE (S_baseline)                     |\n`;
-  report += `|                                                                   |\n`;
-  report += `+-------------------------------------------------------------------+\n\n`;
-  report += `Student Name: ${reportData.studentName}\n`;
-  report += `Student ID:   ${reportData.studentId}\n`;
-  report += `Date:         ${reportData.date}\n\n`;
-  report += `=====================================================================\n`;
-  report += `                    BASELINE READINESS INDEX\n`;
-  report += `=====================================================================\n\n`;
-  report += `                          ${reportData.baselineScore}/100\n`;
-  report += `                      [${reportData.stageBand.toUpperCase()}]\n\n`;
-  report += `=====================================================================\n`;
-  report += `                    QUOTIENT-WISE BREAKDOWN\n`;
-  report += `=====================================================================\n\n`;
-
-  Object.entries(reportData.quotients).forEach(([key, data]) => {
-    const info = quotientInfo[key];
-    const emoji = icons[key] || '📊';
-    report += `+-------------------------------------------------------------------+\n`;
-    report += `| ${key} - ${info.fullName.padEnd(60)}|\n`;
-    report += `|-------------------------------------------------------------------|\n`;
-    report += `| ${emoji} ${info.desc.padEnd(61)}|\n`;
-    report += `|                                                                   |\n`;
-    report += `| Score:       ${data.rawScore}%`.padEnd(68) + `|\n`;
-    report += `| Level:       ${data.level}`.padEnd(68) + `|\n`;
-    report += `| Performance: ${data.earned}/${data.possible} questions correct`.padEnd(68) + `|\n`;
-    report += `+-------------------------------------------------------------------+\n\n`;
-  });
-
-  report += `=====================================================================\n`;
-  report += `                   BAND CLASSIFICATION SYSTEM\n`;
-  report += `=====================================================================\n\n`;
-  report += `  🏆 Advanced    (81-100%): Exceptional mastery\n`;
-  report += `  💪 Strong      (61-80%):  Solid competence\n`;
-  report += `  📈 Progressing (41-60%):  Developing skills\n`;
-  report += `  🌱 Developing  (21-40%):  Early stage\n`;
-  report += `  🌟 Emerging    (0-20%):   Beginning journey\n\n`;
-  report += `=====================================================================\n\n`;
-  report += `                    "This is your starting profile"\n\n`;
-  report += `This baseline assessment (S_baseline) establishes your current readiness\n`;
-  report += `across six key quotients. Use this as your foundation for growth and\n`;
-  report += `development throughout your learning journey with Final Minds.\n\n`;
-  report += `Next Steps:\n`;
-  report += `  • Review each quotient's level and identify areas for improvement\n`;
-  report += `  • Focus on quotients marked as "Developing" or "Emerging"\n`;
-  report += `  • Celebrate your "Strong" and "Advanced" areas\n`;
-  report += `  • Track your progress in future assessments (T2, T3, T4)\n\n`;
-  report += `=====================================================================\n`;
-  report += `Generated by Final Minds Assessment System\n`;
-  report += `Report ID: T1_${reportData.studentId}_${Date.now()}\n`;
-  report += `=====================================================================\n`;
-
-  const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `FinalMinds_T1_Baseline_${reportData.studentId}_${new Date().getTime()}.txt`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-
-  toast.success('📥 Report downloaded successfully!');
+  generateAssessmentReport(user, testResults);
 };
 
 
