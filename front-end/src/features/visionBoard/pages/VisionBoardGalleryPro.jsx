@@ -1,0 +1,919 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import DashboardSidebar from "@/components/DashboardSidebar";
+import DashboardHeader from "@/components/DashboardHeader";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Plus,
+  Trash2,
+  Copy,
+  Eye,
+  EyeOff,
+  Star,
+  Loader2,
+  Images,
+  Calendar,
+  Search,
+  Grid3X3,
+  List,
+  MoreVertical,
+  Download,
+  X,
+  CheckCircle2,
+  ArrowRight,
+} from "lucide-react";
+import {
+  getAllVisionBoards,
+  deleteVisionBoard,
+  duplicateVisionBoard,
+  setActiveVision,
+  clearActiveVision,
+  getActiveVision,
+  resetUserIdCache,
+} from "../services/visionBoardProApi";
+import { GRID_TEMPLATES } from "../templates/gridTemplates";
+import { moderateTextAsync, loadToxicityModel, moderateText } from "../utils/contentModeration";
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BOARD CARD COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════
+
+const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeactivate, isCurrentVision }) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const [isSettingActive, setIsSettingActive] = useState(false);
+  const template =
+    GRID_TEMPLATES[board.templateId] || GRID_TEMPLATES["grid-2x2"];
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      className={`group relative bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isCurrentVision ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-blue-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700'
+        }`}
+    >
+      {/* Active Vision Badge */}
+      {isCurrentVision && (
+        <div className="absolute top-0 left-0 right-0 bg-blue-600 text-white text-[10px] font-bold py-1.5 px-2 text-center z-10 shadow-md tracking-widest uppercase">
+          <Star className="w-3 h-3 inline mr-1 mb-0.5 fill-white" />
+          Active Vision
+        </div>
+      )}
+
+      {/* Collage Image */}
+      <div className={`relative aspect-square bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden ${isCurrentVision ? 'mt-7 border-t border-slate-100 dark:border-slate-700' : ''}`}>
+        {board.collageImage ? (
+          <img
+            src={board.collageImage}
+            alt={board.title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+            <Images className="w-16 h-16" />
+          </div>
+        )}
+
+        {/* Hover Overlay */}
+        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+          <div className="flex flex-col gap-3">
+            <Button
+              size="sm"
+              onClick={() => onView(board)}
+              className="bg-white hover:bg-slate-100 text-slate-900 font-semibold px-6 shadow-lg transform hover:scale-105 transition-all rounded-full"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              View Full
+            </Button>
+          </div>
+        </div>
+
+        {/* Template Badge */}
+        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-lg text-[10px] font-medium text-white shadow-sm">
+          {template.name}
+        </div>
+
+        {/* Menu Button */}
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
+          <div className="relative">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
+              className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center shadow-lg transition-colors border border-slate-200 dark:border-slate-600"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+
+            {showMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowMenu(false)}
+                />
+                <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-1 z-30 overflow-hidden">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDuplicate(board);
+                      setShowMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-700"
+                  >
+                    <Copy className="w-3.5 h-3.5" /> Duplicate
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(board);
+                      setShowMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Info */}
+      <div className="p-5 relative">
+        <div className="mb-4">
+          <h3 className="font-bold text-slate-800 dark:text-white truncate text-base mb-1" title={board.title}>
+            {board.title}
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
+            <Calendar className="w-3.5 h-3.5" />
+            {formatDate(board.createdAt)}
+          </p>
+        </div>
+
+        <Button
+          size="sm"
+          onClick={async (e) => {
+            e.stopPropagation();
+            setIsSettingActive(true);
+            if (isCurrentVision) {
+              await onDeactivate(board);
+            } else {
+              await onSetAsActive(board);
+            }
+            setIsSettingActive(false);
+          }}
+          disabled={isSettingActive}
+          className={`w-full text-xs font-bold h-10 shadow-sm relative overflow-hidden transition-all duration-300 rounded-lg group/btn ${isCurrentVision
+            ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-500 text-green-700 dark:text-green-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 hover:text-red-600'
+            : 'bg-blue-600 hover:bg-blue-700 text-white border-0 hover:shadow-lg hover:-translate-y-0.5'
+            }`}
+        >
+          {isSettingActive ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : isCurrentVision ? (
+            <>
+              <span className="flex items-center group-hover/btn:hidden">
+                <CheckCircle2 className="w-3.5 h-3.5 mr-2" />
+                Active Vision
+              </span>
+              <span className="hidden group-hover/btn:flex items-center">
+                <EyeOff className="w-3.5 h-3.5 mr-2" />
+                Deactivate
+              </span>
+            </>
+          ) : (
+            <>
+              Set as Active Goal
+            </>
+          )}
+        </Button>
+      </div>
+    </motion.div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DELETE CONFIRMATION MODAL
+// ═══════════════════════════════════════════════════════════════════════════
+
+const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+        onClick={onCancel}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-gray-200"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mx-auto mb-4">
+            <Trash2 className="w-6 h-6 text-red-600" />
+          </div>
+          <h3 className="text-lg font-semibold text-center mb-2 text-[#002147]">
+            Delete Vision Board?
+          </h3>
+          <p className="text-center mb-6 text-gray-500">
+            Are you sure you want to delete "{board?.title}"? This action cannot
+            be undone.
+          </p>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              className="flex-1 border-gray-200 text-gray-700 hover:bg-gray-50"
+              onClick={onCancel}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-[#002147]"
+              onClick={onConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VIEW MODAL
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ViewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange }) => {
+  const { toast } = useToast();
+
+  if (!isOpen || !board) return null;
+
+  const isCurrentVision = currentVisionId === board._id;
+
+  const handleDownload = () => {
+    if (!board.collageImage) return;
+    const link = document.createElement("a");
+    link.download = `${board.title || "vision-board"}.png`;
+    link.href = board.collageImage;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleSetAsVision = async () => {
+    try {
+      await setActiveVision(board._id);
+      onVisionChange(board._id);
+
+      toast({
+        title: "Vision Enabled!",
+        description: "Your vision board is now displayed on your dashboard.",
+      });
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to set as vision",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDisableVision = async () => {
+    try {
+      await clearActiveVision();
+      onVisionChange(null);
+
+      toast({
+        title: "Vision Disabled",
+        description: "Vision board removed from dashboard.",
+      });
+      onClose();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to disable vision",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="bg-white rounded-2xl w-auto max-w-[90vw] shadow-2xl border border-gray-200"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-[#002147] truncate pr-4">
+              {board.title}
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+
+          {/* Image - Auto size based on content */}
+          <div className="p-4 bg-white flex justify-center items-center">
+            {board.collageImage ? (
+              <img
+                src={board.collageImage}
+                alt={board.title}
+                className="rounded-lg shadow-lg"
+                style={{
+                  maxWidth: '80vw',
+                  maxHeight: '60vh',
+                  width: 'auto',
+                  height: 'auto',
+                  objectFit: 'contain'
+                }}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-48 w-48 text-gray-500">
+                <Images className="w-16 h-16" />
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="px-4 py-3 border-t border-gray-200 flex flex-row justify-between items-center gap-3">
+            {isCurrentVision ? (
+              <Button
+                onClick={handleDisableVision}
+                className="bg-red-600 hover:bg-red-700 text-[#002147] font-semibold"
+              >
+                <EyeOff className="w-4 h-4 mr-2" />
+                Disable Vision
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSetAsVision}
+                className="bg-[#30919D] hover:bg-[#267a84] text-[#002147] font-semibold shadow-[0_0_15px_rgba(48,145,157,0.4)]"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Enable as Vision
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              onClick={handleDownload}
+              className="border-gray-200 text-[#002147] hover:bg-gray-50 bg-white"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download
+            </Button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN GALLERY COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════
+
+const VisionBoardGalleryPro = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [boards, setBoards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deleteBoard, setDeleteBoard] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [viewBoard, setViewBoard] = useState(null);
+  const [maxAllowed, setMaxAllowed] = useState(3);
+  const [canCreateMore, setCanCreateMore] = useState(true);
+  const [currentVisionId, setCurrentVisionId] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+
+  const TITLE_CHAR_LIMIT = 50;
+  const DESCRIPTION_CHAR_LIMIT = 250;
+
+  // Load boards and check current vision
+  useEffect(() => {
+    // Check if user has basic info (at least email) before making API calls
+    const user = JSON.parse(
+      sessionStorage.getItem("user") || localStorage.getItem("user") || "{}"
+    );
+
+    // Allow loading if user has id OR email (API will fetch id by email if missing)
+    if (!user._id && !user.id && !user.email) {
+      // User not authenticated at all - skip silently
+      return;
+    }
+
+    // Reset cache to ensure fresh ID fetch (important for dev bypass login)
+    resetUserIdCache();
+
+    loadBoards();
+    loadActiveVision();
+    // Pre-load Toxicity Model
+    loadToxicityModel();
+  }, []);
+
+  const loadActiveVision = async () => {
+    try {
+      // API will fetch correct user ID by email if missing from session
+      const result = await getActiveVision();
+      if (result.data) {
+        setCurrentVisionId(result.data.id);
+      }
+    } catch (error) {
+      // Only log error if it's not an authentication error (those are expected for new users)
+      if (!error.message?.includes('not authenticated')) {
+        console.error('Failed to load active vision:', error);
+      }
+    }
+  };
+
+  const loadBoards = async () => {
+    try {
+      setIsLoading(true);
+
+      // Log user info for debugging
+      const user = JSON.parse(
+        sessionStorage.getItem("user") || localStorage.getItem("user") || "{}"
+      );
+      console.log('[VisionBoard] Loading boards for user:', { id: user._id || user.id, email: user.email, fullName: user.fullName });
+
+      // API will fetch correct user ID by email if missing from session
+
+      const result = await getAllVisionBoards();
+      console.log('[VisionBoard] Loaded boards:', result.data?.length || 0, 'boards');
+      setBoards(result.data || []);
+      setMaxAllowed(result.maxAllowed || 3);
+      setCanCreateMore(result.canCreateMore !== false);
+    } catch (error) {
+      // Check if it's an authentication error
+      if (error.message && error.message.includes("not authenticated")) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to view your vision boards",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to load vision boards",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInstantCheck = (text, fieldName) => {
+    // Use aggressive substring matching for rapid real-time feedback
+    const result = moderateText(text, false);
+    if (!result.isClean) {
+      toast({
+        title: "Inappropriate Content",
+        description: `Your ${fieldName} contains inappropriate language. Actions have been blocked for safety.`,
+        variant: "destructive",
+      });
+      setShowCreateModal(false);
+      setNewTitle("");
+      setNewDescription("");
+      return true;
+    }
+    return false;
+  };
+
+  const handleCreateNew = () => {
+    if (!canCreateMore) {
+      toast({
+        title: "Limit Reached",
+        description: `You can only save up to ${maxAllowed} vision boards. Delete one to create a new one.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowCreateModal(true);
+  };
+
+  const handleConfirmCreate = async () => {
+    const trimmedTitle = newTitle.trim();
+    const trimmedDescription = newDescription.trim();
+
+    // Synchronous Gatekeeper Check
+    if (handleInstantCheck(trimmedTitle, "title")) return;
+    if (handleInstantCheck(trimmedDescription, "description")) return;
+
+    if (!trimmedTitle || !trimmedDescription) {
+      toast({
+        title: "Add a title and description",
+        description: "Please enter both fields to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Content moderation check - REMOVED deep checks for speed, relying on Editor's Save
+    /* 
+    const titleCheck = await moderateTextAsync(trimmedTitle);
+    if (!titleCheck.isClean) {
+      toast({
+        title: "Inappropriate Content",
+        description: "Your vision board title contains inappropriate language. Please revise.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const descCheck = await moderateTextAsync(trimmedDescription);
+    if (!descCheck.isClean) {
+      toast({
+        title: "Inappropriate Content",
+        description: "Your vision board description contains inappropriate language. Please revise.",
+        variant: "destructive",
+      });
+      return;
+    }
+    */
+
+    if (trimmedTitle.length > TITLE_CHAR_LIMIT) {
+      toast({
+        title: "Title is too long",
+        description: `Please keep the title to ${TITLE_CHAR_LIMIT} characters or fewer.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (trimmedDescription.length > DESCRIPTION_CHAR_LIMIT) {
+      toast({
+        title: "Description is too long",
+        description: `Please keep the description within ${DESCRIPTION_CHAR_LIMIT} characters.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const payload = {
+      initialTitle: trimmedTitle,
+      initialDescription: trimmedDescription,
+    };
+    setShowCreateModal(false);
+    setNewTitle("");
+    setNewDescription("");
+    navigate("/vision-board-pro/create", { state: payload });
+  };
+
+  const handleView = (board) => {
+    setViewBoard(board);
+  };
+
+  // Handle setting a vision board as active and navigating to dashboard
+  const handleSetAsActive = async (board) => {
+    try {
+      await setActiveVision(board._id);
+      setCurrentVisionId(board._id);
+
+      toast({
+        title: "Vision Enabled!",
+        description: "Your vision board is now displayed on your dashboard.",
+      });
+
+      // Navigate to dashboard to show the active vision
+      navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to set vision board",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteBoard) return;
+
+    try {
+      setIsDeleting(true);
+      await deleteVisionBoard(deleteBoard._id);
+      setBoards((prev) => {
+        const newBoards = prev.filter((b) => b._id !== deleteBoard._id);
+        // Update canCreateMore since we deleted one
+        setCanCreateMore(newBoards.length < maxAllowed);
+        return newBoards;
+      });
+      toast({
+        title: "Deleted",
+        description: "Vision board deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete vision board",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteBoard(null);
+    }
+  };
+
+  const handleDuplicate = async (board) => {
+    // Check limit before duplicating
+    if (boards.length >= maxAllowed) {
+      toast({
+        title: "Limit Reached",
+        description: `You can only save up to ${maxAllowed} vision boards. Delete one to duplicate.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const result = await duplicateVisionBoard(board._id);
+      setBoards((prev) => {
+        const newBoards = [result.data, ...prev];
+        setCanCreateMore(newBoards.length < maxAllowed);
+        return newBoards;
+      });
+      toast({
+        title: "Duplicated",
+        description: "Vision board duplicated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to duplicate vision board",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Filter boards by search
+  const filteredBoards = boards.filter((board) =>
+    board.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+      <DashboardSidebar />
+
+      <div className="min-h-screen transition-all duration-300">
+        <DashboardHeader />
+
+        <main className="w-full relative py-8 px-4 md:px-0">
+          <div className="max-w-7xl mx-auto pb-12">
+
+            {/* Header Section */}
+            <div className="w-full text-center mb-12 px-4 relative z-10">
+              <div className="inline-block p-2 px-6 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-bold tracking-wide uppercase mb-3">
+                Dream & Manifest
+              </div>
+              <h2 className="text-3xl md:text-5xl font-black text-slate-800 dark:text-white tracking-tight leading-tight mb-4">
+                My Vision <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Boards</span>
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
+                Visualize your goals and manifest your future. Create, view, and set your active vision board here.
+              </p>
+            </div>
+
+            {/* Actions Toolbar */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+              <div className="relative w-full md:w-96 group">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search your dreams..."
+                  className="pl-10 bg-white dark:bg-[#1e293b] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm h-12"
+                />
+              </div>
+
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="hidden md:flex items-center text-xs font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-[#1e293b] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                  {boards.length} / {maxAllowed} Boards Used
+                </div>
+
+                <Button
+                  onClick={handleCreateNew}
+                  disabled={!canCreateMore}
+                  className={`h-12 px-6 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all ${canCreateMore
+                    ? "bg-blue-600 hover:bg-blue-700 text-white hover:-translate-y-1"
+                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                    }`}
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Create New Board
+                </Button>
+              </div>
+            </div>
+
+            {/* Content */}
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-32 space-y-4">
+                <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+                <p className="text-slate-400 animate-pulse">Loading your visions...</p>
+              </div>
+            ) : boards.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-24 text-center bg-white dark:bg-[#1e293b] rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm border-dashed">
+                <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mb-6">
+                  <Images className="w-8 h-8 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">No vision boards found</h3>
+                <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-8">
+                  {searchQuery ? "Try adjusting your search terms." : "Start your journey by creating your first vision board today."}
+                </p>
+                <Button onClick={handleCreateNew} className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-8 h-12 font-bold shadow-lg hover:shadow-blue-500/25">
+                  <Plus className="w-5 h-5 mr-2" /> Create Board
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <AnimatePresence>
+                  {filteredBoards.map(board => (
+                    <BoardCard
+                      key={board._id}
+                      board={board}
+                      onDelete={setDeleteBoard}
+                      onDuplicate={handleDuplicate}
+                      onView={handleView}
+                      onSetAsActive={handleSetAsActive}
+                      onDeactivate={async () => {
+                        // Inline deactivate handler
+                        try {
+                          await clearActiveVision();
+                          setCurrentVisionId(null);
+                          toast({
+                            title: "Vision Deactivated",
+                            description: "Vision board removed from dashboard.",
+                          });
+                        } catch (error) {
+                          toast({
+                            title: "Error",
+                            description: "Failed to deactivate vision board",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
+                      isCurrentVision={currentVisionId === board._id}
+                    />
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Delete Confirmation Modal */}
+        <DeleteModal
+          isOpen={!!deleteBoard}
+          board={deleteBoard}
+          onConfirm={handleDelete}
+          onCancel={() => setDeleteBoard(null)}
+          isDeleting={isDeleting}
+        />
+
+        {/* View Modal */}
+        <ViewModal
+          isOpen={!!viewBoard}
+          board={viewBoard}
+          onClose={() => setViewBoard(null)}
+          currentVisionId={currentVisionId}
+          onVisionChange={setCurrentVisionId}
+        />
+
+        {/* Create New Modal */}
+        <AnimatePresence>
+          {showCreateModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+              onClick={() => setShowCreateModal(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white dark:bg-[#0f172a] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200 dark:border-slate-700"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">What's your dream?</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Add a title and a short description to start your new vision board.</p>
+
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                      <label className="font-semibold">Title</label>
+                      <span className={`font-medium ${newTitle.length >= TITLE_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
+                        {newTitle.length}/{TITLE_CHAR_LIMIT}
+                      </span>
+                    </div>
+                    <Input
+                      value={newTitle}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setNewTitle(val);
+                        handleInstantCheck(val, "title");
+                      }}
+                      placeholder="e.g., My 2026 Goals..."
+                      maxLength={TITLE_CHAR_LIMIT}
+                      className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                      <label className="font-semibold">Description</label>
+                      <span className={`font-medium ${newDescription.length >= DESCRIPTION_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
+                        {newDescription.length}/{DESCRIPTION_CHAR_LIMIT}
+                      </span>
+                    </div>
+                    <textarea
+                      value={newDescription}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setNewDescription(val);
+                        handleInstantCheck(val, "description");
+                      }}
+                      rows={3}
+                      placeholder="Briefly describe what you want to achieve..."
+                      maxLength={DESCRIPTION_CHAR_LIMIT}
+                      className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 mt-8">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCreateModal(false)}
+                    className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleConfirmCreate}
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/20"
+                  >
+                    Start Creating <ArrowRight className="w-4 h-4 ml-1.5" />
+                  </Button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
+export default VisionBoardGalleryPro;

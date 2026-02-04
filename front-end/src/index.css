@@ -1,0 +1,252 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 212 100% 14%;
+    /* Navy #002147 */
+    --foreground: 210 40% 98%;
+    /* White */
+
+    --card: 212 90% 18%;
+    /* Slightly lighter navy */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 212 90% 18%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 174 53% 40%;
+    /* Teal #30919D */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 43 74% 49%;
+    /* Gold #daa520 */
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 212 30% 25%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 212 30% 25%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 212 30% 25%;
+    --input: 212 30% 25%;
+    --ring: 174 53% 40%;
+
+    --radius: 0.5rem;
+
+    /* LMS Professional Theme */
+    --lms-bg: 184 65% 96%;
+    /* #EAF6F6 */
+    --lms-card: 0 0% 100%;
+    --lms-primary: 212 100% 14%;
+    /* Navy #002147 */
+    --lms-sidebar-active: 0 0% 15%;
+    /* #262626 */
+    --lms-text: 0 0% 20%;
+    --lms-text-muted: 0 0% 50%;
+    --lms-border: 184 30% 90%;
+    --lms-accent: 174 53% 40%;
+    /* #30919D */
+  }
+}
+
+@layer components {
+  .lms-card {
+    @apply bg-white dark:bg-[#002A5C]/40 dark:backdrop-blur-xl rounded-[24px] border border-gray-100 dark:border-white/5 transition-all duration-300;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  }
+
+  .lms-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  }
+
+  .lms-dashboard-bg {
+    @apply bg-[#F8FAFC] dark:bg-[#00152E];
+    background-image:
+      radial-gradient(at 0% 0%, hsla(184, 53%, 40%, 0.03) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(43, 74%, 49%, 0.03) 0, transparent 50%);
+  }
+
+  .premium-gradient-bg {
+    background: linear-gradient(135deg, #002147 0%, #003366 100%);
+  }
+
+  .premium-border {
+    @apply border border-gray-100 dark:border-white/10;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    @apply bg-white dark:bg-navy text-[#1A1A1A] dark:text-white antialiased transition-colors duration-300;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold tracking-tight text-[#002147] dark:text-white;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Custom Premium Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-[#30919D]/20 dark:bg-white/10 rounded-full transition-colors;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-[#30919D]/40 dark:bg-white/20;
+  }
+
+  /* Allow text selection in inputs and textareas */
+  input,
+  textarea,
+  [contenteditable] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
+  @media print {
+    body {
+      display: none !important;
+    }
+  }
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-light to-white;
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-gold to-gold-light;
+  }
+
+  .glass-card {
+    @apply bg-white/10 dark:bg-black/20 backdrop-blur-md border border-white/10 shadow-xl;
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(218, 165, 32, 0.3) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(218, 165, 32, 0.3);
+    border-radius: 20px;
+  }
+
+  .container-responsive {
+    @apply px-3 sm:px-4 md:px-6 lg:px-8;
+  }
+
+  .text-responsive-xs {
+    @apply text-[10px] sm:text-xs;
+  }
+
+  .text-responsive-sm {
+    @apply text-xs sm:text-sm;
+  }
+
+  .text-responsive-base {
+    @apply text-sm sm:text-base;
+  }
+
+  .text-responsive-lg {
+    @apply text-base sm:text-lg md:text-xl;
+  }
+
+  .text-responsive-xl {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+
+  .text-responsive-2xl {
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+
+  .text-responsive-3xl {
+    @apply text-2xl sm:text-3xl md:text-4xl;
+  }
+
+  .space-responsive {
+    @apply space-y-3 sm:space-y-4 md:space-y-6;
+  }
+
+  .gap-responsive {
+    @apply gap-2 sm:gap-3 md:gap-4;
+  }
+
+  .p-responsive {
+    @apply p-3 sm:p-4 md:p-6 lg:p-8;
+  }
+
+  .py-responsive {
+    @apply py-3 sm:py-4 md:py-6 lg:py-8;
+  }
+
+  .px-responsive {
+    @apply px-3 sm:px-4 md:px-6 lg:px-8;
+  }
+
+  .tap-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
