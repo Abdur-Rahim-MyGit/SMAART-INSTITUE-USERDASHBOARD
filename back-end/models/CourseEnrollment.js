@@ -17,6 +17,7 @@ const moduleProgressSchema = new mongoose.Schema({
   }],
   videoProgress: [{
     dayId: Number,
+    stepId: { type: Number, default: 1 }, // NEW: Support for multiple steps per day
     maxWatchedTime: { type: Number, default: 0 }, // in seconds
     videoDuration: { type: Number, default: 0 }, // in seconds
     isCompleted: { type: Boolean, default: false },
