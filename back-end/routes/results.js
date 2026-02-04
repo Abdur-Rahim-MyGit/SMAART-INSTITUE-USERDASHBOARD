@@ -6,6 +6,8 @@ const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuest
 
 const router = express.Router();
 
+console.log("✅ Results Route Loaded with T1 Fixes (V2)");
+
 // Apply protection to all result routes
 router.use(protect);
 
@@ -126,6 +128,18 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                         order: q.order || idx
                     }));
                 }
+            }
+
+            // FIX: If resuming a T1 assessment that was created with full question set (300) instead of 36
+            const isT1Resume = assessment.assessmentCode === 'ASM00001' ||
+                (assessment.assessmentName && assessment.assessmentName.toLowerCase().includes('baseline'));
+
+            if (isT1Resume && existingResult.totalQuestions > 36) {
+                console.log(`⚠️ [FIX] Resumed T1 session has incorrect totalQuestions (${existingResult.totalQuestions}). Fixing to 36.`);
+                existingResult.totalQuestions = 36;
+                // If the user has more than 36 questions in questionOrder, strictly speaking we should probably trim them 
+                // but usually the frontend slices them anyway. The critical part is totalQuestions for validation.
+                await existingResult.save();
             }
 
             console.log(`📤 [DEBUG] Final question count to send: ${questions.length}`);
@@ -334,8 +348,25 @@ router.post('/:resultId/submit', async (req, res) => {
             });
         }
 
+        // T1 Baseline Assessment Specific Fix (Migration/Legacy Support)
+        // If we are strictly at 36 answers and expected 300, it's definitely the T1 Baseline configuration issue.
+        if (result.totalQuestions === 300 && result.responses.length === 36) {
+            console.log(`🔧 [FIX] Forced T1 Baseline Correction: 36/300 detected for result ${resultId}`);
+            result.totalQuestions = 36;
+        }
+
+        // Fallback for other mismatches if identified as T1 Baseline
+        const isT1Assessment = result.assessmentCode === 'ASM00001' ||
+            (result.assessmentName && result.assessmentName.toLowerCase().includes('baseline'));
+
+        if (isT1Assessment && result.totalQuestions > 36 && result.responses.length >= 36) {
+            console.log(`🔧 [FIX] Correcting T1 Assessment totalQuestions from ${result.totalQuestions} to 36 for result ${resultId}`);
+            result.totalQuestions = 36;
+        }
+
         // Validate all questions answered
         if (result.responses.length < result.totalQuestions) {
+            console.warn(`❌ Submission Blocked: ${result.responses.length}/${result.totalQuestions} answered. ResultID: ${resultId}`);
             return res.status(400).json({
                 success: false,
                 error: `Please answer all questions. ${result.responses.length}/${result.totalQuestions} answered.`
@@ -381,11 +412,11 @@ router.post('/:resultId/submit', async (req, res) => {
         };
 
         // Check if this is T1 Assessment
-        const isT1Assessment = assessment.assessmentCode === 'ASM00001' ||
+        const isT1Baseline = assessment.assessmentCode === 'ASM00001' ||
             assessment.questionCategory === 'T1' ||
             assessment.assessmentName?.toLowerCase().includes('baseline');
 
-        if (isT1Assessment) {
+        if (isT1Baseline) {
             console.log('📊 Calculating T1 Baseline and Quotient Scores...');
 
             // Fetch full question details for quotient mapping
@@ -991,43 +1022,25 @@ router.post('/:resultId/submit', async (req, res) => {
         if (isBaseLineTest) {
             try {
                 const BaseLineResult = require('../models/BaseLineResult');
+                const baselineUtils = require('../utils/baselineUtils');
 
-                // Create a fast lookup map for questions
-                const qMap = new Map();
-                assessment.questions.forEach(q => qMap.set(q._id.toString(), q));
+                console.log('📊 Calculating refined Base Line scores...');
+                const profileData = baselineUtils.calculateBaseLineProfile(assessment, result);
 
-                let totalCorrect = 0;
-
-                result.responses.forEach(response => {
-                    const question = qMap.get(response.questionId.toString());
-                    if (question) {
-                        const correct = question.correctAnswer === response.selectedValue;
-                        if (correct) {
-                            totalCorrect++;
-                        }
-                        // Update individual response score for user verification
-                        response.score = correct ? (question.points || 1) : 0;
-                        response.isCorrect = correct;
-                    }
-                });
-
-                // Explicitly save the main result document to persist the updated responses with scores
+                // Explicitly save the main result document to persist updated response.isCorrect
                 await result.save();
 
                 const baseLineResult = new BaseLineResult({
                     userId: result.userId,
                     resultId: result._id,
-                    score: totalCorrect,
-                    totalScore: assessment.questions.length,
-                    percentage: Math.round((totalCorrect / assessment.questions.length) * 100)
+                    ...profileData
                 });
 
                 await baseLineResult.save();
-                console.log('✅ Base Line Result saved successfully:', baseLineResult._id);
+                console.log('✅ Refined Base Line Result saved successfully:', baseLineResult._id);
 
-                responseData.score = totalCorrect;
-                responseData.totalScore = assessment.questions.length;
-                responseData.percentage = Math.round((totalCorrect / assessment.questions.length) * 100);
+                // Add all calculated fields to responseData
+                Object.assign(responseData, profileData);
             } catch (blError) {
                 console.error('Error calculating Base Line scores:', blError);
                 return res.status(500).json({

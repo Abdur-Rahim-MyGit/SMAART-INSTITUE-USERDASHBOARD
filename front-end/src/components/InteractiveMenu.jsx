@@ -35,7 +35,7 @@ const InteractiveMenu = () => {
               onClick={() => handleItemClick(item)}
               style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 500 }}
               className={`
-                relative px-2 lg:px-3 py-6 text-xs xl:text-sm uppercase tracking-[0.05em] transition-all duration-300
+                group relative px-2 lg:px-3 py-6 text-xs xl:text-sm uppercase tracking-[0.05em] transition-all duration-300
                 ${isActive
                   ? 'text-[#002147] dark:text-white font-bold'
                   : 'text-[#64748b] dark:text-slate-400 hover:text-[#002147] dark:hover:text-white'
@@ -43,11 +43,18 @@ const InteractiveMenu = () => {
               `}
             >
               <span className="relative z-10">{item.label}</span>
+              
+              {/* Hover Indicator */}
+              <motion.div
+                className="absolute bottom-4 left-2 right-2 h-0.5 bg-[#30919D]/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                initial={false}
+              />
+
               {isActive && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#30919D] rounded-full"
-                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  className="absolute bottom-0 left-2 right-2 h-0.5 bg-[#30919D] rounded-full shadow-[0_0_10px_rgba(48,145,157,0.5)]"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
             </button>
