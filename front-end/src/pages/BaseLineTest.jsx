@@ -6,6 +6,7 @@ import { assessmentApi } from "@/services/assessmentApi";
 import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
+import BadgeModal from "@/components/badges/BadgeModal";
 
 // Helper function to get band colors - MINIMAL MONOCHROME THEME
 const getBandColor = (level) => {
@@ -113,6 +114,30 @@ const BaseLineTest = () => {
   const [testResults, setTestResults] = useState(null);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [timeElapsed, setTimeElapsed] = useState(0);
+
+  // Badge notification state
+  const [earnedBadge, setEarnedBadge] = useState(null);
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+
+  const handleBadgesEarned = (newBadges) => {
+    if (newBadges && newBadges.length > 0) {
+      const badgeData = newBadges[0];
+      const formattedBadge = {
+        id: badgeData.badge._id,
+        title: badgeData.badge.title,
+        description: badgeData.badge.description,
+        tier: badgeData.badge.tier,
+        xp: badgeData.badge.xp,
+        category: badgeData.badge.category,
+        earnedDate: badgeData.earnedDate,
+        percentile: 10,
+        isEarned: true
+      };
+      setEarnedBadge(formattedBadge);
+      setShowBadgeModal(true);
+      toast.success(`Badge Unlocked: ${formattedBadge.title}!`);
+    }
+  };
 
   // Get current question
   const current = questions[index];
@@ -293,6 +318,11 @@ const BaseLineTest = () => {
       if (response.success) {
         setSubmitted(true);
         setTestResults(response.data);
+
+        // Handle badges earned upon submission
+        if (response.data.badgesEarned && response.data.badgesEarned.length > 0) {
+          handleBadgesEarned(response.data.badgesEarned);
+        }
       }
     } catch (err) {
       console.error("Error submitting assessment:", err);
@@ -798,6 +828,14 @@ const BaseLineTest = () => {
           </div>
         )
       }
+
+      {/* Badge Notification Modal */}
+      <BadgeModal
+        isOpen={showBadgeModal}
+        onClose={() => setShowBadgeModal(false)}
+        badge={earnedBadge}
+        userName={user?.fullName || 'Student'}
+      />
 
       <style dangerouslySetInnerHTML={{
         __html: `

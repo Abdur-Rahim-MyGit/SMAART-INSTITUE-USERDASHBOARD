@@ -3,6 +3,7 @@ const Result = require('../models/Result');
 const Assessment = require('../models/Assessment');
 const { protect } = require('../middleware/auth');
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions } = require('../utils/questionShuffler');
+const { checkAssessmentBadges } = require('../utils/badgeUtils');
 
 const router = express.Router();
 
@@ -399,7 +400,7 @@ router.post('/:resultId/submit', async (req, res) => {
         const calculatedScore = result.responses.reduce((sum, r) => sum + (r.score || 0), 0);
         // Default max score is totalQuestions * 1 (assuming 1 point per question)
         const maxScore = result.totalQuestions;
-        const percentage = maxScore > 0 ? Math.round((calculatedScore / maxScore) * 100) : 0;
+        let percentage = maxScore > 0 ? Math.round((calculatedScore / maxScore) * 100) : 0;
 
         let responseData = {
             resultId: result._id,
@@ -492,6 +493,9 @@ router.post('/:resultId/submit', async (req, res) => {
             responseData.stageBand = determineLevel(baselineScore);
             responseData.assessmentType = 'T1_BASELINE';
 
+            // Set percentage for badge checking
+            percentage = baselineScore;
+
             // Save T1 results to BaseLineResult collection
             try {
                 const BaseLineResult = require('../models/BaseLineResult');
@@ -519,503 +523,6 @@ router.post('/:resultId/submit', async (req, res) => {
         }
 
 
-        // Only calculate Big Five scores if it's a Big Five assessment
-        if (isBig5) {
-            console.log('🎯 This is a Big Five assessment, calculating scores...');
-            // Calculate Big Five scores using official formulas
-            const rawScores = result.calculateScores();
-            console.log('📊 Raw scores calculated:', rawScores);
-
-            // Import Big5Result model
-            const Big5Result = require('../models/Big5Result');
-
-            // Determine levels for each trait (based on 0-100 scale)
-            // Old scale (0-40): Low 0-22 (55%), Moderate 23-28 (70%), High 29-40
-            // New scale (0-100): Low 0-55, Moderate 56-70, High 71-100
-            const determineLevel = (score) => {
-                if (score >= 0 && score <= 55) return 'Low';
-                if (score >= 56 && score <= 70) return 'Moderate';
-                if (score >= 71 && score <= 100) return 'High';
-                return 'Moderate'; // Default fallback
-            };
-
-            // Calculate Emotional Stability using raw neuroticism (0-40 scale)
-            console.log('📊 Raw scores object:', rawScores);
-            console.log('🔢 Raw neuroticism value:', rawScores.rawNeuroticism);
-
-            let emotionalStabilityScore = 50; // Default fallback
-            try {
-                if (rawScores.rawNeuroticism !== undefined && rawScores.rawNeuroticism !== null) {
-                    // Formula: 60 - rawNeuroticism, then normalize to 0-100
-                    const rawEmotionalStability = 60 - rawScores.rawNeuroticism;
-                    console.log('🧮 Raw emotional stability (60 - rawNeuroticism):', rawEmotionalStability);
-                    // Normalize from 0-60 range to 0-100 scale
-                    emotionalStabilityScore = Math.round((rawEmotionalStability / 60) * 100);
-                    console.log('✅ Normalized emotional stability score:', emotionalStabilityScore);
-                } else {
-                    console.warn('⚠️ rawNeuroticism is undefined, using default emotional stability score');
-                }
-            } catch (error) {
-                console.error('❌ Error calculating emotional stability:', error);
-            }
-
-            // Create Big5Result document with scores and levels
-            const big5Result = new Big5Result({
-                userId: result.userId,
-                resultId: result._id,
-                scores: {
-                    extraversion: {
-                        raw: rawScores.extraversion,
-                        level: determineLevel(rawScores.extraversion)
-                    },
-                    agreeableness: {
-                        raw: rawScores.agreeableness,
-                        level: determineLevel(rawScores.agreeableness)
-                    },
-                    conscientiousness: {
-                        raw: rawScores.conscientiousness,
-                        level: determineLevel(rawScores.conscientiousness)
-                    },
-                    neuroticism: {
-                        raw: rawScores.neuroticism,
-                        level: determineLevel(rawScores.neuroticism)
-                    },
-                    openness: {
-                        raw: rawScores.openness,
-                        level: determineLevel(rawScores.openness)
-                    },
-                    emotionalStability: {
-                        raw: emotionalStabilityScore,
-                        level: determineLevel(emotionalStabilityScore)
-                    }
-                }
-            });
-
-            await big5Result.save();
-            console.log('✅ Big5Result saved successfully:', big5Result._id);
-
-            responseData.big5ResultId = big5Result._id;
-            responseData.scores = big5Result.scores;
-            console.log('📤 Response data with scores:', responseData);
-        }
-
-        // Check if this is a VAK assessment and calculate learning style
-        const isVAK = assessment && assessment.assessmentCode === "ASM00003";
-
-
-        if (isVAK) {
-            // Import VAK utilities and model
-            const { countVAKAnswers, calculateVAKStyle } = require('../utils/vakUtils');
-            const VAKResult = require('../models/VAKResult');
-
-            // Count A, B, C answers
-            const counts = countVAKAnswers(result.responses);
-
-            // Calculate learning style
-            const { style, description } = calculateVAKStyle(counts.visual, counts.auditory, counts.kinesthetic);
-
-            // Create VAKResult document
-            const vakResult = new VAKResult({
-                userId: result.userId,
-                resultId: result._id,
-                scores: {
-                    visual: counts.visual,
-                    auditory: counts.auditory,
-                    kinesthetic: counts.kinesthetic
-                },
-                learningStyle: style,
-                description: description
-            });
-
-            await vakResult.save();
-            console.log('✅ VAKResult saved successfully:', vakResult._id);
-
-            responseData.vakResultId = vakResult._id;
-            responseData.learningStyle = style;
-            responseData.learningStyleDescription = description;
-            responseData.vakScores = counts;
-        }
-
-        // Check if this is an EQ assessment and calculate scores
-        const isEQ = assessment && assessment.assessmentCode === "ASM00002";
-
-
-        if (isEQ) {
-            // Import EQ utilities and model
-            const { calculateRawScore, normalizeScore, getPercentileRange, getColorCode, getPercentileDescription } = require('../utils/eqUtils');
-            const EQResult = require('../models/EQResult');
-
-            // Calculate raw score (sum of all 16 responses)
-            const rawScore = calculateRawScore(result.responses);
-
-            // Normalize to 0-100 scale
-            const normalizedScore = normalizeScore(rawScore);
-
-            // Determine percentile range and color
-            const percentileRange = getPercentileRange(normalizedScore);
-            const colorCode = getColorCode(percentileRange);
-            const description = getPercentileDescription(percentileRange);
-
-            // Create EQResult document
-            const eqResult = new EQResult({
-                userId: result.userId,
-                resultId: result._id,
-                rawScore: rawScore,
-                normalizedScore: normalizedScore,
-                percentileRange: percentileRange,
-                colorCode: colorCode
-            });
-
-            await eqResult.save();
-            console.log('✅ EQResult saved successfully:', eqResult._id);
-
-            responseData.eqResultId = eqResult._id;
-            responseData.normalizedScore = normalizedScore;
-            responseData.percentileRange = percentileRange;
-            responseData.colorCode = colorCode;
-            responseData.description = description;
-        }
-
-        // Check if this is a CQ assessment and calculate scores
-        const isCQ = assessment && assessment.assessmentCode === "ASM00004";
-
-
-        if (isCQ) {
-            try {
-                // Import CQ utilities and model
-                const {
-                    calculateCreativityRawScore,
-                    normalizeCreativityScore,
-                    calculateCompositeScore,
-                    getPercentileRange,
-                    getColorCode,
-                    getQuartile,
-                    getPercentileDescription
-                } = require('../utils/cqUtils');
-                const CQResult = require('../models/CQResult');
-                const Big5Result = require('../models/Big5Result');
-
-                // Fetch user's Big Five Openness score
-                const big5Result = await Big5Result.findOne({ userId: result.userId })
-                    .sort({ createdAt: -1 });
-
-                if (!big5Result || !big5Result.scores.openness) {
-                    return res.status(400).json({
-                        success: false,
-                        error: 'You must complete the Big 5 Assessment before taking the CQ test. The CQ score requires your Openness score from the Big Five assessment.'
-                    });
-                }
-
-                const opennessScore = big5Result.scores.openness.raw;
-
-                // Calculate creativity score from responses
-                const { rawScore: creativityRawScore, count: questionCount } = calculateCreativityRawScore(result.responses);
-
-                const creativityScore = normalizeCreativityScore(creativityRawScore, questionCount);
-
-                // Calculate composite CQ score (average of openness and creativity)
-                const compositeScore = calculateCompositeScore(opennessScore, creativityScore);
-
-                // Determine percentile range, color code, and quartile
-                const percentileRange = getPercentileRange(compositeScore);
-                const colorCode = getColorCode(percentileRange);
-                const quartile = getQuartile(percentileRange);
-                const description = getPercentileDescription(percentileRange);
-
-                // Create CQResult document
-                const cqResult = new CQResult({
-                    userId: result.userId,
-                    resultId: result._id,
-                    opennessScore: opennessScore,
-                    creativityScore: creativityScore,
-                    compositeScore: compositeScore,
-                    percentileRange: percentileRange,
-                    colorCode: colorCode,
-                    quartile: quartile
-                });
-
-                await cqResult.save();
-                console.log('✅ CQResult saved successfully:', cqResult._id);
-
-                responseData.cqResultId = cqResult._id;
-                responseData.opennessScore = opennessScore;
-                responseData.creativityScore = creativityScore;
-                responseData.compositeScore = compositeScore;
-                responseData.percentileRange = percentileRange;
-                responseData.colorCode = colorCode;
-                responseData.quartile = quartile;
-                responseData.description = description;
-            } catch (cqError) {
-                console.error('Error calculating CQ scores:', cqError);
-                return res.status(500).json({
-                    success: false,
-                    error: 'Failed to calculate CQ scores',
-                    message: cqError.message
-                });
-            }
-        }
-
-        // Check if this is an ARQ assessment and calculate scores
-        const isARQ = assessment && assessment.assessmentCode === "ASM00005";
-
-
-        if (isARQ) {
-            try {
-                // Import ARQ utilities and model
-                const {
-                    calculateAdaptabilityRawScore,
-                    normalizeAdaptabilityScore,
-                    calculateResilienceRawScore,
-                    normalizeResilienceScore,
-                    calculateCompositeScore,
-                    getPercentileRange,
-                    getColorCode,
-                    getQuartile,
-                    getPercentileDescription
-                } = require('../utils/arqUtils');
-                const ARQResult = require('../models/ARQResult');
-
-                // Split responses into adaptability (0-8) and resilience (9-14)
-                // Sort responses by question order to ensure correct indexing
-                const sortedResponses = [...result.responses].sort((a, b) => {
-                    const indexA = result.questionOrder.findIndex(qId => qId.toString() === a.questionId.toString());
-                    const indexB = result.questionOrder.findIndex(qId => qId.toString() === b.questionId.toString());
-                    return indexA - indexB;
-                });
-
-                const adaptabilityResponses = sortedResponses.slice(0, 9); // Questions 0-8
-                const resilienceResponses = sortedResponses.slice(9, 15); // Questions 9-14
-
-                // Calculate adaptability score
-                const adaptabilityRawScore = calculateAdaptabilityRawScore(adaptabilityResponses);
-                const adaptabilityScore = normalizeAdaptabilityScore(adaptabilityRawScore);
-
-                // Calculate resilience score (with reverse scoring for questions 10, 12, 14)
-                const resilienceRawScore = calculateResilienceRawScore(resilienceResponses, sortedResponses);
-                const resilienceScore = normalizeResilienceScore(resilienceRawScore);
-
-                // Calculate composite ARQ score (average of adaptability and resilience)
-                const compositeScore = calculateCompositeScore(adaptabilityScore, resilienceScore);
-
-                // Determine percentile range, color code, and quartile
-                const percentileRange = getPercentileRange(compositeScore);
-                const colorCode = getColorCode(percentileRange);
-                const quartile = getQuartile(percentileRange);
-                const description = getPercentileDescription(percentileRange);
-
-                // Create ARQResult document
-                const arqResult = new ARQResult({
-                    userId: result.userId,
-                    resultId: result._id,
-                    adaptabilityScore: adaptabilityScore,
-                    resilienceScore: resilienceScore,
-                    compositeScore: compositeScore,
-                    percentileRange: percentileRange,
-                    colorCode: colorCode,
-                    quartile: quartile
-                });
-
-                await arqResult.save();
-                console.log('✅ ARQResult saved successfully:', arqResult._id);
-
-                responseData.arqResultId = arqResult._id;
-                responseData.adaptabilityScore = adaptabilityScore;
-                responseData.resilienceScore = resilienceScore;
-                responseData.compositeScore = compositeScore;
-                responseData.percentileRange = percentileRange;
-                responseData.colorCode = colorCode;
-                responseData.quartile = quartile;
-                responseData.description = description;
-            } catch (arqError) {
-                console.error('Error calculating ARQ scores:', arqError);
-                return res.status(500).json({
-                    success: false,
-                    error: 'Failed to calculate ARQ scores',
-                    message: arqError.message
-                });
-            }
-        }
-
-        // Check if this is an AIQ assessment and calculate scores
-        const isAIQ = assessment && assessment.assessmentCode === "ASM00006";
-
-
-        if (isAIQ) {
-            try {
-                // Import AIQ utilities and model
-                const {
-                    calculateSubscoreRawScore,
-                    normalizeSubscoreToPercentage,
-                    calculateMeanScore,
-                    normalizeToAIQPercentage,
-                    getPercentileRange,
-                    getRAGGCategory,
-                    getColorCode,
-                    getQuartile,
-                    getPercentileDescription
-                } = require('../utils/aiqUtils');
-                const AIQResult = require('../models/AIQResult');
-
-                // Sort responses by question order to ensure correct indexing
-                const sortedResponses = [...result.responses].sort((a, b) => {
-                    const indexA = result.questionOrder.findIndex(qId => qId.toString() === a.questionId.toString());
-                    const indexB = result.questionOrder.findIndex(qId => qId.toString() === b.questionId.toString());
-                    return indexA - indexB;
-                });
-
-                // Split responses into 5 competency areas (4 questions each)
-                const a1Responses = sortedResponses.slice(0, 4);   // AI Knowledge
-                const a2Responses = sortedResponses.slice(4, 8);   // AI Use & Skills
-                const a3Responses = sortedResponses.slice(8, 12);  // AI Critical Thinking
-                const a4Responses = sortedResponses.slice(12, 16); // AI Ethics
-                const a5Responses = sortedResponses.slice(16, 20); // AI Self-Efficacy
-
-                // Calculate raw scores for each competency area
-                const a1RawScore = calculateSubscoreRawScore(a1Responses);
-                const a2RawScore = calculateSubscoreRawScore(a2Responses);
-                const a3RawScore = calculateSubscoreRawScore(a3Responses);
-                const a4RawScore = calculateSubscoreRawScore(a4Responses);
-                const a5RawScore = calculateSubscoreRawScore(a5Responses);
-
-                // Normalize each subscore to 0-100 percentage
-                const a1Score = normalizeSubscoreToPercentage(a1RawScore, 4);
-                const a2Score = normalizeSubscoreToPercentage(a2RawScore, 4);
-                const a3Score = normalizeSubscoreToPercentage(a3RawScore, 4);
-                const a4Score = normalizeSubscoreToPercentage(a4RawScore, 4);
-                const a5Score = normalizeSubscoreToPercentage(a5RawScore, 4);
-
-                // Calculate mean score across all 5 competencies
-                const subscores = { a1: a1Score, a2: a2Score, a3: a3Score, a4: a4Score, a5: a5Score };
-                const meanScore = calculateMeanScore(subscores);
-
-                // Normalize to AIQ percentage (0-100)
-                const aiqPercentage = normalizeToAIQPercentage(meanScore);
-
-                // Determine percentile range and RAGG category
-                const percentileRange = getPercentileRange(aiqPercentage);
-                const raggCategory = getRAGGCategory(percentileRange);
-                const colorCode = getColorCode(raggCategory);
-                const quartile = getQuartile(percentileRange);
-                const description = getPercentileDescription(percentileRange);
-
-                // Create AIQResult document
-                const aiqResult = new AIQResult({
-                    userId: result.userId,
-                    resultId: result._id,
-                    subscores: {
-                        a1: a1Score,
-                        a2: a2Score,
-                        a3: a3Score,
-                        a4: a4Score,
-                        a5: a5Score
-                    },
-                    meanScore: meanScore,
-                    aiqPercentage: aiqPercentage,
-                    percentileRange: percentileRange,
-                    raggCategory: raggCategory,
-                    colorCode: colorCode,
-                    quartile: quartile
-                });
-
-                await aiqResult.save();
-                console.log('✅ AIQResult saved successfully:', aiqResult._id);
-
-                responseData.aiqResultId = aiqResult._id;
-                responseData.subscores = subscores;
-                responseData.meanScore = meanScore;
-                responseData.aiqPercentage = aiqPercentage;
-                responseData.percentileRange = percentileRange;
-                responseData.raggCategory = raggCategory;
-                responseData.colorCode = colorCode;
-                responseData.quartile = quartile;
-                responseData.description = description;
-            } catch (aiqError) {
-                console.error('Error calculating AIQ scores:', aiqError);
-                return res.status(500).json({
-                    success: false,
-                    error: 'Failed to calculate AIQ scores',
-                    message: aiqError.message
-                });
-            }
-        }
-
-        // SQ (Sustainability Quotient) - ASM00007
-        const isSQ = assessment && assessment.assessmentCode === "ASM00007";
-        if (isSQ) {
-            try {
-                const sqUtils = require('../utils/sqUtils');
-                const SQResult = require('../models/SQResult');
-
-                console.log('📊 Calculating SQ scores...');
-
-                // Sort responses by questionOrder
-                const sortedResponses = [...result.responses].sort((a, b) => {
-                    const indexA = result.questionOrder.findIndex(qId => qId.toString() === a.questionId.toString());
-                    const indexB = result.questionOrder.findIndex(qId => qId.toString() === b.questionId.toString());
-                    return indexA - indexB;
-                });
-
-                // Calculate raw score (sum of all 20 responses)
-                const rawScore = sqUtils.calculateRawScore(sortedResponses);
-                console.log('Raw Score:', rawScore);
-
-                // Normalize to 0-100 percentage
-                const sqPercentage = sqUtils.normalizeScore(rawScore);
-                console.log('SQ Percentage:', sqPercentage);
-
-                // Determine percentile range
-                const percentileRange = sqUtils.getPercentileRange(sqPercentage);
-                console.log('Percentile Range:', percentileRange);
-
-                // Get RAGG category
-                const raggCategory = sqUtils.getRAGGCategory(percentileRange);
-                console.log('RAGG Category:', raggCategory);
-
-                // Get color code
-                const colorCode = sqUtils.getColorCode(raggCategory);
-                console.log('Color Code:', colorCode);
-
-                // Get quartile
-                const quartile = sqUtils.getQuartile(percentileRange);
-                console.log('Quartile:', quartile);
-
-                // Get description
-                const description = sqUtils.getPercentileDescription(percentileRange);
-
-                // Save SQ result
-                const sqResult = new SQResult({
-                    userId: result.userId,
-                    resultId: result._id,
-                    rawScore,
-                    sqPercentage,
-                    percentileRange,
-                    raggCategory,
-                    colorCode,
-                    quartile,
-                    description
-                });
-
-                await sqResult.save();
-                console.log('✅ SQ result saved successfully');
-
-                // Add SQ data to response
-                responseData.rawScore = rawScore;
-                responseData.sqPercentage = sqPercentage;
-                responseData.percentileRange = percentileRange;
-                responseData.raggCategory = raggCategory;
-                responseData.colorCode = colorCode;
-                responseData.quartile = quartile;
-                responseData.description = description;
-
-            } catch (sqError) {
-                console.error('Error calculating SQ scores:', sqError);
-                return res.status(500).json({
-                    success: false,
-                    error: 'Failed to calculate SQ scores',
-                    message: sqError.message
-                });
-            }
-        }
 
         // Check if this is a Base Line Test (MCQ based)
         const isBaseLineTest = assessment && (assessment.assessmentCode === "ASM99999-T1" || assessment.assessmentCode === "ASM00001");
@@ -1041,6 +548,9 @@ router.post('/:resultId/submit', async (req, res) => {
 
                 // Add all calculated fields to responseData
                 Object.assign(responseData, profileData);
+
+                // Set percentage for badge checking
+                percentage = profileData.baselineScore || 0;
             } catch (blError) {
                 console.error('Error calculating Base Line scores:', blError);
                 return res.status(500).json({
@@ -1051,6 +561,22 @@ router.post('/:resultId/submit', async (req, res) => {
             }
         }
 
+
+        // Check for Assessment Badges
+        try {
+            const badgesEarned = await checkAssessmentBadges(
+                result.userId,
+                result.assessmentCode || assessment?.assessmentCode,
+                percentage
+            );
+
+            if (badgesEarned && badgesEarned.length > 0) {
+                console.log(`🏆 Awarded ${badgesEarned.length} badges for assessment ${result.assessmentId}`);
+                responseData.badgesEarned = badgesEarned;
+            }
+        } catch (badgeError) {
+            console.error("⚠️ Error checking assessment badges:", badgeError);
+        }
 
         res.json({
             success: true,

@@ -8,6 +8,7 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import TaskQuestion from "@/components/TaskQuestion";
+import BadgeModal from "@/components/badges/BadgeModal";
 
 const ModuleViewPage = () => {
   const { courseId, moduleId, dayId } = useParams();
@@ -23,6 +24,35 @@ const ModuleViewPage = () => {
   const [courseData, setCourseData] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Badge notification state
+  const [earnedBadge, setEarnedBadge] = useState(null);
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+
+  const handleBadgesEarned = (newBadges) => {
+    if (newBadges && newBadges.length > 0) {
+      // Use the first new badge for now
+      const badgeData = newBadges[0];
+
+      const formattedBadge = {
+        id: badgeData.badge._id,
+        title: badgeData.badge.title,
+        description: badgeData.badge.description,
+        tier: badgeData.badge.tier,
+        xp: badgeData.badge.xp,
+        category: badgeData.badge.category,
+        earnedDate: badgeData.earnedDate,
+        percentile: 10, // Default or mock value
+        isEarned: true
+      };
+
+      setEarnedBadge(formattedBadge);
+      setShowBadgeModal(true);
+
+      // Play a sound or trigger confetti here if desired
+      toast.success(`Badge Unlocked: ${formattedBadge.title}!`);
+    }
+  };
 
   // Get current user
   useEffect(() => {
@@ -87,7 +117,7 @@ const ModuleViewPage = () => {
               // --- Task Generator Helper ---
               const generateTasksForTitle = (title) => {
                 const t = (title || "").toLowerCase();
-                
+
                 // 1. Critical Thinking / Analysis
                 if (t.includes('critical') || t.includes('thinking') || t.includes('analysis')) {
                   return [
@@ -278,12 +308,12 @@ const ModuleViewPage = () => {
                 videoDescription: videoExtractor('description') || day.moduleDetails?.description || day.description || 'Watch this video to master the concepts for today.',
                 videoTranscription: videoExtractor('transcription') || '',
                 tasks: generateTasksForTitle(day.title || day.moduleDetails?.title).map((t, idx) => ({
-                    ...t,
-                    id: idx + 1,
-                    type: 'mcq',
-                    points: 10,
-                    completed: false
-                  }))
+                  ...t,
+                  id: idx + 1,
+                  type: 'mcq',
+                  points: 10,
+                  completed: false
+                }))
               };
             }),
           }));
@@ -426,7 +456,7 @@ const ModuleViewPage = () => {
         });
 
         const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
-        await courseEnrollmentAPI.updateTaskProgress({
+        const response = await courseEnrollmentAPI.updateTaskProgress({
           studentId: currentUser._id || currentUser.id,
           courseCode: courseCode,
           moduleId: moduleId,
@@ -435,6 +465,11 @@ const ModuleViewPage = () => {
           completed: isCompleted
         });
         console.log('Task progress saved successfully');
+
+        // Check for new badges
+        if (response.badgesEarned && response.badgesEarned.length > 0) {
+          handleBadgesEarned(response.badgesEarned);
+        }
       } catch (error) {
         console.error("Failed to save task progress:", error);
         // Revert on error
@@ -477,7 +512,7 @@ const ModuleViewPage = () => {
     if (currentUser && courseData) {
       try {
         const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
-        await courseEnrollmentAPI.updateVideoProgress({
+        const response = await courseEnrollmentAPI.updateVideoProgress({
           studentId: currentUser._id || currentUser.id,
           courseCode: courseCode,
           moduleId: moduleId,
@@ -486,6 +521,11 @@ const ModuleViewPage = () => {
           videoDuration: duration,
           isCompleted: isCompleted
         });
+
+        // Check for new badges
+        if (response.badgesEarned && response.badgesEarned.length > 0) {
+          handleBadgesEarned(response.badgesEarned);
+        }
       } catch (error) {
         console.error("Failed to save video progress:", error);
       }
@@ -558,18 +598,18 @@ const ModuleViewPage = () => {
     if (dayIndex === 0) return true; // First day always unlocked
     const mod = moduleObj || modules.find(m => m.id === moduleId);
     if (!mod || !mod.days) return false;
-    
+
     // Check previous day
     const prevDay = mod.days[dayIndex - 1];
     const dayTasks = prevDay.tasks || [];
     const completedTasksCount = getDayCompletedCount(moduleId, prevDay.id);
     const prevDayTasksCompleted = completedTasksCount >= dayTasks.length && dayTasks.length > 0;
-    
+
     const prevKey = `${moduleId}-${prevDay.id}`;
     const prevDayMaxWatched = videoProgressMap[prevKey] || 0;
     const prevDayDuration = videoDurationMap[prevKey] || 0;
     const isCompletedFlag = videoCompletionMap[prevKey] === true;
-    
+
     // Strict video completion: either the flag is true, or max watched is roughly equal to duration
     const prevVideoDone = isCompletedFlag || (prevDayDuration > 0 && prevDayMaxWatched >= (prevDayDuration - 2));
     const prevDayHadNoVideo = !prevDay.videoUrl;
@@ -1011,8 +1051,8 @@ const ModuleViewPage = () => {
                             relative flex-1 bg-white dark:bg-[#1e293b] rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col
                             ${!unlocked ? 'border-slate-200 dark:border-slate-800 opacity-60 grayscale-[0.5]' :
                             isDayCompleted
-                            ? 'border-emerald-500/30 shadow-[0_4px_20px_-12px_rgba(16,185,129,0.3)]'
-                            : 'border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-blue-500/30 hover:-translate-y-1'
+                              ? 'border-emerald-500/30 shadow-[0_4px_20px_-12px_rgba(16,185,129,0.3)]'
+                              : 'border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-blue-500/30 hover:-translate-y-1'
                           }
                          `}>
                           {/* Status Stripe */}
@@ -1033,7 +1073,7 @@ const ModuleViewPage = () => {
                                   Done
                                 </span>
                               )}
-                              
+
                               {!unlocked && (
                                 <span className="px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
                                   Locked
@@ -1254,7 +1294,15 @@ const ModuleViewPage = () => {
           </motion.div>
         </main>
       </div>
-    </div>
+
+      {/* Badge Notification Modal */}
+      <BadgeModal
+        isOpen={showBadgeModal}
+        onClose={() => setShowBadgeModal(false)}
+        badge={earnedBadge}
+        userName={currentUser?.fullName || 'Student'}
+      />
+    </div >
   );
 };
 

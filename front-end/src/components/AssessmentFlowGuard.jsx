@@ -7,7 +7,7 @@ import DashboardLoader from "@/components/DashboardLoader";
 /**
  * AssessmentFlowGuard component
  * Enforces authentication AND a strict order of assessments before allowing access to the dashboard.
- * Order: Big5 -> VAK -> EQ -> CQ -> ARQ -> AIQ -> SQ
+ * Order: T1 Baseline Assessment
  * 
  * Developer bypass: Set sessionStorage.setItem('devSkipAssessments', 'true') to skip
  */
