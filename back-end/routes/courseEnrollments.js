@@ -166,6 +166,8 @@ router.get('/student/:studentId', async (req, res) => {
 
 
 // Update task progress
+const { checkCourseCompletionBadges } = require('../utils/badgeUtils');
+
 router.post('/task-progress', async (req, res) => {
     try {
         console.log('Received task-progress request:', req.body);
@@ -257,6 +259,14 @@ router.post('/task-progress', async (req, res) => {
         await enrollment.save();
         console.log('Enrollment saved successfully');
 
+        // Check for course completion badges if status became 'completed'
+        if (enrollment.status === 'completed') {
+            const awardedBadges = await checkCourseCompletionBadges(studentId, course._id, course);
+            if (awardedBadges.length > 0) {
+                return res.json({ success: true, data: enrollment, badgesEarned: awardedBadges });
+            }
+        }
+
         res.json({ success: true, data: enrollment });
 
     } catch (err) {
@@ -270,6 +280,7 @@ router.post('/video-progress', async (req, res) => {
     try {
         const { studentId, courseCode, moduleId, dayId, maxWatchedTime, videoDuration, isCompleted } = req.body;
         const Course = require('../models/Course');
+        const { checkCourseCompletionBadges } = require('../utils/badgeUtils'); // Ensure util is available or rely on top-level import
 
         // Find course
         const course = await Course.findOne({ courseCode });
@@ -336,6 +347,15 @@ router.post('/video-progress', async (req, res) => {
         }
 
         await enrollment.save();
+
+        // Check for course completion badges if status became 'completed'
+        if (enrollment.status === 'completed') {
+            const awardedBadges = await checkCourseCompletionBadges(studentId, course._id, course);
+            if (awardedBadges.length > 0) {
+                return res.json({ success: true, data: enrollment, badgesEarned: awardedBadges });
+            }
+        }
+
         res.json({ success: true, data: enrollment });
 
     } catch (err) {
