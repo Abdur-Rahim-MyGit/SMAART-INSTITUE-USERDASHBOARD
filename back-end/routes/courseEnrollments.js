@@ -268,7 +268,7 @@ router.post('/task-progress', async (req, res) => {
 // Update video progress (sync maxWatchedTime)
 router.post('/video-progress', async (req, res) => {
     try {
-        const { studentId, courseCode, moduleId, dayId, maxWatchedTime, videoDuration, isCompleted } = req.body;
+        const { studentId, courseCode, moduleId, dayId, stepId, maxWatchedTime, videoDuration, isCompleted } = req.body;
         const Course = require('../models/Course');
 
         // Find course
@@ -304,20 +304,30 @@ router.post('/video-progress', async (req, res) => {
             });
             modProgress = enrollment.moduleProgress[enrollment.moduleProgress.length - 1];
         }
-
-        // Find or create video progress for this specific day
+        // Find or create video progress for this specific day AND step
         if (!modProgress.videoProgress) modProgress.videoProgress = [];
-        let vidProgress = modProgress.videoProgress.find(vp => vp.dayId === parseInt(dayId));
+
+        // Find existing record by both dayId and stepId
+        let vidProgress = modProgress.videoProgress.find(vp =>
+            vp.dayId === parseInt(dayId) &&
+            (vp.stepId === parseInt(stepId) || (!vp.stepId && parseInt(stepId) === 1))
+        );
 
         if (!vidProgress) {
+            console.log(`Adding new video progress for S${dayId} Step ${stepId}`);
             modProgress.videoProgress.push({
                 dayId: parseInt(dayId),
-                maxWatchedTime: parseFloat(maxWatchedTime),
+                stepId: parseInt(stepId || 1),
+                maxWatchedTime: parseFloat(maxWatchedTime || 0),
                 videoDuration: parseFloat(videoDuration || 0),
                 isCompleted: !!isCompleted,
                 lastUpdated: new Date()
             });
         } else {
+            console.log(`Updating existing video progress for S${dayId} Step ${stepId}`);
+            // Update stepId if it was missing (legacy migration)
+            if (!vidProgress.stepId) vidProgress.stepId = parseInt(stepId || 1);
+
             // Only update if the new time is greater
             if (parseFloat(maxWatchedTime) > vidProgress.maxWatchedTime) {
                 vidProgress.maxWatchedTime = parseFloat(maxWatchedTime);
