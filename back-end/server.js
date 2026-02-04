@@ -102,13 +102,6 @@ app.use('/api/registrations', require('./routes/registrations'));
 // Academic Routes
 app.use('/api/assessments', require('./routes/assessments'));
 app.use('/api/results', require('./routes/results'));
-app.use('/api/big5results', require('./routes/big5results'));
-app.use('/api/vakresults', require('./routes/vakresults'));
-app.use('/api/eqresults', require('./routes/eqresults'));
-app.use('/api/cqresults', require('./routes/cqresults'));
-app.use('/api/arqresults', require('./routes/arqresults'));
-app.use('/api/aiqresults', require('./routes/aiqresults'));
-app.use('/api/sqresults', require('./routes/sqresults'));
 app.use('/api/baselineresults', require('./routes/baselineresults'));
 app.use('/api/courses', require('./routes/courses'));
 app.use('/api/enrollments', require('./routes/enrollments'));
