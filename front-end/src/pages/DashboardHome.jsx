@@ -584,7 +584,10 @@ const DashboardHome = () => {
                             <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[#002147] text-xs font-bold shadow-sm">
                               {enrolledCourses[0].progress || 0}% Complete
                             </div>
+<<<<<<< Updated upstream
+=======
                           </div>
+>>>>>>> Stashed changes
 
                           {/* Right: Details */}
                           <div className="md:col-span-7 p-6">
