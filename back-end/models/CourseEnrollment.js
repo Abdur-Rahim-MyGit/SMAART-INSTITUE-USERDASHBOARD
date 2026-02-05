@@ -127,22 +127,46 @@ courseEnrollmentSchema.methods.calculateProgress = function () {
 };
 
 // Update progress before saving
-courseEnrollmentSchema.pre('save', function (next) {
-  this.progress = this.calculateProgress();
+courseEnrollmentSchema.pre('save', async function (next) {
+  try {
+    // Only calculate progress if there is module progress
+    if (this.moduleProgress && this.moduleProgress.length > 0) {
+      // Need to fetch the course to know total number of modules
+      const Course = mongoose.model('Course');
+      const course = await Course.findById(this.course);
 
-  // Update status based on progress
-  if (this.progress === 0) {
-    this.status = 'enrolled';
-  } else if (this.progress === 100) {
-    this.status = 'completed';
-    if (!this.completionDate) {
-      this.completionDate = new Date();
+      if (course && course.modules && course.modules.length > 0) {
+        const completedModules = this.moduleProgress.filter(m => m.status === 'completed').length;
+        // Calculate progress based on TOTAL modules in the course, not just started ones
+        this.progress = Math.min(100, Math.round((completedModules / course.modules.length) * 100));
+      } else {
+        // Fallback if course lookup fails (use existing method but limit to 100)
+        this.progress = Math.min(100, this.calculateProgress());
+      }
+    } else {
+      this.progress = 0;
     }
-  } else {
-    this.status = 'in_progress';
-  }
 
-  next();
+    // Update status based on progress
+    if (this.progress === 0) {
+      this.status = 'enrolled';
+    } else if (this.progress === 100) {
+      this.status = 'completed';
+      if (!this.completionDate) {
+        this.completionDate = new Date();
+      }
+    } else {
+      this.status = 'in_progress';
+      // If previously completed but now new modules added, reset completion date
+      if (this.status !== 'completed') {
+        this.completionDate = undefined;
+      }
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = mongoose.model('CourseEnrollment', courseEnrollmentSchema);

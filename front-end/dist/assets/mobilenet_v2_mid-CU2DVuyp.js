@@ -1,1 +1,0 @@
-import{_ as r}from"./index-BPXnk1uH.js";var t=function(){return r(()=>import("./model.min-Dy8shFxn.js"),[])},o=[function(){return r(()=>import("./group1-shard1of2.min-CbLR05No.js"),[])},function(){return r(()=>import("./group1-shard2of2.min-D8ff2eBC.js"),[])}];export{t as modelJson,o as weightBundles};
