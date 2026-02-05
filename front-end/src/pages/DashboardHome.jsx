@@ -516,7 +516,6 @@ const DashboardHome = () => {
                             </button>
                           </div>
                         </div>
-                      </div>
 
                     {/* Progress Bar */}
                     <div className="mb-6">
@@ -585,6 +584,10 @@ const DashboardHome = () => {
                             <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[#002147] text-xs font-bold shadow-sm">
                               {enrolledCourses[0].progress || 0}% Complete
                             </div>
+<<<<<<< Updated upstream
+=======
+                          </div>
+>>>>>>> Stashed changes
 
                           {/* Right: Details */}
                           <div className="md:col-span-7 p-6">
@@ -634,6 +637,7 @@ const DashboardHome = () => {
                             </button>
                           </div>
                         </div>
+                      </div>
                     ) : (
                       // Empty state
                       <div className="bg-gray-50 dark:bg-white/[0.02] rounded-xl border-2 border-dashed border-gray-300 dark:border-white/10 p-10 text-center">
