@@ -151,6 +151,7 @@ app.use('/api/contact', require('./routes/contact'));
 app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/upload', require('./routes/uploadRoutes')); // New upload route
 app.use('/api/badges', require('./routes/badges')); // Badges & Achievement System
+app.use('/api/notifications', require('./routes/notifications')); // Notification System
 
 
 

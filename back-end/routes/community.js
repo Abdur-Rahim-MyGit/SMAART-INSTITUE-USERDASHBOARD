@@ -9,6 +9,7 @@ const Teacher = require('../models/Teacher');
 const Registration = require('../models/Registration');
 const { protect } = require('../middleware/auth');
 const { uploadCommunity } = require('../middleware/upload');
+const { notifyCommunityReply } = require('../services/notificationService');
 
 // Apply protection to all community routes
 router.use(protect);
@@ -681,6 +682,28 @@ router.post('/discussions/:id/reply', async (req, res) => {
     });
 
     await discussion.save();
+
+    // Send notification to post author about the reply (don't notify if replying to own post)
+    if (discussion.author.toString() !== authorId) {
+      try {
+        // Get replier's name for the notification
+        let replier = await User.findById(authorId).select('fullName');
+        if (!replier) replier = await Student.findById(authorId).select('fullName');
+        if (!replier) replier = await Teacher.findById(authorId).select('fullName');
+        if (!replier) replier = await Registration.findById(authorId).select('fullName');
+        const replierName = replier?.fullName || 'Someone';
+
+        await notifyCommunityReply(
+          discussion.author,
+          discussion.title || 'your post',
+          replierName,
+          discussion._id
+        );
+        console.log(`🔔 Notification sent for community reply to ${discussion.author}`);
+      } catch (notifyError) {
+        console.error("⚠️ Error sending reply notification:", notifyError);
+      }
+    }
 
     const populatedDiscussion = await CommunityPost.findById(discussion._id).lean();
 

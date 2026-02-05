@@ -4,6 +4,7 @@ const Assessment = require('../models/Assessment');
 const { protect } = require('../middleware/auth');
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions } = require('../utils/questionShuffler');
 const { checkAssessmentBadges } = require('../utils/badgeUtils');
+const { notifyAssessmentComplete } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -576,6 +577,18 @@ router.post('/:resultId/submit', async (req, res) => {
             }
         } catch (badgeError) {
             console.error("⚠️ Error checking assessment badges:", badgeError);
+        }
+
+        // Send notification for assessment completion
+        try {
+            await notifyAssessmentComplete(
+                result.userId,
+                assessment?.assessmentName || 'Assessment',
+                percentage
+            );
+            console.log(`🔔 Notification sent for assessment completion: ${assessment?.assessmentName}`);
+        } catch (notifyError) {
+            console.error("⚠️ Error sending assessment notification:", notifyError);
         }
 
         res.json({
