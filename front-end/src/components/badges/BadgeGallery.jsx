@@ -5,94 +5,8 @@ import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
 
 // Sample badge data - In production, this would come from your API
-const sampleBadges = [
-    {
-        id: 'BADGE-CRQ-2026-001',
-        title: 'Cognitive Champion',
-        description: 'Mastered cognitive reasoning assessments with exceptional performance',
-        tier: 'gold',
-        xp: 500,
-        percentile: 5,
-        category: 'assessment',
-        earnedDate: '2026-01-15',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-EQ-2026-002',
-        title: 'Emotional Intelligence Master',
-        description: 'Demonstrated outstanding emotional quotient skills',
-        tier: 'silver',
-        xp: 350,
-        percentile: 15,
-        category: 'assessment',
-        earnedDate: '2026-01-20',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-LRN-2026-003',
-        title: 'Quick Learner',
-        description: 'Completed 5 courses in record time',
-        tier: 'bronze',
-        xp: 200,
-        percentile: 25,
-        category: 'learning',
-        earnedDate: '2026-01-10',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-SOC-2026-004',
-        title: 'Community Leader',
-        description: 'Actively contributed to community discussions',
-        tier: 'silver',
-        xp: 300,
-        percentile: 20,
-        category: 'community',
-        earnedDate: '2026-01-25',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-STREAK-2026-005',
-        title: '30-Day Streak',
-        description: 'Maintained a 30-day learning streak',
-        tier: 'gold',
-        xp: 450,
-        percentile: 10,
-        category: 'streak',
-        earnedDate: '2026-02-01',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-PRO-2026-006',
-        title: 'Professional Ready',
-        description: 'Completed all professional readiness assessments',
-        tier: 'gold',
-        xp: 600,
-        percentile: 3,
-        category: 'certification',
-        isEarned: false,
-    },
-    {
-        id: 'BADGE-AI-2026-007',
-        title: 'AI Literacy Pioneer',
-        description: 'Demonstrated advanced AI & Digital literacy',
-        tier: 'bronze',
-        xp: 250,
-        percentile: 30,
-        category: 'assessment',
-        earnedDate: '2026-01-28',
-        isEarned: true,
-    },
-    {
-        id: 'BADGE-ETHICS-2026-008',
-        title: 'Ethics Guardian',
-        description: 'Mastered ethical and sustainability judgement assessments',
-        tier: 'silver',
-        xp: 350,
-        percentile: 15,
-        category: 'assessment',
-        isEarned: false,
-    },
-];
+// Sample badge data removed to show only real achievements
+const sampleBadges = [];
 
 const categories = [
     { id: 'all', label: 'All Badges', icon: FaTrophy },
@@ -103,7 +17,22 @@ const categories = [
     { id: 'certification', label: 'Certification', icon: FaCrown },
 ];
 
-const BadgeGallery = ({ badges = sampleBadges, userName = 'Student' }) => {
+const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) => {
+    // Define all possible badges in the system
+    const allPossibleBadges = [
+        {
+            id: 'EARLY-ACHIEVER',
+            title: 'Early Achiever',
+            description: 'Completed the first three sessions of your first course!',
+            tier: 'bronze',
+            xp: 150,
+            category: 'learning',
+            isEarned: userEarnedBadges.some(ub => ub.badgeId === 'EARLY-ACHIEVER')
+        }
+    ];
+
+    const badges = allPossibleBadges;
+
     const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
@@ -125,7 +54,9 @@ const BadgeGallery = ({ badges = sampleBadges, userName = 'Student' }) => {
 
     const handleBadgeClick = (badge) => {
         if (badge.isEarned) {
-            setSelectedBadge(badge);
+            // Find the specific earned badge to get its unique _id
+            const earnedBadge = userEarnedBadges.find(ub => ub.badgeId === badge.id);
+            setSelectedBadge(earnedBadge || badge);
             setIsModalOpen(true);
         }
     };
@@ -189,51 +120,12 @@ const BadgeGallery = ({ badges = sampleBadges, userName = 'Student' }) => {
                 </motion.div>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
+            {/* Filters removed for single badge display */}
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                    <FaFilter className="w-4 h-4" />
-                    <span className="text-sm font-medium">Filter:</span>
+                    <FaTrophy className="w-4 h-4 text-[#30919D]" />
+                    <span className="text-sm font-bold uppercase tracking-wider text-[#002147] dark:text-white">Your Achievements</span>
                 </div>
-
-                {/* Category Filters */}
-                <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => {
-                        const Icon = category.icon;
-                        return (
-                            <button
-                                key={category.id}
-                                onClick={() => setActiveCategory(category.id)}
-                                className={`
-                                    flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
-                                    transition-all duration-200
-                                    ${
-                                        activeCategory === category.id
-                                            ? 'bg-[#002147] text-white shadow-md'
-                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                    }
-                                `}
-                            >
-                                <Icon className="w-3.5 h-3.5" />
-                                {category.label}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {/* Earned Only Toggle */}
-                <label className="flex items-center gap-2 cursor-pointer ml-auto">
-                    <input
-                        type="checkbox"
-                        checked={showEarnedOnly}
-                        onChange={(e) => setShowEarnedOnly(e.target.checked)}
-                        className="sr-only peer"
-                    />
-                    <div className="relative w-10 h-5 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-checked:bg-[#30919D] transition-colors">
-                        <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${showEarnedOnly ? 'translate-x-5' : ''}`} />
-                    </div>
-                    <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">Earned Only</span>
-                </label>
             </div>
 
             {/* Badge Grid */}

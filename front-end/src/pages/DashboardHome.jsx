@@ -34,11 +34,12 @@ import TaskListSkeleton from '@/components/skeletons/TaskListSkeleton';
 import { API_BASE_URL } from '@/services/api';
 import ActivityFeed from '@/components/ActivityFeed';
 import UpcomingDeadlines from '@/components/UpcomingDeadlines';
+import useUser from "@/hooks/useUser";
 
 const DashboardHome = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [user, setUser] = useState({ fullName: "Student", id: "23606" });
+  const { user, loading: userLoading } = useUser();
   const { avatarData } = useAvatar();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showVisionSplash, setShowVisionSplash] = useState(false);
@@ -64,11 +65,7 @@ const DashboardHome = () => {
       setShowVisionSplash(true);
     }
   }, []);
-
   useEffect(() => {
-    const userData = sessionStorage.getItem("user");
-    if (userData) setUser(JSON.parse(userData));
-
     // Real-time clock update
     const clockInterval = setInterval(() => {
       setCurrentDate(new Date());
@@ -110,8 +107,9 @@ const DashboardHome = () => {
 
         let courses = [];
         if (coursesResponse.ok) {
-          courses = await coursesResponse.json();
-          setEnrolledCourses(Array.isArray(courses) ? courses : []);
+          const coursesData = await coursesResponse.json();
+          courses = Array.isArray(coursesData.data) ? coursesData.data : (Array.isArray(coursesData) ? coursesData : []);
+          setEnrolledCourses(courses);
         }
 
         // Fetch baseline results
@@ -130,44 +128,90 @@ const DashboardHome = () => {
           baseline = await baselineResponse.json();
         }
 
-        // Calculate stats
+        // Calculate stats and resume point
         const totalCourses = courses.length;
-        let completedModules = 0;
-        let totalModules = 0;
-        let completedThisWeek = 0;
+        let completedModulesCount = 0;
+        let totalProgressSum = 0;
+        let resumeUrl = '/dashboard/courses';
+        
+        // Find the "Active" course (most recently accessed or first one)
+        const activeCourseEnrollment = [...courses].sort((a, b) => 
+          new Date(b.lastAccessedAt || 0) - new Date(a.lastAccessedAt || 0)
+        )[0];
 
-        const now = new Date();
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        if (activeCourseEnrollment) {
+          const course = activeCourseEnrollment.course;
+          const enrollment = activeCourseEnrollment;
+          
+          // Basic logic: find first module and day that isn't fully completed
+          // We look into enrollment.moduleProgress which we populated in backend
+          let resumeModuleId = 1;
+          let resumeDayId = 1;
+
+          if (course && Array.isArray(course.modules)) {
+            let found = false;
+            for (let mIdx = 0; mIdx < course.modules.length; mIdx++) {
+              const moduleDoc = course.modules[mIdx];
+              const modProgress = (enrollment.moduleProgress || []).find(
+                mp => mp.module === moduleDoc._id || mp.module?._id === moduleDoc._id
+              );
+
+              if (!modProgress || modProgress.status !== 'completed') {
+                resumeModuleId = mIdx + 1;
+                
+                // Find first day that isn't completed in this module
+                // We check videoProgress and completedTasks
+                const videoProgress = modProgress?.videoProgress || [];
+                const completedTasks = modProgress?.completedTasks || [];
+                
+                // Assume 6 sessions per module if not specified
+                for (let d = 1; d <= 6; d++) {
+                  const isVidDone = videoProgress.some(vp => vp.dayId === d && vp.isCompleted);
+                  const isTaskDone = completedTasks.some(ct => ct.dayId === d);
+                  
+                  if (!isVidDone || !isTaskDone) {
+                    resumeDayId = d;
+                    found = true;
+                    break;
+                  }
+                }
+              }
+              if (found) break;
+            }
+          }
+
+          if (course?._id) {
+             // If courseId is valid MongoDB ID, use it, else use normalized code (fallback)
+             const cid = course._id;
+             resumeUrl = `/dashboard/courses/${cid}/modules/${resumeModuleId}/days/${resumeDayId}`;
+          }
+        }
 
         courses.forEach(enrollment => {
-          if (enrollment.modules && Array.isArray(enrollment.modules)) {
-            enrollment.modules.forEach(module => {
-              totalModules++;
-              if (module.completed) {
-                completedModules++;
-
-                // Check if completed this week
-                if (module.completedAt && new Date(module.completedAt) > weekAgo) {
-                  completedThisWeek++;
-                }
+          totalProgressSum += (enrollment.progress || 0);
+          if (enrollment.moduleProgress && Array.isArray(enrollment.moduleProgress)) {
+            enrollment.moduleProgress.forEach(module => {
+              if (module.status === 'completed') {
+                completedModulesCount++;
               }
             });
           }
         });
 
-        // Calculate weekly progress
-        const weeklyProgressPercent = totalModules > 0
-          ? Math.round((completedThisWeek / totalModules) * 100)
+        // Calculate average progress across all enrolled courses
+        const overallProgress = totalCourses > 0 
+          ? Math.round(totalProgressSum / totalCourses) 
           : 0;
 
         setStats({
           totalCourses,
-          completedModules,
+          completedModules: completedModulesCount,
           baselineScore: baseline?.baselineScore || 0,
-          dayStreak: 12 // TODO: Calculate from activity log
+          dayStreak: 12, // TODO: Calculate from activity log
+          resumeUrl
         });
 
-        setWeeklyProgress(weeklyProgressPercent);
+        setWeeklyProgress(overallProgress);
 
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -397,7 +441,7 @@ const DashboardHome = () => {
                               Welcome back, {user.fullName.split(' ')[0]}! 👋
                             </h1>
                             <p className="text-white/70 text-base max-w-xl leading-relaxed">
-                              You've completed <span className="text-white font-semibold">{weeklyProgress}%</span> of your weekly goal.
+                              You've completed <span className="text-white font-semibold">{weeklyProgress}%</span> of your overall course journey.
                               {enrolledCourses.length > 0 ? (
                                 <> Keep up the momentum and continue your learning journey!</>
                               ) : (
@@ -405,10 +449,9 @@ const DashboardHome = () => {
                               )}
                             </p>
 
-                            {/* Weekly Progress Bar */}
                             <div className="mt-4 space-y-2">
                               <div className="flex justify-between text-xs text-white/70">
-                                <span>Weekly Progress</span>
+                                <span>Overall Progress</span>
                                 <span>{weeklyProgress}%</span>
                               </div>
                               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -424,7 +467,7 @@ const DashboardHome = () => {
 
                           <div className="mt-8 flex items-center gap-4">
                             <button
-                              onClick={() => navigate('/dashboard/courses')} // Redirect to courses
+                              onClick={() => navigate(stats.resumeUrl || '/dashboard/courses')} // Redirect to resume point
                               className="px-6 py-2.5 bg-[#30919D] hover:bg-[#287a84] text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-[#30919D]/20 flex items-center gap-2"
                             >
                               Resume Learning
@@ -483,7 +526,7 @@ const DashboardHome = () => {
                       <div className="lms-card p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                         {/* Left: Video Thumbnail */}
                         <div
-                          onClick={() => navigate('/dashboard/courses')}
+                          onClick={() => navigate(stats.resumeUrl || '/dashboard/courses')}
                           className="md:col-span-5 relative group cursor-pointer overflow-hidden rounded-2xl h-48 md:h-full min-h-[180px]"
                         >
                           <img

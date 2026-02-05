@@ -1,6 +1,7 @@
 const express = require('express');
 const CourseEnrollment = require('../models/CourseEnrollment');
 const { protect } = require('../middleware/auth');
+const { awardEarlyAchieverBadge } = require('../utils/badgeHelper');
 
 const router = express.Router();
 
@@ -254,8 +255,16 @@ router.post('/task-progress', async (req, res) => {
             }
         }
 
+        enrollment.lastAccessedAt = new Date();
         await enrollment.save();
         console.log('Enrollment saved successfully');
+
+        // Check for badge eligibility
+        try {
+            await awardEarlyAchieverBadge(studentId);
+        } catch (badgeErr) {
+            console.error('Error in badge awarding:', badgeErr);
+        }
 
         res.json({ success: true, data: enrollment });
 
@@ -345,7 +354,16 @@ router.post('/video-progress', async (req, res) => {
             }
         }
 
+        enrollment.lastAccessedAt = new Date();
         await enrollment.save();
+
+        // Check for badge eligibility
+        try {
+            await awardEarlyAchieverBadge(studentId);
+        } catch (badgeErr) {
+            console.error('Error in badge awarding:', badgeErr);
+        }
+
         res.json({ success: true, data: enrollment });
 
     } catch (err) {

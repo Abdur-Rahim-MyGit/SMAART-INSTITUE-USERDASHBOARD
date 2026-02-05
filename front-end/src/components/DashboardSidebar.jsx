@@ -15,6 +15,7 @@ import {
   Settings,
   HelpCircle,
   Bell,
+  ShieldCheck,
   MoreHorizontal,
 } from "lucide-react";
 import ProfileDropdown from "@/components/ProfileDropdown";
@@ -27,6 +28,7 @@ const menuItems = [
   { icon: Lightbulb, label: "Vision Boards", path: "/dashboard/vision-boards" },
   { icon: Zap, label: "SMAART Toolkit", path: "/dashboard/smaart-toolkit" },
   { icon: Award, label: "My Certificate", path: "/dashboard/certificate" },
+  { icon: ShieldCheck, label: "Verify Certificate", path: "/verify-certificate" },
 ];
 
 

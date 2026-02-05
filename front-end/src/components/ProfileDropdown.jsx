@@ -2,40 +2,17 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AvatarProfileCard from "./AvatarProfileCard";
+import useUser from "@/hooks/useUser";
 
 import { API_BASE_URL, getBackendUrl } from "../services/api";
 
 const ProfileDropdown = () => {
   const [showProfileCard, setShowProfileCard] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, refreshUser } = useUser();
   const [profilePhoto, setProfilePhoto] = useState(null);
   const dropdownRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const navigate = useNavigate();
-
-  // Get user data from sessionStorage
-  useEffect(() => {
-    const userData = sessionStorage.getItem("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser({
-        // Preserve the user ID - check all possible ID fields
-        id: parsedUser.id || parsedUser._id || parsedUser.userId,
-        _id: parsedUser._id || parsedUser.id || parsedUser.userId,
-        userId: parsedUser.userId || parsedUser.id || parsedUser._id,
-        fullName: parsedUser.fullName || "User",
-        name: parsedUser.fullName || "User",
-        email: parsedUser.email || "user@example.com",
-        role: parsedUser.role || "student",
-        userType: parsedUser.userType,
-        gender: parsedUser.gender, // Remove default "male" to allow fallback logic in AvatarProfileCard
-        avatar: null, // Will be fetched from Registration API
-        college: parsedUser.college,
-        studentId: parsedUser.studentId,
-        hasRegistration: parsedUser.hasRegistration
-      });
-    }
-  }, []);
 
   // Fetch profile photo from Registration API
   useEffect(() => {
@@ -49,19 +26,7 @@ const ProfileDropdown = () => {
           if (data.otherDetails?.profilePhoto) {
             setProfilePhoto(`${getBackendUrl()}/${data.otherDetails.profilePhoto}`);
           }
-          // Update user data from registration if available (name, gender)
-          if (data.fullName || data.gender) {
-            setUser(prev => {
-              const updated = {
-                ...prev,
-                gender: data.gender || prev?.gender,
-                fullName: data.fullName || prev?.fullName,
-                name: data.fullName || prev?.name
-              };
-              sessionStorage.setItem("user", JSON.stringify(updated));
-              return updated;
-            });
-          }
+          // Note: UserContext handles overall user data syncing
         }
       } catch (error) {
         console.error("Error fetching profile photo:", error);

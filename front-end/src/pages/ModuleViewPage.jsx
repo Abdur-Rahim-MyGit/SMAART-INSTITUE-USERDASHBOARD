@@ -8,8 +8,10 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import TaskQuestion from "@/components/TaskQuestion";
+import useUser from "@/hooks/useUser";
 
 const ModuleViewPage = () => {
+  const { user: currentUser, loading: userLoading } = useUser();
   const { courseId, moduleId, dayId } = useParams();
   const navigate = useNavigate();
   const [selectedModule, setSelectedModule] = useState(moduleId ? parseInt(moduleId) : null);
@@ -21,17 +23,8 @@ const ModuleViewPage = () => {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [courseData, setCourseData] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedStepId, setSelectedStepId] = useState(null); // Track user-selected step
-
-  // Get current user
-  useEffect(() => {
-    const userData = sessionStorage.getItem("user");
-    if (userData) {
-      setCurrentUser(JSON.parse(userData));
-    }
-  }, []);
 
   // Reset selected step when session changes
   useEffect(() => {
@@ -72,7 +65,7 @@ const ModuleViewPage = () => {
             description: module.description || 'No description available',
             duration: module.timeAllocation ? `${module.timeAllocation} minutes` : 'Duration not specified',
             sequence: module.sequence || index + 1,
-            days: Array.from({ length: Math.max(5, module.days?.length || 0) }, (_, dayIndex) => {
+            days: Array.from({ length: Math.max(6, module.days?.length || 0) }, (_, dayIndex) => {
               const day = module.days?.[dayIndex]; // Existing day or undefined
               const id = dayIndex + 1;
 
@@ -152,7 +145,7 @@ const ModuleViewPage = () => {
 
               // --- DUMMY DATA GENERATOR (if day is missing) ---
               if (!day) {
-                const dayTitle = `Session ${id}: ${['Core Foundations', 'Advanced Concepts', 'Strategic Analysis', 'Practical Lab', 'Mastery Review'][dayIndex % 5]}`;
+                const dayTitle = `Session ${id}: ${['Core Foundations', 'Advanced Concepts', 'Strategic Analysis', 'Practical Lab', 'Mastery Review', 'Expert Insight'][dayIndex % 6]}`;
                 return {
                   id,
                   _id: `dummy-${id}`,
@@ -335,11 +328,9 @@ const ModuleViewPage = () => {
           setModules(fetchedModules);
 
           // 2. Fetch Enrollment Progress if user is logged in
-          const userData = sessionStorage.getItem("user");
-          if (userData) {
-            const user = JSON.parse(userData);
+          if (currentUser) {
             try {
-              const enrollmentResponse = await courseEnrollmentAPI.getByStudentAndCourse(user._id || user.id, course._id);
+              const enrollmentResponse = await courseEnrollmentAPI.getByStudentAndCourse(currentUser._id || currentUser.id, course._id);
 
               if (enrollmentResponse.success && enrollmentResponse.data && enrollmentResponse.data.length > 0) {
                 const enrollment = enrollmentResponse.data[0];
@@ -395,7 +386,7 @@ const ModuleViewPage = () => {
     };
 
     fetchData();
-  }, [courseId]);
+  }, [courseId, currentUser]);
 
   // --- ROUTE GUARD EFFECT ---
   // Strictly enforce sequential progression on mount and URL changes
@@ -436,7 +427,7 @@ const ModuleViewPage = () => {
         title: `Session ${j + 1}`,
         description: `Topic for Day ${j + 1}`,
         duration: "45 minutes",
-        dayType: j < 5 ? 'course' : 'catchup',
+        dayType: j < 6 ? 'course' : 'catchup',
         videoUrl: null, // No video for placeholder data
         videoTitle: `Session ${j + 1} Lesson`,
         videoDescription: "Content not yet available. Please contact your instructor.",
@@ -615,9 +606,16 @@ const ModuleViewPage = () => {
       const key = `${mId}-${session.id}-1`;
       return videoCompletionMap[key] === true;
     }
-    // Empty session: If no stairs to climb, you're already at the top.
-    // We count empty sessions as done so they don't block progression.
-    return true;
+    // No video/steps: Check tasks if they exist
+    if (session.tasks && session.tasks.length > 0) {
+      const completedTasksCount = session.tasks.filter(t => 
+        completedTasks[`${mId}-${session.id}-${t.id}`] === true
+      ).length;
+      return completedTasksCount === session.tasks.length;
+    }
+
+    // Default: If truly empty and no tasks, don't show as done by default
+    return false;
   };
 
   const isDayUnlocked = (moduleId, dayIndex, moduleObj) => {

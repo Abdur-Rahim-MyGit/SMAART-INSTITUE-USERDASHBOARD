@@ -6,8 +6,9 @@ const menuItems = [
   { id: 'home', label: 'Home', path: '/dashboard' },
   { id: 'courses', label: 'My Courses', path: '/dashboard/courses' },
   { id: 'vision', label: 'Vision Boards', path: '/dashboard/vision-boards' },
-  { id: 'toolkit', label: 'SMAART Toolkit', path: '/dashboard/smaart-toolkit' },
+  { id: 'toolkit', label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
   { id: 'certificate', label: 'Certificate', path: '/dashboard/certificate' },
+  { id: 'verify', label: 'Verify', path: '/verify-certificate' },
 ];
 
 const InteractiveMenu = () => {
