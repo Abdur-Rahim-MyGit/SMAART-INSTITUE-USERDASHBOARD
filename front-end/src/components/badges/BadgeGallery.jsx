@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { FaTrophy, FaStar, FaFire, FaMedal, FaCrown, FaChartLine, FaFilter } from 'react-icons/fa';
 import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
+import { Loader2 } from 'lucide-react';
 
 // Sample badge data - In production, this would come from your API
 // Sample badge data removed to show only real achievements
@@ -37,6 +38,7 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
     const [showEarnedOnly, setShowEarnedOnly] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchBadges = async () => {

@@ -164,12 +164,37 @@ const DashboardHome = () => {
                 const videoProgress = modProgress?.videoProgress || [];
                 const completedTasks = modProgress?.completedTasks || [];
                 
-                // Assume 6 sessions per module if not specified
-                for (let d = 1; d <= 6; d++) {
+                // Use actual days from module if available, otherwise fallback to 6
+                const daysCount = moduleDoc.days?.length || 6;
+                
+                for (let d = 1; d <= daysCount; d++) {
+                  // Check simple completion first (if we have day-level tracking in future)
+                  // For now check granular progress
+                  
+                  // Check if any video step for this day is completed
+                  // In new model, we might have multiple steps. 
+                  // If ANY step is done, we consider "started". 
+                  // But to be "completed", ALL steps for that day should be done.
+                  // For "resume", we want the first NOT fully completed day.
+                  
+                  // However, the current logic checks if *any* video is done. 
+                  // If isVidDone is true, it skips. This implies "if begun, count as done"? 
+                  // The original code was: if (!isVidDone || !isTaskDone) -> resumeDayId = d;
+                  // So if EITHER video OR task is NOT done, we resume there.
+                  // This means we find the first day where something is missing.
+                  
                   const isVidDone = videoProgress.some(vp => vp.dayId === d && vp.isCompleted);
                   const isTaskDone = completedTasks.some(ct => ct.dayId === d);
                   
-                  if (!isVidDone || !isTaskDone) {
+                  // If tasks exist for this day in the module definition, check them
+                  const dayDoc = moduleDoc.days?.find(day => day.dayNumber === d || day.id === d);
+                  const hasTasks = dayDoc?.tasks?.length > 0;
+                  
+                  // If there are no tasks, ignore isTaskDone check
+                  const taskCondition = hasTasks ? isTaskDone : true;
+                  
+                  // Simplied: If video is not done OR (tasks exist and are not done)
+                  if (!isVidDone || !taskCondition) {
                     resumeDayId = d;
                     found = true;
                     break;
@@ -500,7 +525,7 @@ const DashboardHome = () => {
                             </div>
                           </motion.div>
 
-                          <div className="mt-8 flex items-center gap-4">
+                          <div className="mt-8 flex items-center gap-6">
                             <button
                               onClick={() => navigate(stats.resumeUrl || '/dashboard/courses')} // Redirect to resume point
                               className="px-6 py-2.5 bg-[#30919D] hover:bg-[#287a84] text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-[#30919D]/20 flex items-center gap-2"
@@ -512,37 +537,17 @@ const DashboardHome = () => {
                               onClick={() => navigate('/profile')}
                               className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-medium transition-all backdrop-blur-md border border-white/10"
                             >
-                              View Activity
+                              View Profile
                             </button>
                           </div>
                         </div>
-
-                    {/* Progress Bar */}
-                    <div className="mb-6">
-                      <div className="h-2.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#30919D] rounded-full transition-all duration-1000"
-                          style={{ width: `${weeklyProgress}%` }}
-                        />
                       </div>
-                    </div>
+
+
 
                     {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        onClick={() => navigate('/dashboard/courses')}
-                        className="px-6 py-2.5 bg-[#30919D] hover:bg-[#287a84] text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2"
-                      >
-                        <Play className="w-4 h-4 fill-current" />
-                        Continue Learning
-                      </button>
-                      <button
-                        onClick={() => navigate('/profile')}
-                        className="px-6 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold transition-colors"
-                      >
-                        View Profile
-                      </button>
-                    </div>
+
+                  </div>
                   </section>
 
                   {/* Current Course - Professional Design */}
@@ -584,10 +589,7 @@ const DashboardHome = () => {
                             <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-lg text-[#002147] text-xs font-bold shadow-sm">
                               {enrolledCourses[0].progress || 0}% Complete
                             </div>
-<<<<<<< Updated upstream
-=======
                           </div>
->>>>>>> Stashed changes
 
                           {/* Right: Details */}
                           <div className="md:col-span-7 p-6">
