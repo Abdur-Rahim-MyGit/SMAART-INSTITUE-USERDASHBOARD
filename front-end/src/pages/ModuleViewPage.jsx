@@ -9,6 +9,8 @@ import DashboardHeader from "@/components/DashboardHeader";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import TaskQuestion from "@/components/TaskQuestion";
 import useUser from "@/hooks/useUser";
+import BadgeModal from "@/components/badges/BadgeModal";
+import { Loader2 } from "lucide-react";
 
 const ModuleViewPage = () => {
   const { user: currentUser, loading: userLoading } = useUser();
@@ -25,6 +27,8 @@ const ModuleViewPage = () => {
   const [courseData, setCourseData] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedStepId, setSelectedStepId] = useState(null); // Track user-selected step
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+  const [earnedBadge, setEarnedBadge] = useState(null);
 
   // Reset selected step when session changes
   useEffect(() => {
@@ -440,6 +444,13 @@ const ModuleViewPage = () => {
     }));
   };
 
+
+  const handleBadgesEarned = (badges) => {
+    if (badges && badges.length > 0) {
+      setEarnedBadge(badges[0]);
+      setShowBadgeModal(true);
+    }
+  };
 
   const toggleTask = async (moduleId, dayId, taskId) => {
     const key = `${moduleId}-${dayId}-${taskId}`;

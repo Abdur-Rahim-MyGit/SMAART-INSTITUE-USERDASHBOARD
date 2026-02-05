@@ -262,13 +262,20 @@ router.post('/task-progress', async (req, res) => {
         console.log('Enrollment saved successfully');
 
         // Check for badge eligibility
+        const badgesEarned = [];
         try {
-            await awardEarlyAchieverBadge(studentId);
+            const earlyBadge = await awardEarlyAchieverBadge(studentId);
+            if (earlyBadge) badgesEarned.push(earlyBadge);
+
+            const completionBadges = await checkCourseCompletionBadges(studentId, course._id.toString(), course);
+            if (completionBadges && completionBadges.length > 0) {
+                badgesEarned.push(...completionBadges.map(b => b.badgeDetails));
+            }
         } catch (badgeErr) {
             console.error('Error in badge awarding:', badgeErr);
         }
 
-        res.json({ success: true, data: enrollment });
+        res.json({ success: true, data: enrollment, badgesEarned });
 
     } catch (err) {
         console.error('Error updating task progress:', err);
@@ -361,13 +368,20 @@ router.post('/video-progress', async (req, res) => {
         await enrollment.save();
 
         // Check for badge eligibility
+        const badgesEarned = [];
         try {
-            await awardEarlyAchieverBadge(studentId);
+            const earlyBadge = await awardEarlyAchieverBadge(studentId);
+            if (earlyBadge) badgesEarned.push(earlyBadge);
+
+            const completionBadges = await checkCourseCompletionBadges(studentId, course._id.toString(), course);
+            if (completionBadges && completionBadges.length > 0) {
+                badgesEarned.push(...completionBadges.map(b => b.badgeDetails));
+            }
         } catch (badgeErr) {
             console.error('Error in badge awarding:', badgeErr);
         }
 
-        res.json({ success: true, data: enrollment });
+        res.json({ success: true, data: enrollment, badgesEarned });
 
     } catch (err) {
         console.error('Error updating video progress:', err);
