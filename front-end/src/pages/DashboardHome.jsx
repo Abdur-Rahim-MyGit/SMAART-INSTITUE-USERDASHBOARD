@@ -34,11 +34,12 @@ import TaskListSkeleton from '@/components/skeletons/TaskListSkeleton';
 import { API_BASE_URL } from '@/services/api';
 import ActivityFeed from '@/components/ActivityFeed';
 import UpcomingDeadlines from '@/components/UpcomingDeadlines';
+import useUser from "@/hooks/useUser";
 
 const DashboardHome = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [user, setUser] = useState({ fullName: "Student", id: "23606" });
+  const { user, loading: userLoading } = useUser();
   const { avatarData } = useAvatar();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showVisionSplash, setShowVisionSplash] = useState(false);
@@ -64,11 +65,7 @@ const DashboardHome = () => {
       setShowVisionSplash(true);
     }
   }, []);
-
   useEffect(() => {
-    const userData = sessionStorage.getItem("user");
-    if (userData) setUser(JSON.parse(userData));
-
     // Real-time clock update
     const clockInterval = setInterval(() => {
       setCurrentDate(new Date());
@@ -110,8 +107,9 @@ const DashboardHome = () => {
 
         let courses = [];
         if (coursesResponse.ok) {
-          courses = await coursesResponse.json();
-          setEnrolledCourses(Array.isArray(courses) ? courses : []);
+          const coursesData = await coursesResponse.json();
+          courses = Array.isArray(coursesData.data) ? coursesData.data : (Array.isArray(coursesData) ? coursesData : []);
+          setEnrolledCourses(courses);
         }
 
         // Fetch baseline results
@@ -130,44 +128,115 @@ const DashboardHome = () => {
           baseline = await baselineResponse.json();
         }
 
-        // Calculate stats
+        // Calculate stats and resume point
         const totalCourses = courses.length;
-        let completedModules = 0;
-        let totalModules = 0;
-        let completedThisWeek = 0;
+        let completedModulesCount = 0;
+        let totalProgressSum = 0;
+        let resumeUrl = '/dashboard/courses';
+        
+        // Find the "Active" course (most recently accessed or first one)
+        const activeCourseEnrollment = [...courses].sort((a, b) => 
+          new Date(b.lastAccessedAt || 0) - new Date(a.lastAccessedAt || 0)
+        )[0];
 
-        const now = new Date();
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        if (activeCourseEnrollment) {
+          const course = activeCourseEnrollment.course;
+          const enrollment = activeCourseEnrollment;
+          
+          // Basic logic: find first module and day that isn't fully completed
+          // We look into enrollment.moduleProgress which we populated in backend
+          let resumeModuleId = 1;
+          let resumeDayId = 1;
+
+          if (course && Array.isArray(course.modules)) {
+            let found = false;
+            for (let mIdx = 0; mIdx < course.modules.length; mIdx++) {
+              const moduleDoc = course.modules[mIdx];
+              const modProgress = (enrollment.moduleProgress || []).find(
+                mp => mp.module === moduleDoc._id || mp.module?._id === moduleDoc._id
+              );
+
+              if (!modProgress || modProgress.status !== 'completed') {
+                resumeModuleId = mIdx + 1;
+                
+                // Find first day that isn't completed in this module
+                // We check videoProgress and completedTasks
+                const videoProgress = modProgress?.videoProgress || [];
+                const completedTasks = modProgress?.completedTasks || [];
+                
+                // Use actual days from module if available, otherwise fallback to 6
+                const daysCount = moduleDoc.days?.length || 6;
+                
+                for (let d = 1; d <= daysCount; d++) {
+                  // Check simple completion first (if we have day-level tracking in future)
+                  // For now check granular progress
+                  
+                  // Check if any video step for this day is completed
+                  // In new model, we might have multiple steps. 
+                  // If ANY step is done, we consider "started". 
+                  // But to be "completed", ALL steps for that day should be done.
+                  // For "resume", we want the first NOT fully completed day.
+                  
+                  // However, the current logic checks if *any* video is done. 
+                  // If isVidDone is true, it skips. This implies "if begun, count as done"? 
+                  // The original code was: if (!isVidDone || !isTaskDone) -> resumeDayId = d;
+                  // So if EITHER video OR task is NOT done, we resume there.
+                  // This means we find the first day where something is missing.
+                  
+                  const isVidDone = videoProgress.some(vp => vp.dayId === d && vp.isCompleted);
+                  const isTaskDone = completedTasks.some(ct => ct.dayId === d);
+                  
+                  // If tasks exist for this day in the module definition, check them
+                  const dayDoc = moduleDoc.days?.find(day => day.dayNumber === d || day.id === d);
+                  const hasTasks = dayDoc?.tasks?.length > 0;
+                  
+                  // If there are no tasks, ignore isTaskDone check
+                  const taskCondition = hasTasks ? isTaskDone : true;
+                  
+                  // Simplied: If video is not done OR (tasks exist and are not done)
+                  if (!isVidDone || !taskCondition) {
+                    resumeDayId = d;
+                    found = true;
+                    break;
+                  }
+                }
+              }
+              if (found) break;
+            }
+          }
+
+          if (course?._id) {
+             // If courseId is valid MongoDB ID, use it, else use normalized code (fallback)
+             const cid = course._id;
+             resumeUrl = `/dashboard/courses/${cid}/modules/${resumeModuleId}/days/${resumeDayId}`;
+          }
+        }
 
         courses.forEach(enrollment => {
-          if (enrollment.modules && Array.isArray(enrollment.modules)) {
-            enrollment.modules.forEach(module => {
-              totalModules++;
-              if (module.completed) {
-                completedModules++;
-
-                // Check if completed this week
-                if (module.completedAt && new Date(module.completedAt) > weekAgo) {
-                  completedThisWeek++;
-                }
+          totalProgressSum += (enrollment.progress || 0);
+          if (enrollment.moduleProgress && Array.isArray(enrollment.moduleProgress)) {
+            enrollment.moduleProgress.forEach(module => {
+              if (module.status === 'completed') {
+                completedModulesCount++;
               }
             });
           }
         });
 
-        // Calculate weekly progress
-        const weeklyProgressPercent = totalModules > 0
-          ? Math.round((completedThisWeek / totalModules) * 100)
+        // Calculate average progress across all enrolled courses
+        const overallProgress = totalCourses > 0 
+          ? Math.round(totalProgressSum / totalCourses) 
           : 0;
 
         setStats({
           totalCourses,
-          completedModules,
+          completedModules: completedModulesCount,
           baselineScore: baseline?.baselineScore || 0,
-          dayStreak: 12 // TODO: Calculate from activity log
+          dayStreak: 12, // TODO: Calculate from activity log
+          resumeUrl
         });
 
-        setWeeklyProgress(weeklyProgressPercent);
+        setWeeklyProgress(overallProgress);
 
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -407,56 +476,78 @@ const DashboardHome = () => {
                   </div>
                 </div>
 
-                {/* LEFT COLUMN - Main Content */}
-                <div className="lg:col-span-8 space-y-6">
+                {/* LEFT COLUMN - Main Content (Hero + Courses) */}
+                <div className="lg:col-span-8 space-y-8">
+
+                  {/* 1. Feature Hero Message */}
+                  <section className="relative overflow-hidden rounded-[24px] bg-[#002147] p-8 shadow-xl">
+                    {/* Background Pattern */}
+                    <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-[#30919D]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#30919D 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
+                    <div className="relative z-10">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                          >
+                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white/90 text-xs font-medium mb-4 backdrop-blur-md border border-white/10">
+                              <Zap className="w-3 h-3 text-[#daa520]" />
+                              <span>Daily Streak: {stats.dayStreak} Days</span>
+                            </span>
+                            <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
+                              Welcome back, {user.fullName.split(' ')[0]}! 👋
+                            </h1>
+                            <p className="text-white/70 text-base max-w-xl leading-relaxed">
+                              You've completed <span className="text-white font-semibold">{weeklyProgress}%</span> of your overall course journey.
+                              {enrolledCourses.length > 0 ? (
+                                <> Keep up the momentum and continue your learning journey!</>
+                              ) : (
+                                <> Start your learning journey by enrolling in a course!</>
+                              )}
+                            </p>
+
+                            <div className="mt-4 space-y-2">
+                              <div className="flex justify-between text-xs text-white/70">
+                                <span>Overall Progress</span>
+                                <span>{weeklyProgress}%</span>
+                              </div>
+                              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${weeklyProgress}%` }}
+                                  transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
+                                  className="h-full bg-[#30919D] rounded-full"
+                                />
+                              </div>
+                            </div>
+                          </motion.div>
+
+                          <div className="mt-8 flex items-center gap-6">
+                            <button
+                              onClick={() => navigate(stats.resumeUrl || '/dashboard/courses')} // Redirect to resume point
+                              className="px-6 py-2.5 bg-[#30919D] hover:bg-[#287a84] text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-[#30919D]/20 flex items-center gap-2"
+                            >
+                              Resume Learning
+                              <Play className="w-4 h-4 fill-current" />
+                            </button>
+                            <button
+                              onClick={() => navigate('/profile')}
+                              className="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-medium transition-all backdrop-blur-md border border-white/10"
+                            >
+                              View Profile
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
 
-                  {/* Weekly Progress Overview - Professional Card */}
-                  <section className="bg-white dark:bg-white/5 rounded-xl p-6 border border-gray-200 dark:border-white/10">
-                    <div className="flex items-start justify-between mb-6">
-                      <div>
-                        <h2 className="text-lg font-bold text-[#002147] dark:text-white mb-1">
-                          Weekly Progress
-                        </h2>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {enrolledCourses.length > 0
-                            ? `You've completed ${weeklyProgress}% of your weekly learning goal`
-                            : 'Start learning to track your progress'
-                          }
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-[#30919D]">{weeklyProgress}%</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">This week</p>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="mb-6">
-                      <div className="h-2.5 bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#30919D] rounded-full transition-all duration-1000"
-                          style={{ width: `${weeklyProgress}%` }}
-                        />
-                      </div>
-                    </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-wrap gap-3">
-                      <button
-                        onClick={() => navigate('/dashboard/courses')}
-                        className="px-6 py-2.5 bg-[#30919D] hover:bg-[#287a84] text-white rounded-lg text-sm font-semibold transition-colors flex items-center gap-2"
-                      >
-                        <Play className="w-4 h-4 fill-current" />
-                        Continue Learning
-                      </button>
-                      <button
-                        onClick={() => navigate('/profile')}
-                        className="px-6 py-2.5 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold transition-colors"
-                      >
-                        View Profile
-                      </button>
-                    </div>
+
+                  </div>
                   </section>
 
                   {/* Current Course - Professional Design */}
@@ -476,25 +567,22 @@ const DashboardHome = () => {
                     {dashboardLoading ? (
                       <CourseCardSkeleton />
                     ) : enrolledCourses.length > 0 ? (
-                      <div className="bg-white dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden hover:border-[#30919D]/30 transition-all">
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
-                          {/* Left: Thumbnail */}
-                          <div
-                            onClick={() => navigate('/dashboard/courses')}
-                            className="md:col-span-5 relative cursor-pointer overflow-hidden h-56 md:h-full min-h-[240px] group"
-                          >
-                            <img
-                              src={enrolledCourses[0].course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"}
-                              alt="Course Thumbnail"
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
-                            {/* Play Button */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:bg-white transition-colors">
-                                <Play className="w-6 h-6 text-[#30919D] fill-current ml-0.5" />
-                              </div>
+                      // Show first enrolled course
+                      <div className="lms-card p-6 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                        {/* Left: Video Thumbnail */}
+                        <div
+                          onClick={() => navigate(stats.resumeUrl || '/dashboard/courses')}
+                          className="md:col-span-5 relative group cursor-pointer overflow-hidden rounded-2xl h-48 md:h-full min-h-[180px]"
+                        >
+                          <img
+                            src={enrolledCourses[0].course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"}
+                            alt="Course Thumbnail"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                          <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group-hover:scale-110 transition-transform">
+                              <Play className="w-5 h-5 text-white fill-current" />
                             </div>
 
                             {/* Progress Badge */}

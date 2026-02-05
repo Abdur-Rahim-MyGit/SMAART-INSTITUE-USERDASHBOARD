@@ -2,6 +2,7 @@ const express = require('express');
 const CourseEnrollment = require('../models/CourseEnrollment');
 const Course = require('../models/Course');
 const { protect } = require('../middleware/auth');
+const { awardEarlyAchieverBadge } = require('../utils/badgeHelper');
 const { notifyCourseEnrollment, notifyCourseCompleted } = require('../services/notificationService');
 
 const router = express.Router();
@@ -269,15 +270,15 @@ router.post('/task-progress', async (req, res) => {
             }
         }
 
+        enrollment.lastAccessedAt = new Date();
         await enrollment.save();
         console.log('Enrollment saved successfully');
 
-        // Check for course completion badges if status became 'completed'
-        if (enrollment.status === 'completed') {
-            const awardedBadges = await checkCourseCompletionBadges(studentId, course._id, course);
-            if (awardedBadges.length > 0) {
-                return res.json({ success: true, data: enrollment, badgesEarned: awardedBadges });
-            }
+        // Check for badge eligibility
+        try {
+            await awardEarlyAchieverBadge(studentId);
+        } catch (badgeErr) {
+            console.error('Error in badge awarding:', badgeErr);
         }
 
         res.json({ success: true, data: enrollment });
@@ -369,10 +370,11 @@ router.post('/video-progress', async (req, res) => {
             }
         }
 
+        enrollment.lastAccessedAt = new Date();
         await enrollment.save();
 
-        // Check for course completion badges if status became 'completed'
-        if (enrollment.status === 'completed') {
+        // Check for badge eligibility
+        try {
             // Send course completion notification
             try {
                 await notifyCourseCompleted(studentId, { title: course.title, _id: course._id });
@@ -381,10 +383,9 @@ router.post('/video-progress', async (req, res) => {
                 console.error("⚠️ Error sending course completion notification:", notifyError);
             }
 
-            const awardedBadges = await checkCourseCompletionBadges(studentId, course._id, course);
-            if (awardedBadges.length > 0) {
-                return res.json({ success: true, data: enrollment, badgesEarned: awardedBadges });
-            }
+            await awardEarlyAchieverBadge(studentId);
+        } catch (badgeErr) {
+            console.error('Error in badge awarding:', badgeErr);
         }
 
         res.json({ success: true, data: enrollment });

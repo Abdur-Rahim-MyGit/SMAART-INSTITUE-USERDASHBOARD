@@ -16,9 +16,9 @@ router.post('/issue', protect, async (req, res) => {
             assessmentWindow
         } = req.body;
 
-        const user = await User.findById(req.user._id);
+        const user = req.user;
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'User object not found in request context' });
         }
 
         // Generate unique certificate ID
@@ -52,6 +52,9 @@ router.post('/issue', protect, async (req, res) => {
         });
 
         await certificate.save();
+        console.log(`✅ Certificate ${certificateId} saved for user ${user.email}`);
+
+        const frontendUrl = process.env.FRONTEND_URL || (req.headers.origin || 'http://localhost:8080');
 
         // Send notification for certificate issued
         try {
@@ -70,12 +73,16 @@ router.post('/issue', protect, async (req, res) => {
                 certificateType: certificate.certificateType,
                 certificateTitle: certificate.certificateTitle,
                 issueDate: certificate.issueDate,
-                verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-certificate/${certificate.certificateId}`
+                verificationUrl: `${frontendUrl}/verify-certificate/${certificate.certificateId}`
             }
         });
     } catch (error) {
-        console.error('Error issuing certificate:', error);
-        res.status(500).json({ message: 'Failed to issue certificate', error: error.message });
+        console.error('❌ Error issuing certificate:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to issue certificate',
+            error: error.message
+        });
     }
 });
 

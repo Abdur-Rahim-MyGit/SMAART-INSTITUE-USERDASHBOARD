@@ -6,6 +6,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
+import apiCall from '@/services/api';
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 
@@ -36,29 +37,26 @@ const tierConfig = {
     },
 };
 
-// Mock function to verify badge - In production, this would call your API
+// Real function to verify badge using the backend API
 const verifyBadge = async (badgeId) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    
-    // Mock verification - return null for invalid badges
-    if (!badgeId || badgeId.length < 10) {
+    try {
+        const response = await apiCall(`/users/verify-badge/${badgeId}`, {
+            method: 'GET'
+        });
+        
+        if (response.success) {
+            return {
+                ...response.badge,
+                earnedBy: response.owner.fullName,
+                issuedBy: response.issuedBy,
+                isValid: true
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('API Verification error:', error);
         return null;
     }
-
-    // Return mock badge data
-    return {
-        id: badgeId,
-        title: 'Cognitive Champion',
-        description: 'Mastered cognitive reasoning assessments with exceptional performance',
-        tier: 'gold',
-        xp: 500,
-        percentile: 5,
-        earnedBy: 'John Doe',
-        earnedDate: '2026-01-15',
-        issuedBy: 'SMAART Institute',
-        isValid: true,
-    };
 };
 
 const VerifyBadge = () => {

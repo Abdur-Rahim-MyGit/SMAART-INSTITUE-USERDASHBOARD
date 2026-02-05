@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Calendar, User, Hash, TrendingUp } from 'lucide-react';
-import axios from 'axios';
+import apiCall from '@/services/api';
 import { toast } from 'sonner';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import { Html5QrcodeScanner } from 'html5-qrcode';
 
 const VerifyCertificate = () => {
     const { certificateId: urlCertId } = useParams();
@@ -12,7 +11,49 @@ const VerifyCertificate = () => {
     const [certificateId, setCertificateId] = useState(urlCertId || '');
     const [verificationResult, setVerificationResult] = useState(null);
     const [isVerifying, setIsVerifying] = useState(false);
+    const [isScanning, setIsScanning] = useState(false);
     const [error, setError] = useState(null);
+
+    useEffect(() => {
+        let scanner = null;
+        if (isScanning) {
+            scanner = new Html5QrcodeScanner('reader', {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            });
+
+            scanner.render((decodedText) => {
+                // Success callback
+                try {
+                    // Try to extract ID from URL if it's a URL
+                    let certId = decodedText;
+                    if (decodedText.includes('/verify-certificate/')) {
+                        certId = decodedText.split('/verify-certificate/').pop();
+                    } else if (decodedText.startsWith('http')) {
+                        const url = new URL(decodedText);
+                        const pathParts = url.pathname.split('/');
+                        certId = pathParts[pathParts.length - 1];
+                    }
+                    
+                    setCertificateId(certId);
+                    setIsScanning(false);
+                    scanner.clear();
+                    verifyCertificate(certId);
+                } catch (e) {
+                    toast.error("Invalid QR code format");
+                }
+            }, (error) => {
+                // Ignore errors during scan
+            });
+        }
+
+        return () => {
+            if (scanner) {
+                scanner.clear().catch(err => console.error("Error clearing scanner", err));
+            }
+        };
+    }, [isScanning]);
 
     useEffect(() => {
         if (urlCertId) {
@@ -31,14 +72,16 @@ const VerifyCertificate = () => {
         setVerificationResult(null);
 
         try {
-            const response = await axios.get(`${API_URL}/api/certificates/verify/${certId.trim()}`);
+            const response = await apiCall(`/certificates/verify/${certId.trim()}`, {
+                method: 'GET'
+            });
 
-            if (response.data.success) {
-                setVerificationResult(response.data);
-                if (response.data.verified) {
+            if (response.success) {
+                setVerificationResult(response);
+                if (response.verified) {
                     toast.success('Certificate verified successfully!');
                 } else {
-                    toast.warning(response.data.message);
+                    toast.warning(response.message);
                 }
             }
         } catch (err) {
@@ -59,6 +102,12 @@ const VerifyCertificate = () => {
         verifyCertificate();
     };
 
+    const toggleScanner = () => {
+        setIsScanning(!isScanning);
+        setVerificationResult(null);
+        setError(null);
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-[#e8ecef] via-[#f5f7fa] to-[#e8ecef] dark:from-[#001229] dark:via-[#001a3d] dark:to-[#001229] py-12 px-4">
             <div className="max-w-4xl mx-auto">
@@ -71,12 +120,48 @@ const VerifyCertificate = () => {
                         Certificate Verification
                     </h1>
                     <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                        Verify the authenticity of SMAART Institute certificates. Enter the certificate ID or scan the QR code.
+                        Verify the authenticity of SMAART Institute certificates. Use our secure scanner or enter the certificate ID below.
                     </p>
                 </div>
 
+                {/* Verification Modes */}
+                <div className="flex justify-center mb-8">
+                    <div className="inline-flex bg-white dark:bg-[#1e293b] rounded-xl p-1 shadow-md border border-gray-200 dark:border-slate-700">
+                        <button
+                            onClick={() => setIsScanning(false)}
+                            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${!isScanning
+                                ? 'bg-[#002147] text-white shadow-sm'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white'
+                                }`}
+                        >
+                            Manual Entry
+                        </button>
+                        <button
+                            onClick={() => setIsScanning(true)}
+                            className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${isScanning
+                                ? 'bg-[#002147] text-white shadow-sm'
+                                : 'text-slate-600 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white'
+                                }`}
+                        >
+                            Scan QR Code
+                        </button>
+                    </div>
+                </div>
+
+                {/* QR Scanner Section */}
+                {isScanning && (
+                    <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 p-8 mb-8 overflow-hidden text-center">
+                        <h3 className="text-xl font-bold text-[#002147] dark:text-white mb-4">Scanner Ready</h3>
+                        <div id="reader" className="mx-auto rounded-xl overflow-hidden max-w-sm border-2 border-dashed border-[#30919D]/30"></div>
+                        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400 font-medium">
+                            Position the certificate's QR code within the square to scan automatically
+                        </p>
+                    </div>
+                )}
+
                 {/* Search Form */}
-                <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 p-8 mb-8">
+                {!isScanning && (
+                    <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 p-8 mb-8">
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
@@ -112,6 +197,7 @@ const VerifyCertificate = () => {
                         </button>
                     </form>
                 </div>
+                )}
 
                 {/* Error Message */}
                 {error && (

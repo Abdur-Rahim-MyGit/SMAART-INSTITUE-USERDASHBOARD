@@ -390,3 +390,44 @@
         opacity: 0.03 !important;
     }
 }
+
+/* ── PDF Capture Normalization ──────────────────── */
+/* Fixes for html2canvas miscalculating character and word spacing */
+.capturing-pdf * {
+    text-rendering: auto !important;
+    -webkit-font-smoothing: antialiased !important;
+    font-variant-ligatures: none !important;
+    font-kerning: none !important;
+    font-feature-settings: "kern" 0, "liga" 0, "clig" 0, "calt" 0 !important;
+    letter-spacing: 0.2px !important;
+}
+
+.capturing-pdf .institute-name,
+.capturing-pdf .cert-main-title h1,
+.capturing-pdf .recipient-name,
+.capturing-pdf .signature-name {
+    letter-spacing: 0.5px !important;
+    word-spacing: 0.1em !important;
+}
+
+.capturing-pdf .cert-statement {
+    line-height: 1.8 !important;
+    letter-spacing: 0.1px !important;
+    word-spacing: 0.25em !important;
+    /* Forced space between words */
+    max-width: 96% !important;
+}
+
+.capturing-pdf .legal-disclaimer {
+    line-height: 1.5 !important;
+    letter-spacing: 0.1px !important;
+    word-spacing: 0.2em !important;
+}
+
+.capturing-pdf .stat-label {
+    letter-spacing: normal !important;
+}
+
+.capturing-pdf .credential-label {
+    letter-spacing: 0.25em !important;
+}

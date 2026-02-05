@@ -3,8 +3,11 @@ import { motion } from 'framer-motion';
 import { FaTrophy, FaStar, FaFire, FaMedal, FaCrown, FaChartLine, FaFilter } from 'react-icons/fa';
 import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
-import { API_BASE_URL } from '@/services/api';
 import { Loader2 } from 'lucide-react';
+
+// Sample badge data - In production, this would come from your API
+// Sample badge data removed to show only real achievements
+const sampleBadges = [];
 
 const categories = [
     { id: 'all', label: 'All Badges', icon: FaTrophy },
@@ -15,13 +18,27 @@ const categories = [
     { id: 'certification', label: 'Certification', icon: FaCrown },
 ];
 
-const BadgeGallery = ({ userName = 'Student' }) => {
-    const [badges, setBadges] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) => {
+    // Define all possible badges in the system
+    const allPossibleBadges = [
+        {
+            id: 'EARLY-ACHIEVER',
+            title: 'Early Achiever',
+            description: 'Completed the first three sessions of your first course!',
+            tier: 'bronze',
+            xp: 150,
+            category: 'learning',
+            isEarned: userEarnedBadges.some(ub => ub.badgeId === 'EARLY-ACHIEVER')
+        }
+    ];
+
+    const badges = allPossibleBadges;
+
     const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
     const [showEarnedOnly, setShowEarnedOnly] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchBadges = async () => {
@@ -83,7 +100,9 @@ const BadgeGallery = ({ userName = 'Student' }) => {
 
     const handleBadgeClick = (badge) => {
         if (badge.isEarned) {
-            setSelectedBadge(badge);
+            // Find the specific earned badge to get its unique _id
+            const earnedBadge = userEarnedBadges.find(ub => ub.badgeId === badge.id);
+            setSelectedBadge(earnedBadge || badge);
             setIsModalOpen(true);
         }
     };
@@ -155,50 +174,12 @@ const BadgeGallery = ({ userName = 'Student' }) => {
                 </motion.div>
             </div>
 
-            {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
+            {/* Filters removed for single badge display */}
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                    <FaFilter className="w-4 h-4" />
-                    <span className="text-sm font-medium">Filter:</span>
+                    <FaTrophy className="w-4 h-4 text-[#30919D]" />
+                    <span className="text-sm font-bold uppercase tracking-wider text-[#002147] dark:text-white">Your Achievements</span>
                 </div>
-
-                {/* Category Filters */}
-                <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => {
-                        const Icon = category.icon;
-                        return (
-                            <button
-                                key={category.id}
-                                onClick={() => setActiveCategory(category.id)}
-                                className={`
-                                    flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
-                                    transition-all duration-200
-                                    ${activeCategory === category.id
-                                        ? 'bg-[#002147] text-white shadow-md'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                    }
-                                `}
-                            >
-                                <Icon className="w-3.5 h-3.5" />
-                                {category.label}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {/* Earned Only Toggle */}
-                <label className="flex items-center gap-2 cursor-pointer ml-auto">
-                    <input
-                        type="checkbox"
-                        checked={showEarnedOnly}
-                        onChange={(e) => setShowEarnedOnly(e.target.checked)}
-                        className="sr-only peer"
-                    />
-                    <div className="relative w-10 h-5 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-checked:bg-[#30919D] transition-colors">
-                        <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${showEarnedOnly ? 'translate-x-5' : ''}`} />
-                    </div>
-                    <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">Earned Only</span>
-                </label>
             </div>
 
             {/* Badge Grid */}
