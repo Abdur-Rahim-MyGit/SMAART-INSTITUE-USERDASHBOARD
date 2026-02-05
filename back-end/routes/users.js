@@ -1,7 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
+const Student = require('../models/Student');
 const upload = require('../middleware/upload');
 
 const router = express.Router();
@@ -461,7 +463,7 @@ router.get('/register-details/:email', async (req, res) => {
       });
     }
 
-    // Try to find registration by userId
+    // Try to find registration by userId or email
     const registration = await Registration.findOne({
       $or: [
         { userId: user._id },
@@ -469,12 +471,39 @@ router.get('/register-details/:email', async (req, res) => {
       ]
     });
 
+    // Aggregated badges
+    let aggregatedBadges = [];
+    if (user && user.badges) aggregatedBadges = [...user.badges];
+
+    // If we found User, also check Student for more badges
+    if (userSource === 'User') {
+      const student = await Student.findOne({ email: normalizedEmail });
+      if (student && student.badges) {
+        student.badges.forEach(b => {
+          if (!aggregatedBadges.some(ab => ab.badgeId === b.badgeId)) {
+            aggregatedBadges.push(b);
+          }
+        });
+      }
+    } else if (userSource === 'Student') {
+      // If we found Student, also check User for more badges
+      const otherUser = await User.findOne({ email: normalizedEmail });
+      if (otherUser && otherUser.badges) {
+        otherUser.badges.forEach(b => {
+          if (!aggregatedBadges.some(ab => ab.badgeId === b.badgeId)) {
+            aggregatedBadges.push(b);
+          }
+        });
+      }
+    }
+
     if (registration) {
       console.log(`[register-details] Found registration for ${normalizedEmail}: ${registration.fullName || user.fullName}`);
       return res.json({
         ...registration.toObject(),
         fullName: registration.fullName || user.fullName,
-        gender: registration.gender || user.gender
+        gender: registration.gender || user.gender,
+        badges: aggregatedBadges
       });
     }
 
@@ -484,6 +513,7 @@ router.get('/register-details/:email', async (req, res) => {
       fullName: user.fullName,
       email: user.email,
       gender: user.gender,
+      badges: aggregatedBadges,
       otherDetails: {}
     });
   } catch (err) {
@@ -524,6 +554,57 @@ router.post('/create', async (req, res) => {
       },
     });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Verify Badge by unique _id (Public)
+router.get('/verify-badge/:badgeId', async (req, res) => {
+  try {
+    const { badgeId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(badgeId)) {
+      return res.status(400).json({ error: 'Invalid Badge ID format' });
+    }
+
+    let user = await User.findOne({ "badges._id": badgeId });
+    let badge = null;
+    let ownerName = '';
+
+    if (user) {
+      badge = user.badges.id(badgeId);
+      ownerName = user.fullName;
+    } else {
+      user = await Student.findOne({ "badges._id": badgeId });
+      if (user) {
+        badge = user.badges.id(badgeId);
+        ownerName = user.fullName;
+      }
+    }
+
+    if (!badge) {
+      return res.status(404).json({ error: 'Badge not found or invalid' });
+    }
+
+    res.json({
+      success: true,
+      badge: {
+        id: badge._id,
+        badgeId: badge.badgeId,
+        title: badge.title,
+        description: badge.description,
+        tier: badge.tier,
+        xp: badge.xp,
+        earnedDate: badge.earnedAt || badge.earnedDate,
+        category: badge.category
+      },
+      owner: {
+        fullName: ownerName
+      },
+      issuedBy: 'SMAART Institute'
+    });
+  } catch (err) {
+    console.error('[verify-badge] Error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

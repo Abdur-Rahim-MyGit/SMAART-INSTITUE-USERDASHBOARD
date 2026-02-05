@@ -4,13 +4,12 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 import { toast } from 'sonner';
-import axios from 'axios';
+import apiCall from '@/services/api';
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { BadgeGallery } from "@/components/badges";
+import useUser from "@/hooks/useUser";
 import './Certificate.css';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const certificateTypes = [
     {
@@ -48,6 +47,7 @@ const skills = [
 
 const Certificate = () => {
     const certificateRef = useRef(null);
+    const { user, refreshUser } = useUser();
     const [selectedType, setSelectedType] = useState(null);
     const [activeTab, setActiveTab] = useState('certificates'); // 'certificates' or 'badges'
     const [userData, setUserData] = useState({ fullName: 'Ms. Rehana Ameer', gender: 'Female' });
@@ -57,18 +57,23 @@ const Certificate = () => {
     const [isGenerating, setIsGenerating] = useState(false);
 
     useEffect(() => {
-        const storedUser = sessionStorage.getItem('user');
-        if (storedUser) {
-            const parsed = JSON.parse(storedUser);
-            if (parsed.fullName) {
-                const prefix = parsed.gender?.toLowerCase() === 'female' ? 'Ms. ' : (parsed.gender?.toLowerCase() === 'male' ? 'Mr. ' : '');
+        if (user) {
+            if (user.fullName) {
+                const prefix = user.gender?.toLowerCase() === 'female' ? 'Ms. ' : (user.gender?.toLowerCase() === 'male' ? 'Mr. ' : '');
                 setUserData({
-                    fullName: `${prefix}${parsed.fullName}`,
-                    gender: parsed.gender
+                    fullName: `${prefix}${user.fullName}`,
+                    gender: user.gender
                 });
             }
         }
-    }, []);
+    }, [user]);
+
+    useEffect(() => {
+        // Refresh user data when entering badges tab to catch new badges
+        if (activeTab === 'badges') {
+            refreshUser();
+        }
+    }, [activeTab, refreshUser]);
 
     // Generate certificate and QR code when type is selected
     useEffect(() => {
@@ -80,28 +85,20 @@ const Certificate = () => {
     const generateCertificate = async () => {
         setIsGenerating(true);
         try {
-            const token = sessionStorage.getItem('token');
-
             // Issue certificate through backend
-            const response = await axios.post(
-                `${API_URL}/api/certificates/issue`,
-                {
+            const response = await apiCall('/certificates/issue', {
+                method: 'POST',
+                body: JSON.stringify({
                     certificateType: selectedType.id,
                     certificateTitle: selectedType.title,
                     validatedSkills: skills.map(s => ({ label: s.label, score: 85 })),
                     readinessBand: 'Proficient',
                     assessmentWindow: `TST-${new Date().getFullYear()}-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`
-                },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
+                })
+            });
 
-            if (response.data.success) {
-                const { certificateId, verificationUrl } = response.data.certificate;
+            if (response.success) {
+                const { certificateId, verificationUrl } = response.certificate;
                 setCertId(certificateId);
 
                 // Generate QR code with verification URL
@@ -172,6 +169,7 @@ const Certificate = () => {
                 onclone: (clonedDoc) => {
                     const clonedElement = clonedDoc.getElementById('certificate-to-print');
                     if (clonedElement) {
+                        clonedElement.classList.add('capturing-pdf');
                         clonedElement.style.margin = '0';
                         clonedElement.style.padding = '0';
                         clonedElement.style.boxShadow = 'none';
@@ -303,7 +301,7 @@ const Certificate = () => {
                         {/* Badges Tab */}
                         {activeTab === 'badges' && (
                             <div className="max-w-6xl mx-auto">
-                                <BadgeGallery userName={userData.fullName} />
+                                <BadgeGallery userName={userData.fullName} badges={user?.badges || []} />
                                 
                                 {/* Verify Badge Link */}
                                 <div className="mt-8 text-center">

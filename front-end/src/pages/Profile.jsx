@@ -20,11 +20,14 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL, getBackendUrl } from "@/services/api";
+import useUser from "@/hooks/useUser";
 
 import ProfileSkeleton from '@/components/skeletons/ProfileSkeleton';
+import BadgeGallery from "@/components/badges/BadgeGallery";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { user, loading: userLoading, refreshUser } = useUser();
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
@@ -37,97 +40,66 @@ const Profile = () => {
     dateOfBirth: "",
     address: ""
   });
+  const [activeTab, setActiveTab] = useState("info"); // 'info' or 'badges'
 
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [memberSince, setMemberSince] = useState("2024");
 
-  // Load user data from sessionStorage on mount
+  // Force refresh user details on mount to get latest badges/progress
   useEffect(() => {
-    const userData = sessionStorage.getItem("user");
-    const registrationData = sessionStorage.getItem("registration");
+    refreshUser();
+  }, [refreshUser]);
 
-    if (!userData) {
+  useEffect(() => {
+    if (!userLoading && !user) {
       navigate("/");
       return;
     }
 
-    const user = JSON.parse(userData);
-    const registration = registrationData ? JSON.parse(registrationData) : {};
-
-    // Helper to extract string from potential JSON object for institution
-    const parseInstitution = (inst) => {
-      try {
-        if (typeof inst === 'string' && inst.trim().startsWith('{')) {
-          const parsed = JSON.parse(inst);
-          return parsed.name || inst;
-        }
-        return inst;
-      } catch (e) {
-        return inst;
-      }
-    };
-
-    const newFormData = {
-      name: user.fullName || "",
-      email: user.email || "",
-      phone: user.mobileNumber || "",
-      institution: parseInstitution(registration.institution) || "",
-      yearOfStudy: registration.yearSemester || "3rd Year",
-      department: registration.department || "",
-      studentId: registration.studentId || "",
-      dateOfBirth: registration.dob ? new Date(registration.dob).toISOString().split('T')[0] : "",
-      address: registration.address ?
-        `${registration.address.city || ""}, ${registration.address.state || ""}, ${registration.address.country || ""}`.replace(/^,\s*/, '').replace(/,\s*$/, '').replace(/,\s*,/g, ',')
-        : ""
-    };
-
-    setFormData(newFormData);
-
-    // Set member since from user creation date
-    if (user.createdAt) {
-      const date = new Date(user.createdAt);
-      setMemberSince(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
-    }
-
-    // Fetch full registration details including profile photo
-    const fetchRegistrationDetails = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
-
-        if (response.ok) {
-          const fullRegistration = await response.json();
-
-          const updatedFormData = {
-            name: user.fullName || "",
-            email: user.email || "",
-            phone: user.mobileNumber || "",
-            institution: parseInstitution(fullRegistration.institution) || "",
-            yearOfStudy: fullRegistration.yearSemester || "3rd Year",
-            department: fullRegistration.department || "",
-            studentId: fullRegistration.studentId || "",
-            dateOfBirth: fullRegistration.dob ? new Date(fullRegistration.dob).toISOString().split('T')[0] : "",
-            address: fullRegistration.address ?
-              `${fullRegistration.address.city || ""}, ${fullRegistration.address.state || ""}, ${fullRegistration.address.country || ""}`.replace(/^,\s*/, '').replace(/,\s*$/, '').replace(/,\s*,/g, ',')
-              : ""
-          };
-
-          setFormData(updatedFormData);
-
-          // Set profile photo
-          if (fullRegistration.otherDetails?.profilePhoto) {
-            const photoUrl = `${getBackendUrl()}/${fullRegistration.otherDetails.profilePhoto}`;
-            setProfilePhoto(photoUrl);
+    if (user) {
+      // Helper to extract string from potential JSON object for institution
+      const parseInstitution = (inst) => {
+        try {
+          if (typeof inst === 'string' && inst.trim().startsWith('{')) {
+            const parsed = JSON.parse(inst);
+            return parsed.name || inst;
           }
+          return inst;
+        } catch (e) {
+          return inst;
         }
-      } catch (error) {
-        console.error("Error fetching registration details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchRegistrationDetails();
-  }, [navigate]);
+      const reg = user.otherDetails || {};
+      
+      const newFormData = {
+        name: user.fullName || "",
+        email: user.email || "",
+        phone: user.mobileNumber || "",
+        institution: parseInstitution(user.institution || reg.institution) || "",
+        yearOfStudy: user.yearSemester || reg.yearOfStudy || reg.yearSemester || "3rd Year",
+        department: user.department || reg.department || "",
+        studentId: user.studentId || reg.studentId || "",
+        dateOfBirth: (user.dob || reg.dob) ? new Date(user.dob || reg.dob).toISOString().split('T')[0] : "",
+        address: (user.address || reg.address) ?
+          `${(user.address || reg.address).city || ""}, ${(user.address || reg.address).state || ""}, ${(user.address || reg.address).country || ""}`.replace(/^,\s*/, '').replace(/,\s*$/, '').replace(/,\s*,/g, ',')
+          : ""
+      };
+
+      setFormData(newFormData);
+
+      if (user.createdAt) {
+        const date = new Date(user.createdAt);
+        setMemberSince(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+      }
+
+      if (user.otherDetails?.profilePhoto) {
+        setProfilePhoto(`${getBackendUrl()}/${user.otherDetails.profilePhoto}`);
+      }
+
+      setLoading(false);
+    }
+  }, [user, userLoading, navigate]);
 
   const getInitials = (name) => {
     return name
@@ -260,7 +232,33 @@ const Profile = () => {
 
               {/* Right Content Area */}
               <div className="space-y-4">
-                {/* Student Details Section */}
+                {/* Tabs Switcher */}
+                <div className="flex bg-white rounded-lg border border-gray-200 p-1 shadow-sm">
+                  <button
+                    onClick={() => setActiveTab("info")}
+                    className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all ${
+                      activeTab === "info"
+                        ? "bg-[#30919D] text-white shadow-sm"
+                        : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    Information
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("badges")}
+                    className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition-all ${
+                      activeTab === "badges"
+                        ? "bg-[#30919D] text-white shadow-sm"
+                        : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    Badges & Achievements
+                  </button>
+                </div>
+
+                {activeTab === "info" ? (
+                  <>
+                    {/* Student Details Section */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -416,9 +414,22 @@ const Profile = () => {
                     </div>
                   </div>
                 </motion.div>
-              </div>
-            </div>
-          </main>
+              </>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="bg-white rounded-lg border border-gray-200 shadow-sm p-4"
+              >
+                <BadgeGallery 
+                  userName={formData.name} 
+                  badges={user?.badges || []} 
+                />
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </main>
         )}
       </div>
     </div>

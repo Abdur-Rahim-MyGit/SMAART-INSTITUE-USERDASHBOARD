@@ -6,6 +6,7 @@ import DashboardHeader from "@/components/DashboardHeader";
 import AssessmentBanner from "@/components/AssessmentBanner";
 import { assessmentApi } from "@/services/assessmentApi";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
+import useUser from "@/hooks/useUser";
 
 // Theme colors: Navy (#002147), Teal (#30919D), White
 const THEME = {
@@ -28,15 +29,14 @@ const assessmentConfig = [
     duration: '~45 mins'
   }
 ];
-
 const MyAssessments = () => {
+  const { user: currentUser, loading: userLoading } = useUser();
+  const userName = currentUser?.fullName || "";
   const [hasCompletedBaseLine, setHasCompletedBaseLine] = useState(false);
   const [loading, setLoading] = useState(true);
   const [nextUnlockTime, setNextUnlockTime] = useState(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFirstLogin, setIsFirstLogin] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
 
   const [baseLineAssessmentDetails, setBaseLineAssessmentDetails] = useState(null);
 
@@ -50,7 +50,7 @@ const MyAssessments = () => {
     baseline: hasCompletedBaseLine
   };
 
-  // Check for first login and get user name
+  // Check for first login
   useEffect(() => {
     const firstLoginFlag = sessionStorage.getItem("isFirstLogin");
     if (firstLoginFlag === "true") {
@@ -58,17 +58,6 @@ const MyAssessments = () => {
       setTimeout(() => {
         sessionStorage.removeItem("isFirstLogin");
       }, 5000);
-    }
-    
-    const userData = sessionStorage.getItem("user");
-    if (userData) {
-      try {
-        const user = JSON.parse(userData);
-        setUserName(user.fullName || "");
-        setCurrentUser(user);
-      } catch (e) {
-        console.error("Error parsing user data:", e);
-      }
     }
   }, []);
 
