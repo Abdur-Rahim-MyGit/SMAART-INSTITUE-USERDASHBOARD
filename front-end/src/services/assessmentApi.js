@@ -91,69 +91,6 @@ export const assessmentApi = {
     },
 
     /**
-     * Get Big Five results for a user
-     * @param {string} userId - User ID
-     * @returns {Promise} Big Five results
-     */
-    getBig5Results: async (userId) => {
-        return apiCall(`/big5results/user/${userId}`);
-    },
-
-    /**
-     * Get VAK results for a user
-     * @param {string} userId - User ID
-     * @returns {Promise} VAK results
-     */
-    getVAKResults: async (userId) => {
-        return apiCall(`/vakresults/user/${userId}`);
-    },
-
-    /**
-     * Get EQ results for a user
-     * @param {string} userId - User ID
-     * @returns {Promise} EQ results
-     */
-    getEQResults: async (userId) => {
-        return apiCall(`/eqresults/user/${userId}`);
-    },
-
-    /**
-     * Get CQ results for a user
-     * @param {string} userId - User ID
-     * @returns {Promise} CQ results
-     */
-    getCQResults: async (userId) => {
-        return apiCall(`/cqresults/user/${userId}`);
-    },
-
-    /**
-     * Get ARQ results for a user
-     * @param {string} userId - User ID
-     * @returns {Promise} ARQ results
-     */
-    getARQResults: async (userId) => {
-        return apiCall(`/arqresults/${userId}`);
-    },
-
-    /**
-     * Get AIQ results for a user
-     * @param {string} userId - User ID
-     * @returns {Promise} AIQ results
-     */
-    getAIQResults: async (userId) => {
-        return apiCall(`/aiqresults/user/${userId}`);
-    },
-
-    /**
-     * Get SQ results for a user
-     * @param {string} userId - User ID
-     * @returns {Promise} SQ results
-     */
-    getSQResults: async (userId) => {
-        return apiCall(`/sqresults/user/${userId}`);
-    },
-
-    /**
      * Get Base Line results for a user
      * @param {string} userId - User ID
      * @returns {Promise} Base Line results

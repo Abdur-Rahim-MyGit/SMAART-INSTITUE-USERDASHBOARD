@@ -38,6 +38,45 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
     const [activeCategory, setActiveCategory] = useState('all');
     const [showEarnedOnly, setShowEarnedOnly] = useState(false);
 
+    useEffect(() => {
+        const fetchBadges = async () => {
+            try {
+                const userStr = sessionStorage.getItem('user');
+                if (!userStr) {
+                    setIsLoading(false);
+                    return;
+                }
+                const user = JSON.parse(userStr);
+                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    // Transform API data to match component expectations
+                    const formattedBadges = data.data.map(userBadge => ({
+                        id: userBadge.badge._id,
+                        badgeId: userBadge.badge.badgeId,
+                        title: userBadge.badge.title,
+                        description: userBadge.badge.description,
+                        tier: userBadge.badge.tier,
+                        xp: userBadge.badge.xp,
+                        category: userBadge.badge.category,
+                        earnedDate: userBadge.earnedDate,
+                        isEarned: userBadge.isEarned,
+                        progress: userBadge.progress,
+                        icon: userBadge.badge.icon
+                    }));
+                    setBadges(formattedBadges);
+                }
+            } catch (error) {
+                console.error('Error fetching badges:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchBadges();
+    }, []);
+
     // Calculate stats
     const earnedBadges = badges.filter((b) => b.isEarned);
     const totalXP = earnedBadges.reduce((acc, b) => acc + (b.xp || 0), 0);
@@ -60,6 +99,14 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
             setIsModalOpen(true);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <Loader2 className="w-8 h-8 animate-spin text-teal" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">

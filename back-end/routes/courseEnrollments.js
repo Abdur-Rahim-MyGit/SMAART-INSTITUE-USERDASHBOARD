@@ -167,6 +167,8 @@ router.get('/student/:studentId', async (req, res) => {
 
 
 // Update task progress
+const { checkCourseCompletionBadges } = require('../utils/badgeUtils');
+
 router.post('/task-progress', async (req, res) => {
     try {
         console.log('Received task-progress request:', req.body);
@@ -279,6 +281,7 @@ router.post('/video-progress', async (req, res) => {
     try {
         const { studentId, courseCode, moduleId, dayId, stepId, maxWatchedTime, videoDuration, isCompleted } = req.body;
         const Course = require('../models/Course');
+        const { checkCourseCompletionBadges } = require('../utils/badgeUtils'); // Ensure util is available or rely on top-level import
 
         // Find course
         const course = await Course.findOne({ courseCode });
