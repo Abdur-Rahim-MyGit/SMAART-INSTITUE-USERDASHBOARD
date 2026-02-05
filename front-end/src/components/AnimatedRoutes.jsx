@@ -34,6 +34,7 @@ const BaseLineTest = lazy(() => import('@/pages/BaseLineTest'));
 const Analysis = lazy(() => import('@/pages/Analysis'));
 const Motivational = lazy(() => import('@/pages/Motivational'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const Notifications = lazy(() => import('@/pages/Notifications'));
 const Help = lazy(() => import('@/pages/Help'));
 const AdminTickets = lazy(() => import('@/pages/AdminTickets'));
 const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
@@ -117,6 +118,8 @@ const AnimatedRoutes = () => {
                     <Route path="/dashboard/library" element={<AssessmentFlowGuard><Library /></AssessmentFlowGuard>} />
                     <Route path="/settings" element={<AssessmentFlowGuard><Settings /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/settings" element={<AssessmentFlowGuard><Settings /></AssessmentFlowGuard>} />
+                    <Route path="/notifications" element={<AssessmentFlowGuard><Notifications /></AssessmentFlowGuard>} />
+                    <Route path="/dashboard/notifications" element={<AssessmentFlowGuard><Notifications /></AssessmentFlowGuard>} />
                     <Route path="/help" element={<AssessmentFlowGuard><Help /></AssessmentFlowGuard>} />
                     <Route path="/tickets" element={<AssessmentFlowGuard><SupportTicketsPage /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/support" element={<AssessmentFlowGuard><SupportTicketsPage /></AssessmentFlowGuard>} />

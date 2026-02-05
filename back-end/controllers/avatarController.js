@@ -10,6 +10,7 @@
 
 const Avatar = require('../models/Avatar');
 const User = require('../models/User');
+const { notifyLevelUp, notifyStreakMilestone } = require('../services/notificationService');
 
 // Default asset URLs (replace with your actual Cloudinary/S3 URLs)
 const DEFAULT_ASSETS = {
@@ -144,6 +145,14 @@ exports.levelUp = async (req, res) => {
     // Add enough XP to trigger level up
     const result = await avatar.addXP(avatar.xpToNextLevel);
 
+    // Send notification for level up
+    try {
+      await notifyLevelUp(userId, result.newLevel, result.unlocks || []);
+      console.log(`🔔 Notification sent for level up to ${result.newLevel}`);
+    } catch (notifyError) {
+      console.error("⚠️ Error sending level up notification:", notifyError);
+    }
+
     res.json({
       success: true,
       message: `Leveled up to ${result.newLevel}!`,
@@ -181,7 +190,18 @@ exports.addXP = async (req, res) => {
     }
 
     const avatar = await Avatar.getOrCreate(userId);
+    const previousLevel = avatar.level;
     const result = await avatar.addXP(amount);
+
+    // If user leveled up, send notification
+    if (result.newLevel > previousLevel) {
+      try {
+        await notifyLevelUp(userId, result.newLevel, result.unlocks || []);
+        console.log(`🔔 Notification sent for level up to ${result.newLevel}`);
+      } catch (notifyError) {
+        console.error("⚠️ Error sending level up notification:", notifyError);
+      }
+    }
 
     res.json({
       success: true,
@@ -313,12 +333,26 @@ exports.updateStreak = async (req, res) => {
 
     // Bonus XP for streak milestones
     let bonusXP = 0;
-    if (newStreak % 7 === 0) {
-      bonusXP = 50; // Weekly streak bonus
-      await avatar.addXP(bonusXP);
-    } else if (newStreak % 30 === 0) {
+    let isMilestone = false;
+    
+    if (newStreak % 30 === 0) {
       bonusXP = 200; // Monthly streak bonus
+      isMilestone = true;
       await avatar.addXP(bonusXP);
+    } else if (newStreak % 7 === 0) {
+      bonusXP = 50; // Weekly streak bonus
+      isMilestone = true;
+      await avatar.addXP(bonusXP);
+    }
+
+    // Send notification for streak milestones
+    if (isMilestone) {
+      try {
+        await notifyStreakMilestone(userId, newStreak, bonusXP);
+        console.log(`🔔 Notification sent for ${newStreak} day streak milestone`);
+      } catch (notifyError) {
+        console.error("⚠️ Error sending streak notification:", notifyError);
+      }
     }
 
     res.json({

@@ -3,6 +3,7 @@ const router = express.Router();
 const Certificate = require('../models/Certificate');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+const { notifyCertificateIssued } = require('../services/notificationService');
 
 // Generate and issue a new certificate (Protected - Student only)
 router.post('/issue', protect, async (req, res) => {
@@ -51,6 +52,14 @@ router.post('/issue', protect, async (req, res) => {
         });
 
         await certificate.save();
+
+        // Send notification for certificate issued
+        try {
+            await notifyCertificateIssued(user._id, certificateType, certificateTitle);
+            console.log(`🔔 Notification sent for certificate: ${certificateTitle}`);
+        } catch (notifyError) {
+            console.error("⚠️ Error sending certificate notification:", notifyError);
+        }
 
         res.status(201).json({
             success: true,

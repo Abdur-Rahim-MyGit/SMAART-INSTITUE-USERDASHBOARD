@@ -1,6 +1,8 @@
 const express = require('express');
 const CourseEnrollment = require('../models/CourseEnrollment');
+const Course = require('../models/Course');
 const { protect } = require('../middleware/auth');
+const { notifyCourseEnrollment, notifyCourseCompleted } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -72,6 +74,17 @@ router.post('/', async (req, res) => {
     try {
         const enrollment = new CourseEnrollment(req.body);
         await enrollment.save();
+
+        // Send notification for course enrollment
+        try {
+            // Try to get course title for better notification
+            const course = await Course.findById(enrollment.course);
+            const courseName = course?.title || 'a new course';
+            await notifyCourseEnrollment(enrollment.student, courseName);
+            console.log(`🔔 Notification sent for course enrollment: ${courseName}`);
+        } catch (notifyError) {
+            console.error("⚠️ Error sending enrollment notification:", notifyError);
+        }
 
         res.status(201).json({
             success: true,
@@ -360,6 +373,14 @@ router.post('/video-progress', async (req, res) => {
 
         // Check for course completion badges if status became 'completed'
         if (enrollment.status === 'completed') {
+            // Send course completion notification
+            try {
+                await notifyCourseCompleted(studentId, { title: course.title, _id: course._id });
+                console.log(`🔔 Notification sent for course completion: ${course.title}`);
+            } catch (notifyError) {
+                console.error("⚠️ Error sending course completion notification:", notifyError);
+            }
+
             const awardedBadges = await checkCourseCompletionBadges(studentId, course._id, course);
             if (awardedBadges.length > 0) {
                 return res.json({ success: true, data: enrollment, badgesEarned: awardedBadges });

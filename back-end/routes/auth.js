@@ -6,6 +6,7 @@ const Registration = require('../models/Registration');
 const User = require('../models/User');
 const LoginOtp = require('../models/LoginOtp');
 const { generateOTP, sendOTPEmail } = require('../utils/emailService');
+const { notifyWelcome } = require('../services/notificationService');
 
 // SECURITY: Import rate limiters
 const { loginLimiter, otpLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
@@ -81,6 +82,14 @@ router.post('/register', async (req, res) => {
     });
 
     await registration.save();
+
+    // Send welcome notification
+    try {
+      await notifyWelcome(registration._id, fullName);
+      console.log(`🔔 Welcome notification sent to ${fullName}`);
+    } catch (notifyError) {
+      console.error("⚠️ Error sending welcome notification:", notifyError);
+    }
 
     // Create JWT token - SECURITY: Enforce environment secret and reduce expiry
     const token = jwt.sign(

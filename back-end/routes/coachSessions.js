@@ -1,5 +1,7 @@
 const express = require('express');
 const CoachSession = require('../models/CoachSession');
+const Coach = require('../models/Coach');
+const { notifySessionScheduled } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -69,6 +71,16 @@ router.post('/', async (req, res) => {
     try {
         const session = new CoachSession(req.body);
         await session.save();
+
+        // Send notification for session scheduled
+        try {
+            const coach = await Coach.findById(session.coach);
+            const coachName = coach?.name || 'your coach';
+            await notifySessionScheduled(session.student, session, coachName);
+            console.log(`🔔 Notification sent for session scheduled with ${coachName}`);
+        } catch (notifyError) {
+            console.error("⚠️ Error sending session notification:", notifyError);
+        }
 
         res.status(201).json({
             success: true,
