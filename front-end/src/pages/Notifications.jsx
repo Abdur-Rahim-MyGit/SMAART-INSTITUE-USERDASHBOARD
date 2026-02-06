@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import DashboardSidebar from '@/components/DashboardSidebar';
+import DashboardHeader from '@/components/DashboardHeader';
 import {
   Bell,
   Check,
   CheckCheck,
   Trash2,
-  ArrowLeft,
   Trophy,
   BookOpen,
   Star,
@@ -18,7 +19,6 @@ import {
   Megaphone,
   ClipboardCheck,
   ExternalLink,
-  Filter,
   RefreshCw
 } from 'lucide-react';
 
@@ -273,126 +273,129 @@ const Notifications = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate(-1)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#30919D] rounded-xl flex items-center justify-center">
-                  <Bell className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-lg font-bold text-gray-900">Notifications</h1>
-                  {unreadCount > 0 && (
-                    <p className="text-sm text-gray-500">{unreadCount} unread</p>
-                  )}
-                </div>
-              </div>
-            </div>
+      <DashboardSidebar />
+      
+      <div className="min-h-screen transition-all duration-300">
+        <DashboardHeader />
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => fetchNotifications(1, false)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Refresh"
-              >
-                <RefreshCw className="w-5 h-5" />
-              </button>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllAsRead}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#30919D] hover:bg-[#30919D]/10 rounded-lg transition-colors"
-                >
-                  <CheckCheck className="w-4 h-4" />
-                  <span className="hidden sm:inline">Mark all read</span>
-                </button>
-              )}
-              {notifications.length > 0 && (
-                <button
-                  onClick={clearAll}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Clear all</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Filter tabs */}
-          <div className="flex gap-1 pb-3">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                filter === 'all'
-                  ? 'bg-[#002147] text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilter('unread')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
-                filter === 'unread'
-                  ? 'bg-[#002147] text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              Unread
-              {unreadCount > 0 && (
-                <span className={`px-1.5 py-0.5 text-xs rounded-full ${
-                  filter === 'unread' ? 'bg-white/20' : 'bg-[#30919D] text-white'
-                }`}>
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-10 h-10 border-3 border-[#30919D] border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : notifications.length === 0 ? (
+        <main className="container mx-auto px-3 py-4 max-w-6xl">
+          {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center justify-center py-20 text-center"
+            className="mb-6"
           >
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <Bell className="w-12 h-12 text-gray-400" />
+            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#30919D] to-[#002147] rounded-xl flex items-center justify-center">
+                    <Bell className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-900">Notifications</h1>
+                    <p className="text-sm text-gray-500">
+                      {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All caught up!'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => fetchNotifications(1, false)}
+                    className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Refresh"
+                  >
+                    <RefreshCw className="w-5 h-5" />
+                  </button>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={markAllAsRead}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#30919D] hover:bg-[#30919D]/10 rounded-lg transition-colors"
+                    >
+                      <CheckCheck className="w-4 h-4" />
+                      <span className="hidden sm:inline">Mark all read</span>
+                    </button>
+                  )}
+                  {notifications.length > 0 && (
+                    <button
+                      onClick={clearAll}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span className="hidden sm:inline">Clear all</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Filter tabs */}
+              <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                <button
+                  onClick={() => setFilter('all')}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    filter === 'all'
+                      ? 'bg-[#002147] text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFilter('unread')}
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
+                    filter === 'unread'
+                      ? 'bg-[#002147] text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Unread
+                  {unreadCount > 0 && (
+                    <span className={`px-1.5 py-0.5 text-xs rounded-full ${
+                      filter === 'unread' ? 'bg-white/20' : 'bg-[#30919D] text-white'
+                    }`}>
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
-              {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
-            </h2>
-            <p className="text-gray-500 max-w-sm">
-              {filter === 'unread' 
-                ? "You're all caught up! Check back later for new updates."
-                : "When you get notifications, they'll appear here. Stay tuned!"
-              }
-            </p>
           </motion.div>
-        ) : (
-          <div className="space-y-6">
-            {Object.entries(groupedNotifications).map(([dateLabel, items]) => (
-              <div key={dateLabel}>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">
-                  {dateLabel}
-                </h3>
-                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100">
-                  <AnimatePresence>
+
+          {/* Content */}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="w-10 h-10 border-3 border-[#30919D] border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : notifications.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-xl border border-gray-200 p-8 shadow-sm"
+            >
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <Bell className="w-12 h-12 text-gray-400" />
+                </div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
+                </h2>
+                <p className="text-gray-500 max-w-sm">
+                  {filter === 'unread' 
+                    ? "You're all caught up! Check back later for new updates."
+                    : "When you get notifications, they'll appear here. Stay tuned!"
+                  }
+                </p>
+              </div>
+            </motion.div>
+          ) : (
+            <div className="space-y-4">
+              {Object.entries(groupedNotifications).map(([dateLabel, items]) => (
+                <div key={dateLabel}>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">
+                    {dateLabel}
+                  </h3>
+                  <div className="bg-white rounded-xl border border-gray-200 overflow-hidden divide-y divide-gray-100 shadow-sm">
+                    <AnimatePresence>
                     {items.map((notification) => {
                       const IconComponent = getIcon(notification.icon);
                       
@@ -491,7 +494,7 @@ const Notifications = () => {
               <div className="flex justify-center pt-4">
                 <button
                   onClick={loadMore}
-                  className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                  className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
                 >
                   Load more notifications
                 </button>
@@ -499,6 +502,7 @@ const Notifications = () => {
             )}
           </div>
         )}
+        </main>
       </div>
     </div>
   );
