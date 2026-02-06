@@ -256,7 +256,7 @@
     padding-bottom: 5mm;
     border-top: 1px solid #f1f5f9;
     /* Formal subtle separator */
-    padding-top: 10mm;
+    padding-top: 4mm;
     margin-top: auto;
     /* Push to bottom naturally */
 }
@@ -430,4 +430,115 @@
 
 .capturing-pdf .credential-label {
     letter-spacing: 0.25em !important;
+}
+
+/* ── Combined Certificate Styles ── */
+.combined-content {
+    background: #ffffff;
+    /* Explicit Gold Border */
+    border: 1.5mm solid #b8860b;
+    /* Create an even white frame between the outer Navy and inner Gold borders */
+    margin: 6mm;
+    /* Adjust size to fit perfectly with the margin */
+    width: calc(100% - 12mm);
+    height: calc(100% - 12mm);
+    /* Remove default shadow if any */
+    box-shadow: none;
+    /* Ensure padding inside the gold border is balanced but compact enough to fit all content */
+    padding: 8mm 14mm;
+    box-sizing: border-box;
+}
+
+/* Triple Border Effect removed */
+
+.combined-title {
+    color: #ce1126 !important;
+    /* Red Title */
+    font-size: 24pt !important;
+    /* Slightly adjusted size */
+    letter-spacing: 0.05em;
+}
+
+.combined-recipient {
+    color: #002147 !important;
+    /* Standard Navy Name */
+    position: relative;
+    display: inline-block;
+    min-width: auto !important;
+    /* Shrink to fit name */
+
+    /* Use border-bottom with generous padding for robust PDF generation */
+    border-bottom: 2px solid #b8860b !important;
+    padding-bottom: 8mm !important;
+    /* Visual gap between text and line */
+    margin-bottom: 2mm;
+    /* Space after the line */
+
+    padding-left: 10mm;
+    padding-right: 10mm;
+    line-height: 1.2 !important;
+}
+
+/* Remove pseudo-element approach as it causes PDF alignment issues */
+.combined-recipient::after {
+    display: none;
+}
+
+.combined-cert-details {
+    margin-bottom: 6mm;
+}
+
+.included-certs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3mm;
+    margin-top: 6mm;
+    align-items: center;
+    /* Center alignment looks better for certificates */
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.included-cert-item {
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+    font-family: 'Cinzel', serif;
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #002147;
+    position: relative;
+    padding: 1mm 4mm;
+}
+
+/* Add a subtle underline to list items */
+.included-cert-item::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    height: 1px;
+    background: rgba(184, 134, 11, 0.2);
+}
+
+.cert-bullet {
+    width: 6px;
+    height: 6px;
+    background-color: #ce1126;
+    /* Red Bullets */
+    transform: rotate(45deg);
+    /* Diamond shape */
+    flex-shrink: 0;
+}
+
+.included-cert-item.gold-theme .cert-bullet {
+    background-color: #b8860b;
+    /* Gold bullet for the Gold cert */
+}
+
+.combined-watermark {
+    color: #b8860b;
+    opacity: 0.05 !important;
 }
