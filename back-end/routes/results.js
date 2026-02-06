@@ -4,6 +4,63 @@ const Assessment = require('../models/Assessment');
 const { protect } = require('../middleware/auth');
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions } = require('../utils/questionShuffler');
 const { checkAssessmentBadges } = require('../utils/badgeUtils');
+const { notifyAssessmentComplete } = require('../services/notificationService');
+const router = express.Router();
+
+// Submit Assessment Result
+router.post('/submit', protect, async (req, res) => {
+    try {
+        const { assessmentId, responses, timeSpent } = req.body; // Adjusted payload assumption
+        const userId = req.user._id;
+
+        // Fetch assessment
+        const assessment = await Assessment.findById(assessmentId);
+        if (!assessment) {
+            return res.status(404).json({ success: false, error: 'Assessment not found' });
+        }
+
+        // Calculate score (Basic implementation)
+        let score = 0;
+        const totalQuestions = responses.length;
+        responses.forEach(r => {
+            if (r.isCorrect) score++;
+        });
+        const percentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
+
+        // Create Result
+        const result = new Result({
+            userId,
+            assessmentId,
+            assessmentCode: assessment.assessmentCode,
+            assessmentName: assessment.assessmentName,
+            responses,
+            score,
+            totalQuestions,
+            percentage,
+            timeSpent,
+            completionStatus: 'completed',
+            submittedAt: new Date()
+        });
+        await result.save();
+
+        // Response Data
+        const responseData = {
+            resultId: result._id,
+            score,
+            percentage,
+            badgeEarned: null // simplified
+        };
+
+        // Check for Badges
+        try {
+            const badgeResult = await checkAssessmentBadges(userId, assessment.assessmentCode, percentage);
+            if (badgeResult && badgeResult.earned) {
+                responseData.badgeEarned = badgeResult.badge;
+            }
+        } catch (badgeError) {
+            console.error("Badge check failed:", badgeError);
+        }
+
         // Send notification for assessment completion
         try {
             await notifyAssessmentComplete(

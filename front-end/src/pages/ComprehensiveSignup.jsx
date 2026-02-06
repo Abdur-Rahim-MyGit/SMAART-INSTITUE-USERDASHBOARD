@@ -1,22 +1,46 @@
 import { useState, useEffect, useRef } from "react";
-// Version: 1.0.1 - Enabled Data Pre-filling for Edit Mode    }
+import { useNavigate, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, User, GraduationCap, Award, Palette, Briefcase, Target, FolderOpen, FileText, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import FileUpload from "@/components/FileUpload";
+import { API_BASE_URL } from "@/services/api";
 
+const ComprehensiveSignup = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { userData, selectedInstitution, isEditMode } = location.state || {};
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [preFilledFields, setPreFilledFields] = useState({});
+
+  useEffect(() => {
+    // Pre-fill logic based on navigation state
     if (selectedInstitution) {
       try {
-        const institutionObj = JSON.parse(selectedInstitution);
+        const institutionObj = typeof selectedInstitution === 'string' ? JSON.parse(selectedInstitution) : selectedInstitution;
         setPersonalDetails(prev => ({ ...prev, institution: institutionObj.name || selectedInstitution }));
         setPreFilledFields(prev => ({ ...prev, institution: true }));
-      } catch { setPersonalDetails(prev => ({ ...prev, institution: selectedInstitution })); setPreFilledFields(prev => ({ ...prev, institution: true })); }
+      } catch {
+        setPersonalDetails(prev => ({ ...prev, institution: selectedInstitution }));
+        setPreFilledFields(prev => ({ ...prev, institution: true }));
+      }
     }
-    if (userData?.department) { setPersonalDetails(prev => ({ ...prev, department: userData.department })); setPreFilledFields(prev => ({ ...prev, department: true })); }
-  }, [navigate]);
+    if (userData?.department) {
+      setPersonalDetails(prev => ({ ...prev, department: userData.department }));
+      setPreFilledFields(prev => ({ ...prev, department: true }));
+    }
+  }, [navigate, selectedInstitution, userData]);
 
   const [personalDetails, setPersonalDetails] = useState({
     fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", alternateMobile: "", email: "",
     institution: "", department: "", studentId: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "",
     profilePhoto: null,
     address: { city: "", state: "", country: "" }
-  });  const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
+  }); const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
   const [extracurricular, setExtracurricular] = useState({ isApplicable: true, items: [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] });
@@ -24,7 +48,7 @@ import { useState, useEffect, useRef } from "react";
   const [sectorPreferences, setSectorPreferences] = useState({ preferredSectors: [], secondarySectors: [], otherSector: "" }); // added otherSector
   const [careerGoals, setCareerGoals] = useState({ shortTerm: "", mediumTerm: "", longTerm: "" });
   const [workExperience, setWorkExperience] = useState({ isApplicable: true, items: [{ id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, description: "", certificate: null, githubLink: "" }] });
-  const [projects, setProjects] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] });  const [certificates, setCertificates] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }); // added verificationUrl
+  const [projects, setProjects] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] }); const [certificates, setCertificates] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }); // added verificationUrl
 
   const steps = [
     { title: "Profile", icon: <User className="w-4 h-4" /> },
@@ -135,7 +159,8 @@ import { useState, useEffect, useRef } from "react";
       const p = projects.items[i];
       if (!p.title?.trim() || !p.qualificationLevel || !p.teamType || !p.startDate || !p.description?.trim()) { toast.error(`Project ${i + 1}: All fields marked * are required`); return false; }
       if (p.qualificationLevel === 'Company' && !p.companyName?.trim()) { toast.error(`Project ${i + 1}: Company Name is required`); return false; }
-      if (p.qualificationLevel === 'College' && !p.institution?.trim()) { toast.error(`Project ${i + 1}: Institution is required`); return false; }    }
+      if (p.qualificationLevel === 'College' && !p.institution?.trim()) { toast.error(`Project ${i + 1}: Institution is required`); return false; }
+    }
     return true;
   };
 
@@ -178,7 +203,7 @@ import { useState, useEffect, useRef } from "react";
   const removeJobPref = (id) => setJobPreferences(prev => ({ ...prev, items: prev.items.filter(j => j.id !== id) }));
   const addWorkExperience = () => setWorkExperience(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, description: "", certificate: null, githubLink: "" }] }));
   const removeWorkExperience = (id) => setWorkExperience(prev => ({ ...prev, items: prev.items.filter(w => w.id !== id) }));
-  const addProject = () => setProjects(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] }));  const removeProject = (id) => setProjects(prev => ({ ...prev, items: prev.items.filter(p => p.id !== id) }));
+  const addProject = () => setProjects(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] })); const removeProject = (id) => setProjects(prev => ({ ...prev, items: prev.items.filter(p => p.id !== id) }));
   const addCertificate = () => setCertificates(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }));
   const removeCertificate = (id) => setCertificates(prev => ({ ...prev, items: prev.items.filter(c => c.id !== id) }));
 

@@ -16,24 +16,22 @@ const categories = [
 
 const BadgeGallery = ({ userName = 'Student' }) => {
     const [badges, setBadges] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);    const [selectedBadge, setSelectedBadge] = useState(null);
+    const [isLoading, setIsLoading] = useState(true); const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
     const [showEarnedOnly, setShowEarnedOnly] = useState(false);
-=======
-    const [isLoading, setIsLoading] = useState(true);
->>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
+
 
     useEffect(() => {
         const fetchBadges = async () => {
             try {
                 const userStr = sessionStorage.getItem('user');
-<<<<<<< HEAD                if (!userStr) {
+                if (!userStr) {
                     setIsLoading(false);
                     return;
                 }
                 const user = JSON.parse(userStr);
-                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`);                const data = await response.json();
+                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`); const data = await response.json();
 
                 if (data.success) {
                     // Transform API data to match component expectations
@@ -78,7 +76,7 @@ const BadgeGallery = ({ userName = 'Student' }) => {
 
     const handleBadgeClick = (badge) => {
         if (badge.isEarned) {
-            setSelectedBadge(badge);            setIsModalOpen(true);
+            setSelectedBadge(badge); setIsModalOpen(true);
         }
     };
 
