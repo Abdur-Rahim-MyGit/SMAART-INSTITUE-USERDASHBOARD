@@ -32,6 +32,13 @@ const certificateTypes = [
         shortTitle: 'Professional Diploma\nin Employability & Leadership Readiness',
         subtitle: 'Employability & Leadership Readiness',
         code: 'ELR'
+    },
+    {
+        id: 'combined',
+        title: 'Master Professional Diploma in Comprehensive Readiness',
+        shortTitle: 'Master Professional Diploma\nin Comprehensive Readiness',
+        subtitle: 'Acknowledging Capacity, Capability & Leadership',
+        code: 'MPD'
     }
 ];
 
@@ -158,28 +165,32 @@ const Certificate = () => {
             window.scrollTo(0, 0);
 
             const canvas = await html2canvas(element, {
-                scale: 3,
+                scale: 4, // Higher scale for better clarity
                 useCORS: true,
                 logging: false,
                 backgroundColor: '#ffffff',
-                width: element.offsetWidth,
-                height: element.offsetHeight,
                 scrollX: 0,
                 scrollY: 0,
                 onclone: (clonedDoc) => {
                     const clonedElement = clonedDoc.getElementById('certificate-to-print');
                     if (clonedElement) {
                         clonedElement.classList.add('capturing-pdf');
+                        // Reset all positioning and margins to ensure full bleed capture
                         clonedElement.style.margin = '0';
                         clonedElement.style.padding = '0';
                         clonedElement.style.boxShadow = 'none';
                         clonedElement.style.border = 'none';
                         clonedElement.style.transform = 'none';
-                        clonedElement.style.position = 'absolute';
+                        clonedElement.style.position = 'fixed'; // Fixed to ensure it stays at top-left
                         clonedElement.style.top = '0';
                         clonedElement.style.left = '0';
-                        clonedElement.style.width = `${element.offsetWidth}px`;
-                        clonedElement.style.height = `${element.offsetHeight}px`;
+                        // Explicitly set A4 dimensions
+                        clonedElement.style.width = '210mm';
+                        clonedElement.style.height = '297mm';
+                        clonedElement.style.maxWidth = 'none';
+                        clonedElement.style.maxHeight = 'none';
+                        // Force background to be white
+                        clonedElement.style.backgroundColor = '#ffffff';
                     }
                 }
             });
@@ -228,22 +239,20 @@ const Certificate = () => {
                             <div className="inline-flex bg-white dark:bg-slate-800 rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-slate-700">
                                 <button
                                     onClick={() => setActiveTab('certificates')}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                                        activeTab === 'certificates'
-                                            ? 'bg-[#002147] text-white shadow-md'
-                                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                                    }`}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'certificates'
+                                        ? 'bg-[#002147] text-white shadow-md'
+                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                        }`}
                                 >
                                     <Award className="w-5 h-5" />
                                     Certificates
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('badges')}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
-                                        activeTab === 'badges'
-                                            ? 'bg-[#002147] text-white shadow-md'
-                                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                                    }`}
+                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'badges'
+                                        ? 'bg-[#002147] text-white shadow-md'
+                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                        }`}
                                 >
                                     <Trophy className="w-5 h-5" />
                                     Badges & Achievements
@@ -302,7 +311,7 @@ const Certificate = () => {
                         {activeTab === 'badges' && (
                             <div className="max-w-6xl mx-auto">
                                 <BadgeGallery userName={userData.fullName} badges={user?.badges || []} />
-                                
+
                                 {/* Verify Badge Link */}
                                 <div className="mt-8 text-center">
                                     <a
@@ -358,9 +367,9 @@ const Certificate = () => {
                     <div className="transform scale-[0.6] sm:scale-[0.8] lg:scale-[0.9] origin-top mt-16 shadow-2xl">
                         <div className="certificate-paper" ref={certificateRef} id="certificate-to-print">
                             {/* Security Watermark Backdrop */}
-                            <div className="cert-watermark-overlay">{certId}</div>
+                            <div className={`cert-watermark-overlay ${selectedType.id === 'combined' ? 'combined-watermark' : ''}`}>{certId}</div>
 
-                            <div className="cert-content">
+                            <div className={`cert-content ${selectedType.id === 'combined' ? 'combined-content' : ''}`}>
                                 <header className="cert-header">
                                     <div className="institute-name">SMAART INSTITUTE</div>
                                     <div className="credential-label">PROFESSIONAL CREDENTIAL</div>
@@ -368,18 +377,45 @@ const Certificate = () => {
 
                                 <main className="cert-body">
                                     <section className="cert-main-title">
-                                        <h1 style={{ whiteSpace: 'pre-line' }}>{selectedType.shortTitle}</h1>
+                                        <h1 style={{ whiteSpace: 'pre-line' }} className={selectedType.id === 'combined' ? 'combined-title' : ''}>
+                                            {selectedType.shortTitle}
+                                        </h1>
                                         <div className="subtitle">{selectedType.subtitle}</div>
                                     </section>
 
                                     <section className="recipient-block">
                                         <div className="this-certifies">This certifies that</div>
-                                        <div className="recipient-name">{userData.fullName.toUpperCase()}</div>
+                                        <div className={`recipient-name ${selectedType.id === 'combined' ? 'combined-recipient' : ''}`}>
+                                            {userData.fullName.toUpperCase()}
+                                        </div>
                                     </section>
 
-                                    <p className="cert-statement">
-                                        has successfully completed the SMAART Institute professional learning and assessment programme demonstrating verified readiness across defined professional competencies.
-                                    </p>
+                                    {selectedType.id === 'combined' ? (
+                                        <div className="combined-cert-details">
+                                            <p className="cert-statement">
+                                                has successfully verified mastery across the complete spectrum of professional readiness,
+                                                demonstrating specific excellence in the following accredited domains:
+                                            </p>
+                                            <div className="included-certs-list">
+                                                <div className="included-cert-item red-theme">
+                                                    <div className="cert-bullet"></div>
+                                                    <span>Professional Certificate in Capacity & Work Readiness</span>
+                                                </div>
+                                                <div className="included-cert-item blue-theme">
+                                                    <div className="cert-bullet"></div>
+                                                    <span>Advanced Professional Certificate in Applied Capability</span>
+                                                </div>
+                                                <div className="included-cert-item gold-theme">
+                                                    <div className="cert-bullet"></div>
+                                                    <span>Professional Diploma in Employability & Leadership Readiness</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="cert-statement">
+                                            has successfully completed the SMAART Institute professional learning and assessment programme demonstrating verified readiness across defined professional competencies.
+                                        </p>
+                                    )}
 
                                     <section className="skills-panel">
                                         <div className="skills-column">
@@ -434,11 +470,13 @@ const Certificate = () => {
                                     </div>
                                 </footer>
 
-                                <div className="legal-disclaimer">
-                                    This credential is an industry-recognized professional qualification and does not confer
-                                    academic degree or government-regulated diploma equivalence within the UK education framework.
-                                    &copy; {new Date().getFullYear()} SMAART Institute London.
-                                </div>
+                                {selectedType.id !== 'combined' && (
+                                    <div className="legal-disclaimer">
+                                        This credential is an industry-recognized professional qualification and does not confer
+                                        academic degree or government-regulated diploma equivalence within the UK education framework.
+                                        &copy; {new Date().getFullYear()} SMAART Institute London.
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
