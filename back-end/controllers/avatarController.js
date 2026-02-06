@@ -10,140 +10,13 @@
 
 const Avatar = require('../models/Avatar');
 const User = require('../models/User');
-
-// Default asset URLs (replace with your actual Cloudinary/S3 URLs)
-const DEFAULT_ASSETS = {
-  baseModel: 'https://models.readyplayer.me/default-avatar.glb',
-  accessories: {
-    shoes: 'https://your-storage.com/avatars/accessories/shoes.glb',
-    jacket: 'https://your-storage.com/avatars/accessories/jacket.glb',
-    glasses: 'https://your-storage.com/avatars/accessories/glasses.glb'
-  },
-  animations: {
-    idle: 'https://your-storage.com/avatars/animations/idle.glb',
-    celebrate: 'https://your-storage.com/avatars/animations/celebrate.glb',
-    wave: 'https://your-storage.com/avatars/animations/wave.glb',
-    dance: 'https://your-storage.com/avatars/animations/dance.glb'
-  }
-};
-
-/**
- * GET /api/avatar
- * Fetch the current user's avatar state including all unlocks
- */
-exports.getAvatar = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    // Get or create avatar for user
-    const avatar = await Avatar.getOrCreate(userId);
-
-    // Use req.user which is already typed (Student/Teacher/User/Registration) by protect middleware
-    const user = req.user;
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+    // Send notification for level up
+    try {
+      await notifyLevelUp(userId, result.newLevel, result.unlocks || []);
+      console.log(`🔔 Notification sent for level up to ${result.newLevel}`);
+    } catch (notifyError) {
+      console.error("⚠️ Error sending level up notification:", notifyError);
     }
-
-    // Attempt to get gender
-    let gender = user.gender;
-    const Registration = require('../models/Registration');
-
-    if (!gender) {
-      // Look up by linked userId first
-      const registration = await Registration.findOne({ userId: user._id });
-      gender = registration?.gender;
-
-      // If still missing, try by email (defensive fallback)
-      if (!gender && user.email) {
-        const normalizedEmail = user.email.toLowerCase().trim();
-        const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regRecord = await Registration.findOne({
-          email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') }
-        });
-        gender = regRecord?.gender;
-      }
-    }
-
-    // Prepare response with only unlocked items
-    const response = {
-      success: true,
-      data: {
-        userId: avatar.userId,
-        level: avatar.level,
-        xp: avatar.xp,
-        xpToNextLevel: avatar.xpToNextLevel,
-        levelProgress: avatar.levelProgress,
-        streak: avatar.streak,
-        baseModel: avatar.baseModel || DEFAULT_ASSETS.baseModel,
-        accessories: {
-          shoes: {
-            unlocked: avatar.accessories.shoes.unlocked,
-            equipped: avatar.accessories.shoes.equipped,
-            modelUrl: avatar.accessories.shoes.unlocked
-              ? (avatar.accessories.shoes.modelUrl || DEFAULT_ASSETS.accessories.shoes)
-              : null
-          },
-          jacket: {
-            unlocked: avatar.accessories.jacket.unlocked,
-            equipped: avatar.accessories.jacket.equipped,
-            modelUrl: avatar.accessories.jacket.unlocked
-              ? (avatar.accessories.jacket.modelUrl || DEFAULT_ASSETS.accessories.jacket)
-              : null
-          },
-          glasses: {
-            unlocked: avatar.accessories.glasses.unlocked,
-            equipped: avatar.accessories.glasses.equipped,
-            modelUrl: avatar.accessories.glasses.unlocked
-              ? (avatar.accessories.glasses.modelUrl || DEFAULT_ASSETS.accessories.glasses)
-              : null
-          }
-        },
-        animations: {
-          idle: {
-            unlocked: true,
-            url: avatar.animations.idle.url || DEFAULT_ASSETS.animations.idle
-          },
-          celebrate: {
-            unlocked: avatar.animations.celebrate.unlocked,
-            url: avatar.animations.celebrate.unlocked
-              ? (avatar.animations.celebrate.url || DEFAULT_ASSETS.animations.celebrate)
-              : null
-          }
-        },
-        currentAnimation: avatar.currentAnimation,
-        customization: avatar.customization,
-        user: {
-          fullName: user?.fullName,
-          profileImage: user?.profileImage,
-          gender: gender
-        }
-      }
-    };
-
-    res.json(response);
-  } catch (error) {
-    console.error('Error fetching avatar:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch avatar',
-      error: error.message
-    });
-  }
-};
-
-/**
- * POST /api/avatar/level-up
- * Manually trigger level up (for testing or admin purposes)
- */
-exports.levelUp = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const avatar = await Avatar.getOrCreate(userId);
-
-    // Add enough XP to trigger level up
-    const result = await avatar.addXP(avatar.xpToNextLevel);
-
     res.json({
       success: true,
       message: `Leveled up to ${result.newLevel}!`,
@@ -181,8 +54,18 @@ exports.addXP = async (req, res) => {
     }
 
     const avatar = await Avatar.getOrCreate(userId);
+    const previousLevel = avatar.level;
     const result = await avatar.addXP(amount);
 
+    // If user leveled up, send notification
+    if (result.newLevel > previousLevel) {
+      try {
+        await notifyLevelUp(userId, result.newLevel, result.unlocks || []);
+        console.log(`🔔 Notification sent for level up to ${result.newLevel}`);
+      } catch (notifyError) {
+        console.error("⚠️ Error sending level up notification:", notifyError);
+      }
+    }
     res.json({
       success: true,
       message: `Added ${amount} XP!`,
@@ -313,13 +196,26 @@ exports.updateStreak = async (req, res) => {
 
     // Bonus XP for streak milestones
     let bonusXP = 0;
-    if (newStreak % 7 === 0) {
-      bonusXP = 50; // Weekly streak bonus
-      await avatar.addXP(bonusXP);
-    } else if (newStreak % 30 === 0) {
+    let isMilestone = false;
+    
+    if (newStreak % 30 === 0) {
       bonusXP = 200; // Monthly streak bonus
+      isMilestone = true;
+      await avatar.addXP(bonusXP);
+    } else if (newStreak % 7 === 0) {
+      bonusXP = 50; // Weekly streak bonus
+      isMilestone = true;
       await avatar.addXP(bonusXP);
     }
+
+    // Send notification for streak milestones
+    if (isMilestone) {
+      try {
+        await notifyStreakMilestone(userId, newStreak, bonusXP);
+        console.log(`🔔 Notification sent for ${newStreak} day streak milestone`);
+      } catch (notifyError) {
+        console.error("⚠️ Error sending streak notification:", notifyError);
+      }    }
 
     res.json({
       success: true,

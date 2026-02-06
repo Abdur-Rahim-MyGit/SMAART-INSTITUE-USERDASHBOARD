@@ -2,13 +2,16 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AvatarProfileCard from "./AvatarProfileCard";
+=======
+import useUser from "@/hooks/useUser";
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
 
 import { API_BASE_URL, getBackendUrl } from "../services/api";
 
 const ProfileDropdown = () => {
   const [showProfileCard, setShowProfileCard] = useState(false);
-  const [user, setUser] = useState(null);
-  const [profilePhoto, setProfilePhoto] = useState(null);
+<<<<<<< HEAD
+  const [user, setUser] = useState(null);  const [profilePhoto, setProfilePhoto] = useState(null);
   const dropdownRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const navigate = useNavigate();
@@ -36,32 +39,6 @@ const ProfileDropdown = () => {
       });
     }
   }, []);
-
-  // Fetch profile photo from Registration API
-  useEffect(() => {
-    const fetchProfilePhoto = async () => {
-      if (!user?.email) return;
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.otherDetails?.profilePhoto) {
-            setProfilePhoto(`${getBackendUrl()}/${data.otherDetails.profilePhoto}`);
-          }
-          // Update user data from registration if available (name, gender)
-          if (data.fullName || data.gender) {
-            setUser(prev => {
-              const updated = {
-                ...prev,
-                gender: data.gender || prev?.gender,
-                fullName: data.fullName || prev?.fullName,
-                name: data.fullName || prev?.name
-              };
-              sessionStorage.setItem("user", JSON.stringify(updated));
-              return updated;
-            });
-          }
         }
       } catch (error) {
         console.error("Error fetching profile photo:", error);

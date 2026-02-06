@@ -66,10 +66,9 @@ const handoutSchema = new mongoose.Schema({
   isDownloadable: { type: Boolean, default: true }
 }, { _id: true });
 
-// Day schema for module days (5 course completion days + 2 catch-up days)
+// Day schema for module days (6 course completion days + 2 catch-up days)
 const daySchema = new mongoose.Schema({
-  dayNumber: { type: Number, required: true }, // 1-5 for course days, 6-7 for catch-up days
-  dayType: {
+  dayNumber: { type: Number, required: true }, // 1-6 for course days, 7-8 for catch-up days  dayType: {
     type: String,
     enum: ['course', 'catchup'],
     default: 'course'
@@ -141,11 +140,10 @@ const daySchema = new mongoose.Schema({
 const moduleSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
-  duration: { type: Number, default: 7 }, // in days (5 course + 2 catch-up)
+  duration: { type: Number, default: 8 }, // in days (6 course + 2 catch-up)
   timeAllocation: Number, // in minutes
   sequence: { type: Number, required: true },
-  // Days structure: 5 course days + 2 catch-up days
-  days: [daySchema],
+  // Days structure: 6 course days + 2 catch-up days  days: [daySchema],
   // Legacy support - keep for backward compatibility
   textReading: {
     title: String,

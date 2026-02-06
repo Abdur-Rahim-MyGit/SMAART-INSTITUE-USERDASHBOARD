@@ -1,154 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-// Version: 1.0.1 - Enabled Data Pre-filling for Edit Mode
-import { motion, AnimatePresence } from "framer-motion";
-import { Upload, X, ChevronDown, User, GraduationCap, FileText, Award, CreditCard, Palette, Lock, Check, Briefcase, Target, FolderOpen, Plus, Trash2, ChevronRight, Quote, QrCode, Loader2, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import { API_BASE_URL, apiCall } from "@/services/api";
-import FileUpload from "@/components/FileUpload";
-
-const ComprehensiveSignup = () => {
-  const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const [preFilledFields, setPreFilledFields] = useState({
-    email: false, fullName: false, mobileNumber: false, institution: false, department: false,
-  });
-
-  useEffect(() => {
-    const signupEmail = sessionStorage.getItem("signupEmail");
-    const signupFullName = sessionStorage.getItem("signupFullName");
-    const selectedInstitution = sessionStorage.getItem("selectedInstitution");
-    const userDataStr = sessionStorage.getItem("user");
-    let userData = null;
-    if (userDataStr) { try { userData = JSON.parse(userDataStr); } catch (error) { console.error("Error parsing user data:", error); } }
-    const email = signupEmail || userData?.email;
-    const fullName = signupFullName || userData?.fullName;
-
-    const fetchExistingRegistration = async (targetEmail) => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/users/register-details/${targetEmail}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (!data) return;
-
-          // Map Personal Details
-          setPersonalDetails(prev => ({
-            ...prev,
-            fullName: data.fullName || prev.fullName,
-            nickname: data.nickname || "",
-            dob: data.dob ? new Date(data.dob?.$date || data.dob).toISOString().split('T')[0] : "",
-            gender: data.gender || "",
-            mobileNumber: data.mobileNumber || data.mobile || "",
-            alternateMobile: data.alternateMobile || "",
-            email: data.email || prev.email,
-            institution: data.institution || prev.institution,
-            department: data.department || prev.department,
-            studentId: data.studentId || "",
-            yearOfStudy: data.yearOfStudy || "",
-            yearOfPassing: data.yearOfPassing || "",
-            educationLevel: data.educationLevel || "",
-            address: data.address || { city: "", state: "", country: "" },
-            profilePhoto: data.otherDetails?.profilePhoto || data.profilePhoto || null
-          }));
-
-          // Map 10th/12th
-          if (data.tenthDetails) setTenthDetails(prev => ({ ...prev, ...data.tenthDetails }));
-          if (data.twelfthDetails) setTwelfthDetails(prev => ({ ...prev, ...data.twelfthDetails }));
-
-          // Map Higher Education
-          if (data.higherEducation) {
-            const h = Array.isArray(data.higherEducation) ? data.higherEducation : [data.higherEducation];
-            setHigherEducation(h.map(item => ({ ...item, id: item.id || Date.now() + Math.random() })));
-          }
-
-          // Map Extracurricular
-          if (data.extracurricular) {
-            setExtracurricular({
-              isApplicable: Array.isArray(data.extracurricular) && data.extracurricular.length > 0,
-              items: Array.isArray(data.extracurricular) && data.extracurricular.length > 0
-                ? data.extracurricular.map(i => ({ ...i, id: i.id || Date.now() + Math.random() }))
-                : [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }]
-            });
-          }
-
-          // Map Job Preferences
-          if (data.jobPreferences) {
-            const prefItems = Array.isArray(data.jobPreferences.items) ? data.jobPreferences.items : (data.jobPreferences.preferredRole ? [data.jobPreferences] : []);
-            setJobPreferences({
-              items: prefItems.length > 0
-                ? prefItems.map(i => ({ ...i, id: i.id || Date.now() + Math.random() }))
-                : [{ id: Date.now(), preferredRole: "", jobType: "", preferredLocation: "", willingToRelocate: "", expectedSalary: "" }]
-            });
-          }
-
-          // Map Sector Preferences
-          if (data.sectorPreferences) {
-            setSectorPreferences(prev => ({
-              ...prev,
-              preferredSectors: data.sectorPreferences.preferredSectors || [],
-              secondarySectors: data.sectorPreferences.secondarySectors || [],
-            }));
-          }
-
-          // Map Career Goals
-          if (data.careerGoals) setCareerGoals(data.careerGoals);
-
-          // Map Work Experience
-          if (data.workExperience) {
-            setWorkExperience({
-              isApplicable: Array.isArray(data.workExperience) && data.workExperience.length > 0,
-              items: Array.isArray(data.workExperience) && data.workExperience.length > 0
-                ? data.workExperience.map(i => ({
-                  ...i,
-                  id: i.id || Date.now() + Math.random(),
-                  startDate: i.startDate ? new Date(i.startDate?.$date || i.startDate).toISOString().split('T')[0] : "",
-                  endDate: i.endDate ? new Date(i.endDate?.$date || i.endDate).toISOString().split('T')[0] : ""
-                }))
-                : [{ id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, description: "", certificate: null, githubLink: "" }]
-            });
-          }
-
-          // Map Projects
-          if (data.projects) {
-            setProjects({
-              isApplicable: Array.isArray(data.projects) && data.projects.length > 0,
-              items: Array.isArray(data.projects) && data.projects.length > 0
-                ? data.projects.map(i => ({
-                  ...i,
-                  id: i.id || Date.now() + Math.random(),
-                  startDate: i.startDate ? new Date(i.startDate?.$date || i.startDate).toISOString().split('T')[0] : "",
-                  endDate: i.endDate ? new Date(i.endDate?.$date || i.endDate).toISOString().split('T')[0] : ""
-                }))
-                : [{ id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }]
-            });
-          }
-
-          // Map Certificates
-          if (data.certificates) {
-            setCertificates({
-              isApplicable: Array.isArray(data.certificates) && data.certificates.length > 0,
-              items: Array.isArray(data.certificates) && data.certificates.length > 0
-                ? data.certificates.map(i => ({ ...i, id: i.id || Date.now() + Math.random() }))
-                : [{ id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }]
-            });
-          }
-        }
-      } catch (error) {
-        console.error("Error pre-filling registration:", error);
-      }
-    };
-
-    if (email) {
-      setPersonalDetails(prev => ({ ...prev, email, fullName: fullName || prev.fullName, mobileNumber: userData?.mobileNumber || userData?.mobile || "", institution: "" }));
-      setPreFilledFields(prev => ({ ...prev, email: true, fullName: !!fullName, mobileNumber: !!(userData?.mobileNumber || userData?.mobile) }));
-      fetchExistingRegistration(email);
-    }
+// Version: 1.0.1 - Enabled Data Pre-filling for Edit Mode    }
 
     if (selectedInstitution) {
       try {
@@ -165,8 +16,7 @@ const ComprehensiveSignup = () => {
     institution: "", department: "", studentId: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "",
     profilePhoto: null,
     address: { city: "", state: "", country: "" }
-  });
-  const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
+  });  const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
   const [extracurricular, setExtracurricular] = useState({ isApplicable: true, items: [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] });
@@ -174,8 +24,7 @@ const ComprehensiveSignup = () => {
   const [sectorPreferences, setSectorPreferences] = useState({ preferredSectors: [], secondarySectors: [], otherSector: "" }); // added otherSector
   const [careerGoals, setCareerGoals] = useState({ shortTerm: "", mediumTerm: "", longTerm: "" });
   const [workExperience, setWorkExperience] = useState({ isApplicable: true, items: [{ id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, description: "", certificate: null, githubLink: "" }] });
-  const [projects, setProjects] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] });
-  const [certificates, setCertificates] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }); // added verificationUrl
+  const [projects, setProjects] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] });  const [certificates, setCertificates] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }); // added verificationUrl
 
   const steps = [
     { title: "Profile", icon: <User className="w-4 h-4" /> },
@@ -286,8 +135,7 @@ const ComprehensiveSignup = () => {
       const p = projects.items[i];
       if (!p.title?.trim() || !p.qualificationLevel || !p.teamType || !p.startDate || !p.description?.trim()) { toast.error(`Project ${i + 1}: All fields marked * are required`); return false; }
       if (p.qualificationLevel === 'Company' && !p.companyName?.trim()) { toast.error(`Project ${i + 1}: Company Name is required`); return false; }
-      if (p.qualificationLevel === 'College' && !p.institution?.trim()) { toast.error(`Project ${i + 1}: Institution is required`); return false; }
-    }
+      if (p.qualificationLevel === 'College' && !p.institution?.trim()) { toast.error(`Project ${i + 1}: Institution is required`); return false; }    }
     return true;
   };
 
@@ -330,8 +178,7 @@ const ComprehensiveSignup = () => {
   const removeJobPref = (id) => setJobPreferences(prev => ({ ...prev, items: prev.items.filter(j => j.id !== id) }));
   const addWorkExperience = () => setWorkExperience(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, description: "", certificate: null, githubLink: "" }] }));
   const removeWorkExperience = (id) => setWorkExperience(prev => ({ ...prev, items: prev.items.filter(w => w.id !== id) }));
-  const addProject = () => setProjects(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] }));
-  const removeProject = (id) => setProjects(prev => ({ ...prev, items: prev.items.filter(p => p.id !== id) }));
+  const addProject = () => setProjects(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] }));  const removeProject = (id) => setProjects(prev => ({ ...prev, items: prev.items.filter(p => p.id !== id) }));
   const addCertificate = () => setCertificates(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }));
   const removeCertificate = (id) => setCertificates(prev => ({ ...prev, items: prev.items.filter(c => c.id !== id) }));
 
@@ -368,7 +215,6 @@ const ComprehensiveSignup = () => {
 
       finalSectors.preferredSectors = processSectors(finalSectors.preferredSectors);
       finalSectors.secondarySectors = processSectors(finalSectors.secondarySectors);
-
       formData.append("sectorPreferences", JSON.stringify(finalSectors));
 
       formData.append("careerGoals", JSON.stringify(careerGoals));
@@ -502,8 +348,7 @@ const ComprehensiveSignup = () => {
                       <div><Label>State *</Label><Input value={personalDetails.address.state} onChange={(e) => setPersonalDetails({ ...personalDetails, address: { ...personalDetails.address, state: e.target.value } })} placeholder="e.g. Maharashtra" className={inputClass} /></div>
                       <div><Label>Country *</Label><Input value={personalDetails.address.country} onChange={(e) => setPersonalDetails({ ...personalDetails, address: { ...personalDetails.address, country: e.target.value } })} placeholder="e.g. India" className={inputClass} /></div>
                     </div>
-                  </div>
-                </div>
+                  </div>                </div>
               </motion.div>
             )}
 
@@ -515,8 +360,7 @@ const ComprehensiveSignup = () => {
                   <div className="md:col-span-2"><Label>School Name *</Label><Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} placeholder="Enter your 10th school name" className={inputClass} /></div>
                   <div><Label>Year of Passing *</Label><select value={tenthDetails.yearOfPassing} onChange={(e) => setTenthDetails({ ...tenthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
                   <div><Label>Percentage (%) *</Label><Input type="number" max="100" value={tenthDetails.percentage} onChange={(e) => setTenthDetails({ ...tenthDetails, percentage: e.target.value })} placeholder="e.g. 85.5" className={inputClass} /></div>
-                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={tenthDetails.marksheet} onChange={(fid, fdata) => setTenthDetails({ ...tenthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original 10th marksheet (PDF/JPG)" /></div>
-                </div>
+                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={tenthDetails.marksheet} onChange={(fid, fdata) => setTenthDetails({ ...tenthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original 10th marksheet (PDF/JPG)" /></div>                </div>
               </motion.div>
             )}
 
@@ -529,8 +373,7 @@ const ComprehensiveSignup = () => {
                   <div><Label>Stream *</Label><select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value })} className={selectClass}><option value="">Select Stream</option><option value="Science">Science</option><option value="Commerce">Commerce</option><option value="Arts">Arts</option><option value="Other">Other</option></select></div>
                   <div><Label>Year of Passing *</Label><select value={twelfthDetails.yearOfPassing} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
                   <div><Label>Percentage (%) *</Label><Input type="number" max="100" value={twelfthDetails.percentage} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, percentage: e.target.value })} placeholder="e.g. 92.0" className={inputClass} /></div>
-                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={twelfthDetails.marksheet} onChange={(fid, fdata) => setTwelfthDetails({ ...twelfthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original 12th marksheet (PDF/JPG)" /></div>
-                </div>
+                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={twelfthDetails.marksheet} onChange={(fid, fdata) => setTwelfthDetails({ ...twelfthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original 12th marksheet (PDF/JPG)" /></div>                </div>
               </motion.div>
             )}
 
@@ -557,8 +400,7 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2">
                         <Label>Degree Certificate / Provisional Upload {item.degreeStatus === 'Completed' ? '*' : '(Optional)'}</Label>
                         <FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = [...higherEducation]; n[index].certificate = fdata?.url || fid; setHigherEducation(n); }} helperText="Upload your degree or provisional certificate" />
-                      </div>
-                    </div>
+                      </div>                    </div>
                   </div>
                 ))}
               </motion.div>
@@ -571,8 +413,7 @@ const ComprehensiveSignup = () => {
                   <h2 className="text-2xl font-bold">Extra-Curricular Activities</h2>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer text-slate-500"><input type="checkbox" checked={!extracurricular.isApplicable} onChange={(e) => setExtracurricular({ ...extracurricular, isApplicable: !e.target.checked })} className="accent-[#30919D]" /><span className="text-sm">Not Applicable</span></label>
-                    {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Activity</Button>}
-                  </div>
+                    {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Activity</Button>}                  </div>
                 </div>
                 {extracurricular.isApplicable ? extracurricular.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
@@ -585,8 +426,7 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2"><Label>Description (Optional)</Label><textarea value={item.description} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].description = e.target.value; setExtracurricular(n); }} placeholder="Briefly describe your role and contributions" className={textareaClass} /></div>
                     </div>
                   </div>
-                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No activities to add. Check the box above if you have any!</div>}
-              </motion.div>
+                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No activities to add. Check the box above if you have any!</div>}              </motion.div>
             )}
 
             {/* Step 6: Job Prefs - Refined Salary */}
@@ -606,8 +446,7 @@ const ComprehensiveSignup = () => {
                       <div><Label>Preferred Location *</Label><Input value={item.preferredLocation} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation = e.target.value; setJobPreferences(n); }} placeholder="e.g. Bangalore, Remote, Pune" className={inputClass} /></div>
                       <div><Label>Willing to Relocate *</Label><select value={item.willingToRelocate} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].willingToRelocate = e.target.value; setJobPreferences(n); }} className={selectClass}><option value="">Select Option</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
                       <div className="md:col-span-2">
-                        <Label>Expected Salary Range (LPA) *</Label>
-                        <select value={item.expectedSalary} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].expectedSalary = e.target.value; setJobPreferences(n); }} className={selectClass}>
+                        <Label>Expected Salary Range (LPA) *</Label>                        <select value={item.expectedSalary} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].expectedSalary = e.target.value; setJobPreferences(n); }} className={selectClass}>
                           <option value="">Select Range</option>
                           {salaryRanges.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
@@ -656,8 +495,7 @@ const ComprehensiveSignup = () => {
                   {(sectorPreferences.preferredSectors.includes("Other") || sectorPreferences.secondarySectors.includes("Other")) && (
                     <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                       <Label>Specify Other Sector *</Label>
-                      <Input value={sectorPreferences.otherSector} onChange={(e) => setSectorPreferences({ ...sectorPreferences, otherSector: e.target.value })} className={inputClass} placeholder="e.g. Aerospace, Robotics, Renewable Energy" />
-                    </div>
+                      <Input value={sectorPreferences.otherSector} onChange={(e) => setSectorPreferences({ ...sectorPreferences, otherSector: e.target.value })} className={inputClass} placeholder="e.g. Aerospace, Robotics, Renewable Energy" />                    </div>
                   )}
                 </div>
               </motion.div>
@@ -681,8 +519,7 @@ const ComprehensiveSignup = () => {
                 <div>
                   <Label>Long-term Goal (3-5 years) *</Label>
                   <textarea value={careerGoals.longTerm} onChange={(e) => setCareerGoals({ ...careerGoals, longTerm: e.target.value })} className={textareaClass} placeholder="e.g. Establish my own ed-tech startup or become a Chief Technology Officer (CTO) at a global firm. Focus on driving large-scale digital transformation." />
-                </div>
-              </motion.div>
+                </div>              </motion.div>
             )}
 
             {/* Step 9: Work */}
@@ -692,8 +529,7 @@ const ComprehensiveSignup = () => {
                   <h2 className="text-2xl font-bold">Work Experience</h2>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer text-slate-500"><input type="checkbox" checked={!workExperience.isApplicable} onChange={(e) => setWorkExperience({ ...workExperience, isApplicable: !e.target.checked })} className="accent-[#30919D]" /><span className="text-sm">Not Applicable</span></label>
-                    {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Experience</Button>}
-                  </div>
+                    {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Experience</Button>}                  </div>
                 </div>
                 {workExperience.isApplicable ? workExperience.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
@@ -714,8 +550,7 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2"><Label>Experience Certificate / Offer Letter *</Label><FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].certificate = fdata?.url || fid; setWorkExperience(n); }} helperText="Upload certificate, offer letter or salary slips" /></div>
                     </div>
                   </div>
-                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No work experience to add.</div>}
-              </motion.div>
+                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No work experience to add.</div>}              </motion.div>
             )}
 
             {/* Step 10: Projects */}
@@ -725,8 +560,7 @@ const ComprehensiveSignup = () => {
                   <h2 className="text-2xl font-bold">Projects</h2>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer text-slate-500"><input type="checkbox" checked={!projects.isApplicable} onChange={(e) => setProjects({ ...projects, isApplicable: !e.target.checked })} className="accent-[#30919D]" /><span className="text-sm">Not Applicable</span></label>
-                    {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Project</Button>}
-                  </div>
+                    {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Project</Button>}                  </div>
                 </div>
                 {projects.isApplicable ? projects.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
@@ -745,8 +579,7 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2"><Label>Project URL / GitHub Link (Optional)</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} placeholder="https://github.com/... or https://project-demo.com" className={inputClass} /></div>
                     </div>
                   </div>
-                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No projects to add.</div>}
-              </motion.div>
+                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No projects to add.</div>}              </motion.div>
             )}
 
             {/* Step 11: Certs - Refined URL Input */}
@@ -756,8 +589,7 @@ const ComprehensiveSignup = () => {
                   <h2 className="text-2xl font-bold">Technical Certificates</h2>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer text-slate-500"><input type="checkbox" checked={!certificates.isApplicable} onChange={(e) => setCertificates({ ...certificates, isApplicable: !e.target.checked })} className="accent-[#30919D]" /><span className="text-sm">Not Applicable</span></label>
-                    {certificates.isApplicable && <Button onClick={addCertificate} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Certificate</Button>}
-                  </div>
+                    {certificates.isApplicable && <Button onClick={addCertificate} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Certificate</Button>}                  </div>
                 </div>
                 {certificates.isApplicable ? certificates.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
@@ -768,7 +600,6 @@ const ComprehensiveSignup = () => {
                       <div><Label>Issuing Organization *</Label><Input value={item.issuingOrg} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].issuingOrg = e.target.value; setCertificates(n); }} placeholder="e.g. Amazon Web Services, Google, Coursera" className={inputClass} /></div>
                       <div><Label>Year of Completion *</Label><select value={item.yearOfCompletion} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].yearOfCompletion = e.target.value; setCertificates(n); }} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
                       <div><Label>Verification Method *</Label><select value={item.verificationType} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationType = e.target.value; setCertificates(n); }} className={selectClass}><option value="">Select Method</option><option value="url">Verification URL</option><option value="qr">QR Code on PDF</option></select></div>
-
                       {item.verificationType === "url" && (
                         <div className="md:col-span-2"><Label>Verification URL *</Label><Input value={item.verificationUrl} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationUrl = e.target.value; setCertificates(n); }} className={inputClass} placeholder="https://..." /></div>
                       )}
@@ -776,8 +607,7 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2"><Label>Upload Certificate (PDF/JPG) *</Label><FileUpload value={item.certificateFile} onChange={(fid, fdata) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].certificateFile = fdata?.url || fid; setCertificates(n); }} helperText="Upload the certificate file for verification" /></div>
                     </div>
                   </div>
-                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No certificates to add.</div>}
-              </motion.div>
+                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No certificates to add.</div>}              </motion.div>
             )}
 
           </AnimatePresence>

@@ -6,6 +6,9 @@ import DashboardHeader from "@/components/DashboardHeader";
 import AssessmentBanner from "@/components/AssessmentBanner";
 import { assessmentApi } from "@/services/assessmentApi";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
+=======
+import useUser from "@/hooks/useUser";
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
 
 // Theme colors: Navy (#002147), Teal (#30919D), White
 const THEME = {
@@ -28,30 +31,15 @@ const assessmentConfig = [
     duration: '~45 mins'
   }
 ];
+<<<<<<< HEAD
 
-const MyAssessments = () => {
-  const [hasCompletedBaseLine, setHasCompletedBaseLine] = useState(false);
+const MyAssessments = () => {  const [hasCompletedBaseLine, setHasCompletedBaseLine] = useState(false);
   const [loading, setLoading] = useState(true);
   const [nextUnlockTime, setNextUnlockTime] = useState(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isFirstLogin, setIsFirstLogin] = useState(false);
   const [userName, setUserName] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
-
-  const [baseLineAssessmentDetails, setBaseLineAssessmentDetails] = useState(null);
-
-  const [results, setResults] = useState({
-    baseline: null
-  });
-  const [selectedAssessment, setSelectedAssessment] = useState(null);
-
-  // Get completion status map
-  const completionStatus = {
-    baseline: hasCompletedBaseLine
-  };
-
-  // Check for first login and get user name
-  useEffect(() => {
+  const [currentUser, setCurrentUser] = useState(null);  useEffect(() => {
     const firstLoginFlag = sessionStorage.getItem("isFirstLogin");
     if (firstLoginFlag === "true") {
       setIsFirstLogin(true);
@@ -59,6 +47,7 @@ const MyAssessments = () => {
         sessionStorage.removeItem("isFirstLogin");
       }, 5000);
     }
+<<<<<<< HEAD
     
     const userData = sessionStorage.getItem("user");
     if (userData) {
@@ -70,6 +59,8 @@ const MyAssessments = () => {
         console.error("Error parsing user data:", e);
       }
     }
+=======
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
   }, []);
 
   useEffect(() => {

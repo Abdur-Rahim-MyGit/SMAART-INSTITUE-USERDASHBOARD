@@ -3,22 +3,9 @@ const router = express.Router();
 const Certificate = require('../models/Certificate');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
-
-// Generate and issue a new certificate (Protected - Student only)
-router.post('/issue', protect, async (req, res) => {
-    try {
-        const {
-            certificateType,
-            certificateTitle,
-            validatedSkills,
-            readinessBand,
-            assessmentWindow
-        } = req.body;
-
-        const user = await User.findById(req.user._id);
+        const user = req.user;
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+            return res.status(404).json({ message: 'User object not found in request context' });        }
 
         // Generate unique certificate ID
         const certificateCode = {
@@ -51,23 +38,16 @@ router.post('/issue', protect, async (req, res) => {
         });
 
         await certificate.save();
-
-        res.status(201).json({
-            success: true,
-            message: 'Certificate issued successfully',
-            certificate: {
-                certificateId: certificate.certificateId,
-                fullName: certificate.fullName,
-                certificateType: certificate.certificateType,
-                certificateTitle: certificate.certificateTitle,
-                issueDate: certificate.issueDate,
-                verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-certificate/${certificate.certificateId}`
+                verificationUrl: `${frontendUrl}/verify-certificate/${certificate.certificateId}`
             }
         });
     } catch (error) {
-        console.error('Error issuing certificate:', error);
-        res.status(500).json({ message: 'Failed to issue certificate', error: error.message });
-    }
+        console.error('❌ Error issuing certificate:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to issue certificate',
+            error: error.message
+        });    }
 });
 
 // Get all certificates for the logged-in user (Protected)

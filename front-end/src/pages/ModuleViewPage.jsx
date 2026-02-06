@@ -10,8 +10,7 @@ import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import TaskQuestion from "@/components/TaskQuestion";
 import BadgeModal from "@/components/badges/BadgeModal";
 
-const ModuleViewPage = () => {
-  const { courseId, moduleId, dayId } = useParams();
+const ModuleViewPage = () => {  const { courseId, moduleId, dayId } = useParams();
   const navigate = useNavigate();
   const [selectedModule, setSelectedModule] = useState(moduleId ? parseInt(moduleId) : null);
   const [selectedDay, setSelectedDay] = useState(dayId ? parseInt(dayId) : null);
@@ -62,7 +61,6 @@ const ModuleViewPage = () => {
       setCurrentUser(JSON.parse(userData));
     }
   }, []);
-
   // Reset selected step when session changes
   useEffect(() => {
     setSelectedStepId(null);
@@ -102,8 +100,7 @@ const ModuleViewPage = () => {
             description: module.description || 'No description available',
             duration: module.timeAllocation ? `${module.timeAllocation} minutes` : 'Duration not specified',
             sequence: module.sequence || index + 1,
-            days: Array.from({ length: Math.max(5, module.days?.length || 0) }, (_, dayIndex) => {
-              const day = module.days?.[dayIndex]; // Existing day or undefined
+            days: Array.from({ length: Math.max(5, module.days?.length || 0) }, (_, dayIndex) => {              const day = module.days?.[dayIndex]; // Existing day or undefined
               const id = dayIndex + 1;
 
               // --- Helper to parse duration ---
@@ -182,8 +179,7 @@ const ModuleViewPage = () => {
 
               // --- DUMMY DATA GENERATOR (if day is missing) ---
               if (!day) {
-                const dayTitle = `Session ${id}: ${['Core Foundations', 'Advanced Concepts', 'Strategic Analysis', 'Practical Lab', 'Mastery Review'][dayIndex % 5]}`;
-                return {
+                const dayTitle = `Session ${id}: ${['Core Foundations', 'Advanced Concepts', 'Strategic Analysis', 'Practical Lab', 'Mastery Review'][dayIndex % 5]}`;                return {
                   id,
                   _id: `dummy-${id}`,
                   dayNumber: id,
@@ -370,7 +366,6 @@ const ModuleViewPage = () => {
             const user = JSON.parse(userData);
             try {
               const enrollmentResponse = await courseEnrollmentAPI.getByStudentAndCourse(user._id || user.id, course._id);
-
               if (enrollmentResponse.success && enrollmentResponse.data && enrollmentResponse.data.length > 0) {
                 const enrollment = enrollmentResponse.data[0];
                 const progressMap = {};
@@ -426,7 +421,6 @@ const ModuleViewPage = () => {
 
     fetchData();
   }, [courseId]);
-
   // --- ROUTE GUARD EFFECT ---
   // Strictly enforce sequential progression on mount and URL changes
   useEffect(() => {
@@ -466,8 +460,7 @@ const ModuleViewPage = () => {
         title: `Session ${j + 1}`,
         description: `Topic for Day ${j + 1}`,
         duration: "45 minutes",
-        dayType: j < 5 ? 'course' : 'catchup',
-        videoUrl: null, // No video for placeholder data
+        dayType: j < 5 ? 'course' : 'catchup',        videoUrl: null, // No video for placeholder data
         videoTitle: `Session ${j + 1} Lesson`,
         videoDescription: "Content not yet available. Please contact your instructor.",
         tasks: Array.from({ length: 5 }, (_, k) => ({
@@ -581,6 +574,18 @@ const ModuleViewPage = () => {
     }
   };
 
+=======
+  const handleBadgesEarned = (badges) => {
+    if (badges && badges.length > 0) {
+      setEarnedBadge(badges[0]);
+      setShowBadgeModal(true);
+      if (badges.length > 1) {
+        toast.success(`You earned ${badges.length} badges!`);
+      }
+    }
+  };
+
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
   // Navigation functions
   const navigateToCourses = () => {
     navigate('/dashboard/courses');
@@ -655,10 +660,10 @@ const ModuleViewPage = () => {
       const key = `${mId}-${session.id}-1`;
       return videoCompletionMap[key] === true;
     }
+<<<<<<< HEAD
     // Empty session: If no stairs to climb, you're already at the top.
     // We count empty sessions as done so they don't block progression.
-    return true;
-  };
+    return true;  };
 
   const isDayUnlocked = (moduleId, dayIndex, moduleObj) => {
     if (dayIndex === 0) return true; // First day always unlocked

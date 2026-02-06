@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, Award, BookOpen, Clock, Zap, Target } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { CheckCircle2, Award, BookOpen, Clock, Zap, Target } from 'lucide-react';import { motion } from 'framer-motion';
 import { API_BASE_URL } from '@/services/api';
 
 const ActivityFeed = ({ userId }) => {
@@ -16,6 +15,9 @@ const ActivityFeed = ({ userId }) => {
                     return;
                 }
 
+=======
+                // Fetch enrollments and assessments
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
                 const [enrollmentsResponse, assessmentsResponse] = await Promise.all([
                     fetch(`${API_BASE_URL.replace('/api', '')}/api/courseEnrollments/student/${userId}`, {
                         headers: { 'Authorization': `Bearer ${token}` }
@@ -25,11 +27,11 @@ const ActivityFeed = ({ userId }) => {
                     })
                 ]);
 
+<<<<<<< HEAD
                 const enrollments = enrollmentsResponse.ok ? await enrollmentsResponse.ok && enrollmentsResponse.json() : [];
                 const assessments = assessmentsResponse.ok ? await assessmentsResponse.json() : null;
 
                 const timeline = [];
-
                 if (Array.isArray(enrollments)) {
                     enrollments.forEach(enrollment => {
                         if (enrollment.modules && Array.isArray(enrollment.modules)) {
@@ -42,29 +44,30 @@ const ActivityFeed = ({ userId }) => {
                                         subtitle: enrollment.course?.title || 'Course Module',
                                         time: new Date(module.completedAt),
                                         icon: CheckCircle2,
-                                        color: 'emerald'
-                                    });
+                                        color: 'emerald'                                    });
                                 }
                             });
                         }
                     });
                 }
 
+=======
+                // Add assessment completion
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
                 if (assessments && assessments.createdAt) {
                     timeline.push({
                         id: 'baseline',
                         type: 'assessment',
+<<<<<<< HEAD
                         title: `Baseline Assessment Mastered`,
                         subtitle: `Score: ${assessments.baselineScore || 0}% Rank: ${assessments.stageBand || 'Elite'}`,
                         time: new Date(assessments.createdAt),
-                        icon: Target,
-                        color: 'purple'
+                        icon: Target,                        color: 'purple'
                     });
                 }
 
                 timeline.sort((a, b) => b.time - a.time);
-                setActivities(timeline.slice(0, 5));
-                setLoading(false);
+                setActivities(timeline.slice(0, 5));                setLoading(false);
             } catch (err) {
                 console.error('Failed to fetch activities:', err);
                 setLoading(false);
@@ -93,8 +96,7 @@ const ActivityFeed = ({ userId }) => {
                             <div className="w-12 h-12 bg-slate-200 dark:bg-white/5 rounded-2xl shrink-0" />
                             <div className="flex-1 space-y-2">
                                 <div className="h-4 bg-slate-200 dark:bg-white/5 rounded w-3/4" />
-                                <div className="h-3 bg-slate-200 dark:bg-white/5 rounded w-1/2" />
-                            </div>
+                                <div className="h-3 bg-slate-200 dark:bg-white/5 rounded w-1/2" />                            </div>
                         </div>
                     ))}
                 </div>
@@ -147,8 +149,7 @@ const ActivityFeed = ({ userId }) => {
                                     </span>
                                 </div>
                                 <p className="text-xs font-bold text-slate-400 dark:text-gray-500 truncate uppercase tracking-tight">
-                                    {activity.subtitle}
-                                </p>
+                                    {activity.subtitle}                                </p>
                             </div>
                         </motion.div>
                     ))}

@@ -5,7 +5,6 @@ import axios from 'axios';
 import { toast } from 'sonner';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
 const VerifyCertificate = () => {
     const { certificateId: urlCertId } = useParams();
     const navigate = useNavigate();
@@ -14,8 +13,7 @@ const VerifyCertificate = () => {
     const [isVerifying, setIsVerifying] = useState(false);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        if (urlCertId) {
+    useEffect(() => {        if (urlCertId) {
             verifyCertificate(urlCertId);
         }
     }, [urlCertId]);
@@ -38,8 +36,7 @@ const VerifyCertificate = () => {
                 if (response.data.verified) {
                     toast.success('Certificate verified successfully!');
                 } else {
-                    toast.warning(response.data.message);
-                }
+                    toast.warning(response.data.message);                }
             }
         } catch (err) {
             console.error('Verification error:', err);
@@ -79,8 +76,7 @@ const VerifyCertificate = () => {
                 <div className="bg-white dark:bg-[#1e293b] rounded-2xl shadow-xl border border-gray-200 dark:border-slate-700 p-8 mb-8">
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                                Certificate ID
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">                                Certificate ID
                             </label>
                             <div className="relative">
                                 <input
@@ -90,14 +86,12 @@ const VerifyCertificate = () => {
                                     placeholder="e.g., SMAART-CAP-2025-ABC12"
                                     className="w-full px-4 py-3 pl-12 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#30919D] focus:border-transparent transition-all"
                                 />
-                                <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                            </div>
+                                <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />                            </div>
                         </div>
                         <button
                             type="submit"
                             disabled={isVerifying || !certificateId.trim()}
-                            className="w-full bg-gradient-to-r from-[#002147] to-[#0d1b2a] hover:from-[#0d1b2a] hover:to-[#002147] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                        >
+                            className="w-full bg-gradient-to-r from-[#002147] to-[#0d1b2a] hover:from-[#0d1b2a] hover:to-[#002147] text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"                        >
                             {isVerifying ? (
                                 <>
                                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -125,8 +119,7 @@ const VerifyCertificate = () => {
                                 <p className="text-red-700 dark:text-red-300">{error}</p>
                             </div>
                         </div>
-                    </div>
-                )}
+                    </div>                )}
 
                 {/* Verification Result */}
                 {verificationResult && (
@@ -154,8 +147,7 @@ const VerifyCertificate = () => {
                                 </h2>
                                 <p className={`${verificationResult.verified
                                         ? 'text-green-700 dark:text-green-300'
-                                        : 'text-yellow-700 dark:text-yellow-300'
-                                    }`}>
+                                        : 'text-yellow-700 dark:text-yellow-300'                                    }`}>
                                     {verificationResult.message}
                                 </p>
                             </div>
@@ -173,8 +165,7 @@ const VerifyCertificate = () => {
                                         <p className="text-lg font-bold text-slate-900 dark:text-white">
                                             {verificationResult.certificate.fullName}
                                         </p>
-                                        <p className="text-sm text-slate-600 dark:text-slate-400">
-                                            ID: {verificationResult.certificate.studentId}
+                                        <p className="text-sm text-slate-600 dark:text-slate-400">                                            ID: {verificationResult.certificate.studentId}
                                         </p>
                                     </div>
 
@@ -183,8 +174,7 @@ const VerifyCertificate = () => {
                                             <Award className="w-5 h-5 text-green-600 dark:text-green-400" />
                                             <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Certificate Type</span>
                                         </div>
-                                        <p className="text-lg font-bold text-slate-900 dark:text-white">
-                                            {verificationResult.certificate.certificateTitle}
+                                        <p className="text-lg font-bold text-slate-900 dark:text-white">                                            {verificationResult.certificate.certificateTitle}
                                         </p>
                                     </div>
 
@@ -193,8 +183,7 @@ const VerifyCertificate = () => {
                                             <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
                                             <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Issue Date</span>
                                         </div>
-                                        <p className="text-lg font-bold text-slate-900 dark:text-white">
-                                            {new Date(verificationResult.certificate.issueDate).toLocaleDateString('en-GB', {
+                                        <p className="text-lg font-bold text-slate-900 dark:text-white">                                            {new Date(verificationResult.certificate.issueDate).toLocaleDateString('en-GB', {
                                                 day: 'numeric',
                                                 month: 'long',
                                                 year: 'numeric'
@@ -207,8 +196,7 @@ const VerifyCertificate = () => {
                                             <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
                                             <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">Readiness Band</span>
                                         </div>
-                                        <p className="text-lg font-bold text-slate-900 dark:text-white">
-                                            {verificationResult.certificate.readinessBand}
+                                        <p className="text-lg font-bold text-slate-900 dark:text-white">                                            {verificationResult.certificate.readinessBand}
                                         </p>
                                     </div>
                                 </div>
@@ -222,26 +210,22 @@ const VerifyCertificate = () => {
                                     <div className="grid grid-cols-2 gap-4 text-sm">
                                         <div>
                                             <span className="text-slate-600 dark:text-slate-400">Certificate ID:</span>
-                                            <p className="font-mono font-bold text-slate-900 dark:text-white">
-                                                {verificationResult.certificate.certificateId}
+                                            <p className="font-mono font-bold text-slate-900 dark:text-white">                                                {verificationResult.certificate.certificateId}
                                             </p>
                                         </div>
                                         <div>
                                             <span className="text-slate-600 dark:text-slate-400">Assessment Window:</span>
-                                            <p className="font-mono font-bold text-slate-900 dark:text-white">
-                                                {verificationResult.certificate.assessmentWindow}
+                                            <p className="font-mono font-bold text-slate-900 dark:text-white">                                                {verificationResult.certificate.assessmentWindow}
                                             </p>
                                         </div>
                                         <div>
                                             <span className="text-slate-600 dark:text-slate-400">Issuing Authority:</span>
-                                            <p className="font-bold text-slate-900 dark:text-white">
-                                                {verificationResult.certificate.issuingAuthority}
+                                            <p className="font-bold text-slate-900 dark:text-white">                                                {verificationResult.certificate.issuingAuthority}
                                             </p>
                                         </div>
                                         <div>
                                             <span className="text-slate-600 dark:text-slate-400">Verification Count:</span>
-                                            <p className="font-bold text-slate-900 dark:text-white">
-                                                {verificationResult.certificate.verificationCount} times
+                                            <p className="font-bold text-slate-900 dark:text-white">                                                {verificationResult.certificate.verificationCount} times
                                             </p>
                                         </div>
                                     </div>
@@ -250,23 +234,20 @@ const VerifyCertificate = () => {
                                 {/* Validated Skills */}
                                 {verificationResult.certificate.validatedSkills && verificationResult.certificate.validatedSkills.length > 0 && (
                                     <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-green-200 dark:border-green-800">
-                                        <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-3">
-                                            Validated Skills
+                                        <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400 mb-3">                                            Validated Skills
                                         </h3>
                                         <div className="grid md:grid-cols-2 gap-2">
                                             {verificationResult.certificate.validatedSkills.map((skill, index) => (
                                                 <div key={index} className="flex items-center gap-2 text-sm">
                                                     <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0" />
-                                                    <span className="text-slate-900 dark:text-white">{skill.label}</span>
-                                                </div>
+                                                    <span className="text-slate-900 dark:text-white">{skill.label}</span>                                                </div>
                                             ))}
                                         </div>
                                     </div>
                                 )}
                             </div>
                         )}
-                    </div>
-                )}
+                    </div>                )}
 
                 {/* Info Section */}
                 {!verificationResult && !error && (
@@ -274,8 +255,7 @@ const VerifyCertificate = () => {
                         <h3 className="text-lg font-bold text-blue-900 dark:text-blue-200 mb-3">
                             How to Verify
                         </h3>
-                        <ul className="space-y-2 text-blue-800 dark:text-blue-300">
-                            <li className="flex items-start gap-2">
+                        <ul className="space-y-2 text-blue-800 dark:text-blue-300">                            <li className="flex items-start gap-2">
                                 <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
                                 <span>Enter the certificate ID found on the certificate document</span>
                             </li>
@@ -289,8 +269,7 @@ const VerifyCertificate = () => {
                             </li>
                         </ul>
                     </div>
-                )}
-            </div>
+                )}            </div>
         </div>
     );
 };

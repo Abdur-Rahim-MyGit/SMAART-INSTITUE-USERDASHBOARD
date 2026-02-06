@@ -141,8 +141,16 @@ const studentSchema = new mongoose.Schema({
   currentSessionId: {
     type: String,
     default: null
-  }
-}, {
+  },
+  badges: [{
+    badgeId: String,
+    title: String,
+    description: String,
+    tier: { type: String, enum: ['bronze', 'silver', 'gold'] },
+    xp: { type: Number, default: 0 },
+    category: String,
+    earnedAt: { type: Date, default: Date.now }
+  }]}, {
   timestamps: true
 });
 

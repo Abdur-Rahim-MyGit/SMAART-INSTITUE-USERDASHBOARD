@@ -129,8 +129,7 @@ const ModuleView = ({ courseId, onBack }) => {
                   title: `Day ${i + 1}`,
                   description: `Topic for Day ${i + 1}`,
                   duration: "45 minutes",
-                  dayType: i < 5 ? 'course' : 'catchup',
-                  tasks: Array.from({ length: 5 }, (_, j) => ({
+                  dayType: i < 5 ? 'course' : 'catchup',                  tasks: Array.from({ length: 5 }, (_, j) => ({
                     id: j + 1,
                     title: `Task ${j + 1}`,
                     completed: false,
@@ -215,8 +214,7 @@ const ModuleView = ({ courseId, onBack }) => {
         title: `Day ${j + 1}`,
         description: `Topic for Day ${j + 1}`,
         duration: "45 minutes",
-        dayType: j < 5 ? 'course' : 'catchup',
-        tasks: Array.from({ length: 5 }, (_, k) => ({
+        dayType: j < 5 ? 'course' : 'catchup',        tasks: Array.from({ length: 5 }, (_, k) => ({
           id: k + 1,
           title: `Task ${k + 1}`,
           completed: false,
@@ -642,8 +640,7 @@ const ModuleView = ({ courseId, onBack }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {module.days.map((day, index) => {
             const dayCompletedCount = getDayCompletedCount(selectedModule, day.id);
-            const isDayCompleted = dayCompletedCount === day.tasks.length;
-            
+            const isDayCompleted = dayCompletedCount === day.tasks.length;            
             return (
               <motion.button
                 key={day.id}

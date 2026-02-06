@@ -5,7 +5,6 @@ import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
 import { API_BASE_URL } from '@/services/api';
 import { Loader2 } from 'lucide-react';
-
 const categories = [
     { id: 'all', label: 'All Badges', icon: FaTrophy },
     { id: 'assessment', label: 'Assessments', icon: FaStar },
@@ -17,23 +16,24 @@ const categories = [
 
 const BadgeGallery = ({ userName = 'Student' }) => {
     const [badges, setBadges] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [selectedBadge, setSelectedBadge] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);    const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
     const [showEarnedOnly, setShowEarnedOnly] = useState(false);
+=======
+    const [isLoading, setIsLoading] = useState(true);
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
 
     useEffect(() => {
         const fetchBadges = async () => {
             try {
                 const userStr = sessionStorage.getItem('user');
-                if (!userStr) {
+<<<<<<< HEAD                if (!userStr) {
                     setIsLoading(false);
                     return;
                 }
                 const user = JSON.parse(userStr);
-                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`);
-                const data = await response.json();
+                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`);                const data = await response.json();
 
                 if (data.success) {
                     // Transform API data to match component expectations
@@ -78,8 +78,7 @@ const BadgeGallery = ({ userName = 'Student' }) => {
 
     const handleBadgeClick = (badge) => {
         if (badge.isEarned) {
-            setSelectedBadge(badge);
-            setIsModalOpen(true);
+            setSelectedBadge(badge);            setIsModalOpen(true);
         }
     };
 
@@ -193,8 +192,7 @@ const BadgeGallery = ({ userName = 'Student' }) => {
                         <div className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${showEarnedOnly ? 'translate-x-5' : ''}`} />
                     </div>
                     <span className="text-sm text-slate-600 dark:text-slate-300 font-medium">Earned Only</span>
-                </label>
-            </div>
+                </label>            </div>
 
             {/* Badge Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">

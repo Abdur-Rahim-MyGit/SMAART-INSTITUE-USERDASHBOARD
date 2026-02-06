@@ -41,7 +41,6 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
     const tier = tierConfig[badge.tier] || tierConfig.bronze;
     const TierIcon = tier.icon;
     const verificationUrl = `${window.location.origin}/verify-badge/${badge.id}`;
-
     const handleShare = async (platform) => {
         setIsSharing(true);
         const shareText = `🏆 I just earned the "${badge.title}" badge at SMAART Institute! ${badge.xp ? `+${badge.xp} XP` : ''} #SMAARTInstitute #Achievement`;
@@ -241,8 +240,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                         <div className="text-left">
                                             <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Verify this badge</p>
                                             <p className="text-xs font-mono text-slate-600 dark:text-slate-300 break-all max-w-[200px]">
-                                                {badge.id}
-                                            </p>
+                                                {badge.id}                                            </p>
                                         </div>
                                     </div>
                                 </div>

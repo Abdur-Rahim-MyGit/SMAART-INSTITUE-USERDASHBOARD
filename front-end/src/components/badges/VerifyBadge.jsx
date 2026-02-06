@@ -6,6 +6,9 @@ import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
+=======
+import apiCall from '@/services/api';
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 
@@ -36,6 +39,7 @@ const tierConfig = {
     },
 };
 
+<<<<<<< HEAD
 // Mock function to verify badge - In production, this would call your API
 const verifyBadge = async (badgeId) => {
     // Simulate API call
@@ -58,8 +62,7 @@ const verifyBadge = async (badgeId) => {
         earnedDate: '2026-01-15',
         issuedBy: 'SMAART Institute',
         isValid: true,
-    };
-};
+    };};
 
 const VerifyBadge = () => {
     const { badgeId } = useParams();

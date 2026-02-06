@@ -1,8 +1,9 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const CourseEnrollment = require('../models/CourseEnrollment');
+const Course = require('../models/Course');
 const { protect } = require('../middleware/auth');
-
+const { awardEarlyAchieverBadge } = require('../utils/badgeHelper');
+const { notifyCourseEnrollment, notifyCourseCompleted } = require('../services/notificationService');
 const router = express.Router();
 
 // Apply protection to all enrollment routes
@@ -43,17 +44,7 @@ router.get('/', async (req, res) => {
 // Get enrollment by ID
 router.get('/:id', async (req, res) => {
     try {
-        const { id } = req.params;
-
-        if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Invalid Enrollment ID format'
-            });
-        }
-
-        const enrollment = await CourseEnrollment.findById(id)
-            .populate('student', 'fullName email studentId')
+        const enrollment = await CourseEnrollment.findById(req.params.id)            .populate('student', 'fullName email studentId')
             .populate('course', 'title courseCode modules')
             .populate('college', 'name code');
 
@@ -83,90 +74,7 @@ router.post('/', async (req, res) => {
         const enrollment = new CourseEnrollment(req.body);
         await enrollment.save();
 
-        res.status(201).json({
-            success: true,
-            message: 'Course enrollment created successfully',
-            data: enrollment
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: 'Failed to create course enrollment',
-            message: err.message
-        });
-    }
-});
-
-// Update course enrollment progress
-router.put('/:id', async (req, res) => {
-    try {
-        const enrollment = await CourseEnrollment.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true, runValidators: true }
-        );
-
-        if (!enrollment) {
-            return res.status(404).json({
-                success: false,
-                error: 'Course enrollment not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            message: 'Course enrollment updated successfully',
-            data: enrollment
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: 'Failed to update course enrollment',
-            message: err.message
-        });
-    }
-});
-
-// Delete course enrollment
-router.delete('/:id', async (req, res) => {
-    try {
-        const enrollment = await CourseEnrollment.findByIdAndDelete(req.params.id);
-
-        if (!enrollment) {
-            return res.status(404).json({
-                success: false,
-                error: 'Course enrollment not found'
-            });
-        }
-
-        res.json({
-            success: true,
-            message: 'Course enrollment deleted successfully'
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: 'Failed to delete course enrollment',
-            message: err.message
-        });
-    }
-});
-
-// Get student's enrollments
-router.get('/student/:studentId', async (req, res) => {
-    try {
-        const { studentId } = req.params;
-
-        // Validation for MongoDB ObjectId to prevent 500 errors on invalid IDs
-        if (!mongoose.Types.ObjectId.isValid(studentId)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Invalid Student ID format'
-            });
-        }
-
-        const enrollments = await CourseEnrollment.find({ student: studentId })
-            .populate('course', 'title courseCode duration status')
+        const enrollments = await CourseEnrollment.find({ student: req.params.studentId })            .populate('course', 'title courseCode duration status')
             .populate('college', 'name code')
             .sort({ enrollmentDate: -1 });
 
@@ -276,16 +184,15 @@ router.post('/task-progress', async (req, res) => {
             }
         }
 
+        enrollment.lastAccessedAt = new Date();
         await enrollment.save();
         console.log('Enrollment saved successfully');
 
-        // Check for course completion badges if status became 'completed'
-        if (enrollment.status === 'completed') {
-            const awardedBadges = await checkCourseCompletionBadges(studentId, course._id, course);
-            if (awardedBadges.length > 0) {
-                return res.json({ success: true, data: enrollment, badgesEarned: awardedBadges });
-            }
-        }
+        // Check for badge eligibility
+        try {
+            await awardEarlyAchieverBadge(studentId);
+        } catch (badgeErr) {
+            console.error('Error in badge awarding:', badgeErr);        }
 
         res.json({ success: true, data: enrollment });
 
@@ -376,15 +283,22 @@ router.post('/video-progress', async (req, res) => {
             }
         }
 
+        enrollment.lastAccessedAt = new Date();
         await enrollment.save();
 
-        // Check for course completion badges if status became 'completed'
-        if (enrollment.status === 'completed') {
-            const awardedBadges = await checkCourseCompletionBadges(studentId, course._id, course);
-            if (awardedBadges.length > 0) {
-                return res.json({ success: true, data: enrollment, badgesEarned: awardedBadges });
+        // Check for badge eligibility
+        try {
+            // Send course completion notification
+            try {
+                await notifyCourseCompleted(studentId, { title: course.title, _id: course._id });
+                console.log(`🔔 Notification sent for course completion: ${course.title}`);
+            } catch (notifyError) {
+                console.error("⚠️ Error sending course completion notification:", notifyError);
             }
-        }
+
+            await awardEarlyAchieverBadge(studentId);
+        } catch (badgeErr) {
+            console.error('Error in badge awarding:', badgeErr);        }
 
         res.json({ success: true, data: enrollment });
 

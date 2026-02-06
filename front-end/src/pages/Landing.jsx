@@ -158,7 +158,6 @@ const Landing = () => {
                 onInstitutionSelected={handleInstitutionSelected}
             />
         </PageTransition>
-    );
-};
+    );};
 
 export default Landing;

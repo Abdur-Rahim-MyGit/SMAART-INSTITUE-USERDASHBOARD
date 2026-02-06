@@ -4,8 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import PageTransition from "@/components/PageTransition";
 import VisionBoardSplash from "@/components/VisionBoardSplash";
-import BadgeModal from "@/components/badges/BadgeModal";
-import {
+import BadgeModal from "@/components/badges/BadgeModal";import {
   TrendingUp,
   Plus,
   ArrowUpRight,
@@ -31,8 +30,7 @@ import {
   Flame,
   Star,
   Medal,
-  Trophy
-} from "lucide-react";
+  Trophy} from "lucide-react";
 import { toast } from "sonner";
 import { getTasks, createTask, updateTask, deleteTask } from "@/services/taskService";
 import useAvatar from '@/hooks/useAvatar';
@@ -42,32 +40,25 @@ import TaskListSkeleton from '@/components/skeletons/TaskListSkeleton';
 import { API_BASE_URL } from '@/services/api';
 import ActivityFeed from '@/components/ActivityFeed';
 import UpcomingDeadlines from '@/components/UpcomingDeadlines';
+=======
+import useUser from "@/hooks/useUser";
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
 
 const DashboardHome = () => {
   const navigate = useNavigate();
   const location = useLocation();
+<<<<<<< HEAD
   // Version: 1.0.4 - Robust property access and safe default state
   const [user, setUser] = useState({ fullName: "Student" });
   const { avatarData } = useAvatar();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [showVisionSplash, setShowVisionSplash] = useState(false);
-  const [activeTaskTab, setActiveTaskTab] = useState("All tasks");
+  const [showVisionSplash, setShowVisionSplash] = useState(false);  const [activeTaskTab, setActiveTaskTab] = useState("All tasks");
 
   // Real data states
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [earnedBadges, setEarnedBadges] = useState([]);
   const [selectedBadge, setSelectedBadge] = useState(null);
-  const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);
-  const [stats, setStats] = useState({
-    totalCourses: 0,
-    completedModules: 0,
-    baselineScore: 0,
-    dayStreak: 12,
-    badgeCount: 0
-  });
-  const [dashboardLoading, setDashboardLoading] = useState(true);
-  const [badgesLoading, setBadgesLoading] = useState(true);
-  const [dashboardError, setDashboardError] = useState(null);
+  const [isBadgeModalOpen, setIsBadgeModalOpen] = useState(false);  const [dashboardError, setDashboardError] = useState(null);
   const [weeklyProgress, setWeeklyProgress] = useState(0);
 
   // Check if this is a fresh login (show splash)
@@ -81,7 +72,6 @@ const DashboardHome = () => {
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
     if (userData) setUser(JSON.parse(userData));
-
     const clockInterval = setInterval(() => {
       setCurrentDate(new Date());
     }, 1000);
@@ -94,11 +84,14 @@ const DashboardHome = () => {
     sessionStorage.setItem('visionSplashShown', 'true');
   };
 
-  // Fetch Dashboard Data
-  useEffect(() => {
+  // Fetch Dashboard Data  useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setDashboardLoading(true);
+=======
+        setDashboardError(null);
+
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
         const userId = user.id || user._id;
         const token = sessionStorage.getItem('token');
 
@@ -107,6 +100,7 @@ const DashboardHome = () => {
           return;
         }
 
+<<<<<<< HEAD
         // Fetch courses, baseline results and earned badges
         const [coursesRes, baselineRes, badgesRes] = await Promise.all([
           fetch(`${API_BASE_URL.replace('/api', '')}/api/courseEnrollments/student/${userId}`, { headers: { 'Authorization': `Bearer ${token}` } }),
@@ -158,8 +152,7 @@ const DashboardHome = () => {
         }
 
         const weeklyProgressPercent = totalModules > 0
-          ? Math.round((completedThisWeek / totalModules) * 100)
-          : 0;
+          ? Math.round((completedThisWeek / totalModules) * 100)          : 0;
 
         setStats({
           totalCourses,
@@ -186,7 +179,6 @@ const DashboardHome = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [tasks, setTasks] = useState([]);
-
   const fetchTasks = async () => {
     try {
       const data = await getTasks();
@@ -208,8 +200,7 @@ const DashboardHome = () => {
       });
       fetchTasks();
       toast.success("Task added!");
-    } catch (error) { toast.error("Failed to add task"); }
-  };
+    } catch (error) { toast.error("Failed to add task"); }  };
 
   const handleToggleTaskStatus = async (task) => {
     try {
@@ -217,8 +208,7 @@ const DashboardHome = () => {
       setTasks(tasks.map(t => t._id === task._id ? { ...t, status: newStatus } : t));
       await updateTask(task._id, { status: newStatus });
       fetchTasks();
-    } catch (error) { toast.error("Failed to update status"); fetchTasks(); }
-  };
+    } catch (error) { toast.error("Failed to update status"); fetchTasks(); }  };
 
   const handleDeleteTask = async (id) => {
     try {
@@ -248,8 +238,7 @@ const DashboardHome = () => {
         userName={user?.fullName || "Student"}
       />
 
-      <div className="min-h-screen lms-dashboard-bg text-slate-900 dark:text-slate-100 font-sans selection:bg-[#30919D]/30">
-        <DashboardSidebar />
+      <div className="min-h-screen lms-dashboard-bg text-slate-900 dark:text-slate-100 font-sans selection:bg-[#30919D]/30">        <DashboardSidebar />
 
         <div className="min-h-screen">
           <PageTransition>
@@ -624,7 +613,6 @@ const DashboardHome = () => {
                       <button className="w-full py-4 bg-white text-[#002147] rounded-2xl font-black text-sm transition-all hover:scale-105 active:scale-95 shadow-xl">Upgrade Account</button>
                     </div>
                   </div>
-
                 </div>
 
               </div>

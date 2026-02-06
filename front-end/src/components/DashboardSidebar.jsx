@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ClipboardList,
@@ -15,19 +14,22 @@ import {
   Settings,
   HelpCircle,
   Bell,
-  MoreHorizontal,
-} from "lucide-react";
+  MoreHorizontal,} from "lucide-react";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
 import ChatbotModal from "@/components/ChatbotModal";
 
+=======
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
 const menuItems = [
   { icon: Home, label: "Home", path: "/dashboard" },
   { icon: BookOpen, label: "My Courses", path: "/dashboard/courses" },
   { icon: Lightbulb, label: "Vision Boards", path: "/dashboard/vision-boards" },
   { icon: Zap, label: "SMAART Toolkit", path: "/dashboard/smaart-toolkit" },
   { icon: Award, label: "My Certificate", path: "/dashboard/certificate" },
-];
+<<<<<<< HEAD];
 
 
 const bottomMenuItems = [
@@ -41,6 +43,142 @@ const DashboardSidebar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+=======
+  
+  // Notification state
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const notificationRef = useRef(null);
+
+  // Auth headers
+  const getAuthHeaders = () => {
+    const token = sessionStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    };
+  };
+
+  // Fetch notifications
+  const fetchNotifications = useCallback(async () => {
+    setNotifLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications?limit=10`, {
+        headers: getAuthHeaders()
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setNotifications(data.notifications || []);
+          setUnreadCount(data.unreadCount || 0);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    } finally {
+      setNotifLoading(false);
+    }
+  }, []);
+
+  // Fetch on dropdown open
+  useEffect(() => {
+    if (notificationOpen) {
+      fetchNotifications();
+    }
+  }, [notificationOpen, fetchNotifications]);
+
+  // Fetch unread count on mount and periodically
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/notifications/unread-count`, {
+          headers: getAuthHeaders()
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setUnreadCount(data.unreadCount || 0);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching unread count:', err);
+      }
+    };
+    
+    fetchUnreadCount();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Generate test notification
+  const generateTestNotification = async () => {
+    console.log('🔔 Generating test notification...');
+    try {
+      const testTypes = [
+        { type: 'badge', title: '🏆 New Badge Earned!', message: 'Congratulations! You earned the "Quick Learner" badge.' },
+        { type: 'assessment', title: '📊 Assessment Results Ready', message: 'Your Baseline Assessment results are available.' },
+        { type: 'course', title: '📚 New Course Available', message: 'Check out "Leadership Essentials" - now available!' },
+        { type: 'achievement', title: '🎉 Level Up!', message: 'You reached Level 5! New avatar items unlocked.' },
+        { type: 'system', title: '👋 Welcome!', message: 'Welcome to SMAART Minds! Start your learning journey today.' }
+      ];
+      const randomNotif = testTypes[Math.floor(Math.random() * testTypes.length)];
+      
+      console.log('🔔 Sending notification:', randomNotif);
+      const response = await fetch(`${API_BASE_URL}/notifications/test`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(randomNotif)
+      });
+      const data = await response.json();
+      console.log('🔔 Response:', data);
+      
+      if (data.success) {
+        fetchNotifications();
+      } else {
+        console.error('🔔 Error:', data.message);
+      }
+    } catch (err) {
+      console.error('Error creating test notification:', err);
+    }
+  };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+        setNotificationOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Mark all as read
+  const markAllRead = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/notifications/read-all`, {
+        method: 'PATCH',
+        headers: getAuthHeaders()
+      });
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Error:', err);
+    }
+  };
+
+  // Time ago formatter
+  const timeAgo = (date) => {
+    const secs = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (secs < 60) return 'now';
+    if (secs < 3600) return `${Math.floor(secs / 60)}m`;
+    if (secs < 86400) return `${Math.floor(secs / 3600)}h`;
+    return `${Math.floor(secs / 86400)}d`;
+  };
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
 
   // Prevent background scroll when mobile drawer is open
   useEffect(() => {
@@ -87,12 +225,12 @@ const DashboardSidebar = () => {
           {/* Right: Actions */}
           <div className="flex items-center gap-4">
 
+<<<<<<< HEAD
             {/* Notification Badge */}
             <button className="p-2 mr-1 rounded-full text-gray-400 hover:text-[#30919D] hover:bg-[#30919D]/5 transition-all relative group/nav">
               <Bell className="w-5 h-5 group-hover/nav:animate-bounce" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#002147] shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
             </button>
-
             {/* Profile */}
             <ProfileDropdown />
           </div>

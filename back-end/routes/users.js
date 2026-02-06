@@ -1,7 +1,9 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
+const Student = require('../models/Student');
 const upload = require('../middleware/upload');
 
 const router = express.Router();
@@ -122,8 +124,7 @@ router.post('/register-details', upload.fields([
       yearOfStudy: parsedPersonalDetails?.yearOfStudy || '',
       yearOfPassing: parsedPersonalDetails?.yearOfPassing || '',
       alternateMobile: parsedPersonalDetails?.alternateMobile || '',
-      studentId: parsedPersonalDetails?.studentId || '',
-      address: parsedPersonalDetails?.address || { city: '', state: '', country: '' },
+
 
       // 10th Standard Details
       tenthDetails: {
@@ -155,7 +156,6 @@ router.post('/register-details', upload.fields([
         degreeStatus: h.degreeStatus || '',
         certificate: h.certificate || ''
       })) : [],
-
       // Extra-Curricular Activities
       extracurricular: Array.isArray(parsedExtracurricular) ? parsedExtracurricular : [],
 
@@ -194,8 +194,6 @@ router.post('/register-details', upload.fields([
         issuingOrg: c.issuingOrg,
         certificateFile: c.certificateFile || '',
         yearOfCompletion: c.yearOfCompletion || '',
-        verificationType: c.verificationType || '',
-        verificationUrl: c.verificationUrl || '',
       })) : [],
 
       submissionDate: new Date(),
@@ -467,18 +465,13 @@ router.get('/register-details/:email', async (req, res) => {
     }
 
     // Try to find registration by userId
-    const registration = await Registration.findOne({
-      $or: [
-        { userId: user._id },
-        { email: normalizedEmail }
-      ]
-    });
+    const registration = await Registration.findOne({ userId: user._id });
 
     if (registration) {
-      console.log(`[register-details] Found registration for ${normalizedEmail}: ${registration.fullName || user.fullName}`);
       return res.json({
         ...registration.toObject(),
-        fullName: registration.fullName || user.fullName,
+        fullName: user.fullName || registration.fullName,
+        email: user.email || registration.email,
         gender: registration.gender || user.gender
       });
     }
@@ -488,49 +481,62 @@ router.get('/register-details/:email', async (req, res) => {
     res.json({
       fullName: user.fullName,
       email: user.email,
-      gender: user.gender,
-      otherDetails: {}
+      gender: user.gender
     });
   } catch (err) {
-    console.error('[register-details] Error:', err.message);
+    console.error('Error in register-details:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Create User (for signup without password)
-router.post('/create', async (req, res) => {
+// Verify Badge by unique _id (Public)
+router.get('/verify-badge/:badgeId', async (req, res) => {
   try {
-    const { firstName, lastName, email, mobileNumber } = req.body;
+    const { badgeId } = req.params;
 
-    // Check if user exists
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ error: 'User already exists' });
+    if (!mongoose.Types.ObjectId.isValid(badgeId)) {
+      return res.status(400).json({ error: 'Invalid Badge ID format' });
     }
 
-    // Create new user without password
-    user = new User({
-      firstName,
-      lastName,
-      email,
-      mobileNumber,
-      password: null, // No password for now
-    });
+    let user = await User.findOne({ "badges._id": badgeId });
+    let badge = null;
+    let ownerName = '';
 
-    await user.save();
+    if (user) {
+      badge = user.badges.id(badgeId);
+      ownerName = user.fullName;
+    } else {
+      user = await Student.findOne({ "badges._id": badgeId });
+      if (user) {
+        badge = user.badges.id(badgeId);
+        ownerName = user.fullName;
+      }
+    }
 
-    res.status(201).json({
-      message: 'User created successfully',
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
+    if (!badge) {
+      return res.status(404).json({ error: 'Badge not found or invalid' });
+    }
+
+    res.json({
+      success: true,
+      badge: {
+        id: badge._id,
+        badgeId: badge.badgeId,
+        title: badge.title,
+        description: badge.description,
+        tier: badge.tier,
+        xp: badge.xp,
+        earnedDate: badge.earnedAt || badge.earnedDate,
+        category: badge.category
       },
+      owner: {
+        fullName: ownerName
+      },
+      issuedBy: 'SMAART Institute'
     });
   } catch (err) {
+    console.error('[verify-badge] Error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
-
 module.exports = router;

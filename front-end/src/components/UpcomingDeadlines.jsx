@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Plus, CheckCircle2, Clock, Calendar, Trash2, AlertCircle, ListTodo } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Plus, CheckCircle2, Clock, Calendar, Trash2, AlertCircle, ListTodo } from 'lucide-react';import { motion, AnimatePresence } from 'framer-motion';
 
 const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => {
     const [isAdding, setIsAdding] = useState(false);
@@ -16,8 +15,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
     const pendingTasks = tasks.filter(t => t.status !== "Completed");
     const completedTasks = tasks.filter(t => t.status === "Completed");
 
-    const sortedTasks = [...pendingTasks].sort((a, b) => {
-        const dateA = a.date ? new Date(a.date) : new Date();
+    const sortedTasks = [...pendingTasks].sort((a, b) => {        const dateA = a.date ? new Date(a.date) : new Date();
         const dateB = b.date ? new Date(b.date) : new Date();
         return dateA - dateB;
     });
@@ -41,8 +39,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                     onClick={() => setIsAdding(!isAdding)}
                     className="w-10 h-10 rounded-xl bg-[#30919D] text-white flex items-center justify-center shadow-lg shadow-[#30919D]/30 transition-all hover:scale-110 active:scale-95"
                 >
-                    <Plus className={`w-5 h-5 transition-transform duration-300 ${isAdding ? 'rotate-45' : ''}`} />
-                </button>
+                    <Plus className={`w-5 h-5 transition-transform duration-300 ${isAdding ? 'rotate-45' : ''}`} />                </button>
             </div>
 
             {/* Add Task Form */}
@@ -72,8 +69,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                 >
                                     Add Task
                                 </button>
-                            </div>
-                        </div>
+                            </div>                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -115,8 +111,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                         <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
                                             <Calendar size={12} className="text-[#30919D]" />
                                             {task.date ? new Date(task.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Today'}
-                                        </div>
-                                    </div>
+                                        </div>                                    </div>
                                 </div>
 
                                 <button
@@ -143,8 +138,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                                 className="text-[10px] font-black uppercase text-[#30919D] hover:underline"
                                             >
                                                 Relist
-                                            </button>
-                                        </div>
+                                            </button>                                        </div>
                                     ))}
                                 </div>
                             </div>

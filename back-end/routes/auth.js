@@ -6,82 +6,13 @@ const Registration = require('../models/Registration');
 const User = require('../models/User');
 const LoginOtp = require('../models/LoginOtp');
 const { generateOTP, sendOTPEmail } = require('../utils/emailService');
-
-// SECURITY: Import rate limiters
-const { loginLimiter, otpLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
-const { body, validationResult } = require('express-validator');
-
-const router = express.Router();
-
-// === Authentication Flow Constants ===
-const OTP_MAX_ATTEMPTS = 5;
-const ACCOUNT_LOCK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
-const OTP_RESEND_COOLDOWN = 60 * 1000; // 1 minute in milliseconds
-
-const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-// === Password Policy Validation Helper ===
-const validatePasswordPolicy = (password) => {
-  const errors = [];
-
-  if (!password || password.length < 8) {
-    errors.push('Minimum 8 characters required');
-  }
-  if (!/[A-Z]/.test(password)) {
-    errors.push('At least one uppercase letter required');
-  }
-  if (!/[a-z]/.test(password)) {
-    errors.push('At least one lowercase letter required');
-  }
-  if (!/[0-9]/.test(password)) {
-    errors.push('At least one number required');
-  }
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('At least one special character required (!@#$%^&*(),.?":{}|<>)');
-  }
-
-  return {
-    isValid: errors.length === 0,
-    errors: errors
-  };
-};
-
-// === Helper to check if account is locked ===
-const checkAccountLock = (user) => {
-  if (user.accountLockedUntil && user.accountLockedUntil > new Date()) {
-    const remainingMs = user.accountLockedUntil - new Date();
-    const remainingMinutes = Math.ceil(remainingMs / 60000);
-    return {
-      isLocked: true,
-      remainingMinutes,
-      lockedUntil: user.accountLockedUntil
-    };
-  }
-  return { isLocked: false };
-};
-
-// Register
-router.post('/register', async (req, res) => {
-  try {
-    const { fullName, email, mobileNumber, password, institution } = req.body;
-
-    // Check if user exists
-    let registration = await Registration.findOne({ email });
-    if (registration) {
-      return res.status(400).json({ error: 'User already exists' });
+    // Send welcome notification
+    try {
+      await notifyWelcome(registration._id, fullName);
+      console.log(`🔔 Welcome notification sent to ${fullName}`);
+    } catch (notifyError) {
+      console.error("⚠️ Error sending welcome notification:", notifyError);
     }
-
-    // Create new registration
-    registration = new Registration({
-      fullName,
-      email,
-      mobileNumber,
-      password,
-      institution,
-    });
-
-    await registration.save();
-
     // Create JWT token - SECURITY: Enforce environment secret and reduce expiry
     const token = jwt.sign(
       { userId: registration._id, email: registration.email },

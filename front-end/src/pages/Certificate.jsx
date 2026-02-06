@@ -11,7 +11,6 @@ import { BadgeGallery } from "@/components/badges";
 import './Certificate.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
 const certificateTypes = [
     {
         id: 'capacity',
@@ -33,6 +32,15 @@ const certificateTypes = [
         shortTitle: 'Professional Diploma\nin Employability & Leadership Readiness',
         subtitle: 'Employability & Leadership Readiness',
         code: 'ELR'
+=======
+    },
+    {
+        id: 'combined',
+        title: 'Master Professional Diploma in Comprehensive Readiness',
+        shortTitle: 'Master Professional Diploma\nin Comprehensive Readiness',
+        subtitle: 'Acknowledging Capacity, Capability & Leadership',
+        code: 'MPD'
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
     }
 ];
 
@@ -48,7 +56,7 @@ const skills = [
 
 const Certificate = () => {
     const certificateRef = useRef(null);
-    const [selectedType, setSelectedType] = useState(null);
+<<<<<<< HEAD    const [selectedType, setSelectedType] = useState(null);
     const [activeTab, setActiveTab] = useState('certificates'); // 'certificates' or 'badges'
     const [userData, setUserData] = useState({ fullName: 'Ms. Rehana Ameer', gender: 'Female' });
     const [issueDate] = useState(new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }));
@@ -69,7 +77,6 @@ const Certificate = () => {
             }
         }
     }, []);
-
     // Generate certificate and QR code when type is selected
     useEffect(() => {
         if (selectedType) {
@@ -85,8 +92,7 @@ const Certificate = () => {
             // Issue certificate through backend
             const response = await axios.post(
                 `${API_URL}/api/certificates/issue`,
-                {
-                    certificateType: selectedType.id,
+                {                    certificateType: selectedType.id,
                     certificateTitle: selectedType.title,
                     validatedSkills: skills.map(s => ({ label: s.label, score: 85 })),
                     readinessBand: 'Proficient',
@@ -101,8 +107,7 @@ const Certificate = () => {
             );
 
             if (response.data.success) {
-                const { certificateId, verificationUrl } = response.data.certificate;
-                setCertId(certificateId);
+                const { certificateId, verificationUrl } = response.data.certificate;                setCertId(certificateId);
 
                 // Generate QR code with verification URL
                 const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
@@ -166,23 +171,26 @@ const Certificate = () => {
                 logging: false,
                 backgroundColor: '#ffffff',
                 width: element.offsetWidth,
-                height: element.offsetHeight,
-                scrollX: 0,
+                height: element.offsetHeight,                scrollX: 0,
                 scrollY: 0,
                 onclone: (clonedDoc) => {
                     const clonedElement = clonedDoc.getElementById('certificate-to-print');
                     if (clonedElement) {
+=======
+                        clonedElement.classList.add('capturing-pdf');
+                        // Reset all positioning and margins to ensure full bleed capture
+>>>>>>> fc2825fbaa54e1b4fc5ae041d1051e6ce061b29f
                         clonedElement.style.margin = '0';
                         clonedElement.style.padding = '0';
                         clonedElement.style.boxShadow = 'none';
                         clonedElement.style.border = 'none';
                         clonedElement.style.transform = 'none';
+<<<<<<< HEAD
                         clonedElement.style.position = 'absolute';
                         clonedElement.style.top = '0';
                         clonedElement.style.left = '0';
                         clonedElement.style.width = `${element.offsetWidth}px`;
-                        clonedElement.style.height = `${element.offsetHeight}px`;
-                    }
+                        clonedElement.style.height = `${element.offsetHeight}px`;                    }
                 }
             });
 
@@ -234,8 +242,7 @@ const Certificate = () => {
                                         activeTab === 'certificates'
                                             ? 'bg-[#002147] text-white shadow-md'
                                             : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                                    }`}
-                                >
+                                    }`}                                >
                                     <Award className="w-5 h-5" />
                                     Certificates
                                 </button>
@@ -245,8 +252,7 @@ const Certificate = () => {
                                         activeTab === 'badges'
                                             ? 'bg-[#002147] text-white shadow-md'
                                             : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                                    }`}
-                                >
+                                    }`}                                >
                                     <Trophy className="w-5 h-5" />
                                     Badges & Achievements
                                 </button>
@@ -304,8 +310,7 @@ const Certificate = () => {
                         {activeTab === 'badges' && (
                             <div className="max-w-6xl mx-auto">
                                 <BadgeGallery userName={userData.fullName} />
-                                
-                                {/* Verify Badge Link */}
+                                                                {/* Verify Badge Link */}
                                 <div className="mt-8 text-center">
                                     <a
                                         href="/verify-badge"
@@ -362,16 +367,14 @@ const Certificate = () => {
                             {/* Security Watermark Backdrop */}
                             <div className="cert-watermark-overlay">{certId}</div>
 
-                            <div className="cert-content">
-                                <header className="cert-header">
+                            <div className="cert-content">                                <header className="cert-header">
                                     <div className="institute-name">SMAART INSTITUTE</div>
                                     <div className="credential-label">PROFESSIONAL CREDENTIAL</div>
                                 </header>
 
                                 <main className="cert-body">
                                     <section className="cert-main-title">
-                                        <h1 style={{ whiteSpace: 'pre-line' }}>{selectedType.shortTitle}</h1>
-                                        <div className="subtitle">{selectedType.subtitle}</div>
+                                        <h1 style={{ whiteSpace: 'pre-line' }}>{selectedType.shortTitle}</h1>                                        <div className="subtitle">{selectedType.subtitle}</div>
                                     </section>
 
                                     <section className="recipient-block">
@@ -382,7 +385,6 @@ const Certificate = () => {
                                     <p className="cert-statement">
                                         has successfully completed the SMAART Institute professional learning and assessment programme demonstrating verified readiness across defined professional competencies.
                                     </p>
-
                                     <section className="skills-panel">
                                         <div className="skills-column">
                                             <h2 className="panel-title">Validated Skill Quotients</h2>
@@ -440,8 +442,7 @@ const Certificate = () => {
                                     This credential is an industry-recognized professional qualification and does not confer
                                     academic degree or government-regulated diploma equivalence within the UK education framework.
                                     &copy; {new Date().getFullYear()} SMAART Institute London.
-                                </div>
-                            </div>
+                                </div>                            </div>
                         </div>
                     </div>
                 </main>

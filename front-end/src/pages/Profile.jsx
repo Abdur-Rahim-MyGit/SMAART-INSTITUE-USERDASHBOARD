@@ -1,28 +1,5 @@
 import { useState, useEffect } from "react";
-// Version: 1.0.7 - Polished Detail Display & Robust Mapping
-import { motion } from "framer-motion";
-import {
-  MapPin,
-  Calendar,
-  Clock,
-  ChevronRight,
-  Edit2,
-  Mail,
-  Phone,
-  Building,
-  GraduationCap,
-  BookOpen,
-  Award,
-  User,
-  Video,
-  Plus,
-  Briefcase,
-  FolderOpen,
-  FileText,
-  Target,
-  Sparkles,
-  Layout
-} from "lucide-react";
+// Version: 1.0.7 - Polished Detail Display & Robust Mapping} from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { Link, useNavigate } from "react-router-dom";
@@ -31,8 +8,7 @@ import { API_BASE_URL, getBackendUrl } from "@/services/api";
 import ProfileSkeleton from '@/components/skeletons/ProfileSkeleton';
 
 const Profile = () => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -52,8 +28,7 @@ const Profile = () => {
   // Load user data from sessionStorage on mount
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
-    if (!userData) {
-      navigate("/");
+    if (!userData) {      navigate("/");
       return;
     }
 
@@ -105,7 +80,6 @@ const Profile = () => {
 
     fetchRegistrationDetails();
   }, [navigate]);
-
   const getInitials = (name) => {
     return name
       .split(" ")
@@ -125,8 +99,7 @@ const Profile = () => {
       return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
     } catch (e) {
       return "Not set";
-    }
-  };
+    }  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -222,8 +195,7 @@ const Profile = () => {
                         <p className="text-[10px] text-gray-500">Last Updated</p>
                         <p className="text-xs font-medium text-gray-900">
                           {completeRegistration?.submissionDate ? formatDate(completeRegistration.submissionDate) : "Recently"}
-                        </p>
-                      </div>
+                        </p>                      </div>
                     </div>
                   </div>
 
@@ -232,8 +204,7 @@ const Profile = () => {
                     onClick={() => navigate('/comprehensive-signup')}
                     className="w-full py-2 mt-4 rounded-md border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors"
                   >
-                    Edit Profile
-                  </button>
+                    Edit Profile                  </button>
                 </motion.div>
 
                 {/* Intro Video Card */}
@@ -257,8 +228,7 @@ const Profile = () => {
 
               {/* Right Content Area */}
               <div className="space-y-4">
-                {/* Student Details Section */}
-                <motion.div
+                {/* Student Details Section */}                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 }}
@@ -285,24 +255,7 @@ const Profile = () => {
 
                     <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-md bg-[#30919D]/10 flex items-center justify-center flex-shrink-0">
-                          <Mail className="w-4 h-4 text-[#30919D]" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-500">Email Address</p>
-                          <p className="text-xs font-medium text-gray-900 truncate">{formData.email || "Not set"}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-md bg-[#30919D]/10 flex items-center justify-center flex-shrink-0">
-                          <Phone className="w-4 h-4 text-[#30919D]" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-500">Phone</p>
-                          <p className="text-xs font-medium text-gray-900 truncate">{formData.phone || "Not set"}</p>
+                        <div className="w-8 h-8 rounded-md bg-[#30919D]/10 flex items-center justify-center flex-shrink-0">                          <p className="text-xs font-medium text-gray-900 truncate">{formData.phone || "Not set"}</p>
                         </div>
                       </div>
                     </div>
@@ -321,67 +274,7 @@ const Profile = () => {
 
                     <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-md bg-[#30919D]/10 flex items-center justify-center flex-shrink-0">
-                          <Calendar className="w-4 h-4 text-[#30919D]" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-500">Date of Birth</p>
-                          <p className="text-xs font-medium text-gray-900 truncate">{formatDate(formData.dateOfBirth)}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-md bg-[#30919D]/10 flex items-center justify-center flex-shrink-0">
-                          <Award className="w-4 h-4 text-[#30919D]" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-500">Gender</p>
-                          <p className="text-xs font-medium text-gray-900 truncate capitalize">{completeRegistration?.gender || "Not set"}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-md bg-[#30919D]/10 flex items-center justify-center flex-shrink-0">
-                          <Building className="w-4 h-4 text-[#30919D]" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-500">Institution</p>
-                          <p className="text-xs font-medium text-gray-900 truncate">
-                            {completeRegistration?.institution || "Not set"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-md bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                          <Layout className="w-4 h-4 text-emerald-600" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-500">Department</p>
-                          <p className="text-xs font-medium text-gray-900 truncate">
-                            {completeRegistration?.department || "Not set"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-md bg-[#30919D]/10 flex items-center justify-center flex-shrink-0">
-                          <BookOpen className="w-4 h-4 text-[#30919D]" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-gray-500">Year of Study/Passing</p>
-                          <p className="text-xs font-medium text-gray-900 truncate">
-                            {completeRegistration?.yearOfStudy || "N/A"} / {completeRegistration?.yearOfPassing || "N/A"}
-                          </p>
-                        </div>
+                        <div className="w-8 h-8 rounded-md bg-[#30919D]/10 flex items-center justify-center flex-shrink-0">                        </div>
                       </div>
                     </div>
                   </div>
@@ -461,8 +354,7 @@ const Profile = () => {
                           </div>
                         ) : (
                           <p className="text-[10px] text-gray-400 italic">No details provided</p>
-                        )}
-                      </div>
+                        )}                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -669,51 +561,6 @@ const Profile = () => {
                     </div>
                   </motion.div>
                 </div>
-
-                {/* Active Courses Card */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.25 }}
-                  className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
-                >
-                  <div className="px-4 py-2.5 border-b border-gray-100">
-                    <h3 className="font-bold text-gray-900 uppercase tracking-wide text-xs">Active Courses</h3>
-                    <div className="w-10 h-0.5 bg-[#30919D] mt-1.5"></div>
-                  </div>
-
-                  <div className="p-3">
-                    <div className="grid grid-cols-3 gap-2">
-                      {/* Sample Course Card */}
-                      <Link
-                        to="/dashboard/courses"
-                        className="group block p-3 border border-gray-200 rounded-lg hover:border-[#30919D] hover:shadow-sm transition-all"
-                      >
-                        <div className="aspect-video bg-gradient-to-br from-[#30919D]/20 to-[#002147]/20 rounded mb-2 flex items-center justify-center">
-                          <BookOpen className="w-5 h-5 text-[#30919D] opacity-50" />
-                        </div>
-                        <p className="text-xs font-medium text-gray-900 group-hover:text-[#30919D] transition-colors">
-                          View All Courses
-                        </p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">Continue learning →</p>
-                      </Link>
-
-                      {/* Add New Card */}
-                      <Link
-                        to="/dashboard/courses"
-                        className="flex flex-col items-center justify-center p-3 border border-dashed border-gray-200 rounded-lg hover:border-[#30919D] hover:bg-[#30919D]/5 transition-all cursor-pointer"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mb-1.5">
-                          <Plus className="w-4 h-4 text-gray-400" />
-                        </div>
-                        <p className="text-[10px] font-medium text-gray-600">Explore Courses</p>
-                      </Link>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </main>
         )}
       </div>
     </div>

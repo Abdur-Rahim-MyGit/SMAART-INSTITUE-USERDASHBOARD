@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Lock,
-  ChevronRight,
-  PlayCircle
+  ChevronRight,  PlayCircle
 } from "lucide-react";
 import { coursesAPI } from "@/services/api";
 
@@ -11,13 +10,11 @@ const CoursePathway = ({ onCourseClick }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
-
   // --- Configuration ---
   const STEPS_CONFIG = [
     { color: "#3B82F6", label: "01" }, // Blue
     { color: "#14B8A6", label: "02" }, // Teal
-    { color: "#06B6D4", label: "03" }, // Cyan
-    { color: "#8B5CF6", label: "04" }, // Violet
+    { color: "#06B6D4", label: "03" }, // Cyan    { color: "#8B5CF6", label: "04" }, // Violet
     { color: "#F59E0B", label: "05" }, // Amber
     { color: "#EC4899", label: "06" }, // Pink
     { color: "#10B981", label: "07" }, // Emerald
@@ -35,8 +32,7 @@ const CoursePathway = ({ onCourseClick }) => {
           { id: 2, title: "Capability", modules: [1, 2, 3], description: "Develop specific capabilities required for your role." },
           { id: 3, title: "Leadership", modules: [1, 2, 3], description: "Step into leadership with confidence and vision." },
           { id: 4, title: "Innovation", modules: [1, 2], description: "Master the art of creative problem solving." },
-          { id: 5, title: "Strategy", modules: [1, 2, 3], description: "Learn to think strategically and plan for the long term." },
-        ];
+          { id: 5, title: "Strategy", modules: [1, 2, 3], description: "Learn to think strategically and plan for the long term." },        ];
 
         const response = await coursesAPI.getAll();
         const coursesData = response.data || response;
@@ -45,8 +41,7 @@ const CoursePathway = ({ onCourseClick }) => {
         // Ensure we have enough vertical space mapping
         setCourses(finalData);
       } catch (err) {
-        console.error('Error fetching courses:', err);
-      } finally {
+        console.error('Error fetching courses:', err);      } finally {
         setLoading(false);
       }
     };
@@ -94,7 +89,6 @@ const CoursePathway = ({ onCourseClick }) => {
 
     // Final drop
     path += ` L ${baseX} ${100 + (courses.length * VERTICAL_SPACING) + 200}`;
-
     return path;
   };
 
@@ -147,8 +141,7 @@ const CoursePathway = ({ onCourseClick }) => {
                 <stop offset="100%" stopColor="#94a3b8" />
               </linearGradient>
               <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-                <feMerge>
+                <feGaussianBlur stdDeviation="4" result="coloredBlur" />                <feMerge>
                   <feMergeNode in="coloredBlur" />
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
@@ -190,8 +183,7 @@ const CoursePathway = ({ onCourseClick }) => {
 
             {/* Animated Dashed Center Line */}
             <path
-              d={generateVerticalPath()}
-              fill="none"
+              d={generateVerticalPath()}              fill="none"
               stroke="#3b82f6"
               strokeWidth="4"
               strokeLinecap="round"
@@ -282,8 +274,7 @@ const CoursePathway = ({ onCourseClick }) => {
 
                       <div className="absolute bottom-3 left-6">
                         <div className="bg-black/20 backdrop-blur-sm px-3 py-1 rounded-lg text-white text-[10px] font-bold uppercase tracking-widest border border-white/10">
-                          Module {String(index + 1).padStart(2, '0')}
-                        </div>
+                          Module {String(index + 1).padStart(2, '0')}                        </div>
                       </div>
                     </div>
 
@@ -340,7 +331,6 @@ const CoursePathway = ({ onCourseClick }) => {
             </div>
           </motion.div>
         </div>
-
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+
 const Badge = require('../models/Badge');
 const UserBadge = require('../models/UserBadge');
 const { protect } = require('../middleware/auth');
@@ -10,6 +10,7 @@ const {
     updateBadgeProgress
 } = require('../utils/badgeUtils');
 
+const { notifyBadgeEarned } = require('../services/notificationService');
 const router = express.Router();
 
 // Apply authentication to all routes
@@ -96,13 +97,6 @@ router.get('/user/:userId/earned', async (req, res) => {
     try {
         const { userId } = req.params;
 
-        // Validation for MongoDB ObjectId to prevent 500 errors on invalid IDs
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({
-                success: false,
-                error: 'Invalid User ID format'
-            });
-        }
 
         const userBadges = await UserBadge.find({ userId, isEarned: true })
             .populate('badgeId')
@@ -155,6 +149,19 @@ router.post('/award', async (req, res) => {
 
         const result = await awardBadge(userId, badgeId, metadata);
 
+
+        // Send notification for badge earned
+        if (result && result.badge) {
+            try {
+                await notifyBadgeEarned(userId, {
+                    badgeId: result.badge.badgeId || badgeId,
+                    title: result.badge.title || 'New Badge',
+                    xp: result.badge.xp || 0
+                });
+            } catch (notifError) {
+                console.error('Failed to send badge notification:', notifError);
+            }
+        }
         res.json({
             success: true,
             data: result
