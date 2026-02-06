@@ -3,9 +3,17 @@ const router = express.Router();
 const Certificate = require('../models/Certificate');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
+
+// Issue a new certificate (Protected)
+router.post('/issue', protect, async (req, res) => {
+    try {
+        const { certificateType, certificateTitle, validatedSkills, readinessBand, assessmentWindow } = req.body;
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
         const user = req.user;
         if (!user) {
-            return res.status(404).json({ message: 'User object not found in request context' });        }
+            return res.status(404).json({ message: 'User object not found in request context' });
+        }
 
         // Generate unique certificate ID
         const certificateCode = {
@@ -37,7 +45,17 @@ const { protect } = require('../middleware/auth');
             }
         });
 
+
         await certificate.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Certificate issued successfully',
+            certificate: {
+                certificateId: certificate.certificateId,
+                certificateType: certificate.certificateType,
+                certificateTitle: certificate.certificateTitle,
+                issueDate: certificate.issueDate,
                 verificationUrl: `${frontendUrl}/verify-certificate/${certificate.certificateId}`
             }
         });
@@ -47,7 +65,8 @@ const { protect } = require('../middleware/auth');
             success: false,
             message: 'Failed to issue certificate',
             error: error.message
-        });    }
+        });
+    }
 });
 
 // Get all certificates for the logged-in user (Protected)
