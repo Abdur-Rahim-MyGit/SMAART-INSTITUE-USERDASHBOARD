@@ -6,6 +6,77 @@ const Registration = require('../models/Registration');
 const User = require('../models/User');
 const LoginOtp = require('../models/LoginOtp');
 const { generateOTP, sendOTPEmail } = require('../utils/emailService');
+const { notifyWelcome } = require('../services/notificationService');
+const { body, validationResult } = require('express-validator');
+const router = express.Router();
+const rateLimit = require('express-rate-limit');
+
+// Rate Limiting definition (assuming it might be used or needed, if not defined elsewhere)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many login attempts, please try again after 15 minutes' }
+});
+const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too many OTP attempts, please try again after 15 minutes' }
+});
+const passwordResetLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many password reset attempts, please try again after an hour' }
+});
+
+// Helper for Regex escaping
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+// Account Lock Helper
+const ACCOUNT_LOCK_DURATION = 15 * 60 * 1000;
+const OTP_MAX_ATTEMPTS = 5;
+
+function checkAccountLock(user) {
+  if (user.accountLockedUntil && user.accountLockedUntil > new Date()) {
+    const remainingTime = Math.ceil((user.accountLockedUntil - new Date()) / 60000);
+    return {
+      isLocked: true,
+      lockedUntil: user.accountLockedUntil,
+      remainingMinutes: remainingTime
+    };
+  }
+  return { isLocked: false };
+}
+
+// Register User
+router.post('/register', async (req, res) => {
+  try {
+    const { fullName, email, password, institution, department, gender, studentId } = req.body;
+
+    // Basic Validation
+    if (!email || !password || !fullName) {
+      return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    // Check if user already exists
+    const existingUser = await Registration.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User with this email already exists' });
+    }
+
+    // Create Registration
+    const registration = new Registration({
+      fullName,
+      email,
+      password, // Password hashing is handled in the model pre-save hook
+      institution,
+      department,
+      gender,
+      studentId
+    });
+
+    await registration.save();
     // Send welcome notification
     try {
       await notifyWelcome(registration._id, fullName);
