@@ -122,6 +122,8 @@ router.post('/register-details', upload.fields([
       yearOfStudy: parsedPersonalDetails?.yearOfStudy || '',
       yearOfPassing: parsedPersonalDetails?.yearOfPassing || '',
       alternateMobile: parsedPersonalDetails?.alternateMobile || '',
+      studentId: parsedPersonalDetails?.studentId || '',
+      address: parsedPersonalDetails?.address || { city: '', state: '', country: '' },
 
       // 10th Standard Details
       tenthDetails: {
@@ -141,17 +143,18 @@ router.post('/register-details', upload.fields([
       },
 
       // Higher Education
-      higherEducation: {
-        qualificationLevel: parsedHigherEducation?.qualificationLevel || '',
-        degree: parsedHigherEducation?.degree || '',
-        specialization: parsedHigherEducation?.specialization || '',
-        institutionName: parsedHigherEducation?.institutionName || '',
-        university: parsedHigherEducation?.university || '',
-        yearOfPassing: parsedHigherEducation?.yearOfPassing || '',
-        cgpaPercentage: parsedHigherEducation?.cgpaPercentage || '',
-        degreeStatus: parsedHigherEducation?.degreeStatus || '',
-        certificate: parsedHigherEducation?.certificate || '',
-      },
+      higherEducation: Array.isArray(parsedHigherEducation) ? parsedHigherEducation.map(h => ({
+        id: h.id,
+        qualificationLevel: h.qualificationLevel || '',
+        degree: h.degree || '',
+        specialization: h.specialization || '',
+        institutionName: h.institutionName || '',
+        university: h.university || '',
+        yearOfPassing: h.yearOfPassing || '',
+        cgpaPercentage: h.cgpaPercentage || '',
+        degreeStatus: h.degreeStatus || '',
+        certificate: h.certificate || ''
+      })) : [],
 
       // Extra-Curricular Activities
       extracurricular: Array.isArray(parsedExtracurricular) ? parsedExtracurricular : [],
@@ -191,6 +194,8 @@ router.post('/register-details', upload.fields([
         issuingOrg: c.issuingOrg,
         certificateFile: c.certificateFile || '',
         yearOfCompletion: c.yearOfCompletion || '',
+        verificationType: c.verificationType || '',
+        verificationUrl: c.verificationUrl || '',
       })) : [],
 
       submissionDate: new Date(),

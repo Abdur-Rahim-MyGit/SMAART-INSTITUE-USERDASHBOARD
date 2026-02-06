@@ -43,7 +43,7 @@ const InteractiveMenu = () => {
               `}
             >
               <span className="relative z-10">{item.label}</span>
-              
+
               {/* Hover Indicator */}
               <motion.div
                 className="absolute bottom-4 left-2 right-2 h-0.5 bg-[#30919D]/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"

@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Badge = require('../models/Badge');
 const UserBadge = require('../models/UserBadge');
 const { protect } = require('../middleware/auth');
@@ -94,6 +95,14 @@ router.get('/user/:userId/stats', async (req, res) => {
 router.get('/user/:userId/earned', async (req, res) => {
     try {
         const { userId } = req.params;
+
+        // Validation for MongoDB ObjectId to prevent 500 errors on invalid IDs
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid User ID format'
+            });
+        }
 
         const userBadges = await UserBadge.find({ userId, isEarned: true })
             .populate('badgeId')

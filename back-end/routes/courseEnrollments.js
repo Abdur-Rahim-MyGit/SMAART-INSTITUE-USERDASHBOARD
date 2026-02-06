@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const CourseEnrollment = require('../models/CourseEnrollment');
 const { protect } = require('../middleware/auth');
 
@@ -42,7 +43,16 @@ router.get('/', async (req, res) => {
 // Get enrollment by ID
 router.get('/:id', async (req, res) => {
     try {
-        const enrollment = await CourseEnrollment.findById(req.params.id)
+        const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid Enrollment ID format'
+            });
+        }
+
+        const enrollment = await CourseEnrollment.findById(id)
             .populate('student', 'fullName email studentId')
             .populate('course', 'title courseCode modules')
             .populate('college', 'name code');
@@ -145,7 +155,17 @@ router.delete('/:id', async (req, res) => {
 // Get student's enrollments
 router.get('/student/:studentId', async (req, res) => {
     try {
-        const enrollments = await CourseEnrollment.find({ student: req.params.studentId })
+        const { studentId } = req.params;
+
+        // Validation for MongoDB ObjectId to prevent 500 errors on invalid IDs
+        if (!mongoose.Types.ObjectId.isValid(studentId)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid Student ID format'
+            });
+        }
+
+        const enrollments = await CourseEnrollment.find({ student: studentId })
             .populate('course', 'title courseCode duration status')
             .populate('college', 'name code')
             .sort({ enrollmentDate: -1 });

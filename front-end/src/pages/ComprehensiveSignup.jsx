@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+// Version: 1.0.1 - Enabled Data Pre-filling for Edit Mode
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, X, ChevronDown, User, GraduationCap, FileText, Award, CreditCard, Palette, Lock, Check, Briefcase, Target, FolderOpen, Plus, Trash2, ChevronRight, Quote, QrCode, Loader2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,9 +30,124 @@ const ComprehensiveSignup = () => {
     const email = signupEmail || userData?.email;
     const fullName = signupFullName || userData?.fullName;
 
+    const fetchExistingRegistration = async (targetEmail) => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/register-details/${targetEmail}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (!data) return;
+
+          // Map Personal Details
+          setPersonalDetails(prev => ({
+            ...prev,
+            fullName: data.fullName || prev.fullName,
+            nickname: data.nickname || "",
+            dob: data.dob ? new Date(data.dob?.$date || data.dob).toISOString().split('T')[0] : "",
+            gender: data.gender || "",
+            mobileNumber: data.mobileNumber || data.mobile || "",
+            alternateMobile: data.alternateMobile || "",
+            email: data.email || prev.email,
+            institution: data.institution || prev.institution,
+            department: data.department || prev.department,
+            studentId: data.studentId || "",
+            yearOfStudy: data.yearOfStudy || "",
+            yearOfPassing: data.yearOfPassing || "",
+            educationLevel: data.educationLevel || "",
+            address: data.address || { city: "", state: "", country: "" },
+            profilePhoto: data.otherDetails?.profilePhoto || data.profilePhoto || null
+          }));
+
+          // Map 10th/12th
+          if (data.tenthDetails) setTenthDetails(prev => ({ ...prev, ...data.tenthDetails }));
+          if (data.twelfthDetails) setTwelfthDetails(prev => ({ ...prev, ...data.twelfthDetails }));
+
+          // Map Higher Education
+          if (data.higherEducation) {
+            const h = Array.isArray(data.higherEducation) ? data.higherEducation : [data.higherEducation];
+            setHigherEducation(h.map(item => ({ ...item, id: item.id || Date.now() + Math.random() })));
+          }
+
+          // Map Extracurricular
+          if (data.extracurricular) {
+            setExtracurricular({
+              isApplicable: Array.isArray(data.extracurricular) && data.extracurricular.length > 0,
+              items: Array.isArray(data.extracurricular) && data.extracurricular.length > 0
+                ? data.extracurricular.map(i => ({ ...i, id: i.id || Date.now() + Math.random() }))
+                : [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }]
+            });
+          }
+
+          // Map Job Preferences
+          if (data.jobPreferences) {
+            const prefItems = Array.isArray(data.jobPreferences.items) ? data.jobPreferences.items : (data.jobPreferences.preferredRole ? [data.jobPreferences] : []);
+            setJobPreferences({
+              items: prefItems.length > 0
+                ? prefItems.map(i => ({ ...i, id: i.id || Date.now() + Math.random() }))
+                : [{ id: Date.now(), preferredRole: "", jobType: "", preferredLocation: "", willingToRelocate: "", expectedSalary: "" }]
+            });
+          }
+
+          // Map Sector Preferences
+          if (data.sectorPreferences) {
+            setSectorPreferences(prev => ({
+              ...prev,
+              preferredSectors: data.sectorPreferences.preferredSectors || [],
+              secondarySectors: data.sectorPreferences.secondarySectors || [],
+            }));
+          }
+
+          // Map Career Goals
+          if (data.careerGoals) setCareerGoals(data.careerGoals);
+
+          // Map Work Experience
+          if (data.workExperience) {
+            setWorkExperience({
+              isApplicable: Array.isArray(data.workExperience) && data.workExperience.length > 0,
+              items: Array.isArray(data.workExperience) && data.workExperience.length > 0
+                ? data.workExperience.map(i => ({
+                  ...i,
+                  id: i.id || Date.now() + Math.random(),
+                  startDate: i.startDate ? new Date(i.startDate?.$date || i.startDate).toISOString().split('T')[0] : "",
+                  endDate: i.endDate ? new Date(i.endDate?.$date || i.endDate).toISOString().split('T')[0] : ""
+                }))
+                : [{ id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, description: "", certificate: null, githubLink: "" }]
+            });
+          }
+
+          // Map Projects
+          if (data.projects) {
+            setProjects({
+              isApplicable: Array.isArray(data.projects) && data.projects.length > 0,
+              items: Array.isArray(data.projects) && data.projects.length > 0
+                ? data.projects.map(i => ({
+                  ...i,
+                  id: i.id || Date.now() + Math.random(),
+                  startDate: i.startDate ? new Date(i.startDate?.$date || i.startDate).toISOString().split('T')[0] : "",
+                  endDate: i.endDate ? new Date(i.endDate?.$date || i.endDate).toISOString().split('T')[0] : ""
+                }))
+                : [{ id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }]
+            });
+          }
+
+          // Map Certificates
+          if (data.certificates) {
+            setCertificates({
+              isApplicable: Array.isArray(data.certificates) && data.certificates.length > 0,
+              items: Array.isArray(data.certificates) && data.certificates.length > 0
+                ? data.certificates.map(i => ({ ...i, id: i.id || Date.now() + Math.random() }))
+                : [{ id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }]
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error pre-filling registration:", error);
+      }
+    };
+
     if (email) {
-      setPersonalDetails(prev => ({ ...prev, email, fullName: fullName || prev.fullName, mobileNumber: userData?.mobileNumber || "", institution: "" }));
-      setPreFilledFields(prev => ({ ...prev, email: true, fullName: !!fullName, mobileNumber: !!userData?.mobileNumber }));
+      setPersonalDetails(prev => ({ ...prev, email, fullName: fullName || prev.fullName, mobileNumber: userData?.mobileNumber || userData?.mobile || "", institution: "" }));
+      setPreFilledFields(prev => ({ ...prev, email: true, fullName: !!fullName, mobileNumber: !!(userData?.mobileNumber || userData?.mobile) }));
+      fetchExistingRegistration(email);
     }
 
     if (selectedInstitution) {
@@ -44,7 +160,12 @@ const ComprehensiveSignup = () => {
     if (userData?.department) { setPersonalDetails(prev => ({ ...prev, department: userData.department })); setPreFilledFields(prev => ({ ...prev, department: true })); }
   }, [navigate]);
 
-  const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null });
+  const [personalDetails, setPersonalDetails] = useState({
+    fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", alternateMobile: "", email: "",
+    institution: "", department: "", studentId: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "",
+    profilePhoto: null,
+    address: { city: "", state: "", country: "" }
+  });
   const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
@@ -53,7 +174,7 @@ const ComprehensiveSignup = () => {
   const [sectorPreferences, setSectorPreferences] = useState({ preferredSectors: [], secondarySectors: [], otherSector: "" }); // added otherSector
   const [careerGoals, setCareerGoals] = useState({ shortTerm: "", mediumTerm: "", longTerm: "" });
   const [workExperience, setWorkExperience] = useState({ isApplicable: true, items: [{ id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, description: "", certificate: null, githubLink: "" }] });
-  const [projects, setProjects] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", doneIn: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] });
+  const [projects, setProjects] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] });
   const [certificates, setCertificates] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }); // added verificationUrl
 
   const steps = [
@@ -163,11 +284,9 @@ const ComprehensiveSignup = () => {
     if (!projects.isApplicable) return true;
     for (let i = 0; i < projects.items.length; i++) {
       const p = projects.items[i];
-      if (!p.title?.trim() || !p.doneIn || !p.teamType || !p.startDate || !p.description?.trim()) { toast.error(`Project ${i + 1}: All fields marked * are required`); return false; }
-      // URL is now optional/conditional? No, user said "if they select url give a url input box and it can be none also"
-      // Let's make it optional if empty
-      if (p.doneIn === 'Company' && !p.companyName?.trim()) { toast.error(`Project ${i + 1}: Company Name is required`); return false; }
-      if (p.doneIn === 'College' && !p.institution?.trim()) { toast.error(`Project ${i + 1}: Institution is required`); return false; }
+      if (!p.title?.trim() || !p.qualificationLevel || !p.teamType || !p.startDate || !p.description?.trim()) { toast.error(`Project ${i + 1}: All fields marked * are required`); return false; }
+      if (p.qualificationLevel === 'Company' && !p.companyName?.trim()) { toast.error(`Project ${i + 1}: Company Name is required`); return false; }
+      if (p.qualificationLevel === 'College' && !p.institution?.trim()) { toast.error(`Project ${i + 1}: Institution is required`); return false; }
     }
     return true;
   };
@@ -211,7 +330,7 @@ const ComprehensiveSignup = () => {
   const removeJobPref = (id) => setJobPreferences(prev => ({ ...prev, items: prev.items.filter(j => j.id !== id) }));
   const addWorkExperience = () => setWorkExperience(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, description: "", certificate: null, githubLink: "" }] }));
   const removeWorkExperience = (id) => setWorkExperience(prev => ({ ...prev, items: prev.items.filter(w => w.id !== id) }));
-  const addProject = () => setProjects(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", doneIn: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] }));
+  const addProject = () => setProjects(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", qualificationLevel: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", projectUrl: "" }] }));
   const removeProject = (id) => setProjects(prev => ({ ...prev, items: prev.items.filter(p => p.id !== id) }));
   const addCertificate = () => setCertificates(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }));
   const removeCertificate = (id) => setCertificates(prev => ({ ...prev, items: prev.items.filter(c => c.id !== id) }));
@@ -234,11 +353,22 @@ const ComprehensiveSignup = () => {
       formData.append("jobPreferences", JSON.stringify(jobPreferences.items));
 
       // Inject Other sector if present
-      const finalSectors = { ...sectorPreferences };
-      if (finalSectors.preferredSectors.includes("Other")) {
-        finalSectors.preferredSectors = finalSectors.preferredSectors.filter(s => s !== "Other");
-        if (finalSectors.otherSector.trim()) finalSectors.preferredSectors.push(finalSectors.otherSector.trim());
-      }
+      const finalSectors = {
+        preferredSectors: [...sectorPreferences.preferredSectors],
+        secondarySectors: [...sectorPreferences.secondarySectors]
+      };
+
+      const processSectors = (list) => {
+        let updated = list.filter(s => s !== "Other");
+        if (list.includes("Other") && sectorPreferences.otherSector.trim()) {
+          updated.push(sectorPreferences.otherSector.trim());
+        }
+        return updated;
+      };
+
+      finalSectors.preferredSectors = processSectors(finalSectors.preferredSectors);
+      finalSectors.secondarySectors = processSectors(finalSectors.secondarySectors);
+
       formData.append("sectorPreferences", JSON.stringify(finalSectors));
 
       formData.append("careerGoals", JSON.stringify(careerGoals));
@@ -340,25 +470,39 @@ const ComprehensiveSignup = () => {
               <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Personal Details</h2>
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div><Label>Full Name</Label><Input value={personalDetails.fullName} disabled={preFilledFields.fullName} onChange={(e) => setPersonalDetails({ ...personalDetails, fullName: e.target.value })} className={inputClass} /></div>
-                  <div><Label>Nick Name *</Label><Input value={personalDetails.nickname} onChange={(e) => setPersonalDetails({ ...personalDetails, nickname: e.target.value })} className={inputClass} /></div>
+                  <div><Label>Full Name (Locked)</Label><Input value={personalDetails.fullName} disabled placeholder="Full Name" className={inputClass + " bg-slate-100 opacity-80"} /></div>
+                  <div><Label>Nick Name *</Label><Input value={personalDetails.nickname} onChange={(e) => setPersonalDetails({ ...personalDetails, nickname: e.target.value })} placeholder="Enter your nickname" className={inputClass} /></div>
                   <div><Label>Date of Birth *</Label><Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass + " [color-scheme:light] dark:[color-scheme:dark]"} /></div>
-                  <div><Label>Gender *</Label><select value={personalDetails.gender} onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })} className={selectClass}><option value="">Select</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div>
-                  <div><Label>Current Year of Study *</Label><select value={personalDetails.yearOfStudy} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                  <div><Label>Year of Passing (Expected) *</Label><select value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                  <div><Label>Mobile Number</Label><Input value={personalDetails.mobileNumber} disabled={preFilledFields.mobileNumber} onChange={(e) => setPersonalDetails({ ...personalDetails, mobileNumber: e.target.value })} className={inputClass} /></div>
-                  <div><Label>Email</Label><Input value={personalDetails.email} disabled className={inputClass + " opacity-60 cursor-not-allowed"} /></div>
-                  <div><Label>Institution</Label><Input value={personalDetails.institution} disabled={preFilledFields.institution} onChange={(e) => setPersonalDetails({ ...personalDetails, institution: e.target.value })} className={inputClass} /></div>
-                  <div><Label>Choose ur domain *</Label>
+                  <div><Label>Gender *</Label><select value={personalDetails.gender} onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })} className={selectClass}><option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+                  <div><Label>Phone Number (Locked)</Label><Input value={personalDetails.mobileNumber} disabled placeholder="Mobile Number" className={inputClass + " bg-slate-100 opacity-80"} /></div>
+                  <div><Label>Alternate Mobile *</Label><Input type="number" value={personalDetails.alternateMobile} onChange={(e) => setPersonalDetails({ ...personalDetails, alternateMobile: e.target.value })} placeholder="Enter alternate mobile number" className={inputClass} /></div>
+                  <div><Label>Email ID (Locked)</Label><Input value={personalDetails.email} disabled placeholder="Email Address" className={inputClass + " bg-slate-100 opacity-80"} /></div>
+                  <div><Label>Student ID (Optional)</Label><Input value={personalDetails.studentId} onChange={(e) => setPersonalDetails({ ...personalDetails, studentId: e.target.value })} placeholder="Enter your Student ID/Roll No" className={inputClass} /></div>
+
+                  <div><Label>College Name (Locked)</Label><Input value={personalDetails.institution} disabled placeholder="College Name" className={inputClass + " bg-slate-100 opacity-80"} /></div>
+                  <div><Label>Department (Locked)</Label><Input value={personalDetails.department} disabled placeholder="Department" className={inputClass + " bg-slate-100 opacity-80"} /></div>
+
+                  <div><Label>Year of Study *</Label><Input type="date" value={personalDetails.yearOfStudy} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })} className={inputClass + " [color-scheme:light] dark:[color-scheme:dark]"} /></div>
+                  <div><Label>Year of Passing *</Label><Input type="date" value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={inputClass + " [color-scheme:light] dark:[color-scheme:dark]"} /></div>
+
+                  <div className="md:col-span-2"><Label>Qualification Level *</Label>
                     <select value={personalDetails.educationLevel} onChange={(e) => setPersonalDetails({ ...personalDetails, educationLevel: e.target.value })} className={selectClass}>
-                      <option value="">Select Domain</option>
-                      <option value="UG-Engineering">UG Engineering</option>
-                      <option value="PG-Engineering">PG Engineering</option>
-                      <option value="UG-NonEngineering">UG Non-Engineering</option>
-                      <option value="PG-NonEngineering">PG Non-Engineering</option>
+                      <option value="">Select Qualification Level</option>
+                      <option value="Diploma">Diploma</option>
+                      <option value="UG">Undergraduate (UG)</option>
+                      <option value="PG">Postgraduate (PG)</option>
+                      <option value="PhD">PhD</option>
                     </select>
                   </div>
-                  <div><Label>Department</Label><Input value={personalDetails.department} disabled={preFilledFields.department} onChange={(e) => setPersonalDetails({ ...personalDetails, department: e.target.value })} className={inputClass} /></div>
+
+                  <div className="md:col-span-2 pt-4 border-t border-slate-100 dark:border-white/10">
+                    <h3 className="text-sm font-semibold mb-3 text-slate-500">Current Address</h3>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div><Label>City *</Label><Input value={personalDetails.address.city} onChange={(e) => setPersonalDetails({ ...personalDetails, address: { ...personalDetails.address, city: e.target.value } })} placeholder="e.g. Pune" className={inputClass} /></div>
+                      <div><Label>State *</Label><Input value={personalDetails.address.state} onChange={(e) => setPersonalDetails({ ...personalDetails, address: { ...personalDetails.address, state: e.target.value } })} placeholder="e.g. Maharashtra" className={inputClass} /></div>
+                      <div><Label>Country *</Label><Input value={personalDetails.address.country} onChange={(e) => setPersonalDetails({ ...personalDetails, address: { ...personalDetails.address, country: e.target.value } })} placeholder="e.g. India" className={inputClass} /></div>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -368,10 +512,10 @@ const ComprehensiveSignup = () => {
               <motion.div key="tenth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">10th Standard Details</h2>
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2"><Label>School Name *</Label><Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} className={inputClass} /></div>
+                  <div className="md:col-span-2"><Label>School Name *</Label><Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} placeholder="Enter your 10th school name" className={inputClass} /></div>
                   <div><Label>Year of Passing *</Label><select value={tenthDetails.yearOfPassing} onChange={(e) => setTenthDetails({ ...tenthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                  <div><Label>Percentage (%) *</Label><Input type="number" max="100" value={tenthDetails.percentage} onChange={(e) => setTenthDetails({ ...tenthDetails, percentage: e.target.value })} className={inputClass} /></div>
-                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={tenthDetails.marksheet} onChange={(fid, fdata) => setTenthDetails({ ...tenthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original marksheet" /></div>
+                  <div><Label>Percentage (%) *</Label><Input type="number" max="100" value={tenthDetails.percentage} onChange={(e) => setTenthDetails({ ...tenthDetails, percentage: e.target.value })} placeholder="e.g. 85.5" className={inputClass} /></div>
+                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={tenthDetails.marksheet} onChange={(fid, fdata) => setTenthDetails({ ...tenthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original 10th marksheet (PDF/JPG)" /></div>
                 </div>
               </motion.div>
             )}
@@ -381,11 +525,11 @@ const ComprehensiveSignup = () => {
               <motion.div key="twelfth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">12th Standard Details</h2>
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2"><Label>School/College Name *</Label><Input value={twelfthDetails.schoolName} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, schoolName: e.target.value })} className={inputClass} /></div>
-                  <div><Label>Stream *</Label><select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value })} className={selectClass}><option value="">Select</option><option value="science">Science</option><option value="commerce">Commerce</option><option value="arts">Arts</option></select></div>
+                  <div className="md:col-span-2"><Label>School/College Name *</Label><Input value={twelfthDetails.schoolName} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, schoolName: e.target.value })} placeholder="Enter your 12th school/college name" className={inputClass} /></div>
+                  <div><Label>Stream *</Label><select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value })} className={selectClass}><option value="">Select Stream</option><option value="Science">Science</option><option value="Commerce">Commerce</option><option value="Arts">Arts</option><option value="Other">Other</option></select></div>
                   <div><Label>Year of Passing *</Label><select value={twelfthDetails.yearOfPassing} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                  <div><Label>Percentage (%) *</Label><Input type="number" max="100" value={twelfthDetails.percentage} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, percentage: e.target.value })} className={inputClass} /></div>
-                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={twelfthDetails.marksheet} onChange={(fid, fdata) => setTwelfthDetails({ ...twelfthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original marksheet" /></div>
+                  <div><Label>Percentage (%) *</Label><Input type="number" max="100" value={twelfthDetails.percentage} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, percentage: e.target.value })} placeholder="e.g. 92.0" className={inputClass} /></div>
+                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={twelfthDetails.marksheet} onChange={(fid, fdata) => setTwelfthDetails({ ...twelfthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original 12th marksheet (PDF/JPG)" /></div>
                 </div>
               </motion.div>
             )}
@@ -400,17 +544,20 @@ const ComprehensiveSignup = () => {
                 {higherEducation.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {higherEducation.length > 1 && <button onClick={() => removeHigherEd(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Degree #{index + 1}</h3>
+                    <h3 className="font-semibold mb-4 text-[#30919D]">Degree #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Qualification Level *</Label><select value={item.qualificationLevel} onChange={(e) => { const n = [...higherEducation]; n[index].qualificationLevel = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select</option><option value="UG">UG</option><option value="PG">PG</option><option value="PhD">PhD</option></select></div>
-                      <div><Label>Degree Name *</Label><Input value={item.degree} onChange={(e) => { const n = [...higherEducation]; n[index].degree = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                      <div><Label>Specialization *</Label><Input value={item.specialization} onChange={(e) => { const n = [...higherEducation]; n[index].specialization = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                      <div><Label>Institution *</Label><Input value={item.institutionName} onChange={(e) => { const n = [...higherEducation]; n[index].institutionName = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                      <div><Label>University *</Label><Input value={item.university} onChange={(e) => { const n = [...higherEducation]; n[index].university = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
+                      <div><Label>Qualification Level *</Label><select value={item.qualificationLevel} onChange={(e) => { const n = [...higherEducation]; n[index].qualificationLevel = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Level</option><option value="Diploma">Diploma</option><option value="UG">Undergraduate (UG)</option><option value="PG">Postgraduate (PG)</option><option value="PhD">PhD</option></select></div>
+                      <div><Label>Degree Name *</Label><Input value={item.degree} onChange={(e) => { const n = [...higherEducation]; n[index].degree = e.target.value; setHigherEducation(n); }} placeholder="e.g. B.Tech Computer Science" className={inputClass} /></div>
+                      <div><Label>Specialization (Optional)</Label><Input value={item.specialization} onChange={(e) => { const n = [...higherEducation]; n[index].specialization = e.target.value; setHigherEducation(n); }} placeholder="e.g. Artificial Intelligence" className={inputClass} /></div>
+                      <div><Label>Institution Name *</Label><Input value={item.institutionName} onChange={(e) => { const n = [...higherEducation]; n[index].institutionName = e.target.value; setHigherEducation(n); }} placeholder="Enter name of college/institute" className={inputClass} /></div>
+                      <div><Label>University *</Label><Input value={item.university} onChange={(e) => { const n = [...higherEducation]; n[index].university = e.target.value; setHigherEducation(n); }} placeholder="Enter university name" className={inputClass} /></div>
                       <div><Label>Year of Passing *</Label><select value={item.yearOfPassing} onChange={(e) => { const n = [...higherEducation]; n[index].yearOfPassing = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                      <div><Label>CGPA / Percentage (Max 100) *</Label><Input type="number" max="100" value={item.cgpaPercentage} onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                      <div><Label>Status *</Label><select value={item.degreeStatus} onChange={(e) => { const n = [...higherEducation]; n[index].degreeStatus = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select</option><option value="pursuing">Pursuing</option><option value="completed">Completed</option></select></div>
-                      <div className="md:col-span-2"><Label>Upload Certificate *</Label><FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = [...higherEducation]; n[index].certificate = fdata?.url || fid; setHigherEducation(n); }} /></div>
+                      <div><Label>CGPA / Percentage *</Label><Input type="number" max="100" value={item.cgpaPercentage} onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }} placeholder="e.g. 8.5 or 85" className={inputClass} /></div>
+                      <div><Label>Degree Status *</Label><select value={item.degreeStatus} onChange={(e) => { const n = [...higherEducation]; n[index].degreeStatus = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Status</option><option value="Pursuing">Pursuing</option><option value="Completed">Completed</option></select></div>
+                      <div className="md:col-span-2">
+                        <Label>Degree Certificate / Provisional Upload {item.degreeStatus === 'Completed' ? '*' : '(Optional)'}</Label>
+                        <FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = [...higherEducation]; n[index].certificate = fdata?.url || fid; setHigherEducation(n); }} helperText="Upload your degree or provisional certificate" />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -421,24 +568,24 @@ const ComprehensiveSignup = () => {
             {currentStep === 5 && (
               <motion.div key="activities" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Activities</h2>
+                  <h2 className="text-2xl font-bold">Extra-Curricular Activities</h2>
                   <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!extracurricular.isApplicable} onChange={(e) => setExtracurricular({ ...extracurricular, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>}
+                    <label className="flex items-center gap-2 cursor-pointer text-slate-500"><input type="checkbox" checked={!extracurricular.isApplicable} onChange={(e) => setExtracurricular({ ...extracurricular, isApplicable: !e.target.checked })} className="accent-[#30919D]" /><span className="text-sm">Not Applicable</span></label>
+                    {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Activity</Button>}
                   </div>
                 </div>
                 {extracurricular.isApplicable ? extracurricular.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
-                    {extracurricular.items.length > 1 && <button onClick={() => removeExtracurricular(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Activity #{index + 1}</h3>
+                    {extracurricular.items.length > 1 && <button onClick={() => removeExtracurricular(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>}
+                    <h3 className="font-semibold mb-4 text-[#30919D]">Activity #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Type *</Label><Input value={item.activityType} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].activityType = e.target.value; setExtracurricular(n); }} className={inputClass} /></div>
-                      <div><Label>Level *</Label><select value={item.level} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].level = e.target.value; setExtracurricular(n); }} className={selectClass}><option value="">Select</option><option value="school">School</option><option value="college">College</option><option value="state">State</option></select></div>
-                      <div className="md:col-span-2"><Label>Achievements</Label><Input value={item.achievements} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].achievements = e.target.value; setExtracurricular(n); }} className={inputClass} /></div>
-                      <div className="md:col-span-2"><Label>Description</Label><textarea value={item.description} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].description = e.target.value; setExtracurricular(n); }} className={textareaClass} /></div>
+                      <div><Label>Activity Type (Sports, Arts, Volunteering, etc.)</Label><Input value={item.activityType} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].activityType = e.target.value; setExtracurricular(n); }} placeholder="e.g. Football, Painting, NGO Volunteering" className={inputClass} /></div>
+                      <div><Label>Level</Label><select value={item.level} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].level = e.target.value; setExtracurricular(n); }} className={selectClass}><option value="">Select Level</option><option value="School">School</option><option value="College">College</option><option value="District">District</option><option value="State">State</option><option value="National">National</option><option value="International">International</option></select></div>
+                      <div className="md:col-span-2"><Label>Achievements (If any)</Label><textarea value={item.achievements} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].achievements = e.target.value; setExtracurricular(n); }} placeholder="e.g. Won 1st place in Inter-College debate competition" className={textareaClass} /></div>
+                      <div className="md:col-span-2"><Label>Description (Optional)</Label><textarea value={item.description} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].description = e.target.value; setExtracurricular(n); }} placeholder="Briefly describe your role and contributions" className={textareaClass} /></div>
                     </div>
                   </div>
-                )) : <div className="p-10 text-center text-slate-400">No activities to add.</div>}
+                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No activities to add. Check the box above if you have any!</div>}
               </motion.div>
             )}
 
@@ -447,19 +594,19 @@ const ComprehensiveSignup = () => {
               <motion.div key="jobpref" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold">Job Preferences</h2>
-                  <Button onClick={addJobPref} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>
+                  <Button onClick={addJobPref} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Preference</Button>
                 </div>
                 {jobPreferences.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
-                    {jobPreferences.items.length > 1 && <button onClick={() => removeJobPref(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Pref #{index + 1}</h3>
+                    {jobPreferences.items.length > 1 && <button onClick={() => removeJobPref(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>}
+                    <h3 className="font-semibold mb-4 text-[#30919D]">Preference #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Role *</Label><Input value={item.preferredRole} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredRole = e.target.value; setJobPreferences(n); }} className={inputClass} /></div>
-                      <div><Label>Type *</Label><select value={item.jobType} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].jobType = e.target.value; setJobPreferences(n); }} className={selectClass}><option value="">Select</option><option value="full-time">Full-Time</option><option value="internship">Internship</option></select></div>
-                      <div><Label>Location *</Label><Input value={item.preferredLocation} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation = e.target.value; setJobPreferences(n); }} className={inputClass} /></div>
-                      <div><Label>Relocate *</Label><select value={item.willingToRelocate} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].willingToRelocate = e.target.value; setJobPreferences(n); }} className={selectClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
-                      <div>
-                        <Label>Expected Salary *</Label>
+                      <div><Label>Preferred Job Role *</Label><Input value={item.preferredRole} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredRole = e.target.value; setJobPreferences(n); }} placeholder="e.g. Software Engineer, Data Analyst" className={inputClass} /></div>
+                      <div><Label>Preferred Job Type *</Label><select value={item.jobType} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].jobType = e.target.value; setJobPreferences(n); }} className={selectClass}><option value="">Select Type</option><option value="Full-Time">Full-Time</option><option value="Internship">Internship</option></select></div>
+                      <div><Label>Preferred Location *</Label><Input value={item.preferredLocation} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation = e.target.value; setJobPreferences(n); }} placeholder="e.g. Bangalore, Remote, Pune" className={inputClass} /></div>
+                      <div><Label>Willing to Relocate *</Label><select value={item.willingToRelocate} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].willingToRelocate = e.target.value; setJobPreferences(n); }} className={selectClass}><option value="">Select Option</option><option value="Yes">Yes</option><option value="No">No</option></select></div>
+                      <div className="md:col-span-2">
+                        <Label>Expected Salary Range (LPA) *</Label>
                         <select value={item.expectedSalary} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].expectedSalary = e.target.value; setJobPreferences(n); }} className={selectClass}>
                           <option value="">Select Range</option>
                           {salaryRanges.map(s => <option key={s} value={s}>{s}</option>)}
@@ -475,21 +622,41 @@ const ComprehensiveSignup = () => {
             {currentStep === 7 && (
               <motion.div key="sectors" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <h2 className="text-2xl font-bold">Sector Preferences</h2>
-                <div>
-                  <Label>Preferred Sectors *</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {sectorOptions.map(s => (
-                      <button key={s}
-                        onClick={() => { const updated = sectorPreferences.preferredSectors.includes(s) ? sectorPreferences.preferredSectors.filter(x => x !== s) : [...sectorPreferences.preferredSectors, s]; setSectorPreferences({ ...sectorPreferences, preferredSectors: updated }); }}
-                        className={`px-4 py-2 rounded-full border transition-colors ${sectorPreferences.preferredSectors.includes(s) ? "bg-teal-500 text-white border-teal-500" : "bg-white dark:bg-transparent border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-teal-500"}`}>
-                        {s}
-                      </button>
-                    ))}
+                <p className="text-sm text-slate-500 mb-4">Select the sectors you are most interested in pursuing a career in.</p>
+
+                <div className="space-y-8">
+                  <div>
+                    <Label className="text-base font-bold text-[#30919D]">Primary Sectors of Interest *</Label>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {sectorOptions.map(s => (
+                        <button key={`primary-${s}`}
+                          type="button"
+                          onClick={() => { const updated = sectorPreferences.preferredSectors.includes(s) ? sectorPreferences.preferredSectors.filter(x => x !== s) : [...sectorPreferences.preferredSectors, s]; setSectorPreferences({ ...sectorPreferences, preferredSectors: updated }); }}
+                          className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${sectorPreferences.preferredSectors.includes(s) ? "bg-[#30919D] text-white border-[#30919D] shadow-md shadow-teal-500/20" : "bg-white dark:bg-transparent border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-[#30919D]"}`}>
+                          {s}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  {sectorPreferences.preferredSectors.includes("Other") && (
-                    <div className="mt-4">
+
+                  <div>
+                    <Label className="text-base font-bold text-slate-500">Secondary Sectors (Optional)</Label>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {sectorOptions.map(s => (
+                        <button key={`secondary-${s}`}
+                          type="button"
+                          onClick={() => { const updated = sectorPreferences.secondarySectors.includes(s) ? sectorPreferences.secondarySectors.filter(x => x !== s) : [...sectorPreferences.secondarySectors, s]; setSectorPreferences({ ...sectorPreferences, secondarySectors: updated }); }}
+                          className={`px-4 py-2 rounded-full border text-sm font-medium transition-all ${sectorPreferences.secondarySectors.includes(s) ? "bg-slate-500 text-white border-slate-500 shadow-md" : "bg-white dark:bg-transparent border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-slate-400"}`}>
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {(sectorPreferences.preferredSectors.includes("Other") || sectorPreferences.secondarySectors.includes("Other")) && (
+                    <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                       <Label>Specify Other Sector *</Label>
-                      <Input value={sectorPreferences.otherSector} onChange={(e) => setSectorPreferences({ ...sectorPreferences, otherSector: e.target.value })} className={inputClass} placeholder="e.g. Aerospace, Robotics" />
+                      <Input value={sectorPreferences.otherSector} onChange={(e) => setSectorPreferences({ ...sectorPreferences, otherSector: e.target.value })} className={inputClass} placeholder="e.g. Aerospace, Robotics, Renewable Energy" />
                     </div>
                   )}
                 </div>
@@ -499,10 +666,22 @@ const ComprehensiveSignup = () => {
             {/* Step 8: Goals - Refined Placeholders */}
             {currentStep === 8 && (
               <motion.div key="goals" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold">Career Goals</h2>
-                <div><Label>Short-term Goal (0-1 year) *</Label><textarea value={careerGoals.shortTerm} onChange={(e) => setCareerGoals({ ...careerGoals, shortTerm: e.target.value })} className={textareaClass} placeholder="e.g. Secure a software developer role in a product-based company and master React by end of 2024." /></div>
-                <div><Label>Medium-term Goal (1-3 years) *</Label><textarea value={careerGoals.mediumTerm} onChange={(e) => setCareerGoals({ ...careerGoals, mediumTerm: e.target.value })} className={textareaClass} placeholder="e.g. Become a Senior Developer, lead a small team, and contribute to open source projects. Plan to be active in this role by 2026." /></div>
-                <div><Label>Long-term Goal (3-5 years) *</Label><textarea value={careerGoals.longTerm} onChange={(e) => setCareerGoals({ ...careerGoals, longTerm: e.target.value })} className={textareaClass} placeholder="e.g. Start my own tech venture solving educational problems or become a Solution Architect." /></div>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold">Career Goals</h2>
+                  <p className="text-sm text-slate-500 mt-1">Define your professional trajectory to help us match you with the right opportunities.</p>
+                </div>
+                <div>
+                  <Label>Short-term Goal (0-1 year) *</Label>
+                  <textarea value={careerGoals.shortTerm} onChange={(e) => setCareerGoals({ ...careerGoals, shortTerm: e.target.value })} className={textareaClass} placeholder="e.g. Secure a software developer role in a product-based company and master React by end of 2024. Plan to complete 3 major certifications." />
+                </div>
+                <div>
+                  <Label>Medium-term Goal (1-3 years) *</Label>
+                  <textarea value={careerGoals.mediumTerm} onChange={(e) => setCareerGoals({ ...careerGoals, mediumTerm: e.target.value })} className={textareaClass} placeholder="e.g. Transition into a Senior Project Manager role, lead a cross-functional team of 10+, and obtain PMP certification. Reach an annual income of 15 LPA." />
+                </div>
+                <div>
+                  <Label>Long-term Goal (3-5 years) *</Label>
+                  <textarea value={careerGoals.longTerm} onChange={(e) => setCareerGoals({ ...careerGoals, longTerm: e.target.value })} className={textareaClass} placeholder="e.g. Establish my own ed-tech startup or become a Chief Technology Officer (CTO) at a global firm. Focus on driving large-scale digital transformation." />
+                </div>
               </motion.div>
             )}
 
@@ -512,27 +691,30 @@ const ComprehensiveSignup = () => {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold">Work Experience</h2>
                   <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!workExperience.isApplicable} onChange={(e) => setWorkExperience({ ...workExperience, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>}
+                    <label className="flex items-center gap-2 cursor-pointer text-slate-500"><input type="checkbox" checked={!workExperience.isApplicable} onChange={(e) => setWorkExperience({ ...workExperience, isApplicable: !e.target.checked })} className="accent-[#30919D]" /><span className="text-sm">Not Applicable</span></label>
+                    {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Experience</Button>}
                   </div>
                 </div>
                 {workExperience.isApplicable ? workExperience.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
-                    {workExperience.items.length > 1 && <button onClick={() => removeWorkExperience(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Exp #{index + 1}</h3>
+                    {workExperience.items.length > 1 && <button onClick={() => removeWorkExperience(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>}
+                    <h3 className="font-semibold mb-4 text-[#30919D]">Experience #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Type *</Label><select value={item.experienceType} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].experienceType = e.target.value; setWorkExperience(n); }} className={selectClass}><option value="">Select</option><option value="internship">Internship</option><option value="full-time">Full-Time</option></select></div>
-                      <div><Label>Org Name *</Label><Input value={item.organizationName} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].organizationName = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
-                      <div><Label>Title *</Label><Input value={item.jobTitle} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].jobTitle = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
-                      <div><Label>Industry *</Label><Input value={item.industry} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].industry = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
+                      <div><Label>Experience Type *</Label><select value={item.experienceType} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].experienceType = e.target.value; setWorkExperience(n); }} className={selectClass}><option value="">Select Type</option><option value="Internship">Internship</option><option value="Full-Time">Full-Time</option><option value="Contract">Contract</option></select></div>
+                      <div><Label>Organization Name *</Label><Input value={item.organizationName} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].organizationName = e.target.value; setWorkExperience(n); }} placeholder="Enter name of the company" className={inputClass} /></div>
+                      <div><Label>Job Title / Role *</Label><Input value={item.jobTitle} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].jobTitle = e.target.value; setWorkExperience(n); }} placeholder="e.g. Frontend Developer" className={inputClass} /></div>
+                      <div><Label>Industry / Sector *</Label><Input value={item.industry} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].industry = e.target.value; setWorkExperience(n); }} placeholder="e.g. FinTech, E-commerce, Healthcare" className={inputClass} /></div>
                       <div><Label>Start Date *</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].startDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
                       {!item.currentlyWorking && <div><Label>End Date *</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].endDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>}
-                      <div className="md:col-span-2"><input type="checkbox" checked={item.currentlyWorking} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) n.items[index].endDate = ""; setWorkExperience(n); }} /> Currently working</div>
-                      <div className="md:col-span-2"><Label>Description *</Label><textarea value={item.description} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].description = e.target.value; setWorkExperience(n); }} className={textareaClass} /></div>
-                      <div className="md:col-span-2"><Label>Certificate *</Label><FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].certificate = fdata?.url || fid; setWorkExperience(n); }} /></div>
+                      <div className="md:col-span-2 flex items-center gap-2">
+                        <input type="checkbox" id={`current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) n.items[index].endDate = ""; setWorkExperience(n); }} className="w-4 h-4 accent-[#30919D]" />
+                        <Label htmlFor={`current-${item.id}`} className="cursor-pointer">I am currently working here</Label>
+                      </div>
+                      <div className="md:col-span-2"><Label>Description *</Label><textarea value={item.description} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].description = e.target.value; setWorkExperience(n); }} placeholder="Describe your key responsibilities and achievements..." className={textareaClass} /></div>
+                      <div className="md:col-span-2"><Label>Experience Certificate / Offer Letter *</Label><FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].certificate = fdata?.url || fid; setWorkExperience(n); }} helperText="Upload certificate, offer letter or salary slips" /></div>
                     </div>
                   </div>
-                )) : <div className="p-10 text-center text-slate-400">No experience to add.</div>}
+                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No work experience to add.</div>}
               </motion.div>
             )}
 
@@ -542,27 +724,28 @@ const ComprehensiveSignup = () => {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold">Projects</h2>
                   <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!projects.isApplicable} onChange={(e) => setProjects({ ...projects, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>}
+                    <label className="flex items-center gap-2 cursor-pointer text-slate-500"><input type="checkbox" checked={!projects.isApplicable} onChange={(e) => setProjects({ ...projects, isApplicable: !e.target.checked })} className="accent-[#30919D]" /><span className="text-sm">Not Applicable</span></label>
+                    {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Project</Button>}
                   </div>
                 </div>
                 {projects.isApplicable ? projects.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
-                    {projects.items.length > 1 && <button onClick={() => removeProject(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Project #{index + 1}</h3>
+                    {projects.items.length > 1 && <button onClick={() => removeProject(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>}
+                    <h3 className="font-semibold mb-4 text-[#30919D]">Project #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Title *</Label><Input value={item.title} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].title = e.target.value; setProjects(n); }} className={inputClass} /></div>
-                      <div><Label>Done In *</Label><select value={item.doneIn} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].doneIn = e.target.value; setProjects(n); }} className={selectClass}><option value="">Select</option><option value="College">College</option><option value="Company">Company</option></select></div>
-                      {item.doneIn === 'College' && <div><Label>Institution *</Label><Input value={item.institution} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].institution = e.target.value; setProjects(n); }} className={inputClass} /></div>}
-                      {item.doneIn === 'Company' && <div><Label>Company *</Label><Input value={item.companyName} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].companyName = e.target.value; setProjects(n); }} className={inputClass} /></div>}
-                      <div><Label>Team Type *</Label><select value={item.teamType} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].teamType = e.target.value; setProjects(n); }} className={selectClass}><option value="">Select</option><option value="Individual">Individual</option><option value="Team">Team</option></select></div>
+                      <div className="md:col-span-2"><Label>Project Title *</Label><Input value={item.title} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].title = e.target.value; setProjects(n); }} placeholder="e.g. AI-driven Traffic Management System" className={inputClass} /></div>
+                      <div><Label>Associated Qualification Level *</Label><select value={item.qualificationLevel} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].qualificationLevel = e.target.value; setProjects(n); }} className={selectClass}><option value="">Select Level</option><option value="College">College/University Project</option><option value="Company">Company/Internship Project</option><option value="Independent">Independent/Personal Project</option></select></div>
+                      {(item.qualificationLevel === 'College' || item.qualificationLevel === 'Company') && (
+                        <div><Label>{item.qualificationLevel === 'College' ? 'Institution Name *' : 'Organization Name *'}</Label><Input value={item.qualificationLevel === 'College' ? item.institution : item.companyName} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; if (item.qualificationLevel === 'College') n.items[index].institution = e.target.value; else n.items[index].companyName = e.target.value; setProjects(n); }} placeholder={`Enter ${item.qualificationLevel.toLowerCase()} name`} className={inputClass} /></div>
+                      )}
+                      <div><Label>Team Type *</Label><select value={item.teamType} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].teamType = e.target.value; setProjects(n); }} className={selectClass}><option value="">Select Type</option><option value="Individual">Individual</option><option value="Team">Team</option></select></div>
                       <div><Label>Start Date *</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].startDate = e.target.value; setProjects(n); }} className={inputClass} /></div>
                       {!item.currentlyWorking && <div><Label>End Date *</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].endDate = e.target.value; setProjects(n); }} className={inputClass} /></div>}
-                      <div className="md:col-span-2"><Label>Description *</Label><textarea value={item.description} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].description = e.target.value; setProjects(n); }} className={textareaClass} /></div>
-                      <div className="md:col-span-2"><Label>URL (Optional)</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} className={inputClass} /></div>
+                      <div className="md:col-span-2"><Label>Project Description *</Label><textarea value={item.description} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].description = e.target.value; setProjects(n); }} placeholder="Explain the project goal, your role, and tools/technologies used..." className={textareaClass} /></div>
+                      <div className="md:col-span-2"><Label>Project URL / GitHub Link (Optional)</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} placeholder="https://github.com/... or https://project-demo.com" className={inputClass} /></div>
                     </div>
                   </div>
-                )) : <div className="p-10 text-center text-slate-400">No projects to add.</div>}
+                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No projects to add.</div>}
               </motion.div>
             )}
 
@@ -570,30 +753,30 @@ const ComprehensiveSignup = () => {
             {currentStep === 11 && (
               <motion.div key="certs" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Certificates</h2>
+                  <h2 className="text-2xl font-bold">Technical Certificates</h2>
                   <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!certificates.isApplicable} onChange={(e) => setCertificates({ ...certificates, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {certificates.isApplicable && <Button onClick={addCertificate} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>}
+                    <label className="flex items-center gap-2 cursor-pointer text-slate-500"><input type="checkbox" checked={!certificates.isApplicable} onChange={(e) => setCertificates({ ...certificates, isApplicable: !e.target.checked })} className="accent-[#30919D]" /><span className="text-sm">Not Applicable</span></label>
+                    {certificates.isApplicable && <Button onClick={addCertificate} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Certificate</Button>}
                   </div>
                 </div>
                 {certificates.isApplicable ? certificates.items.map((item, index) => (
                   <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
-                    {certificates.items.length > 1 && <button onClick={() => removeCertificate(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Cert #{index + 1}</h3>
+                    {certificates.items.length > 1 && <button onClick={() => removeCertificate(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2 transition-colors"><Trash2 size={18} /></button>}
+                    <h3 className="font-semibold mb-4 text-[#30919D]">Certificate #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Title *</Label><Input value={item.title} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].title = e.target.value; setCertificates(n); }} className={inputClass} /></div>
-                      <div><Label>Issuer *</Label><Input value={item.issuingOrg} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].issuingOrg = e.target.value; setCertificates(n); }} className={inputClass} /></div>
-                      <div><Label>Year *</Label><select value={item.yearOfCompletion} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].yearOfCompletion = e.target.value; setCertificates(n); }} className={selectClass}><option value="">Select</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                      <div><Label>Verification *</Label><select value={item.verificationType} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationType = e.target.value; setCertificates(n); }} className={selectClass}><option value="">Select</option><option value="url">URL</option><option value="qr">QR</option></select></div>
+                      <div className="md:col-span-2"><Label>Certificate Title *</Label><Input value={item.title} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].title = e.target.value; setCertificates(n); }} placeholder="e.g. AWS Certified Solutions Architect" className={inputClass} /></div>
+                      <div><Label>Issuing Organization *</Label><Input value={item.issuingOrg} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].issuingOrg = e.target.value; setCertificates(n); }} placeholder="e.g. Amazon Web Services, Google, Coursera" className={inputClass} /></div>
+                      <div><Label>Year of Completion *</Label><select value={item.yearOfCompletion} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].yearOfCompletion = e.target.value; setCertificates(n); }} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
+                      <div><Label>Verification Method *</Label><select value={item.verificationType} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationType = e.target.value; setCertificates(n); }} className={selectClass}><option value="">Select Method</option><option value="url">Verification URL</option><option value="qr">QR Code on PDF</option></select></div>
 
                       {item.verificationType === "url" && (
                         <div className="md:col-span-2"><Label>Verification URL *</Label><Input value={item.verificationUrl} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationUrl = e.target.value; setCertificates(n); }} className={inputClass} placeholder="https://..." /></div>
                       )}
 
-                      <div className="md:col-span-2"><Label>Upload *</Label><FileUpload value={item.certificateFile} onChange={(fid, fdata) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].certificateFile = fdata?.url || fid; setCertificates(n); }} /></div>
+                      <div className="md:col-span-2"><Label>Upload Certificate (PDF/JPG) *</Label><FileUpload value={item.certificateFile} onChange={(fid, fdata) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].certificateFile = fdata?.url || fid; setCertificates(n); }} helperText="Upload the certificate file for verification" /></div>
                     </div>
                   </div>
-                )) : <div className="p-10 text-center text-slate-400">No certificates to add.</div>}
+                )) : <div className="p-10 text-center text-slate-400 bg-slate-50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200">No certificates to add.</div>}
               </motion.div>
             )}
 

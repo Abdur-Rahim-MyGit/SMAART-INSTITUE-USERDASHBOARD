@@ -1,0 +1,842 @@
+[
+    {
+        "title": "Full Stack Developer",
+        "category": "Engineering",
+        "description": "Design and develop both front-end and back-end web architecture. Work with databases, servers, and clients.",
+        "salary": {
+            "min": 400000,
+            "max": 1500000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "25% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "JavaScript",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "React",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Node.js",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "MongoDB",
+                "level": 6,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Develop user-facing features",
+            "Build reusable code",
+            "Optimize for speed",
+            "Collaborate with teams"
+        ]
+    },
+    {
+        "title": "Data Scientist",
+        "category": "Data",
+        "description": "Extract insights from data using statistical methods and machine learning. Build predictive models.",
+        "salary": {
+            "min": 600000,
+            "max": 2000000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "40% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Python",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "Machine Learning",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "SQL",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Statistics",
+                "level": 8,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Analyze data trends",
+            "Build ML models",
+            "Create visualizations",
+            "Present insights"
+        ]
+    },
+    {
+        "title": "Digital Marketing Manager",
+        "category": "Marketing",
+        "description": "Plan and execute digital marketing campaigns across SEO, SEM, social media, and email.",
+        "salary": {
+            "min": 350000,
+            "max": 1200000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "18% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "SEO/SEM",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Google Analytics",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Content Strategy",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Social Media",
+                "level": 8,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Manage campaigns",
+            "Analyze metrics",
+            "Optimize conversions",
+            "Lead marketing team"
+        ]
+    },
+    {
+        "title": "DevOps Engineer",
+        "category": "Engineering",
+        "description": "Automate and streamline operations and processes. Build and maintain tools for deployment.",
+        "salary": {
+            "min": 500000,
+            "max": 1800000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "30% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "AWS/Azure",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Docker/Kubernetes",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "CI/CD",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Linux",
+                "level": 7,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Deploy applications",
+            "Monitor systems",
+            "Automate processes",
+            "Ensure uptime"
+        ]
+    },
+    {
+        "title": "Business Analyst",
+        "category": "Business",
+        "description": "Bridge gap between IT and business. Analyze processes and recommend improvements.",
+        "salary": {
+            "min": 400000,
+            "max": 1300000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "15% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Business Analysis",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "SQL",
+                "level": 6,
+                "importance": 8
+            },
+            {
+                "name": "Excel",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Communication",
+                "level": 9,
+                "importance": 10
+            }
+        ],
+        "typicalTasks": [
+            "Gather requirements",
+            "Create documentation",
+            "Analyze data",
+            "Present findings"
+        ]
+    },
+    {
+        "title": "UI/UX Designer",
+        "category": "Design",
+        "description": "Design user interfaces and experiences for web and mobile applications.",
+        "salary": {
+            "min": 350000,
+            "max": 1200000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "20% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Figma",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "Prototyping",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "User Research",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Visual Design",
+                "level": 8,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Create wireframes",
+            "Design interfaces",
+            "Conduct user testing",
+            "Collaborate with developers"
+        ]
+    },
+    {
+        "title": "Cybersecurity Analyst",
+        "category": "Security",
+        "description": "Protect organization's computer systems and networks from cyber threats.",
+        "salary": {
+            "min": 450000,
+            "max": 1600000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "35% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Network Security",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Ethical Hacking",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Linux",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Risk Assessment",
+                "level": 8,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Monitor networks",
+            "Investigate breaches",
+            "Implement security",
+            "Train employees"
+        ]
+    },
+    {
+        "title": "Product Manager",
+        "category": "Product",
+        "description": "Define product vision and strategy. Work with cross-functional teams to deliver products.",
+        "salary": {
+            "min": 800000,
+            "max": 2500000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "22% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Product Strategy",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Agile",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "User Research",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Data Analysis",
+                "level": 6,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Define roadmap",
+            "Prioritize features",
+            "Analyze metrics",
+            "Lead product launches"
+        ]
+    },
+    {
+        "title": "Cloud Architect",
+        "category": "Engineering",
+        "description": "Design and manage cloud computing strategy and infrastructure.",
+        "salary": {
+            "min": 1000000,
+            "max": 3000000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "28% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "AWS/Azure/GCP",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "System Architecture",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "Security",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Networking",
+                "level": 8,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Design cloud solutions",
+            "Migrate systems",
+            "Optimize costs",
+            "Ensure security"
+        ]
+    },
+    {
+        "title": "Machine Learning Engineer",
+        "category": "Data",
+        "description": "Build and deploy machine learning models at scale.",
+        "salary": {
+            "min": 700000,
+            "max": 2200000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "45% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Python",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "TensorFlow/PyTorch",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Deep Learning",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "MLOps",
+                "level": 7,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Build ML models",
+            "Deploy pipelines",
+            "Optimize performance",
+            "Research algorithms"
+        ]
+    },
+    {
+        "title": "Content Writer",
+        "category": "Marketing",
+        "description": "Create engaging content for websites, blogs, social media, and marketing materials.",
+        "salary": {
+            "min": 250000,
+            "max": 800000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Moderate",
+            "growth": "12% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Writing",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "SEO",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Research",
+                "level": 8,
+                "importance": 8
+            },
+            {
+                "name": "Editing",
+                "level": 8,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Write articles",
+            "Create copy",
+            "Edit content",
+            "Research topics"
+        ]
+    },
+    {
+        "title": "HR Manager",
+        "category": "Business",
+        "description": "Manage recruitment, employee relations, and organizational development.",
+        "salary": {
+            "min": 400000,
+            "max": 1400000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Moderate",
+            "growth": "10% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Recruitment",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Employee Relations",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Communication",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "HR Analytics",
+                "level": 6,
+                "importance": 7
+            }
+        ],
+        "typicalTasks": [
+            "Recruit talent",
+            "Manage policies",
+            "Handle conflicts",
+            "Develop programs"
+        ]
+    },
+    {
+        "title": "Mobile App Developer",
+        "category": "Engineering",
+        "description": "Develop mobile applications for iOS and Android platforms.",
+        "salary": {
+            "min": 400000,
+            "max": 1600000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "20% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "React Native/Flutter",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "iOS/Android",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "JavaScript/Dart",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "API Integration",
+                "level": 7,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Build mobile apps",
+            "Optimize performance",
+            "Fix bugs",
+            "Publish to stores"
+        ]
+    },
+    {
+        "title": "Data Analyst",
+        "category": "Data",
+        "description": "Analyze data to help businesses make informed decisions.",
+        "salary": {
+            "min": 350000,
+            "max": 1000000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "25% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "SQL",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Excel",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Python/R",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Data Visualization",
+                "level": 7,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Analyze data",
+            "Create reports",
+            "Build dashboards",
+            "Present insights"
+        ]
+    },
+    {
+        "title": "Blockchain Developer",
+        "category": "Engineering",
+        "description": "Develop blockchain-based applications and smart contracts.",
+        "salary": {
+            "min": 600000,
+            "max": 2000000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Moderate",
+            "growth": "High in FinTech"
+        },
+        "requiredSkills": [
+            {
+                "name": "Solidity/Rust",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Smart Contracts",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Cryptography",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Web3",
+                "level": 7,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Develop smart contracts",
+            "Build dApps",
+            "Audit code",
+            "Research protocols"
+        ]
+    },
+    {
+        "title": "Sales Manager",
+        "category": "Sales",
+        "description": "Lead sales team and drive revenue growth through strategic planning.",
+        "salary": {
+            "min": 500000,
+            "max": 1800000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "15% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Sales Strategy",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Team Leadership",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "CRM",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Negotiation",
+                "level": 9,
+                "importance": 10
+            }
+        ],
+        "typicalTasks": [
+            "Lead sales team",
+            "Set targets",
+            "Close deals",
+            "Analyze performance"
+        ]
+    },
+    {
+        "title": "Graphic Designer",
+        "category": "Design",
+        "description": "Create visual content for digital and print media.",
+        "salary": {
+            "min": 250000,
+            "max": 900000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Moderate",
+            "growth": "12% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Adobe Creative Suite",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "Typography",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Branding",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Illustration",
+                "level": 7,
+                "importance": 7
+            }
+        ],
+        "typicalTasks": [
+            "Design graphics",
+            "Create layouts",
+            "Develop branding",
+            "Collaborate with clients"
+        ]
+    },
+    {
+        "title": "QA Engineer",
+        "category": "Engineering",
+        "description": "Test software applications to ensure quality and functionality.",
+        "salary": {
+            "min": 300000,
+            "max": 1000000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "18% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Testing",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Selenium",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "API Testing",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Bug Tracking",
+                "level": 8,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Test applications",
+            "Write test cases",
+            "Report bugs",
+            "Automate tests"
+        ]
+    },
+    {
+        "title": "Financial Analyst",
+        "category": "Finance",
+        "description": "Analyze financial data and provide insights for business decisions.",
+        "salary": {
+            "min": 400000,
+            "max": 1500000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Moderate",
+            "growth": "10% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Financial Modeling",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Excel",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "Accounting",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Data Analysis",
+                "level": 7,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Analyze financials",
+            "Create models",
+            "Prepare reports",
+            "Forecast trends"
+        ]
+    },
+    {
+        "title": "System Administrator",
+        "category": "Engineering",
+        "description": "Maintain and manage IT infrastructure and systems.",
+        "salary": {
+            "min": 350000,
+            "max": 1200000,
+            "currency": "INR"
+        },
+        "marketData": {
+            "demand": "Moderate",
+            "growth": "8% YoY"
+        },
+        "requiredSkills": [
+            {
+                "name": "Linux/Windows",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Networking",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Scripting",
+                "level": 6,
+                "importance": 7
+            },
+            {
+                "name": "Troubleshooting",
+                "level": 8,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Manage servers",
+            "Monitor systems",
+            "Backup data",
+            "Resolve issues"
+        ]
+    }
+]

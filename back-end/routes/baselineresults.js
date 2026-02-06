@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const BaseLineResult = require('../models/BaseLineResult');
 
 const router = express.Router();
@@ -7,6 +8,14 @@ const router = express.Router();
 router.get('/user/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
+
+        // Validation for MongoDB ObjectId to prevent 500 errors on invalid IDs
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid User ID format'
+            });
+        }
 
         const baseLineResult = await BaseLineResult.findOne({ userId })
             .sort({ createdAt: -1 }); // Get most recent result
@@ -36,6 +45,11 @@ router.get('/user/:userId', async (req, res) => {
 router.delete('/reset/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ success: false, error: 'Invalid User ID format' });
+        }
+
         const result = await BaseLineResult.deleteMany({ userId });
 
         res.json({

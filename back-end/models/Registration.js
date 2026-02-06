@@ -46,7 +46,9 @@ const registrationSchema = new mongoose.Schema({
   },
 
   // Higher Education Details
-  higherEducation: {
+  higherEducation: [{
+    _id: false,
+    id: String,
     qualificationLevel: String,
     degree: String,
     specialization: String,
@@ -56,7 +58,7 @@ const registrationSchema = new mongoose.Schema({
     cgpaPercentage: String,
     degreeStatus: String,
     certificate: String, // file path
-  },
+  }],
 
   // Extra-Curricular Activities
   extracurricular: [{
@@ -127,6 +129,8 @@ const registrationSchema = new mongoose.Schema({
     issuingOrg: String,
     certificateFile: String, // file path
     yearOfCompletion: String,
+    verificationType: String,
+    verificationUrl: String,
   }],
 
   // Legacy fields for backward compatibility

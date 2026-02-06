@@ -1,0 +1,472 @@
+[
+    {
+        "title": "Full Stack Developer",
+        "category": "Engineering",
+        "description": "Design and develop both front-end and back-end web architecture. Ensure the responsiveness of applications and work alongside graphic designers for web design features.",
+        "salary": {
+            "min": 80000,
+            "max": 150000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "22% (Much faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "JavaScript",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "React",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Node.js",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "SQL",
+                "level": 6,
+                "importance": 8
+            },
+            {
+                "name": "Git",
+                "level": 6,
+                "importance": 7
+            }
+        ],
+        "typicalTasks": [
+            "Develop user-facing features using React.js",
+            "Build reusable code and libraries for future use",
+            "Optimize application for maximum speed and scalability",
+            "Collaborate with other team members and stakeholders"
+        ]
+    },
+    {
+        "title": "Data Scientist",
+        "category": "Data",
+        "description": "Extract meaning from and interpret data, which requires both tools and methods from statistics and machine learning, as well as being human.",
+        "salary": {
+            "min": 95000,
+            "max": 170000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "36% (Much faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "Python",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "Machine Learning",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "SQL",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Statistics",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Data Visualization",
+                "level": 7,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Analyze large amounts of information to discover trends and patterns",
+            "Build predictive models and machine-learning algorithms",
+            "Combine models through ensemble modeling",
+            "Present information using data visualization techniques"
+        ]
+    },
+    {
+        "title": "Product Manager",
+        "category": "Product",
+        "description": "Identify customer needs and the larger business objectives that a product or feature will fulfill, articulates what success looks like for a product, and rallies a team to turn that vision into a reality.",
+        "salary": {
+            "min": 90000,
+            "max": 160000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "10% (Faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "Product Strategy",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Agile Methodologies",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "User Research",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Data Analysis",
+                "level": 6,
+                "importance": 8
+            },
+            {
+                "name": "Communication",
+                "level": 9,
+                "importance": 10
+            }
+        ],
+        "typicalTasks": [
+            "Determine customers' needs and desires by specifying the research needed to obtain market information",
+            "Recommend the nature and scope of present and future product lines",
+            "Assess market competition by comparing the company's product to competitors' products",
+            "Bring new products to market by analyzing proposed product requirements and product development programs"
+        ]
+    },
+    {
+        "title": "DevOps Engineer",
+        "category": "Engineering",
+        "description": "Introduce processes, tools, and methodologies to balance needs throughout the software development life cycle, from coding and deployment, to maintenance and updates.",
+        "salary": {
+            "min": 95000,
+            "max": 165000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "21% (Much faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "AWS/Azure",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Docker/Kubernetes",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "CI/CD Pipelines",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Linux",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Python/Bash Scripting",
+                "level": 7,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Implement integrations requested by customers",
+            "Deploy updates and fixes",
+            "Build tools to reduce occurrences of errors and improve customer experience",
+            "Develop software to integrate with internal back-end systems"
+        ]
+    },
+    {
+        "title": "UX/UI Designer",
+        "category": "Design",
+        "description": "Design the user interface and user experience of software applications and websites. Create wireframes, prototypes, and high-fidelity mockups.",
+        "salary": {
+            "min": 70000,
+            "max": 130000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "Moderate",
+            "growth": "13% (Faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "Figma",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "Prototyping",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "User Research",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "HTML/CSS",
+                "level": 5,
+                "importance": 6
+            },
+            {
+                "name": "Visual Design",
+                "level": 8,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Gather and evaluate user requirements in collaboration with product managers and engineers",
+            "Illustrate design ideas using storyboards, process flows and sitemaps",
+            "Design graphic user interface elements, like menus, tabs and widgets",
+            "Build page navigation buttons and search fields"
+        ]
+    },
+    {
+        "title": "Cybersecurity Analyst",
+        "category": "Security",
+        "description": "Plan and carry out security measures to protect an organization's computer networks and systems.",
+        "salary": {
+            "min": 85000,
+            "max": 160000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "33% (Much faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "Network Security",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Risk Assessment",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Linux",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Penetration Testing",
+                "level": 7,
+                "importance": 8
+            },
+            {
+                "name": "Incident Response",
+                "level": 8,
+                "importance": 9
+            }
+        ],
+        "typicalTasks": [
+            "Monitor their organization's networks for security breaches and investigate a violation when one occurs",
+            "Install and use software, such as firewalls and data encryption programs, to protect sensitive information",
+            "Prepare reports that document security breaches and the extent of the damage caused by the breaches",
+            "Research the latest information technology (IT) security trends"
+        ]
+    },
+    {
+        "title": "Cloud Architect",
+        "category": "Engineering",
+        "description": "Responsible for the planning, design, and management of cloud computing resources within an organization.",
+        "salary": {
+            "min": 120000,
+            "max": 200000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "25% (Much faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "Cloud Strategy",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "AWS/Azure/GCP",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "System Architecture",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "Security",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Networking",
+                "level": 8,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Create a well-informed cloud strategy and manage the adaption process",
+            "Evaluate cloud applications, hardware, and software",
+            "Develop and organize cloud systems",
+            "Work closely with IT security to monitor the company's cloud privacy"
+        ]
+    },
+    {
+        "title": "Machine Learning Engineer",
+        "category": "Data",
+        "description": "Research, build, and design self-running artificial intelligence (AI) systems to automate predictive models.",
+        "salary": {
+            "min": 110000,
+            "max": 190000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "Very High",
+            "growth": "40% (Much faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "Python",
+                "level": 9,
+                "importance": 10
+            },
+            {
+                "name": "TensorFlow/PyTorch",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Deep Learning",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Data Structures",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Mathematics",
+                "level": 8,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Design and develop machine learning and deep learning systems",
+            "Run machine learning tests and experiments",
+            "Implement appropriate ML algorithms",
+            "Study and transform data science prototypes"
+        ]
+    },
+    {
+        "title": "Blockchain Developer",
+        "category": "Engineering",
+        "description": "Specialize in developing and implementing architecture and solutions using blockchain technology.",
+        "salary": {
+            "min": 100000,
+            "max": 180000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "High demand in niche markets"
+        },
+        "requiredSkills": [
+            {
+                "name": "Solidity/Rust",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Smart Contracts",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Cryptography",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Data Structures",
+                "level": 8,
+                "importance": 9
+            },
+            {
+                "name": "Web3.js",
+                "level": 7,
+                "importance": 8
+            }
+        ],
+        "typicalTasks": [
+            "Research, design, develop, and test blockchain technologies",
+            "Brainstorm and help evaluate applications for new tools and technologies as they continually evolve",
+            "Maintain and extend client- and server-side applications that are responsible for business logic and integration",
+            "Document new solutions as well as maintaining that of existing ones"
+        ]
+    },
+    {
+        "title": "Digital Marketing Manager",
+        "category": "Marketing",
+        "description": "Plan and execute all digital marketing, including SEO/SEM, marketing database, email, social media and display advertising campaigns.",
+        "salary": {
+            "min": 60000,
+            "max": 120000,
+            "currency": "USD"
+        },
+        "marketData": {
+            "demand": "High",
+            "growth": "10% (Faster than average)"
+        },
+        "requiredSkills": [
+            {
+                "name": "SEO/SEM",
+                "level": 8,
+                "importance": 10
+            },
+            {
+                "name": "Google Analytics",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Content Strategy",
+                "level": 7,
+                "importance": 9
+            },
+            {
+                "name": "Social Media",
+                "level": 8,
+                "importance": 8
+            },
+            {
+                "name": "Data Analysis",
+                "level": 6,
+                "importance": 7
+            }
+        ],
+        "typicalTasks": [
+            "Design and oversee all aspects of our digital marketing department including our marketing database, email, and display advertising campaigns",
+            "Develop and monitor campaign budgets",
+            "Plan and manage our social media platforms",
+            "Prepare accurate reports on our marketing campaign's overall performance"
+        ]
+    }
+]
