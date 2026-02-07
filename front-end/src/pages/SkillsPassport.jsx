@@ -186,7 +186,7 @@ const SkillsPassport = () => {
                                         </p>
                                         {activeTab === 'baseline' && (
                                             <a
-                                                href="/dashboard/assessment/baseline"
+                                                href="/dashboard/assessments/baseline"
                                                 className="px-6 py-3 bg-[#002147] text-white rounded-lg font-bold hover:bg-[#002147]/90 transition-colors shadow-lg shadow-[#002147]/20"
                                             >
                                                 Start Assessment

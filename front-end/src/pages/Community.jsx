@@ -807,8 +807,8 @@ const Community = () => {
                         Clear Search
                       </button>
                     )}
-                    {/* Seed Data Button for Development */}
-                    {!debouncedSearch && (
+                    {/* Seed Data Button for Development Only */}
+                    {import.meta.env.DEV && !debouncedSearch && (
                       <button
                         onClick={async () => {
                           try {
