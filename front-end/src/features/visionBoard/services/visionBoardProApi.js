@@ -28,8 +28,8 @@ const getUserId = async () => {
     let source = 'sessionStorage';
 
     if (!userStr || userStr === '{}' || userStr === 'undefined') {
-      userStr = localStorage.getItem("user");
-      source = 'localStorage';
+      userStr = null;
+      source = 'none';
     }
 
     if (!userStr || userStr === '{}' || userStr === 'undefined' || userStr === 'null') {
