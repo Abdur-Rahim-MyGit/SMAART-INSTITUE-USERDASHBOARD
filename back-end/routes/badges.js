@@ -8,6 +8,7 @@ const {
     awardBadge,
     updateBadgeProgress
 } = require('../utils/badgeUtils');
+const { notifyBadgeEarned } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -145,6 +146,19 @@ router.post('/award', async (req, res) => {
         }
 
         const result = await awardBadge(userId, badgeId, metadata);
+
+        // Send notification for badge earned
+        if (result && result.badge) {
+            try {
+                await notifyBadgeEarned(userId, {
+                    badgeId: result.badge.badgeId || badgeId,
+                    title: result.badge.title || 'New Badge',
+                    xp: result.badge.xp || 0
+                });
+            } catch (notifError) {
+                console.error('Failed to send badge notification:', notifError);
+            }
+        }
 
         res.json({
             success: true,

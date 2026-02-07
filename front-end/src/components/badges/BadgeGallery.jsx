@@ -44,12 +44,17 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
         const fetchBadges = async () => {
             try {
                 const userStr = sessionStorage.getItem('user');
+                const token = sessionStorage.getItem('token');
                 if (!userStr) {
                     setIsLoading(false);
                     return;
                 }
                 const user = JSON.parse(userStr);
-                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`);
+                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`, {
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    }
+                });
                 const data = await response.json();
 
                 if (data.success) {
