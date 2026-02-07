@@ -247,7 +247,7 @@ const DashboardHome = () => {
       }
     };
 
-    if (user.id || user._id) {
+    if (user?.id || user?._id) {
       fetchDashboardData();
     }
   }, [user]);
@@ -385,7 +385,7 @@ const DashboardHome = () => {
                       {currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                     </p>
                     <h1 className="text-3xl lg:text-4xl font-bold text-[#002147] dark:text-white mb-2">
-                      Welcome back, {user.fullName.split(' ')[0]}
+                      Welcome back, {user?.fullName?.split(' ')[0] || 'Student'}
                     </h1>
                     <p className="text-base text-gray-600 dark:text-gray-300">
                       Here's your learning overview for today
@@ -498,7 +498,7 @@ const DashboardHome = () => {
                               <span>Daily Streak: {stats.dayStreak} Days</span>
                             </span>
                             <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-                              Welcome back, {user.fullName.split(' ')[0]}! 👋
+                              Welcome back, {user?.fullName?.split(' ')[0] || 'Student'}! 👋
                             </h1>
                             <p className="text-white/70 text-base max-w-xl leading-relaxed">
                               You've completed <span className="text-white font-semibold">{weeklyProgress}%</span> of your overall course journey.

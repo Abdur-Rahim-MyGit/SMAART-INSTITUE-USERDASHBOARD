@@ -235,6 +235,14 @@ export const courseEnrollmentAPI = {
       body: JSON.stringify(data),
     });
   },
+
+  // Update quiz progress
+  updateQuizProgress: async (data) => {
+    return apiCall('/courseEnrollments/quiz-progress', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 export default apiCall;
