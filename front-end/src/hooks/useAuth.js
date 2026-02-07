@@ -12,7 +12,8 @@ export const useAuth = () => {
 
     useEffect(() => {
         try {
-            const userData = sessionStorage.getItem("user");
+            // FIX #4: Read sessionStorage first, fall back to localStorage
+            const userData = sessionStorage.getItem("user") || localStorage.getItem("user");
             if (userData) {
                 const parsedUser = JSON.parse(userData);
                 setUser(parsedUser);
