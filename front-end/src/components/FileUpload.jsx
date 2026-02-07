@@ -97,10 +97,10 @@ const FileUpload = ({
 
             <div
                 className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${isDragging
-                        ? "border-teal-500 bg-teal-50 dark:bg-teal-500/10"
-                        : value
-                            ? "border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/5"
-                            : "border-slate-300 dark:border-white/10 hover:border-teal-400 dark:hover:border-teal-400/50"
+                    ? "border-teal-500 bg-teal-50 dark:bg-teal-500/10"
+                    : value
+                        ? "border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/5"
+                        : "border-slate-300 dark:border-white/10 hover:border-teal-400 dark:hover:border-teal-400/50"
                     }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -128,7 +128,7 @@ const FileUpload = ({
                                 className="flex flex-col items-center"
                             >
                                 <Loader2 className="w-10 h-10 text-teal-500 animate-spin mb-2" />
-                                <p className="text-sm text-teal-600 font-medium">Uploading to Cloud...</p>
+                                <p className="text-sm text-teal-600 font-medium">Adding to your Skills Passport...</p>
                             </motion.div>
                         ) : value ? (
                             <motion.div
