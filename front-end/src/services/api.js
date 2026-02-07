@@ -30,6 +30,72 @@ const getAuthHeaders = () => {
   return token ? { "Authorization": `Bearer ${token}` } : {};
 };
 
+// === SECURITY FIX #10: Silent token renewal ===
+// Decode JWT payload (without verification — backend validates)
+const decodeTokenPayload = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+  } catch {
+    return null;
+  }
+};
+
+// Renew token if it expires within the next hour
+let renewalInProgress = false;
+const TOKEN_RENEWAL_THRESHOLD = 60 * 60 * 1000; // 1 hour before expiry
+
+const tryRenewToken = async () => {
+  if (renewalInProgress) return;
+  const token = sessionStorage.getItem("token");
+  if (!token) return;
+
+  const payload = decodeTokenPayload(token);
+  if (!payload || !payload.exp) return;
+
+  const expiresAt = payload.exp * 1000; // convert to ms
+  const timeUntilExpiry = expiresAt - Date.now();
+
+  // Only renew if within the threshold window (but still valid)
+  if (timeUntilExpiry > TOKEN_RENEWAL_THRESHOLD || timeUntilExpiry <= 0) return;
+
+  renewalInProgress = true;
+  try {
+    const baseUrl = workingBaseUrl || API_BASE_URL;
+    const response = await fetch(`${baseUrl}/auth/renew-token`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.token) {
+        sessionStorage.setItem("token", data.token);
+        console.log('🔄 Token renewed silently');
+      }
+    }
+  } catch (err) {
+    // Silent failure — next API call will trigger 401 flow if token truly expired
+    console.warn('Token renewal failed silently:', err.message);
+  } finally {
+    renewalInProgress = false;
+  }
+};
+
+// Check for renewal every 5 minutes
+setInterval(tryRenewToken, 5 * 60 * 1000);
+// Also check on page visibility restore
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') tryRenewToken();
+  });
+}
+
 export const apiCall = async (endpoint, options = {}) => {
   const timeout = 30000; // 30 seconds timeout - increased to prevent "signal aborted" on slow operations like sending emails
 
@@ -71,6 +137,7 @@ export const apiCall = async (endpoint, options = {}) => {
 
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("user");
+        localStorage.removeItem("user"); // FIX #4: Clear localStorage too
 
         // Use window.location to force redirect and UI reset
         if (!window.location.pathname.includes('/login')) {
@@ -128,8 +195,10 @@ export const apiCall = async (endpoint, options = {}) => {
       error.message.includes('NetworkError') ||
       error.message.includes('ERR_CONNECTION_REFUSED');
 
-    if (isNetworkError && !workingBaseUrl) {
-      console.warn("⚠️ API connection failed, searching for backend fallbacks...");
+    // FIX #14: Only probe fallback ports in development mode
+    const isDev = import.meta.env.DEV;
+    if (isNetworkError && !workingBaseUrl && isDev) {
+      console.warn("⚠️ API connection failed, searching for backend fallbacks (dev mode)...");
 
       const fallbacks = [
         API_BASE_URL.replace(":5000", ":5001"),

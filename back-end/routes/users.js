@@ -507,12 +507,11 @@ router.get('/register-details/:email', async (req, res) => {
       });
     }
 
-    // Return user data without registration
+    // Return user data without registration — include all available fields
     console.log(`[register-details] Returning ${userSource} data for ${normalizedEmail}: ${user.fullName}`);
+    const userObj = user.toObject ? user.toObject() : user;
     res.json({
-      fullName: user.fullName,
-      email: user.email,
-      gender: user.gender,
+      ...userObj,
       badges: aggregatedBadges,
       otherDetails: {}
     });
