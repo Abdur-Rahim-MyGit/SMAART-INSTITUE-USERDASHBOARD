@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const CourseEnrollment = require('../models/CourseEnrollment');
 const { protect } = require('../middleware/auth');
 const { awardEarlyAchieverBadge } = require('../utils/badgeHelper');
@@ -375,5 +376,84 @@ router.post('/video-progress', async (req, res) => {
     }
 });
 
+
+// Update quiz/assessment progress
+router.post('/quiz-progress', async (req, res) => {
+    try {
+        const { studentId, courseCode, moduleId, dayId, quizId, score, totalPoints } = req.body;
+        const Course = require('../models/Course');
+        const { checkCourseCompletionBadges } = require('../utils/badgeUtils');
+
+        // Find course
+        const course = await Course.findOne({ courseCode });
+        if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
+
+        // Find or create enrollment
+        let enrollment = await CourseEnrollment.findOne({
+            student: studentId,
+            course: course._id
+        });
+
+        if (!enrollment) {
+            enrollment = new CourseEnrollment({
+                student: studentId,
+                course: course._id,
+                status: 'in_progress',
+                moduleProgress: []
+            });
+        }
+
+        // Get module doc
+        const moduleIndex = parseInt(moduleId) - 1;
+        const moduleDoc = course.modules[moduleIndex];
+        if (!moduleDoc) return res.status(404).json({ success: false, error: 'Module not found' });
+
+        // Find or create module progress
+        let modProgress = enrollment.moduleProgress.find(mp => mp.module.toString() === moduleDoc._id.toString());
+        if (!modProgress) {
+            enrollment.moduleProgress.push({
+                module: moduleDoc._id,
+                quizzesTaken: []
+            });
+            modProgress = enrollment.moduleProgress[enrollment.moduleProgress.length - 1];
+        }
+
+        if (!modProgress.quizzesTaken) modProgress.quizzesTaken = [];
+
+        // Add or update quiz record
+        // Note: For micro-assessments stored in Course model, we might not have a separate Quiz ID,
+        // so we can generate a consistent pseudo-ID or use the one provided by frontend.
+        const existingQuiz = modProgress.quizzesTaken.find(q => q.quizId && q.quizId.toString() === quizId);
+
+        if (existingQuiz) {
+            // Update existing attempt (keep highest score or just last attempt? Usually highest)
+            if (score > existingQuiz.score) {
+                existingQuiz.score = score;
+            }
+            // Always update these
+            existingQuiz.totalPoints = totalPoints;
+            existingQuiz.attempts = (existingQuiz.attempts || 0) + 1;
+            existingQuiz.completedAt = new Date();
+        } else {
+            // New attempt
+            modProgress.quizzesTaken.push({
+                quizId: quizId || new mongoose.Types.ObjectId(), // If no ID, generate one (though frontend should provide stable ID)
+                score: score,
+                totalPoints: totalPoints,
+                attempts: 1,
+                completedAt: new Date()
+            });
+        }
+
+        enrollment.lastAccessedAt = new Date();
+        await enrollment.save();
+
+        res.json({ success: true, data: enrollment });
+
+    } catch (err) {
+        console.error('Error updating quiz progress:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 module.exports = router;
