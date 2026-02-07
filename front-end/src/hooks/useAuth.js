@@ -12,7 +12,7 @@ export const useAuth = () => {
 
     useEffect(() => {
         try {
-            const userData = sessionStorage.getItem("user") || localStorage.getItem("user");
+            const userData = sessionStorage.getItem("user");
             if (userData) {
                 const parsedUser = JSON.parse(userData);
                 setUser(parsedUser);

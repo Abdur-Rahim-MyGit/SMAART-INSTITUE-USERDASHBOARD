@@ -21,7 +21,7 @@ const getUserId = () => {
   try {
     let userData = sessionStorage.getItem("user");
     if (!userData) {
-      userData = localStorage.getItem("user");
+      userData = null;
     }
     if (userData) {
       const user = JSON.parse(userData);
