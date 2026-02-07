@@ -133,15 +133,67 @@ courseEnrollmentSchema.pre('save', async function (next) {
     if (this.moduleProgress && this.moduleProgress.length > 0) {
       // Need to fetch the course to know total number of modules
       const Course = mongoose.model('Course');
-      const course = await Course.findById(this.course);
+
+      let course = null;
+      // Handle case where this.course is already populated
+      if (this.course && this.course.modules) {
+        course = this.course;
+      } else {
+        course = await Course.findById(this.course);
+      }
 
       if (course && course.modules && course.modules.length > 0) {
-        const completedModules = this.moduleProgress.filter(m => m.status === 'completed').length;
-        // Calculate progress based on TOTAL modules in the course, not just started ones
-        this.progress = Math.min(100, Math.round((completedModules / course.modules.length) * 100));
+        let totalExpectedDays = 0;
+        let completedDaysCount = 0;
+
+        course.modules.forEach(mod => {
+          // Denominator floor is 6 sessions per module (per UI framework)
+          const modExpected = Math.max(6, mod.days ? mod.days.length : 0);
+          totalExpectedDays += modExpected;
+
+          // Find matching moduleProgress
+          const mProg = this.moduleProgress.find(mp =>
+            mp.module.toString() === mod._id.toString()
+          );
+
+          if (mProg) {
+            // Use a Set to avoid double-counting the same day if both video and tasks are done
+            const completedInMod = new Set();
+
+            // From videos
+            if (mProg.videoProgress) {
+              mProg.videoProgress.forEach(vp => {
+                // dayId is 1-indexed from frontend
+                if (vp.isCompleted) completedInMod.add(vp.dayId);
+              });
+            }
+
+            // From tasks (completedTasks entries usually imply completion)
+            if (mProg.completedTasks) {
+              mProg.completedTasks.forEach(ct => {
+                completedInMod.add(ct.dayId);
+              });
+            }
+
+            // Update module status: If all real days are completed, mark as 'completed'
+            const realDaysCount = mod.days ? mod.days.length : 0;
+            if (realDaysCount > 0 && completedInMod.size >= realDaysCount) {
+              mProg.status = 'completed';
+            } else if (completedInMod.size > 0) {
+              mProg.status = 'in_progress';
+            }
+
+            completedDaysCount += completedInMod.size;
+          }
+        });
+
+        // Final progress = sum of completed days across all modules / sum of expected days (min 6 per mod)
+        this.progress = totalExpectedDays > 0
+          ? Math.min(100, Math.round((completedDaysCount / totalExpectedDays) * 100))
+          : 0;
       } else {
-        // Fallback if course lookup fails (use existing method but limit to 100)
-        this.progress = Math.min(100, this.calculateProgress());
+        // Log warning but don't fallback to flawed moduleProgress.length
+        console.warn(`[ProgressFix] Skipping progress update: Course ${this.course} not found or has no modules.`);
       }
     } else {
       this.progress = 0;

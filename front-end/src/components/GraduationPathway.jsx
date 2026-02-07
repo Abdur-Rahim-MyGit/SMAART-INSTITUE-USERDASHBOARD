@@ -48,48 +48,98 @@ const GraduationPathway = ({ onCourseClick }) => {
     return `Embark on an enriching learning journey with ${courseTitle}. This carefully designed course provides comprehensive knowledge, practical skills, and engaging content to help you achieve your educational goals and unlock new opportunities.`;
   };
 
+  // NEW: Fill placeholder days to ensure 6 sessions are always shown
+  const fillPlaceholderDays = (module, moduleNum) => {
+    const existingDaysCount = module.days ? module.days.length : 0;
+    if (existingDaysCount >= 6) return module.days || [];
+
+    const days = module.days ? [...module.days] : [];
+    for (let i = existingDaysCount + 1; i <= 6; i++) {
+        days.push({
+            id: i,
+            dayNumber: i,
+            title: `Session ${i} (Locked)`,
+            description: "Additional learning content coming soon.",
+            status: 'locked',
+            tasks: [],
+            isPlaceholder: true
+        });
+    }
+    return days;
+  };
+
   const [courses, setCourses] = useState([]);
   const [courseModules, setCourseModules] = useState({});
+  const [enrollments, setEnrollments] = useState({}); // Track user enrollments
   const [loading, setLoading] = useState(true);
   const [loadingModules, setLoadingModules] = useState({});
   const [error, setError] = useState(null);
 
-  // Fetch courses from database - NOW WITH FULL MODULE DATA
+  // Fetch courses and enrollments from database
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await coursesAPI.getAll();
-        const coursesData = response.data || response;
-        console.log('📚 Fetched courses from MongoDB:', coursesData);
-        console.log('📊 Number of courses:', coursesData.length);
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = localStorage.getItem('token');
+        const userId = user?.id || user?._id;
+
+        // Fetch courses
+        const coursesResponse = await coursesAPI.getAll();
+        const coursesData = coursesResponse.data || coursesResponse;
         
+        // Fetch enrollments if user is logged in
+        let enrollmentsData = [];
+        if (userId && token) {
+          const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+          const enrollResponse = await fetch(
+            `${API_BASE_URL}/course-enrollments/student/${userId}`,
+            {
+              headers: { 'Authorization': `Bearer ${token}` }
+            }
+          );
+          if (enrollResponse.ok) {
+            const resData = await enrollResponse.json();
+            enrollmentsData = resData.data || [];
+          }
+        }
+
+        const enrollMap = {};
+        enrollmentsData.forEach(e => {
+          const cid = e.course?._id || e.course;
+          enrollMap[cid] = e;
+        });
+        setEnrollments(enrollMap);
+
         if (coursesData.length > 0) {
-          // Extract modules directly from course data
           const modulesMap = {};
-          coursesData.forEach(course => {
+          coursesData.forEach((course, cIdx) => {
             const courseId = course._id || course.id;
             if (course.modules && course.modules.length > 0) {
-              modulesMap[courseId] = course.modules;
+              // Apply placeholder days to all modules for consistent 6-session UI
+              const formattedModules = course.modules.map((m, mIdx) => ({
+                 ...m,
+                 days: fillPlaceholderDays(m, mIdx + 1)
+              }));
+              modulesMap[courseId] = formattedModules;
             }
           });
           setCourseModules(modulesMap);
           
-          // Auto-expand first course
           const firstCourseId = coursesData[0]._id || coursesData[0].id;
           setExpandedUnits([firstCourseId]);
         }
         
         setCourses(Array.isArray(coursesData) ? coursesData : []);
       } catch (err) {
-        console.error('Error fetching courses:', err);
+        console.error('Error fetching data:', err);
         setError('Failed to load courses');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCourses();
+    fetchData();
   }, []);
 
   // Simplified - modules are now loaded with courses
@@ -162,11 +212,48 @@ const GraduationPathway = ({ onCourseClick }) => {
         const courseId = course._id || course.id;
         const isExpanded = expandedUnits.includes(courseId);
         const modules = courseModules[courseId] || [];
-        const completedModules = modules.filter(m => m.status === 'completed').length;
+        const enrollment = enrollments[courseId];
+
+        // NEW: Calculate progress based on days completed across modules
+        let totalDisplayDays = 0;
+        let completedDisplayDays = 0;
+
+        modules.forEach((mod, mIdx) => {
+          // Denominator matches UI count (min 6)
+          const modTotalDays = Math.max(6, mod.days?.length || 0);
+          totalDisplayDays += modTotalDays;
+
+          const modProgress = enrollment?.moduleProgress?.find(mp => 
+            mp.module === mod._id || mp.module?._id === mod._id
+          );
+
+          if (mod.days) {
+            mod.days.forEach((day, dIdx) => {
+              if (day.isPlaceholder) return; // Cannot complete placeholders
+              const dId = day.dayNumber || dIdx + 1;
+              const isVidDone = modProgress?.videoProgress?.some(vp => vp.dayId === dId && vp.isCompleted);
+              const isTaskDone = modProgress?.completedTasks?.some(ct => ct.dayId === dId);
+              
+              const hasTasks = day.tasks?.length > 0;
+              const taskCondition = hasTasks ? isTaskDone : true;
+              
+              if (isVidDone && taskCondition) {
+                completedDisplayDays++;
+              }
+            });
+          }
+        });
+
+        const progressPercent = totalDisplayDays > 0 ? Math.round((completedDisplayDays / totalDisplayDays) * 100) : 0;
+        const isCompleted = progressPercent === 100 && totalDisplayDays > 0;
+        const isInProgress = (enrollment?.progress || progressPercent) > 0 || courseIdx === 0;
+        const completedModules = modules.filter((mod, mIdx) => {
+            const modProgress = enrollment?.moduleProgress?.find(mp => 
+                mp.module === mod._id || mp.module?._id === mod._id
+            );
+            return modProgress?.status === 'completed';
+        }).length;
         const totalModules = modules.length;
-        const progressPercent = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
-        const isCompleted = completedModules === totalModules && totalModules > 0;
-        const isInProgress = completedModules > 0 || courseIdx === 0;
 
         return (
           <motion.div 
@@ -270,13 +357,28 @@ const GraduationPathway = ({ onCourseClick }) => {
                     {!loadingModules[courseId] && modules.length > 0 && (
                       <div className="space-y-3">
                         {modules.map((module, moduleIdx) => {
-                          const isModuleActive = module.status === 'active' || module.status === 'completed' || moduleIdx === 0;
-                          const isModuleCompleted = module.status === 'completed';
-                          const isModuleInProgress = module.status === 'active' || (moduleIdx === 0 && !isModuleCompleted);
+                          const modProgress = enrollment?.moduleProgress?.find(mp => 
+                            mp.module === module._id || mp.module?._id === module._id
+                          );
+                          
+                          const isModuleCompleted = modProgress?.status === 'completed';
+                          const isModuleInProgress = (modProgress?.status === 'in_progress' || modProgress?.status === 'not_started') && (moduleIdx === 0 || enrollment?.moduleProgress?.[moduleIdx-1]?.status === 'completed');
+                          const isModuleActive = isModuleCompleted || isModuleInProgress;
+                          
                           const days = module.days || [];
                           const moduleKey = `${courseId}-${moduleIdx}`;
                           const isExpanded = expandedModules.includes(moduleKey);
-                          const completedDays = days.filter(d => d.status === 'completed').length;
+                          
+                          // Use the same 1-based logic for day completion
+                          let completedDays = 0;
+                          days.forEach((day, dIdx) => {
+                            const dId = day.dayNumber || dIdx + 1;
+                            const isVidDone = modProgress?.videoProgress?.some(vp => vp.dayId === dId && vp.isCompleted);
+                            const isTaskDone = modProgress?.completedTasks?.some(ct => ct.dayId === dId);
+                            const hasTasks = day.tasks?.length > 0;
+                            const taskCondition = hasTasks ? isTaskDone : true;
+                            if (isVidDone && taskCondition) completedDays++;
+                          });
 
                           return (
                             <motion.div
@@ -339,7 +441,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                                       />
                                     </svg>
                                     <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#002147]">
-                                      {days.length > 0 ? Math.round((completedDays / days.length) * 100) : 0}%
+                                      {Math.round((completedDays / Math.max(6, days.length)) * 100)}%
                                     </span>
                                   </div>
 
@@ -365,10 +467,19 @@ const GraduationPathway = ({ onCourseClick }) => {
                                   >
                                     <div className="p-4">
                                       <div className="flex flex-wrap gap-2">
-                                        {days.map((day, dayIdx) => {
-                                          const isDayActive = dayIdx === 0 || days[dayIdx - 1]?.status === 'completed';
-                                          const isDayCompleted = day.status === 'completed';
-                                          const isDayInProgress = day.status === 'active' || (dayIdx === 0 && !isDayCompleted);
+                                          {days.map((day, dayIdx) => {
+                                            const dayNumber = day.dayNumber || dayIdx + 1;
+                                            const isVidDone = modProgress?.videoProgress?.some(vp => vp.dayId === dayNumber && vp.isCompleted);
+                                            const isTaskDone = modProgress?.completedTasks?.some(ct => ct.dayId === dayNumber);
+                                            const hasTasks = day.tasks?.length > 0;
+                                            const taskCondition = hasTasks ? isTaskDone : true;
+                                            
+                                            const isDayCompleted = isVidDone && taskCondition;
+                                            const isDayActive = dayIdx === 0 || (prevDayStatus); // Minimal unlock logic for UI
+                                            const isDayInProgress = !isDayCompleted && isDayActive;
+                                            
+                                            // Helper for next day's unlock
+                                            var prevDayStatus = isDayCompleted; 
 
                                           return (
                                             <motion.button
