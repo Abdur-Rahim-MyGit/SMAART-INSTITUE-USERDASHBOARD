@@ -125,7 +125,7 @@ const daySchema = new mongoose.Schema({
     title: String,
     type: {
       type: String,
-      enum: ['video', 'quiz', 'text', 'assignment', 'reflection', 'flashcards', 'assessment']
+      enum: ['video', 'quiz', 'text', 'assignment', 'reflection', 'flashcards', 'assessment', 'submission', 'flashcard']
     },
     content: mongoose.Schema.Types.Mixed,
     isRequired: { type: Boolean, default: true }
@@ -156,6 +156,14 @@ const moduleSchema = new mongoose.Schema({
   quizzes: [quizSchema],
   reflectionQuestions: [reflectionQuestionSchema],
   handouts: [handoutSchema],
+  handouts: [handoutSchema],
+  microAssessments: [{
+    moduleId: Number,
+    dayId: Number,
+    stepId: { type: Number, default: 2 }, // Default to step 2 (after video)
+    title: String,
+    questions: [quizSchema]
+  }],
   passingCriteria: {
     quizScore: { type: Number, default: 60 }, // percentage
     requiredVideos: { type: Boolean, default: true },
