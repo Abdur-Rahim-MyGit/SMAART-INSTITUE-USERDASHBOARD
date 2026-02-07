@@ -120,8 +120,29 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
             return;
         }
 
-        if (newPassword.length < 6) {
-            toast.error("Password must be at least 6 characters");
+        // SECURITY FIX #8: Match backend password policy (8+ chars with complexity)
+        if (newPassword.length < 8) {
+            toast.error("Password must be at least 8 characters");
+            return;
+        }
+
+        if (!/[A-Z]/.test(newPassword)) {
+            toast.error("Password must contain at least one uppercase letter");
+            return;
+        }
+
+        if (!/[a-z]/.test(newPassword)) {
+            toast.error("Password must contain at least one lowercase letter");
+            return;
+        }
+
+        if (!/[0-9]/.test(newPassword)) {
+            toast.error("Password must contain at least one number");
+            return;
+        }
+
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(newPassword)) {
+            toast.error("Password must contain at least one special character");
             return;
         }
 
@@ -307,6 +328,31 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                             className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-teal focus:ring-2 focus:ring-teal/30 transition-all outline-none"
                                         />
                                     </div>
+                                    {/* SECURITY FIX #8: Password requirements display */}
+                                    {newPassword.length > 0 && (
+                                        <div className="space-y-1 text-xs">
+                                            <p className={newPassword.length >= 8 ? 'text-green-400' : 'text-white/40'}>
+                                                {newPassword.length >= 8 ? '✓' : '○'} 8+ characters
+                                            </p>
+                                            <p className={/[A-Z]/.test(newPassword) ? 'text-green-400' : 'text-white/40'}>
+                                                {/[A-Z]/.test(newPassword) ? '✓' : '○'} Uppercase letter
+                                            </p>
+                                            <p className={/[a-z]/.test(newPassword) ? 'text-green-400' : 'text-white/40'}>
+                                                {/[a-z]/.test(newPassword) ? '✓' : '○'} Lowercase letter
+                                            </p>
+                                            <p className={/[0-9]/.test(newPassword) ? 'text-green-400' : 'text-white/40'}>
+                                                {/[0-9]/.test(newPassword) ? '✓' : '○'} Number
+                                            </p>
+                                            <p className={/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? 'text-green-400' : 'text-white/40'}>
+                                                {/[!@#$%^&*(),.?":{}|<>]/.test(newPassword) ? '✓' : '○'} Special character
+                                            </p>
+                                            {confirmPassword.length > 0 && (
+                                                <p className={newPassword === confirmPassword ? 'text-green-400' : 'text-red-400'}>
+                                                    {newPassword === confirmPassword ? '✓' : '✗'} Passwords match
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
                                     <Button
                                         type="submit"
                                         className="w-full bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 text-white font-bold py-6 rounded-xl"

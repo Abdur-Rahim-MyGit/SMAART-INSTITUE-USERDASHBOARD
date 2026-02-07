@@ -11,6 +11,7 @@ const { notifyWelcome } = require('../services/notificationService');
 // SECURITY: Import rate limiters
 const { loginLimiter, otpLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
 const { body, validationResult } = require('express-validator');
+const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -61,10 +62,197 @@ const checkAccountLock = (user) => {
   return { isLocked: false };
 };
 
-// Register
-router.post('/register', async (req, res) => {
+// === SECURITY FIX #6: Real Signup OTP Flow ===
+
+// Send OTP for signup email verification
+router.post('/send-signup-otp', passwordResetLimiter, async (req, res) => {
   try {
+    const { email, fullName } = req.body;
+
+    if (!email || !fullName) {
+      return res.status(400).json({ error: 'Email and full name are required' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({ error: 'Please provide a valid email address' });
+    }
+
+    // Check if email already registered across all user collections
+    const Student = require('../models/Student');
+    const existingStudent = await Student.findOne({ email: normalizedEmail });
+    const existingUser = await User.findOne({ email: normalizedEmail });
+    const existingReg = await Registration.findOne({ email: normalizedEmail });
+
+    if (existingStudent || existingUser || existingReg) {
+      return res.status(400).json({ error: 'An account with this email already exists. Please login instead.' });
+    }
+
+    // Clean up any previous signup OTPs for this email
+    await LoginOtp.deleteMany({ email: normalizedEmail, flowType: 'account-verify' });
+
+    // Generate OTP and temp token
+    const otp = generateOTP();
+    const tempToken = crypto.randomBytes(32).toString('hex');
+
+    // Save OTP record
+    const otpRecord = new LoginOtp({
+      email: normalizedEmail,
+      otp,
+      tempToken,
+      userData: { email: normalizedEmail, fullName: fullName.trim() },
+      flowType: 'account-verify',
+      maxAttempts: 5,
+    });
+    await otpRecord.save();
+
+    // Send OTP email
+    await sendOTPEmail(normalizedEmail, otp, fullName.trim());
+    console.log(`📧 Signup OTP sent to ${normalizedEmail}`);
+
+    res.json({
+      success: true,
+      message: 'OTP sent to your email',
+      tempToken,
+    });
+  } catch (err) {
+    console.error('[Send Signup OTP] Error:', err.message);
+    res.status(500).json({ error: 'Failed to send OTP. Please try again.' });
+  }
+});
+
+// Verify signup OTP
+router.post('/verify-signup-otp', otpLimiter, async (req, res) => {
+  try {
+    const { tempToken, otp } = req.body;
+
+    if (!tempToken || !otp) {
+      return res.status(400).json({ error: 'Token and OTP are required' });
+    }
+
+    const otpRecord = await LoginOtp.findOne({
+      tempToken,
+      flowType: 'account-verify',
+      isUsed: false,
+    });
+
+    if (!otpRecord) {
+      return res.status(400).json({ error: 'OTP has expired or is invalid. Please request a new one.' });
+    }
+
+    // Check max attempts
+    if (otpRecord.attempts >= otpRecord.maxAttempts) {
+      await LoginOtp.deleteOne({ _id: otpRecord._id });
+      return res.status(400).json({ error: 'Maximum attempts exceeded. Please request a new OTP.' });
+    }
+
+    // Verify OTP
+    const isValid = await otpRecord.verifyOtp(otp);
+    if (!isValid) {
+      otpRecord.attempts += 1;
+      await otpRecord.save();
+      const remaining = otpRecord.maxAttempts - otpRecord.attempts;
+      return res.status(400).json({
+        error: `Invalid OTP. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`,
+      });
+    }
+
+    // Mark as used
+    otpRecord.isUsed = true;
+    await otpRecord.save();
+
+    res.json({
+      success: true,
+      message: 'Email verified successfully',
+      email: otpRecord.userData.email,
+      fullName: otpRecord.userData.fullName,
+    });
+  } catch (err) {
+    console.error('[Verify Signup OTP] Error:', err.message);
+    res.status(500).json({ error: 'Failed to verify OTP. Please try again.' });
+  }
+});
+
+// Resend signup OTP
+router.post('/resend-signup-otp', passwordResetLimiter, async (req, res) => {
+  try {
+    const { tempToken } = req.body;
+
+    if (!tempToken) {
+      return res.status(400).json({ error: 'Token is required' });
+    }
+
+    // Find existing OTP record
+    const existingOtp = await LoginOtp.findOne({
+      tempToken,
+      flowType: 'account-verify',
+    });
+
+    if (!existingOtp) {
+      return res.status(400).json({ error: 'Session expired. Please start over.' });
+    }
+
+    const { email, fullName } = existingOtp.userData;
+
+    // Delete old record
+    await LoginOtp.deleteOne({ _id: existingOtp._id });
+
+    // Generate new OTP with same temp token
+    const otp = generateOTP();
+    const newTempToken = crypto.randomBytes(32).toString('hex');
+
+    const otpRecord = new LoginOtp({
+      email,
+      otp,
+      tempToken: newTempToken,
+      userData: { email, fullName },
+      flowType: 'account-verify',
+      maxAttempts: 5,
+    });
+    await otpRecord.save();
+
+    await sendOTPEmail(email, otp, fullName);
+    console.log(`📧 Signup OTP resent to ${email}`);
+
+    res.json({
+      success: true,
+      message: 'New OTP sent to your email',
+      tempToken: newTempToken,
+    });
+  } catch (err) {
+    console.error('[Resend Signup OTP] Error:', err.message);
+    res.status(500).json({ error: 'Failed to resend OTP. Please try again.' });
+  }
+});
+
+// Register - SECURITY FIX #15: Added input validation
+router.post('/register',
+  [
+    body('fullName').notEmpty().withMessage('Full name is required').trim().escape(),
+    body('email').isEmail().withMessage('Please provide a valid email').normalizeEmail(),
+    body('mobileNumber').optional().matches(/^[0-9]{10}$/).withMessage('Please provide a valid 10-digit mobile number'),
+    body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+    body('institution').optional().trim().escape(),
+  ],
+  async (req, res) => {
+  try {
+    // SECURITY FIX #15: Check validation results
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
     const { fullName, email, mobileNumber, password, institution } = req.body;
+
+    // SECURITY FIX #8: Validate password policy on registration
+    const policyCheck = validatePasswordPolicy(password);
+    if (!policyCheck.isValid) {
+      return res.status(400).json({
+        error: 'Password does not meet requirements',
+        requirements: policyCheck.errors
+      });
+    }
 
     // Check if user exists
     let registration = await Registration.findOne({ email });
@@ -98,10 +286,11 @@ router.post('/register', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // Set HttpOnly Cookie
+    // Set HttpOnly Cookie - SECURITY FIX #7: Added sameSite
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
 
@@ -126,7 +315,7 @@ router.post('/login',
   [
     // Relaxed validation to allow Student IDs (alphanumeric)
     body('email').notEmpty().withMessage('Email or ID is required'),
-    body('password').optional().isString().trim(), // Optional because of first-time login bypass, but if present must be string
+    body('password').notEmpty().withMessage('Password is required').isString().trim(),
   ],
   async (req, res) => {
     // Check validation results
@@ -263,23 +452,20 @@ router.post('/login',
         return res.status(400).json({ error: 'Invalid credentials or user not found in selected institution' });
       }
 
-      // Check password
-      // Check password
-      // Allow proceeding if password is not set BUT user must change password (first login flow)
-      const isFirstTimeLogin = userType === 'student' && user.mustChangePassword;
-
-      if (!isFirstTimeLogin) {
-        if (!user.password) {
-          return res.status(400).json({ error: 'Password not set for this account' });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-          return res.status(400).json({ error: 'Invalid credentials' });
-        }
+      // === SECURITY FIX #1: Check account status before allowing login ===
+      if (user.status && !['active'].includes(user.status)) {
+        const statusMessages = {
+          pending: 'Your account is pending approval. Please contact your administrator.',
+          inactive: 'Your account has been deactivated. Please contact your administrator.',
+          suspended: 'Your account has been suspended. Please contact your administrator.',
+          graduated: 'Your account has been archived. Please contact your administrator.'
+        };
+        return res.status(403).json({
+          error: statusMessages[user.status] || `Account status '${user.status}' does not allow login. Please contact your administrator.`
+        });
       }
 
-      // === NEW: Check account lock status for students ===
+      // === SECURITY FIX #12: Check account lock BEFORE password verification ===
       if (userType === 'student') {
         const lockStatus = checkAccountLock(user);
         if (lockStatus.isLocked) {
@@ -289,6 +475,36 @@ router.post('/login',
             lockedUntil: lockStatus.lockedUntil,
             isLocked: true
           });
+        }
+      }
+
+      // Check password
+      // === SECURITY FIX #2: Require password even for first-time login students ===
+      const isFirstTimeLogin = userType === 'student' && user.mustChangePassword;
+
+      if (isFirstTimeLogin) {
+        // First-time students must still verify their default password
+        if (!password) {
+          return res.status(400).json({ error: 'Password is required. Please enter your default password.' });
+        }
+        if (user.password) {
+          const isMatch = await bcrypt.compare(password, user.password);
+          if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid default password. Please contact your administrator.' });
+          }
+        }
+      } else {
+        if (!user.password) {
+          return res.status(400).json({ error: 'Password not set for this account' });
+        }
+
+        if (!password) {
+          return res.status(400).json({ error: 'Password is required' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return res.status(400).json({ error: 'Invalid credentials' });
         }
       }
 
@@ -643,27 +859,32 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     else if (user.userType === 'registration') userModelName = 'Registration';
 
     const UserModel = require(`../models/${userModelName}`);
-    // console.log(`[Auth] Checking session for user ${user._id} type ${userModelName}`);
     const freshUser = await UserModel.findById(user._id);
 
-    // Check existing session BEFORE marking OTP as used
-    // Check existing session BEFORE marking OTP as used
-    // AUTO-LOGOUT IMPLEMENTATION:
-    // We detected an active session, but we will proceed to overwrite it (forcing logout on other device).
-    // Check existing session BEFORE marking OTP as used
-    // If user is already logged in and didn't request force logout, return conflict
+    // === SINGLE SESSION ENFORCEMENT ===
+    // If there's an existing session, check if it's actually still valid
+    // Sessions older than 24h are stale (JWT has expired) - auto-clear them
     if (freshUser.currentSessionId && !forceLogout) {
-      return res.status(409).json({
-        error: 'You are already logged in on another device.',
-        requiresForceLogout: true,
-        message: 'You are already logged in on another device. Do you want to logout from the other device and login here?'
-      });
+      const lastLogin = freshUser.lastLogin || freshUser.updatedAt || freshUser.createdAt;
+      const sessionAge = Date.now() - new Date(lastLogin).getTime();
+      const JWT_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+      if (sessionAge >= JWT_EXPIRY_MS) {
+        // Stale session — old JWT has expired, auto-clear and let login proceed
+        console.log(`[Auth] Stale session detected for user ${user._id} (${Math.round(sessionAge / 3600000)}h old). Auto-clearing.`);
+        await UserModel.findByIdAndUpdate(user._id, { currentSessionId: null });
+      } else {
+        // Session is still potentially active — ask user to force logout
+        return res.status(409).json({
+          error: 'You are already logged in on another device.',
+          requiresForceLogout: true,
+          message: 'You are already logged in on another device. Do you want to logout from the other device and login here?'
+        });
+      }
     }
 
-    if (freshUser.currentSessionId) {
-      console.log(`[Auth] Auto-force logging out previous session for user ${user._id}`);
-      // effectively we just fall through to the next steps which generate a NEW session ID
-      // and update the user record, invalidating the old session.
+    if (freshUser.currentSessionId && forceLogout) {
+      console.log(`[Auth] Force logging out previous session for user ${user._id}`);
     }
 
     // Valid Login or Force Logout - NOW mark as used
@@ -681,9 +902,10 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     // Generate NEW Session ID
     const sessionId = require('crypto').randomUUID();
 
-    // Update user with new session ID
+    // Update user with new session ID and lastLogin timestamp
     await UserModel.findByIdAndUpdate(user._id, {
-      currentSessionId: sessionId
+      currentSessionId: sessionId,
+      lastLogin: new Date()
     });
 
     // Re-issue JWT token with sessionId included
@@ -712,10 +934,11 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     // Delete OTP record
     await LoginOtp.deleteOne({ _id: loginOtp._id });
 
-    // Set HttpOnly Cookie
+    // Set HttpOnly Cookie - SECURITY FIX #7: Added sameSite
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
 
@@ -1011,31 +1234,38 @@ router.post('/first-login-change-password', async (req, res) => {
     if (existingRegistration) {
       console.log(`[Auth] Student ${student.email} already registered - denying password change, redirecting to dashboard`);
 
+      // Generate session ID for single-session enforcement
+      const sessionId = require('crypto').randomUUID();
+
       // Update student record to mark as not first login
       await Student.findByIdAndUpdate(student._id, {
         mustChangePassword: false,
-        isFirstLogin: false
+        isFirstLogin: false,
+        currentSessionId: sessionId,
+        lastLogin: new Date()
       });
 
       // Delete the temp token
       await LoginOtp.deleteOne({ _id: loginOtp._id });
 
-      // Create JWT token and redirect to dashboard - SECURITY: Enforce environment secret and reduce expiry
+      // Create JWT token and redirect to dashboard
       const token = jwt.sign(
         {
           userId: student._id,
           email: student.email,
           userType: 'student',
-          role: 'student'
+          role: 'student',
+          sessionId: sessionId
         },
         process.env.JWT_SECRET,
         { expiresIn: '24h' }
       );
 
-      // Set HttpOnly Cookie
+      // Set HttpOnly Cookie - SECURITY FIX #7: Added sameSite
       res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
       });
 
@@ -1062,23 +1292,28 @@ router.post('/first-login-change-password', async (req, res) => {
     }
 
     // Update student password and first login flags
+    // Generate session ID for single-session enforcement
+    const sessionId = require('crypto').randomUUID();
+
     student.password = newPassword; // Will be hashed by pre-save hook
     student.mustChangePassword = false;
     student.isFirstLogin = false;
     student.passwordChangedAt = new Date();
     student.lastLogin = new Date();
+    student.currentSessionId = sessionId;
     await student.save();
 
     // Delete the temp token
     await LoginOtp.deleteOne({ _id: loginOtp._id });
 
-    // Create JWT token - SECURITY: Enforce environment secret and reduce expiry
+    // Create JWT token with session ID
     const token = jwt.sign(
       {
         userId: student._id,
         email: student.email,
         userType: 'student',
-        role: 'student'
+        role: 'student',
+        sessionId: sessionId
       },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
@@ -1107,10 +1342,11 @@ router.post('/first-login-change-password', async (req, res) => {
 
     console.log(`[Auth] Student ${student.email} successfully changed password on first login`);
 
-    // Set HttpOnly Cookie
+    // Set HttpOnly Cookie - SECURITY FIX #7: Added sameSite
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
 
@@ -1125,16 +1361,67 @@ router.post('/first-login-change-password', async (req, res) => {
   }
 });
 
-router.post('/logout', (req, res) => {
+// SECURITY FIX #10: Token renewal - issue a fresh JWT if current is still valid
+router.post('/renew-token', protect, async (req, res) => {
+  try {
+    const user = req.user;
+
+    // Issue a fresh token with the same claims, preserving sessionId
+    const payload = {
+      userId: user._id,
+      email: user.email,
+    };
+    if (user.role) payload.role = user.role;
+    if (user.userType) payload.userType = user.userType;
+    // CRITICAL: Preserve sessionId for single-session enforcement
+    if (user.currentSessionId) payload.sessionId = user.currentSessionId;
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+    // Set refreshed HttpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.json({ success: true, token });
+  } catch (err) {
+    console.error('[Token Renewal] Error:', err.message);
+    res.status(500).json({ error: 'Failed to renew token' });
+  }
+});
+
+// SECURITY FIX #16: Logout now invalidates server-side session
+router.post('/logout', protect, async (req, res) => {
+  try {
+    // Clear the server-side session to invalidate the JWT
+    if (req.user && req.user._id) {
+      const Student = require('../models/Student');
+      const Teacher = require('../models/Teacher');
+      const userType = req.user.role || 'user';
+
+      let UserModel = User;
+      if (userType === 'student') UserModel = Student;
+      else if (userType === 'teacher') UserModel = Teacher;
+
+      await UserModel.findByIdAndUpdate(req.user._id, { currentSessionId: null });
+    }
+  } catch (err) {
+    console.error('Error clearing session on logout:', err);
+    // Continue with cookie clearing even if session clear fails
+  }
+
   res.cookie('token', 'none', {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
+    sameSite: 'strict',
   });
   res.status(200).json({ success: true, message: 'Logged out successfully' });
 });
 
 // Check Session (for frontend to validate cookie)
-const { protect } = require('../middleware/auth');
 router.get('/me', protect, async (req, res) => {
   res.status(200).json({
     success: true,

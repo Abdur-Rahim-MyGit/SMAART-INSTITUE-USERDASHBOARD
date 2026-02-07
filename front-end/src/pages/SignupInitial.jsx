@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { apiCall } from "@/services/api";
 
 const SignupInitial = () => {
   const navigate = useNavigate();
@@ -35,17 +36,27 @@ const SignupInitial = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // SECURITY FIX #6: Call real backend OTP endpoint
+      const data = await apiCall('/auth/send-signup-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), fullName: fullName.trim() }),
+      });
+
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
 
       // Store in sessionStorage for next step
-      sessionStorage.setItem("signupFullName", fullName);
-      sessionStorage.setItem("signupEmail", email);
+      sessionStorage.setItem("signupFullName", fullName.trim());
+      sessionStorage.setItem("signupEmail", email.trim());
+      sessionStorage.setItem("signupTempToken", data.tempToken);
 
-      toast.success("Proceeding to registration details!");
-      navigate("/signup");
+      toast.success("OTP sent to your email!");
+      navigate("/verify-otp");
     } catch (error) {
-      toast.error("Failed to proceed. Please try again.");
+      toast.error(error.message || "Failed to send OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }

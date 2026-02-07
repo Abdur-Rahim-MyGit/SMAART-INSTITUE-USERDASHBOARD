@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { apiCall } from "@/services/api";
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
@@ -13,16 +14,19 @@ const VerifyOTP = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
   const [email, setEmail] = useState("");
+  const [tempToken, setTempToken] = useState("");
 
   useEffect(() => {
-    // Get email from sessionStorage
+    // Get email and tempToken from sessionStorage
     const storedEmail = sessionStorage.getItem("signupEmail");
-    if (!storedEmail) {
+    const storedToken = sessionStorage.getItem("signupTempToken");
+    if (!storedEmail || !storedToken) {
       toast.error("Please start from signup");
       navigate("/signup-initial");
       return;
     }
     setEmail(storedEmail);
+    setTempToken(storedToken);
 
     // Countdown timer
     const timer = setInterval(() => {
@@ -65,24 +69,28 @@ const VerifyOTP = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call to verify OTP
-      // In real app, send OTP to backend for verification
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // SECURITY FIX #6: Call real backend OTP verification
+      const data = await apiCall('/auth/verify-signup-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tempToken, otp }),
+      });
 
-      // For demo: accept any 6-digit code
-      if (/^\d{6}$/.test(otp)) {
-        toast.success("OTP verified successfully!");
-        
-        // Store verification status
-        sessionStorage.setItem("otpVerified", "true");
-        
-        // Redirect to comprehensive signup
-        navigate("/signup");
-      } else {
-        toast.error("Invalid OTP. Please try again.");
+      if (data.error) {
+        toast.error(data.error);
+        return;
       }
+
+      toast.success("OTP verified successfully!");
+      
+      // Store verification status
+      sessionStorage.setItem("otpVerified", "true");
+      sessionStorage.removeItem("signupTempToken");
+      
+      // Redirect to comprehensive signup
+      navigate("/signup");
     } catch (error) {
-      toast.error("Failed to verify OTP. Please try again.");
+      toast.error(error.message || "Failed to verify OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -91,12 +99,29 @@ const VerifyOTP = () => {
   const handleResendOTP = async () => {
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // SECURITY FIX #6: Call real backend resend endpoint
+      const data = await apiCall('/auth/resend-signup-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tempToken }),
+      });
+
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      // Update tempToken (backend issues a new one on resend)
+      if (data.tempToken) {
+        setTempToken(data.tempToken);
+        sessionStorage.setItem("signupTempToken", data.tempToken);
+      }
+
       toast.success("OTP resent to your email!");
       setOtp("");
       setTimeLeft(300);
     } catch (error) {
-      toast.error("Failed to resend OTP");
+      toast.error(error.message || "Failed to resend OTP");
     } finally {
       setIsLoading(false);
     }
@@ -105,6 +130,7 @@ const VerifyOTP = () => {
   const handleGoBack = () => {
     sessionStorage.removeItem("signupEmail");
     sessionStorage.removeItem("signupFullName");
+    sessionStorage.removeItem("signupTempToken");
     navigate("/signup-initial");
   };
 
