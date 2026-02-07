@@ -3,12 +3,12 @@ import { toast } from "sonner";
 
 // Quotient information with full names and descriptions
 const quotientInfo = {
-    CRQ: { name: 'Cognitive Reasoning', fullName: 'Cognitive Reasoning Quotient', desc: 'Critical thinking & logical reasoning' },
-    SRQ: { name: 'Self-regulation & Drive', fullName: 'Self-regulation & Drive Quotient', desc: 'Motivation, resilience & emotional control' },
-    LQ: { name: 'Learning Agility', fullName: 'Learning Agility Quotient', desc: 'Adaptability & continuous learning' },
-    SIQ: { name: 'Social Interaction', fullName: 'Social Interaction Quotient', desc: 'Collaboration, empathy & communication' },
-    PEQ: { name: 'Professional Execution', fullName: 'Professional Execution Quotient', desc: 'Work ethic, reliability & delivery' },
-    DAQ: { name: 'Digital & AI Literacy', fullName: 'Digital & AI Literacy Quotient', desc: 'Tech proficiency & AI readiness' }
+    CRQ: { name: 'Cognitive Readiness', fullName: 'Cognitive Readiness Quotient', desc: 'Critical thinking & problem solving' },
+    SRQ: { name: 'Social Readiness', fullName: 'Social Readiness Quotient', desc: 'Interpersonal & communication skills' },
+    LQ: { name: 'Learning Quotient', fullName: 'Learning Quotient', desc: 'Adaptability & knowledge acquisition' },
+    SIQ: { name: 'Self-Identity', fullName: 'Self-Identity Quotient', desc: 'Self-awareness & personal values' },
+    PEQ: { name: 'Physical & Emotional', fullName: 'Physical & Emotional Quotient', desc: 'Wellness & emotional intelligence' },
+    DAQ: { name: 'Digital Age', fullName: 'Digital Age Quotient', desc: 'Tech literacy & digital fluency' }
 };
 
 // Helper: Get score color based on percentage
@@ -31,11 +31,11 @@ const getFeedback = (quotient, level) => {
             Emerging: "Foundational reasoning skills are present but require significant nurturing. You may rely more on intuition than logic. Structured exercises in logic and pattern recognition will be very beneficial."
         },
         SRQ: {
-            Advanced: "Exhibits outstanding emotional control and drive. You stay calm under extreme pressure and are self-motivated to a rarely seen degree. You are a natural anchor for others during turbulent times.",
-            Strong: "Very good self-regualtion and motivation. You bounce back from setbacks quickly and generally maintain focus on your goals. Occasional high-stress situations may still test you, but you handle them well.",
-            Progressing: "You are learning to manage your emotions and drive. While you have good days, stress can sometimes derail your focus. Building consistent daily habits will help stabilize your performance.",
-            Developing: "You struggle somewhat with self-motivation or emotional regulation. Setbacks might discourage you easily. Focus on small wins to build confidence and resilience.",
-            Emerging: "Significant challenges with motivation or emotional control detected. You may often feel overwhelmed. Priority should be placed on stress-management techniques and setting very achievable micro-goals."
+            Advanced: "Masterful social intelligence. You read rooms instantly, empathize deeply, and communicate with high impact. You can build consensus and lead diverse groups effortlessly.",
+            Strong: "Strong collaborator and communicator. You work well in team settings and can resolve standard conflicts. You are generally liked and trusted by peers.",
+            Progressing: "You are developing your social radar. You communicate clearly but may miss subtle non-verbal cues. Practice active listening to deepen your connections.",
+            Developing: "Social situations may drain you or feel confusing. You might prefer solitary work. Developing a few key communication scripts can help you navigate teamwork more comfortably.",
+            Emerging: "Social interaction is a significant challenge. You may struggle to understand others' perspectives. tailored coaching in communication and empathy is recommended."
         },
         LQ: {
             Advanced: "A voracious and agile learner. You adapt to new information instantly and seek out knowledge proactively. Your ability to unlearn and relearn is a major competitive advantage.",
@@ -45,18 +45,18 @@ const getFeedback = (quotient, level) => {
             Emerging: "You may be resistant to new learning or change. This rigidity can hinder growth. Focus on curiosity and asking 'why' to spark the learning process."
         },
         SIQ: {
-            Advanced: "Masterful social intelligence. You read rooms instantly, empathize deeply, and communicate with high impact. You can build consensus and lead diverse groups effortlessly.",
-            Strong: "Strong collaborator and communicator. You work well in team settings and can resolve standard conflicts. You are generally liked and trusted by peers.",
-            Progressing: "You are developing your social radar. You communicate clearly but may miss subtle non-verbal cues. Practice active listening to deepen your connections.",
-            Developing: "Social situations may drain you or feel confusing. You might prefer solitary work. Developing a few key communication scripts can help you navigate teamwork more comfortably.",
-            Emerging: "Social interaction is a significant challenge. You may struggle to understand others' perspectives. tailored coaching in communication and empathy is recommended."
+            Advanced: "Exceptional self-awareness and alignment with personal values. You have a very clear sense of purpose and identity, allowing you to make confident, values-based decisions.",
+            Strong: "Solid understanding of your personal values and identity. You generally act in alignment with your beliefs and show healthy self-reflection.",
+            Progressing: "You are developing a clearer sense of self. You may occasionally feel conflicted between your actions and values. Spend time reflecting on what truly matters to you.",
+            Developing: "Your sense of personal identity is still forming. You may rely on external validation rather than internal values. Exploration of personal values would be beneficial.",
+            Emerging: "Significant uncertainty regarding personal values and identity. You may feel disconnected from your purpose. Guidance in self-discovery and value-setting is recommended."
         },
         PEQ: {
-            Advanced: "The epitome of reliability and professional excellence. You deliver high-quality work consistently and ethically. Your reputation is likely one of your strongest assets.",
-            Strong: "Highly reliable and professional. You meet deadlines and maintain good standards of quality. You are a dependable team member who takes ownership of tasks.",
-            Progressing: "You are building your professional identity. You usually deliver, but consistency might vary. Focus on time management and attention to detail to level up.",
-            Developing: "You are still learning professional norms. Deadlines or quality standards might occasionally slip. mentorship on workplace expectations would be valuable.",
-            Emerging: "Significant gaps in professional execution. Reliability or quality issues needs addressing immediately. Focus on the basics: punctuality, honesty, and finishing what you start."
+            Advanced: "Outstanding wellness and emotional intelligence. You manage your energy and emotions perfectly, maintaining a high level of performance and well-being consistently.",
+            Strong: "Good emotional intelligence and self-care habits. You generally handle stress well and maintain a healthy balance between your physical and emotional states.",
+            Progressing: "You are learning to balance your emotional and physical well-being. Stress can sometimes affect your mood or energy levels. Focus on consistent wellness routines.",
+            Developing: "You may struggle with managing stress or maintaining consistent energy. Emotions might sometimes overwhelm your decision-making. Mindfulness practices can help.",
+            Emerging: "Significant challenges in emotional regulation or physical wellness. You may often feel drained or emotionally reactive. Prioritize fundamental self-care and stress management."
         },
         DAQ: {
             Advanced: "A digital native with high AI readiness. You leverage technology to multiply your output and are comfortable with cutting-edge tools. You see technology as an extension of your mind.",

@@ -158,15 +158,23 @@ const AssessmentFlowGuard = ({ children }) => {
 
     // Determine next path
     let requiredPath = null;
-    let isLocked = false;
     const nextAssessmentIndex = assessmentOrder.findIndex(item => !assessmentData[item.key]);
 
     if (nextAssessmentIndex !== -1) {
       const nextAssessment = assessmentOrder[nextAssessmentIndex];
-      const isVisitingAssessment = assessmentOrder.some(a => location.pathname.startsWith(a.path));
-
-      // Strict enforcement: User must complete this assessment before accessing anything else
       requiredPath = nextAssessment.path;
+    } else {
+      // All required assessments are done.
+      // Now block access to completed assessment paths if the user tries to go back manually.
+      const isVisitingCompletedAssessment = assessmentOrder.some(a => 
+        location.pathname.startsWith(a.path) && assessmentData[a.key]?.status === true
+      );
+
+      if (isVisitingCompletedAssessment) {
+        console.log("Blocking access to completed assessment:", location.pathname);
+        navigate('/dashboard', { replace: true });
+        return;
+      }
     }
 
     setNextPath(requiredPath);

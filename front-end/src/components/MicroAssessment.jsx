@@ -135,7 +135,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
       
       {/* HEADER */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white flex justify-between items-center">
@@ -165,8 +165,8 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
             <div className="w-20 h-20 bg-[#30919D]/10 rounded-full flex items-center justify-center mx-auto text-[#30919D] mb-6">
                <AlertCircle size={40} />
             </div>
-            <h3 className="text-3xl font-extrabold text-slate-900">Ready for the Assessment?</h3>
-            <p className="text-slate-600 max-w-md mx-auto text-lg">
+            <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">Ready for the Assessment?</h3>
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-lg">
               You will have <strong>5 randomized questions</strong> to answer. 
               You have <strong>90 seconds</strong> per question. 
               Applying the CLEAR-5 framework is key.
@@ -185,11 +185,11 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
           <div className="max-w-3xl mx-auto">
              {/* Progress Bar */}
              <div className="mb-8">
-               <div className="flex justify-between text-sm text-gray-500 mb-2">
+               <div className="flex justify-between text-sm text-gray-500 dark:text-slate-400 mb-2">
                  <span>Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
                  <span>Score: {score}</span>
                </div>
-               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+               <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
                  <motion.div 
                    className="h-full bg-[#30919D]"
                    initial={{ width: 0 }}
@@ -205,7 +205,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                exit={{ opacity: 0, x: -20 }}
                className="space-y-6"
              >
-                <h3 className="text-xl font-medium text-gray-800 leading-relaxed">
+                <h3 className="text-xl font-medium text-gray-800 dark:text-slate-200 leading-relaxed">
                   {currentQuestion.question}
                 </h3>
 
@@ -216,13 +216,13 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      
                      let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all ";
                      if (showExplanation) {
-                        if (isCorrect) btnClass += "border-green-500 bg-green-50 text-green-800";
-                        else if (isSelected) btnClass += "border-red-500 bg-red-50 text-red-800";
-                        else btnClass += "border-gray-200 opacity-50";
+                        if (isCorrect) btnClass += "border-green-500 bg-green-50 text-green-800 dark:bg-green-500/10 dark:text-green-400";
+                        else if (isSelected) btnClass += "border-red-500 bg-red-50 text-red-800 dark:bg-red-500/10 dark:text-red-400";
+                        else btnClass += "border-gray-200 dark:border-slate-800 opacity-50";
                      } else {
                         btnClass += isSelected 
-                          ? "border-[#30919D] bg-[#30919D]/10 text-[#0e5c65]" 
-                          : "border-gray-200 hover:border-[#30919D]/50 hover:bg-slate-50";
+                          ? "border-[#30919D] bg-[#30919D]/10 text-[#0e5c65] dark:text-[#30919D] dark:bg-[#30919D]/20" 
+                          : "border-gray-200 dark:border-slate-700 hover:border-[#30919D]/50 hover:bg-slate-50 dark:hover:bg-slate-800";
                      }
 
                      return (
@@ -237,12 +237,12 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                              w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
                              ${showExplanation && isCorrect ? 'border-green-500 bg-green-500 text-white' : ''}
                              ${showExplanation && isSelected && !isCorrect ? 'border-red-500 bg-red-500 text-white' : ''}
-                             ${!showExplanation && isSelected ? 'border-[#30919D] bg-[#30919D]' : 'border-gray-300'}
+                             ${!showExplanation && isSelected ? 'border-[#30919D] bg-[#30919D]' : 'border-gray-300 dark:border-slate-600'}
                            `}>
                               {showExplanation && isCorrect && <CheckCircle2 size={14} />}
                               {showExplanation && isSelected && !isCorrect && <XCircle size={14} />}
                            </div>
-                           <span>{option}</span>
+                           <span className="dark:text-slate-300">{option}</span>
                          </div>
                        </button>
                      );
@@ -255,7 +255,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-900"
+                      className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-900 dark:text-blue-300"
                     >
                        <p className="font-semibold mb-1 flex items-center gap-2">
                          <AlertCircle size={16} /> Explanation
@@ -290,22 +290,22 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                 <Trophy size={48} />
               </motion.div>
               
-              <div>
-                <h3 className="text-3xl font-bold text-gray-800">Assessment Complete!</h3>
-                <p className="text-gray-500 mt-2">Here is how you performed</p>
+               <div>
+                <h3 className="text-3xl font-bold text-gray-800 dark:text-white">Assessment Complete!</h3>
+                <p className="text-gray-500 dark:text-slate-400 mt-2">Here is how you performed</p>
               </div>
 
               <div className="flex justify-center gap-8 py-6">
                  <div className="text-center">
-                    <div className="text-4xl font-bold text-slate-900">{score}</div>
-                    <div className="text-xs text-gray-500 uppercase tracking-wider">Your Score</div>
+                    <div className="text-4xl font-bold text-slate-900 dark:text-white">{score}</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">Your Score</div>
                  </div>
                  <div className="text-center">
-                    <div className="text-4xl font-bold text-gray-300">/</div>
+                    <div className="text-4xl font-bold text-gray-300 dark:text-slate-600">/</div>
                  </div>
                  <div className="text-center">
-                    <div className="text-4xl font-bold text-slate-900">{shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0)}</div>
-                    <div className="text-xs text-gray-500 uppercase tracking-wider">Total Points</div>
+                    <div className="text-4xl font-bold text-slate-900 dark:text-white">{shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0)}</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Points</div>
                  </div>
               </div>
 

@@ -169,7 +169,15 @@ const BaseLineTest = () => {
           throw new Error("User ID not found. Please log in again.");
         }
 
-        console.log(`ðŸ‘¤ User: ${parsedUser.fullName} (${userId})`);
+        // NEW: CRITICAL - Do not allow re-taking if baseline already exists
+        console.log("ðŸ” Checking for existing baseline results...");
+        const baselineCheck = await assessmentApi.getBaseLineResults(userId).catch(() => ({ success: false }));
+        if (baselineCheck.success && baselineCheck.data) {
+          console.warn("âœ… Baseline already completed. Redirecting...");
+          toast.info("You have already completed your baseline assessment.");
+          navigate("/dashboard/assessments", { replace: true });
+          return;
+        }
 
         // Fetch Base Line assessment by code
         console.log("ðŸ“¡ Fetching assessment details for ASM00001...");

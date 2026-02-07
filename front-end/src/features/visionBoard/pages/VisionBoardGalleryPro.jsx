@@ -445,7 +445,7 @@ const VisionBoardGalleryPro = () => {
   useEffect(() => {
     // Check if user has basic info (at least email) before making API calls
     const user = JSON.parse(
-      sessionStorage.getItem("user") || localStorage.getItem("user") || "{}"
+      sessionStorage.getItem("user") || "{}"
     );
 
     // Allow loading if user has id OR email (API will fetch id by email if missing)
@@ -484,7 +484,7 @@ const VisionBoardGalleryPro = () => {
 
       // Log user info for debugging
       const user = JSON.parse(
-        sessionStorage.getItem("user") || localStorage.getItem("user") || "{}"
+        sessionStorage.getItem("user") || "{}"
       );
       console.log('[VisionBoard] Loading boards for user:', { id: user._id || user.id, email: user.email, fullName: user.fullName });
 
