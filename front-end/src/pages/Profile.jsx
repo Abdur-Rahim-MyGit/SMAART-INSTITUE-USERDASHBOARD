@@ -34,7 +34,7 @@ const Profile = () => {
     email: "",
     phone: "",
     institution: "",
-    yearOfStudy: "3rd Year",
+    yearOfStudy: "",
     department: "",
     studentId: "",
     dateOfBirth: "",
@@ -43,7 +43,9 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState("info"); // 'info' or 'badges'
 
   const [profilePhoto, setProfilePhoto] = useState(null);
-  const [memberSince, setMemberSince] = useState("2024");
+  const [memberSince, setMemberSince] = useState("");
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [isNewUser, setIsNewUser] = useState(false);
 
   // Force refresh user details on mount to get latest badges/progress
   useEffect(() => {
@@ -77,7 +79,7 @@ const Profile = () => {
         email: user.email || "",
         phone: user.mobileNumber || "",
         institution: parseInstitution(user.institution || reg.institution) || "",
-        yearOfStudy: user.yearSemester || reg.yearOfStudy || reg.yearSemester || "3rd Year",
+        yearOfStudy: user.yearSemester || reg.yearOfStudy || reg.yearSemester || "",
         department: user.department || reg.department || "",
         studentId: user.studentId || reg.studentId || "",
         dateOfBirth: (user.dob || reg.dob) ? new Date(user.dob || reg.dob).toISOString().split('T')[0] : "",
@@ -91,15 +93,40 @@ const Profile = () => {
       if (user.createdAt) {
         const date = new Date(user.createdAt);
         setMemberSince(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+        // Check if account is less than 30 days old
+        const daysSinceCreation = (Date.now() - date.getTime()) / (1000 * 60 * 60 * 24);
+        setIsNewUser(daysSinceCreation < 30);
       }
 
-      if (user.otherDetails?.profilePhoto) {
-        setProfilePhoto(`${getBackendUrl()}/${user.otherDetails.profilePhoto}`);
+      // Profile photo: check multiple possible fields
+      const photoPath = user.profileImage || user.otherDetails?.profileImage || user.otherDetails?.profilePhoto;
+      if (photoPath) {
+        setProfilePhoto(`${getBackendUrl()}/${photoPath}`);
       }
+
+      // Fetch enrolled courses
+      fetchEnrolledCourses(user._id || user.id);
 
       setLoading(false);
     }
   }, [user, userLoading, navigate]);
+
+  const fetchEnrolledCourses = async (userId) => {
+    try {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      if (!userId || !token) return;
+      const response = await fetch(
+        API_BASE_URL.replace('/api', '') + `/api/courseEnrollments/student/${userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await response.json();
+      if (data.success && Array.isArray(data.data)) {
+        setEnrolledCourses(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching enrolled courses:', error);
+    }
+  };
 
   const getInitials = (name) => {
     return name
@@ -154,8 +181,8 @@ const Profile = () => {
                           </span>
                         )}
                       </div>
-                      {/* Online Status Badge */}
-                      <div className="absolute -right-2 top-1 flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-full border border-gray-200 shadow-sm">
+                      {/* Online Status Badge - shown since user is viewing their own profile */}
+                      <div className="absolute -right-2 top-1 flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-full border border-gray-200 shadow-sm" title="You are currently online">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                         <span className="text-[10px] text-gray-600 font-medium">Online</span>
                       </div>
@@ -165,16 +192,19 @@ const Profile = () => {
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1.5">
                         <h2 className="text-base font-bold text-gray-900">{formData.name || "Student"}</h2>
-                        <Edit2 className="w-3 h-3 text-gray-400 cursor-pointer hover:text-[#30919D] transition-colors" />
-                        <span className="bg-green-100 text-green-700 text-[10px] font-semibold px-1.5 py-0.5 rounded">NEW</span>
+                        <Edit2 className="w-3 h-3 text-gray-400 cursor-pointer hover:text-[#30919D] transition-colors" onClick={() => navigate('/dashboard/settings')} title="Edit profile" />
+                        {isNewUser && <span className="bg-green-100 text-green-700 text-[10px] font-semibold px-1.5 py-0.5 rounded">NEW</span>}
                       </div>
                       <p className="text-gray-500 text-xs">@{formData.email?.split('@')[0] || 'student'}</p>
                     </div>
                   </div>
 
                   {/* Preview Profile Button */}
-                  <button className="w-full py-2 rounded-md border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5 mb-4">
-                    Preview Student Profile
+                  <button 
+                    onClick={() => navigate('/dashboard/settings')}
+                    className="w-full py-2 rounded-md border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5 mb-4"
+                  >
+                    Edit Student Profile
                     <ChevronRight className="w-3 h-3" />
                   </button>
 
@@ -192,7 +222,7 @@ const Profile = () => {
                       <User className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="text-[10px] text-gray-500">Member since</p>
-                        <p className="text-xs font-medium text-gray-900">{memberSince}</p>
+                        <p className="text-xs font-medium text-gray-900">{memberSince || "Not available"}</p>
                       </div>
                     </div>
 
@@ -200,14 +230,17 @@ const Profile = () => {
                       <Clock className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="text-[10px] text-gray-500">Status</p>
-                        <p className="text-xs font-medium text-gray-900">Available</p>
+                        <p className="text-xs font-medium text-gray-900">{user?.status || "Active"}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Edit Button */}
-                  <button className="w-full py-2 mt-4 rounded-md border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors">
-                    Edit
+                  <button 
+                    onClick={() => navigate('/dashboard/settings')}
+                    className="w-full py-2 mt-4 rounded-md border border-gray-300 text-gray-700 text-xs font-medium hover:bg-gray-50 transition-colors"
+                  >
+                    Edit Profile
                   </button>
                 </motion.div>
 
@@ -387,21 +420,44 @@ const Profile = () => {
 
                   <div className="p-3">
                     <div className="grid grid-cols-3 gap-2">
-                      {/* Sample Course Card */}
-                      <Link
-                        to="/dashboard/courses"
-                        className="group block p-3 border border-gray-200 rounded-lg hover:border-[#30919D] hover:shadow-sm transition-all"
-                      >
-                        <div className="aspect-video bg-gradient-to-br from-[#30919D]/20 to-[#002147]/20 rounded mb-2 flex items-center justify-center">
-                          <BookOpen className="w-5 h-5 text-[#30919D] opacity-50" />
-                        </div>
-                        <p className="text-xs font-medium text-gray-900 group-hover:text-[#30919D] transition-colors">
-                          View All Courses
-                        </p>
-                        <p className="text-[10px] text-gray-500 mt-0.5">Continue learning →</p>
-                      </Link>
+                      {enrolledCourses.length > 0 ? (
+                        enrolledCourses.slice(0, 2).map((enrollment) => (
+                          <Link
+                            key={enrollment._id}
+                            to="/dashboard/courses"
+                            className="group block p-3 border border-gray-200 rounded-lg hover:border-[#30919D] hover:shadow-sm transition-all"
+                          >
+                            <div className="aspect-video bg-gradient-to-br from-[#30919D]/20 to-[#002147]/20 rounded mb-2 flex items-center justify-center overflow-hidden">
+                              {enrollment.course?.thumbnail ? (
+                                <img src={enrollment.course.thumbnail} alt={enrollment.course?.title} className="w-full h-full object-cover" />
+                              ) : (
+                                <BookOpen className="w-5 h-5 text-[#30919D] opacity-50" />
+                              )}
+                            </div>
+                            <p className="text-xs font-medium text-gray-900 group-hover:text-[#30919D] transition-colors truncate">
+                              {enrollment.course?.title || 'Course'}
+                            </p>
+                            <p className="text-[10px] text-gray-500 mt-0.5">
+                              {enrollment.progress != null ? `${Math.round(enrollment.progress)}% complete` : 'Continue learning →'}
+                            </p>
+                          </Link>
+                        ))
+                      ) : (
+                        <Link
+                          to="/dashboard/courses"
+                          className="group block p-3 border border-gray-200 rounded-lg hover:border-[#30919D] hover:shadow-sm transition-all"
+                        >
+                          <div className="aspect-video bg-gradient-to-br from-[#30919D]/20 to-[#002147]/20 rounded mb-2 flex items-center justify-center">
+                            <BookOpen className="w-5 h-5 text-[#30919D] opacity-50" />
+                          </div>
+                          <p className="text-xs font-medium text-gray-900 group-hover:text-[#30919D] transition-colors">
+                            No courses yet
+                          </p>
+                          <p className="text-[10px] text-gray-500 mt-0.5">Browse courses →</p>
+                        </Link>
+                      )}
 
-                      {/* Add New Card */}
+                      {/* Explore More Card */}
                       <Link
                         to="/dashboard/courses"
                         className="flex flex-col items-center justify-center p-3 border border-dashed border-gray-200 rounded-lg hover:border-[#30919D] hover:bg-[#30919D]/5 transition-all cursor-pointer"

@@ -12,9 +12,11 @@ import LoginOtpModal from "./auth/LoginOtpModal";
 import ForgotPasswordModal from "./auth/ForgotPasswordModal";
 import FirstLoginPasswordModal from "./auth/FirstLoginPasswordModal";
 import { resetUserIdCache } from "@/features/visionBoard/services/visionBoardProApi";
+import { useUser } from "@/contexts/UserContext";
 
 const LoginCard = () => {
   const navigate = useNavigate();
+  const { setUser } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [showInstitutionSelector, setShowInstitutionSelector] = useState(true);
   const [selectedInstitution, setSelectedInstitution] = useState(null);
@@ -123,7 +125,9 @@ const LoginCard = () => {
 
       // Direct login for first-time users (no OTP required)
       sessionStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.user));
       sessionStorage.setItem("token", data.token);
+      setUser(data.user);
 
       toast.success("Login successful!");
 
@@ -224,6 +228,8 @@ const LoginCard = () => {
     // Regular login success
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
     setShowOtpModal(false);
 
     // Clear vision board cache to ensure fresh data for this user
@@ -253,6 +259,8 @@ const LoginCard = () => {
   const handlePasswordChangeSuccess = (data, redirectToDashboard = false) => {
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("user", JSON.stringify(data.user));
+    setUser(data.user);
     setShowPasswordChangeModal(false);
     setPasswordChangeData({ tempToken: "", email: "", fullName: "" });
 

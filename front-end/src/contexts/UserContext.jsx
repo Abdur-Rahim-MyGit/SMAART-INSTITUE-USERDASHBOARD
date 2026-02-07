@@ -24,8 +24,9 @@ export const UserProvider = ({ children }) => {
             gender: data.gender || prev?.gender,
             email: data.email || prev?.email,
           };
-          // Persist the updated user data
+          // Persist the updated user data to both storages (FIX #4: dual storage sync)
           sessionStorage.setItem("user", JSON.stringify(updated));
+          localStorage.setItem("user", JSON.stringify(updated));
           return updated;
         });
       }

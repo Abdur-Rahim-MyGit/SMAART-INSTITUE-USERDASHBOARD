@@ -57,7 +57,7 @@ const FloatingCommunityButton = () => {
             }
         } catch (error) {
             // Silently handle unauthorized/network errors in background poll
-            if (error && error.message && !error.message.includes('Unauthorized')) {
+            if (error && error.message && !error.message.includes('Unauthorized') && !error.message.includes('Failed to fetch')) {
                 console.error('Error fetching community stats:', error);
             }
         }

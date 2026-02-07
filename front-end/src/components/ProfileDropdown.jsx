@@ -77,11 +77,12 @@ const ProfileDropdown = () => {
     name: user.fullName || user.name || "User",
   } : {
     fullName: "User",
-    name: "User",
     email: "user@example.com",
     role: "student",
     avatar: null
   };
+
+  const displayName = displayUser.fullName || displayUser.name || "User";
 
   // Use profilePhoto if available
   const avatarUrl = profilePhoto || displayUser.avatar;
@@ -95,7 +96,7 @@ const ProfileDropdown = () => {
       >
         {/* Name Only */}
         <div className="text-right hidden sm:block">
-          <p className="text-sm font-semibold text-[#002147] dark:text-white">{displayUser.name}</p>
+          <p className="text-sm font-semibold text-[#002147] dark:text-white">{displayName}</p>
         </div>
 
         {/* Profile Avatar */}
@@ -103,12 +104,12 @@ const ProfileDropdown = () => {
           {avatarUrl ? (
             <img
               src={avatarUrl}
-              alt={displayUser.name}
+              alt={displayName}
               className="w-10 h-10 rounded-xl object-cover"
             />
           ) : (
             <span className="text-base font-bold text-white">
-              {getInitials(displayUser.name)}
+              {getInitials(displayName)}
             </span>
           )}
         </div>

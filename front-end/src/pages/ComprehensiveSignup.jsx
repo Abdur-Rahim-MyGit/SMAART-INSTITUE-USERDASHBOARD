@@ -29,6 +29,12 @@ const ComprehensiveSignup = () => {
     const email = signupEmail || userData?.email;
     const fullName = signupFullName || userData?.fullName;
 
+    // SECURITY FIX #11: Redirect if no signup context and no logged-in user
+    if (!email && !userData) {
+      navigate('/', { replace: true });
+      return;
+    }
+
     if (email) {
       setPersonalDetails(prev => ({ ...prev, email, fullName: fullName || prev.fullName, mobileNumber: userData?.mobileNumber || "", institution: "" }));
       setPreFilledFields(prev => ({ ...prev, email: true, fullName: !!fullName, mobileNumber: !!userData?.mobileNumber }));

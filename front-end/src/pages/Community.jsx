@@ -190,7 +190,7 @@ const Community = () => {
 
   // Get current user
   useEffect(() => {
-    const userData = localStorage.getItem("user");
+    const userData = sessionStorage.getItem("user");
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
@@ -205,7 +205,7 @@ const Community = () => {
         console.error('Community - Failed to parse user data:', e);
       }
     } else {
-      console.warn('Community - No user data found in localStorage');
+      console.warn('Community - No user data found in sessionStorage');
     }
   }, []);
 
@@ -236,7 +236,7 @@ const Community = () => {
     let userId = currentUserId;
     if (!userId) {
       try {
-        const stored = JSON.parse(localStorage.getItem("user") || "{}");
+        const stored = JSON.parse(sessionStorage.getItem("user") || "{}");
         userId = stored._id || stored.id || stored.userId;
         if (userId && !currentUser) setCurrentUser(stored);
       } catch (e) { /* ignore */ }
@@ -484,11 +484,11 @@ const Community = () => {
     setModerationWarning('');
 
     // Try multiple sources for the author ID
-    // 1. From currentUser state (already parsed from localStorage on mount)
-    // 2. Re-read from localStorage for latest data
+    // 1. From currentUser state (already parsed from storage on mount)
+    // 2. Re-read from storage for latest data
     let storedUser = {};
     try {
-      const userStr = localStorage.getItem('user');
+      const userStr = sessionStorage.getItem('user');
       if (userStr) {
         storedUser = JSON.parse(userStr);
       }
@@ -807,8 +807,8 @@ const Community = () => {
                         Clear Search
                       </button>
                     )}
-                    {/* Seed Data Button for Development */}
-                    {!debouncedSearch && (
+                    {/* Seed Data Button for Development Only */}
+                    {import.meta.env.DEV && !debouncedSearch && (
                       <button
                         onClick={async () => {
                           try {

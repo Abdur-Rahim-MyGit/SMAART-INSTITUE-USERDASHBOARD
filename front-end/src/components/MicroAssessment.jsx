@@ -1,0 +1,325 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Clock, CheckCircle2, XCircle, AlertCircle, ArrowRight, Trophy } from 'lucide-react';
+import { courseEnrollmentAPI } from '../services/api';
+
+const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentId, onComplete, initialResult }) => {
+  const [step, setStep] = useState('intro'); // intro, quiz, result
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [shuffledQuestions, setShuffledQuestions] = useState([]);
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(90);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (assessmentData && assessmentData.questions) {
+      // Shuffle questions once on mount
+      const shuffled = [...assessmentData.questions].sort(() => 0.5 - Math.random()).slice(0, 5);
+      setShuffledQuestions(shuffled);
+    }
+  }, [assessmentData]);
+
+  // Check for existing result
+  useEffect(() => {
+      if (initialResult && initialResult.isCompleted) {
+          setScore(initialResult.score);
+          setStep('result');
+      }
+  }, [initialResult]);
+
+  useEffect(() => {
+    if (step === 'quiz') {
+      setTimeLeft(90);
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            handleTimeout();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [step, currentQuestionIndex]);
+
+  const handleTimeout = () => {
+    clearInterval(timerRef.current);
+    // Auto-submit as incorrect if not answered
+    if (selectedAnswer === null) {
+        handleSubmitAnswer(null);
+    }
+  };
+
+  const handleStart = () => {
+    setStep('quiz');
+    setCurrentQuestionIndex(0);
+    setScore(0);
+  };
+
+  const handleSubmitAnswer = (answerIndex) => {
+    if (showExplanation) return; // Prevent double submission
+    
+    clearInterval(timerRef.current);
+    
+    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+    let isCorrect = false;
+
+    // Handle timeout (answerIndex is null)
+    if (answerIndex !== null) {
+        const selectedOption = currentQuestion.options[answerIndex];
+        isCorrect = selectedOption === currentQuestion.correctAnswer;
+    }
+
+    if (isCorrect) {
+      setScore(prev => prev + (currentQuestion.points || 1));
+    }
+
+    setSelectedAnswer(answerIndex);
+    setShowExplanation(true); // Show explanation state
+  };
+
+  const handleNextQuestion = () => {
+    setShowExplanation(false);
+    setSelectedAnswer(null);
+
+    if (currentQuestionIndex < shuffledQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      finishQuiz();
+    }
+  };
+
+  const finishQuiz = async () => {
+    setStep('result');
+    setIsSubmitting(true);
+    
+    // Calculate final score
+    // Note: score state might not be immediately updated if called directly after setScore
+    // allow a small render cycle or use a calculated value if needed. 
+    // Here we use the state 'score' which is updated on each answer.
+    
+    // However, since handleNextQuestion calls this, we need to be careful. 
+    // Actually, 'score' is updated in handleSubmitAnswer, so by the time we click "Next" (which calls handleNextQuestion), score is stable.
+
+    try {
+        await courseEnrollmentAPI.updateQuizProgress({
+            studentId,
+            courseCode,
+            moduleId,
+            dayId,
+            quizId: assessmentData._id || 'micro-assessment-day-3', // Use ID from DB or fallback
+            score: score, // This might miss the LAST point if we called finishQuiz directly from submit. But we have a "Next" button flow.
+            // Wait: If it's the last question, handleSubmitAnswer sets showExplanation. User clicks "Finish" (was Next).
+            // So score IS updated.
+            totalPoints: shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0)
+        });
+    } catch (error) {
+        console.error("Failed to save progress", error);
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  if (!shuffledQuestions.length) return <div>Loading Assessment...</div>;
+
+  const currentQuestion = shuffledQuestions[currentQuestionIndex];
+
+  return (
+    <div className="w-full max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+      
+      {/* HEADER */}
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
+            <Trophy className="text-[#30919D] drop-shadow-lg" size={28} />
+            {assessmentData.title || "Micro-Assessment"}
+          </h2>
+          <p className="text-white/80 text-sm mt-1">Test your knowledge</p>
+        </div>
+        
+        {step === 'quiz' && (
+           <div className={`
+             flex items-center gap-2 px-4 py-2 rounded-full font-mono font-bold text-lg
+             ${timeLeft < 10 ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-white/10 text-white'}
+           `}>
+             <Clock size={20} />
+             {formatTime(timeLeft)}
+           </div>
+        )}
+      </div>
+
+      <div className="p-8 min-h-[400px]">
+        {/* INTRO STEP */}
+        {step === 'intro' && (
+          <div className="text-center space-y-6 py-8">
+            <div className="w-20 h-20 bg-[#30919D]/10 rounded-full flex items-center justify-center mx-auto text-[#30919D] mb-6">
+               <AlertCircle size={40} />
+            </div>
+            <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">Ready for the Assessment?</h3>
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-lg">
+              You will have <strong>5 randomized questions</strong> to answer. 
+              You have <strong>90 seconds</strong> per question. 
+              Applying the CLEAR-5 framework is key.
+            </p>
+            <button
+              onClick={handleStart}
+              className="px-8 py-3 bg-[#30919D] hover:bg-[#25737d] text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#30919D]/30"
+            >
+              Start Assessment
+            </button>
+          </div>
+        )}
+
+        {/* QUIZ STEP */}
+        {step === 'quiz' && (
+          <div className="max-w-3xl mx-auto">
+             {/* Progress Bar */}
+             <div className="mb-8">
+               <div className="flex justify-between text-sm text-gray-500 dark:text-slate-400 mb-2">
+                 <span>Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
+                 <span>Score: {score}</span>
+               </div>
+               <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                 <motion.div 
+                   className="h-full bg-[#30919D]"
+                   initial={{ width: 0 }}
+                   animate={{ width: `${((currentQuestionIndex + 1) / shuffledQuestions.length) * 100}%` }}
+                 />
+               </div>
+             </div>
+
+             <motion.div
+               key={currentQuestionIndex}
+               initial={{ opacity: 0, x: 20 }}
+               animate={{ opacity: 1, x: 0 }}
+               exit={{ opacity: 0, x: -20 }}
+               className="space-y-6"
+             >
+                <h3 className="text-xl font-medium text-gray-800 dark:text-slate-200 leading-relaxed">
+                  {currentQuestion.question}
+                </h3>
+
+                <div className="space-y-3">
+                  {currentQuestion.options.map((option, idx) => {
+                     const isSelected = selectedAnswer === idx;
+                     const isCorrect = option === currentQuestion.correctAnswer;
+                     
+                     let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all ";
+                     if (showExplanation) {
+                        if (isCorrect) btnClass += "border-green-500 bg-green-50 text-green-800 dark:bg-green-500/10 dark:text-green-400";
+                        else if (isSelected) btnClass += "border-red-500 bg-red-50 text-red-800 dark:bg-red-500/10 dark:text-red-400";
+                        else btnClass += "border-gray-200 dark:border-slate-800 opacity-50";
+                     } else {
+                        btnClass += isSelected 
+                          ? "border-[#30919D] bg-[#30919D]/10 text-[#0e5c65] dark:text-[#30919D] dark:bg-[#30919D]/20" 
+                          : "border-gray-200 dark:border-slate-700 hover:border-[#30919D]/50 hover:bg-slate-50 dark:hover:bg-slate-800";
+                     }
+
+                     return (
+                       <button
+                         key={idx}
+                         onClick={() => !showExplanation && handleSubmitAnswer(idx)}
+                         disabled={showExplanation}
+                         className={btnClass}
+                       >
+                         <div className="flex items-center gap-3">
+                           <div className={`
+                             w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                             ${showExplanation && isCorrect ? 'border-green-500 bg-green-500 text-white' : ''}
+                             ${showExplanation && isSelected && !isCorrect ? 'border-red-500 bg-red-500 text-white' : ''}
+                             ${!showExplanation && isSelected ? 'border-[#30919D] bg-[#30919D]' : 'border-gray-300 dark:border-slate-600'}
+                           `}>
+                              {showExplanation && isCorrect && <CheckCircle2 size={14} />}
+                              {showExplanation && isSelected && !isCorrect && <XCircle size={14} />}
+                           </div>
+                           <span className="dark:text-slate-300">{option}</span>
+                         </div>
+                       </button>
+                     );
+                  })}
+                </div>
+
+                {/* Explanation & Next Button */}
+                <AnimatePresence>
+                  {showExplanation && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-900 dark:text-blue-300"
+                    >
+                       <p className="font-semibold mb-1 flex items-center gap-2">
+                         <AlertCircle size={16} /> Explanation
+                       </p>
+                       <p className="text-sm opacity-90">
+                         {currentQuestion.explanation || "No explanation provided."}
+                       </p>
+
+                       <button
+                         onClick={handleNextQuestion}
+                         className="mt-4 flex items-center gap-2 bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors ml-auto"
+                       >
+                         {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                         <ArrowRight size={16} />
+                       </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+             </motion.div>
+          </div>
+        )}
+
+        {/* RESULT STEP */}
+        {step === 'result' && (
+           <div className="text-center py-8 space-y-6">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }} 
+                className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600"
+              >
+                <Trophy size={48} />
+              </motion.div>
+              
+               <div>
+                <h3 className="text-3xl font-bold text-gray-800 dark:text-white">Assessment Complete!</h3>
+                <p className="text-gray-500 dark:text-slate-400 mt-2">Here is how you performed</p>
+              </div>
+
+              <div className="flex justify-center gap-8 py-6">
+                 <div className="text-center">
+                    <div className="text-4xl font-bold text-slate-900 dark:text-white">{score}</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">Your Score</div>
+                 </div>
+                 <div className="text-center">
+                    <div className="text-4xl font-bold text-gray-300 dark:text-slate-600">/</div>
+                 </div>
+                 <div className="text-center">
+                    <div className="text-4xl font-bold text-slate-900 dark:text-white">{shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0)}</div>
+                    <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Points</div>
+                 </div>
+              </div>
+
+              <button
+                onClick={() => onComplete(score)}
+                className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold shadow-lg shadow-green-500/30 transition-all"
+              >
+                Continue to Next Step
+              </button>
+           </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MicroAssessment;

@@ -35,7 +35,7 @@ const MyNotes = () => {
 
     useEffect(() => {
         // Load User
-        const userData = sessionStorage.getItem("user") || localStorage.getItem("user");
+        const userData = sessionStorage.getItem("user");
         if (userData) {
             const parsed = JSON.parse(userData);
             setUser(parsed);
