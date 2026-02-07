@@ -812,7 +812,7 @@ const DashboardHome = () => {
 
                   {/* 3. Activity Feed Widget */}
                   <div>
-                    <ActivityFeed userId={user.id || user._id} />
+                    {user && <ActivityFeed userId={user.id || user._id} />}
                   </div>
 
                   {/* 4. Upgrade Card - Clean Professional Design */}
