@@ -649,26 +649,34 @@ const ModuleViewPage = () => {
     const mod = modules.find(m => m.id === moduleId);
     if (!mod || !mod.days) return 0;
     const day = mod.days.find(d => d.id === dayId);
-    if (!day || !day.steps) return 0;
+    
+    // If it's a dummy day (no day object in DB), it's zero progress
+    if (!day) return 0;
 
-    return day.steps.filter(step => {
-      const key = `${moduleId}-${dayId}-${step.id}`;
-      return videoCompletionMap[key] === true;
-    }).length;
+    // Check if day is completed using existing logic
+    return checkSessionCompletion(moduleId, day) ? 1 : 0;
   };
 
   const getModuleCompletedCount = (moduleId) => {
     const module = modules.find(m => m.id === moduleId);
-    if (!module || !module.days) {
-      return { completed: 0, total: 0 };
+    if (!module) {
+      return { completed: 0, total: 6 };
     }
-    let totalSteps = 0;
-    let completed = 0;
-    module.days.forEach(day => {
-      totalSteps += (day.steps || []).length;
-      completed += getDayCompletedCount(moduleId, day.id);
-    });
-    return { completed, total: totalSteps };
+
+    // Use the same logic as the UI for total days (usually 6)
+    const totalDays = Math.max(6, module.days?.length || 0);
+    let completedDays = 0;
+
+    // Count completed real days
+    if (module.days) {
+      module.days.forEach(day => {
+        if (checkSessionCompletion(moduleId, day)) {
+          completedDays++;
+        }
+      });
+    }
+
+    return { completed: completedDays, total: totalDays };
   };
 
   const getDisplayDuration = (moduleId, dayId, defaultDuration) => {
