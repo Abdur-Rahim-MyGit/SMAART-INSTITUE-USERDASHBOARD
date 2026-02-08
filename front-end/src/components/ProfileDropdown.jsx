@@ -82,6 +82,7 @@ const ProfileDropdown = () => {
     avatar: null
   };
 
+  // Use fullName consistently
   const displayName = displayUser.fullName || displayUser.name || "User";
 
   // Use profilePhoto if available

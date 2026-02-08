@@ -115,6 +115,17 @@ const AssessmentFlowGuard = ({ children }) => {
         }
 
         const parsedUser = JSON.parse(userData);
+
+        // Safety check: parsedUser might be null if 'null' string was stored
+        if (!parsedUser) {
+          console.error("Invalid user data in session (null), clearing...");
+          sessionStorage.clear();
+          setIsAuthenticated(false);
+          setLoading(false);
+          navigate("/", { replace: true });
+          return;
+        }
+
         const userId = parsedUser.id || parsedUser._id;
 
         // NEW: Check if registration is completed

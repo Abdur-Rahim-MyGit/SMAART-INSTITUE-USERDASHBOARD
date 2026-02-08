@@ -73,18 +73,31 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
 
   // Handle successful login (after OTP or direct)
   const handleLoginSuccess = (data) => {
+    console.log("[LoginModal] Login successful, storing user data:", {
+      hasToken: !!data.token,
+      hasUser: !!data.user,
+      userEmail: data.user?.email,
+      hasRegistration: data.user?.hasRegistration,
+      isRegistered: data.user?.isRegistered,
+      nextStep: data.nextStep
+    });
+
     toast.success("Login successful!");
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
+
+    console.log("[LoginModal] Data stored in sessionStorage");
     onClose();
 
     // Navigate based on nextStep or user state
     const nextStep = data.nextStep || "/dashboard";
     if (data.user && !data.user.hasRegistration && !data.user.isRegistered) {
+      console.log("[LoginModal] User needs to complete registration - redirecting to /complete-registration");
       sessionStorage.setItem("signupEmail", data.user.email);
       sessionStorage.setItem("signupFullName", data.user.fullName);
       navigate("/complete-registration");
     } else {
+      console.log("[LoginModal] Navigating to:", nextStep);
       navigate(nextStep);
     }
   };

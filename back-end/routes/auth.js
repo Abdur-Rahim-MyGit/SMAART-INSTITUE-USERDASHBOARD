@@ -861,27 +861,20 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     const UserModel = require(`../models/${userModelName}`);
     const freshUser = await UserModel.findById(user._id);
 
-    // === SINGLE SESSION ENFORCEMENT ===
-    // If there's an existing session, check if it's actually still valid
-    // Sessions older than 24h are stale (JWT has expired) - auto-clear them
-    if (freshUser.currentSessionId && !forceLogout) {
-      const lastLogin = freshUser.lastLogin || freshUser.updatedAt || freshUser.createdAt;
-      const sessionAge = Date.now() - new Date(lastLogin).getTime();
-      const JWT_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-      if (sessionAge >= JWT_EXPIRY_MS) {
-        // Stale session — old JWT has expired, auto-clear and let login proceed
-        console.log(`[Auth] Stale session detected for user ${user._id} (${Math.round(sessionAge / 3600000)}h old). Auto-clearing.`);
-        await UserModel.findByIdAndUpdate(user._id, { currentSessionId: null });
-      } else {
-        // Session is still potentially active — ask user to force logout
-        return res.status(409).json({
-          error: 'You are already logged in on another device.',
-          requiresForceLogout: true,
-          message: 'You are already logged in on another device. Do you want to logout from the other device and login here?'
-        });
-      }
-    }
+    // Check existing session BEFORE marking OTP as used
+    // Check existing session BEFORE marking OTP as used
+    // AUTO-LOGOUT IMPLEMENTATION:
+    // We detected an active session, but we will proceed to overwrite it (forcing logout on other device).
+    // Check existing session BEFORE marking OTP as used
+    // If user is already logged in and didn't request force logout, return conflict
+    // AUTO-LOGOUT ENABLED: Automatically logout previous session upon successful OTP verification
+    // if (freshUser.currentSessionId && !forceLogout) {
+    //   return res.status(409).json({
+    //     error: 'You are already logged in on another device.',
+    //     requiresForceLogout: true,
+    //     message: 'You are already logged in on another device. Do you want to logout from the other device and login here?'
+    //   });
+    // }
 
     if (freshUser.currentSessionId && forceLogout) {
       console.log(`[Auth] Force logging out previous session for user ${user._id}`);

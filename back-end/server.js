@@ -130,6 +130,28 @@ app.use('/api/groups', require('./routes/groups'));
 // Avatar System Routes (3D Level-Based Unlock System)
 app.use('/api/avatar', require('./routes/avatar'));
 
+// AI Career Coach Routes - Inline to avoid module loading issues
+const aiCareerCoachController = require('./controllers/aiCareerCoachController');
+const { protect: authMiddleware } = require('./middleware/auth');
+
+// Profile Management
+app.get('/api/ai-career-coach/profile', authMiddleware, aiCareerCoachController.getProfile);
+app.put('/api/ai-career-coach/profile', authMiddleware, aiCareerCoachController.updateProfile);
+app.post('/api/ai-career-coach/profile/analyze', authMiddleware, aiCareerCoachController.analyzeProfile);
+
+// Career Features
+app.get('/api/ai-career-coach/recommendations', authMiddleware, aiCareerCoachController.getCareerRecommendations);
+app.post('/api/ai-career-coach/skill-gap', authMiddleware, aiCareerCoachController.analyzeSkillGap);
+app.post('/api/ai-career-coach/learning-plan', authMiddleware, aiCareerCoachController.generateLearningPlan);
+app.post('/api/ai-career-coach/resume', authMiddleware, aiCareerCoachController.generateResume);
+
+// Chat Features
+app.post('/api/ai-career-coach/chat', authMiddleware, aiCareerCoachController.chat);
+app.get('/api/ai-career-coach/chat/sessions', authMiddleware, aiCareerCoachController.getChatSessions);
+app.get('/api/ai-career-coach/chat/:sessionId', authMiddleware, aiCareerCoachController.getChatHistory);
+
+logger.info('✅ AI Career Coach Routes Loaded (Inline)');
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });

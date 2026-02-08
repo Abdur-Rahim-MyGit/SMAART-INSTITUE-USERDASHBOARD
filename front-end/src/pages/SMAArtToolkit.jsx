@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Heart, BookOpen, BookText, ArrowRight, Briefcase, MessageSquare, Award, Search, FileText } from "lucide-react";
+import { Heart, BookOpen, BookText, ArrowRight, MessageSquare, User, FileText, Brain } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { useNavigate } from "react-router-dom";
@@ -7,10 +7,10 @@ import { useNavigate } from "react-router-dom";
 const toolkitSections = [
   {
     id: 1,
-    title: "AI Career Coach",
-    description: "Get personalized career guidance powered by AI. Receive tailored advice, career path recommendations, and strategic insights to accelerate your professional growth.",
-    icon: Briefcase,
-    path: "/dashboard/ai-career-coach",
+    title: "AI Career Chat",
+    description: "Have real-time conversations with your AI career coach. Get personalized advice, career guidance, and strategic insights 24/7 to accelerate your professional growth.",
+    icon: MessageSquare,
+    path: "/dashboard/ai-career-coach/chat",
     color: "from-purple-400 to-indigo-500",
     iconColor: "text-purple-500",
     badge: "AI Powered",
@@ -18,50 +18,28 @@ const toolkitSections = [
   },
   {
     id: 2,
-    title: "AI Interview Preparation",
-    description: "Practice with AI-powered mock interviews. Get real-time feedback, improve your responses, and build confidence for your next job interview.",
-    icon: MessageSquare,
-    path: "/dashboard/ai-interview-prep",
-    color: "from-emerald-400 to-teal-500",
-    iconColor: "text-emerald-500",
-    badge: "AI Powered",
-    badgeColor: "from-emerald-600 to-teal-600"
-  },
-  {
-    id: 3,
-    title: "Portable Micro Certification",
-    description: "Earn industry-recognized micro-credentials that showcase your skills. Build a portfolio of verified achievements to stand out in the job market.",
-    icon: Award,
-    path: "/certificate",
-    color: "from-amber-400 to-yellow-500",
-    iconColor: "text-amber-500",
-    badge: "New",
-    badgeColor: "from-amber-600 to-orange-600"
-  },
-  {
-    id: 4,
-    title: "Job & Internship Opportunities",
-    description: "Discover curated job openings and internship programs matched to your skills and career goals. Connect with top employers and kickstart your career.",
-    icon: Search,
-    path: "/dashboard/job-opportunities",
+    title: "Profile Analysis",
+    description: "Complete career profile with AI-powered analysis, career path recommendations, skill gap insights, and personalized learning plans - all in one place.",
+    icon: User,
+    path: "/dashboard/profile-analysis",
     color: "from-blue-400 to-cyan-500",
     iconColor: "text-blue-500",
-    badge: "Featured",
+    badge: "Comprehensive",
     badgeColor: "from-blue-600 to-cyan-600"
   },
   {
-    id: 5,
+    id: 3,
     title: "SMAART AI Resume Builder",
-    description: "Create professional, ATS-optimized resumes with AI assistance. Get intelligent suggestions, formatting tips, and industry-specific templates.",
+    description: "Create ATS-optimized resume content powered by AI. Generate professional summaries, experience descriptions, and keyword-rich content tailored for your target role.",
     icon: FileText,
-    path: "/dashboard/ai-resume-builder",
-    color: "from-rose-400 to-pink-500",
-    iconColor: "text-rose-500",
-    badge: "AI Powered",
-    badgeColor: "from-rose-600 to-pink-600"
+    path: "/dashboard/resume-builder",
+    color: "from-violet-400 to-purple-500",
+    iconColor: "text-violet-500",
+    badge: "Professional",
+    badgeColor: "from-violet-600 to-purple-600"
   },
   {
-    id: 6,
+    id: 4,
     title: "Mind Care Sessions",
     description: "Personalized wellness sessions designed to nurture your mental health and emotional well-being. Connect with experts and discover inner peace.",
     icon: Heart,
@@ -72,18 +50,18 @@ const toolkitSections = [
     badgeColor: "from-rose-600 to-pink-600"
   },
   {
-    id: 7,
+    id: 5,
     title: "Library",
     description: "Access a vast collection of resources, books, articles, and learning materials to expand your knowledge and fuel your personal growth.",
     icon: BookOpen,
     path: "/dashboard/library",
-    color: "from-blue-400 to-cyan-500",
-    iconColor: "text-blue-500",
+    color: "from-emerald-400 to-teal-500",
+    iconColor: "text-emerald-500",
     badge: "Resources",
-    badgeColor: "from-blue-600 to-cyan-600"
+    badgeColor: "from-emerald-600 to-teal-600"
   },
   {
-    id: 8,
+    id: 6,
     title: "General Dictionary",
     description: "Your comprehensive reference guide for terminology, concepts, and definitions. Master the vocabulary that empowers your learning journey.",
     icon: BookText,
@@ -103,69 +81,37 @@ const ToolkitCard = ({ section, index }) => {
     <motion.div
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.08, type: "spring", stiffness: 100 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
       onClick={() => navigate(section.path)}
       className="group relative h-full cursor-pointer"
     >
-      {/* Outer Glow Effect */}
+      {/* Glow Effect */}
       <div className={`absolute -inset-0.5 bg-gradient-to-r ${section.color} rounded-3xl opacity-0 group-hover:opacity-75 transition duration-500 blur-xl group-hover:blur-2xl`} />
 
-      <div className={`
-        relative h-full overflow-hidden rounded-3xl
-        bg-white dark:bg-[#1e293b]
-        border border-slate-200 dark:border-slate-700
-        shadow-xl shadow-slate-200/50 dark:shadow-black/20
-        transition-all duration-500
-        group-hover:translate-y-[-8px] group-hover:shadow-2xl
-        group-hover:border-transparent
-      `}>
-        {/* Animated Background Gradient */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity duration-500`} />
+      {/* Card */}
+      <div className="relative h-full overflow-hidden rounded-3xl bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-black/20 transition-all duration-500 group-hover:translate-y-[-8px] group-hover:shadow-2xl group-hover:border-transparent">
 
-        {/* Ambient Glow */}
+        {/* Background Gradient */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity duration-500`} />
         <div className={`absolute top-0 right-0 w-72 h-72 bg-gradient-to-br ${section.color} opacity-5 dark:opacity-[0.08] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 transition-all duration-500 group-hover:scale-150 group-hover:opacity-15 dark:group-hover:opacity-25`} />
 
-        {/* Shimmer Effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-        </div>
-
+        {/* Content */}
         <div className="p-8 h-full flex flex-col items-start relative z-10">
 
-          {/* Header: Icon & Badge */}
+          {/* Header */}
           <div className="w-full flex justify-between items-start mb-6">
-            <div className={`
-              relative w-16 h-16 rounded-2xl flex items-center justify-center
-              bg-gradient-to-br ${section.color}
-              shadow-lg shadow-blue-500/30 dark:shadow-none
-              text-white
-              transition-all duration-500
-              group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-2xl
-            `}>
+            <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${section.color} shadow-lg shadow-blue-500/30 dark:shadow-none text-white transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-2xl`}>
               <Icon size={30} strokeWidth={2} className="relative z-10" />
-              {/* Icon Glow */}
-              <div className="absolute inset-0 bg-white/20 rounded-2xl blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
 
-            <span className={`
-              text-[10px] font-bold uppercase tracking-widest text-white 
-              py-1.5 px-3 rounded-lg 
-              bg-gradient-to-r ${section.badgeColor || 'from-blue-600 to-purple-600'}
-              shadow-lg shadow-blue-500/30
-              transition-all duration-300
-              group-hover:scale-105 group-hover:shadow-xl
-            `}>
+            <span className={`text-[10px] font-bold uppercase tracking-widest text-white py-1.5 px-3 rounded-lg bg-gradient-to-r ${section.badgeColor || 'from-blue-600 to-purple-600'} shadow-lg shadow-blue-500/30 transition-all duration-300 group-hover:scale-105 group-hover:shadow-xl`}>
               {section.badge}
             </span>
           </div>
 
-          {/* Content */}
+          {/* Title & Description */}
           <div className="flex-1">
-            <h3 className={`
-              text-xl font-bold text-slate-800 dark:text-white mb-3 
-              transition-all duration-300
-              group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${section.color}
-            `}>
+            <h3 className={`text-xl font-bold text-slate-800 dark:text-white mb-3 transition-all duration-300 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${section.color}`}>
               {section.title}
             </h3>
 
@@ -174,33 +120,13 @@ const ToolkitCard = ({ section, index }) => {
             </p>
           </div>
 
-          {/* Footer / Action */}
-          <div className={`
-            w-full mt-8 pt-6 
-            border-t border-slate-100 dark:border-slate-700 
-            flex items-center justify-between 
-            transition-all duration-300
-            group-hover:border-transparent
-          `}>
-            <span className={`
-              text-xs font-bold uppercase tracking-wider
-              transition-all duration-300
-              text-slate-400 dark:text-slate-500
-              group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r ${section.color}
-            `}>
+          {/* Footer */}
+          <div className="w-full mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between transition-all duration-300 group-hover:border-transparent">
+            <span className="text-xs font-bold uppercase tracking-wider transition-all duration-300 text-slate-400 dark:text-slate-500 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-indigo-600">
               Explore Tool
             </span>
 
-            <div className={`
-              w-10 h-10 rounded-full 
-              bg-slate-50 dark:bg-slate-800 
-              flex items-center justify-center 
-              transition-all duration-500
-              group-hover:bg-gradient-to-r ${section.color}
-              group-hover:text-white
-              group-hover:scale-110 group-hover:rotate-45
-              shadow-md group-hover:shadow-xl
-            `}>
+            <div className={`w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center transition-all duration-500 group-hover:bg-gradient-to-r ${section.color} group-hover:text-white group-hover:scale-110 group-hover:rotate-45 shadow-md group-hover:shadow-xl`}>
               <ArrowRight size={16} className="transition-transform duration-300" />
             </div>
           </div>
@@ -221,25 +147,50 @@ const SMAArtToolkit = () => {
         <main className="w-full relative py-8 px-4 md:px-0">
           <div className="max-w-7xl mx-auto pb-12">
 
-            {/* Header Section - exact match to CoursePathway */}
-            <div className="w-full text-center mb-12 px-4 relative z-10">
-              <div className="inline-block p-2 px-6 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-bold tracking-wide uppercase mb-3">
-                Resource Hub
-              </div>
-              <h2 className="text-3xl md:text-5xl font-black text-slate-800 dark:text-white tracking-tight leading-tight mb-4">
-                Smaart <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Toolkit</span>
-              </h2>
-              <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                Your curated collection of tools and resources designed to support your journey toward self-improvement and mental wellness.
-              </p>
+            {/* Header */}
+            <div className="mb-12 px-4">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="text-center"
+              >
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <Brain className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+                  <h1 className="text-4xl md:text-5xl font-black text-slate-800 dark:text-white">
+                    SMAART Toolkit
+                  </h1>
+                </div>
+                <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+                  Empower your journey with AI-powered career tools, wellness resources, and comprehensive learning materials
+                </p>
+              </motion.div>
             </div>
 
-            {/* Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-              {toolkitSections.map((section, index) => (
-                <ToolkitCard key={section.id} section={section} index={index} />
-              ))}
+            {/* Toolkit Grid */}
+            <div className="px-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {toolkitSections.map((section, index) => (
+                  <ToolkitCard key={section.id} section={section} index={index} />
+                ))}
+              </div>
             </div>
+
+            {/* Info Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="mt-12 px-4"
+            >
+              <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl p-8 text-white text-center">
+                <h3 className="text-2xl font-bold mb-2">🚀 Unlock Your Potential</h3>
+                <p className="text-white/90 max-w-2xl mx-auto">
+                  Explore our comprehensive toolkit designed to support your career growth, mental wellness, and continuous learning
+                </p>
+              </div>
+            </motion.div>
+
           </div>
         </main>
       </div>
