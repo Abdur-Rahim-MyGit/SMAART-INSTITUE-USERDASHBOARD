@@ -42,6 +42,11 @@ const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
 const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
 
+// AI Career Coach pages
+const AIChat = lazy(() => import('@/pages/AICareerCoach/AIChat'));
+const ProfileAnalysis = lazy(() => import('@/pages/AICareerCoach/ProfileAnalysis'));
+const ResumeBuilder = lazy(() => import('@/pages/AICareerCoach/ResumeBuilder'));
+
 // Auth guard component
 import AssessmentFlowGuard from '@/components/AssessmentFlowGuard';
 
@@ -126,6 +131,13 @@ const AnimatedRoutes = () => {
                     <Route path="/admin/tickets" element={<AssessmentFlowGuard><AdminTickets /></AssessmentFlowGuard>} />
                     <Route path="/certificate" element={<AssessmentFlowGuard><Certificate /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/certificate" element={<AssessmentFlowGuard><Certificate /></AssessmentFlowGuard>} />
+
+                    {/* AI Career Coach Routes */}
+                    <Route path="/dashboard/ai-career-coach/chat" element={<AssessmentFlowGuard><AIChat /></AssessmentFlowGuard>} />
+                    <Route path="/dashboard/profile-analysis" element={<AssessmentFlowGuard><ProfileAnalysis /></AssessmentFlowGuard>} />
+                    <Route path="/dashboard/resume-builder" element={<AssessmentFlowGuard><ResumeBuilder /></AssessmentFlowGuard>} />
+
+
 
                     {/* Assessment Routes */}
                     <Route path="/dashboard/assessments/baseline" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />

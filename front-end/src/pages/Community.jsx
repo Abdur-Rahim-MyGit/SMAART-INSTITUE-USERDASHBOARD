@@ -190,7 +190,7 @@ const Community = () => {
 
   // Get current user
   useEffect(() => {
-    const userData = localStorage.getItem("user");
+    const userData = sessionStorage.getItem("user");
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
@@ -205,7 +205,7 @@ const Community = () => {
         console.error('Community - Failed to parse user data:', e);
       }
     } else {
-      console.warn('Community - No user data found in localStorage');
+      console.warn('Community - No user data found in sessionStorage');
     }
   }, []);
 
@@ -236,7 +236,7 @@ const Community = () => {
     let userId = currentUserId;
     if (!userId) {
       try {
-        const stored = JSON.parse(localStorage.getItem("user") || "{}");
+        const stored = JSON.parse(sessionStorage.getItem("user") || "{}");
         userId = stored._id || stored.id || stored.userId;
         if (userId && !currentUser) setCurrentUser(stored);
       } catch (e) { /* ignore */ }
@@ -488,7 +488,7 @@ const Community = () => {
     // 2. Re-read from localStorage for latest data
     let storedUser = {};
     try {
-      const userStr = localStorage.getItem('user');
+      const userStr = sessionStorage.getItem('user');
       if (userStr) {
         storedUser = JSON.parse(userStr);
       }

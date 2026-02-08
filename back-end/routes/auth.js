@@ -652,13 +652,14 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     // We detected an active session, but we will proceed to overwrite it (forcing logout on other device).
     // Check existing session BEFORE marking OTP as used
     // If user is already logged in and didn't request force logout, return conflict
-    if (freshUser.currentSessionId && !forceLogout) {
-      return res.status(409).json({
-        error: 'You are already logged in on another device.',
-        requiresForceLogout: true,
-        message: 'You are already logged in on another device. Do you want to logout from the other device and login here?'
-      });
-    }
+    // AUTO-LOGOUT ENABLED: Automatically logout previous session upon successful OTP verification
+    // if (freshUser.currentSessionId && !forceLogout) {
+    //   return res.status(409).json({
+    //     error: 'You are already logged in on another device.',
+    //     requiresForceLogout: true,
+    //     message: 'You are already logged in on another device. Do you want to logout from the other device and login here?'
+    //   });
+    // }
 
     if (freshUser.currentSessionId) {
       console.log(`[Auth] Auto-force logging out previous session for user ${user._id}`);

@@ -82,6 +82,12 @@ const DashboardHome = () => {
   // Fetch Dashboard Data (Real Data Integration)
   useEffect(() => {
     const fetchDashboardData = async () => {
+      // Don't fetch if user is not loaded yet
+      if (!user || (!user.id && !user._id)) {
+        setDashboardLoading(false);
+        return;
+      }
+
       try {
         setDashboardLoading(true);
         setDashboardError(null);
@@ -133,16 +139,16 @@ const DashboardHome = () => {
         let completedModulesCount = 0;
         let totalProgressSum = 0;
         let resumeUrl = '/dashboard/courses';
-        
+
         // Find the "Active" course (most recently accessed or first one)
-        const activeCourseEnrollment = [...courses].sort((a, b) => 
+        const activeCourseEnrollment = [...courses].sort((a, b) =>
           new Date(b.lastAccessedAt || 0) - new Date(a.lastAccessedAt || 0)
         )[0];
 
         if (activeCourseEnrollment) {
           const course = activeCourseEnrollment.course;
           const enrollment = activeCourseEnrollment;
-          
+
           // Basic logic: find first module and day that isn't fully completed
           // We look into enrollment.moduleProgress which we populated in backend
           let resumeModuleId = 1;
@@ -158,41 +164,41 @@ const DashboardHome = () => {
 
               if (!modProgress || modProgress.status !== 'completed') {
                 resumeModuleId = mIdx + 1;
-                
+
                 // Find first day that isn't completed in this module
                 // We check videoProgress and completedTasks
                 const videoProgress = modProgress?.videoProgress || [];
                 const completedTasks = modProgress?.completedTasks || [];
-                
+
                 // Use actual days from module if available, otherwise fallback to 6
                 const daysCount = moduleDoc.days?.length || 6;
-                
+
                 for (let d = 1; d <= daysCount; d++) {
                   // Check simple completion first (if we have day-level tracking in future)
                   // For now check granular progress
-                  
+
                   // Check if any video step for this day is completed
                   // In new model, we might have multiple steps. 
                   // If ANY step is done, we consider "started". 
                   // But to be "completed", ALL steps for that day should be done.
                   // For "resume", we want the first NOT fully completed day.
-                  
+
                   // However, the current logic checks if *any* video is done. 
                   // If isVidDone is true, it skips. This implies "if begun, count as done"? 
                   // The original code was: if (!isVidDone || !isTaskDone) -> resumeDayId = d;
                   // So if EITHER video OR task is NOT done, we resume there.
                   // This means we find the first day where something is missing.
-                  
+
                   const isVidDone = videoProgress.some(vp => vp.dayId === d && vp.isCompleted);
                   const isTaskDone = completedTasks.some(ct => ct.dayId === d);
-                  
+
                   // If tasks exist for this day in the module definition, check them
                   const dayDoc = moduleDoc.days?.find(day => day.dayNumber === d || day.id === d);
                   const hasTasks = dayDoc?.tasks?.length > 0;
-                  
+
                   // If there are no tasks, ignore isTaskDone check
                   const taskCondition = hasTasks ? isTaskDone : true;
-                  
+
                   // Simplied: If video is not done OR (tasks exist and are not done)
                   if (!isVidDone || !taskCondition) {
                     resumeDayId = d;
@@ -206,9 +212,9 @@ const DashboardHome = () => {
           }
 
           if (course?._id) {
-             // If courseId is valid MongoDB ID, use it, else use normalized code (fallback)
-             const cid = course._id;
-             resumeUrl = `/dashboard/courses/${cid}/modules/${resumeModuleId}/days/${resumeDayId}`;
+            // If courseId is valid MongoDB ID, use it, else use normalized code (fallback)
+            const cid = course._id;
+            resumeUrl = `/dashboard/courses/${cid}/modules/${resumeModuleId}/days/${resumeDayId}`;
           }
         }
 
@@ -224,8 +230,8 @@ const DashboardHome = () => {
         });
 
         // Calculate average progress across all enrolled courses
-        const overallProgress = totalCourses > 0 
-          ? Math.round(totalProgressSum / totalCourses) 
+        const overallProgress = totalCourses > 0
+          ? Math.round(totalProgressSum / totalCourses)
           : 0;
 
         setStats({
@@ -247,7 +253,7 @@ const DashboardHome = () => {
       }
     };
 
-    if (user.id || user._id) {
+    if (user && (user.id || user._id)) {
       fetchDashboardData();
     }
   }, [user]);
@@ -361,6 +367,14 @@ const DashboardHome = () => {
     { day: "Tue", date: 11 },
   ];
 
+  if (userLoading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center lms-dashboard-bg">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#30919D]"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Vision Board Splash on Login */}
@@ -385,7 +399,7 @@ const DashboardHome = () => {
                       {currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                     </p>
                     <h1 className="text-3xl lg:text-4xl font-bold text-[#002147] dark:text-white mb-2">
-                      Welcome back, {user.fullName.split(' ')[0]}
+                      Welcome back, {user?.fullName?.split(' ')[0] || 'Student'}
                     </h1>
                     <p className="text-base text-gray-600 dark:text-gray-300">
                       Here's your learning overview for today
@@ -498,7 +512,7 @@ const DashboardHome = () => {
                               <span>Daily Streak: {stats.dayStreak} Days</span>
                             </span>
                             <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-                              Welcome back, {user.fullName.split(' ')[0]}! 👋
+                              Welcome back, {user?.fullName?.split(' ')[0] || 'Student'}! 👋
                             </h1>
                             <p className="text-white/70 text-base max-w-xl leading-relaxed">
                               You've completed <span className="text-white font-semibold">{weeklyProgress}%</span> of your overall course journey.
@@ -545,9 +559,9 @@ const DashboardHome = () => {
 
 
 
-                    {/* Action Buttons */}
+                      {/* Action Buttons */}
 
-                  </div>
+                    </div>
                   </section>
 
                   {/* Current Course - Professional Design */}
@@ -763,8 +777,8 @@ const DashboardHome = () => {
                             key={day}
                             onClick={() => setSelectedDate(date)}
                             className={`h-10 rounded-lg flex flex-col items-center justify-center relative cursor-pointer transition-all ${isSelected || isToday
-                                ? 'bg-[#30919D] text-white shadow-sm'
-                                : 'hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300'
+                              ? 'bg-[#30919D] text-white shadow-sm'
+                              : 'hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300'
                               }`}
                           >
                             <span className="text-sm font-medium">{day}</span>
@@ -812,7 +826,7 @@ const DashboardHome = () => {
 
                   {/* 3. Activity Feed Widget */}
                   <div>
-                    <ActivityFeed userId={user.id || user._id} />
+                    {user && <ActivityFeed userId={user.id || user._id} />}
                   </div>
 
                   {/* 4. Upgrade Card - Clean Professional Design */}

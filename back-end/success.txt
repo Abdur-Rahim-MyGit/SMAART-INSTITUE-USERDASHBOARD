@@ -1,0 +1,42 @@
+﻿≡ƒº¬ Testing OpenRouter API with NEW configuration...
+
+API Key: sk-or-v1-e1026decaea36aa025c17...
+Model: deepseek/deepseek-r1-0528:free
+
+≡ƒôí Sending request to OpenRouter...
+
+Γ£à SUCCESS! AI Career Coach is working!
+
+≡ƒñû AI Response:
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+Hello! I am your AI Career Coach and I am working perfectly!  
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+
+≡ƒôè Usage Stats:
+{
+  "prompt_tokens": 26,
+  "completion_tokens": 37,
+  "total_tokens": 63,
+  "cost": 0,
+  "is_byok": false,
+  "prompt_tokens_details": {
+    "cached_tokens": 3,
+    "audio_tokens": 0
+  },
+  "cost_details": {
+    "upstream_inference_cost": 0,
+    "upstream_inference_prompt_cost": 0,
+    "upstream_inference_completions_cost": 0
+  },
+  "completion_tokens_details": {
+    "reasoning_tokens": 24,
+    "audio_tokens": 0
+  }
+}
+
+≡ƒÄë AI Career Coach is READY TO USE!
+
+≡ƒÜÇ Next Steps:
+1. Go to: http://localhost:8080/dashboard/smaart-toolkit
+2. Click "AI Career Chat"
+3. Start chatting with your AI Career Coach!
