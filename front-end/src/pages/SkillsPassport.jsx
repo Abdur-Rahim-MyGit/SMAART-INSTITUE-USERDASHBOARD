@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Brain, Heart, BookOpen, Users, Briefcase, Monitor, Leaf, Download } from "lucide-react";
+import { Brain, Heart, BookOpen, Users, Target, Briefcase, Monitor, Leaf, Download } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import { assessmentApi } from "@/services/assessmentApi";
 import SkillsPassportSkeleton from "@/components/skeletons/SkillsPassportSkeleton";
+import { generateAssessmentReport } from "@/utils/reportGenerator";
+import { toast as sonnerToast } from "sonner";
 
 const SkillsPassport = () => {
     const [activeTab, setActiveTab] = useState("baseline");
@@ -35,28 +37,26 @@ const SkillsPassport = () => {
         fetchData();
     }, []);
 
-    // Quotients definition
+    // Quotients definition (Aligned with Backend/T1ResultsDisplay)
     const quotientsInfo = [
-        { id: 'CRQ', name: "Cognitive Reasoning", icon: Brain, color: "text-purple-600", bar: "bg-purple-600" },
-        { id: 'SRQ', name: "Self-regulation & Drive", icon: Heart, color: "text-rose-600", bar: "bg-rose-600" },
-        { id: 'LQ', name: "Learning Agility", icon: BookOpen, color: "text-blue-600", bar: "bg-blue-600" },
-        { id: 'SIQ', name: "Social Interaction", icon: Users, color: "text-indigo-600", bar: "bg-indigo-600" },
-        { id: 'PEQ', name: "Professional Execution", icon: Briefcase, color: "text-emerald-600", bar: "bg-emerald-600" },
-        { id: 'DAQ', name: "Digital & AI Literacy", icon: Monitor, color: "text-cyan-600", bar: "bg-cyan-600" },
-        { id: 'SEQ', name: "Ethical & Sustainability", icon: Leaf, color: "text-green-600", bar: "bg-green-600" },
+        { id: 'CRQ', name: "Cognitive Readiness", icon: Brain, color: "text-purple-600", bar: "bg-purple-600" },
+        { id: 'SRQ', name: "Social Readiness", icon: Users, color: "text-blue-600", bar: "bg-blue-600" },
+        { id: 'LQ', name: "Learning Quotient", icon: BookOpen, color: "text-indigo-600", bar: "bg-indigo-600" },
+        { id: 'SIQ', name: "Self-Identity", icon: Target, color: "text-rose-600", bar: "bg-rose-600" },
+        { id: 'PEQ', name: "Physical & Emotional", icon: Heart, color: "text-emerald-600", bar: "bg-emerald-600" },
+        { id: 'DAQ', name: "Digital Age", icon: Monitor, color: "text-cyan-600", bar: "bg-cyan-600" },
     ];
 
     // Format Scores from Data
     const getScores = (profile) => {
-        if (!profile) return { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0, SEQ: 0 };
+        if (!profile) return { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 };
         return {
             CRQ: profile.CRQ?.rawScore || 0,
             SRQ: profile.SRQ?.rawScore || 0,
             LQ: profile.LQ?.rawScore || 0,
             SIQ: profile.SIQ?.rawScore || 0,
             PEQ: profile.PEQ?.rawScore || 0,
-            DAQ: profile.DAQ?.rawScore || 0,
-            SEQ: profile.SEQ?.rawScore || 0
+            DAQ: profile.DAQ?.rawScore || 0
         };
     };
 
@@ -66,29 +66,51 @@ const SkillsPassport = () => {
             title: "T1 Assessment",
             date: baselineResult ? new Date(baselineResult.createdAt).toLocaleDateString() : "Not Completed",
             scores: getScores(baselineResult?.t1Profile),
-            status: baselineResult ? "Completed" : "Pending"
+            status: baselineResult ? "Completed" : "Pending",
+            average: baselineResult?.baselineScore || 0
         },
         test2: {
             title: "T2 Assessment",
             date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0, SEQ: 0 },
-            status: "Pending"
+            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
+            status: "Pending",
+            average: 0
         },
         test3: {
             title: "T3 Assessment",
             date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0, SEQ: 0 },
-            status: "Pending"
+            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
+            status: "Pending",
+            average: 0
         },
         test4: {
             title: "T4 Assessment",
             date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0, SEQ: 0 },
-            status: "Pending"
+            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
+            status: "Pending",
+            average: 0
         }
     };
 
     const currentData = testData[activeTab];
+
+    const handleDownloadReport = () => {
+        if (!baselineResult) {
+            sonnerToast.error("Please complete the assessment to download your report.");
+            return;
+        }
+
+        try {
+            const userStr = sessionStorage.getItem("user");
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                generateAssessmentReport(user, baselineResult);
+            }
+        } catch (error) {
+            console.error("Error generating report:", error);
+            sonnerToast.error("Failed to generate report. Please try again.");
+        }
+    };
 
     return (
         <div className="min-h-screen bg-white flex overflow-hidden font-sans">
@@ -144,7 +166,7 @@ const SkillsPassport = () => {
                                     </div>
                                     <div className="text-right">
                                         <div className="text-3xl font-black text-[#30919D]">
-                                            {Math.round(Object.values(currentData.scores).reduce((a, b) => a + b, 0) / 7)}%
+                                            {currentData.average}%
                                         </div>
                                         <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Average</div>
                                     </div>
@@ -164,7 +186,7 @@ const SkillsPassport = () => {
                                         </p>
                                         {activeTab === 'baseline' && (
                                             <a
-                                                href="/dashboard/assessment/baseline"
+                                                href="/dashboard/assessments/baseline"
                                                 className="px-6 py-3 bg-[#002147] text-white rounded-lg font-bold hover:bg-[#002147]/90 transition-colors shadow-lg shadow-[#002147]/20"
                                             >
                                                 Start Assessment
@@ -227,9 +249,16 @@ const SkillsPassport = () => {
 
                                 {/* Footer Action */}
                                 <div className="p-6 border-t border-slate-100 bg-slate-50/30 flex justify-end">
-                                    <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-lg font-semibold hover:bg-slate-50 hover:border-slate-300 transition-all text-sm shadow-sm">
+                                    <button
+                                        onClick={handleDownloadReport}
+                                        disabled={currentData.status === "Pending"}
+                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all text-sm shadow-sm ${currentData.status === "Pending"
+                                            ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                                            : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+                                            }`}
+                                    >
                                         <Download className="w-4 h-4" />
-                                        Download Passport
+                                        Download AI Report
                                     </button>
                                 </div>
                             </motion.div>
@@ -246,7 +275,7 @@ const RadarChart = ({ data }) => {
     const size = 300;
     const center = size / 2;
     const radius = 100;
-    const totalAxes = 7;
+    const totalAxes = 6;
 
     // Calculate point coordinates
     const getPoint = (value, index, maxRadius) => {

@@ -4,10 +4,7 @@ import { FaTrophy, FaStar, FaFire, FaMedal, FaCrown, FaChartLine, FaFilter } fro
 import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
 import { Loader2 } from 'lucide-react';
-
-// Sample badge data - In production, this would come from your API
-// Sample badge data removed to show only real achievements
-const sampleBadges = [];
+import { apiCall } from '@/services/api';
 
 const categories = [
     { id: 'all', label: 'All Badges', icon: FaTrophy },
@@ -19,21 +16,7 @@ const categories = [
 ];
 
 const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) => {
-    // Define all possible badges in the system
-    const allPossibleBadges = [
-        {
-            id: 'EARLY-ACHIEVER',
-            title: 'Early Achiever',
-            description: 'Completed the first three sessions of your first course!',
-            tier: 'bronze',
-            xp: 150,
-            category: 'learning',
-            isEarned: userEarnedBadges.some(ub => ub.badgeId === 'EARLY-ACHIEVER')
-        }
-    ];
-
-    const badges = allPossibleBadges;
-
+    const [badges, setBadges] = useState([]);
     const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
@@ -44,38 +27,46 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
         const fetchBadges = async () => {
             try {
                 const userStr = sessionStorage.getItem('user');
-                const token = sessionStorage.getItem('token');
                 if (!userStr) {
                     setIsLoading(false);
                     return;
                 }
                 const user = JSON.parse(userStr);
-                const response = await fetch(`${API_BASE_URL}/badges/user/${user.id || user._id}`, {
-                    headers: {
-                        'Authorization': token ? `Bearer ${token}` : ''
-                    }
-                });
-                const data = await response.json();
+                const data = await apiCall(`/badges/user/${user.id || user._id}`);
 
-                if (data.success) {
-                    // Transform API data to match component expectations
+                if (data.success && Array.isArray(data.data)) {
                     const formattedBadges = data.data.map(userBadge => ({
-                        id: userBadge.badge._id,
-                        badgeId: userBadge.badge.badgeId,
-                        title: userBadge.badge.title,
-                        description: userBadge.badge.description,
-                        tier: userBadge.badge.tier,
-                        xp: userBadge.badge.xp,
-                        category: userBadge.badge.category,
+                        id: userBadge.badge?._id || userBadge._id,
+                        badgeId: userBadge.badge?.badgeId || userBadge.badgeId,
+                        title: userBadge.badge?.title || userBadge.title || 'Badge',
+                        description: userBadge.badge?.description || userBadge.description || '',
+                        tier: userBadge.badge?.tier || userBadge.tier || 'bronze',
+                        xp: userBadge.badge?.xp || userBadge.xp || 0,
+                        category: userBadge.badge?.category || userBadge.category || 'learning',
                         earnedDate: userBadge.earnedDate,
-                        isEarned: userBadge.isEarned,
-                        progress: userBadge.progress,
-                        icon: userBadge.badge.icon
+                        isEarned: userBadge.isEarned !== undefined ? userBadge.isEarned : true,
+                        progress: userBadge.progress || 100,
+                        icon: userBadge.badge?.icon || userBadge.icon
                     }));
                     setBadges(formattedBadges);
+                } else {
+                    // Fallback: use badges passed via props
+                    if (userEarnedBadges.length > 0) {
+                        setBadges(userEarnedBadges.map(b => ({
+                            ...b,
+                            isEarned: true,
+                        })));
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching badges:', error);
+                // Fallback to prop badges on error
+                if (userEarnedBadges.length > 0) {
+                    setBadges(userEarnedBadges.map(b => ({
+                        ...b,
+                        isEarned: true,
+                    })));
+                }
             } finally {
                 setIsLoading(false);
             }

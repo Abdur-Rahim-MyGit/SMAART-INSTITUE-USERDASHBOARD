@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
  * useAuth Hook
  * 
  * Provides access to the current authenticated user
- * Reads from localStorage and returns user object
+ * Reads from sessionStorage first, falls back to localStorage (FIX #4: dual storage sync)
  */
 export const useAuth = () => {
     const [user, setUser] = useState(null);
@@ -12,7 +12,8 @@ export const useAuth = () => {
 
     useEffect(() => {
         try {
-            const userData = sessionStorage.getItem("user");
+            // FIX #4: Read sessionStorage first, fall back to localStorage
+            const userData = sessionStorage.getItem("user") || localStorage.getItem("user");
             if (userData) {
                 const parsedUser = JSON.parse(userData);
                 setUser(parsedUser);

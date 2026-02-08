@@ -484,8 +484,8 @@ const Community = () => {
     setModerationWarning('');
 
     // Try multiple sources for the author ID
-    // 1. From currentUser state (already parsed from localStorage on mount)
-    // 2. Re-read from localStorage for latest data
+    // 1. From currentUser state (already parsed from storage on mount)
+    // 2. Re-read from storage for latest data
     let storedUser = {};
     try {
       const userStr = sessionStorage.getItem('user');
@@ -807,8 +807,8 @@ const Community = () => {
                         Clear Search
                       </button>
                     )}
-                    {/* Seed Data Button for Development */}
-                    {!debouncedSearch && (
+                    {/* Seed Data Button for Development Only */}
+                    {import.meta.env.DEV && !debouncedSearch && (
                       <button
                         onClick={async () => {
                           try {

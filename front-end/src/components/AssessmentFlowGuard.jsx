@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { assessmentApi } from "@/services/assessmentApi";
+import { apiCall } from "@/services/api";
 import { Loader2 } from "lucide-react";
 import DashboardLoader from "@/components/DashboardLoader";
 
@@ -9,7 +10,7 @@ import DashboardLoader from "@/components/DashboardLoader";
  * Enforces authentication AND a strict order of assessments before allowing access to the dashboard.
  * Order: T1 Baseline Assessment
  * 
- * Developer bypass: Set sessionStorage.setItem('devSkipAssessments', 'true') to skip
+ * Developer bypass: Only available in dev mode via sessionStorage.setItem('devSkipAssessments', 'true')
  */
 const AssessmentFlowGuard = ({ children }) => {
   const [loading, setLoading] = useState(true);
@@ -26,39 +27,59 @@ const AssessmentFlowGuard = ({ children }) => {
 
   const LOCK_DURATION = 60 * 1000; // 1 minute in milliseconds
 
-  // Check for developer bypass flag
+  // SECURITY FIX #5: Developer bypass only available in dev mode
   const isDevBypass = () => {
-    return sessionStorage.getItem('devSkipAssessments') === 'true';
+    return import.meta.env.DEV && sessionStorage.getItem('devSkipAssessments') === 'true';
   };
 
-  // Auth check function - can be called on visibility change
-  const checkAuth = useCallback(() => {
+  // SECURITY FIX #9: Auth check validates token with server, not just sessionStorage existence
+  const checkAuth = useCallback(async (serverValidate = false) => {
     const userData = sessionStorage.getItem("user");
-    if (!userData) {
+    const token = sessionStorage.getItem("token");
+    if (!userData || !token) {
       setIsAuthenticated(false);
       navigate("/", { replace: true });
       return false;
     }
+
+    // On mount, validate token with server
+    if (serverValidate) {
+      try {
+        await apiCall('/auth/me');
+      } catch (err) {
+        console.warn('[AssessmentFlowGuard] Token validation failed:', err.message);
+        sessionStorage.removeItem("user");
+        sessionStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setIsAuthenticated(false);
+        navigate("/", { replace: true });
+        return false;
+      }
+    }
+
     return true;
   }, [navigate]);
 
   // Listen for page visibility changes (catches back button from cached pages)
   useEffect(() => {
+    // Validate token with server on initial mount
+    checkAuth(true);
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        checkAuth();
+        checkAuth(false); // Quick local check on visibility change
       }
     };
 
     // Also check on popstate (back/forward button)
     const handlePopState = () => {
-      checkAuth();
+      checkAuth(false);
     };
 
     // Check on page show (bfcache restore)
     const handlePageShow = (event) => {
       if (event.persisted) {
-        checkAuth();
+        checkAuth(false);
       }
     };
 
@@ -169,15 +190,23 @@ const AssessmentFlowGuard = ({ children }) => {
 
     // Determine next path
     let requiredPath = null;
-    let isLocked = false;
     const nextAssessmentIndex = assessmentOrder.findIndex(item => !assessmentData[item.key]);
 
     if (nextAssessmentIndex !== -1) {
       const nextAssessment = assessmentOrder[nextAssessmentIndex];
-      const isVisitingAssessment = assessmentOrder.some(a => location.pathname.startsWith(a.path));
-
-      // Strict enforcement: User must complete this assessment before accessing anything else
       requiredPath = nextAssessment.path;
+    } else {
+      // All required assessments are done.
+      // Now block access to completed assessment paths if the user tries to go back manually.
+      const isVisitingCompletedAssessment = assessmentOrder.some(a => 
+        location.pathname.startsWith(a.path) && assessmentData[a.key]?.status === true
+      );
+
+      if (isVisitingCompletedAssessment) {
+        console.log("Blocking access to completed assessment:", location.pathname);
+        navigate('/dashboard', { replace: true });
+        return;
+      }
     }
 
     setNextPath(requiredPath);
@@ -185,8 +214,9 @@ const AssessmentFlowGuard = ({ children }) => {
   }, [location.pathname, assessmentData]);
 
 
-  // Developer skip handler
+  // SECURITY FIX #5: Developer skip handler (dev mode only)
   const handleDevSkip = () => {
+    if (!import.meta.env.DEV) return; // Extra safety guard
     sessionStorage.setItem('devSkipAssessments', 'true');
     console.log('🚀 DEV SKIP: Assessment flow bypassed');
     setNextPath(null);
@@ -207,13 +237,15 @@ const AssessmentFlowGuard = ({ children }) => {
               <Loader2 className="w-12 h-12 text-[#30919D] animate-spin" />
               <p className="ml-4 text-white font-medium">Finalizing setup...</p>
             </div>
-            {/* Developer Skip Button */}
-            <button
-              onClick={handleDevSkip}
-              className="mt-8 text-[10px] text-white/30 hover:text-white/60 uppercase tracking-widest font-bold transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded"
-            >
-              ⚡ DEV: Skip to Dashboard
-            </button>
+            {/* Developer Skip Button - SECURITY FIX #5: Only shown in dev mode */}
+            {import.meta.env.DEV && (
+              <button
+                onClick={handleDevSkip}
+                className="mt-8 text-[10px] text-white/30 hover:text-white/60 uppercase tracking-widest font-bold transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded"
+              >
+                ⚡ DEV: Skip to Dashboard
+              </button>
+            )}
           </div>
         )}
       </>
@@ -224,13 +256,13 @@ const AssessmentFlowGuard = ({ children }) => {
   if (nextPath) {
     // If we are NOT currently at the required path, redirect
     if (location.pathname !== nextPath) {
-      // Show dev skip option before redirecting
-      if (showDevSkip) {
+      // Show dev skip option before redirecting (dev mode only)
+      if (showDevSkip && import.meta.env.DEV) {
         return (
           <div className="flex flex-col items-center justify-center min-h-screen bg-[#001229]">
             <p className="text-white font-medium mb-4">Redirecting to required assessment...</p>
             <p className="text-white/60 text-sm mb-6">Next: {nextPath}</p>
-            {/* Developer Skip Button */}
+            {/* Developer Skip Button - SECURITY FIX #5: Only shown in dev mode */}
             <button
               onClick={handleDevSkip}
               className="text-xs text-white/40 hover:text-white bg-white/5 hover:bg-white/10 px-6 py-3 rounded-lg uppercase tracking-widest font-bold transition-colors border border-white/10"

@@ -72,7 +72,10 @@ const ProfileDropdown = () => {
   };
 
   // Show default user if no session data
-  const displayUser = user || {
+  const displayUser = user ? {
+    ...user,
+    name: user.fullName || user.name || "User",
+  } : {
     fullName: "User",
     email: "user@example.com",
     role: "student",

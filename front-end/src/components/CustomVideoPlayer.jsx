@@ -12,10 +12,14 @@ import {
   Loader2,
   Settings,
   PictureInPicture2,
-  Gauge
+  Gauge,
+  CheckCircle,
+  Sparkles
 } from 'lucide-react';
+import Confetti from 'react-confetti';
 
-const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, onProgressUpdate }) => {
+const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, onProgressUpdate, onNext }) => {
+
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -31,8 +35,10 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
   const [isCompleted, setIsCompleted] = useState(initialCompleted);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [isPiPSupported, setIsPiPSupported] = useState(false);
   const [ripples, setRipples] = useState([]);
+  const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
   const controlsTimeoutRef = useRef(null);
   const lastSyncTimeRef = useRef(0);
   const lastUrlRef = useRef(videoUrl);
@@ -89,6 +95,8 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
           onProgressUpdate(video.duration, true, video.duration);
         }
       }
+      // Show success animation whenever video ends
+      setShowSuccess(true);
     };
 
     const handleDurationChange = () => setVideoDuration(video.duration);
@@ -144,6 +152,21 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
   }, [maxTimeReached, isCompleted]);
 
   // Handle page leave / pause
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        setContainerDimensions({
+          width: containerRef.current.offsetWidth,
+          height: containerRef.current.offsetHeight
+        });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
@@ -416,15 +439,15 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-0 left-0 right-0 pt-16 pb-3 sm:pb-4 px-3 sm:px-6 bg-gradient-to-t from-white via-white/95 to-transparent z-40 transition-opacity duration-300 border-t border-gray-200"
+            className="absolute bottom-0 left-0 right-0 pt-16 pb-3 sm:pb-4 px-3 sm:px-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-40 transition-opacity duration-300"
           >
             {/* Scrubber Container */}
             <div className="relative group/scrubber mb-4">
               {/* Background Track */}
-              <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1.5 bg-white/20 rounded-full overflow-hidden">
                 {/* Progress Bar */}
                 <div
-                  className="h-full bg-gradient-to-r from-[#002147] to-[#30919D]"
+                  className="h-full bg-gradient-to-r from-[#30919D] to-[#287a84]"
                   style={{ width: `${(currentTime / videoDuration) * 100}%` }}
                 />
               </div>
@@ -442,8 +465,8 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
 
               {/* Custom Thumb (Indicator) */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full shadow-lg pointer-events-none transition-transform scale-0 group-hover/scrubber:scale-100"
-                style={{ left: `calc(${(currentTime / videoDuration) * 100}% - 8px)`, backgroundColor: '#002147' }}
+                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full shadow-lg pointer-events-none transition-transform scale-0 group-hover/scrubber:scale-100 bg-white"
+                style={{ left: `calc(${(currentTime / videoDuration) * 100}% - 8px)` }}
               />
             </div>
 
@@ -451,13 +474,13 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
             <div className="flex items-center justify-between gap-1 sm:gap-4">
               <div className="flex items-center gap-1 sm:gap-4">
                 {/* Play/Pause */}
-                <button onClick={togglePlay} className="hover:text-[#30919D] transition-colors p-1" style={{ color: '#002147' }}>
+                <button onClick={togglePlay} className="hover:text-[#30919D] transition-colors p-1 text-white">
                   {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6 fill-current" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />}
                 </button>
 
                 {/* Volume Control */}
                 <div className="flex items-center gap-1 sm:gap-2 group/volume">
-                  <button onClick={toggleMute} className="hover:text-[#30919D] transition-colors p-1" style={{ color: '#002147' }}>
+                  <button onClick={toggleMute} className="hover:text-[#30919D] transition-colors p-1 text-white">
                     {isMuted || volume === 0 ? <VolumeX className="w-5 h-5 sm:w-6 sm:h-6" /> : <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />}
                   </button>
                   <div className="w-0 group-hover/volume:w-20 overflow-hidden transition-all duration-300 flex items-center h-8">
@@ -468,13 +491,13 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
                       step="0.05"
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-full accent-[#002147] h-1"
+                      className="w-full accent-[#30919D] h-1"
                     />
                   </div>
                 </div>
 
                 {/* Time Display */}
-                <div className="text-[10px] sm:text-xs font-medium tabular-nums border-l border-gray-300 pl-2 sm:pl-4 h-4 flex items-center" style={{ color: '#002147' }}>
+                <div className="text-[10px] sm:text-xs font-medium tabular-nums border-l border-white/20 pl-2 sm:pl-4 h-4 flex items-center text-white/90">
                   <span>{formatTime(currentTime)}</span>
                   <span className="mx-1 opacity-50">/</span>
                   <span className="opacity-70">{formatTime(videoDuration)}</span>
@@ -484,8 +507,8 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
               <div className="flex items-center gap-2 sm:gap-4">
                 {/* Title / Info - Only shown when wide enough */}
                 <div className="hidden lg:block">
-                  <span className="text-[10px] font-bold uppercase tracking-widest mr-2" style={{ color: '#30919D', opacity: 0.6 }}>Now Playing</span>
-                  <span className="text-sm font-semibold truncate max-w-[200px] inline-block align-middle" style={{ color: '#002147' }}>{title}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest mr-2 text-[#30919D]">Now Playing</span>
+                  <span className="text-sm font-semibold truncate max-w-[200px] inline-block align-middle text-white">{title}</span>
                 </div>
 
                 {/* Playback Speed Control */}
@@ -497,9 +520,8 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
                         setShowSpeedMenu(!showSpeedMenu);
                       }
                     }}
-                    className={`transition-colors p-1 flex items-center gap-1 ${isCompleted ? 'hover:text-[#30919D] cursor-pointer' : 'opacity-40 cursor-not-allowed'
+                    className={`transition-colors p-1 flex items-center gap-1 ${isCompleted ? 'hover:text-[#30919D] cursor-pointer text-white' : 'opacity-40 cursor-not-allowed text-white/60'
                       }`}
-                    style={{ color: '#002147' }}
                     title={isCompleted ? 'Playback Speed' : '🔒 Complete video to unlock'}
                   >
                     <Gauge className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -541,9 +563,8 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
                         togglePiP();
                       }
                     }}
-                    className={`transition-colors p-1 ${isCompleted ? 'hover:text-[#30919D] cursor-pointer' : 'opacity-40 cursor-not-allowed'
+                    className={`transition-colors p-1 ${isCompleted ? 'hover:text-[#30919D] cursor-pointer text-white' : 'opacity-40 cursor-not-allowed text-white/60'
                       }`}
-                    style={{ color: '#002147' }}
                     title={isCompleted ? 'Picture-in-Picture' : '🔒 Complete video to unlock'}
                   >
                     <PictureInPicture2 className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -551,7 +572,7 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
                 )}
 
                 {/* Fullscreen */}
-                <button onClick={toggleFullscreen} className="hover:text-[#30919D] transition-colors p-1.5 sm:p-1" style={{ color: '#002147' }}>
+                <button onClick={toggleFullscreen} className="hover:text-[#30919D] transition-colors p-1.5 sm:p-1 text-white">
                   {isFullscreen ? <Minimize className="w-5 h-5 sm:w-6 sm:h-6" /> : <Maximize className="w-5 h-5 sm:w-6 sm:h-6" />}
                 </button>
               </div>
@@ -560,16 +581,130 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
         )}
       </AnimatePresence>
 
-      {/* Top Gradient Overlay for Info (Persistent on hover) */}
+
+
+
+      {/* Success / Completion Overlay */}
       <AnimatePresence>
-        {showControls && (
+        {showSuccess && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/95 to-transparent pointer-events-none p-6 border-b border-gray-200"
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md p-6 text-center overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
           >
-            <h4 className="font-bold text-lg drop-shadow-sm" style={{ color: '#002147' }}>{title}</h4>
+            {/* Confetti Explosion */}
+            <div className="absolute inset-0 pointer-events-none">
+              <Confetti
+                width={containerDimensions.width}
+                height={containerDimensions.height}
+                recycle={false}
+                numberOfPieces={400}
+                gravity={0.15}
+                colors={['#30919D', '#002147', '#FFD700', '#FFFFFF', '#4ADE80']}
+              />
+            </div>
+
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 30 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
+              className="relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 max-w-sm w-full shadow-2xl border border-white/20"
+            >
+              {/* Glowing Background Effect behind the card */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#30919D]/20 to-[#002147]/20 rounded-2xl blur-xl -z-10" />
+
+              {/* Animated Icon */}
+              <div className="w-24 h-24 mx-auto mb-6 relative">
+                 <motion.div 
+                    initial={{ scale: 0, rotate: -45 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: "spring", stiffness: 200, delay: 0.4 }}
+                    className="w-full h-full bg-gradient-to-tr from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30"
+                 >
+                    <motion.svg 
+                      viewBox="0 0 24 24" 
+                      className="w-14 h-14 text-white stroke-current"
+                      fill="none" 
+                      strokeWidth="3"
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <motion.path 
+                        d="M20 6L9 17l-5-5"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{ pathLength: 1, opacity: 1 }}
+                        transition={{ duration: 0.6, ease: "easeOut", delay: 0.6 }}
+                      />
+                    </motion.svg>
+                 </motion.div>
+                 
+                 {/* Sparkles around icon */}
+                 {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: [0, 1, 0], opacity: [0, 1, 0], rotate: [0, 90] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 0.8 + (i * 0.4) }}
+                      className="absolute top-0 right-0"
+                      style={{ 
+                        left: `${50 + 40 * Math.cos(i * 2.1)}%`, 
+                        top: `${50 + 40 * Math.sin(i * 2.1)}%` 
+                      }}
+                    >
+                      <Sparkles className="w-6 h-6 text-yellow-400 fill-yellow-400" />
+                    </motion.div>
+                 ))}
+              </div>
+
+              {/* Text Content */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+              >
+                <h3 className="text-3xl font-bold text-white mb-2 drop-shadow-md">
+                  Awesome Job!
+                </h3>
+                <p className="text-gray-200 mb-8 font-medium text-lg">
+                  Lesson Completed Successfully
+                </p>
+              </motion.div>
+              
+              {/* Buttons */}
+              <motion.div 
+                className="flex gap-3 justify-center"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 }}
+              >
+                <button
+                  onClick={() => {
+                    setShowSuccess(false);
+                    if (videoRef.current) {
+                        videoRef.current.currentTime = 0;
+                        videoRef.current.play();
+                    }
+                  }}
+                  className="px-6 py-3 rounded-xl border border-white/30 text-white font-semibold hover:bg-white/10 flex items-center gap-2 transition-all active:scale-95"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Replay
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSuccess(false);
+                    if (onNext) onNext();
+                  }}
+                  className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#30919D] to-[#287a84] text-white font-bold hover:shadow-lg hover:shadow-[#30919D]/40 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
+                >
+                  Next Lesson
+                  <Play className="w-4 h-4 fill-current" />
+                </button>
+              </motion.div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
