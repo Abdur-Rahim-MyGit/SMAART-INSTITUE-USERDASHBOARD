@@ -18,7 +18,7 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
     const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
-    const [showEarnedOnly, setShowEarnedOnly] = useState(false);
+    const [showEarnedOnly, setShowEarnedOnly] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -38,7 +38,7 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
                         badgeId: userBadge.badge?.badgeId || userBadge.badgeId,
                         title: userBadge.badge?.title || userBadge.title || 'Badge',
                         description: userBadge.badge?.description || userBadge.description || '',
-                        tier: userBadge.badge?.tier || userBadge.tier || 'bronze',
+                        tier: userBadge.badge?.tier || userBadge.tier || 'standard',
                         xp: userBadge.badge?.xp || userBadge.xp || 0,
                         category: userBadge.badge?.category || userBadge.category || 'learning',
                         earnedDate: userBadge.earnedDate,
@@ -75,10 +75,9 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
 
     // Calculate stats
     const earnedBadges = badges.filter((b) => b.isEarned);
+    const earnedBadgesCount = earnedBadges.length;
     const totalXP = earnedBadges.reduce((acc, b) => acc + (b.xp || 0), 0);
-    const goldCount = earnedBadges.filter((b) => b.tier === 'gold').length;
-    const silverCount = earnedBadges.filter((b) => b.tier === 'silver').length;
-    const bronzeCount = earnedBadges.filter((b) => b.tier === 'bronze').length;
+    const totalBadges = badges.length;
 
     // Filter and sort badges
     const filteredBadges = badges

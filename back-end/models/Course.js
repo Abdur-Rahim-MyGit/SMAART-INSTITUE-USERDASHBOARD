@@ -141,7 +141,8 @@ const daySchema = new mongoose.Schema({
 const moduleSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
-  duration: { type: Number, default: 8 }, // in days (6 course + 2 catch-up)
+  duration: { type: Number, default: 3 }, // in days (completion period)
+  totalBatches: { type: Number, default: 25 }, // number of batches per skill
   timeAllocation: Number, // in minutes
   sequence: { type: Number, required: true },
   // Days structure: 6 course days + 2 catch-up days

@@ -18,13 +18,13 @@ const badgeSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ['assessment', 'learning', 'streak', 'community', 'certification', 'milestone', 'special'],
+        enum: ['assessment', 'learning', 'streak', 'community', 'certification', 'milestone', 'special', 'capability', 'capacity', 'leadership'],
         required: true
     },
     tier: {
         type: String,
-        enum: ['bronze', 'silver', 'gold', 'platinum', 'diamond'],
-        default: 'bronze'
+        enum: ['standard', 'bronze', 'silver', 'gold', 'platinum', 'diamond'],
+        default: 'standard'
     },
     xp: {
         type: Number,
@@ -42,9 +42,11 @@ const badgeSchema = new mongoose.Schema({
     criteria: {
         type: {
             type: String,
-            enum: ['course_completion', 'assessment_score', 'streak', 'module_completion', 'custom'],
+            enum: ['course_completion', 'assessment_score', 'streak', 'module_completion', 'skill_completion', 'custom'],
             required: true
         },
+        // For skill_completion
+        skillId: mongoose.Schema.Types.ObjectId,
         // For course_completion
         courseId: mongoose.Schema.Types.ObjectId,
         // For assessment_score
