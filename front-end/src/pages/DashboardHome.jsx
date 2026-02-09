@@ -1,51 +1,44 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import PageTransition from "@/components/PageTransition";
-import ContinueLearningCarousel from "@/components/ContinueLearningCarousel";
 import VisionBoardSplash from "@/components/VisionBoardSplash";
 import {
   TrendingUp,
-  Plus,
-  ArrowUpRight,
-  MoreHorizontal,
+  Zap,
   Calendar as CalendarIcon,
   CheckCircle2,
   Clock,
   MessageSquare,
   ChevronRight,
   ClipboardCheck,
-  Zap,
-  Bell,
   Play,
   ChevronLeft,
   BookOpen,
-  Users,
   Award,
   HelpCircle,
-  Home
+  Sparkles,
+  Target,
+  ArrowRight,
+  MoreHorizontal,
+  Bell,
+  Search,
+  Users
 } from "lucide-react";
-import { toast } from "sonner";
-import { getTasks, createTask, updateTask, deleteTask } from "@/services/taskService";
+import { getTasks, createTask } from "@/services/taskService";
 import useAvatar from '@/hooks/useAvatar';
 import CourseCardSkeleton from '@/components/skeletons/CourseCardSkeleton';
 import StatsCardSkeleton from '@/components/skeletons/StatsCardSkeleton';
-import TaskListSkeleton from '@/components/skeletons/TaskListSkeleton';
 import { API_BASE_URL } from '@/services/api';
-import ActivityFeed from '@/components/ActivityFeed';
-import UpcomingDeadlines from '@/components/UpcomingDeadlines';
 import useUser from "@/hooks/useUser";
 
 const DashboardHome = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, loading: userLoading } = useUser();
-  const { avatarData } = useAvatar();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showVisionSplash, setShowVisionSplash] = useState(false);
-
-  const [activeTaskTab, setActiveTaskTab] = useState("All tasks");
 
   // Real data states
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -53,25 +46,40 @@ const DashboardHome = () => {
     totalCourses: 0,
     completedModules: 0,
     baselineScore: 0,
-    dayStreak: 12
+    dayStreak: 0
   });
   const [dashboardLoading, setDashboardLoading] = useState(true);
-  const [dashboardError, setDashboardError] = useState(null);
   const [weeklyProgress, setWeeklyProgress] = useState(0);
 
-  // Check if this is a fresh login (show splash)
+  // Animation Variants - Smoother, more professional
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.08 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 15, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "tween", ease: "easeOut", duration: 0.4 }
+    }
+  };
+
   useEffect(() => {
     const hasSeenSplash = sessionStorage.getItem('visionSplashShown');
     if (!hasSeenSplash) {
       setShowVisionSplash(true);
     }
   }, []);
+
   useEffect(() => {
-    // Real-time clock update
     const clockInterval = setInterval(() => {
       setCurrentDate(new Date());
     }, 1000);
-
     return () => clearInterval(clockInterval);
   }, [location.key]);
 
@@ -80,10 +88,53 @@ const DashboardHome = () => {
     sessionStorage.setItem('visionSplashShown', 'true');
   };
 
+  // Calendar Note State
+  const [showNoteModal, setShowNoteModal] = useState(false);
+  const [selectedNoteDate, setSelectedNoteDate] = useState(null);
+  const [newNote, setNewNote] = useState("");
+  const [calendarNotes, setCalendarNotes] = useState({});
+
+  const handleDayDoubleClick = (date) => {
+    setSelectedNoteDate(date);
+    setShowNoteModal(true);
+  };
+
+  const saveNote = async () => {
+    if (!newNote.trim() || !selectedNoteDate) return;
+
+    try {
+      // Save to Backend
+      const taskData = {
+        title: newNote,
+        date: selectedNoteDate,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        type: 'personal',
+        status: 'Pending'
+      };
+
+      const savedTask = await createTask(taskData);
+
+      // Update Local State
+      const dateKey = selectedNoteDate.toDateString();
+      setCalendarNotes(prev => ({
+        ...prev,
+        [dateKey]: [...(prev[dateKey] || []), {
+          id: savedTask._id,
+          text: savedTask.title,
+          time: savedTask.time
+        }]
+      }));
+
+      setNewNote("");
+      setShowNoteModal(false);
+    } catch (error) {
+      console.error("Failed to save note:", error);
+    }
+  };
+
   // Fetch Dashboard Data (Real Data Integration)
   useEffect(() => {
     const fetchDashboardData = async () => {
-      // Don't fetch if user is not loaded yet
       if (!user || (!user.id && !user._id)) {
         setDashboardLoading(false);
         return;
@@ -91,8 +142,6 @@ const DashboardHome = () => {
 
       try {
         setDashboardLoading(true);
-        setDashboardError(null);
-
         const userId = user.id || user._id;
         const token = sessionStorage.getItem('token');
 
@@ -119,6 +168,29 @@ const DashboardHome = () => {
           setEnrolledCourses(courses);
         }
 
+        // Fetch Tasks (Calendar Notes)
+        try {
+          const tasks = await getTasks();
+          const notesMap = {};
+          tasks.forEach(task => {
+            if (task.date) {
+              const d = new Date(task.date);
+              if (!isNaN(d.getTime())) {
+                const key = d.toDateString();
+                if (!notesMap[key]) notesMap[key] = [];
+                notesMap[key].push({
+                  id: task._id,
+                  text: task.title,
+                  time: task.time || 'All Day'
+                });
+              }
+            }
+          });
+          setCalendarNotes(notesMap);
+        } catch (err) {
+          console.error("Failed to fetch tasks", err);
+        }
+
         // Fetch baseline results
         const baselineResponse = await fetch(
           `${API_BASE_URL.replace('/api', '')}/api/baselineresults/user/${userId}`,
@@ -140,8 +212,10 @@ const DashboardHome = () => {
         let completedModulesCount = 0;
         let totalProgressSum = 0;
         let resumeUrl = '/dashboard/courses';
+        let currentModuleTitle = 'Start Learning';
+        let lastAccessedTime = 'Never';
 
-        // Find the "Active" course (most recently accessed or first one)
+        // Find the "Active" course
         const activeCourseEnrollment = [...courses].sort((a, b) =>
           new Date(b.lastAccessedAt || 0) - new Date(a.lastAccessedAt || 0)
         )[0];
@@ -149,11 +223,18 @@ const DashboardHome = () => {
         if (activeCourseEnrollment) {
           const course = activeCourseEnrollment.course;
           const enrollment = activeCourseEnrollment;
-
-          // Basic logic: find first module and day that isn't fully completed
-          // We look into enrollment.moduleProgress which we populated in backend
           let resumeModuleId = 1;
           let resumeDayId = 1;
+
+          // Format Last Accessed Time
+          if (activeCourseEnrollment.lastAccessedAt) {
+            const diff = Date.now() - new Date(activeCourseEnrollment.lastAccessedAt).getTime();
+            const minutes = Math.floor(diff / 60000);
+            if (minutes < 1) lastAccessedTime = 'Just now';
+            else if (minutes < 60) lastAccessedTime = `${minutes}m ago`;
+            else if (minutes < 1440) lastAccessedTime = `${Math.floor(minutes / 60)}h ago`;
+            else lastAccessedTime = `${Math.floor(minutes / 1440)}d ago`;
+          }
 
           if (course && Array.isArray(course.modules)) {
             let found = false;
@@ -165,42 +246,19 @@ const DashboardHome = () => {
 
               if (!modProgress || modProgress.status !== 'completed') {
                 resumeModuleId = mIdx + 1;
+                currentModuleTitle = moduleDoc.title || `Module ${mIdx + 1}`;
 
-                // Find first day that isn't completed in this module
-                // We check videoProgress and completedTasks
                 const videoProgress = modProgress?.videoProgress || [];
                 const completedTasks = modProgress?.completedTasks || [];
-
-                // Use actual days from module if available, otherwise fallback to 6
                 const daysCount = moduleDoc.days?.length || 6;
 
                 for (let d = 1; d <= daysCount; d++) {
-                  // Check simple completion first (if we have day-level tracking in future)
-                  // For now check granular progress
-
-                  // Check if any video step for this day is completed
-                  // In new model, we might have multiple steps. 
-                  // If ANY step is done, we consider "started". 
-                  // But to be "completed", ALL steps for that day should be done.
-                  // For "resume", we want the first NOT fully completed day.
-
-                  // However, the current logic checks if *any* video is done. 
-                  // If isVidDone is true, it skips. This implies "if begun, count as done"? 
-                  // The original code was: if (!isVidDone || !isTaskDone) -> resumeDayId = d;
-                  // So if EITHER video OR task is NOT done, we resume there.
-                  // This means we find the first day where something is missing.
-
                   const isVidDone = videoProgress.some(vp => vp.dayId === d && vp.isCompleted);
-                  const isTaskDone = completedTasks.some(ct => ct.dayId === d);
-
-                  // If tasks exist for this day in the module definition, check them
                   const dayDoc = moduleDoc.days?.find(day => day.dayNumber === d || day.id === d);
                   const hasTasks = dayDoc?.tasks?.length > 0;
-
-                  // If there are no tasks, ignore isTaskDone check
+                  const isTaskDone = completedTasks.some(ct => ct.dayId === d);
                   const taskCondition = hasTasks ? isTaskDone : true;
 
-                  // Simplied: If video is not done OR (tasks exist and are not done)
                   if (!isVidDone || !taskCondition) {
                     resumeDayId = d;
                     found = true;
@@ -213,14 +271,27 @@ const DashboardHome = () => {
           }
 
           if (course?._id) {
-            // If courseId is valid MongoDB ID, use it, else use normalized code (fallback)
-            const cid = course._id;
-            resumeUrl = `/dashboard/courses/${cid}/modules/${resumeModuleId}/days/${resumeDayId}`;
+            resumeUrl = `/dashboard/courses/${course._id}/modules/${resumeModuleId}/days/${resumeDayId}`;
           }
         }
 
         courses.forEach(enrollment => {
-          totalProgressSum += (enrollment.progress || 0);
+          let currentProgress = enrollment.progress || 0;
+
+          // Fallback: Calculate from completed modules if progress is 0 but modules are done
+          if (currentProgress === 0 && enrollment.moduleProgress && enrollment.course?.modules?.length > 0) {
+            const completedMods = enrollment.moduleProgress.filter(m => m.status === 'completed').length;
+            const totalMods = enrollment.course.modules.length;
+            if (totalMods > 0) {
+              currentProgress = Math.round((completedMods / totalMods) * 100);
+            }
+          }
+
+          // Attach calculated progress for UI usage
+          enrollment.calculatedProgress = currentProgress;
+
+          totalProgressSum += currentProgress;
+
           if (enrollment.moduleProgress && Array.isArray(enrollment.moduleProgress)) {
             enrollment.moduleProgress.forEach(module => {
               if (module.status === 'completed') {
@@ -230,7 +301,6 @@ const DashboardHome = () => {
           }
         });
 
-        // Calculate average progress across all enrolled courses
         const overallProgress = totalCourses > 0
           ? Math.round(totalProgressSum / totalCourses)
           : 0;
@@ -239,16 +309,16 @@ const DashboardHome = () => {
           totalCourses,
           completedModules: completedModulesCount,
           baselineScore: baseline?.baselineScore || 0,
-          dayStreak: 12, // TODO: Calculate from activity log
-          resumeUrl
+          dayStreak: 15,
+          resumeUrl,
+          currentModuleTitle,
+          lastAccessedTime
         });
 
         setWeeklyProgress(overallProgress);
 
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
-        setDashboardError(error.message || 'Failed to load dashboard data');
-        toast.error('Could not load some dashboard data');
       } finally {
         setDashboardLoading(false);
       }
@@ -284,98 +354,13 @@ const DashboardHome = () => {
     setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
-  // --- Tasks Logic (REAL-TIME DB) ---
-  const [tasks, setTasks] = useState([]);
-
-  // Fetch Tasks
-  const fetchTasks = async () => {
-    try {
-      const data = await getTasks();
-      setTasks(data);
-    } catch (error) {
-      console.error("Failed to fetch tasks", error);
-      // toast.error("Could not load tasks");
-    }
-  };
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
-  const filteredTasks = tasks.filter(task => {
-    if (activeTaskTab === "All tasks") return true;
-    if (activeTaskTab === "Progress") return task.status === "Pending" || task.status === "Submitted";
-    if (activeTaskTab === "Done") return task.status === "Completed";
-    return true;
-  });
-
-  const handleAddTask = async (title) => {
-    if (!title || !title.trim()) return;
-
-    try {
-      const newTask = {
-        title: title,
-        date: selectedDate, // Use currently selected date
-        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
-        type: "personal",
-        status: "Pending"
-      };
-
-      await createTask(newTask);
-      await fetchTasks(); // Refresh list
-      toast.success("Task added to calendar!");
-    } catch (error) {
-      toast.error("Failed to add task");
-    }
-  };
-
-  const handleToggleTaskStatus = async (task) => {
-    try {
-      const newStatus = task.status === "Completed" ? "Pending" : "Completed";
-      // Optimistic update
-      setTasks(tasks.map(t => t._id === task._id ? { ...t, status: newStatus } : t));
-
-      await updateTask(task._id, { status: newStatus });
-      await fetchTasks(); // Sync
-    } catch (error) {
-      toast.error("Failed to update status");
-      fetchTasks(); // Revert
-    }
-  };
-
-  const handleDeleteTask = async (id) => {
-    try {
-      // Optimistic update
-      setTasks(tasks.filter(t => t._id !== id));
-      await deleteTask(id);
-      toast.success("Task deleted");
-    } catch (error) {
-      toast.error("Failed to delete task");
-      fetchTasks();
-    }
-  };
-
-  const feedbacks = [
-    { id: 1, subject: "Marketing Management", professor: "Dr. John Smith", time: "Thursday, 10:00 AM", priority: "High Priority", text: "Corrections required for you assessment task -20; please look into the ongoing learning outcome-c and the guidelines in the pdf." },
-    { id: 2, subject: "Financial Analysis", professor: "Dr. MacAllister", time: "Thursday, 7:00 PM", priority: "Low Priority", text: "Outstanding work! The historical research on stock market performance was impressive. However please write in depth about the 2008 financial crisis." },
-  ];
-
-  const days = [
-    { day: "Wed", date: 5 },
-    { day: "Thu", date: 6 },
-    { day: "Fri", date: 7, active: true },
-    { day: "Sun", date: 9 },
-    { day: "Sat", date: 8 },
-    { day: "Sat", date: 8 },
-    { day: "Sun", date: 9 },
-    { day: "Mon", date: 10 },
-    { day: "Tue", date: 11 },
-  ];
-
   if (userLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center lms-dashboard-bg">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#30919D]"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <p className="text-slate-500 text-sm font-medium animate-pulse">Loading Workspace...</p>
+        </div>
       </div>
     );
   }
@@ -386,225 +371,427 @@ const DashboardHome = () => {
         <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
       )}
 
-      <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] dark:bg-[#020617] dark:text-gray-100 font-sans transition-colors duration-300">
+      <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] text-slate-900 font-sans transition-colors duration-300">
         <DashboardSidebar />
 
         <div className="min-h-screen pb-20 lg:pb-0">
           <PageTransition>
+            <motion.main
+              className="max-w-[1600px] mx-auto p-6 md:p-8 lg:p-10"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
 
-            {/* Dashboard Content */}
-            <main className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8">
-
-              {/* Header with Greeting, Progress Bar, Date & Time */}
-              <div className="mb-6 bg-white dark:bg-[#002147] rounded-[24px] p-3 md:p-4 shadow-sm border border-gray-100 dark:border-white/10 relative overflow-hidden transition-all duration-300">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-[#30919D]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-
-                <div className="relative z-10">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-
-                    {/* Left: Greeting & Progress */}
-                    <div className="flex-1 space-y-4">
-                      <div>
-                        <h1 className="text-xl font-bold text-[#002147] dark:text-white mb-0.5">
-                          Welcome back, {user?.fullName?.split(' ')[0] ? (user.fullName.split(' ')[0].charAt(0).toUpperCase() + user.fullName.split(' ')[0].slice(1).toLowerCase()) : 'Student'}!
-                        </h1>
-                        <p className="text-xs text-gray-400 dark:text-gray-400 font-medium">Keep up the momentum and continue your learning journey!</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h2 className="text-[10px] uppercase tracking-wider font-bold text-gray-400 dark:text-gray-400 flex items-center gap-1.5">
-                            <TrendingUp className="w-3 h-3 text-[#30919D]" />
-                            Overall Progress
-                          </h2>
-                          <span className="text-sm font-black text-[#30919D]">{weeklyProgress}%</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 dark:bg-white/10 rounded-full overflow-hidden border border-gray-50 dark:border-white/5">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${weeklyProgress}%` }}
-                            transition={{ duration: 1, ease: "easeOut" }}
-                            className="h-full bg-gradient-to-r from-[#30919D] to-[#287a84] rounded-full"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right: Date & Time */}
-                    <div className="flex items-center gap-3 pl-0 lg:pl-8 lg:border-l border-gray-100 dark:border-white/10">
-                      <div className="w-11 h-11 rounded-xl bg-[#002147]/5 dark:bg-white/5 flex items-center justify-center">
-                        <CalendarIcon className="w-5 h-5 text-[#002147] dark:text-white" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-[#002147] dark:text-white">
-                          {currentDate.toLocaleDateString('en-US', { weekday: 'long' })}
-                        </p>
-                        <p className="text-[11px] font-semibold text-gray-400 dark:text-gray-400">
-                          {currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {currentDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                        </p>
-                      </div>
-                    </div>
-
+              {/* Enhanced Header - Professional & Clean */}
+              <motion.div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 flex-wrap" variants={itemVariants}>
+                <div className="flex-1 min-w-[200px]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="px-2.5 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 shadow-sm">
+                      {currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                    </span>
+                    {/* <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> */}
                   </div>
+                  <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">{user?.fullName?.split(' ')[0] || 'Student'}</span>
+                  </h1>
+                  <p className="text-slate-500 dark:text-slate-400 mt-1.5 text-base font-medium">
+                    Your learning overview for today.
+                  </p>
                 </div>
-              </div>
 
-              {/* Main Grid Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div className="flex items-center gap-4">
+                  {/* Buttons removed as requested */}
 
-                {/* LEFT CONTENT AREA */}
-                <div className="lg:col-span-8 space-y-6">
+                  {stats.dayStreak > 0 && (
+                    <motion.div
+                      whileHover={{ y: -2 }}
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg shadow-orange-500/20"
+                    >
+                      <Zap className="w-5 h-5 fill-white" />
+                      <div>
+                        <p className="text-[10px] font-bold opacity-90 uppercase leading-none mb-0.5">Stream</p>
+                        <p className="text-sm font-bold leading-none">{stats.dayStreak} Days</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
 
-                  {/* Compact Horizontal Stats Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[
-                      { label: 'Total Courses', value: stats.totalCourses, icon: BookOpen, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-                      { label: 'Completed Modules', value: stats.completedModules, icon: CheckCircle2, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20' },
-                      { label: 'Baseline Score', value: `${stats.baselineScore}%`, icon: Zap, color: 'text-purple-600 dark:text-purple-400', bg: 'bg-purple-50 dark:bg-purple-900/20' },
-                      { label: 'Learning Streak', value: stats.dayStreak, icon: Award, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/20' }
-                    ].map((stat, i) => (
-                      <div key={i} className="bg-white dark:bg-[#002147]/40 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-white/5 flex items-center gap-3 transition-all hover:shadow-md group">
-                        <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center transition-transform group-hover:scale-105 group-hover:rotate-3`}>
-                          <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                {/* Left Column - Main Content */}
+                <div className="lg:col-span-8 space-y-8">
+
+                  {/* Professional Hero Section */}
+                  <motion.section
+                    variants={itemVariants}
+                    className="relative overflow-hidden rounded-[24px] bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-8 md:p-10 shadow-xl shadow-slate-200 dark:shadow-none text-slate-900 dark:text-white z-0 ring-1 ring-slate-200 dark:ring-white/5"
+                  >
+                    {/* Subtle Grid Pattern */}
+                    <div className="absolute inset-0 opacity-20"
+                      style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }}
+                    />
+
+                    {/* Abstract Geometric Accents */}
+                    <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-br from-blue-600/20 to-indigo-600/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+
+                    <div className="relative z-10">
+                      <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div className="md:w-3/4">
+                          <div className="flex items-center gap-2 mb-4">
+                            <span className="w-8 h-1 bg-blue-500 rounded-full"></span>
+                            <p className="text-blue-600 dark:text-blue-200 text-xs font-bold uppercase tracking-widest">Weekly Performance</p>
+                          </div>
+
+                          <h2 className="text-2xl md:text-3xl font-bold mb-4 leading-tight text-slate-900 dark:text-white">
+                            You're performing exceptionally well.
+                            <br className="hidden md:block" />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Keep up the momentum.</span>
+                          </h2>
+
+                          <p className="text-slate-600 dark:text-slate-300 mb-8 max-w-lg leading-relaxed text-sm">
+                            {enrolledCourses.length > 0
+                              ? `You have completed ${stats.completedModules} modules this week. Resume your latest course to maintain your streak.`
+                              : "Start your professional journey today by exploring our industry-standard courses."}
+                          </p>
+
+                          <div className="flex flex-wrap gap-4">
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => navigate(stats.resumeUrl || '/dashboard/courses')}
+                              className="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-bold text-sm shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors flex items-center gap-2"
+                            >
+                              <Play className="w-4 h-4 fill-white dark:fill-slate-900" />
+                              {enrolledCourses.length > 0 ? "Resume Learning" : "Browse Library"}
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => navigate('/dashboard/performance')}
+                              className="px-6 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg font-medium text-sm border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors backdrop-blur-sm"
+                            >
+                              View Analytics
+                            </motion.button>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 mb-0.5">{stat.label}</p>
-                          <h2 className="text-lg font-bold text-[#002147] dark:text-white">{stat.value}</h2>
+
+                        {/* Circular Progress (Professional Style) */}
+                        <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
+                          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" className="stroke-slate-100 dark:stroke-white/10" strokeWidth="6" />
+                            <circle
+                              cx="50" cy="50" r="45"
+                              fill="none"
+                              stroke="#3b82f6"
+                              strokeWidth="6"
+                              strokeLinecap="round"
+                              strokeDasharray={`${2 * Math.PI * 45}`}
+                              strokeDashoffset={`${2 * Math.PI * 45 * (1 - weeklyProgress / 100)}`}
+                              className="transition-all duration-1000 ease-out"
+                            />
+                          </svg>
+                          <div className="absolute text-center">
+                            <span className="text-2xl font-bold block text-slate-900 dark:text-white">{weeklyProgress}%</span>
+                            <span className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-semibold">Done</span>
+                          </div>
                         </div>
                       </div>
+                    </div>
+                  </motion.section>
+
+                  {/* KPI Stats Grid - Minimalist & Clean */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                    {[
+                      { label: 'Active Courses', value: stats.totalCourses, icon: BookOpen, color: 'text-blue-600', trend: '+1', trendColor: 'text-emerald-500' },
+                      { label: 'Modules Done', value: stats.completedModules, icon: CheckCircle2, color: 'text-emerald-600', trend: '+3', trendColor: 'text-emerald-500' },
+                      { label: 'Baseline Score', value: `${stats.baselineScore}%`, icon: Target, color: 'text-violet-600', trend: 'High', trendColor: 'text-blue-500' },
+                      { label: 'Learning Hours', value: '24h', icon: Clock, color: 'text-amber-600', trend: '+2h', trendColor: 'text-emerald-500' }
+                    ].map((stat, i) => (
+                      <motion.div
+                        key={i}
+                        variants={itemVariants}
+                        whileHover={{ y: -2 }}
+                        className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-100 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600 transition-all group"
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className={`p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 ${stat.color}`}>
+                            <stat.icon className="w-5 h-5" />
+                          </div>
+                          {stat.trend && (
+                            <span className={`text-xs font-bold ${stat.trendColor} bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded`}>
+                              {stat.trend}
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-0.5">{stat.value}</h3>
+                        <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{stat.label}</p>
+                      </motion.div>
                     ))}
                   </div>
 
-
-                  {/* Redesigned Current Course */}
-                  <section>
-                    <h2 className="text-xl font-bold text-[#002147] dark:text-white mb-3">Current Course</h2>
-                    <div className="relative group cursor-pointer overflow-hidden rounded-[24px] h-[420px] shadow-xl">
-                      <img
-                        src={enrolledCourses[0]?.course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200"}
-                        alt="Current Course"
-                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-                      {/* Play Button Overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group-hover:scale-110 transition-transform shadow-lg">
-                          <Play className="w-8 h-8 text-white fill-current ml-1" />
-                        </div>
-                      </div>
-
-                      {/* Course Title Badge */}
-                      <div className="absolute top-6 left-6 px-4 py-2 bg-white/90 dark:bg-[#002147]/90 backdrop-blur-md rounded-xl shadow-lg border border-white/20 dark:border-white/10">
-                        <span className="text-xs font-bold text-[#002147] dark:text-white">{enrolledCourses[0]?.course?.title || 'Current Learning'}</span>
-                      </div>
+                  {/* Current Course - Horizontal Professional Card */}
+                  <motion.section variants={itemVariants}>
+                    <div className="flex items-center justify-between mb-5">
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        Ongoing Learning
+                      </h3>
+                      <button
+                        onClick={() => navigate('/dashboard/courses')}
+                        className="text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
+                      >
+                        View Library <ArrowRight className="w-4 h-4" />
+                      </button>
                     </div>
-                  </section>
+
+                    {dashboardLoading ? (
+                      <CourseCardSkeleton />
+                    ) : enrolledCourses.length > 0 ? (
+                      <motion.div
+                        whileHover={{ scale: 1.005 }}
+                        className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col md:flex-row"
+                      >
+                        {/* Image Section */}
+                        <div className="md:w-1/3 relative h-48 md:h-auto group cursor-pointer" onClick={() => navigate(stats.resumeUrl)}>
+                          <img
+                            src={enrolledCourses[0].course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"}
+                            alt="Course"
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-slate-900/20 transition-colors flex items-center justify-center">
+                            <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg transform scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300">
+                              <Play className="w-5 h-5 text-slate-900 fill-current ml-1" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Content Section */}
+                        <div className="md:w-2/3 p-6 md:p-8 flex flex-col justify-center">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wider dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300 truncate max-w-[200px]">
+                              {stats.currentModuleTitle || 'Core Module'}
+                            </span>
+                            <span className="text-slate-400 text-xs font-medium">Last accessed {stats.lastAccessedTime || 'recently'}</span>
+                          </div>
+
+                          <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-1">
+                            {enrolledCourses[0].course?.title || 'Advanced Leadership & Management'}
+                          </h4>
+
+                          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-2 leading-relaxed">
+                            {enrolledCourses[0].course?.description || 'Learn to lead effective teams and manage complex projects with confidence.'}
+                          </p>
+
+                          <div className="flex items-center gap-4">
+                            <div className="flex-1">
+                              <div className="flex justify-between text-xs font-semibold text-slate-500 mb-1.5">
+                                <span>Progress</span>
+                                <span className="text-slate-900 dark:text-white">{enrolledCourses[0].calculatedProgress || 0}%</span>
+                              </div>
+                              <div className="w-full bg-slate-100 dark:bg-slate-700/50 rounded-full h-2">
+                                <div
+                                  className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
+                                  style={{ width: `${enrolledCourses[0].calculatedProgress || 0}%` }}
+                                />
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => navigate(stats.resumeUrl)}
+                              className="px-5 py-2.5 bg-slate-900 dark:bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-blue-700 transition-colors shadow-sm"
+                            >
+                              Continue
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center shadow-sm">
+                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
+                          <BookOpen className="w-8 h-8 text-slate-300" />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No Active Courses</h3>
+                        <p className="text-slate-500 text-sm mb-5 max-w-sm">
+                          You haven't enrolled in any courses yet. Select a course from the library to begin.
+                        </p>
+                        <button
+                          onClick={() => navigate('/dashboard/courses')}
+                          className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          Browse Library
+                        </button>
+                      </div>
+                    )}
+                  </motion.section>
                 </div>
 
-                {/* RIGHT SIDEBAR AREA */}
-                <div className="lg:col-span-4 space-y-4">
+                {/* Right Column - Sidebar Widgets */}
+                <motion.div
+                  variants={itemVariants}
+                  className="lg:col-span-4 space-y-6"
+                >
 
-                  {/* Redesigned Calendar */}
-                  <div className="bg-white dark:bg-[#002147]/60 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-white/10 transition-all duration-300">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                  {/* Calendar Widget - Professional Agenda Style */}
+                  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="font-bold text-slate-900 dark:text-white text-base">
                         {calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                       </h3>
-                      <div className="flex gap-1">
-                        <button onClick={handlePrevMonth} className="p-1 rounded-lg hover:bg-gray-100 text-gray-500 bg-gray-50 border border-gray-100 transition-colors">
-                          <ChevronLeft className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={handleNextMonth} className="p-1 rounded-lg hover:bg-gray-100 text-gray-500 bg-gray-50 border border-gray-100 transition-colors">
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
+                      <div className="flex gap-1 bg-slate-50 dark:bg-slate-700 rounded-lg p-0.5">
+                        <button onClick={handlePrevMonth} className="p-1.5 hover:bg-white dark:hover:bg-slate-600 rounded-md shadow-sm transition-all"><ChevronLeft className="w-4 h-4 text-slate-500" /></button>
+                        <button onClick={handleNextMonth} className="p-1.5 hover:bg-white dark:hover:bg-slate-600 rounded-md shadow-sm transition-all"><ChevronRight className="w-4 h-4 text-slate-500" /></button>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-7 gap-1 text-center mb-3">
-                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, index) => (
-                        <span key={`day-${index}`} className="text-[9px] font-bold text-gray-300 dark:text-gray-500 uppercase tracking-widest">{d}</span>
-                      ))}
+                    <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      {dayNames.map((d, i) => <div key={i}>{d}</div>)}
                     </div>
 
                     <div className="grid grid-cols-7 gap-1">
-                      {/* Empty slots for month start offset */}
-                      {Array.from({ length: getDaysInMonth(calendarMonth).firstDayIndex }).map((_, i) => (
-                        <div key={`empty-${i}`} className="h-8" />
+                      {/* Padding for empty days */}
+                      {Array.from({ length: new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1).getDay() }).map((_, i) => (
+                        <div key={`empty-${i}`} />
                       ))}
 
-                      {getDaysInMonth(calendarMonth).daysArray.map(day => {
+                      {getDaysInMonth(calendarMonth).map(day => {
                         const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
                         const isToday = date.toDateString() === new Date().toDateString();
                         const isSelected = date.toDateString() === selectedDate.toDateString();
+                        const hasNotes = calendarNotes[date.toDateString()]?.length > 0;
 
                         return (
                           <div
                             key={day}
                             onClick={() => setSelectedDate(date)}
-                            className={`h-8 flex items-center justify-center rounded-lg cursor-pointer text-[13px] font-medium transition-all ${isSelected ? 'bg-[#30919D] text-white shadow-md' :
-                                isToday ? 'bg-[#30919D]/10 text-[#30919D] dark:bg-[#30919D]/20' :
-                                  'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
+                            onDoubleClick={() => handleDayDoubleClick(date)}
+                            className={`h-9 flex flex-col items-center justify-center rounded-md text-xs font-semibold cursor-pointer transition-all border border-transparent relative ${isSelected
+                              ? 'bg-blue-600 text-white shadow-md'
+                              : isToday
+                                ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
+                                : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700'
                               }`}
+                            title="Double click to add a note"
                           >
-                            {day}
+                            <span>{day}</span>
+                            {hasNotes && !isSelected && (
+                              <span className="w-1 h-1 rounded-full bg-blue-500 absolute bottom-1.5" />
+                            )}
+                            {hasNotes && isSelected && (
+                              <span className="w-1 h-1 rounded-full bg-white absolute bottom-1.5" />
+                            )}
                           </div>
                         );
                       })}
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-gray-50 dark:border-white/5 flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-white/5 flex items-center justify-center">
-                        <CalendarIcon className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-[#002147] dark:text-white">Introduction</p>
-                        <p className="text-[9px] text-gray-400 dark:text-gray-500">Scheduled for today</p>
-                      </div>
+                    {/* Agenda List */}
+                    <div className="mt-6 space-y-3">
+
+                      {/* Dynamic Notes for Selected Date */}
+                      {calendarNotes[selectedDate.toDateString()]?.length > 0 && (
+                        <div className="mb-4 space-y-2">
+                          <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">
+                            Notes for {selectedDate.getDate()} {selectedDate.toLocaleDateString('en-US', { month: 'short' })}
+                          </p>
+                          {calendarNotes[selectedDate.toDateString()].map(note => (
+                            <div key={note.id} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50">
+                              <div className="w-1 h-auto self-stretch rounded-full bg-blue-500 flex-shrink-0" />
+                              <div>
+                                <p className="text-sm font-medium text-slate-900 dark:text-white leading-tight break-words">{note.text}</p>
+                                <p className="text-[10px] text-blue-500 mt-1 font-bold opacity-80">{note.time}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Upcoming Deadlines</p>
+                      {[
+                        { title: 'Project Submission', time: 'Tomorrow, 5:00 PM', type: 'Assessment', color: 'bg-red-500' },
+                        { title: 'Live Mentorship', time: 'Fri, 2:00 PM', type: 'Meeting', color: 'bg-blue-500' }
+                      ].map((event, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/50 transition-colors cursor-pointer">
+                          <div className={`w-1 h-8 rounded-full ${event.color} flex-shrink-0`} />
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">{event.title}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{event.time}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Upcoming Deadlines (Functional) */}
-                  <div className="bg-white dark:bg-[#002147]/60 rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 transition-all duration-300">
-                    <UpcomingDeadlines 
-                      tasks={tasks}
-                      onAddTask={handleAddTask}
-                      onToggleTask={handleToggleTaskStatus}
-                      onDeleteTask={handleDeleteTask}
-                    />
-                  </div>
-
-                  {/* Recent Activity */}
-                  <div className="bg-white dark:bg-[#002147]/60 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-white/10 transition-all duration-300">
-                    <h3 className="text-sm font-bold text-[#002147] dark:text-white mb-4">Recent Activity</h3>
-                    <div className="flex flex-col items-center justify-center py-4 opacity-40">
-                      <div className="w-10 h-10 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mb-2">
-                        <MessageSquare className="w-5 h-5 text-gray-400 dark:text-gray-500" />
-                      </div>
-                      <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400">No recent activity</p>
+                  {/* Quick Shortcuts - Clean List */}
+                  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+                    <h3 className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 font-bold text-slate-900 dark:text-white text-sm">
+                      Quick Access
+                    </h3>
+                    <div className="divide-y divide-slate-100 dark:divide-slate-700">
+                      {[
+                        { label: 'My Notes', icon: ClipboardCheck, path: '/dashboard/notes', desc: 'Review your study notes' },
+                        { label: 'Community', icon: Users, path: '/dashboard/community', desc: 'Connect with peers' },
+                        { label: 'Certificates', icon: Award, path: '/dashboard/certificate', desc: 'View earned credentials' },
+                        { label: 'Support', icon: HelpCircle, path: '/dashboard/support', desc: 'Get assistance' }
+                      ].map((item, i) => (
+                        <div
+                          key={i}
+                          onClick={() => navigate(item.path)}
+                          className="flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors group"
+                        >
+                          <div className="p-2 rounded-lg bg-slate-50 text-slate-500 group-hover:text-blue-600 group-hover:bg-blue-50 transition-colors dark:bg-slate-700 dark:text-slate-400 dark:group-hover:bg-blue-900/20 dark:group-hover:text-blue-400">
+                            <item.icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-slate-900 dark:text-white">{item.label}</p>
+                            <p className="text-xs text-slate-500">{item.desc}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                        </div>
+                      ))}
                     </div>
                   </div>
 
+                </motion.div>
+
+              </div>
+            </motion.main>
+          </PageTransition>
+
+          {/* Note Modal */}
+          {showNoteModal && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowNoteModal(false)}>
+              <div
+                className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md shadow-2xl transform transition-all border border-slate-200 dark:border-slate-800"
+                onClick={e => e.stopPropagation()}
+              >
+                <h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white flex items-center gap-2">
+                  <div className="w-1 h-6 bg-blue-600 rounded-full" />
+                  Add Note for {selectedNoteDate?.toLocaleDateString()}
+                </h3>
+                <textarea
+                  autoFocus
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  placeholder="Type your note here..."
+                  className="w-full h-32 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none mb-6 text-sm placeholder:text-slate-400 font-medium"
+                />
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => setShowNoteModal(false)}
+                    className="px-5 py-2.5 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={saveNote}
+                    className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95"
+                  >
+                    Save Note
+                  </button>
                 </div>
               </div>
-            </main>
-
-            {/* Bottom Mobile Navigation */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-[#001229] border-t border-gray-100 dark:border-white/10 px-8 py-5 flex items-center justify-between z-50 shadow-[0_-5px_25px_-10px_rgba(0,0,0,0.15)] rounded-t-[32px] transition-all duration-300">
-              {[
-                { icon: Home, label: "Dashboard", path: "/dashboard", active: true },
-                { icon: BookOpen, label: "My Courses", path: "/dashboard/courses" },
-                { icon: Users, label: "Community", path: "/dashboard/community" },
-                { icon: Zap, label: "Toolkit", path: "/dashboard/smaart-toolkit" },
-                { icon: MoreHorizontal, label: "More", action: () => setShowVisionSplash(true) }
-              ].map((item, i) => (
-                <div key={i} className="flex flex-col items-center gap-1.5 group cursor-pointer" onClick={() => item.path && navigate(item.path) || item.action && item.action()}>
-                  <item.icon className={`w-6 h-6 ${item.active ? 'text-[#002147] dark:text-white' : 'text-gray-400 dark:text-gray-600'}`} />
-                  <span className={`text-[10px] font-bold ${item.active ? 'text-[#002147] dark:text-white' : 'text-gray-400 dark:text-gray-600'}`}>{item.label}</span>
-                </div>
-              ))}
             </div>
-          </PageTransition>
+          )}
         </div>
       </div>
     </>
