@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Badge = require('../models/Badge');
 const UserBadge = require('../models/UserBadge');
 const CourseEnrollment = require('../models/CourseEnrollment');
@@ -69,7 +70,7 @@ const awardBadge = async (userId, badgeId, metadata = {}) => {
 };
 
 /**
- * Check and award course completion badge
+ * Check and award course completion badges
  * @param {String} userId - User ID
  * @param {String} courseId - Course ID
  * @param {Object} courseData - Course details
@@ -203,24 +204,65 @@ const updateBadgeProgress = async (userId, badgeId, currentProgress) => {
  */
 const getUserBadges = async (userId) => {
     try {
+        const User = require('../models/User');
+        const Student = require('../models/Student');
+
+        // Find user in both collections to get legacy badges
+        let userDoc = await User.findById(userId);
+        if (!userDoc) {
+            userDoc = await Student.findById(userId);
+        }
+
         const userBadges = await UserBadge.find({ userId })
             .populate('badgeId')
             .sort({ earnedDate: -1 });
 
-        // Get all available badges
+        // Get all available badges from the new system
         const allBadges = await Badge.find({ isActive: true });
 
-        // Create a map of user's badges
+        // Create a map of user's badges from the NEW system
         const userBadgeMap = new Map();
         userBadges.forEach(ub => {
             if (ub.badgeId) {
-                userBadgeMap.set(ub.badgeId._id.toString(), ub);
+                userBadgeMap.set(ub.badgeId.badgeId, {
+                    isEarned: ub.isEarned,
+                    earnedDate: ub.earnedDate,
+                    progress: ub.progress,
+                    metadata: ub.metadata
+                });
             }
         });
 
-        // Combine all badges with user's progress
+        // Add legacy badges to the map if they aren't already there
+        if (userDoc && userDoc.badges) {
+            userDoc.badges.forEach(lb => {
+                // Map legacy IDs to new ones to prevent double-counting
+                let normalizedId = lb.badgeId;
+                if (normalizedId === 'EARLY-ACHIEVER') {
+                    normalizedId = 'BADGE-FIRST-3-SESSIONS';
+                }
+
+                if (!userBadgeMap.has(normalizedId)) {
+                    userBadgeMap.set(normalizedId, {
+                        isEarned: true,
+                        earnedDate: lb.earnedAt || lb.earnedDate,
+                        progress: { current: 1, target: 1, percentage: 100 },
+                        metadata: lb.metadata || {},
+                        isLegacy: true,
+                        title: lb.title,
+                        description: lb.description,
+                        icon: lb.icon,
+                        tier: lb.tier,
+                        xp: lb.xp,
+                        category: lb.category
+                    });
+                }
+            });
+        }
+
+        // Combine all known badges
         const badges = allBadges.map(badge => {
-            const userBadge = userBadgeMap.get(badge._id.toString());
+            const userBadge = userBadgeMap.get(badge.badgeId);
 
             return {
                 id: badge.badgeId,
@@ -233,18 +275,124 @@ const getUserBadges = async (userId) => {
                 icon: badge.icon,
                 color: badge.color,
                 rarity: badge.rarity,
-                isEarned: userBadge ? userBadge.isEarned : false,
+                isEarned: !!userBadge,
                 earnedDate: userBadge ? userBadge.earnedDate : null,
-                progress: userBadge ? userBadge.progress : { current: 0, target: 1, percentage: 0 },
-                metadata: userBadge ? userBadge.metadata : {},
+                progress: userBadge?.progress || { current: 0, target: 1, percentage: 0 },
+                metadata: userBadge?.metadata || {},
                 percentile: userBadge?.metadata?.percentile
             };
+        });
+
+        // Add legacy badges that aren't in the official "allBadges" list if any
+        userBadgeMap.forEach((ub, bid) => {
+            if (!badges.some(b => b.id === bid)) {
+                badges.push({
+                    id: bid,
+                    title: ub.title || bid,
+                    description: ub.description || '',
+                    category: ub.category || 'special',
+                    tier: ub.tier || 'bronze',
+                    xp: ub.xp || 0,
+                    icon: ub.icon || 'award',
+                    isEarned: true,
+                    earnedDate: ub.earnedDate,
+                    progress: { current: 1, target: 1, percentage: 100 },
+                    metadata: ub.metadata,
+                    isLegacy: true
+                });
+            }
         });
 
         return badges;
     } catch (error) {
         console.error('Error getting user badges:', error);
         throw error;
+    }
+};
+
+/**
+ * Check and award "First Three Sessions" badge
+ * @param {String} userId - User ID
+ * @param {String} courseId - Course ID (optional, to check if it's the first course)
+ */
+const checkFirstThreeSessionsBadge = async (userId, courseId = null) => {
+    try {
+        console.log(`[BadgeDebug] 🔍 Global check for "First Three Sessions" badge for user: ${userId}`);
+
+        // Find all enrollments for this user
+        const enrollments = await CourseEnrollment.find({ student: userId })
+            .populate('course');
+
+        if (enrollments.length === 0) {
+            console.log(`[BadgeDebug] ❌ No enrollments found for user ${userId}`);
+            return [];
+        }
+
+        const completedDaysSet = new Set();
+        let primaryCourseName = 'First Course';
+
+        // Sort enrollments by date just to identify the "first" for naming purposes
+        const sortedEnrollments = [...enrollments].sort((a, b) => a.enrollmentDate - b.enrollmentDate);
+        if (sortedEnrollments.length > 0) {
+            primaryCourseName = sortedEnrollments[0].course?.title || primaryCourseName;
+        }
+
+        console.log(`[BadgeDebug] 📊 Aggregating progress across ${enrollments.length} enrollments...`);
+
+        for (const enrollment of enrollments) {
+            if (enrollment.moduleProgress && enrollment.moduleProgress.length > 0) {
+                const firstModuleProgress = enrollment.moduleProgress[0];
+
+                // From videos
+                if (firstModuleProgress.videoProgress) {
+                    firstModuleProgress.videoProgress.forEach(vp => {
+                        if (vp.isCompleted) {
+                            completedDaysSet.add(vp.dayId);
+                            console.log(`[BadgeDebug] ✅ Day ${vp.dayId} completed in ${enrollment.course?.title} (Video)`);
+                        }
+                    });
+                }
+
+                // From tasks
+                if (firstModuleProgress.completedTasks) {
+                    firstModuleProgress.completedTasks.forEach(ct => {
+                        completedDaysSet.add(ct.dayId);
+                        console.log(`[BadgeDebug] ✅ Day ${ct.dayId} completed in ${enrollment.course?.title} (Task)`);
+                    });
+                }
+            }
+        }
+
+        const completedDaysTotal = completedDaysSet.size;
+        console.log(`[BadgeDebug] 📉 Total unique completed days across all courses: ${completedDaysTotal} (Days: ${Array.from(completedDaysSet).join(', ')})`);
+
+        if (completedDaysTotal >= 3) {
+            const badge = await Badge.findOne({ badgeId: 'BADGE-FIRST-3-SESSIONS' });
+            if (!badge) {
+                console.log('[BadgeDebug] ❌ BUG: "BADGE-FIRST-3-SESSIONS" not found in database!');
+                return [];
+            }
+
+            const result = await awardBadge(userId, badge._id, {
+                courseName: primaryCourseName,
+                completedDays: completedDaysTotal,
+                completionDate: new Date()
+            });
+
+            if (result.newlyEarned) {
+                console.log(`[BadgeDebug] 🎉 SUCCESS: Awarded "Getting Started" badge to user ${userId}`);
+                return [result];
+            } else {
+                console.log(`[BadgeDebug] ℹ️ Badge already held by user ${userId}.`);
+            }
+        } else {
+            console.log(`[BadgeDebug] ⏳ Eligibility check: ${completedDaysTotal}/3 days completed. Not awarding yet.`);
+        }
+
+        return [];
+    } catch (error) {
+        console.error('[BadgeDebug] ❌ CRITICAL ERROR in checkFirstThreeSessionsBadge:', error);
+        return [];
     }
 };
 
@@ -305,13 +453,12 @@ const getUserBadgeStats = async (userId) => {
     }
 };
 
-const mongoose = require('mongoose');
-
 module.exports = {
     awardBadge,
     checkCourseCompletionBadges,
     checkAssessmentBadges,
     updateBadgeProgress,
     getUserBadges,
-    getUserBadgeStats
+    getUserBadgeStats,
+    checkFirstThreeSessionsBadge
 };

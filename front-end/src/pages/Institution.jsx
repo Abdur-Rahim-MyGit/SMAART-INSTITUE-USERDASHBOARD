@@ -54,7 +54,7 @@ const Institution = () => {
         />
       </div>
 
-      <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 pt-20 sm:pt-24 pb-12 relative z-10">
+      <main className="min-h-screen flex items-center justify-center px-3 sm:px-4 md:px-6 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-10 md:pb-12 relative z-10">
         <div className="container mx-auto max-w-6xl">
           {/* Back to Home Link */}
           <motion.div
@@ -64,14 +64,15 @@ const Institution = () => {
           >
             <button
               onClick={() => navigate("/")}
-              className="group flex items-center gap-2 text-gray-400 hover:text-[#30919D] transition-colors text-xs font-bold uppercase tracking-widest"
+              className="group flex items-center gap-2 text-gray-400 hover:text-[#30919D] transition-colors text-xs sm:text-sm font-bold uppercase tracking-widest min-h-[44px] py-2"
             >
-              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
-              Back to Marketplace
+              <ArrowLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5 group-hover:-translate-x-1 transition-transform" />
+              <span className="hidden xs:inline">Back to Marketplace</span>
+              <span className="xs:hidden">Back</span>
             </button>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-14 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
 
             {/* Welcome Section (Video) */}
             <motion.div
@@ -80,8 +81,8 @@ const Institution = () => {
               transition={{ delay: 0.2 }}
               className="relative group"
             >
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#30919D] to-[#daa520] rounded-2xl sm:rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-              <div className="relative bg-white dark:bg-[#00152e] backdrop-blur-xl rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl">
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#30919D] to-[#daa520] rounded-xl sm:rounded-2xl md:rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+              <div className="relative bg-white dark:bg-[#00152e] backdrop-blur-xl rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl">
                 <div className="relative aspect-video">
                   <video
                     autoPlay

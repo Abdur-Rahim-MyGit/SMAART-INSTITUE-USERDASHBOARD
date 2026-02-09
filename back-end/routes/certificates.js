@@ -21,11 +21,44 @@ router.post('/issue', protect, async (req, res) => {
             return res.status(404).json({ message: 'User object not found in request context' });
         }
 
+        // CHECK: Does certificate already exist for this user and type?
+        const existingCertificate = await Certificate.findOne({
+            userId: user._id,
+            certificateType: certificateType,
+            status: { $ne: 'revoked' } // Exclude revoked certificates
+        }).sort({ issueDate: -1 }); // Get the most recent one
+
+        if (existingCertificate) {
+            console.log(`✅ Returning existing certificate ${existingCertificate.certificateId} for user ${user.email}`);
+
+            const frontendUrl = process.env.FRONTEND_URL || (req.headers.origin || 'http://localhost:8080');
+            const verificationUrl = `${frontendUrl}/verify-certificate/${existingCertificate.certificateId}`;
+
+            return res.json({
+                success: true,
+                message: 'Certificate already exists',
+                certificate: {
+                    certificateId: existingCertificate.certificateId,
+                    fullName: existingCertificate.fullName,
+                    certificateType: existingCertificate.certificateType,
+                    certificateTitle: existingCertificate.certificateTitle,
+                    issueDate: existingCertificate.issueDate,
+                    verificationUrl: verificationUrl,
+                    validatedSkills: existingCertificate.validatedSkills,
+                    readinessBand: existingCertificate.readinessBand
+                }
+            });
+        }
+
+        // If no existing certificate, create new one
+        console.log(`✨ Creating new certificate for user ${user.email}, type: ${certificateType}`);
+
         // Generate unique certificate ID
         const certificateCode = {
             'capacity': 'CAP',
             'capability': 'APC',
-            'leadership': 'ELR'
+            'leadership': 'ELR',
+            'combined': 'MPD'
         }[certificateType] || 'CRT';
 
         const year = new Date().getFullYear();
@@ -76,6 +109,7 @@ router.post('/issue', protect, async (req, res) => {
                 verificationUrl: `${frontendUrl}/verify-certificate/${certificate.certificateId}`
             }
         });
+
     } catch (error) {
         console.error('❌ Error issuing certificate:', error);
         res.status(500).json({

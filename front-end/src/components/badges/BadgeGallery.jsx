@@ -82,12 +82,19 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
     const silverCount = earnedBadges.filter((b) => b.tier === 'silver').length;
     const bronzeCount = earnedBadges.filter((b) => b.tier === 'bronze').length;
 
-    // Filter badges
-    const filteredBadges = badges.filter((badge) => {
-        const categoryMatch = activeCategory === 'all' || badge.category === activeCategory;
-        const earnedMatch = !showEarnedOnly || badge.isEarned;
-        return categoryMatch && earnedMatch;
-    });
+    // Filter and sort badges
+    const filteredBadges = badges
+        .filter((badge) => {
+            const categoryMatch = activeCategory === 'all' || badge.category === activeCategory;
+            const earnedMatch = !showEarnedOnly || badge.isEarned;
+            return categoryMatch && earnedMatch;
+        })
+        .sort((a, b) => {
+            // Sort by earned status first
+            if (a.isEarned && !b.isEarned) return -1;
+            if (!a.isEarned && b.isEarned) return 1;
+            return 0;
+        });
 
     const handleBadgeClick = (badge) => {
         if (badge.isEarned) {
