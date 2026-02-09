@@ -202,10 +202,10 @@ const DashboardSidebar = () => {
           <div className="flex items-center gap-2">
             {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
             >
-              {isMobileOpen ? <X className="w-5 h-5 text-gray-600" /> : <Menu className="w-5 h-5 text-gray-600" />}
+              {isMobileOpen ? <X className="w-5 h-5 text-gray-600 dark:text-gray-300" /> : <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />}
             </button>
 
             {/* Logo */}
@@ -226,8 +226,13 @@ const DashboardSidebar = () => {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-4">
+            {/* Streak Badge - New Position */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-50 border border-orange-100 shadow-sm">
+              <Zap className="w-4 h-4 text-orange-500 fill-orange-500" />
+              <span className="text-sm font-bold text-orange-900">7 day streak</span>
+            </div>
 
-            {/* Notification Bell with Dropdown */}
+            {/* Notification Bell */}
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setNotificationOpen(!notificationOpen)}
@@ -372,15 +377,15 @@ const DashboardSidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 h-screen w-[280px] flex flex-col z-50 lg:hidden bg-white border-r border-gray-100 shadow-2xl"
+            className="fixed left-0 top-0 h-screen w-[280px] flex flex-col z-50 lg:hidden bg-white dark:bg-[#002147] border-r border-gray-100 dark:border-white/10 shadow-2xl transition-colors duration-300"
           >
             {/* Mobile Header */}
-            <div className="p-4 flex items-center justify-between border-b border-gray-100">
+            <div className="p-4 flex items-center justify-between border-b border-gray-100 dark:border-white/10">
               <Link to="/" className="flex items-center gap-2" onClick={() => setIsMobileOpen(false)}>
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#30919D]">
                   <span className="font-bold text-base text-white">S</span>
                 </div>
-                <span className="font-bold text-lg text-[#002147]">
+                <span className="font-bold text-lg text-[#002147] dark:text-white">
                   SMAART<span className="text-[#30919D]">Minds</span>
                 </span>
               </Link>
@@ -411,7 +416,7 @@ const DashboardSidebar = () => {
                         onClick={() => setIsMobileOpen(false)}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
                           ? 'bg-[#30919D] text-white shadow-lg'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
                           }`}
                       >
                         <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-[#30919D]'}`} />
@@ -439,7 +444,7 @@ const DashboardSidebar = () => {
             </div>
 
             {/* Mobile Bottom */}
-            <div className="p-3 space-y-1 border-t border-gray-100 bg-gray-50">
+            <div className="p-3 space-y-1 border-t border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-black/20">
               {bottomMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isHelpButton = item.label === 'Help';
@@ -465,7 +470,7 @@ const DashboardSidebar = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMobileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-500 hover:bg-white hover:text-gray-700 transition-all"
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-white/5 hover:text-gray-700 dark:hover:text-white transition-all"
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium text-sm">{item.label}</span>
