@@ -564,26 +564,14 @@ const DashboardHome = () => {
                     </div>
                   </div>
 
-                  {/* Upcoming Deadlines */}
-                  <div className="bg-white dark:bg-[#002147]/60 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-white/10 transition-all duration-300">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-bold text-[#002147] dark:text-white">Deadlines</h3>
-                      <span className="text-[9px] font-bold bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full border border-orange-100 dark:border-orange-500/20">2 Pending</span>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-2 group cursor-pointer">
-                        <div className="w-4 h-4 rounded-full border border-orange-200 dark:border-orange-500/30 mt-0.5 group-hover:border-[#30919D] transition-colors" />
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 leading-tight">Assignment due on Feb 11</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2 group cursor-pointer">
-                        <div className="w-4 h-4 rounded-full border border-orange-200 dark:border-orange-500/30 mt-0.5 group-hover:border-[#30919D] transition-colors" />
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 leading-tight">Complete quiz by Feb 20</p>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Upcoming Deadlines (Functional) */}
+                  <div className="bg-white dark:bg-[#002147]/60 rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 transition-all duration-300">
+                    <UpcomingDeadlines 
+                      tasks={tasks}
+                      onAddTask={handleAddTask}
+                      onToggleTask={handleToggleTaskStatus}
+                      onDeleteTask={handleDeleteTask}
+                    />
                   </div>
 
                   {/* Recent Activity */}
