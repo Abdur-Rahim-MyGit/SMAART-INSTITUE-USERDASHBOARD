@@ -21,7 +21,7 @@ const NOTIFICATION_CONFIG = {
  */
 const createNotification = async (data) => {
   const config = NOTIFICATION_CONFIG[data.type] || NOTIFICATION_CONFIG.system;
-  
+
   const notification = await Notification.createNotification({
     userId: data.userId,
     type: data.type,
@@ -99,6 +99,25 @@ const notifyCourseCompleted = async (userId, course) => {
     color: '#10B981',
     metadata: {
       courseId: course._id
+    }
+  });
+};
+
+/**
+ * Notify user about session (day) completion
+ */
+const notifySessionCompleted = async (userId, course, dayId) => {
+  return createNotification({
+    userId,
+    type: 'achievement',
+    title: '💪 Session Completed!',
+    message: `Great job! You've finished all activities for Day ${dayId} in "${course.title}".`,
+    link: `/courses/${course._id}`,
+    icon: 'check-circle',
+    color: '#10B981',
+    metadata: {
+      courseId: course._id,
+      dayId
     }
   });
 };
@@ -265,7 +284,7 @@ const notifyCertificateIssued = async (userId, certificateType, courseName) => {
  */
 const notifyTaskDue = async (userId, taskTitle, hoursUntilDue) => {
   const timeText = hoursUntilDue <= 1 ? 'in 1 hour' : `in ${hoursUntilDue} hours`;
-  
+
   return createNotification({
     userId,
     type: 'task',
@@ -333,6 +352,7 @@ module.exports = {
   notifyAssessmentComplete,
   notifyCourseEnrollment,
   notifyCourseCompleted,
+  notifySessionCompleted,
   notifyModuleUnlocked,
   notifyLevelUp,
   notifyStreakMilestone,
