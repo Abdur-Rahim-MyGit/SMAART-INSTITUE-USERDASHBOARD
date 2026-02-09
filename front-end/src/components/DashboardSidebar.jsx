@@ -2,27 +2,25 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ClipboardList,
   BookOpen,
-  Grid3x3,
   Award,
   Menu,
   X,
   Lightbulb,
   Zap,
-  Users,
   Home,
   Settings,
   HelpCircle,
   Bell,
   ShieldCheck,
-  MoreHorizontal,
   CheckCheck,
-  Trash2,
+  Sun,
+  Moon
 } from "lucide-react";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
 import ChatbotModal from "@/components/ChatbotModal";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -35,7 +33,6 @@ const menuItems = [
   { icon: ShieldCheck, label: "Verify Certificate", path: "/verify-certificate" },
 ];
 
-
 const bottomMenuItems = [
   { icon: Settings, label: "Settings", path: "/dashboard/settings" },
   { icon: HelpCircle, label: "Help" }, // No path - opens chatbot modal
@@ -44,10 +41,10 @@ const bottomMenuItems = [
 const DashboardSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  
+
   // Notification state
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -62,6 +59,11 @@ const DashboardSidebar = () => {
       'Content-Type': 'application/json',
       'Authorization': token ? `Bearer ${token}` : ''
     };
+  };
+
+  // Toggle Theme
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   // Fetch notifications
@@ -109,16 +111,14 @@ const DashboardSidebar = () => {
         console.error('Error fetching unread count:', err);
       }
     };
-    
+
     fetchUnreadCount();
-    // Refresh every 30 seconds
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, []);
 
   // Generate test notification
   const generateTestNotification = async () => {
-    console.log('🔔 Generating test notification...');
     try {
       const testTypes = [
         { type: 'badge', title: '🏆 New Badge Earned!', message: 'Congratulations! You earned the "Quick Learner" badge.' },
@@ -128,20 +128,16 @@ const DashboardSidebar = () => {
         { type: 'system', title: '👋 Welcome!', message: 'Welcome to SMAART Minds! Start your learning journey today.' }
       ];
       const randomNotif = testTypes[Math.floor(Math.random() * testTypes.length)];
-      
-      console.log('🔔 Sending notification:', randomNotif);
+
       const response = await fetch(`${API_BASE_URL}/notifications/test`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(randomNotif)
       });
       const data = await response.json();
-      console.log('🔔 Response:', data);
-      
+
       if (data.success) {
         fetchNotifications();
-      } else {
-        console.error('🔔 Error:', data.message);
       }
     } catch (err) {
       console.error('Error creating test notification:', err);
@@ -196,25 +192,23 @@ const DashboardSidebar = () => {
   return (
     <>
       {/* Top Navigation Bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#002147]/90 backdrop-blur-2xl border-b border-gray-100/50 dark:border-white/10 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] transition-all duration-300">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-slate-200/50 dark:border-white/10 shadow-sm transition-all duration-300">
         <div className="flex items-center justify-between px-6 lg:px-10 h-16">
-          {/* Left: Logo, Skills Passport & Mobile Menu */}
+          {/* Left: Logo */}
           <div className="flex items-center gap-2">
-            {/* Mobile Menu Button */}
             <button
-              className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+              className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
             >
-              {isMobileOpen ? <X className="w-5 h-5 text-gray-600 dark:text-gray-300" /> : <Menu className="w-5 h-5 text-gray-600 dark:text-gray-300" />}
+              {isMobileOpen ? <X className="w-5 h-5 text-slate-600 dark:text-slate-300" /> : <Menu className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
             </button>
 
-            {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-[#002147] to-[#30919D] shadow-[0_4px_15px_-3px_rgba(48,145,157,0.4)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-700 to-blue-500 shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-all duration-300">
                 <span className="font-bold text-lg text-white">S</span>
               </div>
-              <span className="font-bold text-xl tracking-tight text-[#002147] dark:text-white hidden md:block">
-                SMAART<span className="text-[#30919D]"> Minds</span>
+              <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white hidden md:block">
+                SMAART<span className="text-blue-600"> Minds</span>
               </span>
             </Link>
           </div>
@@ -225,26 +219,30 @@ const DashboardSidebar = () => {
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-4">
-            {/* Streak Badge - New Position */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-50 border border-orange-100 shadow-sm">
-              <Zap className="w-4 h-4 text-orange-500 fill-orange-500" />
-              <span className="text-sm font-bold text-orange-900">7 day streak</span>
-            </div>
+          <div className="flex items-center gap-3">
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full text-slate-500 hover:text-blue-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-blue-400 dark:hover:bg-slate-800 transition-all"
+              aria-label="Toggle Theme"
+            >
+              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
 
             {/* Notification Bell */}
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setNotificationOpen(!notificationOpen)}
-                className="p-2 mr-1 rounded-full text-gray-400 hover:text-[#30919D] hover:bg-[#30919D]/5 transition-all relative group/nav"
+                className="p-2 mr-1 rounded-full text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all relative group/nav"
               >
                 <Bell className="w-5 h-5 group-hover/nav:animate-bounce" />
                 {unreadCount > 0 ? (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-white">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-white dark:border-slate-900">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 ) : (
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#002147] shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900 shadow-sm" />
                 )}
               </button>
 
@@ -256,11 +254,11 @@ const DashboardSidebar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-[#001a33] rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+                    className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                     style={{ zIndex: 9999 }}
                   >
                     {/* Header */}
-                    <div className="px-4 py-3 bg-gradient-to-r from-[#002147] to-[#003366] flex items-center justify-between">
+                    <div className="px-4 py-3 bg-gradient-to-r from-slate-900 to-slate-800 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Bell className="w-5 h-5 text-white" />
                         <h3 className="font-semibold text-white">Notifications</h3>
@@ -283,27 +281,26 @@ const DashboardSidebar = () => {
                     </div>
 
                     {/* List */}
-                    <div className="max-h-[350px] overflow-y-auto bg-white dark:bg-[#001a33]">
+                    <div className="max-h-[350px] overflow-y-auto bg-white dark:bg-slate-900">
                       {notifLoading ? (
                         <div className="flex justify-center py-10">
-                          <div className="w-8 h-8 border-2 border-[#30919D] border-t-transparent rounded-full animate-spin" />
+                          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                         </div>
                       ) : notifications.length === 0 ? (
                         <div className="flex flex-col items-center py-10 text-center px-4">
-                          <div className="w-14 h-14 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-3">
-                            <Bell className="w-7 h-7 text-gray-400" />
+                          <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3">
+                            <Bell className="w-7 h-7 text-slate-400" />
                           </div>
-                          <p className="text-gray-500 dark:text-gray-400 font-medium">No notifications yet</p>
-                          <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">We'll notify you when something happens</p>
+                          <p className="text-slate-500 dark:text-slate-400 font-medium">No notifications yet</p>
                           <button
                             onClick={generateTestNotification}
-                            className="mt-4 px-4 py-2 bg-[#30919D] text-white text-sm font-medium rounded-lg hover:bg-[#267a84] transition-colors"
+                            className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                           >
                             Generate Test Notification
                           </button>
                         </div>
                       ) : (
-                        <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
                           {notifications.map((n) => (
                             <div
                               key={n._id}
@@ -311,22 +308,22 @@ const DashboardSidebar = () => {
                                 if (n.link) navigate(n.link);
                                 setNotificationOpen(false);
                               }}
-                              className={`px-4 py-3 flex items-start gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${!n.isRead ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''}`}
+                              className={`px-4 py-3 flex items-start gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${!n.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
                             >
                               <div
                                 className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: `${n.color || '#30919D'}20` }}
+                                style={{ backgroundColor: `${n.color || '#2563EB'}20` }}
                               >
-                                <Bell className="w-5 h-5" style={{ color: n.color || '#30919D' }} />
+                                <Bell className="w-5 h-5" style={{ color: n.color || '#2563EB' }} />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-start">
-                                  <p className="font-medium text-sm text-gray-900 dark:text-white truncate">{n.title}</p>
-                                  <span className="text-xs text-gray-400 ml-2">{timeAgo(n.createdAt)}</span>
+                                  <p className="font-medium text-sm text-slate-900 dark:text-white truncate">{n.title}</p>
+                                  <span className="text-xs text-slate-400 ml-2">{timeAgo(n.createdAt)}</span>
                                 </div>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-0.5">{n.message}</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">{n.message}</p>
                               </div>
-                              {!n.isRead && <div className="w-2 h-2 bg-[#30919D] rounded-full mt-2" />}
+                              {!n.isRead && <div className="w-2 h-2 bg-blue-600 rounded-full mt-2" />}
                             </div>
                           ))}
                         </div>
@@ -334,13 +331,13 @@ const DashboardSidebar = () => {
                     </div>
 
                     {/* Footer */}
-                    <div className="px-4 py-3 bg-gray-50 dark:bg-[#001229] border-t border-gray-100 dark:border-gray-700">
+                    <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700">
                       <button
                         onClick={() => {
                           navigate('/notifications');
                           setNotificationOpen(false);
                         }}
-                        className="w-full text-center text-sm font-medium text-[#30919D] hover:text-[#267a84]"
+                        className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700"
                       >
                         View all notifications
                       </button>
@@ -369,7 +366,7 @@ const DashboardSidebar = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile Sidebar - Slide from left */}
+      {/* Mobile Sidebar */}
       <AnimatePresence>
         {isMobileOpen && (
           <motion.aside
@@ -377,23 +374,23 @@ const DashboardSidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 h-screen w-[280px] flex flex-col z-50 lg:hidden bg-white dark:bg-[#002147] border-r border-gray-100 dark:border-white/10 shadow-2xl transition-colors duration-300"
+            className="fixed left-0 top-0 h-screen w-[280px] flex flex-col z-50 lg:hidden bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-2xl"
           >
             {/* Mobile Header */}
-            <div className="p-4 flex items-center justify-between border-b border-gray-100 dark:border-white/10">
+            <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <Link to="/" className="flex items-center gap-2" onClick={() => setIsMobileOpen(false)}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#30919D]">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-600">
                   <span className="font-bold text-base text-white">S</span>
                 </div>
-                <span className="font-bold text-lg text-[#002147] dark:text-white">
-                  SMAART<span className="text-[#30919D]">Minds</span>
+                <span className="font-bold text-lg text-slate-900 dark:text-white">
+                  SMAART<span className="text-blue-600">Minds</span>
                 </span>
               </Link>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
               </button>
             </div>
 
@@ -415,11 +412,11 @@ const DashboardSidebar = () => {
                         to={item.path}
                         onClick={() => setIsMobileOpen(false)}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                          ? 'bg-[#30919D] text-white shadow-lg'
-                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
+                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                       >
-                        <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-[#30919D]'}`} />
+                        <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-blue-600'}`} />
                         <span className="font-medium">{item.label}</span>
                       </Link>
                     </motion.div>
@@ -428,8 +425,19 @@ const DashboardSidebar = () => {
               </div>
             </nav>
 
+            {/* Mobile Theme Toggle */}
+            <div className="p-3 border-t border-slate-100 dark:border-slate-800">
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-blue-600" />}
+                <span className="font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+              </button>
+            </div>
+
             {/* Mobile Skills Passport */}
-            <div className="p-3 border-t border-gray-100">
+            <div className="p-3">
               <Link
                 to="/dashboard/skills-passport"
                 onClick={() => setIsMobileOpen(false)}
@@ -438,13 +446,13 @@ const DashboardSidebar = () => {
                   background: 'linear-gradient(135deg, #daa520 0%, #b8860b 50%, #daa520 100%)',
                 }}
               >
-                <Award className="w-5 h-5 text-[#002147]" />
-                <span className="font-bold text-[#002147]">Skills Passport</span>
+                <Award className="w-5 h-5 text-slate-900" />
+                <span className="font-bold text-slate-900">Skills Passport</span>
               </Link>
             </div>
 
             {/* Mobile Bottom */}
-            <div className="p-3 space-y-1 border-t border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-black/20">
+            <div className="p-3 space-y-1 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
               {bottomMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isHelpButton = item.label === 'Help';
@@ -457,7 +465,7 @@ const DashboardSidebar = () => {
                         setIsMobileOpen(false);
                         setIsChatbotOpen(true);
                       }}
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-500 hover:bg-white hover:text-gray-700 transition-all w-full"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all w-full"
                     >
                       <Icon className="w-5 h-5" />
                       <span className="font-medium text-sm">{item.label}</span>
@@ -470,7 +478,7 @@ const DashboardSidebar = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMobileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-white/5 hover:text-gray-700 dark:hover:text-white transition-all"
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium text-sm">{item.label}</span>
@@ -482,7 +490,6 @@ const DashboardSidebar = () => {
         )}
       </AnimatePresence>
 
-      {/* Spacer for fixed header */}
       <div className="h-16" />
 
       {/* Chatbot Modal */}
@@ -490,7 +497,6 @@ const DashboardSidebar = () => {
         isOpen={isChatbotOpen}
         onClose={() => setIsChatbotOpen(false)}
         onEscalateToTicket={(conversationId, messages) => {
-          // Navigate to support tickets page with conversation data
           navigate('/dashboard/support', {
             state: { conversationId, messages }
           });

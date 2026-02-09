@@ -41,6 +41,7 @@ const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
 const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
+const Performance = lazy(() => import('@/pages/Performance'));
 
 // AI Career Coach pages
 const AIChat = lazy(() => import('@/pages/AICareerCoach/AIChat'));
@@ -131,6 +132,7 @@ const AnimatedRoutes = () => {
                     <Route path="/admin/tickets" element={<AssessmentFlowGuard><AdminTickets /></AssessmentFlowGuard>} />
                     <Route path="/certificate" element={<AssessmentFlowGuard><Certificate /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/certificate" element={<AssessmentFlowGuard><Certificate /></AssessmentFlowGuard>} />
+                    <Route path="/dashboard/performance" element={<AssessmentFlowGuard><Performance /></AssessmentFlowGuard>} />
 
                     {/* AI Career Coach Routes */}
                     <Route path="/dashboard/ai-career-coach/chat" element={<AssessmentFlowGuard><AIChat /></AssessmentFlowGuard>} />

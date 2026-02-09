@@ -76,6 +76,9 @@ const SignupInitial = () => {
           transition={{ delay: 0.2 }}
           className="text-center mb-6 sm:mb-8"
         >
+          <div className="flex justify-center mb-6">
+            <img src="/logo.png" alt="SMAART Minds" className="h-20 w-auto object-contain" />
+          </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-background mb-1 sm:mb-2">
             Create Account
           </h1>
