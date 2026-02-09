@@ -9,6 +9,7 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { BadgeGallery } from "@/components/badges";
 import useUser from "@/hooks/useUser";
+import blueLogo from '@/assets/blue.png';
 import './Certificate.css';
 
 const certificateTypes = [
@@ -371,7 +372,9 @@ const Certificate = () => {
 
                             <div className={`cert-content ${selectedType.id === 'combined' ? 'combined-content' : ''}`}>
                                 <header className="cert-header">
-                                    <div className="institute-name">SMAART INSTITUTE</div>
+                                    <div className="institute-name">
+                                        <img src={blueLogo} alt="SMAART INSTITUTE" className="cert-logo" />
+                                    </div>
                                     <div className="credential-label">PROFESSIONAL CREDENTIAL</div>
                                 </header>
 

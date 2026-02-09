@@ -337,7 +337,11 @@ const DashboardHome = () => {
     const year = date.getFullYear();
     const month = date.getMonth();
     const days = new Date(year, month + 1, 0).getDate();
-    return Array.from({ length: days }, (_, i) => i + 1);
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    return {
+      daysArray: Array.from({ length: days }, (_, i) => i + 1),
+      firstDayIndex
+    };
   };
 
   const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -370,7 +374,7 @@ const DashboardHome = () => {
       <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] text-slate-900 font-sans transition-colors duration-300">
         <DashboardSidebar />
 
-        <div className="min-h-screen">
+        <div className="min-h-screen pb-20 lg:pb-0">
           <PageTransition>
             <motion.main
               className="max-w-[1600px] mx-auto p-6 md:p-8 lg:p-10"

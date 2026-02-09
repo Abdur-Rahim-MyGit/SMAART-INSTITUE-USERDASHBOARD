@@ -138,42 +138,42 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
     <div className="w-full max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
       
       {/* HEADER */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6 text-white flex justify-between items-center">
+      <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-3 md:p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2 text-white">
+          <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2 text-white">
             <Trophy className="text-[#30919D] drop-shadow-lg" size={28} />
             {assessmentData.title || "Micro-Assessment"}
           </h2>
-          <p className="text-white/80 text-sm mt-1">Test your knowledge</p>
+          <p className="text-white/80 text-[10px] md:text-sm mt-0.5 hidden sm:block">Test your knowledge</p>
         </div>
         
         {step === 'quiz' && (
            <div className={`
-             flex items-center gap-2 px-4 py-2 rounded-full font-mono font-bold text-lg
+             flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono font-bold text-base md:text-lg
              ${timeLeft < 10 ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-white/10 text-white'}
            `}>
-             <Clock size={20} />
+             <Clock className="w-4 h-4 md:w-5 md:h-5" />
              {formatTime(timeLeft)}
            </div>
         )}
       </div>
 
-      <div className="p-8 min-h-[400px]">
+      <div className="p-3 md:p-8 min-h-[300px] md:min-h-[400px]">
         {/* INTRO STEP */}
         {step === 'intro' && (
-          <div className="text-center space-y-6 py-8">
-            <div className="w-20 h-20 bg-[#30919D]/10 rounded-full flex items-center justify-center mx-auto text-[#30919D] mb-6">
-               <AlertCircle size={40} />
+          <div className="text-center space-y-3 md:space-y-6 py-4 md:py-8">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-[#30919D]/10 rounded-full flex items-center justify-center mx-auto text-[#30919D] mb-2 md:mb-6">
+               <AlertCircle className="w-10 h-10 md:w-12 md:h-12" />
             </div>
-            <h3 className="text-3xl font-extrabold text-slate-900 dark:text-white">Ready for the Assessment?</h3>
-            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-lg">
+            <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">Ready for the Assessment?</h3>
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-base md:text-lg">
               You will have <strong>5 randomized questions</strong> to answer. 
               You have <strong>90 seconds</strong> per question. 
               Applying the CLEAR-5 framework is key.
             </p>
             <button
               onClick={handleStart}
-              className="px-8 py-3 bg-[#30919D] hover:bg-[#25737d] text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#30919D]/30"
+              className="w-full sm:w-auto px-8 py-3 bg-[#30919D] hover:bg-[#25737d] text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#30919D]/30"
             >
               Start Assessment
             </button>
@@ -184,7 +184,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
         {step === 'quiz' && (
           <div className="max-w-3xl mx-auto">
              {/* Progress Bar */}
-             <div className="mb-8">
+             <div className="mb-4 md:mb-8">
                <div className="flex justify-between text-sm text-gray-500 dark:text-slate-400 mb-2">
                  <span>Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
                  <span>Score: {score}</span>
@@ -205,16 +205,16 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                exit={{ opacity: 0, x: -20 }}
                className="space-y-6"
              >
-                <h3 className="text-xl font-medium text-gray-800 dark:text-slate-200 leading-relaxed">
+                <h3 className="text-base md:text-xl font-medium text-gray-800 dark:text-slate-200 leading-snug md:leading-relaxed">
                   {currentQuestion.question}
                 </h3>
 
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   {currentQuestion.options.map((option, idx) => {
                      const isSelected = selectedAnswer === idx;
                      const isCorrect = option === currentQuestion.correctAnswer;
                      
-                     let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all ";
+                     let btnClass = "w-full text-left p-2.5 md:p-4 rounded-xl border-2 transition-all ";
                      if (showExplanation) {
                         if (isCorrect) btnClass += "border-green-500 bg-green-50 text-green-800 dark:bg-green-500/10 dark:text-green-400";
                         else if (isSelected) btnClass += "border-red-500 bg-red-50 text-red-800 dark:bg-red-500/10 dark:text-red-400";
@@ -242,7 +242,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                               {showExplanation && isCorrect && <CheckCircle2 size={14} />}
                               {showExplanation && isSelected && !isCorrect && <XCircle size={14} />}
                            </div>
-                           <span className="dark:text-slate-300">{option}</span>
+                           <span className="text-sm md:text-base dark:text-slate-300">{option}</span>
                          </div>
                        </button>
                      );
@@ -266,7 +266,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
                        <button
                          onClick={handleNextQuestion}
-                         className="mt-4 flex items-center gap-2 bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors ml-auto"
+                          className="mt-4 flex w-full sm:w-auto justify-center items-center gap-2 bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors ml-auto"
                        >
                          {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Finish Assessment'}
                          <ArrowRight size={16} />
@@ -281,7 +281,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
         {/* RESULT STEP */}
         {step === 'result' && (
-           <div className="text-center py-8 space-y-6">
+           <div className="text-center py-4 md:py-8 space-y-4 md:space-y-6">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }} 
@@ -295,7 +295,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                 <p className="text-gray-500 dark:text-slate-400 mt-2">Here is how you performed</p>
               </div>
 
-              <div className="flex justify-center gap-8 py-6">
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 py-6">
                  <div className="text-center">
                     <div className="text-4xl font-bold text-slate-900 dark:text-white">{score}</div>
                     <div className="text-xs text-gray-500 dark:text-slate-400 uppercase tracking-wider">Your Score</div>
@@ -311,7 +311,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
               <button
                 onClick={() => onComplete(score)}
-                className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold shadow-lg shadow-green-500/30 transition-all"
+                className="w-full sm:w-auto px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold shadow-lg shadow-green-500/30 transition-all"
               >
                 Continue to Next Step
               </button>

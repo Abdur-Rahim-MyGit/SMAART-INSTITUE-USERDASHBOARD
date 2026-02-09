@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Calendar, User, Hash, TrendingUp } from 'lucide-react';
-import DashboardSidebar from '@/components/DashboardSidebar';
-import DashboardHeader from '@/components/DashboardHeader';
+import Navbar from '@/components/Navbar';
 import apiCall from '@/services/api';
 import { toast } from 'sonner';
 import { Html5QrcodeScanner } from 'html5-qrcode';
@@ -112,13 +111,10 @@ const VerifyCertificate = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <DashboardSidebar />
+        <div className="min-h-screen bg-gray-50 dark:bg-[#020617]">
+            <Navbar showLinks={false} />
             
-            <div className="min-h-screen transition-all duration-300">
-                <DashboardHeader />
-
-                <main className="container mx-auto px-3 py-4 max-w-6xl">
+            <main className="container mx-auto px-3 py-4 max-w-6xl pt-24">
                     {/* Page Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -411,7 +407,6 @@ const VerifyCertificate = () => {
                     </motion.div>
                 )}
                 </main>
-            </div>
         </div>
     );
 };

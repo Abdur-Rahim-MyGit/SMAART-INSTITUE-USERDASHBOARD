@@ -23,8 +23,12 @@ const ProfileDropdown = () => {
         const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
         if (response.ok) {
           const data = await response.json();
-          if (data.otherDetails?.profilePhoto) {
-            setProfilePhoto(`${getBackendUrl()}/${data.otherDetails.profilePhoto}`);
+          // Check for profilePhoto at root level first (new structure), then fallback to otherDetails
+          const photoUrl = data.profilePhoto || data.otherDetails?.profilePhoto;
+          if (photoUrl) {
+            // If it's already a full URL (Cloudinary), use it directly; otherwise prepend backend URL
+            const fullUrl = photoUrl.startsWith('http') ? photoUrl : `${getBackendUrl()}/${photoUrl}`;
+            setProfilePhoto(fullUrl);
           }
           // Note: UserContext handles overall user data syncing
         }

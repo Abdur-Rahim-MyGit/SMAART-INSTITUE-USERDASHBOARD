@@ -90,8 +90,13 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                 {/* Checkbox */}
                                 <button
                                     onClick={() => onToggleTask(task)}
-                                    className="mt-0.5 w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center flex-shrink-0 hover:border-[#30919D] transition-colors"
+                                    className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+                                        task.status === "Completed" 
+                                        ? 'bg-[#30919D] border-[#30919D] text-white' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-[#30919D] hover:bg-[#30919D]/10'
+                                    }`}
                                 >
+                                    {task.status === "Completed" && <CheckCircle2 className="w-3 h-3" />}
                                 </button>
 
                                 <div className="flex-1 min-w-0">
