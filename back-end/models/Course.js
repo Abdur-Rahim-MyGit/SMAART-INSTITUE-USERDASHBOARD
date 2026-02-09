@@ -128,6 +128,7 @@ const daySchema = new mongoose.Schema({
       enum: ['video', 'quiz', 'text', 'assignment', 'reflection', 'flashcards', 'assessment', 'submission', 'flashcard']
     },
     content: mongoose.Schema.Types.Mixed,
+    introText: [String],
     isRequired: { type: Boolean, default: true }
   }],
   keyTakeaways: [String],
