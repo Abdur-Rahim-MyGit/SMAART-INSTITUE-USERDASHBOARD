@@ -35,6 +35,14 @@ const ComprehensiveSignup = () => {
       return;
     }
 
+    // SECURITY FIX #12: Redirect already-registered users away from registration page
+    // If user has already completed registration, they should not access this page
+    if (userData?.hasRegistration || userData?.registrationCompleted) {
+      console.log("[ComprehensiveSignup] User already registered, redirecting to dashboard");
+      navigate('/dashboard', { replace: true });
+      return;
+    }
+
     if (email) {
       setPersonalDetails(prev => ({ ...prev, email, fullName: fullName || prev.fullName, mobileNumber: userData?.mobileNumber || "", institution: "" }));
       setPreFilledFields(prev => ({ ...prev, email: true, fullName: !!fullName, mobileNumber: !!userData?.mobileNumber }));
@@ -221,7 +229,59 @@ const ComprehensiveSignup = () => {
     return true;
   };
 
-  const handleNextStep = () => {
+  // Save individual section to the backend (progressive saving)
+  const saveSection = async (sectionName, sectionData) => {
+    try {
+      await apiCall('/users/register-section', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: personalDetails.email,
+          section: sectionName,
+          data: sectionData,
+        }),
+      });
+      console.log(`[ComprehensiveSignup] Section '${sectionName}' saved successfully`);
+    } catch (error) {
+      console.error(`[ComprehensiveSignup] Failed to save section '${sectionName}':`, error);
+      // Silent fail - don't block the user, data will be saved at final submit
+    }
+  };
+
+  // Map step index to section name and data for progressive saving
+  const getSectionDataForStep = (step) => {
+    switch (step) {
+      case 0:
+        return { name: 'profilePhoto', data: { profilePhoto: personalDetails.profilePhoto } };
+      case 1:
+        return { name: 'personalDetails', data: personalDetails };
+      case 2:
+        return { name: 'tenthDetails', data: tenthDetails };
+      case 3:
+        return { name: 'twelfthDetails', data: twelfthDetails };
+      case 4:
+        return { name: 'higherEducation', data: higherEducation };
+      case 5:
+        return { name: 'extracurricular', data: extracurricular.isApplicable ? extracurricular.items : [] };
+      case 6:
+        return { name: 'jobPreferences', data: jobPreferences.items };
+      case 7:
+        return { name: 'sectorPreferences', data: sectorPreferences };
+      case 8:
+        // Career goals alone - personal development goals handled together
+        return { name: 'careerGoals', data: { ...careerGoals, personalDevelopmentGoals } };
+      case 9:
+        return { name: 'workExperience', data: workExperience.isApplicable ? workExperience.items : [] };
+      case 10:
+        return { name: 'projects', data: projects.isApplicable ? projects.items : [] };
+      case 11:
+        return { name: 'certificates', data: certificates.isApplicable ? certificates.items : [] };
+      default:
+        return null;
+    }
+  };
+
+  const handleNextStep = async () => {
     let isValid = true;
     switch (currentStep) {
       case 0: isValid = !!personalDetails.profilePhoto; if (!isValid) toast.error("Please upload a profile photo"); break;
@@ -238,7 +298,19 @@ const ComprehensiveSignup = () => {
       case 11: isValid = validateCertificates(); break;
       default: isValid = true;
     }
-    if (isValid && currentStep < steps.length - 1) { setCurrentStep(currentStep + 1); window.scrollTo(0, 0); }
+
+    if (isValid) {
+      // Save the current section before moving to the next
+      const sectionInfo = getSectionDataForStep(currentStep);
+      if (sectionInfo) {
+        await saveSection(sectionInfo.name, sectionInfo.data);
+      }
+
+      if (currentStep < steps.length - 1) {
+        setCurrentStep(currentStep + 1);
+        window.scrollTo(0, 0);
+      }
+    }
   };
   const handlePrevStep = () => { if (currentStep > 0) { setCurrentStep(currentStep - 1); window.scrollTo(0, 0); } };
 
@@ -344,11 +416,6 @@ const ComprehensiveSignup = () => {
 
   return (
     <div className="min-h-screen py-8 px-4 bg-slate-50 dark:bg-[#001229] relative overflow-hidden text-slate-900 dark:text-white transition-colors duration-300">
-      <div className="absolute top-4 right-4 z-50">
-        <Button onClick={() => navigate('/dashboard')} variant="ghost" className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
-          Skip <ChevronRight size={16} className="ml-1" />
-        </Button>
-      </div>
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20">
         <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-blue-100 dark:bg-[#30919D]/10 blur-[120px]" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-100 dark:bg-blue-900/10 blur-[100px]" />

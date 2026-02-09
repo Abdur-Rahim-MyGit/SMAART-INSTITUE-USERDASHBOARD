@@ -8,10 +8,12 @@ const registrationSchema = new mongoose.Schema({
   studentId: String,
   fullName: { type: String, required: true },
   nickname: String,
+  profilePhoto: String, // Cloudinary URL for profile photo
+  educationLevel: String, // User's chosen domain
   dob: Date,
   gender: String,
   email: { type: String, required: true },
-  mobileNumber: { type: String, required: true },
+  mobileNumber: { type: String, required: false }, // Made optional for progressive section saving
   alternateMobile: String,
   password: { type: String, required: false },
   institution: String,
@@ -46,7 +48,9 @@ const registrationSchema = new mongoose.Schema({
   },
 
   // Higher Education Details
-  higherEducation: {
+  higherEducation: [{
+    _id: false,
+    id: String,
     qualificationLevel: String,
     degree: String,
     specialization: String,
@@ -56,7 +60,7 @@ const registrationSchema = new mongoose.Schema({
     cgpaPercentage: String,
     degreeStatus: String,
     certificate: String, // file path
-  },
+  }],
 
   // Extra-Curricular Activities
   extracurricular: [{
@@ -69,13 +73,15 @@ const registrationSchema = new mongoose.Schema({
   }],
 
   // Job Preferences
-  jobPreferences: {
+  jobPreferences: [{
+    _id: false,
+    id: String,
     preferredRole: String,
     jobType: String,
     preferredLocation: String,
     willingToRelocate: String,
     expectedSalary: String,
-  },
+  }],
 
   // Sector Preferences
   sectorPreferences: {
@@ -85,6 +91,13 @@ const registrationSchema = new mongoose.Schema({
 
   // Career Goals
   careerGoals: {
+    shortTerm: String,
+    mediumTerm: String,
+    longTerm: String,
+  },
+
+  // Personal Development Goals
+  personalDevelopmentGoals: {
     shortTerm: String,
     mediumTerm: String,
     longTerm: String,
