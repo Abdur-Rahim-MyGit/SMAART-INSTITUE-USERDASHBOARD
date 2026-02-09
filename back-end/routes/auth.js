@@ -861,22 +861,29 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     const UserModel = require(`../models/${userModelName}`);
     const freshUser = await UserModel.findById(user._id);
 
-    // Check existing session BEFORE marking OTP as used
-    // Check existing session BEFORE marking OTP as used
-    // AUTO-LOGOUT IMPLEMENTATION:
-    // We detected an active session, but we will proceed to overwrite it (forcing logout on other device).
-    // Check existing session BEFORE marking OTP as used
-    // If user is already logged in and didn't request force logout, return conflict
-    // AUTO-LOGOUT ENABLED: Automatically logout previous session upon successful OTP verification
-    // if (freshUser.currentSessionId && !forceLogout) {
-    //   return res.status(409).json({
-    //     error: 'You are already logged in on another device.',
-    //     requiresForceLogout: true,
-    //     message: 'You are already logged in on another device. Do you want to logout from the other device and login here?'
-    //   });
-    // }
+    // === SINGLE SESSION ENFORCEMENT ===
+    // Check if user is already logged in on another device
+    
+    // Only check if there's an ACTUAL session ID (not null, not undefined, not empty string)
+    const hasActiveSession = freshUser?.currentSessionId && 
+                             typeof freshUser.currentSessionId === 'string' && 
+                             freshUser.currentSessionId.trim() !== '';
+    
+    console.log(`[Auth] Session check for ${user._id}:`, {
+      currentSessionId: freshUser?.currentSessionId || null,
+      hasActiveSession,
+      forceLogout: !!forceLogout
+    });
+    
+    if (hasActiveSession && !forceLogout) {
+      return res.status(409).json({
+        error: 'You are already logged in on another device.',
+        requiresForceLogout: true,
+        message: 'You are already logged in on another device. Do you want to logout from the other device and login here?'
+      });
+    }
 
-    if (freshUser.currentSessionId && forceLogout) {
+    if (hasActiveSession && forceLogout) {
       console.log(`[Auth] Force logging out previous session for user ${user._id}`);
     }
 
@@ -896,8 +903,11 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     const sessionId = require('crypto').randomUUID();
 
     // Update user with new session ID and lastLogin timestamp
+    // First, get the current lastLogin to store as previousLogin
+    const currentUser = await UserModel.findById(user._id);
     await UserModel.findByIdAndUpdate(user._id, {
       currentSessionId: sessionId,
+      previousLogin: currentUser?.lastLogin || null,
       lastLogin: new Date()
     });
 
@@ -1393,13 +1403,16 @@ router.post('/logout', protect, async (req, res) => {
     if (req.user && req.user._id) {
       const Student = require('../models/Student');
       const Teacher = require('../models/Teacher');
-      const userType = req.user.role || 'user';
+      const Registration = require('../models/Registration');
+      const userType = req.user.userType || req.user.role || 'user';
 
       let UserModel = User;
       if (userType === 'student') UserModel = Student;
       else if (userType === 'teacher') UserModel = Teacher;
+      else if (userType === 'registration') UserModel = Registration;
 
-      await UserModel.findByIdAndUpdate(req.user._id, { currentSessionId: null });
+      const result = await UserModel.findByIdAndUpdate(req.user._id, { currentSessionId: null });
+      console.log(`[Auth] Cleared session for ${userType} user ${req.user._id}:`, result ? 'Success' : 'User not found');
     }
   } catch (err) {
     console.error('Error clearing session on logout:', err);
@@ -1420,6 +1433,39 @@ router.get('/me', protect, async (req, res) => {
     success: true,
     user: req.user
   });
+});
+
+// === UTILITY: Clear stale session by email (for debugging) ===
+router.post('/clear-session', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const Student = require('../models/Student');
+    const Teacher = require('../models/Teacher');
+
+    // Try to clear session in all user models
+    const results = await Promise.all([
+      Registration.findOneAndUpdate({ email }, { currentSessionId: null }),
+      Student.findOneAndUpdate({ email }, { currentSessionId: null }),
+      Teacher.findOneAndUpdate({ email }, { currentSessionId: null }),
+      User.findOneAndUpdate({ email }, { currentSessionId: null })
+    ]);
+
+    const cleared = results.filter(r => r !== null).length;
+    console.log(`[Auth] Cleared session for email ${email} in ${cleared} model(s)`);
+
+    res.json({ 
+      success: true, 
+      message: `Session cleared for ${email}`,
+      modelsCleared: cleared
+    });
+  } catch (error) {
+    console.error('Error clearing session:', error);
+    res.status(500).json({ error: 'Failed to clear session' });
+  }
 });
 
 module.exports = router;
