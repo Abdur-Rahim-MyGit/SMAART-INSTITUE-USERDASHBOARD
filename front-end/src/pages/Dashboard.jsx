@@ -16,15 +16,33 @@ const Dashboard = () => {
     const userData = sessionStorage.getItem("user");
     const registrationData = sessionStorage.getItem("registration");
 
+    console.log("[Dashboard] Checking user session:", {
+      hasUserData: !!userData,
+      hasRegistrationData: !!registrationData
+    });
+
     if (!userData) {
       // Redirect to login if no user data
+      console.error("[Dashboard] No user data found in sessionStorage - redirecting to login");
       navigate("/");
       return;
     }
 
-    setUser(JSON.parse(userData));
-    if (registrationData) {
-      setRegistration(JSON.parse(registrationData));
+    try {
+      const parsedUser = JSON.parse(userData);
+      console.log("[Dashboard] User loaded successfully:", {
+        email: parsedUser.email,
+        fullName: parsedUser.fullName,
+        role: parsedUser.role
+      });
+      setUser(parsedUser);
+
+      if (registrationData) {
+        setRegistration(JSON.parse(registrationData));
+      }
+    } catch (error) {
+      console.error("[Dashboard] Error parsing user data:", error);
+      navigate("/");
     }
   }, [navigate]);
 
@@ -39,7 +57,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen">
       <DashboardSidebar />
-      
+
       <div className="min-h-screen transition-all duration-300">
         <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
           <motion.div
