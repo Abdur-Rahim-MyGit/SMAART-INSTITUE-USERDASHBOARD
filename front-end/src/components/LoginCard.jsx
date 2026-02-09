@@ -308,11 +308,11 @@ const LoginCard = () => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl p-4 flex items-center justify-between group hover:border-[#30919D]/30 transition-all gap-4 shadow-xl"
+        className="bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-4 flex items-center justify-between group hover:border-[#30919D]/30 transition-all gap-3 sm:gap-4 shadow-xl"
       >
-        <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className="w-12 h-12 rounded-xl bg-[#30919D]/10 dark:bg-[#30919D]/20 flex items-center justify-center border border-[#30919D]/20 shrink-0 shadow-inner group-hover:scale-110 transition-transform">
-            <Building2 className="w-6 h-6 text-[#30919D]" />
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-[#30919D]/10 dark:bg-[#30919D]/20 flex items-center justify-center border border-[#30919D]/20 shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+            <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#30919D]" />
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-bold text-[#002147] dark:text-white text-sm sm:text-base truncate tracking-tight">{selectedInstitution?.name}</h3>
@@ -341,30 +341,30 @@ const LoginCard = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white/90 dark:bg-[#002147]/90 backdrop-blur-2xl border border-gray-200 dark:border-white/10 rounded-[2rem] p-6 sm:p-8 shadow-2xl relative overflow-hidden"
+        className="bg-white/90 dark:bg-[#002147]/90 backdrop-blur-2xl border border-gray-200 dark:border-white/10 rounded-2xl sm:rounded-3xl md:rounded-[2rem] p-5 sm:p-6 md:p-8 shadow-2xl relative overflow-hidden"
       >
         {/* Decorative corner glows */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#30919D]/10 to-transparent pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#daa520]/10 to-transparent pointer-events-none" />
 
         {/* Login Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <motion.div
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
-            className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-[#30919D] to-[#267a84] text-white shadow-lg shadow-[#30919D]/20 mb-4 sm:mb-6"
+            className="inline-flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#30919D] to-[#267a84] text-white shadow-lg shadow-[#30919D]/20 mb-3 sm:mb-4 md:mb-6"
           >
-            <Lock className="w-6 h-6 sm:w-7 sm:h-7" />
+            <Lock className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
           </motion.div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#002147] dark:text-white mb-1.5 tracking-tight">Welcome Back</h2>
-          <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-light">Enter your credentials to access the portal</p>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-[#002147] dark:text-white mb-1 sm:mb-1.5 tracking-tight">Welcome Back</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-[11px] sm:text-xs md:text-sm font-light">Enter your credentials to access the portal</p>
         </div>
 
         <motion.form
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="space-y-5 sm:space-y-6"
+          className="space-y-4 sm:space-y-5 md:space-y-6"
           onSubmit={handleLogin}
           aria-label="Login form"
         >

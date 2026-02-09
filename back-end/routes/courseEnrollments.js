@@ -4,7 +4,8 @@ const CourseEnrollment = require('../models/CourseEnrollment');
 const Course = require('../models/Course');
 const { protect } = require('../middleware/auth');
 const { awardEarlyAchieverBadge } = require('../utils/badgeHelper');
-const { notifyCourseEnrollment, notifyCourseCompleted } = require('../services/notificationService');
+const { notifyCourseEnrollment, notifyCourseCompleted, notifySessionCompleted } = require('../services/notificationService');
+const { isSessionCompleted } = require('../utils/progressUtils');
 
 const router = express.Router();
 
@@ -253,6 +254,8 @@ router.post('/task-progress', async (req, res) => {
             t => t.dayId === parseInt(dayId) && t.taskId === parseInt(taskId)
         );
 
+        const wasDoneBefore = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
+
         if (completed) {
             if (taskIndex === -1) {
                 console.log('Adding completed task:', { dayId, taskId });
@@ -275,9 +278,22 @@ router.post('/task-progress', async (req, res) => {
         await enrollment.save();
         console.log('Enrollment saved successfully');
 
+        const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
+
+        if (!wasDoneBefore && isDoneNow) {
+            try {
+                await notifySessionCompleted(studentId, { title: course.title, _id: course._id }, dayId);
+                console.log(`🔔 Session Completed Notification sent for Day ${dayId}`);
+            } catch (notifyError) {
+                console.error("⚠️ Error sending session notification:", notifyError);
+            }
+        }
+
         // Check for badge eligibility
         try {
             await awardEarlyAchieverBadge(studentId);
+            const { checkFirstThreeSessionsBadge } = require('../utils/badgeUtils');
+            await checkFirstThreeSessionsBadge(studentId, course._id);
         } catch (badgeErr) {
             console.error('Error in badge awarding:', badgeErr);
         }
@@ -339,6 +355,8 @@ router.post('/video-progress', async (req, res) => {
             (vp.stepId === parseInt(stepId) || (!vp.stepId && parseInt(stepId) === 1))
         );
 
+        const wasDoneBefore = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
+
         if (!vidProgress) {
             console.log(`Adding new video progress for S${dayId} Step ${stepId}`);
             modProgress.videoProgress.push({
@@ -374,17 +392,22 @@ router.post('/video-progress', async (req, res) => {
         enrollment.lastAccessedAt = new Date();
         await enrollment.save();
 
+        const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
+
+        if (!wasDoneBefore && isDoneNow) {
+            try {
+                await notifySessionCompleted(studentId, { title: course.title, _id: course._id }, dayId);
+                console.log(`🔔 Session Completed Notification sent for Day ${dayId}`);
+            } catch (notifyError) {
+                console.error("⚠️ Error sending session notification:", notifyError);
+            }
+        }
+
         // Check for badge eligibility
         try {
-            // Send course completion notification
-            try {
-                await notifyCourseCompleted(studentId, { title: course.title, _id: course._id });
-                console.log(`🔔 Notification sent for course completion: ${course.title}`);
-            } catch (notifyError) {
-                console.error("⚠️ Error sending course completion notification:", notifyError);
-            }
-
             await awardEarlyAchieverBadge(studentId);
+            const { checkFirstThreeSessionsBadge } = require('../utils/badgeUtils');
+            await checkFirstThreeSessionsBadge(studentId, course._id);
         } catch (badgeErr) {
             console.error('Error in badge awarding:', badgeErr);
         }
@@ -446,6 +469,8 @@ router.post('/quiz-progress', async (req, res) => {
         // so we can generate a consistent pseudo-ID or use the one provided by frontend.
         const existingQuiz = modProgress.quizzesTaken.find(q => q.quizId && q.quizId.toString() === quizId);
 
+        const wasDoneBefore = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
+
         if (existingQuiz) {
             // Update existing attempt (keep highest score or just last attempt? Usually highest)
             if (score > existingQuiz.score) {
@@ -468,6 +493,17 @@ router.post('/quiz-progress', async (req, res) => {
 
         enrollment.lastAccessedAt = new Date();
         await enrollment.save();
+
+        const isDoneNow = await isSessionCompleted(enrollment, course, moduleDoc, dayId);
+
+        if (!wasDoneBefore && isDoneNow) {
+            try {
+                await notifySessionCompleted(studentId, { title: course.title, _id: course._id }, dayId);
+                console.log(`🔔 Session Completed Notification sent for Day ${dayId}`);
+            } catch (notifyError) {
+                console.error("⚠️ Error sending session notification:", notifyError);
+            }
+        }
 
         res.json({ success: true, data: enrollment });
 

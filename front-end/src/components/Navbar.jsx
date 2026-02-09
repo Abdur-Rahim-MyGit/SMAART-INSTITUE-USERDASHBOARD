@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const navItems = ["Services", "How It Works", "Testimonials", "FAQ", "Contact"];
+  const navItems = ["Services", "How It Works", "Testimonials", "FAQ", "Verify Certificate", "Contact"];
 
   // Use simple scroll listener for state
   useEffect(() => {

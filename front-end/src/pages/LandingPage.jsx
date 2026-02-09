@@ -19,6 +19,7 @@ import PricingPlans from "@/components/landing/PricingPlans";
 import Newsletter from "@/components/landing/Newsletter";
 import FAQAccordion from "@/components/landing/FAQAccordion";
 import ContactForm from "@/components/landing/ContactForm";
+import CertificateVerification from "@/components/landing/CertificateVerification";
 import InstitutionSelectModal from "@/components/auth/InstitutionSelectModal";
 import SplashScreen from "@/components/SplashScreen";
 import SectionReveal from "@/components/ui/SectionReveal";
@@ -137,6 +138,10 @@ const LandingPage = () => {
 
       <SectionReveal>
         <FAQAccordion />
+      </SectionReveal>
+
+      <SectionReveal>
+        <CertificateVerification />
       </SectionReveal>
 
       <SectionReveal>

@@ -136,10 +136,10 @@ const InstitutionSelector = ({ onSelect }) => {
               initial={{ opacity: 0, y: 10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
-              className="mb-3 bg-white/90 dark:bg-[#001c3d]/90 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
+              className="mb-3 bg-white/90 dark:bg-[#001c3d]/90 backdrop-blur-xl border border-gray-200 dark:border-white/10 rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
             >
-              <div className="p-2">
-                <p className="px-3 py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-white/5 mb-1">Matching Institutions</p>
+              <div className="p-1.5 sm:p-2">
+                <p className="px-2 sm:px-3 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-white/5 mb-1">Matching Institutions</p>
                 <div className="space-y-1">
                   {colleges.map((college, index) => (
                     <motion.div
@@ -154,12 +154,12 @@ const InstitutionSelector = ({ onSelect }) => {
                         });
                       }}
                       whileHover={{ x: 4 }}
-                      className={`flex items-center gap-4 p-3 cursor-pointer rounded-xl transition-all duration-200 group border ${index === focusedIndex
+                      className={`flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3 cursor-pointer rounded-lg sm:rounded-xl transition-all duration-200 group border ${index === focusedIndex
                         ? "bg-[#30919D]/10 border-[#30919D]/20 shadow-sm"
                         : "border-transparent hover:bg-gray-50 dark:hover:bg-white/5 hover:border-gray-200 dark:hover:border-white/10"
                         }`}
                     >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shadow-inner ${index === focusedIndex ? "bg-[#30919D] text-white" : "bg-gray-100 dark:bg-white/5 text-[#30919D]"
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors shadow-inner ${index === focusedIndex ? "bg-[#30919D] text-white" : "bg-gray-100 dark:bg-white/5 text-[#30919D]"
                         }`}>
                         <Building2 className="h-5 w-5" />
                       </div>
@@ -168,7 +168,7 @@ const InstitutionSelector = ({ onSelect }) => {
                           {college.collegeName}
                         </div>
                         {college.address && (
-                          <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate flex items-center gap-1">
+                          <div className="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate flex items-center gap-1">
                             <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
                             {college.address.city}, {college.address.state}
                           </div>
@@ -232,7 +232,7 @@ const InstitutionSelector = ({ onSelect }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 200)}
-              className="w-full h-14 sm:h-16 pl-12 pr-12 text-base sm:text-lg bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#30919D] focus:ring-4 focus:ring-[#30919D]/10 rounded-2xl font-semibold shadow-lg group-hover:shadow-xl transition-all duration-300"
+              className="w-full h-12 sm:h-14 md:h-16 pl-11 sm:pl-12 pr-11 sm:pr-12 text-sm sm:text-base md:text-lg bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#30919D] focus:ring-4 focus:ring-[#30919D]/10 rounded-xl sm:rounded-2xl font-semibold shadow-lg group-hover:shadow-xl transition-all duration-300"
             />
 
             {loading && (

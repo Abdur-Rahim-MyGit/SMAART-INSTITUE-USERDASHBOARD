@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, ChevronRight, CheckCircle2, Circle, Clock, BookOpen, FileText, Video, ArrowLeft, ShieldCheck, Lightbulb, Lock } from "lucide-react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import BadgeModal from "@/components/badges/BadgeModal";
 import MicroAssessment from "@/components/MicroAssessment";
 
 const ModuleViewPage = () => {
+  const playerRef = useRef(null);
   const { user: currentUser, loading: userLoading } = useUser();
   const { courseId, moduleId, dayId } = useParams();
   const navigate = useNavigate();
@@ -853,7 +854,7 @@ const ModuleViewPage = () => {
 
               {/* LEFT: Main Content Area (Video or Assessment) */}
               <div className="lg:col-span-8 space-y-6">
-                <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-black shadow-2xl aspect-video group">
+                <div className={`relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-black shadow-2xl group ${activeStep?.type === 'assessment' ? 'aspect-auto min-h-[400px]' : 'aspect-video'}`}>
                   {activeStep?.type === 'assessment' ? (
                      <div className="w-full h-full bg-slate-100 dark:bg-slate-900 overflow-y-auto">
                         <MicroAssessment
@@ -908,6 +909,7 @@ const ModuleViewPage = () => {
                      </div>
                   ) : (
                       <CustomVideoPlayer
+                        ref={playerRef}
                         videoUrl={activeStep?.videoUrl || day.videoUrl}
                         title={activeStep?.title || day.videoTitle || day.title}
                         duration={getDisplayDuration(selectedModule, selectedDay, activeStep?.duration || day.duration)}
@@ -942,11 +944,13 @@ const ModuleViewPage = () => {
                 {/* Video Description / Tabs */}
                 <div className="bg-white dark:bg-[#0B1120] rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm dark:shadow-none">
                   <div className="flex gap-6 border-b border-slate-200 dark:border-slate-800 mb-4">
-                    {['overview', 'transcription'].map((tab) => (
+                    {['overview', 'transcription']
+                      .filter(tab => tab !== 'transcription' || activeStep?.type !== 'assessment')
+                      .map((tab) => (
                       <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === tab
+                        className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${(activeTab === tab || (activeStep?.type === 'assessment' && tab === 'overview'))
                           ? 'text-slate-900 dark:text-white border-[#0891b2] dark:border-[#30919D]'
                           : 'text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-600 dark:hover:text-slate-300'
                           }`}
@@ -957,7 +961,7 @@ const ModuleViewPage = () => {
                   </div>
 
                   <AnimatePresence mode="wait">
-                    {activeTab === 'overview' ? (
+                    {(activeTab === 'overview' || activeStep?.type === 'assessment') ? (
                       <motion.div
                         key="overview"
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
@@ -968,12 +972,44 @@ const ModuleViewPage = () => {
                       </motion.div>
                     ) : (
                       <motion.div
-                        key="transcription"
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                         className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-h-60 overflow-y-auto pr-2 custom-scrollbar"
                       >
                         <h3 className="text-slate-900 dark:text-white font-bold mb-2 text-base">Transcription</h3>
-                        <p>{day.videoTranscription || "No transcription available for this session."}</p>
+                        <div className="space-y-2">
+                            {day.videoTranscription ? (
+                                day.videoTranscription.split('\n').map((line, idx) => {
+                                    if (!line.trim()) return null;
+                                    
+                                    // Check for timestamp [mm:ss]
+                                    const match = line.match(/^\[(\d{2}):(\d{2})\](.*)/);
+                                    if (match) {
+                                        const minutes = parseInt(match[1]);
+                                        const seconds = parseInt(match[2]);
+                                        const totalSeconds = minutes * 60 + seconds;
+                                        const text = match[3];
+
+                                        return (
+                                            <div key={idx} className="flex gap-2 group/line hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-colors -mx-1.5">
+                                                <button 
+                                                    onClick={() => playerRef.current?.seekTo(totalSeconds)}
+                                                    className="shrink-0 text-[#0891b2] dark:text-[#30919D] font-mono text-xs font-bold bg-[#0891b2]/10 dark:bg-[#30919D]/10 px-1.5 py-0.5 rounded h-fit hover:bg-[#0891b2]/20 transition-colors cursor-pointer"
+                                                >
+                                                    {match[1]}:{match[2]}
+                                                </button>
+                                                <p className="flex-1 text-slate-600 dark:text-slate-400 group-hover/line:text-slate-900 dark:group-hover/line:text-slate-200 transition-colors">
+                                                    {text}
+                                                </p>
+                                            </div>
+                                        );
+                                    }
+                                    
+                                    return <p key={idx} className="mb-2">{line}</p>;
+                                })
+                            ) : (
+                                <p>No transcription available for this session.</p>
+                            )}
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -1086,42 +1122,50 @@ const ModuleViewPage = () => {
                           const isDayUnlockedStatus = isDayUnlocked(selectedModule, idx, module);
 
                           return (
-                            <button
-                              key={d.id}
-                              onClick={() => {
-                                if (isDayUnlockedStatus) {
-                                  navigateToDay(selectedModule, d.id);
-                                } else {
-                                  toast.error("Finish previous session's videos to unlock!");
-                                }
-                              }}
-                              className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between group ${isCurrent
-                                ? 'bg-[#0891b2]/10 dark:bg-[#30919D]/10 text-[#0891b2] dark:text-[#30919D] border border-[#0891b2]/20 dark:border-[#30919D]/20 shadow-sm'
-                                : !isDayUnlockedStatus
-                                  ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60'
-                                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
-                                }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className={`
-                                     flex items-center justify-center w-5 h-5 rounded-full text-[9px] font-bold border transition-colors
-                                     ${isCurrent
-                                    ? 'bg-[#0891b2] dark:bg-[#30919D] text-white border-transparent'
-                                    : !isDayUnlockedStatus
-                                      ? 'bg-slate-50 dark:bg-slate-900 text-slate-300 border-slate-200 dark:border-slate-800'
-                                      : isCompletedDay
-                                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700'
-                                  }
-                                   `}>
-                                  {!isDayUnlockedStatus ? <Lock size={10} /> : (isCompletedDay ? <CheckCircle2 size={10} /> : d.id)}
+                            <div key={d.id}>
+                              {idx === 3 && (
+                                <div className="flex items-center gap-2 py-3">
+                                  <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+                                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Phase 2</span>
+                                  <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
                                 </div>
-                                <span className="truncate max-w-[130px]">{d.title}</span>
-                              </div>
-                              <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                {isDayUnlockedStatus && <Play size={10} className="fill-current" />}
-                              </div>
-                            </button>
+                              )}
+                              <button
+                                onClick={() => {
+                                  if (isDayUnlockedStatus) {
+                                    navigateToDay(selectedModule, d.id);
+                                  } else {
+                                    toast.error("Finish previous session's videos to unlock!");
+                                  }
+                                }}
+                                className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between group ${isCurrent
+                                  ? 'bg-[#0891b2]/10 dark:bg-[#30919D]/10 text-[#0891b2] dark:text-[#30919D] border border-[#0891b2]/20 dark:border-[#30919D]/20 shadow-sm'
+                                  : !isDayUnlockedStatus
+                                    ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60'
+                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`
+                                       flex items-center justify-center w-5 h-5 rounded-full text-[9px] font-bold border transition-colors
+                                       ${isCurrent
+                                      ? 'bg-[#0891b2] dark:bg-[#30919D] text-white border-transparent'
+                                      : !isDayUnlockedStatus
+                                        ? 'bg-slate-50 dark:bg-slate-900 text-slate-300 border-slate-200 dark:border-slate-800'
+                                        : isCompletedDay
+                                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700'
+                                    }
+                                     `}>
+                                    {!isDayUnlockedStatus ? <Lock size={10} /> : (isCompletedDay ? <CheckCircle2 size={10} /> : d.id)}
+                                  </div>
+                                  <span className="truncate max-w-[130px]">{d.title}</span>
+                                </div>
+                                <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                  {isDayUnlockedStatus && <Play size={10} className="fill-current" />}
+                                </div>
+                              </button>
+                            </div>
                           );
                         })}
                       </div>

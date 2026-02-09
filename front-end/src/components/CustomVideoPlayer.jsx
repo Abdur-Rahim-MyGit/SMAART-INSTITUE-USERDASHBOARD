@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Play,
@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Confetti from 'react-confetti';
 
-const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, onProgressUpdate, onNext }) => {
+const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, onProgressUpdate, onNext }, ref) => {
 
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -42,6 +42,28 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
   const controlsTimeoutRef = useRef(null);
   const lastSyncTimeRef = useRef(0);
   const lastUrlRef = useRef(videoUrl);
+
+  useImperativeHandle(ref, () => ({
+    seekTo: (time) => {
+      if (videoRef.current) {
+        // Allow seeking to any point if completed, otherwise restrict to maxTimeReached
+        const targetTime = isCompleted ? time : Math.min(time, maxTimeReached);
+        
+        // If user tries to seek past max time, showing a toast or indication might be good UI, 
+        // but for now we just clamp it silently or maybe log.
+        if (!isCompleted && time > maxTimeReached) {
+            console.warn("Cannot seek past max watched time.");
+        }
+
+        videoRef.current.currentTime = targetTime;
+        setCurrentTime(targetTime);
+        if (!isPlaying) {
+             videoRef.current.play().catch(e => console.error("Play error:", e));
+        }
+      }
+    },
+    getCurrentTime: () => videoRef.current ? videoRef.current.currentTime : 0
+  }));
 
   const syncProgress = (force = false) => {
     if (!onProgressUpdate || !videoRef.current) return;
@@ -710,6 +732,6 @@ const CustomVideoPlayer = ({ videoUrl, title, duration, poster, initialMaxTime =
       </AnimatePresence>
     </div>
   );
-};
+});
 
 export default CustomVideoPlayer;
