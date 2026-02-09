@@ -103,6 +103,8 @@
     -ms-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+    cursor: default;
+    caret-color: transparent;
   }
 
   h1,
@@ -132,7 +134,7 @@
     @apply bg-[#30919D]/40 dark:bg-white/20;
   }
 
-  /* Allow text selection in inputs and textareas */
+  /* Allow text selection and restore cursor/caret in inputs and textareas */
   input,
   textarea,
   [contenteditable] {
@@ -140,6 +142,8 @@
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
+    cursor: text;
+    caret-color: auto;
   }
 
   @media print {
@@ -250,38 +254,41 @@
     @apply min-h-[44px] min-w-[44px];
   }
 }
-  .scrollbar-modern {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-  }
 
-  .scrollbar-modern::-webkit-scrollbar {
-    width: 6px;
-  }
+.scrollbar-modern {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
 
-  .scrollbar-modern::-webkit-scrollbar-track {
-    background: transparent;
-  }
+.scrollbar-modern::-webkit-scrollbar {
+  width: 6px;
+}
 
-  .scrollbar-modern::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-  }
+.scrollbar-modern::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  .scrollbar-modern::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
+.scrollbar-modern::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+}
 
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
+.scrollbar-modern::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
 
-  .mask-gradient {
-    mask-image: linear-gradient(to right, black 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
-  }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.mask-gradient {
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+}
