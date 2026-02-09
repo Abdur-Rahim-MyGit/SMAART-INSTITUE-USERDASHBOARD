@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaTrophy, FaStar, FaFire, FaMedal, FaCrown, FaChartLine, FaFilter } from 'react-icons/fa';
+import { FaTrophy, FaChevronDown } from 'react-icons/fa';
 import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
 import { Loader2 } from 'lucide-react';
 import { apiCall } from '@/services/api';
 
 const categories = [
-    { id: 'all', label: 'All Badges', icon: FaTrophy },
-    { id: 'assessment', label: 'Assessments', icon: FaStar },
-    { id: 'learning', label: 'Learning', icon: FaChartLine },
-    { id: 'streak', label: 'Streaks', icon: FaFire },
-    { id: 'community', label: 'Community', icon: FaMedal },
-    { id: 'certification', label: 'Certification', icon: FaCrown },
+    { id: 'all', label: 'All' },
+    { id: 'capability', label: 'CAPABILITY' },
+    { id: 'capacity', label: 'CAPACITY' },
+    { id: 'leadership', label: 'LEADERSHIP' },
 ];
 
 const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) => {
@@ -20,7 +18,7 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
     const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
-    const [showEarnedOnly, setShowEarnedOnly] = useState(false);
+    const [showEarnedOnly, setShowEarnedOnly] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -40,7 +38,7 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
                         badgeId: userBadge.badge?.badgeId || userBadge.badgeId,
                         title: userBadge.badge?.title || userBadge.title || 'Badge',
                         description: userBadge.badge?.description || userBadge.description || '',
-                        tier: userBadge.badge?.tier || userBadge.tier || 'bronze',
+                        tier: userBadge.badge?.tier || userBadge.tier || 'standard',
                         xp: userBadge.badge?.xp || userBadge.xp || 0,
                         category: userBadge.badge?.category || userBadge.category || 'learning',
                         earnedDate: userBadge.earnedDate,
@@ -77,10 +75,9 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
 
     // Calculate stats
     const earnedBadges = badges.filter((b) => b.isEarned);
+    const earnedBadgesCount = earnedBadges.length;
     const totalXP = earnedBadges.reduce((acc, b) => acc + (b.xp || 0), 0);
-    const goldCount = earnedBadges.filter((b) => b.tier === 'gold').length;
-    const silverCount = earnedBadges.filter((b) => b.tier === 'silver').length;
-    const bronzeCount = earnedBadges.filter((b) => b.tier === 'bronze').length;
+    const totalBadges = badges.length;
 
     // Filter and sort badges
     const filteredBadges = badges
@@ -114,69 +111,28 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
     }
 
     return (
-        <div className="space-y-8">
-            {/* Stats Overview */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="col-span-2 md:col-span-1 bg-gradient-to-br from-[#002147] to-[#003366] rounded-2xl p-5 text-center text-white shadow-lg"
-                >
-                    <FaTrophy className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
-                    <p className="text-3xl font-bold">{earnedBadges.length}</p>
-                    <p className="text-xs text-blue-200 font-medium">Badges Earned</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl p-5 text-center text-white shadow-lg"
-                >
-                    <FaCrown className="w-6 h-6 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">{goldCount}</p>
-                    <p className="text-xs font-medium opacity-90">Gold</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-gradient-to-br from-slate-400 to-gray-500 rounded-2xl p-5 text-center text-white shadow-lg"
-                >
-                    <FaMedal className="w-6 h-6 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">{silverCount}</p>
-                    <p className="text-xs font-medium opacity-90">Silver</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-gradient-to-br from-amber-600 to-orange-600 rounded-2xl p-5 text-center text-white shadow-lg"
-                >
-                    <FaStar className="w-6 h-6 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">{bronzeCount}</p>
-                    <p className="text-xs font-medium opacity-90">Bronze</p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="bg-gradient-to-br from-[#30919D] to-[#287a84] rounded-2xl p-5 text-center text-white shadow-lg"
-                >
-                    <FaFire className="w-6 h-6 mx-auto mb-2 text-orange-300" />
-                    <p className="text-2xl font-bold">{totalXP.toLocaleString()}</p>
-                    <p className="text-xs font-medium opacity-90">Total XP</p>
-                </motion.div>
-            </div>
-
-            {/* Filters removed for single badge display */}
-            <div className="flex items-center justify-between">
+        <div className="space-y-6">
+            {/* Header with Dropdown Filter */}
+            <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                    <FaTrophy className="w-4 h-4 text-[#30919D]" />
-                    <span className="text-sm font-bold uppercase tracking-wider text-[#002147] dark:text-white">Your Achievements</span>
+                    <FaTrophy className="w-5 h-5 text-[#30919D]" />
+                    <span className="text-lg font-bold uppercase tracking-wider text-[#002147] dark:text-white">Your Achievements</span>
+                </div>
+                
+                {/* Category Dropdown */}
+                <div className="relative">
+                    <select
+                        value={activeCategory}
+                        onChange={(e) => setActiveCategory(e.target.value)}
+                        className="appearance-none bg-white dark:bg-slate-800 border-2 border-[#30919D] text-[#002147] dark:text-white rounded-xl px-4 py-2 pr-10 font-semibold text-sm cursor-pointer shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-[#30919D] focus:ring-offset-2"
+                    >
+                        {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                                {cat.label}
+                            </option>
+                        ))}
+                    </select>
+                    <FaChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#30919D] pointer-events-none" />
                 </div>
             </div>
 

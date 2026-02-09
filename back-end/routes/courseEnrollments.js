@@ -182,7 +182,7 @@ router.get('/student/:studentId', async (req, res) => {
 
 
 // Update task progress
-const { checkCourseCompletionBadges } = require('../utils/badgeUtils');
+const { checkCourseCompletionBadges, checkSkillCompletionBadges } = require('../utils/badgeUtils');
 
 router.post('/task-progress', async (req, res) => {
     try {
@@ -290,15 +290,37 @@ router.post('/task-progress', async (req, res) => {
         }
 
         // Check for badge eligibility
+        const badgesEarned = [];
         try {
-            await awardEarlyAchieverBadge(studentId);
-            const { checkFirstThreeSessionsBadge } = require('../utils/badgeUtils');
-            await checkFirstThreeSessionsBadge(studentId, course._id);
+            const earlyBadge = await awardEarlyAchieverBadge(studentId);
+            if (earlyBadge) badgesEarned.push(earlyBadge);
+            
+            const { checkFirstThreeSessionsBadge, checkSkillCompletionBadges } = require('../utils/badgeUtils');
+            const sessionBadges = await checkFirstThreeSessionsBadge(studentId, course._id);
+            if (sessionBadges && sessionBadges.length > 0) badgesEarned.push(...sessionBadges);
+            
+            // Check if entire module (Skill) is completed
+            const isModuleComplete = enrollment.moduleProgress.some(mp => 
+                mp.module.toString() === moduleDoc._id.toString() && mp.status === 'completed'
+            );
+            
+            if (isModuleComplete || enrollment.status === 'completed') {
+                const skillBadges = await checkSkillCompletionBadges(studentId, moduleDoc._id, moduleDoc.title);
+                if (skillBadges && skillBadges.length > 0) {
+                    badgesEarned.push(...skillBadges.map(b => ({
+                        ...b.badgeDetails._doc,
+                        ...b.badge._doc,
+                        _id: b.badge._id,
+                        id: b.badgeDetails.badgeId
+                    })));
+                }
+                console.log(`🏅 Checked skill badges (task) for ${moduleDoc.title}`);
+            }
         } catch (badgeErr) {
             console.error('Error in badge awarding:', badgeErr);
         }
 
-        res.json({ success: true, data: enrollment });
+        res.json({ success: true, data: enrollment, badgesEarned });
 
     } catch (err) {
         console.error('Error updating task progress:', err);
@@ -311,7 +333,7 @@ router.post('/video-progress', async (req, res) => {
     try {
         const { studentId, courseCode, moduleId, dayId, stepId, maxWatchedTime, videoDuration, isCompleted } = req.body;
         const Course = require('../models/Course');
-        const { checkCourseCompletionBadges } = require('../utils/badgeUtils'); // Ensure util is available or rely on top-level import
+        const { checkCourseCompletionBadges, checkSkillCompletionBadges } = require('../utils/badgeUtils'); // Ensure util is available or rely on top-level import
 
         // Find course
         const course = await Course.findOne({ courseCode });
@@ -404,15 +426,37 @@ router.post('/video-progress', async (req, res) => {
         }
 
         // Check for badge eligibility
+        const badgesEarned = [];
         try {
-            await awardEarlyAchieverBadge(studentId);
+            const earlyBadge = await awardEarlyAchieverBadge(studentId);
+            if (earlyBadge) badgesEarned.push(earlyBadge);
+
             const { checkFirstThreeSessionsBadge } = require('../utils/badgeUtils');
-            await checkFirstThreeSessionsBadge(studentId, course._id);
+            const sessionBadges = await checkFirstThreeSessionsBadge(studentId, course._id);
+            if (sessionBadges && sessionBadges.length > 0) badgesEarned.push(...sessionBadges);
+            
+             // Check if entire module (Skill) is completed
+             const isModuleComplete = enrollment.moduleProgress.some(mp => 
+                mp.module.toString() === moduleDoc._id.toString() && mp.status === 'completed'
+            );
+            
+            if (isModuleComplete || enrollment.status === 'completed') {
+                const skillBadges = await checkSkillCompletionBadges(studentId, moduleDoc._id, moduleDoc.title);
+                if (skillBadges && skillBadges.length > 0) {
+                    badgesEarned.push(...skillBadges.map(b => ({
+                        ...b.badgeDetails._doc,
+                        ...b.badge._doc,
+                        _id: b.badge._id,
+                        id: b.badgeDetails.badgeId
+                    })));
+                }
+                console.log(`🏅 Checked skill badges (video) for ${moduleDoc.title}`);
+            }
         } catch (badgeErr) {
             console.error('Error in badge awarding:', badgeErr);
         }
 
-        res.json({ success: true, data: enrollment });
+        res.json({ success: true, data: enrollment, badgesEarned });
 
     } catch (err) {
         console.error('Error updating video progress:', err);
@@ -426,7 +470,7 @@ router.post('/quiz-progress', async (req, res) => {
     try {
         const { studentId, courseCode, moduleId, dayId, quizId, score, totalPoints } = req.body;
         const Course = require('../models/Course');
-        const { checkCourseCompletionBadges } = require('../utils/badgeUtils');
+        const { checkCourseCompletionBadges, checkSkillCompletionBadges } = require('../utils/badgeUtils');
 
         // Find course
         const course = await Course.findOne({ courseCode });
@@ -505,7 +549,31 @@ router.post('/quiz-progress', async (req, res) => {
             }
         }
 
-        res.json({ success: true, data: enrollment });
+        // Check for badge eligibility (Quiz/Micro-assessment)
+        const badgesEarned = [];
+        try {
+             // Check if entire module (Skill) is completed
+             const isModuleComplete = enrollment.moduleProgress.some(mp => 
+                mp.module.toString() === moduleDoc._id.toString() && mp.status === 'completed'
+            );
+            
+            if (isModuleComplete || enrollment.status === 'completed') {
+                const skillBadges = await checkSkillCompletionBadges(studentId, moduleDoc._id, moduleDoc.title);
+                if (skillBadges && skillBadges.length > 0) {
+                    badgesEarned.push(...skillBadges.map(b => ({
+                        ...b.badgeDetails._doc,
+                        ...b.badge._doc,
+                        _id: b.badge._id,
+                        id: b.badgeDetails.badgeId
+                    })));
+                }
+                console.log(`🏅 Checked skill badges (quiz) for ${moduleDoc.title}`);
+            }
+        } catch (badgeErr) {
+            console.error('Error in badge awarding (quiz):', badgeErr);
+        }
+
+        res.json({ success: true, data: enrollment, badgesEarned });
 
     } catch (err) {
         console.error('Error updating quiz progress:', err);

@@ -1,36 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaShieldAlt, FaStar, FaTimes, FaLinkedin, FaFacebook, FaTwitter, FaDownload, FaExternalLinkAlt, FaCheckCircle, FaTrophy, FaMedal, FaCrown } from 'react-icons/fa';
+import { FaShieldAlt, FaTimes, FaLinkedin, FaFacebook, FaTwitter, FaDownload, FaExternalLinkAlt, FaCheckCircle, FaAward } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 
-const tierConfig = {
-    bronze: {
-        gradient: 'from-amber-600 via-amber-500 to-yellow-600',
-        bgGradient: 'from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30',
-        textColor: 'text-amber-700 dark:text-amber-400',
-        borderColor: 'border-amber-400',
-        stars: 1,
-        icon: FaMedal,
-    },
-    silver: {
-        gradient: 'from-slate-400 via-gray-300 to-slate-500',
-        bgGradient: 'from-slate-50 to-gray-100 dark:from-slate-900/40 dark:to-gray-900/40',
-        textColor: 'text-slate-600 dark:text-slate-300',
-        borderColor: 'border-slate-400',
-        stars: 2,
-        icon: FaTrophy,
-    },
-    gold: {
-        gradient: 'from-yellow-400 via-amber-300 to-yellow-500',
-        bgGradient: 'from-yellow-50 to-amber-50 dark:from-yellow-950/30 dark:to-amber-950/30',
-        textColor: 'text-yellow-600 dark:text-yellow-400',
-        borderColor: 'border-yellow-400',
-        stars: 3,
-        icon: FaCrown,
-    },
+const unifiedStyle = {
+    gradient: 'from-[#30919D] via-[#287a84] to-[#002147]',
+    bgGradient: 'from-teal-50 to-blue-50 dark:from-teal-950/20 dark:to-blue-950/20',
+    textColor: 'text-[#002147] dark:text-teal-300',
+    borderColor: 'border-[#30919D]',
+    icon: FaShieldAlt,
 };
 
 const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
@@ -38,8 +19,6 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
     
     if (!badge) return null;
     
-    const tier = tierConfig[badge.tier] || tierConfig.bronze;
-    const TierIcon = tier.icon;
     const verificationUrl = `${window.location.origin}/verify-badge/${badge._id || badge.id}`;
 
     const handleShare = async (platform) => {
@@ -117,9 +96,9 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         </button>
 
                         {/* Certificate Content for PDF */}
-                        <div id="badge-certificate-content" className={`bg-gradient-to-br ${tier.bgGradient}`}>
+                        <div id="badge-certificate-content" className={`bg-gradient-to-br ${unifiedStyle.bgGradient}`}>
                             {/* Header Banner */}
-                            <div className={`bg-gradient-to-r ${tier.gradient} p-6 text-center`}>
+                            <div className={`bg-gradient-to-r ${unifiedStyle.gradient} p-6 text-center`}>
                                 <h2 className="text-2xl font-bold text-white mb-1">Achievement Unlocked!</h2>
                                 <p className="text-white/80 text-sm">SMAART Institute Badge Credential</p>
                             </div>
@@ -134,13 +113,13 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                         transition={{ type: 'spring', delay: 0.2, damping: 15 }}
                                         className={`
                                             relative w-32 h-32 flex items-center justify-center
-                                            bg-gradient-to-br ${tier.gradient}
+                                            bg-gradient-to-br ${unifiedStyle.gradient}
                                             rounded-full shadow-2xl mb-6
                                         `}
                                     >
                                         <FaShieldAlt className="w-20 h-20 text-white drop-shadow-lg" />
                                         <div className="absolute -bottom-2 -right-2 bg-white dark:bg-slate-800 rounded-full p-2 shadow-lg">
-                                            <TierIcon className={`w-6 h-6 ${tier.textColor}`} />
+                                            <FaAward className={`w-6 h-6 ${unifiedStyle.textColor}`} />
                                         </div>
                                         
                                         {/* Shine Effect */}
@@ -152,38 +131,18 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                         />
                                     </motion.div>
 
-                                    {/* Stars */}
-                                    <div className="flex gap-2 mb-4">
-                                        {[...Array(3)].map((_, i) => (
-                                            <motion.div
-                                                key={i}
-                                                initial={{ scale: 0, rotate: -180 }}
-                                                animate={{ scale: 1, rotate: 0 }}
-                                                transition={{ delay: 0.4 + i * 0.1 }}
-                                            >
-                                                <FaStar
-                                                    className={`w-6 h-6 ${
-                                                        i < tier.stars
-                                                            ? tier.textColor
-                                                            : 'text-gray-300 dark:text-gray-600'
-                                                    }`}
-                                                />
-                                            </motion.div>
-                                        ))}
-                                    </div>
-
                                     {/* Badge Title */}
-                                    <h3 className={`text-2xl font-bold ${tier.textColor} text-center mb-2`}>
+                                    <h3 className={`text-2xl font-bold ${unifiedStyle.textColor} text-center mb-2`}>
                                         {badge.title}
                                     </h3>
 
-                                    {/* Tier Label */}
+                                    {/* Category Label */}
                                     <span className={`
                                         px-4 py-1 rounded-full text-sm font-bold uppercase
-                                        bg-gradient-to-r ${tier.gradient} text-white
+                                        bg-gradient-to-r ${unifiedStyle.gradient} text-white
                                         shadow-md mb-4
                                     `}>
-                                        {badge.tier} Tier
+                                        {badge.category || 'Achievement'}
                                     </span>
 
                                     {/* Description */}
@@ -192,20 +151,14 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     </p>
 
                                     {/* Stats Grid */}
-                                    <div className="grid grid-cols-3 gap-4 w-full max-w-md mb-6">
-                                        <div className={`text-center p-3 rounded-xl ${tier.bgGradient} border ${tier.borderColor}`}>
+                                    <div className="grid grid-cols-2 gap-4 w-full max-w-md mb-6">
+                                        <div className={`text-center p-3 rounded-xl ${unifiedStyle.bgGradient} border ${unifiedStyle.borderColor}`}>
                                             <p className="text-2xl font-bold text-slate-800 dark:text-white">
                                                 {badge.xp || 0}
                                             </p>
                                             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">XP Earned</p>
                                         </div>
-                                        <div className={`text-center p-3 rounded-xl ${tier.bgGradient} border ${tier.borderColor}`}>
-                                            <p className="text-2xl font-bold text-slate-800 dark:text-white">
-                                                Top {badge.percentile || 10}%
-                                            </p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Percentile</p>
-                                        </div>
-                                        <div className={`text-center p-3 rounded-xl ${tier.bgGradient} border ${tier.borderColor}`}>
+                                        <div className={`text-center p-3 rounded-xl ${unifiedStyle.bgGradient} border ${unifiedStyle.borderColor}`}>
                                             <p className="text-2xl font-bold text-slate-800 dark:text-white">
                                                 <FaCheckCircle className="inline w-5 h-5 text-green-500" />
                                             </p>
