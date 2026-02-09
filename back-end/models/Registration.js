@@ -155,6 +155,12 @@ const registrationSchema = new mongoose.Schema({
 
   submissionDate: { type: Date, default: Date.now },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  
+  // Single-session enforcement fields
+  currentSessionId: { type: String, default: null },
+  lastLogin: { type: Date, default: null },
+  previousLogin: { type: Date, default: null },
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

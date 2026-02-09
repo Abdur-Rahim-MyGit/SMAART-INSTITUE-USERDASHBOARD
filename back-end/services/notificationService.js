@@ -37,15 +37,27 @@ const createNotification = async (data) => {
 };
 
 /**
- * Notify user about badge earned
+ * Notify user about badge earned - ONLY ONCE per badge
  */
 const notifyBadgeEarned = async (userId, badge) => {
+  // Check if notification already exists for this badge
+  const existingNotification = await Notification.findOne({
+    userId,
+    type: 'badge',
+    'metadata.badgeId': badge.badgeId
+  });
+
+  if (existingNotification) {
+    console.log(`ℹ️ Badge notification for "${badge.title}" already exists, skipping...`);
+    return null;
+  }
+
   return createNotification({
     userId,
     type: 'badge',
     title: '🏆 New Badge Earned!',
     message: `Congratulations! You've earned the "${badge.title}" badge.`,
-    link: '/badges',
+    link: null, // No hyperlinks - display only
     metadata: {
       badgeId: badge.badgeId,
       xpEarned: badge.xp
@@ -86,37 +98,63 @@ const notifyCourseEnrollment = async (userId, course) => {
 };
 
 /**
- * Notify user about course completion
+ * Notify user about course completion - ONLY ONCE per course
  */
 const notifyCourseCompleted = async (userId, course) => {
+  // Check if notification already exists for this course completion
+  const existingNotification = await Notification.findOne({
+    userId,
+    type: 'course',
+    title: '🎓 Course Completed!',
+    'metadata.courseId': course._id.toString()
+  });
+
+  if (existingNotification) {
+    console.log(`ℹ️ Course completion notification already exists, skipping...`);
+    return null;
+  }
+
   return createNotification({
     userId,
     type: 'course',
     title: '🎓 Course Completed!',
     message: `Amazing! You've completed "${course.title}". Your certificate is ready!`,
-    link: '/certificates',
+    link: null, // No hyperlinks - display only
     icon: 'graduation-cap',
     color: '#10B981',
     metadata: {
-      courseId: course._id
+      courseId: course._id.toString()
     }
   });
 };
 
 /**
- * Notify user about session (day) completion
+ * Notify user about session (day) completion - ONLY ONCE per session
  */
 const notifySessionCompleted = async (userId, course, dayId) => {
+  // Check if notification already exists for this course/day combo
+  const existingNotification = await Notification.findOne({
+    userId,
+    type: 'achievement',
+    'metadata.courseId': course._id.toString(),
+    'metadata.dayId': dayId
+  });
+
+  if (existingNotification) {
+    console.log(`ℹ️ Session notification for Day ${dayId} already exists, skipping...`);
+    return null; // Already notified, don't create duplicate
+  }
+
   return createNotification({
     userId,
     type: 'achievement',
     title: '💪 Session Completed!',
     message: `Great job! You've finished all activities for Day ${dayId} in "${course.title}".`,
-    link: `/courses/${course._id}`,
+    link: null, // No hyperlinks - display only
     icon: 'check-circle',
     color: '#10B981',
     metadata: {
-      courseId: course._id,
+      courseId: course._id.toString(),
       dayId
     }
   });

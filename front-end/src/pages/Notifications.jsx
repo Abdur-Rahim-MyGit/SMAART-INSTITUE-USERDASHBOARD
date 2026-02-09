@@ -60,6 +60,7 @@ const Notifications = () => {
   const [filter, setFilter] = useState('all'); // all, unread
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [summary, setSummary] = useState(null);
   const navigate = useNavigate();
 
   // Get auth headers
@@ -101,11 +102,29 @@ const Notifications = () => {
     }
   }, [filter]);
 
+  // Fetch summary data
+  const fetchSummary = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/summary`, {
+        headers: getAuthHeaders()
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setSummary(data.summary);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching summary:', err);
+    }
+  }, []);
+
   // Initial fetch and filter change
   useEffect(() => {
     setPage(1);
     fetchNotifications(1, false);
-  }, [filter, fetchNotifications]);
+    fetchSummary();
+  }, [filter, fetchNotifications, fetchSummary]);
 
   // Load more
   const loadMore = () => {
@@ -361,6 +380,72 @@ const Notifications = () => {
             </div>
           </motion.div>
 
+          {/* Consolidated Summary Card */}
+          {summary && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mb-6"
+            >
+              <div className="bg-gradient-to-r from-[#002147] to-[#30919D] rounded-xl p-5 text-white shadow-lg">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-semibold">Welcome back, {summary.fullName}!</h2>
+                    <p className="text-white/80 text-sm mt-1">Here's your daily summary</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="w-4 h-4" />
+                    <span>Current Session: {new Date(summary.currentLogin).toLocaleString('en-US', { 
+                      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                    })}</span>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5">
+                  {/* Last Login */}
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <div className="text-white/70 text-xs uppercase tracking-wide">Last Login</div>
+                    <div className="text-white font-semibold mt-1">
+                      {summary.lastLogin 
+                        ? new Date(summary.lastLogin).toLocaleString('en-US', { 
+                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                          })
+                        : 'First login!'
+                      }
+                    </div>
+                  </div>
+                  
+                  {/* Badges Earned */}
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <div className="text-white/70 text-xs uppercase tracking-wide">Badges Earned</div>
+                    <div className="text-white font-semibold mt-1 flex items-center gap-2">
+                      <Award className="w-4 h-4" />
+                      {summary.badgesEarned}
+                    </div>
+                  </div>
+                  
+                  {/* Today's Progress */}
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <div className="text-white/70 text-xs uppercase tracking-wide">Today's Sessions</div>
+                    <div className="text-white font-semibold mt-1 flex items-center gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      {summary.todayCompletedSessions} completed
+                    </div>
+                  </div>
+                  
+                  {/* Total Enrollments */}
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <div className="text-white/70 text-xs uppercase tracking-wide">Enrolled Courses</div>
+                    <div className="text-white font-semibold mt-1">
+                      {summary.totalEnrollments}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Content */}
           {loading ? (
             <div className="flex items-center justify-center py-20">
@@ -447,12 +532,7 @@ const Notifications = () => {
                               <p className="text-sm text-gray-600 mt-1">
                                 {notification.message}
                               </p>
-                              {notification.link && (
-                                <div className="flex items-center gap-1 mt-2 text-[#30919D] text-sm font-medium">
-                                  <span>View details</span>
-                                  <ExternalLink className="w-3.5 h-3.5" />
-                                </div>
-                              )}
+                              {/* Hyperlinks removed - display only mode */}
                             </div>
                           </button>
 

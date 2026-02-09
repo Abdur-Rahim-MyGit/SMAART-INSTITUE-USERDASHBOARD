@@ -653,7 +653,7 @@ const DashboardHome = () => {
                         <div key={`empty-${i}`} />
                       ))}
 
-                      {getDaysInMonth(calendarMonth).map(day => {
+                      {getDaysInMonth(calendarMonth).daysArray.map(day => {
                         const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
                         const isToday = date.toDateString() === new Date().toDateString();
                         const isSelected = date.toDateString() === selectedDate.toDateString();

@@ -78,6 +78,7 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
   lastLogin: Date,
+  previousLogin: Date, // Login timestamp before current session
   // Session management for One Person Login
   currentSessionId: {
     type: String,

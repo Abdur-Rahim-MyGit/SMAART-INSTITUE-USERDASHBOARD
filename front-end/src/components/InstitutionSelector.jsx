@@ -122,7 +122,7 @@ const InstitutionSelector = ({ onSelect }) => {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.1 }}
-      className="w-full relative"
+      className="w-full max-w-full overflow-hidden relative"
     >
       <div className="relative z-50">
 
@@ -232,7 +232,7 @@ const InstitutionSelector = ({ onSelect }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 200)}
-              className="w-full h-12 sm:h-14 md:h-16 pl-11 sm:pl-12 pr-11 sm:pr-12 text-sm sm:text-base md:text-lg bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#30919D] focus:ring-4 focus:ring-[#30919D]/10 rounded-xl sm:rounded-2xl font-semibold shadow-lg group-hover:shadow-xl transition-all duration-300"
+              className="w-full h-12 sm:h-14 pl-11 pr-11 text-sm sm:text-base bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#30919D] focus:ring-4 focus:ring-[#30919D]/10 rounded-xl sm:rounded-2xl font-semibold shadow-lg group-hover:shadow-xl transition-all duration-300"
             />
 
             {loading && (

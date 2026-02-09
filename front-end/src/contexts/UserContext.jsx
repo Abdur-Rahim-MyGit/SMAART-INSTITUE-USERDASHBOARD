@@ -58,10 +58,41 @@ export const UserProvider = ({ children }) => {
     }
   }, [user?.email, fetchUserDetails]);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    console.log('[Logout] Starting logout process...');
+    
+    // Call backend to clear session BEFORE clearing local storage
+    try {
+      const token = sessionStorage.getItem('token');
+      console.log('[Logout] Token found:', token ? 'Yes (length: ' + token.length + ')' : 'No');
+      
+      if (token) {
+        console.log('[Logout] Calling backend logout API...');
+        const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          credentials: 'include' // Include cookies
+        });
+        
+        const result = await response.json().catch(() => ({}));
+        console.log('[Logout] Backend response:', response.status, result);
+      } else {
+        console.log('[Logout] No token found, skipping backend call');
+      }
+    } catch (error) {
+      console.error('[Logout] Error calling logout API:', error);
+      // Continue with local logout even if API call fails
+    }
+    
+    // Clear local storage
+    console.log('[Logout] Clearing local storage...');
     sessionStorage.clear();
     localStorage.clear();
     setUser(null);
+    console.log('[Logout] Logout complete');
   }, []);
 
   return (
