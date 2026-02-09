@@ -67,8 +67,8 @@
     position: relative;
     z-index: 5;
     height: 100%;
-    padding: 18mm 20mm;
-    /* Balanced padding */
+    padding: 6mm 12mm;
+    /* Reduced from 18mm 20mm */
     display: flex;
     flex-direction: column;
 }
@@ -81,14 +81,18 @@
 }
 
 .institute-name {
-    font-family: 'Cinzel', serif;
-    font-size: 28pt;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    color: #002147;
-    margin-bottom: 5mm;
-    /* Increased gap */
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2mm;
+    /* Reduced from 5mm */
     line-height: 1;
+}
+
+.cert-logo {
+    height: 25mm;
+    /* Reduced further as per user request */
+    width: auto;
+    object-fit: contain;
 }
 
 .credential-label {
@@ -252,13 +256,13 @@
 .cert-footer {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    padding-bottom: 5mm;
+    align-items: center;
+    padding-bottom: 4mm;
+    /* Reduced from 5mm */
     border-top: 1px solid #f1f5f9;
-    /* Formal subtle separator */
-    padding-top: 4mm;
+    padding-top: 3mm;
+    /* Reduced from 6mm */
     margin-top: auto;
-    /* Push to bottom naturally */
 }
 
 .signature-zone {
@@ -291,7 +295,8 @@
 .issue-date {
     font-size: 10pt;
     color: #475569;
-    margin-top: 6mm;
+    margin-top: 3mm;
+    /* Reduced from 6mm */
     font-weight: 600;
     font-style: italic;
 }
@@ -299,7 +304,8 @@
 .verification-zone {
     display: flex;
     align-items: center;
-    gap: 6mm;
+    gap: 4mm;
+    /* Reduced from 6mm */
     text-align: right;
 }
 
@@ -327,7 +333,8 @@
     font-size: 9pt;
     font-weight: 700;
     color: #002147;
-    margin-bottom: 2mm;
+    margin-bottom: 1mm;
+    /* Reduced from 2mm */
 }
 
 .cert-id-tag {
@@ -343,7 +350,8 @@
     text-align: center;
     font-size: 7.5pt;
     color: #94a3b8;
-    margin-top: 10mm;
+    margin-top: 5mm;
+    /* Reduced from 10mm */
     font-weight: 400;
     line-height: 1.5;
     max-width: 90%;
@@ -438,14 +446,18 @@
     /* Explicit Gold Border */
     border: 1.5mm solid #b8860b;
     /* Create an even white frame between the outer Navy and inner Gold borders */
-    margin: 6mm;
+    margin: 4mm;
+    /* Reduced from 6mm */
     /* Adjust size to fit perfectly with the margin */
-    width: calc(100% - 12mm);
-    height: calc(100% - 12mm);
+    width: calc(100% - 8mm);
+    /* Adjusted for reduced margin */
+    height: calc(100% - 8mm);
+    /* Adjusted for reduced margin */
     /* Remove default shadow if any */
     box-shadow: none;
     /* Ensure padding inside the gold border is balanced but compact enough to fit all content */
-    padding: 8mm 14mm;
+    padding: 6mm 10mm;
+    /* Reduced from 8mm 14mm */
     box-sizing: border-box;
 }
 
@@ -469,10 +481,11 @@
 
     /* Use border-bottom with generous padding for robust PDF generation */
     border-bottom: 2px solid #b8860b !important;
-    padding-bottom: 8mm !important;
+    padding-bottom: 4mm !important;
+    /* Reduced from 8mm */
     /* Visual gap between text and line */
-    margin-bottom: 2mm;
-    /* Space after the line */
+    margin-bottom: 1mm;
+    /* Reduced from 2mm */
 
     padding-left: 10mm;
     padding-right: 10mm;
@@ -485,14 +498,17 @@
 }
 
 .combined-cert-details {
-    margin-bottom: 6mm;
+    margin-bottom: 3mm;
+    /* Reduced from 6mm */
 }
 
 .included-certs-list {
     display: flex;
     flex-direction: column;
-    gap: 3mm;
-    margin-top: 6mm;
+    gap: 2mm;
+    /* Reduced from 3mm */
+    margin-top: 3mm;
+    /* Reduced from 6mm */
     align-items: center;
     /* Center alignment looks better for certificates */
     width: 90%;
