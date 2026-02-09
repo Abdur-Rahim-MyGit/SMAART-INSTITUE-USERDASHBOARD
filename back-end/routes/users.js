@@ -108,6 +108,44 @@ router.post('/register-details', upload.fields([
     }
 
     // Prepare registration data with all 11 sections
+
+    // Higher Education (Allow array or single object, convert to array)
+    let higherEdArray = [];
+    if (Array.isArray(parsedHigherEducation)) {
+      higherEdArray = parsedHigherEducation;
+    } else if (parsedHigherEducation && typeof parsedHigherEducation === 'object' && Object.keys(parsedHigherEducation).length > 0) {
+      higherEdArray = [parsedHigherEducation];
+    }
+
+    // Map Higher Education with file handling
+    const mappedHigherEducation = higherEdArray.map((he, index) => {
+      let certFile = he.certificate;
+      if (index === 0 && files['higherEducationCertificate']) {
+        certFile = files['higherEducationCertificate'][0].filename;
+      }
+      return {
+        id: he.id,
+        qualificationLevel: he.qualificationLevel || '',
+        degree: he.degree || '',
+        specialization: he.specialization || '',
+        institutionName: he.institutionName || '',
+        university: he.university || '',
+        yearOfPassing: he.yearOfPassing || '',
+        cgpaPercentage: he.cgpaPercentage || '',
+        degreeStatus: he.degreeStatus || '',
+        certificate: certFile || '',
+      };
+    });
+
+    // Map Job Preferences
+    const mappedJobPreferences = Array.isArray(parsedJobPreferences) ? parsedJobPreferences.map(job => ({
+      id: job.id,
+      preferredRole: job.preferredRole || '',
+      jobType: job.jobType || '',
+      preferredLocation: job.preferredLocation || job.preferredLocation1 || '', // Handle varied field names if any
+      willingToRelocate: job.willingToRelocate || '',
+      expectedSalary: job.expectedSalary || '',
+    })) : [];
     const registrationPayload = {
       userId: user._id,
       email: normalizedEmail,
@@ -143,29 +181,13 @@ router.post('/register-details', upload.fields([
       },
 
       // Higher Education
-      higherEducation: {
-        qualificationLevel: parsedHigherEducation?.qualificationLevel || '',
-        degree: parsedHigherEducation?.degree || '',
-        specialization: parsedHigherEducation?.specialization || '',
-        institutionName: parsedHigherEducation?.institutionName || '',
-        university: parsedHigherEducation?.university || '',
-        yearOfPassing: parsedHigherEducation?.yearOfPassing || '',
-        cgpaPercentage: parsedHigherEducation?.cgpaPercentage || '',
-        degreeStatus: parsedHigherEducation?.degreeStatus || '',
-        certificate: parsedHigherEducation?.certificate || '',
-      },
+      higherEducation: mappedHigherEducation,
 
       // Extra-Curricular Activities
       extracurricular: Array.isArray(parsedExtracurricular) ? parsedExtracurricular : [],
 
       // Job Preferences
-      jobPreferences: {
-        preferredRole: parsedJobPreferences?.preferredRole || '',
-        jobType: parsedJobPreferences?.jobType || '',
-        preferredLocation: parsedJobPreferences?.preferredLocation || '',
-        willingToRelocate: parsedJobPreferences?.willingToRelocate || '',
-        expectedSalary: parsedJobPreferences?.expectedSalary || '',
-      },
+      jobPreferences: mappedJobPreferences,
 
       // Sector Preferences
       sectorPreferences: {
@@ -298,6 +320,156 @@ router.post('/register-details', upload.fields([
   }
 });
 
+// Save individual registration section (for progressive saving)
+router.patch('/register-section', async (req, res) => {
+  try {
+    const { email, section, data } = req.body;
+
+    if (!email || !section || !data) {
+      return res.status(400).json({ error: 'Missing required fields: email, section, data' });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Find or create user
+    const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
+    let user = await User.findOne(emailQuery);
+
+    if (!user) {
+      // Create a minimal user record
+      user = new User({
+        fullName: data.fullName || 'User',
+        email: normalizedEmail,
+        mobile: data.mobileNumber || '',
+      });
+      await user.save();
+    }
+
+    // Find or create registration
+    let registration = await Registration.findOne({ userId: user._id });
+
+    if (!registration) {
+      registration = new Registration({
+        userId: user._id,
+        email: normalizedEmail,
+        fullName: user.fullName,
+        mobileNumber: data.mobileNumber || '',
+      });
+    }
+
+    // Update the specific section
+    const sectionMapping = {
+      'profilePhoto': async () => {
+        registration.profilePhoto = data.profilePhoto || registration.profilePhoto;
+        // Sync to User model for immediate feedback in /auth/me
+        if (user) {
+          user.profileImage = registration.profilePhoto;
+          await user.save();
+        }
+      },
+      'personalDetails': async () => {
+        registration.fullName = data.fullName || registration.fullName;
+        registration.nickname = data.nickname || registration.nickname;
+        registration.dob = data.dob || registration.dob;
+        registration.gender = data.gender || registration.gender;
+        registration.mobileNumber = data.mobileNumber || registration.mobileNumber;
+        registration.institution = data.institution || registration.institution;
+        registration.department = data.department || registration.department;
+        registration.yearOfStudy = data.yearOfStudy || registration.yearOfStudy;
+        registration.yearOfPassing = data.yearOfPassing || registration.yearOfPassing;
+        registration.educationLevel = data.educationLevel || registration.educationLevel;
+
+        // Sync critical fields to User model
+        if (user) {
+          if (data.fullName) user.fullName = data.fullName;
+          if (data.mobileNumber) user.mobile = data.mobileNumber;
+          await user.save();
+        }
+      },
+      'tenthDetails': async () => {
+        registration.tenthDetails = {
+          ...registration.tenthDetails,
+          ...data
+        };
+      },
+      'twelfthDetails': async () => {
+        registration.twelfthDetails = {
+          ...registration.twelfthDetails,
+          ...data
+        };
+      },
+      'higherEducation': async () => {
+        // For array of higher education entries
+        registration.higherEducation = data;
+      },
+      'extracurricular': async () => {
+        registration.extracurricular = Array.isArray(data) ? data : [];
+      },
+      'jobPreferences': async () => {
+        registration.jobPreferences = data;
+      },
+      'sectorPreferences': async () => {
+        registration.sectorPreferences = {
+          preferredSectors: data.preferredSectors || [],
+          secondarySectors: data.secondarySectors || [],
+        };
+      },
+      'careerGoals': async () => {
+        registration.careerGoals = {
+          shortTerm: data.shortTerm || '',
+          mediumTerm: data.mediumTerm || '',
+          longTerm: data.longTerm || '',
+        };
+        // Also save personalDevelopmentGoals if present (bundled from frontend)
+        if (data.personalDevelopmentGoals) {
+          registration.personalDevelopmentGoals = {
+            shortTerm: data.personalDevelopmentGoals.shortTerm || '',
+            mediumTerm: data.personalDevelopmentGoals.mediumTerm || '',
+            longTerm: data.personalDevelopmentGoals.longTerm || '',
+          };
+        }
+      },
+      'personalDevelopmentGoals': async () => {
+        registration.personalDevelopmentGoals = {
+          shortTerm: data.shortTerm || '',
+          mediumTerm: data.mediumTerm || '',
+          longTerm: data.longTerm || '',
+        };
+      },
+      'workExperience': async () => {
+        registration.workExperience = Array.isArray(data) ? data : [];
+      },
+      'projects': async () => {
+        registration.projects = Array.isArray(data) ? data : [];
+      },
+      'certificates': async () => {
+        registration.certificates = Array.isArray(data) ? data : [];
+      },
+    };
+
+    if (sectionMapping[section]) {
+      await sectionMapping[section]();
+    } else {
+      return res.status(400).json({ error: `Unknown section: ${section}` });
+    }
+
+    registration.updatedAt = new Date();
+    await registration.save();
+
+    console.log(`[register-section] Saved section '${section}' for ${normalizedEmail}`);
+
+    res.json({
+      success: true,
+      message: `Section '${section}' saved successfully`,
+      section,
+      email: normalizedEmail,
+    });
+  } catch (err) {
+    console.error('[register-section] Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Debug: inspect user login state by email (DEV ONLY)
 router.get('/_debug/state/:email', async (req, res) => {
   try {
@@ -410,6 +582,7 @@ router.post('/login', async (req, res) => {
         role: user.role,
         registrationCompleted: user.registrationCompleted,
         hasRegistration: hasRegistration, // Flag to check if comprehensive registration exists
+        profilePhoto: registration?.profilePhoto || null, // Profile photo from registration
       },
       registration: registration || null,
     });
