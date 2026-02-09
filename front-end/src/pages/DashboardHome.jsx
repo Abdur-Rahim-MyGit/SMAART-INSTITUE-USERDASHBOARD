@@ -398,10 +398,10 @@ const DashboardHome = () => {
               {/* Header with Greeting, Progress Bar, Date & Time */}
               <div className="mb-6 bg-white dark:bg-[#002147] rounded-[24px] p-3 md:p-4 shadow-sm border border-gray-100 dark:border-white/10 relative overflow-hidden transition-all duration-300">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-[#30919D]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                
+
                 <div className="relative z-10">
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                    
+
                     {/* Left: Greeting & Progress */}
                     <div className="flex-1 space-y-4">
                       <div>
@@ -451,10 +451,10 @@ const DashboardHome = () => {
 
               {/* Main Grid Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                
+
                 {/* LEFT CONTENT AREA */}
                 <div className="lg:col-span-8 space-y-6">
-                  
+
                   {/* Compact Horizontal Stats Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
@@ -486,7 +486,7 @@ const DashboardHome = () => {
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      
+
                       {/* Play Button Overlay */}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group-hover:scale-110 transition-transform shadow-lg">
@@ -504,7 +504,7 @@ const DashboardHome = () => {
 
                 {/* RIGHT SIDEBAR AREA */}
                 <div className="lg:col-span-4 space-y-4">
-                  
+
                   {/* Redesigned Calendar */}
                   <div className="bg-white dark:bg-[#002147]/60 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-white/10 transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
@@ -522,8 +522,8 @@ const DashboardHome = () => {
                     </div>
 
                     <div className="grid grid-cols-7 gap-1 text-center mb-3">
-                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => (
-                        <span key={d} className="text-[9px] font-bold text-gray-300 dark:text-gray-500 uppercase tracking-widest">{d}</span>
+                      {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, index) => (
+                        <span key={`day-${index}`} className="text-[9px] font-bold text-gray-300 dark:text-gray-500 uppercase tracking-widest">{d}</span>
                       ))}
                     </div>
 
@@ -532,21 +532,20 @@ const DashboardHome = () => {
                       {Array.from({ length: getDaysInMonth(calendarMonth).firstDayIndex }).map((_, i) => (
                         <div key={`empty-${i}`} className="h-8" />
                       ))}
-                      
+
                       {getDaysInMonth(calendarMonth).daysArray.map(day => {
                         const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
                         const isToday = date.toDateString() === new Date().toDateString();
                         const isSelected = date.toDateString() === selectedDate.toDateString();
-                        
+
                         return (
                           <div
                             key={day}
                             onClick={() => setSelectedDate(date)}
-                            className={`h-8 flex items-center justify-center rounded-lg cursor-pointer text-[13px] font-medium transition-all ${
-                              isSelected ? 'bg-[#30919D] text-white shadow-md' : 
-                              isToday ? 'bg-[#30919D]/10 text-[#30919D] dark:bg-[#30919D]/20' : 
-                              'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
-                            }`}
+                            className={`h-8 flex items-center justify-center rounded-lg cursor-pointer text-[13px] font-medium transition-all ${isSelected ? 'bg-[#30919D] text-white shadow-md' :
+                                isToday ? 'bg-[#30919D]/10 text-[#30919D] dark:bg-[#30919D]/20' :
+                                  'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
+                              }`}
                           >
                             {day}
                           </div>
@@ -565,26 +564,14 @@ const DashboardHome = () => {
                     </div>
                   </div>
 
-                  {/* Upcoming Deadlines */}
-                  <div className="bg-white dark:bg-[#002147]/60 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-white/10 transition-all duration-300">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-bold text-[#002147] dark:text-white">Deadlines</h3>
-                      <span className="text-[9px] font-bold bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full border border-orange-100 dark:border-orange-500/20">2 Pending</span>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-2 group cursor-pointer">
-                        <div className="w-4 h-4 rounded-full border border-orange-200 dark:border-orange-500/30 mt-0.5 group-hover:border-[#30919D] transition-colors" />
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 leading-tight">Assignment due on Feb 11</p>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2 group cursor-pointer">
-                        <div className="w-4 h-4 rounded-full border border-orange-200 dark:border-orange-500/30 mt-0.5 group-hover:border-[#30919D] transition-colors" />
-                        <div>
-                          <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 leading-tight">Complete quiz by Feb 20</p>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Upcoming Deadlines (Functional) */}
+                  <div className="bg-white dark:bg-[#002147]/60 rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 transition-all duration-300">
+                    <UpcomingDeadlines 
+                      tasks={tasks}
+                      onAddTask={handleAddTask}
+                      onToggleTask={handleToggleTaskStatus}
+                      onDeleteTask={handleDeleteTask}
+                    />
                   </div>
 
                   {/* Recent Activity */}
