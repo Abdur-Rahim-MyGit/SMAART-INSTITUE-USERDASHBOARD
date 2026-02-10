@@ -75,6 +75,7 @@ exports.getAvatar = async (req, res) => {
         xpToNextLevel: avatar.xpToNextLevel,
         levelProgress: avatar.levelProgress,
         streak: avatar.streak,
+        streakStatus: avatar.getStreakStatus(),
         baseModel: avatar.baseModel || DEFAULT_ASSETS.baseModel,
         accessories: {
           shoes: {
@@ -322,34 +323,38 @@ exports.setAnimation = async (req, res) => {
 
 /**
  * POST /api/avatar/update-streak
- * Update daily streak (call on user login/activity)
+ * Update daily streak using 7-day cycle system
+ * Cycle = 6 activity days + 1 mandatory holiday (day 7)
  */
 exports.updateStreak = async (req, res) => {
   try {
     const userId = req.user.id;
 
     const avatar = await Avatar.getOrCreate(userId);
-    const newStreak = await avatar.updateStreak();
+    const streakStatus = await avatar.updateStreak();
 
-    // Bonus XP for streak milestones
+    // Bonus XP for completing a full cycle
     let bonusXP = 0;
     let isMilestone = false;
-    
-    if (newStreak % 30 === 0) {
-      bonusXP = 200; // Monthly streak bonus
+
+    if (streakStatus.cycleDay === 7 && streakStatus.isActive) {
+      bonusXP = 50; // Cycle completion bonus
       isMilestone = true;
       await avatar.addXP(bonusXP);
-    } else if (newStreak % 7 === 0) {
-      bonusXP = 50; // Weekly streak bonus
+    }
+
+    // Extra bonus for multi-cycle milestones
+    if (streakStatus.cyclesCompleted > 0 && streakStatus.cyclesCompleted % 4 === 0 && streakStatus.cycleDay === 1) {
+      bonusXP += 200; // Monthly milestone (4 cycles ≈ 28 days)
       isMilestone = true;
-      await avatar.addXP(bonusXP);
+      await avatar.addXP(200);
     }
 
     // Send notification for streak milestones
     if (isMilestone) {
       try {
-        await notifyStreakMilestone(userId, newStreak, bonusXP);
-        console.log(`🔔 Notification sent for ${newStreak} day streak milestone`);
+        await notifyStreakMilestone(userId, streakStatus.totalStreakDays, bonusXP);
+        console.log(`🔔 Streak milestone: ${streakStatus.cyclesCompleted} cycles, +${bonusXP} XP`);
       } catch (notifyError) {
         console.error("⚠️ Error sending streak notification:", notifyError);
       }
@@ -358,7 +363,8 @@ exports.updateStreak = async (req, res) => {
     res.json({
       success: true,
       data: {
-        streak: newStreak,
+        ...streakStatus,
+        streak: avatar.streak,
         bonusXP,
         level: avatar.level,
         xp: avatar.xp
@@ -369,6 +375,35 @@ exports.updateStreak = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to update streak',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * GET /api/avatar/streak-status
+ * Get the current streak status without modifying it
+ */
+exports.getStreakStatus = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const avatar = await Avatar.getOrCreate(userId);
+    const streakStatus = avatar.getStreakStatus();
+
+    res.json({
+      success: true,
+      data: {
+        ...streakStatus,
+        streak: avatar.streak,
+        level: avatar.level,
+        xp: avatar.xp
+      }
+    });
+  } catch (error) {
+    console.error('Error getting streak status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get streak status',
       error: error.message
     });
   }

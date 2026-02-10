@@ -22,35 +22,35 @@ const Settings = () => {
         return (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-white mb-2">Display Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">Display Name</label>
               <input
                 type="text"
                 placeholder="Enter your display name"
-                className="w-full px-4 py-3 rounded-xl bg-[#002147] border border-[#30919D]/30 text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">Email Address</label>
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-full px-4 py-3 rounded-xl bg-[#002147] border border-[#30919D]/30 text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white mb-2">Phone Number</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">Phone Number</label>
               <input
                 type="tel"
                 placeholder="Enter your phone number"
-                className="w-full px-4 py-3 rounded-xl bg-[#002147] border border-[#30919D]/30 text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white mb-2">Bio</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">Bio</label>
               <textarea
                 placeholder="Tell us about yourself"
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl bg-[#002147] border border-[#30919D]/30 text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors resize-none"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors resize-none"
               />
             </div>
           </div>
@@ -67,10 +67,10 @@ const Settings = () => {
               { label: "Coach Session Reminders", description: "Reminders for scheduled coaching sessions" },
               { label: "Community Activity", description: "Updates from community discussions" },
             ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
+              <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
                 <div>
-                  <h4 className="text-white font-medium">{item.label}</h4>
-                  <p className="text-gray-400 text-sm">{item.description}</p>
+                  <h4 className="text-gray-900 dark:text-white font-medium">{item.label}</h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">{item.description}</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -84,35 +84,35 @@ const Settings = () => {
       case "privacy":
         return (
           <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h4 className="text-white font-medium">Profile Visibility</h4>
-                  <p className="text-gray-400 text-sm">Control who can see your profile</p>
+                  <h4 className="text-gray-900 dark:text-white font-medium">Profile Visibility</h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">Control who can see your profile</p>
                 </div>
-                <select className="px-3 py-2 rounded-lg bg-[#001229] border border-[#30919D]/30 text-white focus:outline-none focus:border-[#30919D]">
+                <select className="px-3 py-2 rounded-lg bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#30919D]">
                   <option>Everyone</option>
                   <option>Only Me</option>
                   <option>Connections</option>
                 </select>
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-white font-medium">Two-Factor Authentication</h4>
-                  <p className="text-gray-400 text-sm">Add an extra layer of security</p>
+                  <h4 className="text-gray-900 dark:text-white font-medium">Two-Factor Authentication</h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">Add an extra layer of security</p>
                 </div>
                 <button className="px-4 py-2 rounded-lg bg-[#30919D] text-white font-medium hover:bg-[#30919D]/80 transition-colors">
                   Enable
                 </button>
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-white font-medium">Change Password</h4>
-                  <p className="text-gray-400 text-sm">Update your account password</p>
+                  <h4 className="text-gray-900 dark:text-white font-medium">Change Password</h4>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">Update your account password</p>
                 </div>
                 <button className="px-4 py-2 rounded-lg border border-[#30919D] text-[#30919D] font-medium hover:bg-[#30919D]/10 transition-colors">
                   Change
@@ -125,8 +125,8 @@ const Settings = () => {
       case "appearance":
         return (
           <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
-              <h4 className="text-white font-medium mb-4">Theme</h4>
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
+              <h4 className="text-gray-900 dark:text-white font-medium mb-4">Theme</h4>
               <div className="grid grid-cols-3 gap-3">
                 {["Dark", "Light", "System"].map((theme) => (
                   <button
@@ -136,13 +136,13 @@ const Settings = () => {
                         : "border-[#30919D]/30 hover:border-[#30919D]/50"
                       }`}
                   >
-                    <span className="text-white font-medium">{theme}</span>
+                    <span className="text-gray-900 dark:text-white font-medium">{theme}</span>
                   </button>
                 ))}
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
-              <h4 className="text-white font-medium mb-4">Accent Color</h4>
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
+              <h4 className="text-gray-900 dark:text-white font-medium mb-4">Accent Color</h4>
               <div className="flex gap-3">
                 {["#30919D", "#6366F1", "#EC4899", "#F59E0B", "#10B981"].map((color) => (
                   <button
@@ -160,9 +160,9 @@ const Settings = () => {
       case "language":
         return (
           <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
-              <label className="block text-white font-medium mb-3">Language</label>
-              <select className="w-full px-4 py-3 rounded-xl bg-[#001229] border border-[#30919D]/30 text-white focus:outline-none focus:border-[#30919D]">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
+              <label className="block text-gray-900 dark:text-white font-medium mb-3">Language</label>
+              <select className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#30919D]">
                 <option>English (US)</option>
                 <option>English (UK)</option>
                 <option>Hindi</option>
@@ -170,18 +170,18 @@ const Settings = () => {
                 <option>Telugu</option>
               </select>
             </div>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
-              <label className="block text-white font-medium mb-3">Timezone</label>
-              <select className="w-full px-4 py-3 rounded-xl bg-[#001229] border border-[#30919D]/30 text-white focus:outline-none focus:border-[#30919D]">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
+              <label className="block text-gray-900 dark:text-white font-medium mb-3">Timezone</label>
+              <select className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#30919D]">
                 <option>Asia/Kolkata (GMT+5:30)</option>
                 <option>America/New_York (GMT-5)</option>
                 <option>Europe/London (GMT+0)</option>
                 <option>Asia/Tokyo (GMT+9)</option>
               </select>
             </div>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
-              <label className="block text-white font-medium mb-3">Date Format</label>
-              <select className="w-full px-4 py-3 rounded-xl bg-[#001229] border border-[#30919D]/30 text-white focus:outline-none focus:border-[#30919D]">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
+              <label className="block text-gray-900 dark:text-white font-medium mb-3">Date Format</label>
+              <select className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#30919D]">
                 <option>DD/MM/YYYY</option>
                 <option>MM/DD/YYYY</option>
                 <option>YYYY-MM-DD</option>
@@ -193,20 +193,20 @@ const Settings = () => {
       case "help":
         return (
           <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30 hover:border-[#30919D] transition-colors cursor-pointer">
-              <h4 className="text-white font-medium">FAQ</h4>
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 hover:border-[#30919D] transition-colors cursor-pointer">
+              <h4 className="text-gray-900 dark:text-white font-medium">FAQ</h4>
               <p className="text-gray-400 text-sm">Find answers to common questions</p>
             </div>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30 hover:border-[#30919D] transition-colors cursor-pointer">
-              <h4 className="text-white font-medium">Contact Support</h4>
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 hover:border-[#30919D] transition-colors cursor-pointer">
+              <h4 className="text-gray-900 dark:text-white font-medium">Contact Support</h4>
               <p className="text-gray-400 text-sm">Get in touch with our support team</p>
             </div>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30 hover:border-[#30919D] transition-colors cursor-pointer">
-              <h4 className="text-white font-medium">Report a Bug</h4>
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 hover:border-[#30919D] transition-colors cursor-pointer">
+              <h4 className="text-gray-900 dark:text-white font-medium">Report a Bug</h4>
               <p className="text-gray-400 text-sm">Help us improve by reporting issues</p>
             </div>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30 hover:border-[#30919D] transition-colors cursor-pointer">
-              <h4 className="text-white font-medium">Documentation</h4>
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 hover:border-[#30919D] transition-colors cursor-pointer">
+              <h4 className="text-gray-900 dark:text-white font-medium">Documentation</h4>
               <p className="text-gray-400 text-sm">Read our user guides and tutorials</p>
             </div>
           </div>
@@ -218,7 +218,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#001229]">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#001229]">
       <DashboardSidebar />
 
       <div className="min-h-screen transition-all duration-300">
@@ -236,16 +236,16 @@ const Settings = () => {
                 <div className="p-2 rounded-xl bg-[#30919D]/20">
                   <SettingsIcon className="w-6 h-6 text-[#30919D]" />
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">Settings</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
               </div>
-              <p className="text-gray-400">Manage your account settings and preferences</p>
+              <p className="text-gray-500 dark:text-gray-400">Manage your account settings and preferences</p>
             </div>
 
             {/* Settings Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Sidebar Navigation */}
               <div className="lg:col-span-1">
-                <div className="rounded-2xl bg-[#002147] border border-[#30919D]/30 p-4 space-y-2">
+                <div className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 p-4 space-y-2 shadow-sm dark:shadow-none">
                   {settingsTabs.map((tab) => {
                     const Icon = tab.icon;
                     return (
@@ -253,8 +253,8 @@ const Settings = () => {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${activeTab === tab.id
-                            ? "bg-[#30919D]/20 text-white border border-[#30919D]"
-                            : "text-gray-400 hover:bg-white/5 hover:text-white"
+                            ? "bg-[#30919D]/20 text-gray-900 dark:text-white border border-[#30919D]"
+                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white"
                           }`}
                       >
                         <Icon className="w-5 h-5 flex-shrink-0" />
@@ -272,12 +272,12 @@ const Settings = () => {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="rounded-2xl bg-[#002147] border border-[#30919D]/30 p-6"
+                  className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 p-6 shadow-sm dark:shadow-none"
                 >
-                  <h2 className="text-xl font-bold text-white mb-2">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                     {settingsTabs.find((t) => t.id === activeTab)?.label}
                   </h2>
-                  <p className="text-gray-400 mb-6">
+                  <p className="text-gray-500 dark:text-gray-400 mb-6">
                     {settingsTabs.find((t) => t.id === activeTab)?.description}
                   </p>
 
@@ -285,7 +285,7 @@ const Settings = () => {
 
                   {/* Save Button */}
                   <div className="mt-8 flex justify-end gap-3">
-                    <button className="px-6 py-2.5 rounded-xl border border-[#30919D]/50 text-gray-400 hover:text-white hover:border-[#30919D] transition-colors">
+                    <button className="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-[#30919D]/50 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#30919D] transition-colors">
                       Cancel
                     </button>
                     <button className="px-6 py-2.5 rounded-xl bg-[#30919D] text-white font-medium hover:bg-[#30919D]/80 transition-colors">
