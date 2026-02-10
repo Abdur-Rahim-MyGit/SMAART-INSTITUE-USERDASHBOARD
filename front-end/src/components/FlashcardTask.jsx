@@ -1,17 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const FlashcardTask = ({ content, onComplete, isCompleted }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [reviewedCards, setReviewedCards] = useState(new Set());
+
+  const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted || false);
+
+  // Sync state with prop
+  useEffect(() => {
+    setHasMarkedComplete(isCompleted || false);
+  }, [isCompleted]);
 
   const cards = content?.cards || [];
   const currentCard = cards[currentIndex];
 
   const handleNext = () => {
-    setReviewedCards(prev => new Set([...prev, currentIndex]));
     setIsFlipped(false);
     if (currentIndex < cards.length - 1) {
       setCurrentIndex(currentIndex + 1);
@@ -29,7 +35,15 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
     setIsFlipped(!isFlipped);
   };
 
-  const progress = ((reviewedCards.size / cards.length) * 100).toFixed(0);
+  const handleMarkComplete = () => {
+    setHasMarkedComplete(true);
+    toast.success('Flashcards marked as complete!');
+    if (onComplete) {
+      onComplete();
+    }
+  };
+
+
 
   return (
     <div className="w-full h-full bg-white dark:bg-slate-900 p-4 md:p-6 overflow-y-auto">
@@ -43,18 +57,7 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
           <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2">
             {content?.title || 'Flash Cards'}
           </h2>
-          <div className="flex items-center gap-4">
-            <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                className="h-full bg-[#0891b2] dark:bg-[#30919D]"
-              />
-            </div>
-            <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
-              {reviewedCards.size}/{cards.length}
-            </span>
-          </div>
+
         </div>
 
         {/* Flashcard */}
@@ -130,6 +133,22 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
               <ChevronRight size={20} />
             </button>
           </div>
+
+          {/* Complete Button */}
+          {!hasMarkedComplete ? (
+            <button
+              onClick={handleMarkComplete}
+              className="w-full max-w-md px-6 py-3 bg-[#0891b2] dark:bg-[#30919D] hover:bg-[#0a7a8f] dark:hover:bg-[#2a7d88] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+            >
+              <CheckCircle2 size={20} />
+              Mark as Complete
+            </button>
+          ) : (
+            <div className="w-full max-w-md px-6 py-3 bg-green-100 dark:bg-green-900/30 border-2 border-green-500 dark:border-green-600 text-green-700 dark:text-green-400 font-bold rounded-xl flex items-center justify-center gap-2">
+              <CheckCircle2 size={20} />
+              Completed - You can still review these cards
+            </div>
+          )}
         </div>
 
         {/* Interview Tips */}

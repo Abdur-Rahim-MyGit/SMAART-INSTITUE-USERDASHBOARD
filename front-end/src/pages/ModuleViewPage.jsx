@@ -99,6 +99,7 @@ const ModuleViewPage = () => {
   const [videoProgressMap, setVideoProgressMap] = useState({});
   const [videoCompletionMap, setVideoCompletionMap] = useState({});
   const [videoDurationMap, setVideoDurationMap] = useState({});
+  const [taskResultsMap, setTaskResultsMap] = useState({}); // Stores { score, totalPoints, responses }
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [courseData, setCourseData] = useState(null);
@@ -456,6 +457,7 @@ const ModuleViewPage = () => {
                 const videoProg = {};
                 const videoComp = {};
                 const videoDur = {};
+                const resultsMap = {};
 
                 if (enrollment.moduleProgress) {
                   enrollment.moduleProgress.forEach(mp => {
@@ -478,6 +480,19 @@ const ModuleViewPage = () => {
                           videoProg[key] = vp.maxWatchedTime;
                           videoComp[key] = vp.isCompleted;
                           videoDur[key] = vp.videoDuration || 0;
+                        });
+                      }
+
+                      // Map task results (includes MicroAssessments, Reflections, etc.)
+                      if (mp.taskResults) {
+                        mp.taskResults.forEach(tr => {
+                            const key = `${modId}-${tr.dayId}-${tr.stepId}`;
+                            resultsMap[key] = {
+                                score: tr.score,
+                                totalPoints: tr.totalPoints || 10,
+                                responses: tr.responses
+                            };
+                            videoComp[key] = true; // Mark as done in UI
                         });
                       }
 
@@ -519,6 +534,7 @@ const ModuleViewPage = () => {
                 setVideoProgressMap(videoProg);
                 setVideoCompletionMap(videoComp);
                 setVideoDurationMap(videoDur);
+                setTaskResultsMap(resultsMap);
               }
             } catch (err) {
               console.error("Error fetching enrollment progress:", err);
@@ -724,6 +740,40 @@ const ModuleViewPage = () => {
     setSelectedModule(moduleId);
     setSelectedDay(dayId);
     navigate(`/dashboard/courses/${courseId}/modules/${moduleId}/days/${dayId}`);
+  };
+
+  const handleMoveToNext = () => {
+    const currentModule = modules.find(m => m.id === selectedModule);
+    const currentDay = currentModule?.days?.find(d => d.id === selectedDay);
+    const steps = currentDay?.steps || [];
+    
+    // Find index of current step
+    // Note: selectedStepId might be null if using defaultActiveStep
+    // Robustly find active step's ID first
+    const activeStepId = selectedStepId || steps.find(s => {
+        const key = `${selectedModule}-${selectedDay}-${s.id}`;
+        return !videoCompletionMap[key];
+    })?.id || steps[steps.length - 1]?.id;
+
+    const currentStepIndex = steps.findIndex(s => String(s.id) === String(activeStepId));
+
+    if (currentStepIndex !== -1 && currentStepIndex < steps.length - 1) {
+      // Go to next step in current day
+      const nextStep = steps[currentStepIndex + 1];
+      console.log(`[Navigation] Moving to next step: ${nextStep.id}`);
+      setSelectedStepId(nextStep.id);
+    } else {
+      // Go to next day
+      if (currentModule && selectedDay < currentModule.days.length) {
+        console.log(`[Navigation] Moving to next day: ${selectedDay + 1}`);
+        navigateToDay(selectedModule, selectedDay + 1);
+      } else {
+        // Module complete
+        console.log(`[Navigation] Module complete. Returning to modules.`);
+        toast.success("Module Completed!");
+        setTimeout(() => navigateToModules(), 1500);
+      }
+    }
   };
 
   const getDayCompletedCount = (moduleId, dayId) => {
@@ -944,21 +994,13 @@ const ModuleViewPage = () => {
                             dayId={selectedDay}
                             studentId={currentUser?._id || currentUser?.id}
                             initialResult={(() => {
-                                // Find if this assessment is already done
                                 const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
-                                if (videoCompletionMap[key]) {
-                                    // If we marked it locally as complete, we might not have the score handy if we didn't store it in a map.
-                                    // But we parsed it earlier into videoProgressMap or similar?
-                                    // Actually, we parsed quizzesTaken in the useEffect.
-                                    // Let's refactor the useEffect to store 'assessments' specifically if we need score details.
-                                    // FOR NOW: efficient fix is just passing 'true' for completed, or mocking the result if we don't have exact score here.
-                                    // However, to show the NICE result screen, we want the score.
-                                    
-                                    // Better approach: filter `moduleProgress` derived data if available?
-                                    // Limitation: We don't have easy access to the full `quizzesTaken` array here in the render scope without state.
+                                const result = taskResultsMap[key];
+                                if (result || videoCompletionMap[key]) {
                                     return {
-                                        score: videoProgressMap[key] || 0, // We mapped videoProgress[key] = maxWatchedTime. Maybe we can repurpose or check where we mapped quizzes.
-                                        totalPoints: 5, // Approximate if not stored
+                                        score: result?.score || videoProgressMap[key] || 0,
+                                        totalPoints: result?.totalPoints || 5,
+                                        responses: result?.responses || null,
                                         isCompleted: true
                                     };
                                 }
@@ -973,17 +1015,10 @@ const ModuleViewPage = () => {
                                 }
                                 toast.success("Assessment Completed!");
                                 
-                                // Auto-navigate to next session if available
-                                // We need to find the current module to know total days
-                                const currentModule = modules.find(m => m.id === selectedModule);
-                                if (currentModule && selectedDay < currentModule.days.length) {
-                                    setTimeout(() => {
-                                        navigateToDay(selectedModule, selectedDay + 1);
-                                    }, 1500); // 1.5s delay to let them see the score
-                                } else {
-                                    toast.success("Module Completed!");
-                                    setTimeout(() => navigateToModules(), 1500);
-                                }
+                                // Sequential navigation
+                                setTimeout(() => {
+                                    handleMoveToNext();
+                                }, 1500); 
                             }}
                         />
                      </div>
@@ -992,15 +1027,39 @@ const ModuleViewPage = () => {
                         <SubmissionTask
                             content={activeStep.content}
                             isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
-                            onComplete={(score, totalPoints) => {
+                            initialResult={(() => {
+                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                                const result = taskResultsMap[key];
+                                if (result || videoCompletionMap[key]) {
+                                    return {
+                                        score: result?.score || videoProgressMap[key] || 0,
+                                        totalPoints: result?.totalPoints || 10,
+                                        responses: result?.responses || null,
+                                        isCompleted: true
+                                    };
+                                }
+                                return null;
+                            })()}
+                            onComplete={(score, totalPoints, responses) => {
                                 const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
                                 setVideoCompletionMap(prev => ({...prev, [key]: true}));
                                 if (score !== undefined) {
                                     setVideoProgressMap(prev => ({...prev, [key]: score}));
                                     
-                                    // Save task result with score to backend
+                                    // Save task result with score AND responses to backend
                                     if (currentUser && courseData) {
                                         const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
+                                        
+                                        // Update local results map immediately for persistence in the current session
+                                        setTaskResultsMap(prev => ({
+                                            ...prev,
+                                            [key]: {
+                                                score: score,
+                                                totalPoints: totalPoints || 10,
+                                                responses: responses
+                                            }
+                                        }));
+
                                         courseEnrollmentAPI.updateTaskResult({
                                             studentId: currentUser._id || currentUser.id,
                                             courseCode: courseCode,
@@ -1008,13 +1067,18 @@ const ModuleViewPage = () => {
                                             dayId: selectedDay,
                                             stepId: activeStep.id,
                                             score: score,
-                                            totalPoints: totalPoints || 10 // Default if missing
+                                            totalPoints: totalPoints || 10,
+                                            responses: responses
                                         }).then(response => {
                                             if (response.badgesEarned && response.badgesEarned.length > 0) {
                                                 handleBadgesEarned(response.badgesEarned);
                                             }
                                         }).catch(err => console.error("Failed to save task score:", err));
                                     }
+                                }
+                                // Only auto-navigate when ALL scenarios are complete
+                                if (responses?.allScenariosComplete) {
+                                    setTimeout(() => handleMoveToNext(), 1500);
                                 }
                             }}
                         />
@@ -1024,6 +1088,19 @@ const ModuleViewPage = () => {
                         <ReflectionTask
                             content={activeStep.content}
                             isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
+                            initialResult={(() => {
+                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                                const result = taskResultsMap[key];
+                                if (result || videoCompletionMap[key]) {
+                                    return {
+                                        score: result?.score || videoProgressMap[key] || 0,
+                                        totalPoints: result?.totalPoints || 10,
+                                        responses: result?.responses || null,
+                                        isCompleted: true
+                                    };
+                                }
+                                return null;
+                            })()}
                             onComplete={(result) => {
                                 const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
                                 setVideoCompletionMap(prev => ({...prev, [key]: true}));
@@ -1031,6 +1108,17 @@ const ModuleViewPage = () => {
                                 // Save NVQ Reflection Result to Backend
                                 if (currentUser && courseData && result.score !== undefined) {
                                     const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
+                                    
+                                    // Update local results map immediately
+                                    setTaskResultsMap(prev => ({
+                                        ...prev,
+                                        [key]: {
+                                            score: result.score,
+                                            totalPoints: result.totalPoints,
+                                            responses: result.answers
+                                        }
+                                    }));
+
                                     courseEnrollmentAPI.updateTaskResult({
                                         studentId: currentUser._id || currentUser.id,
                                         courseCode: courseCode,
@@ -1045,12 +1133,15 @@ const ModuleViewPage = () => {
                                             handleBadgesEarned(response.badgesEarned);
                                         }
                                         toast.success("Reflection submitted and saved!");
+                                        setTimeout(() => handleMoveToNext(), 1500);
                                     }).catch(err => {
                                         console.error("Failed to save reflection:", err);
                                         toast.error("Reflection saved locally, but failed to sync.");
+                                        setTimeout(() => handleMoveToNext(), 1500);
                                     });
                                 } else {
                                     toast.success("Reflection submitted!");
+                                    setTimeout(() => handleMoveToNext(), 1000);
                                 }
                             }}
                         />
@@ -1061,9 +1152,10 @@ const ModuleViewPage = () => {
                             content={activeStep.content}
                             isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
                             onComplete={() => {
-                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
-                                setVideoCompletionMap(prev => ({...prev, [key]: true}));
+                                // Save completion to backend
+                                handleVideoProgressUpdate(selectedModule, selectedDay, activeStep.id, 1, true, 1);
                                 toast.success("Flash cards reviewed!");
+                                setTimeout(() => handleMoveToNext(), 1000);
                             }}
                         />
                      </div>
@@ -1082,27 +1174,7 @@ const ModuleViewPage = () => {
                           initialMaxTime={maxWatchedTime}
                           initialCompleted={isVideoCompleted}
                           onProgressUpdate={(time, completed, dur) => handleVideoProgressUpdate(selectedModule, selectedDay, activeStep?.id || 1, time, completed, dur)}
-                          onNext={() => {
-                              // Logic to find next step or next day
-                              const steps = day.steps || [];
-                              // Find index more robustly, handling type mismatch
-                              const currentStepIndex = steps.findIndex(s => String(s.id) === String(activeStep?.id || 1));
-                              
-                              if (currentStepIndex !== -1 && currentStepIndex < steps.length - 1) {
-                                  // Go to next step in current day
-                                  const nextStep = steps[currentStepIndex + 1];
-                                  setSelectedStepId(nextStep.id);
-                              } else {
-                                  // Go to next day
-                                  const currentModule = modules.find(m => m.id === selectedModule);
-                                  if (currentModule && selectedDay < currentModule.days.length) {
-                                      navigateToDay(selectedModule, selectedDay + 1);
-                                  } else {
-                                      toast.success("Module Completed!");
-                                      setTimeout(() => navigateToModules(), 1500);
-                                  }
-                              }
-                          }}
+                          onNext={handleMoveToNext}
                         />
                       )
                   )}

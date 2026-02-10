@@ -4,9 +4,10 @@ import { Clock, CheckCircle2, XCircle, AlertCircle, ArrowRight, Trophy } from 'l
 import { courseEnrollmentAPI } from '../services/api';
 
 const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentId, onComplete, initialResult }) => {
-  const [step, setStep] = useState('intro'); // intro, quiz, result
+  const [step, setStep] = useState('intro'); // intro, quiz, result, review
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [userAnswers, setUserAnswers] = useState([]); // Track user's choices
   const [shuffledQuestions, setShuffledQuestions] = useState([]);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(90);
@@ -16,11 +17,23 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
   useEffect(() => {
     if (assessmentData && assessmentData.questions) {
-      // Shuffle questions once on mount
-      const shuffled = [...assessmentData.questions].sort(() => 0.5 - Math.random()).slice(0, 5);
-      setShuffledQuestions(shuffled);
+      if (initialResult?.responses?.questionIndices) {
+        // Restore previous questions
+        const restored = initialResult.responses.questionIndices.map(idx => assessmentData.questions[idx]);
+        setShuffledQuestions(restored);
+        setUserAnswers(initialResult.responses.userAnswers || []);
+      } else {
+        // Shuffle new questions
+        const indices = Array.from({ length: assessmentData.questions.length }, (_, i) => i);
+        const shuffledIndices = indices.sort(() => 0.5 - Math.random()).slice(0, 5);
+        const shuffled = shuffledIndices.map(idx => assessmentData.questions[idx]);
+        // Store indices in the question objects temporarily so we can save them later
+        shuffled.forEach((q, i) => q._originalIndex = shuffledIndices[i]);
+        setShuffledQuestions(shuffled);
+        setUserAnswers(new Array(shuffled.length).fill(null));
+      }
     }
-  }, [assessmentData]);
+  }, [assessmentData, initialResult]);
 
   // Check for existing result
   useEffect(() => {
@@ -61,8 +74,9 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
   };
 
   const handleSubmitAnswer = (answerIndex) => {
-    if (showExplanation) return; // Prevent double submission
+    if (showExplanation || isSubmitting) return; // Prevent double submission and rapid clicks
     
+    setIsSubmitting(true); // Lock immediately to prevent race conditions
     clearInterval(timerRef.current);
     
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -78,8 +92,16 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
       setScore(prev => prev + (currentQuestion.points || 1));
     }
 
+    // Record answer
+    const newAnswers = [...userAnswers];
+    newAnswers[currentQuestionIndex] = answerIndex;
+    setUserAnswers(newAnswers);
+
     setSelectedAnswer(answerIndex);
     setShowExplanation(true); // Show explanation state
+    
+    // Reset isSubmitting after state updates
+    setTimeout(() => setIsSubmitting(false), 100);
   };
 
   const handleNextQuestion = () => {
@@ -106,16 +128,18 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
     // Actually, 'score' is updated in handleSubmitAnswer, so by the time we click "Next" (which calls handleNextQuestion), score is stable.
 
     try {
-        await courseEnrollmentAPI.updateQuizProgress({
+        await courseEnrollmentAPI.updateTaskResult({
             studentId,
             courseCode,
             moduleId,
             dayId,
-            quizId: assessmentData._id || 'micro-assessment-day-3', // Use ID from DB or fallback
-            score: score, // This might miss the LAST point if we called finishQuiz directly from submit. But we have a "Next" button flow.
-            // Wait: If it's the last question, handleSubmitAnswer sets showExplanation. User clicks "Finish" (was Next).
-            // So score IS updated.
-            totalPoints: shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0)
+            stepId: assessmentData.stepId || 2, // Map to correct step
+            score: score,
+            totalPoints: shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0),
+            responses: {
+                questionIndices: shuffledQuestions.map(q => q._originalIndex),
+                userAnswers: userAnswers
+            }
         });
     } catch (error) {
         console.error("Failed to save progress", error);
@@ -228,8 +252,8 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      return (
                        <button
                          key={idx}
-                         onClick={() => !showExplanation && handleSubmitAnswer(idx)}
-                         disabled={showExplanation}
+                         onClick={() => !showExplanation && !isSubmitting && handleSubmitAnswer(idx)}
+                         disabled={showExplanation || isSubmitting}
                          className={btnClass}
                        >
                          <div className="flex items-center gap-3">
@@ -279,6 +303,81 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
           </div>
         )}
 
+        {/* REVIEW STEP */}
+        {step === 'review' && (
+          <div className="max-w-3xl mx-auto">
+             <div className="flex justify-between items-center mb-6">
+                <button 
+                    onClick={() => setStep('result')}
+                    className="text-sm font-bold text-[#30919D] flex items-center gap-1 hover:underline"
+                >
+                    Back to Results
+                </button>
+                <div className="text-sm font-medium text-slate-500">
+                    Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
+                </div>
+             </div>
+
+             <motion.div
+               key={currentQuestionIndex}
+               initial={{ opacity: 0, y: 10 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="space-y-6"
+             >
+                <h3 className="text-base md:text-xl font-medium text-gray-800 dark:text-slate-200">
+                  {shuffledQuestions[currentQuestionIndex].question}
+                </h3>
+
+                <div className="space-y-3">
+                  {shuffledQuestions[currentQuestionIndex].options.map((option, idx) => {
+                     const isUserChoice = userAnswers[currentQuestionIndex] === idx;
+                     const isCorrect = option === shuffledQuestions[currentQuestionIndex].correctAnswer;
+                     
+                     let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between ";
+                     if (isCorrect) btnClass += "border-green-500 bg-green-50 dark:bg-green-500/10 text-green-800 dark:text-green-400";
+                     else if (isUserChoice) btnClass += "border-red-500 bg-red-50 dark:bg-red-500/10 text-red-800 dark:text-red-400";
+                     else btnClass += "border-gray-100 dark:border-slate-800 opacity-60";
+
+                     return (
+                       <div key={idx} className={btnClass}>
+                         <div className="flex items-center gap-3">
+                           <span className="text-sm md:text-base">{option}</span>
+                         </div>
+                         {isCorrect && <CheckCircle2 size={18} className="text-green-500" />}
+                         {isUserChoice && !isCorrect && <XCircle size={18} className="text-red-500" />}
+                         {isUserChoice && <span className="text-[10px] font-bold uppercase ml-2 px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400">Your Answer</span>}
+                       </div>
+                     );
+                  })}
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Explanation</p>
+                   <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {shuffledQuestions[currentQuestionIndex].explanation || "No explanation provided for this question."}
+                   </p>
+                </div>
+
+                <div className="flex justify-between gap-4">
+                    <button
+                        onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                        disabled={currentQuestionIndex === 0}
+                        className="flex-1 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30"
+                    >
+                        Previous
+                    </button>
+                    <button
+                        onClick={() => setCurrentQuestionIndex(prev => Math.min(shuffledQuestions.length - 1, prev + 1))}
+                        disabled={currentQuestionIndex === shuffledQuestions.length - 1}
+                        className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-bold disabled:opacity-30"
+                    >
+                        Next
+                    </button>
+                </div>
+             </motion.div>
+          </div>
+        )}
+
         {/* RESULT STEP */}
         {step === 'result' && (
            <div className="text-center py-4 md:py-8 space-y-4 md:space-y-6">
@@ -309,12 +408,23 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                  </div>
               </div>
 
-              <button
-                onClick={() => onComplete(score)}
-                className="w-full sm:w-auto px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold shadow-lg shadow-green-500/30 transition-all"
-              >
-                Continue to Next Step
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <button
+                    onClick={() => {
+                        setCurrentQuestionIndex(0);
+                        setStep('review');
+                    }}
+                    className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-slate-800 border-2 border-[#30919D] text-[#30919D] rounded-xl font-bold shadow-sm transition-all hover:bg-[#30919D]/5"
+                  >
+                    Review Responses
+                  </button>
+                  <button
+                    onClick={() => onComplete(score)}
+                    className="w-full sm:w-auto px-8 py-3 bg-[#30919D] hover:bg-[#25737d] text-white rounded-xl font-bold shadow-lg shadow-[#30919D]/30 transition-all"
+                  >
+                    Continue to Next Step
+                  </button>
+              </div>
            </div>
         )}
       </div>
