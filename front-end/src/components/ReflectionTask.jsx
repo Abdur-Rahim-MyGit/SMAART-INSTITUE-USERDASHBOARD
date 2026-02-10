@@ -1,11 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageSquare, Send } from 'lucide-react';
 import { toast } from 'sonner';
 
-const ReflectionTask = ({ content, onComplete, isCompleted }) => {
-  const [answers, setAnswers] = useState({});
+const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => {
+  const [answers, setAnswers] = useState(initialResult?.responses || {});
   const [submitted, setSubmitted] = useState(isCompleted || false);
+
+  // Sync with initialResult if it loads late
+  useEffect(() => {
+    if (initialResult?.responses && Object.keys(answers).length === 0) {
+      setAnswers(initialResult.responses);
+    }
+  }, [initialResult]);
 
   const handleSubmit = () => {
     if (Object.keys(answers).length < (content?.questions?.length || 0)) {

@@ -19,7 +19,8 @@ const Institution = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   // Use the imported video for all IDs for now, or fallback to the specific one if we had distinct videos
-  const videoUrl = videoplayback;
+  // const videoUrl = videoplayback;
+  const videoUrl = "https://res.cloudinary.com/dlpmrdcqp/video/upload/WhatsApp_Video_2026-01-19_at_14.40.50_1_lucryr.mp4";
 
   // Redirect logged-in users to dashboard
   useEffect(() => {
@@ -101,7 +102,7 @@ const Institution = () => {
                   {/* Badge */}
                   <div className="absolute top-3 left-3 sm:top-6 sm:left-6 px-2.5 py-1 sm:px-4 sm:py-1.5 bg-[#002147]/80 backdrop-blur-md border border-[#white]/20 rounded-full flex items-center gap-1.5 sm:gap-2 shadow-lg z-20">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#daa520] animate-pulse shadow-[0_0_10px_rgba(218,165,32,0.5)]" />
-                    <span className="text-[10px] sm:text-xs font-bold text-white tracking-wider uppercase">Chairman's Message</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-white tracking-wider uppercase">Founder's Message</span>
                   </div>
                 </div>
 
