@@ -31,7 +31,7 @@ import useAvatar from '@/hooks/useAvatar';
 import ContinueLearning from '@/components/ContinueLearning';
 import CourseCardSkeleton from '@/components/skeletons/CourseCardSkeleton';
 import StatsCardSkeleton from '@/components/skeletons/StatsCardSkeleton';
-import { API_BASE_URL } from '@/services/api';
+import apiCall, { API_BASE_URL } from '@/services/api';
 import useUser from "@/hooks/useUser";
 
 const DashboardHome = () => {
@@ -449,7 +449,7 @@ const DashboardHome = () => {
                     <div className="text-left">
                       <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 leading-none">Streak</p>
                       <p className="text-sm font-bold text-slate-900 dark:text-white leading-none mt-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        {stats.dayStreak} Days
+                         Day {stats.dayStreak}
                       </p>
                     </div>
                   </motion.button>
