@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useAvatar from '@/hooks/useAvatar';
+import { useUser } from '@/contexts/UserContext';
 
 // Import Video Assets
 import ToddlerBoyIdle from '@/assets/Animations/ToddlerBoyIdle.mp4';
@@ -64,6 +65,9 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
   const {
     avatarData,
   } = useAvatar();
+  
+  // Get logout from UserContext to properly clear backend session
+  const { logout } = useUser();
 
   // Determine which sequence to use based on gender
   // Check both the user prop (from login/session) and avatarData (from separate API fetch)
@@ -225,11 +229,9 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
 
           {/* Secondary Action: Logout */}
           <button
-            onClick={() => {
-              // Direct logout to avoid dependency on API calls (VisionBoardSplash)
-              // which can cause hangs if auth is already flaky.
-              localStorage.clear();
-              sessionStorage.clear();
+            onClick={async () => {
+              // Use UserContext logout to properly clear backend session
+              await logout();
               navigate('/', { replace: true });
             }}
             className="w-full py-2.5 rounded-xl flex items-center justify-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-xs font-medium group"
