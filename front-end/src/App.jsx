@@ -10,7 +10,7 @@ import AnimatedRoutes from "./components/AnimatedRoutes";
 import FloatingCommunityButton from "@/components/FloatingCommunityButton";
 import SecurityGuard from "@/components/SecurityGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import ThemeToggle from "@/components/landing/ThemeToggle";
+
 
 const queryClient = new QueryClient();
 
@@ -24,7 +24,6 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
-                <ThemeToggle />
                 <AnimatedRoutes />
                 <FloatingCommunityButton />
                 <SecurityGuard />
