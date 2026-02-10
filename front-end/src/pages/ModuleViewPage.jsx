@@ -11,6 +11,9 @@ import TaskQuestion from "@/components/TaskQuestion";
 import useUser from "@/hooks/useUser";
 import BadgeModal from "@/components/badges/BadgeModal";
 import MicroAssessment from "@/components/MicroAssessment";
+import SubmissionTask from "@/components/SubmissionTask";
+import ReflectionTask from "@/components/ReflectionTask";
+import FlashcardTask from "@/components/FlashcardTask";
 
 const IntroScreen = ({ lines, onFinish }) => {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
@@ -344,18 +347,18 @@ const ModuleViewPage = () => {
               // Priority 1: Use database 'steps' if available (Multi-step model)
               if (day.steps && Array.isArray(day.steps) && day.steps.length > 0) {
                 steps = day.steps
-                  .filter(s => s.type === 'video')
                   .map((s, idx) => ({
                     id: idx + 1, // Simple 1-based index for step ID
                     dbId: s._id,
                     title: s.title || s.content?.title || `Step ${idx + 1}`,
-                    type: 'video',
-                    videoUrl: transformVideoUrl(s.content?.videoUrl || s.content?.url),
+                    type: s.type || 'video',
+                    videoUrl: s.type === 'video' ? transformVideoUrl(s.content?.videoUrl || s.content?.url) : null,
                     duration: s.content?.duration || 0,
                     description: s.content?.description || s.description,
                     transcription: s.content?.transcription,
                     introText: s.introText || s.content?.introText || [],
-                    isCompleted: false
+                    isCompleted: false,
+                    content: s.content // Preserve content for specialized components
                   }));
               }
 
@@ -931,7 +934,7 @@ const ModuleViewPage = () => {
 
               {/* LEFT: Main Content Area (Video or Assessment) */}
               <div className="lg:col-span-8 space-y-6">
-                <div className={`relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-black shadow-2xl group ${activeStep?.type === 'assessment' ? 'aspect-auto min-h-[400px]' : 'aspect-video'}`}>
+                <div className={`relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-black shadow-2xl group ${['assessment', 'submission', 'reflection', 'flashcard'].includes(activeStep?.type) ? 'aspect-auto min-h-[400px]' : 'aspect-video'}`}>
                   {activeStep?.type === 'assessment' ? (
                      <div className="w-full h-full bg-slate-100 dark:bg-slate-900 overflow-y-auto">
                         <MicroAssessment
@@ -981,6 +984,86 @@ const ModuleViewPage = () => {
                                     toast.success("Module Completed!");
                                     setTimeout(() => navigateToModules(), 1500);
                                 }
+                            }}
+                        />
+                     </div>
+                  ) : activeStep?.type === 'submission' ? (
+                     <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
+                        <SubmissionTask
+                            content={activeStep.content}
+                            isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
+                            onComplete={(score, totalPoints) => {
+                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                                setVideoCompletionMap(prev => ({...prev, [key]: true}));
+                                if (score !== undefined) {
+                                    setVideoProgressMap(prev => ({...prev, [key]: score}));
+                                    
+                                    // Save task result with score to backend
+                                    if (currentUser && courseData) {
+                                        const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
+                                        courseEnrollmentAPI.updateTaskResult({
+                                            studentId: currentUser._id || currentUser.id,
+                                            courseCode: courseCode,
+                                            moduleId: selectedModule,
+                                            dayId: selectedDay,
+                                            stepId: activeStep.id,
+                                            score: score,
+                                            totalPoints: totalPoints || 10 // Default if missing
+                                        }).then(response => {
+                                            if (response.badgesEarned && response.badgesEarned.length > 0) {
+                                                handleBadgesEarned(response.badgesEarned);
+                                            }
+                                        }).catch(err => console.error("Failed to save task score:", err));
+                                    }
+                                }
+                            }}
+                        />
+                     </div>
+                  ) : activeStep?.type === 'reflection' ? (
+                     <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
+                        <ReflectionTask
+                            content={activeStep.content}
+                            isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
+                            onComplete={(result) => {
+                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                                setVideoCompletionMap(prev => ({...prev, [key]: true}));
+                                
+                                // Save NVQ Reflection Result to Backend
+                                if (currentUser && courseData && result.score !== undefined) {
+                                    const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
+                                    courseEnrollmentAPI.updateTaskResult({
+                                        studentId: currentUser._id || currentUser.id,
+                                        courseCode: courseCode,
+                                        moduleId: selectedModule,
+                                        dayId: selectedDay,
+                                        stepId: activeStep.id,
+                                        score: result.score,
+                                        totalPoints: result.totalPoints,
+                                        responses: result.answers
+                                    }).then(response => {
+                                        if (response.badgesEarned && response.badgesEarned.length > 0) {
+                                            handleBadgesEarned(response.badgesEarned);
+                                        }
+                                        toast.success("Reflection submitted and saved!");
+                                    }).catch(err => {
+                                        console.error("Failed to save reflection:", err);
+                                        toast.error("Reflection saved locally, but failed to sync.");
+                                    });
+                                } else {
+                                    toast.success("Reflection submitted!");
+                                }
+                            }}
+                        />
+                     </div>
+                  ) : activeStep?.type === 'flashcard' ? (
+                     <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
+                        <FlashcardTask
+                            content={activeStep.content}
+                            isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
+                            onComplete={() => {
+                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                                setVideoCompletionMap(prev => ({...prev, [key]: true}));
+                                toast.success("Flash cards reviewed!");
                             }}
                         />
                      </div>

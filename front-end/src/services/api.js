@@ -305,9 +305,9 @@ export const courseEnrollmentAPI = {
     });
   },
 
-  // Update quiz progress
-  updateQuizProgress: async (data) => {
-    return apiCall('/courseEnrollments/quiz-progress', {
+  // Update task result (with score)
+  updateTaskResult: async (data) => {
+    return apiCall('/courseEnrollments/task-result', {
       method: 'POST',
       body: JSON.stringify(data),
     });
