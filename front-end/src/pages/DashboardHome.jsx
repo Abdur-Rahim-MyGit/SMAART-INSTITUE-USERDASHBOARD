@@ -649,39 +649,46 @@ const DashboardHome = () => {
 
                     <div className="grid grid-cols-7 gap-1">
                       {/* Padding for empty days */}
-                      {Array.from({ length: new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1).getDay() }).map((_, i) => (
-                        <div key={`empty-${i}`} />
-                      ))}
-
-                      {getDaysInMonth(calendarMonth).map(day => {
-                        const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
-                        const isToday = date.toDateString() === new Date().toDateString();
-                        const isSelected = date.toDateString() === selectedDate.toDateString();
-                        const hasNotes = calendarNotes[date.toDateString()]?.length > 0;
-
+                      {(() => {
+                        const { daysArray, firstDayIndex } = getDaysInMonth(calendarMonth);
                         return (
-                          <div
-                            key={day}
-                            onClick={() => setSelectedDate(date)}
-                            onDoubleClick={() => handleDayDoubleClick(date)}
-                            className={`h-9 flex flex-col items-center justify-center rounded-md text-xs font-semibold cursor-pointer transition-all border border-transparent relative ${isSelected
-                              ? 'bg-blue-600 text-white shadow-md'
-                              : isToday
-                                ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
-                                : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700'
-                              }`}
-                            title="Double click to add a note"
-                          >
-                            <span>{day}</span>
-                            {hasNotes && !isSelected && (
-                              <span className="w-1 h-1 rounded-full bg-blue-500 absolute bottom-1.5" />
-                            )}
-                            {hasNotes && isSelected && (
-                              <span className="w-1 h-1 rounded-full bg-white absolute bottom-1.5" />
-                            )}
-                          </div>
+                          <>
+                            {Array.from({ length: firstDayIndex }).map((_, i) => (
+                              <div key={`empty-${i}`} />
+                            ))}
+
+                            {daysArray.map(day => {
+                              const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
+                              const isToday = date.toDateString() === new Date().toDateString();
+                              const isSelected = date.toDateString() === selectedDate.toDateString();
+                              const hasNotes = calendarNotes[date.toDateString()]?.length > 0;
+
+                              return (
+                                <div
+                                  key={day}
+                                  onClick={() => setSelectedDate(date)}
+                                  onDoubleClick={() => handleDayDoubleClick(date)}
+                                  className={`h-9 flex flex-col items-center justify-center rounded-md text-xs font-semibold cursor-pointer transition-all border border-transparent relative ${isSelected
+                                    ? 'bg-blue-600 text-white shadow-md'
+                                    : isToday
+                                      ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
+                                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700'
+                                    }`}
+                                  title="Double click to add a note"
+                                >
+                                  <span>{day}</span>
+                                  {hasNotes && !isSelected && (
+                                    <span className="w-1 h-1 rounded-full bg-blue-500 absolute bottom-1.5" />
+                                  )}
+                                  {hasNotes && isSelected && (
+                                    <span className="w-1 h-1 rounded-full bg-white absolute bottom-1.5" />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </>
                         );
-                      })}
+                      })()}
                     </div>
 
                     {/* Agenda List */}
