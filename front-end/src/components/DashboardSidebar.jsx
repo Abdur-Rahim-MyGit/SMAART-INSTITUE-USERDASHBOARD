@@ -15,7 +15,9 @@ import {
   ShieldCheck,
   CheckCheck,
   Sun,
-  Moon
+  Moon,
+  Users,
+  ClipboardCheck
 } from "lucide-react";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
@@ -33,6 +35,8 @@ const menuItems = [
   { icon: Zap, label: "SMAART Toolkit", path: "/dashboard/smaart-toolkit" },
   { icon: Award, label: "My Certificate", path: "/dashboard/certificate" },
   { icon: ShieldCheck, label: "Verify Certificate", path: "/verify-certificate" },
+  { icon: Users, label: "Community", path: "/dashboard/community" },
+  { icon: ClipboardCheck, label: "My Notes", path: "/dashboard/notes" },
 ];
 
 const bottomMenuItems = [
@@ -219,14 +223,39 @@ const DashboardSidebar = () => {
             </Link>
           </div>
 
-          {/* Center: Stylized Title */}
-          <div className="hidden lg:flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2">
-            <h1 className="text-2xl font-serif font-bold tracking-widest text-slate-900 dark:text-white uppercase select-none">
-              SMAART INSTITUTE
-            </h1>
-            <p className="text-[10px] font-sans font-bold tracking-[0.3em] text-[#B8860B] uppercase mt-0.5 select-none text-center w-full">
-              PROFESSIONAL CREDENTIAL
-            </p>
+          {/* Center: Desktop Navigation Menu */}
+          <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+            {[
+              { label: 'Home', path: '/dashboard' },
+              { label: 'My Courses', path: '/dashboard/courses' },
+              { label: 'Vision Boards', path: '/dashboard/vision-boards' },
+              { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
+              { label: 'Certificates', path: '/dashboard/certificate' },
+              { label: 'Verify', path: '/verify-certificate' }
+            ].map(item => {
+              const isActive = location.pathname === item.path ||
+                (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
+
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`text-sm font-bold transition-all duration-200 relative group py-1 ${isActive
+                    ? 'text-[#30919D]'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-[#30919D] dark:hover:text-[#30919D]'
+                    }`}
+                >
+                  {item.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#30919D] rounded-full"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right: Actions */}
