@@ -372,10 +372,13 @@ const Certificate = () => {
 
                             <div className={`cert-content ${selectedType.id === 'combined' ? 'combined-content' : ''}`}>
                                 <header className="cert-header">
-                                    <div className="institute-name">
-                                        <img src={blueLogo} alt="SMAART INSTITUTE" className="cert-logo" />
+                                    <div className="cert-logo-container">
+                                        <img src={blueLogo} alt="SMAART INSTITUTE Logo" className="cert-logo" />
                                     </div>
-                                    <div className="credential-label">PROFESSIONAL CREDENTIAL</div>
+                                    <div className="cert-title-container">
+                                        <h1 className="cert-org-name">SMAART INSTITUTE</h1>
+                                        <div className="credential-label">PROFESSIONAL CREDENTIAL</div>
+                                    </div>
                                 </header>
 
                                 <main className="cert-body">

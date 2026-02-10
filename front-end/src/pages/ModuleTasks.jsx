@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 const ModuleTasks = () => {
   const { moduleId } = useParams();
   const navigate = useNavigate();
-  
+
   // Mock module data - in real app this would come from API/context
   const modules = [
     { id: 1, title: "Module 1", locked: false, tasks: Array.from({ length: 7 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: i < 5 })) },
@@ -20,7 +20,7 @@ const ModuleTasks = () => {
   ];
 
   const module = modules.find(m => m.id === parseInt(moduleId));
-  
+
   if (!module) {
     return <div>Module not found</div>;
   }
@@ -35,7 +35,7 @@ const ModuleTasks = () => {
         duration: "45 minutes"
       },
       2: {
-        day: "Day 2", 
+        day: "Day 2",
         title: "Core Concepts",
         description: "Dive deeper into the core concepts and methodologies. Build upon your foundation with practical applications and real-world examples.",
         duration: "60 minutes"
@@ -53,7 +53,7 @@ const ModuleTasks = () => {
         duration: "90 minutes"
       }
     };
-    
+
     return descriptions[moduleId] || {
       day: `Day ${moduleId}`,
       title: `Module ${moduleId}`,
@@ -74,7 +74,7 @@ const ModuleTasks = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#e8ecef' }}>
       <DashboardSidebar />
-      
+
       <div className="min-h-screen transition-all duration-300">
         <header className="sticky top-0 z-30 glass-effect border-b border-sidebar-border">
           <div className="container mx-auto px-6 py-4 flex items-center justify-between">
@@ -83,10 +83,10 @@ const ModuleTasks = () => {
                 whileHover={{ scale: 1.05 }}
                 className="text-accent text-2xl font-display font-bold lg:hidden"
               >
-                SMAART Minds
+                SMAART Institute
               </motion.div>
             </Link>
-            
+
             <div className="flex items-center gap-4 ml-auto">
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -96,7 +96,7 @@ const ModuleTasks = () => {
                 <Bell className="w-6 h-6 text-accent" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
               </motion.button>
-              
+
               <ProfileDropdown />
             </div>
           </div>
@@ -139,7 +139,7 @@ const ModuleTasks = () => {
                 <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(218, 165, 32, 0.15)' }}>
                   <BookOpen className="w-8 h-8" style={{ color: '#daa520' }} />
                 </div>
-                
+
                 <div className="flex-1">
                   <h2 className="text-2xl font-display font-bold mb-3" style={{ color: '#002147' }}>
                     {moduleInfo.title}
@@ -147,7 +147,7 @@ const ModuleTasks = () => {
                   <p className="leading-relaxed mb-6" style={{ color: '#30919D' }}>
                     {moduleInfo.description}
                   </p>
-                  
+
                   <div className="flex items-center gap-8">
                     <div className="flex items-center gap-2">
                       <Clock className="w-5 h-5" style={{ color: '#daa520' }} />
@@ -176,7 +176,7 @@ const ModuleTasks = () => {
                   {completedTasks} / {module.tasks.length} completed
                 </span>
               </div>
-              
+
               <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(218, 165, 32, 0.2)' }}>
                 <motion.div
                   initial={{ width: 0 }}
@@ -186,7 +186,7 @@ const ModuleTasks = () => {
                   style={{ background: 'linear-gradient(to right, #daa520, #FFD700)' }}
                 />
               </div>
-              
+
               <p className="text-sm mt-2" style={{ color: '#30919D' }}>
                 {progressPercentage === 100 ? 'Module completed! 🎉' : `${Math.round(progressPercentage)}% complete`}
               </p>
@@ -203,7 +203,7 @@ const ModuleTasks = () => {
               <h3 className="text-2xl font-display font-bold mb-6" style={{ color: '#002147' }}>
                 Module Tasks
               </h3>
-              
+
               <div className="space-y-4">
                 {module.tasks.map((task, index) => (
                   <motion.div
@@ -215,28 +215,27 @@ const ModuleTasks = () => {
                     style={{ border: '1px solid rgba(218, 165, 32, 0.3)' }}
                     onClick={() => handleTaskToggle(task.id)}
                   >
-                    <Checkbox 
+                    <Checkbox
                       checked={task.completed}
                       className="w-5 h-5"
                       style={{ borderColor: '#daa520' }}
                     />
-                    
+
                     <div className="flex items-center gap-3 flex-1">
                       {task.completed ? (
                         <CheckCircle2 className="w-5 h-5" style={{ color: '#30919D' }} />
                       ) : (
                         <Circle className="w-5 h-5" style={{ color: '#daa520' }} />
                       )}
-                      
-                      <span className={`font-medium transition-colors ${
-                        task.completed 
-                          ? "line-through" 
+
+                      <span className={`font-medium transition-colors ${task.completed
+                          ? "line-through"
                           : ""
-                      }`} style={{ color: task.completed ? '#30919D' : '#002147' }}>
+                        }`} style={{ color: task.completed ? '#30919D' : '#002147' }}>
                         Task {index + 1}
                       </span>
                     </div>
-                    
+
                     {task.completed && (
                       <motion.div
                         initial={{ scale: 0 }}
@@ -268,7 +267,7 @@ const ModuleTasks = () => {
               >
                 Back to Modules
               </motion.button>
-              
+
               {progressPercentage === 100 && (
                 <motion.button
                   whileHover={{ scale: 1.02 }}

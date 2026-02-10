@@ -2,6 +2,8 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import { FileText, Download, CheckCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import whiteLogo from "@/assets/white.png";
+
 const PassportPreview = () => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -19,7 +21,7 @@ const PassportPreview = () => {
   return (
     <section className="py-16 sm:py-24 bg-white dark:bg-[#002147] transition-colors duration-300 relative overflow-hidden">
       {/* Background Orbs */}
-      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#30919D]/5 dark:bg-[#30919D]/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#daa520]/5 dark:bg-[#daa520]/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
@@ -51,11 +53,13 @@ const PassportPreview = () => {
                 <div className="p-5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5 border-b border-gray-100 dark:border-white/10 relative z-10">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-white dark:bg-[#002147] rounded-xl flex items-center justify-center p-1.5 border border-gray-100 dark:border-white/10 shadow-lg">
-                      <div className="w-full h-full bg-gradient-to-br from-[#30919D] to-[#267a84] rounded-lg flex items-center justify-center text-white font-bold text-xl">S</div>
+                      <div className="w-full h-full bg-gradient-to-br from-[#1a3884] to-[#267a84] rounded-lg flex items-center justify-center">
+                        <img src={whiteLogo} alt="Logo" className="w-8 h-8 object-contain" />
+                      </div>
                     </div>
                     <div>
-                      <h3 className="font-bold text-[#002147] dark:text-white text-xl tracking-tight">ICAS Passport</h3>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-[#30919D] font-black">Verified Skill Profile</p>
+                      <h3 className="font-bold text-[#1a3884] dark:text-white text-xl tracking-tight">SMAART Passport</h3>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-[#daa520] font-black">Capability & Skills Record</p>
                     </div>
                   </div>
                   <div className="px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest bg-[#daa520]/10 border border-[#daa520]/30 text-[#b8860b] dark:text-[#daa520] flex items-center gap-2">
@@ -86,10 +90,10 @@ const PassportPreview = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.5 + i * 0.2 }}
-                        className="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 hover:border-[#30919D]/30 transition-colors"
+                        className="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 hover:border-[#daa520]/30 transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <CheckCircle className="w-4 h-4 text-[#30919D]" />
+                          <CheckCircle className="w-4 h-4 text-[#1a3884]" />
                           <div className="h-3 w-40 bg-gray-200 dark:bg-white/10 rounded-full" />
                         </div>
                         <div className="h-2.5 w-10 rounded-full bg-[#daa520]/30" />
@@ -104,7 +108,7 @@ const PassportPreview = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1 font-bold">Issued By</p>
-                      <p className="font-bold text-[#daa520] text-xl font-heading tracking-tight">SMAART Minds</p>
+                      <p className="font-bold text-[#daa520] text-xl font-heading tracking-tight">SMAART Institute</p>
                     </div>
                   </div>
                 </div>
@@ -122,11 +126,11 @@ const PassportPreview = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-[#002147] dark:text-white tracking-tight font-heading leading-tight"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-[#1a3884] dark:text-white tracking-tight font-heading leading-tight"
             >
-              Your Professional Identity, <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#30919D] to-[#40b5c4]">
-                Verified & Portable.
+              SMAART Capability & <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#40b5c4]">
+                Skills Passport™
               </span>
             </motion.h2>
             <motion.p
@@ -136,10 +140,10 @@ const PassportPreview = () => {
               transition={{ delay: 0.2 }}
               className="text-base sm:text-lg mb-10 leading-relaxed text-gray-600 dark:text-gray-400 font-light max-w-2xl mx-auto lg:mx-0"
             >
-              The ICAS Passport is a comprehensive record of your assessed skills, completed courses, and emotional intelligence profile. It's more than a resume—it's proof of your potential in a rapidly evolving world.
+              A verifiable, lifelong record of capability development and progression. It captures not just what you know, but what you can do—providing trusted evidence of your readiness for the future of work.
             </motion.p>
             <ul className="space-y-4 mb-10 text-left max-w-md mx-auto lg:mx-0">
-              {["Industry-recognized certification", "Shareable digital credential", "Detailed skill breakdown"].map((item, index) => (
+              {["Verified Capability Profile", "Universal Portability", "Evidence-Based Progression"].map((item, index) => (
                 <motion.li
                   key={item}
                   initial={{ opacity: 0, x: 20 }}
@@ -167,7 +171,7 @@ const PassportPreview = () => {
                   const element = document.getElementById('contact');
                   if (element) element.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="bg-gradient-to-r from-[#daa520] to-[#b8860b] hover:from-[#b8860b] hover:to-[#daa520] text-white font-bold px-8 py-5 rounded-2xl shadow-xl shadow-[#daa520]/20 text-lg transition-all duration-300 group"
+                className="bg-gradient-to-r from-[#1a3884] to-[#daa520] hover:from-[#daa520] hover:to-[#1a3884] text-white font-bold px-8 py-5 rounded-2xl shadow-xl shadow-[#1a3884]/20 text-lg transition-all duration-300 group"
               >
                 <Download className="mr-3 w-5 h-5 group-hover:-translate-y-1 transition-transform" />
                 Request Sample Passport
@@ -177,7 +181,7 @@ const PassportPreview = () => {
 
         </div>
       </div>
-    </section>
+    </section >
   );
 };
 

@@ -10,7 +10,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hi! I'm your SMAART Minds support assistant. How can I help you today?",
+      content: "Hi! I'm your SMAART Institute support assistant. How can I help you today?",
       timestamp: new Date()
     }
   ]);
@@ -44,7 +44,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
     try {
       // Get auth token from sessionStorage
       const token = sessionStorage.getItem('token');
-      
+
       // Send message to chatbot API
       const response = await sendChatMessage(userMessage, conversationId, token);
 
@@ -56,7 +56,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
           timestamp: new Date()
         };
         setMessages(prev => [...prev, botMessage]);
-        
+
         // Update conversation ID
         if (!conversationId) {
           setConversationId(response.conversationId);
@@ -71,7 +71,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
       }
     } catch (error) {
       console.error('Chat error:', error);
-      
+
       // Add error message
       const errorMessage = {
         role: 'assistant',
@@ -138,13 +138,12 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                    message.role === 'user'
+                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${message.role === 'user'
                       ? 'bg-gradient-to-br from-[#30919D] to-[#267a84] text-white'
                       : message.isError
-                      ? 'bg-red-500/20 text-red-200 border border-red-500/30'
-                      : 'bg-white/10 text-gray-100 border border-white/10'
-                  }`}
+                        ? 'bg-red-500/20 text-red-200 border border-red-500/30'
+                        : 'bg-white/10 text-gray-100 border border-white/10'
+                    }`}
                 >
                   <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                   <p className="text-xs opacity-60 mt-1">

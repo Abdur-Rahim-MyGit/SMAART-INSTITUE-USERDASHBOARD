@@ -20,7 +20,7 @@ const ServiceCard = ({ service, index }) => {
       transition={{ delay: index * 0.2, duration: 0.5 }}
       onMouseMove={handleMouseMove}
       className="group relative rounded-2xl p-8 overflow-hidden flex flex-col transition-all duration-300
-                 bg-white/80 dark:bg-[#002147]/40 backdrop-blur-md border border-gray-200 dark:border-white/10 hover:border-[#30919D]/50 dark:hover:border-[#30919D]/50 hover:shadow-2xl hover:bg-white dark:hover:bg-[#002147]/60"
+                 bg-white/80 dark:bg-[#002147]/40 backdrop-blur-md border border-gray-200 dark:border-white/10 hover:border-[#daa520]/50 dark:hover:border-[#daa520]/50 hover:shadow-2xl hover:bg-white dark:hover:bg-[#002147]/60"
     >
       {/* Spotlight Effect */}
       <motion.div
@@ -29,7 +29,7 @@ const ServiceCard = ({ service, index }) => {
           background: useMotionTemplate`
             radial-gradient(
               650px circle at ${mouseX}px ${mouseY}px,
-              rgba(48, 145, 157, 0.15),
+              rgba(26, 56, 132, 0.15),
               transparent 80%
             )
           `,
@@ -37,11 +37,11 @@ const ServiceCard = ({ service, index }) => {
       />
 
       <div className="relative z-10 flex flex-col h-full">
-        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-[#30919D] to-[#1a5f66] flex items-center justify-center mb-8 shadow-lg shadow-[#30919D]/20 group-hover:scale-110 transition-transform duration-300 text-white`}>
+        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#0d2150] flex items-center justify-center mb-8 shadow-lg shadow-[#1a3884]/20 group-hover:scale-110 transition-transform duration-300 text-white border border-[#daa520]/20`}>
           {service.icon}
         </div>
 
-        <h3 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white group-hover:text-[#30919D] transition-colors">
+        <h3 className="text-2xl font-bold mb-4 text-[#1a3884] dark:text-white group-hover:text-[#daa520] transition-colors">
           {service.title}
         </h3>
 
@@ -52,7 +52,7 @@ const ServiceCard = ({ service, index }) => {
         <ul className="space-y-4 mb-8 border-t border-gray-200 dark:border-white/10 pt-6">
           {service.features.map((feature) => (
             <li key={feature} className="flex items-center text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#30919D] mr-3 shadow-[0_0_8px_#30919D]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#daa520] mr-3 shadow-[0_0_8px_#daa520]" />
               {feature}
             </li>
           ))}
@@ -63,7 +63,7 @@ const ServiceCard = ({ service, index }) => {
             const element = document.getElementById('contact');
             if (element) element.scrollIntoView({ behavior: 'smooth' });
           }}
-          className="w-full justify-between bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white hover:bg-[#30919D] hover:text-white border border-gray-200 dark:border-white/10 hover:border-[#30919D] transition-all duration-300 group/btn h-12 text-base font-medium backdrop-blur-sm"
+          className="w-full justify-between bg-gray-50 dark:bg-white/5 text-[#1a3884] dark:text-white hover:bg-[#1a3884] hover:text-white border border-gray-200 dark:border-white/10 hover:border-[#daa520] transition-all duration-300 group/btn h-12 text-base font-medium backdrop-blur-sm"
         >
           Learn More
           <ArrowRight className="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform" />
@@ -76,25 +76,25 @@ const ServiceCard = ({ service, index }) => {
 const ServiceCards = () => {
   const services = [
     {
-      id: "emotion-couch",
-      title: "Emotion Couch",
-      description: "AI-powered emotional intelligence coaching to build resilience and self-awareness through interactive sessions.",
+      id: "work-ready",
+      title: "Work-Ready & Adaptive Capability",
+      description: "We develop capabilities that enable employability, career progression, and sustained career longevity — supporting individuals from entry into work through growth and transition.",
       icon: <Brain className="w-6 h-6" />,
-      features: ["EQ Assessment", "Personalized Coaching", "Mood Tracking"]
+      features: ["Employability", "Career Progression", "Sustained Longevity"]
     },
     {
-      id: "my-courses",
-      title: "My Courses",
-      description: "Tailored learning modules designed to bridge the gap between academia and industry with real-world skills.",
+      id: "impact-oriented",
+      title: "Impact-Oriented Capability",
+      description: "We develop capabilities for innovation, entrepreneurship, and sustainable value creation — enabling individuals and institutions to create enduring economic and societal impact.",
       icon: <BookOpen className="w-6 h-6" />,
-      features: ["Skill Gap Analysis", "Industry Projects", "Certification"]
+      features: ["Innovation", "Entrepreneurship", "Value Creation"]
     },
     {
-      id: "mind-gym",
-      title: "Mind Gym",
-      description: "Cognitive exercises and mental workouts to sharpen focus, memory, and problem-solving abilities.",
+      id: "career-architecture",
+      title: "SMAART Career Architecture Map™",
+      description: "A modern reference model for careers, framing them as a multi-stage continuum rather than a single transition, reflecting longer careers and technological change.",
       icon: <Dumbbell className="w-6 h-6" />,
-      features: ["Brain Games", "Focus Drills", "Cognitive Analytics"]
+      features: ["Multi-stage Continuum", "Technological Change", "Repeated Transitions"]
     }
   ];
 
@@ -104,7 +104,7 @@ const ServiceCards = () => {
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.03]"></div>
-        <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-[#30919D]/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-[#1a3884]/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-[#daa520]/5 rounded-full blur-[120px]" />
       </div>
 
@@ -114,26 +114,26 @@ const ServiceCards = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="inline-block mb-4 px-4 py-1 rounded-full border border-[#30919D]/30 bg-[#30919D]/10 text-[#30919D] text-sm font-semibold tracking-wide"
+            className="inline-block mb-4 px-4 py-1 rounded-full border border-[#daa520]/30 bg-[#1a3884]/5 text-[#1a3884] text-sm font-semibold tracking-wide"
           >
-            HOLISTIC GROWTH
+            OUR FOCUS
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#002147] dark:text-white tracking-tight font-heading leading-tight"
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1a3884] dark:text-white tracking-tight font-heading leading-tight"
           >
-            Comprehensive <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#30919D] to-[#5ccfd9]">Student Development</span>
+            Building Capability for the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#daa520] dark:from-blue-300 dark:via-white dark:to-yellow-300">Changing World of Work</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed font-light"
+            className="text-xl text-gray-600 dark:text-gray-200 leading-relaxed font-light"
           >
-            Our platform integrates emotional, academic, and cognitive growth into a unified neural journey.
+            We develop capabilities that enable employability, career progression, and sustained career longevity.
           </motion.p>
         </div>
 
