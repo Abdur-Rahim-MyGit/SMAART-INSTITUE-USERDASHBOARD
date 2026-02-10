@@ -55,7 +55,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
       <DashboardSidebar />
 
       <div className="min-h-screen transition-all duration-300">
@@ -66,10 +66,10 @@ const Dashboard = () => {
             className="space-y-4 sm:space-y-6 md:space-y-8"
           >
             <div className="pt-12 sm:pt-0">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-gray-800 mb-1 sm:mb-2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-gray-800 dark:text-white mb-1 sm:mb-2">
                 Welcome Back, {user.fullName}!
               </h1>
-              <p className="text-gray-800/80 text-sm sm:text-base md:text-lg">
+              <p className="text-gray-800/80 dark:text-gray-300 text-sm sm:text-base md:text-lg">
                 Continue your learning journey with Mindz
               </p>
             </div>
@@ -88,12 +88,12 @@ const Dashboard = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`glass-effect rounded-xl p-4 sm:p-5 md:p-6 bg-gradient-to-br ${stat.color} hover-lift cursor-pointer`}
+                  className={`glass-effect rounded-xl p-4 sm:p-5 md:p-6 bg-gradient-to-br ${stat.color} hover-lift cursor-pointer dark:border dark:border-white/10`}
                 >
-                  <h3 className="text-gray-800/70 text-xs sm:text-sm font-medium mb-1 sm:mb-2">
+                  <h3 className="text-gray-800/70 dark:text-gray-300 text-xs sm:text-sm font-medium mb-1 sm:mb-2">
                     {stat.title}
                   </h3>
-                  <p className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-accent">
+                  <p className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-accent dark:text-white">
                     {stat.value}
                   </p>
                 </motion.div>
@@ -106,10 +106,10 @@ const Dashboard = () => {
               transition={{ delay: 0.4 }}
               className="glass-effect rounded-xl p-4 sm:p-6 md:p-8"
             >
-              <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-gray-800 mb-2 sm:mb-3 md:mb-4">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-gray-800 dark:text-white mb-2 sm:mb-3 md:mb-4">
                 Your Learning Path
               </h2>
-              <p className="text-gray-800/80 text-sm sm:text-base">
+              <p className="text-gray-800/80 dark:text-gray-300 text-sm sm:text-base">
                 Select a section from the sidebar to continue your journey
               </p>
             </motion.div>

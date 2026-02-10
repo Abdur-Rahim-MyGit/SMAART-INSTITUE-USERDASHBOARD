@@ -214,7 +214,7 @@ export const useAvatar = () => {
   }, []);
 
   /**
-   * Update daily streak
+   * Update daily streak (7-day cycle)
    */
   const updateStreak = useCallback(async () => {
     try {
@@ -226,6 +226,17 @@ export const useAvatar = () => {
         setAvatarData(prev => ({
           ...prev,
           streak: response.data.streak,
+          streakStatus: {
+            cycleDay: response.data.cycleDay,
+            isHoliday: response.data.isHoliday,
+            isActive: response.data.isActive,
+            cyclesCompleted: response.data.cyclesCompleted,
+            totalStreakDays: response.data.totalStreakDays,
+            daysUntilHoliday: response.data.daysUntilHoliday,
+            cycleProgress: response.data.cycleProgress,
+            lastStreakDate: response.data.lastStreakDate,
+            streakStartDate: response.data.streakStartDate
+          },
           xp: response.data.xp,
           level: response.data.level
         }));
@@ -239,6 +250,36 @@ export const useAvatar = () => {
       }
     } catch (err) {
       console.error('Error updating streak:', err);
+      setError(err.message);
+    }
+  }, []);
+
+  /**
+   * Fetch streak status (read-only, no mutation)
+   */
+  const fetchStreakStatus = useCallback(async () => {
+    try {
+      const response = await apiRequest('/avatar/streak-status');
+      if (response.success) {
+        setAvatarData(prev => ({
+          ...prev,
+          streak: response.data.streak,
+          streakStatus: {
+            cycleDay: response.data.cycleDay,
+            isHoliday: response.data.isHoliday,
+            isActive: response.data.isActive,
+            cyclesCompleted: response.data.cyclesCompleted,
+            totalStreakDays: response.data.totalStreakDays,
+            daysUntilHoliday: response.data.daysUntilHoliday,
+            cycleProgress: response.data.cycleProgress,
+            lastStreakDate: response.data.lastStreakDate,
+            streakStartDate: response.data.streakStartDate
+          }
+        }));
+        return response.data;
+      }
+    } catch (err) {
+      console.error('Error fetching streak status:', err);
       setError(err.message);
     }
   }, []);
@@ -319,6 +360,7 @@ export const useAvatar = () => {
     toggleAccessory,
     setAnimation,
     updateStreak,
+    fetchStreakStatus,
     getUnlockStatus,
     setBaseModel,
     triggerCelebration,

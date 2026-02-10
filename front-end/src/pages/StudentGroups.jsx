@@ -104,7 +104,7 @@ const StudentGroups = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0F4F8] font-sans pb-20 transition-all duration-300 relative overflow-hidden">
+    <div className="min-h-screen bg-[#F0F4F8] dark:bg-[#0B1120] font-sans pb-20 transition-all duration-300 relative overflow-hidden">
       <div className="relative z-50">
         <DashboardSidebar />
       </div>
@@ -118,9 +118,9 @@ const StudentGroups = () => {
         <DashboardHeader />
         
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-white/60 backdrop-blur-xl p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/20">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/20 dark:border-white/5">
           <div>
-            <h1 className="text-3xl font-extrabold text-[#002147] mb-2 tracking-tight">My Student Groups</h1>
+            <h1 className="text-3xl font-extrabold text-[#002147] dark:text-white mb-2 tracking-tight">My Student Groups</h1>
             <p className="text-gray-500 font-medium">Connect and collaborate with your university peers</p>
           </div>
           <button
@@ -138,11 +138,11 @@ const StudentGroups = () => {
             <Loader2 className="w-8 h-8 text-[#002147] animate-spin" />
           </div>
         ) : groups.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+          <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
             <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-blue-500" />
             </div>
-            <h3 className="text-lg font-bold text-[#002147] mb-2">No Groups Yet</h3>
+            <h3 className="text-lg font-bold text-[#002147] dark:text-white mb-2">No Groups Yet</h3>
             <p className="text-gray-500 max-w-sm mx-auto mb-6">
               You haven't joined any groups yet. Create one to start collaborating with your peers!
             </p>
@@ -167,7 +167,7 @@ const StudentGroups = () => {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                    className="bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] border border-white/50 transition-all cursor-pointer group"
+                    className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] border border-white/50 dark:border-white/10 transition-all cursor-pointer group"
                     onClick={() => navigate(`/dashboard/groups/${group._id}`)}
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -181,14 +181,14 @@ const StudentGroups = () => {
                       )}
                     </div>
 
-                    <h3 className="text-lg font-bold text-[#002147] mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-lg font-bold text-[#002147] dark:text-white mb-2 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {group.name}
                     </h3>
                     <p className="text-sm text-gray-500 mb-6 line-clamp-2 min-h-[40px]">
                       {group.description || 'No description provided.'}
                     </p>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-white/5">
                       <div className="flex items-center gap-2 text-sm text-gray-500">
                         <Users className="w-4 h-4" />
                         <span>{group.memberCount} members</span>
@@ -220,10 +220,10 @@ const StudentGroups = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto max-w-lg h-fit bg-white rounded-3xl shadow-2xl z-50 p-6 md:p-8 overflow-y-auto max-h-[90vh]"
+              className="fixed inset-0 m-auto max-w-lg h-fit bg-white dark:bg-slate-900 rounded-3xl shadow-2xl z-50 p-6 md:p-8 overflow-y-auto max-h-[90vh]"
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-[#002147]">Create Group</h2>
+                <h2 className="text-2xl font-bold text-[#002147] dark:text-white">Create Group</h2>
                 <button
                   onClick={() => setShowCreateModal(false)}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -234,32 +234,32 @@ const StudentGroups = () => {
 
               <form onSubmit={handleCreate} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Group Name</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Group Name</label>
                   <input
                     type="text"
                     required
                     maxLength={50}
                     value={newGroup.name}
                     onChange={(e) => setNewGroup(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002147]/20 focus:border-[#002147] transition-all text-gray-900"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002147]/20 dark:focus:ring-blue-500/40 focus:border-[#002147] dark:focus:border-blue-500 transition-all text-gray-900 dark:text-white"
                     placeholder="e.g., CS Study Group"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
                   <textarea
                     rows={3}
                     maxLength={200}
                     value={newGroup.description}
                     onChange={(e) => setNewGroup(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002147]/20 focus:border-[#002147] transition-all resize-none text-gray-900"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002147]/20 dark:focus:ring-blue-500/40 focus:border-[#002147] dark:focus:border-blue-500 transition-all resize-none text-gray-900 dark:text-white"
                     placeholder="What is this group about?"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Icon</label>
                   <div className="flex flex-wrap gap-3">
                     {ICONS.map((item) => {
                       const Icon = item.icon;
@@ -271,7 +271,7 @@ const StudentGroups = () => {
                           onClick={() => setNewGroup(prev => ({ ...prev, icon: item.name }))}
                           className={`p-3 rounded-xl border transition-all ${isSelected 
                             ? 'bg-[#002147] border-[#002147] text-white' 
-                            : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
+                            : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-slate-600'
                           }`}
                         >
                           <Icon className="w-5 h-5" />
@@ -282,7 +282,7 @@ const StudentGroups = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</label>
                   <div className="flex flex-wrap gap-3">
                     {COLORS.map((color) => {
                       const isSelected = newGroup.color === color;

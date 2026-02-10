@@ -355,7 +355,7 @@ const GroupChat = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="flex items-center justify-between px-8 py-5 bg-white/80 backdrop-blur-xl sticky top-0 z-10 border-b border-gray-200/50 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.05)]">
+        <header className="flex items-center justify-between px-4 md:px-8 py-4 md:py-5 bg-white/80 backdrop-blur-xl sticky top-0 z-10 border-b border-gray-200/50 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.05)]">
           <div className="flex items-center gap-5">
             <button 
               onClick={() => navigate('/dashboard/groups')}
@@ -486,7 +486,7 @@ const GroupChat = () => {
 
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
           {(() => {
             const filteredMessages = group.messages?.filter(msg => 
               !msgSearchQuery || 

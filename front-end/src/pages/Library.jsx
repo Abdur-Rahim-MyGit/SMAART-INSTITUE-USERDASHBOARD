@@ -56,10 +56,10 @@ const Library = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h1 className="text-4xl font-display font-bold text-gray-800 mb-2">
+            <h1 className="text-4xl font-display font-bold text-gray-800 dark:text-white mb-2">
               Library
             </h1>
-            <p className="text-gray-600">Explore and manage your learning resources</p>
+            <p className="text-gray-600 dark:text-slate-400">Explore and manage your learning resources</p>
           </motion.div>
 
           {/* Search and Filter Bar */}
@@ -76,13 +76,13 @@ const Library = () => {
                 placeholder="Search library..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-sidebar-primary focus:border-transparent"
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sidebar-primary focus:border-transparent"
               />
             </div>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium text-gray-700 text-sm sm:text-base"
+              className="flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors font-medium text-gray-700 dark:text-slate-300 text-sm sm:text-base"
             >
               <Filter className="w-4 h-4 sm:w-5 sm:h-5" />
               Filter
@@ -167,7 +167,7 @@ const Library = () => {
             transition={{ delay: 0.6 }}
             className="mt-8 sm:mt-10 md:mt-12"
           >
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Recently Added</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4 sm:mb-6">Recently Added</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {[1, 2, 3, 4].map((item) => (
                 <motion.div
@@ -176,14 +176,14 @@ const Library = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.65 + item * 0.05 }}
                   whileHover={{ y: -4 }}
-                  className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all"
+                  className="bg-white dark:bg-slate-800 rounded-lg sm:rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-all"
                 >
                   <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                     <span className="text-2xl sm:text-3xl md:text-4xl">📄</span>
                   </div>
                   <div className="p-3 sm:p-4">
-                    <h3 className="font-semibold text-gray-800 mb-0.5 sm:mb-1 text-sm sm:text-base">Resource {item}</h3>
-                    <p className="text-xs sm:text-sm text-gray-600">Learning material</p>
+                    <h3 className="font-semibold text-gray-800 dark:text-white mb-0.5 sm:mb-1 text-sm sm:text-base">Resource {item}</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-slate-400">Learning material</p>
                   </div>
                 </motion.div>
               ))}

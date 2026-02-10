@@ -103,7 +103,7 @@ const Help = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#001229]">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#001229]">
       <DashboardSidebar />
 
       <div className="min-h-screen transition-all duration-300">
@@ -121,9 +121,9 @@ const Help = () => {
                 <div className="p-2 rounded-xl bg-[#30919D]/20">
                   <HelpCircle className="w-6 h-6 text-[#30919D]" />
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">Help & Support</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Help & Support</h1>
               </div>
-              <p className="text-gray-400">Get answers to common questions or raise a support ticket</p>
+              <p className="text-gray-500 dark:text-gray-400">Get answers to common questions or raise a support ticket</p>
             </div>
 
             {/* Tab Navigation */}
@@ -137,7 +137,7 @@ const Help = () => {
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
                       activeTab === tab.id
                         ? "bg-[#30919D] text-white"
-                        : "bg-[#002147] text-gray-400 hover:text-white border border-[#30919D]/30"
+                        : "bg-white dark:bg-[#002147] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-[#30919D]/30"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -172,16 +172,16 @@ const Help = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Search frequently asked questions..."
-                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#002147] border border-[#30919D]/30 text-white placeholder-gray-500 focus:border-[#30919D] focus:outline-none transition-colors"
+                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-[#30919D] focus:outline-none transition-colors"
                     />
                   </div>
 
                   {/* FAQ List */}
                   <div className="space-y-3">
                     {filteredFaqs.length === 0 ? (
-                      <div className="p-8 text-center rounded-xl bg-[#002147] border border-[#30919D]/30">
-                        <FileQuestion className="w-12 h-12 text-gray-500 mx-auto mb-3" />
-                        <p className="text-gray-400">No FAQs match your search</p>
+                      <div className="p-8 text-center rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30">
+                        <FileQuestion className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+                        <p className="text-gray-500 dark:text-gray-400">No FAQs match your search</p>
                       </div>
                     ) : (
                       filteredFaqs.map((faq, index) => (
@@ -190,13 +190,13 @@ const Help = () => {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="rounded-xl bg-[#002147] border border-[#30919D]/30 overflow-hidden"
+                          className="rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 overflow-hidden shadow-sm dark:shadow-none"
                         >
                           <button
                             onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
                             className="w-full flex items-center justify-between p-4 text-left"
                           >
-                            <span className="text-white font-medium pr-4">{faq.question}</span>
+                            <span className="text-gray-900 dark:text-white font-medium pr-4">{faq.question}</span>
                             <ChevronDown
                               className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${
                                 expandedFaq === index ? "rotate-180" : ""
@@ -211,7 +211,7 @@ const Help = () => {
                                 exit={{ height: 0, opacity: 0 }}
                                 transition={{ duration: 0.2 }}
                               >
-                                <div className="px-4 pb-4 text-gray-400">
+                                <div className="px-4 pb-4 text-gray-600 dark:text-gray-400">
                                   {faq.answer}
                                 </div>
                               </motion.div>
@@ -224,32 +224,32 @@ const Help = () => {
 
                   {/* Contact Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-                    <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
+                    <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 shadow-sm dark:shadow-none">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 rounded-lg bg-[#30919D]/20">
                           <Mail className="w-5 h-5 text-[#30919D]" />
                         </div>
-                        <h3 className="text-white font-medium">Email Support</h3>
+                        <h3 className="text-gray-900 dark:text-white font-medium">Email Support</h3>
                       </div>
-                      <p className="text-gray-400 text-sm">support@smaartminds.com</p>
-                      <p className="text-gray-500 text-xs mt-1">We respond within 24 hours</p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">support@smaartminds.com</p>
+                      <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">We respond within 24 hours</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
+                    <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 shadow-sm dark:shadow-none">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 rounded-lg bg-[#30919D]/20">
                           <Phone className="w-5 h-5 text-[#30919D]" />
                         </div>
-                        <h3 className="text-white font-medium">Phone Support</h3>
+                        <h3 className="text-gray-900 dark:text-white font-medium">Phone Support</h3>
                       </div>
-                      <p className="text-gray-400 text-sm">+91 1800-123-4567</p>
-                      <p className="text-gray-500 text-xs mt-1">Mon-Fri, 9AM-6PM IST</p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">+91 1800-123-4567</p>
+                      <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Mon-Fri, 9AM-6PM IST</p>
                     </div>
                   </div>
 
                   {/* CTA to create ticket */}
-                  <div className="p-6 rounded-xl bg-gradient-to-r from-[#30919D]/20 to-[#002147] border border-[#30919D]/30 text-center">
-                    <h3 className="text-white font-medium mb-2">Can't find what you're looking for?</h3>
-                    <p className="text-gray-400 text-sm mb-4">Create a support ticket and our team will help you out</p>
+                  <div className="p-6 rounded-xl bg-gradient-to-r from-[#30919D]/10 dark:from-[#30919D]/20 to-gray-50 dark:to-[#002147] border border-gray-200 dark:border-[#30919D]/30 text-center">
+                    <h3 className="text-gray-900 dark:text-white font-medium mb-2">Can't find what you're looking for?</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Create a support ticket and our team will help you out</p>
                     <button
                       onClick={() => setActiveTab('create')}
                       className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#30919D] text-white font-medium hover:bg-[#30919D]/80 transition-colors"
@@ -270,10 +270,10 @@ const Help = () => {
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="rounded-2xl bg-[#002147] border border-[#30919D]/30 p-6">
+                  <div className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 p-6 shadow-sm dark:shadow-none">
                     <div className="mb-6">
-                      <h2 className="text-xl font-bold text-white mb-1">Create Support Ticket</h2>
-                      <p className="text-gray-400 text-sm">Describe your issue and we'll get back to you as soon as possible</p>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Create Support Ticket</h2>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">Describe your issue and we'll get back to you as soon as possible</p>
                     </div>
                     <TicketForm
                       onSuccess={handleTicketCreated}
@@ -336,7 +336,7 @@ const Help = () => {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30">
+                        <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 shadow-sm dark:shadow-none">
                           <div className="flex flex-wrap gap-2">
                             <span className="text-sm text-gray-400 mr-2">Status:</span>
                             {['', 'open', 'in-progress', 'resolved', 'closed'].map((status) => (
@@ -346,7 +346,7 @@ const Help = () => {
                                 className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                                   statusFilter === status
                                     ? "bg-[#30919D] text-white"
-                                    : "bg-[#001229] text-gray-400 hover:text-white"
+                                    : "bg-gray-100 dark:bg-[#001229] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                                 }`}
                               >
                                 {status || 'All'}
@@ -365,10 +365,10 @@ const Help = () => {
                       <p className="text-gray-400">Loading tickets...</p>
                     </div>
                   ) : tickets.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 rounded-xl bg-[#002147] border border-[#30919D]/30">
-                      <Inbox className="w-12 h-12 text-gray-500 mb-3" />
-                      <h3 className="text-white font-medium mb-1">No tickets yet</h3>
-                      <p className="text-gray-400 text-sm mb-4">Create a ticket to get help from our support team</p>
+                    <div className="flex flex-col items-center justify-center py-12 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#30919D]/30 shadow-sm dark:shadow-none">
+                      <Inbox className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-3" />
+                      <h3 className="text-gray-900 dark:text-white font-medium mb-1">No tickets yet</h3>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Create a ticket to get help from our support team</p>
                       <button
                         onClick={() => setActiveTab('create')}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#30919D] text-white hover:bg-[#30919D]/80 transition-colors"

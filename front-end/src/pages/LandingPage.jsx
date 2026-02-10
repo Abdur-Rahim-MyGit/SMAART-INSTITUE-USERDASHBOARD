@@ -24,7 +24,7 @@ import InstitutionSelectModal from "@/components/auth/InstitutionSelectModal";
 import SplashScreen from "@/components/SplashScreen";
 import SectionReveal from "@/components/ui/SectionReveal";
 import CookieConsent from "@/components/CookieConsent";
-import ThemeToggle from "@/components/landing/ThemeToggle";
+
 
 const LandingPage = () => {
   const navigate = useNavigate();
