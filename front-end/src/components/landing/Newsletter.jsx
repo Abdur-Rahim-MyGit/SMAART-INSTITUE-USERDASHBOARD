@@ -26,16 +26,16 @@ const Newsletter = () => {
                 <div className="max-w-4xl mx-auto bg-gradient-to-br from-[#001835] to-[#001226] rounded-3xl p-8 md:p-12 border border-white/10 relative overflow-hidden">
 
                     {/* Decorative blobs */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#30919D]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#1a3884]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#daa520]/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2" />
 
                     <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
                         <div className="flex-1 text-center md:text-left">
                             <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                                Stay ahead of the curve
+                                Stay Ahead of the Curve
                             </h3>
                             <p className="text-gray-400">
-                                Get exclusive insights on AI in education, career trends, and product updates delivered to your inbox.
+                                Get exclusive Future of Work insights, career trends, and capability building strategies delivered to your inbox.
                             </p>
                         </div>
 
@@ -46,7 +46,7 @@ const Newsletter = () => {
                                     <Input
                                         type="email"
                                         placeholder="Enter your email"
-                                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#30919D]/50 focus:ring-[#30919D]/20 transition-all"
+                                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#daa520]/50 focus:ring-[#daa520]/20 transition-all"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -55,7 +55,7 @@ const Newsletter = () => {
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full bg-[#30919D] hover:bg-[#287a85] text-white"
+                                    className="w-full bg-[#daa520] hover:bg-[#b8860b] text-[#1a3884] font-bold"
                                 >
                                     {isLoading ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />

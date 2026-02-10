@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { apiCall } from "@/services/api";
 
+import whiteLogo from "@/assets/white.png";
+
 const SignupInitial = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
@@ -77,12 +79,12 @@ const SignupInitial = () => {
           className="text-center mb-6 sm:mb-8"
         >
           <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="SMAART Minds" className="h-20 w-auto object-contain" />
+            <img src={whiteLogo} alt="SMAART Institute" className="h-20 w-auto object-contain" />
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-background mb-1 sm:mb-2">
             Create Account
           </h1>
-          <p className="text-background/70 text-sm sm:text-base">Join SMAART Minds today</p>
+          <p className="text-background/70 text-sm sm:text-base">Join SMAART Institute today</p>
         </motion.div>
 
         <form onSubmit={handleSendOTP} className="space-y-4 sm:space-y-5">
@@ -166,8 +168,8 @@ const SignupInitial = () => {
             By signing up, you agree to our Terms of Service and Privacy Policy
           </p>
         </motion.div>
-      </motion.div>
-    </div>
+      </motion.div >
+    </div >
   );
 };
 

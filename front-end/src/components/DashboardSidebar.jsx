@@ -21,6 +21,8 @@ import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
 import ChatbotModal from "@/components/ChatbotModal";
 import { useTheme } from "@/contexts/ThemeContext";
+import blueLogo from "@/assets/blue.png";
+import whiteLogo from "@/assets/white.png";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -125,7 +127,7 @@ const DashboardSidebar = () => {
         { type: 'assessment', title: '📊 Assessment Results Ready', message: 'Your Baseline Assessment results are available.' },
         { type: 'course', title: '📚 New Course Available', message: 'Check out "Leadership Essentials" - now available!' },
         { type: 'achievement', title: '🎉 Level Up!', message: 'You reached Level 5! New avatar items unlocked.' },
-        { type: 'system', title: '👋 Welcome!', message: 'Welcome to SMAART Minds! Start your learning journey today.' }
+        { type: 'system', title: '👋 Welcome!', message: 'Welcome to SMAART Institute! Start your learning journey today.' }
       ];
       const randomNotif = testTypes[Math.floor(Math.random() * testTypes.length)];
 
@@ -194,6 +196,8 @@ const DashboardSidebar = () => {
       {/* Top Navigation Bar */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-slate-200/50 dark:border-white/10 shadow-sm transition-all duration-300">
         <div className="flex items-center justify-between px-6 lg:px-10 h-16">
+
+
           {/* Left: Logo */}
           <div className="flex items-center gap-2">
             <button
@@ -204,18 +208,25 @@ const DashboardSidebar = () => {
             </button>
 
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-700 to-blue-500 shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-all duration-300">
-                <span className="font-bold text-lg text-white">S</span>
+              <div className="h-10 w-auto flex items-center justify-center transition-all duration-300">
+                <img
+                  src={theme === 'dark' ? whiteLogo : blueLogo}
+                  alt="SMAART Institute"
+                  className="h-10 w-auto object-contain"
+                />
               </div>
-              <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white hidden md:block">
-                SMAART<span className="text-blue-600"> Minds</span>
-              </span>
+
             </Link>
           </div>
 
-          {/* Center: Interactive Menu (Desktop) */}
-          <div className="hidden lg:flex flex-1 justify-center">
-            <InteractiveMenu />
+          {/* Center: Stylized Title */}
+          <div className="hidden lg:flex flex-col items-center justify-center absolute left-1/2 -translate-x-1/2">
+            <h1 className="text-2xl font-serif font-bold tracking-widest text-slate-900 dark:text-white uppercase select-none">
+              SMAART INSTITUTE
+            </h1>
+            <p className="text-[10px] font-sans font-bold tracking-[0.3em] text-[#B8860B] uppercase mt-0.5 select-none text-center w-full">
+              PROFESSIONAL CREDENTIAL
+            </p>
           </div>
 
           {/* Right: Actions */}
@@ -379,11 +390,13 @@ const DashboardSidebar = () => {
             {/* Mobile Header */}
             <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <Link to="/" className="flex items-center gap-2" onClick={() => setIsMobileOpen(false)}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-600">
-                  <span className="font-bold text-base text-white">S</span>
-                </div>
+                <img
+                  src={theme === 'dark' ? whiteLogo : blueLogo}
+                  alt="SMAART Institute"
+                  className="h-9 w-auto object-contain"
+                />
                 <span className="font-bold text-lg text-slate-900 dark:text-white">
-                  SMAART<span className="text-blue-600">Minds</span>
+                  SMAART<span className="text-blue-600"> Institute</span>
                 </span>
               </Link>
               <button

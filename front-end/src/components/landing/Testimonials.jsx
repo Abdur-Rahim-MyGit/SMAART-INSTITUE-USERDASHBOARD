@@ -7,24 +7,24 @@ const Testimonials = () => {
   const testimonials = [
     {
       id: 1,
-      quote: "SMAART Minds transformed how we prepare our students for placements. The insights are incredibly detailed.",
-      author: "Dr. Sarah Johnson",
-      role: "Dean of Students, Tech Institute",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
+      quote: "Impact is measured by capability and progression, not just activity. We look at the whole system.",
+      author: "Systems Thinking",
+      role: "Core Value",
+      image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
     },
     {
       id: 2,
-      quote: "The ICAS Passport gave me a tangible way to show employers my soft skills. I got hired within weeks!",
-      author: "Michael Chen",
-      role: "Computer Science Graduate",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
+      quote: "Focus on real-world outcomes that improve lives and economies. Evidence is our currency.",
+      author: "Measurable Impact",
+      role: "Core Value",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
     },
     {
       id: 3,
-      quote: "Finally, a platform that focuses on emotional intelligence alongside technical skills. Highly recommended.",
-      author: "Priya Patel",
-      role: "HR Director, Global Corp",
-      image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
+      quote: "Preparing for the restructured world of work requires constant evolution and flexibility.",
+      author: "Adaptability",
+      role: "Core Value",
+      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
     }
   ];
 
@@ -45,7 +45,7 @@ const Testimonials = () => {
   return (
     <section id="testimonials" className="py-24 bg-gray-50 dark:bg-[#002147] relative overflow-hidden scroll-mt-24 sm:scroll-mt-28 transition-colors duration-300">
       {/* Background Elements */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#30919D]/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#1a3884]/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
         <div className="text-center mb-16">
@@ -55,8 +55,17 @@ const Testimonials = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white tracking-tight font-heading"
           >
-            Trusted by <span className="text-[#daa520]">Educators & Students</span>
+            Impact & <span className="text-[#daa520]">Values</span>
           </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-lg text-gray-600 dark:text-gray-300"
+          >
+            Guided by the SMAART Values Framework
+          </motion.p>
         </div>
 
         <div
@@ -88,7 +97,7 @@ const Testimonials = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 bg-[#30919D] text-white p-1.5 rounded-full shadow-lg border border-white">
+                    <div className="absolute -bottom-1 -right-1 bg-[#1a3884] text-white p-1.5 rounded-full shadow-lg border border-white">
                       <Quote className="w-3 h-3" />
                     </div>
                   </div>
@@ -108,7 +117,7 @@ const Testimonials = () => {
                       <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
                         {testimonials[currentIndex].author}
                       </h4>
-                      <p className="text-[#30919D] font-medium text-sm uppercase tracking-wide">
+                      <p className="text-[#daa520] font-medium text-sm uppercase tracking-wide">
                         {testimonials[currentIndex].role}
                       </p>
                     </div>
@@ -123,7 +132,7 @@ const Testimonials = () => {
                 variant="ghost"
                 size="icon"
                 onClick={prev}
-                className="rounded-full w-12 h-12 text-gray-500 dark:text-gray-400 hover:text-[#002147] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-all"
+                className="rounded-full w-12 h-12 text-gray-500 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-[#1a3884] dark:hover:bg-[#1a3884] border border-gray-200 dark:border-white/10 transition-all"
               >
                 <ChevronLeft className="w-6 h-6" />
               </Button>
@@ -131,7 +140,7 @@ const Testimonials = () => {
                 variant="ghost"
                 size="icon"
                 onClick={next}
-                className="rounded-full w-12 h-12 text-gray-500 dark:text-gray-400 hover:text-[#002147] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-all"
+                className="rounded-full w-12 h-12 text-gray-500 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-[#1a3884] dark:hover:bg-[#1a3884] border border-gray-200 dark:border-white/10 transition-all"
               >
                 <ChevronRight className="w-6 h-6" />
               </Button>

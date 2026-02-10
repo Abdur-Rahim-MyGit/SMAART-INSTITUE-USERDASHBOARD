@@ -4,9 +4,9 @@ import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import InstitutionSelector from "@/components/InstitutionSelector";
+
 import PageTransition from "@/components/PageTransition";
-import TrustStats from "@/components/landing/TrustStats";
+
 import HeroSection from "@/components/landing/HeroSection";
 import ServiceCards from "@/components/landing/ServiceCards";
 import HowItWorks from "@/components/landing/HowItWorks";
@@ -80,9 +80,9 @@ const LandingPage = () => {
   return (
     <PageTransition className="min-h-screen bg-white dark:bg-[#002147] text-gray-900 dark:text-white selection:bg-[#30919D] selection:text-white transition-colors duration-300">
       <Helmet>
-        <title>Smaart Minds | AI-Powered Student Career Analyser</title>
-        <meta name="description" content="Unlock your future with Smaart Minds. The first AI Career Coach integrating EQ, Cognitive Skills, and Academic Performance to guide students to success." />
-        <meta property="og:title" content="Smaart Minds | Shape Skills, Unlock Future" />
+        <title>SMAART Institute | AI-Powered Student Career Analyser</title>
+        <meta name="description" content="Unlock your future with SMAART Institute. The first AI Career Coach integrating EQ, Cognitive Skills, and Academic Performance to guide students to success." />
+        <meta property="og:title" content="SMAART Institute | Shape Skills, Unlock Future" />
         <meta property="og:description" content="AI-driven assessments and personalized learning pathways for students." />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="/og-image.jpg" />
@@ -97,15 +97,9 @@ const LandingPage = () => {
 
       <IntegrationMarquee />
 
-      <main className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24">
-        <SectionReveal className="py-24">
-          <InstitutionSelector />
-        </SectionReveal>
-      </main>
 
-      <SectionReveal>
-        <TrustStats />
-      </SectionReveal>
+
+
 
       <SectionReveal>
         <InteractiveGrid />

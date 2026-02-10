@@ -5,20 +5,20 @@ const HowItWorks = () => {
   const steps = [
     {
       id: 1,
-      title: "Assess",
-      description: "Complete our AI-driven assessments to discover your strengths and areas for growth.",
+      title: "Skills",
+      description: "Applied ability. Ensuring learning translates into real-world application, not just qualification.",
       icon: <ClipboardCheck className="w-8 h-8" />,
     },
     {
       id: 2,
-      title: "Plan",
-      description: "Receive a personalized learning pathway tailored to your unique profile and goals.",
+      title: "Judgement",
+      description: "Decision quality in real situations. Developing the ability to make effective choices in complex environments.",
       icon: <Map className="w-8 h-8" />,
     },
     {
       id: 3,
-      title: "Earn",
-      description: "Unlock your ICAS Passport and showcase your verified skills to top employers.",
+      title: "Adaptability",
+      description: "Effectiveness as conditions change. Building resilience and flexibility for a restructured world of work.",
       icon: <Award className="w-8 h-8" />,
     }
   ];
@@ -27,7 +27,7 @@ const HowItWorks = () => {
     <section id="how-it-works" className="py-24 bg-white dark:bg-[#002147] relative overflow-hidden scroll-mt-24 sm:scroll-mt-28 transition-colors duration-300">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#30919D] rounded-full blur-[150px]" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#1a3884] rounded-full blur-[150px]" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#daa520] rounded-full blur-[150px]" />
       </div>
 
@@ -37,9 +37,9 @@ const HowItWorks = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 tracking-tight font-heading"
+            className="text-4xl md:text-5xl font-bold text-[#1a3884] dark:text-white mb-6 tracking-tight font-heading"
           >
-            Your Journey to <span className="text-[#daa520]">Success</span>
+            SMAART Integrated <span className="text-[#daa520]">Capability Framework™</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -48,7 +48,7 @@ const HowItWorks = () => {
             transition={{ delay: 0.2 }}
             className="text-xl text-gray-600 dark:text-gray-400 font-light"
           >
-            Three simple steps to transform your potential into professional power.
+            How capability is built for modern work. Integrating skills, judgement, and adaptability.
           </motion.p>
         </div>
 
@@ -80,12 +80,12 @@ const HowItWorks = () => {
                   </div>
 
                   {/* Step Number Badge */}
-                  <div className="absolute -top-4 -right-4 w-10 h-10 rounded-xl bg-[#30919D] text-white flex items-center justify-center font-bold text-lg shadow-lg border-4 border-white dark:border-[#002147]">
+                  <div className="absolute -top-4 -right-4 w-10 h-10 rounded-xl bg-[#1a3884] text-white flex items-center justify-center font-bold text-lg shadow-lg border-4 border-white dark:border-[#002147]">
                     {step.id}
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-[#daa520] transition-colors">
+                <h3 className="text-2xl font-bold text-[#1a3884] dark:text-white mb-4 group-hover:text-[#daa520] transition-colors">
                   {step.title}
                 </h3>
 

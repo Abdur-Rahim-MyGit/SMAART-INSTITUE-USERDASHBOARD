@@ -17,7 +17,7 @@ const IntegrationMarquee = () => {
             <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#001226] to-transparent z-10 pointer-events-none" />
             <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#001226] to-transparent z-10 pointer-events-none" />
 
-            <p className="text-center text-sm font-semibold text-gray-500 uppercase tracking-widest mb-8">Trusted by Leading Institutions</p>
+            <p className="text-center text-sm font-semibold text-white uppercase tracking-widest mb-8">Trusted by Leading Institutions</p>
 
             <div className="flex relative items-center">
                 {/* Gradient Masks for smooth fade */}
@@ -26,18 +26,18 @@ const IntegrationMarquee = () => {
 
                 <motion.div
                     className="flex gap-16 items-center whitespace-nowrap"
-                    animate={{ x: [0, -1000] }}
+                    animate={{ x: "-100%" }}
                     transition={{
                         repeat: Infinity,
                         duration: 40,
                         ease: "linear",
                     }}
                 >
-                    {[...partners, ...partners, ...partners].map((partner, index) => (
+                    {[...partners, ...partners].map((partner, index) => (
                         <div
                             key={index}
-                            className="text-2xl font-bold opacity-50 hover:opacity-100 transition-opacity duration-300 font-serif"
-                            style={{ color: partner.color }}
+                            className="text-2xl font-bold opacity-100 hover:opacity-100 transition-opacity duration-300 font-serif"
+                            style={{ color: partner.color === '#ffffff' ? '#ffffff' : partner.color }}
                         >
                             {partner.name}
                         </div>

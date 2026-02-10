@@ -80,7 +80,7 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
                 <User className="w-8 h-8 text-teal" />
               </div>
               <h2 className="text-3xl font-display font-bold text-white mb-2">Create Account</h2>
-              <p className="text-white/50">Join SMAART Minds today</p>
+              <p className="text-white/50">Join SMAART Institute today</p>
             </div>
 
             {/* Form */}

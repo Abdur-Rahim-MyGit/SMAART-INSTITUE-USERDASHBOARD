@@ -2,8 +2,13 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
+
+import blueLogo from "@/assets/blue.png";
+import whiteLogo from "@/assets/white.png";
 
 const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
+  const { theme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navItems = ["Services", "How It Works", "Testimonials", "FAQ", "Verify Certificate", "Contact"];
@@ -38,16 +43,12 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-[#30919D] to-[#1a5f66] rounded-lg flex items-center justify-center shadow-lg shadow-[#30919D]/20 group-hover:shadow-[#30919D]/40 transition-all duration-300">
-              <span className="text-white font-heading font-bold text-base sm:text-xl">S</span>
-            </div>
-            <div className="flex flex-col">
-              <span className={`text-sm sm:text-base md:text-lg font-bold tracking-tight leading-none ${scrolled || !showLinks ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-white'}`}>
-                SMAART<span className="text-[#30919D]"> Minds</span>
-              </span>
-              <span className="text-[8px] sm:text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none mt-0.5 sm:mt-1">
-                Institute
-              </span>
+            <div className="h-14 sm:h-16 w-auto flex items-center justify-center transition-all duration-300">
+              <img
+                src={theme === 'dark' ? whiteLogo : blueLogo}
+                alt="SMAART Institute"
+                className="h-full w-auto object-contain"
+              />
             </div>
           </Link>
 
@@ -58,22 +59,22 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 <button
                   key={item}
                   onClick={() => scrollToSection(item)}
-                  className={`text-sm font-medium transition-colors relative group ${scrolled ? 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white' : 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'}`}
+                  className={`text-sm font-medium transition-colors relative group ${scrolled ? 'text-[#1a3884] hover:text-[#daa520] dark:text-gray-300 dark:hover:text-[#daa520]' : 'text-[#1a3884] hover:text-[#daa520] dark:text-gray-300 dark:hover:text-[#daa520]'}`}
                 >
                   {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#30919D] transition-all duration-300 group-hover:w-full" />
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#daa520] transition-all duration-300 group-hover:w-full" />
                 </button>
               ))}
               <div className="flex items-center gap-4 pl-4 border-l border-gray-200 dark:border-white/10">
                 <button
                   onClick={onLoginClick}
-                  className={`text-sm font-medium transition-colors ${scrolled ? 'text-gray-900 dark:text-white hover:text-[#30919D]' : 'text-gray-900 dark:text-white hover:text-[#30919D]'}`}
+                  className={`text-sm font-medium transition-colors ${scrolled ? 'text-[#1a3884] dark:text-white hover:text-[#daa520]' : 'text-[#1a3884] dark:text-white hover:text-[#daa520]'}`}
                 >
                   Log in
                 </button>
                 <button
                   onClick={onSignupClick}
-                  className="px-5 py-2 bg-[#30919D] hover:bg-[#267a84] text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-[#30919D]/20 hover:shadow-[#30919D]/40 hover:-translate-y-0.5"
+                  className="px-5 py-2 bg-[#1a3884] hover:bg-[#122c6d] text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 border border-[#daa520]"
                 >
                   Get Started
                 </button>
@@ -121,7 +122,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                     setMobileMenuOpen(false);
                     onSignupClick && onSignupClick();
                   }}
-                  className="w-full py-3 bg-[#30919D] text-white rounded-lg font-medium text-center hover:bg-[#267a84] transition-all"
+                  className="w-full py-3 bg-[#1a3884] text-white rounded-lg font-medium text-center hover:bg-[#122c6d] transition-all border border-[#daa520]"
                 >
                   Get Started
                 </button>

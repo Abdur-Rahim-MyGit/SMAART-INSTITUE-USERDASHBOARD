@@ -5,6 +5,9 @@ import { Menu, X, ChevronDown, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import InstitutionSelector from "@/components/InstitutionSelector"; // We might need to adapt this or use a simplified version
 
+import blueLogo from "@/assets/blue.png";
+import whiteLogo from "@/assets/white.png";
+
 const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -34,22 +37,21 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "backdrop-blur-md shadow-lg py-3"
-          : "bg-transparent py-5"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+        ? "backdrop-blur-md shadow-lg py-3"
+        : "bg-transparent py-5"
+        }`}
       style={isScrolled ? { backgroundColor: 'rgba(8, 30, 53, 0.9)' } : {}}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo Lockup */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative w-12 h-12 flex items-center justify-center bg-white/10 backdrop-blur-sm rounded-xl border border-white/10 shadow-lg group-hover:scale-105 transition-transform overflow-hidden p-1">
-             <img src="/logo.png" alt="SMAART Minds" className="w-full h-full object-contain" />
+          <div className="relative h-14 sm:h-16 w-auto flex items-center justify-center p-1">
+            <img src={whiteLogo} alt="SMAART Institute" className="h-full w-auto object-contain" />
           </div>
           <div className="flex flex-col">
             <span className="text-white font-display font-bold text-xl leading-none tracking-tight drop-shadow-md">
-              SMAART <span style={{ color: '#30919D' }}>MINDS</span>
+              SMAART <span style={{ color: '#daa520' }}>Institute</span>
             </span>
             <span className="text-[10px] font-medium tracking-wider uppercase opacity-80" style={{ color: '#F0F0F2' }}>
               Unlock Potential
@@ -75,8 +77,8 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
           <div className="h-6 w-px" style={{ backgroundColor: 'rgba(218, 165, 32, 0.5)' }} />
 
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="hover:bg-white/10"
               style={{ color: '#F0F0F2' }}
               onClick={onLoginClick}
@@ -84,9 +86,9 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
               <LogIn className="w-4 h-4 mr-2" />
               Login
             </Button>
-            <Button 
+            <Button
               className="text-white font-semibold shadow-lg"
-              style={{ backgroundColor: '#30919D', boxShadow: '0 10px 15px -3px rgba(48, 145, 157, 0.2)' }}
+              style={{ backgroundColor: '#1a3884', boxShadow: '0 10px 15px -3px rgba(26, 56, 132, 0.4)', border: '1px solid #daa520' }}
               onClick={onSignupClick}
             >
               <UserPlus className="w-4 h-4 mr-2" />
@@ -126,8 +128,8 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
                 </button>
               ))}
               <hr style={{ borderColor: '#daa520' }} className="my-2" />
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className="justify-start hover:bg-white/10"
                 style={{ color: '#F0F0F2' }}
                 onClick={() => {
@@ -138,9 +140,9 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
                 <LogIn className="w-4 h-4 mr-2" />
                 Login
               </Button>
-              <Button 
+              <Button
                 className="text-white justify-start"
-                style={{ backgroundColor: '#30919D' }}
+                style={{ backgroundColor: '#1a3884', border: '1px solid #daa520' }}
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onSignupClick();

@@ -43,7 +43,7 @@ const ThemeToggle = () => {
     return (
         <motion.button
             onClick={toggleTheme}
-            className="fixed top-24 right-6 z-[9999] p-3 rounded-2xl bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 shadow-2xl hover:shadow-[#30919D]/20 transition-all duration-500 group overflow-hidden"
+            className="fixed top-24 right-6 z-[9999] p-3 rounded-2xl bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 shadow-2xl hover:shadow-[#daa520]/20 transition-all duration-500 group overflow-hidden"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
             initial={{ opacity: 0, x: 20 }}
@@ -51,7 +51,7 @@ const ThemeToggle = () => {
             aria-label="Toggle theme"
         >
             {/* Inner Glow */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#30919D]/5 to-[#daa520]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#1a3884]/5 to-[#daa520]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             <div className="relative">
                 {theme === 'dark' ? (
