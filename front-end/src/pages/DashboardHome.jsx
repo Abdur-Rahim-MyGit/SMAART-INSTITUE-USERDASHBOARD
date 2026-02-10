@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { getTasks, createTask } from "@/services/taskService";
 import useAvatar from '@/hooks/useAvatar';
+import ContinueLearning from '@/components/ContinueLearning';
 import CourseCardSkeleton from '@/components/skeletons/CourseCardSkeleton';
 import StatsCardSkeleton from '@/components/skeletons/StatsCardSkeleton';
 import { API_BASE_URL } from '@/services/api';
@@ -39,6 +40,7 @@ const DashboardHome = () => {
   const { user, loading: userLoading } = useUser();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showVisionSplash, setShowVisionSplash] = useState(false);
+  const [showStreakModal, setShowStreakModal] = useState(false);
 
   // Real data states
   const [enrolledCourses, setEnrolledCourses] = useState([]);
@@ -305,11 +307,22 @@ const DashboardHome = () => {
           ? Math.round(totalProgressSum / totalCourses)
           : 0;
 
+        // Fetch Streak
+        let currentStreak = 0;
+        try {
+            const streakRes = await apiCall('/avatar/streak-status');
+            if (streakRes.success) {
+                currentStreak = streakRes.data?.totalStreakDays || streakRes.data?.streak || 0;
+            }
+        } catch (e) {
+            console.error("Failed to fetch streak", e);
+        }
+
         setStats({
           totalCourses,
           completedModules: completedModulesCount,
           baselineScore: baseline?.baselineScore || 0,
-          dayStreak: 15,
+          dayStreak: currentStreak,
           resumeUrl,
           currentModuleTitle,
           lastAccessedTime
@@ -371,20 +384,42 @@ const DashboardHome = () => {
         <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
       )}
 
+      {/* Streak Details Modal */}
+      {showStreakModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowStreakModal(false)}>
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-transparent w-full max-w-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <ContinueLearning />
+            <div className="mt-4 flex justify-center">
+              <button 
+                onClick={() => setShowStreakModal(false)}
+                className="px-6 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full font-bold text-sm shadow-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
       <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] text-slate-900 font-sans transition-colors duration-300">
         <DashboardSidebar />
 
         <div className="min-h-screen pb-20 lg:pb-0">
           <PageTransition>
             <motion.main
-              className="max-w-[1600px] mx-auto p-6 md:p-8 lg:p-10"
+              className="max-w-[1600px] mx-auto p-4 md:p-8 lg:p-10"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
             >
 
               {/* Enhanced Header - Professional & Clean */}
-              <motion.div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 flex-wrap" variants={itemVariants}>
+              <motion.div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 flex-wrap" variants={itemVariants}>
                 <div className="flex-1 min-w-[200px]">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="px-2.5 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 shadow-sm">
@@ -392,41 +427,44 @@ const DashboardHome = () => {
                     </span>
                     {/* <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> */}
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
+                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
                     Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">{user?.fullName?.split(' ')[0] || 'Student'}</span>
                   </h1>
-                  <p className="text-slate-500 dark:text-slate-400 mt-1.5 text-base font-medium">
+                  <p className="text-slate-500 dark:text-slate-400 mt-1.5 text-sm md:text-base font-medium">
                     Your learning overview for today.
                   </p>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  {/* Buttons removed as requested */}
-
-                  {stats.dayStreak > 0 && (
-                    <motion.div
-                      whileHover={{ y: -2 }}
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg shadow-orange-500/20"
-                    >
-                      <Zap className="w-5 h-5 fill-white" />
-                      <div>
-                        <p className="text-[10px] font-bold opacity-90 uppercase leading-none mb-0.5">Stream</p>
-                        <p className="text-sm font-bold leading-none">{stats.dayStreak} Days</p>
-                      </div>
-                    </motion.div>
-                  )}
+                  {/* Streak Badge - Click to open details */}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowStreakModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer group"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-orange-500 fill-orange-500" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 leading-none">Streak</p>
+                      <p className="text-sm font-bold text-slate-900 dark:text-white leading-none mt-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {stats.dayStreak} Days
+                      </p>
+                    </div>
+                  </motion.button>
                 </div>
               </motion.div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
 
                 {/* Left Column - Main Content */}
-                <div className="lg:col-span-8 space-y-8">
+                <div className="lg:col-span-8 space-y-6 md:space-y-8">
 
                   {/* Professional Hero Section */}
                   <motion.section
                     variants={itemVariants}
-                    className="relative overflow-hidden rounded-[24px] bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-8 md:p-10 shadow-xl shadow-slate-200 dark:shadow-none text-slate-900 dark:text-white z-0 ring-1 ring-slate-200 dark:ring-white/5"
+                    className="relative overflow-hidden rounded-[20px] md:rounded-[24px] bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 md:p-10 shadow-xl shadow-slate-200 dark:shadow-none text-slate-900 dark:text-white z-0 ring-1 ring-slate-200 dark:ring-white/5"
                   >
                     {/* Subtle Grid Pattern */}
                     <div className="absolute inset-0 opacity-20"
@@ -530,6 +568,8 @@ const DashboardHome = () => {
                       </motion.div>
                     ))}
                   </div>
+
+                  {/* 7-Day Streak Tracker - REMOVED from here, now in Modal */}
 
                   {/* Current Course - Horizontal Professional Card */}
                   <motion.section variants={itemVariants}>
