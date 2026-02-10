@@ -277,7 +277,7 @@ const ImageSlot = ({
       ref={slotRef}
       style={slotStyle}
       className={`relative transition-all ${isSelected ? "ring-2 ring-teal-500 ring-offset-2" : ""
-        } ${!image ? "bg-gray-100/80 hover:bg-gray-200/80" : ""}`}
+        } ${!image ? "bg-slate-100/80 hover:bg-slate-200/80 dark:bg-white/5 dark:hover:bg-white/10" : ""}`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(slot.id);
@@ -328,7 +328,7 @@ const ImageSlot = ({
               {/* Top right controls - Delete & Replace */}
               <div className="absolute top-1 right-1 flex gap-1 z-10">
                 <button
-                  className="w-7 h-7 sm:w-6 sm:h-6 bg-white/90 hover:bg-white active:bg-gray-100 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+                  className="w-7 h-7 sm:w-6 sm:h-6 bg-white/90 hover:bg-white active:bg-slate-100 dark:active:bg-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform"
                   onClick={(e) => {
                     e.stopPropagation();
                     onImageRemove(slot.id);
@@ -342,7 +342,7 @@ const ImageSlot = ({
                   <Trash2 className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-red-500" />
                 </button>
                 <button
-                  className="w-7 h-7 sm:w-6 sm:h-6 bg-white/90 hover:bg-white active:bg-gray-100 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+                  className="w-7 h-7 sm:w-6 sm:h-6 bg-white/90 hover:bg-white active:bg-slate-100 dark:active:bg-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform"
                   onClick={(e) => {
                     e.stopPropagation();
                     fileInputRef.current?.click();
@@ -353,36 +353,36 @@ const ImageSlot = ({
                     fileInputRef.current?.click();
                   }}
                 >
-                  <RefreshCw className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-gray-600" />
+                  <RefreshCw className="w-3.5 h-3.5 sm:w-3 sm:h-3 text-slate-600" />
                 </button>
               </div>
 
               {/* Bottom controls - Zoom, Rotate & Reset (compact for inline) */}
               <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1 z-10 bg-black/70 backdrop-blur-sm rounded-full px-1.5 py-1 box-content shadow-lg border border-white/10 w-max max-w-[90%] overflow-x-auto no-scrollbar">
                 <button
-                  className="w-6 h-6 bg-white/90 hover:bg-white active:bg-gray-100 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform shrink-0"
+                  className="w-6 h-6 bg-white/90 hover:bg-white active:bg-slate-100 dark:active:bg-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform shrink-0"
                   onClick={handleZoomOut}
                   onTouchEnd={handleZoomOut}
                 >
-                  <ZoomOut className="w-3 h-3 text-gray-700" />
+                  <ZoomOut className="w-3 h-3 text-slate-700" />
                 </button>
                 <span className="flex items-center justify-center text-white text-[10px] font-medium min-w-[32px] font-mono">
                   {Math.round((image.scale || 1) * 100)}%
                 </span>
                 <button
-                  className="w-6 h-6 bg-white/90 hover:bg-white active:bg-gray-100 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform shrink-0"
+                  className="w-6 h-6 bg-white/90 hover:bg-white active:bg-slate-100 dark:active:bg-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform shrink-0"
                   onClick={handleZoomIn}
                   onTouchEnd={handleZoomIn}
                 >
-                  <ZoomIn className="w-3 h-3 text-gray-700" />
+                  <ZoomIn className="w-3 h-3 text-slate-700" />
                 </button>
                 <div className="w-px h-4 bg-white/30 self-center shrink-0" />
                 <button
-                  className="w-6 h-6 bg-white/90 hover:bg-white active:bg-gray-100 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform shrink-0"
+                  className="w-6 h-6 bg-white/90 hover:bg-white active:bg-slate-100 dark:active:bg-white/10 rounded-full flex items-center justify-center shadow-sm active:scale-95 transition-transform shrink-0"
                   onClick={handleRotateCW}
                   onTouchEnd={handleRotateCW}
                 >
-                  <RotateCw className="w-3 h-3 text-gray-700" />
+                  <RotateCw className="w-3 h-3 text-slate-700" />
                 </button>
               </div>
             </>
@@ -391,7 +391,7 @@ const ImageSlot = ({
       ) : (
         // Empty slot - tap/click to upload (mobile-friendly)
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer text-gray-400 hover:text-gray-500 active:bg-gray-200/50 transition-colors"
+          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer text-slate-500 hover:text-slate-600 active:bg-slate-200/60 dark:text-white/60 dark:hover:text-white/80 dark:active:bg-white/10 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             fileInputRef.current?.click();
@@ -423,7 +423,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
           onClick={() => onSelect(template.id)}
           className={`relative p-2 rounded-lg border transition-all aspect-square group ${selectedTemplate === template.id
             ? "border-[#30919D] bg-[#30919D]/10 ring-1 ring-[#30919D]/30"
-            : "border-white/10 hover:border-[#30919D]/50 bg-white/5 hover:bg-white/10"
+            : "border-slate-200 dark:border-white/10 hover:border-[#30919D]/50 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10"
             }`}
         >
           {/* Mini preview of template */}
@@ -433,7 +433,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
                 key={i}
                 className={`absolute transition-colors ${selectedTemplate === template.id
                   ? "bg-[#30919D]/50 border border-[#30919D]/30"
-                  : "bg-white/10 border border-white/5 group-hover:bg-white/20"
+                  : "bg-slate-200 dark:bg-white/10 border border-slate-300 dark:border-white/5 group-hover:bg-slate-300 dark:group-hover:bg-white/20"
                   }`}
                 style={{
                   left: `${slot.x}%`,
@@ -446,7 +446,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
             ))}
           </div>
           {selectedTemplate === template.id && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#30919D] rounded-full flex items-center justify-center shadow-md ring-2 ring-[#001a38]">
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#30919D] rounded-full flex items-center justify-center shadow-md ring-2 ring-white dark:ring-[#001a38]">
               <Check className="w-3 h-3 text-white" />
             </div>
           )}
@@ -750,14 +750,14 @@ const TypographyPanel = ({
 
       {/* Active Text Editor */}
       {selectedTextId && textOverlays[selectedTextId] && (
-        <div className="bg-white/5 rounded-xl p-4 border border-white/10 backdrop-blur-sm">
+        <div className="bg-white/90 dark:bg-white/5 rounded-xl p-4 border border-slate-200 dark:border-white/10 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-semibold text-[#30919D] flex items-center gap-2">
               <Type className="w-4 h-4" /> Editing Text
             </span>
             <button
               onClick={() => onDeleteText(selectedTextId)}
-              className="p-1.5 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
+              className="p-1.5 text-red-600 dark:text-red-400 hover:bg-red-500/20 rounded-lg transition-colors"
               title="Delete text"
             >
               <Trash2 className="w-4 h-4" />
@@ -769,13 +769,13 @@ const TypographyPanel = ({
             onChange={(e) =>
               onUpdateText(selectedTextId, { text: e.target.value })
             }
-            className="w-full px-3 py-2.5 text-sm border rounded-lg mb-4 bg-black/20 border-white/10 text-white placeholder:text-white/30 focus:border-[#30919D]/50 focus:ring-1 focus:ring-[#30919D]/50 outline-none transition-all"
+            className="w-full px-3 py-2.5 text-sm border rounded-lg mb-4 bg-white dark:bg-black/20 border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30 focus:border-[#30919D]/50 focus:ring-1 focus:ring-[#30919D]/50 outline-none transition-all"
             placeholder="Enter your text..."
           />
 
           {/* Font Size */}
           <div className="flex items-center gap-3 mb-4">
-            <span className="text-xs font-medium text-white/60 w-12">Size</span>
+            <span className="text-xs font-medium text-slate-600 dark:text-white/60 w-12">Size</span>
             <input
               type="range"
               min="12"
@@ -786,24 +786,24 @@ const TypographyPanel = ({
                   fontSize: parseInt(e.target.value),
                 })
               }
-              className="flex-1 accent-[#30919D] h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer"
+              className="flex-1 accent-[#30919D] h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer"
             />
-            <span className="text-xs font-mono text-white/80 w-8 text-right bg-white/5 px-1 py-0.5 rounded">
+            <span className="text-xs font-mono text-slate-700 dark:text-white/80 w-8 text-right bg-slate-100 dark:bg-white/5 px-1 py-0.5 rounded">
               {textOverlays[selectedTextId].fontSize}
             </span>
           </div>
 
           {/* Text Color */}
           <div className="mb-4">
-            <span className="text-xs font-medium text-white/60 block mb-2">Color</span>
+            <span className="text-xs font-medium text-slate-600 dark:text-white/60 block mb-2">Color</span>
             <div className="flex flex-wrap gap-1.5">
               {TEXT_COLORS.slice(0, 10).map((color) => (
                 <button
                   key={color}
                   onClick={() => onUpdateText(selectedTextId, { color })}
                   className={`w-6 h-6 rounded-md border transition-transform hover:scale-110 ${textOverlays[selectedTextId].color === color
-                    ? "ring-2 ring-white border-transparent"
-                    : "border-white/20 hover:border-white/50"
+                    ? "ring-2 ring-slate-300 dark:ring-white border-transparent"
+                    : "border-slate-300/60 dark:border-white/20 hover:border-slate-400 dark:hover:border-white/50"
                     }`}
                   style={{ backgroundColor: color }}
                 />
@@ -821,8 +821,8 @@ const TypographyPanel = ({
 
           {/* Text Align */}
           <div className="flex items-center gap-2 mb-4">
-            <span className="text-xs font-medium text-white/60 w-12">Align</span>
-            <div className="flex bg-black/20 rounded-lg p-0.5 border border-white/5">
+            <span className="text-xs font-medium text-slate-600 dark:text-white/60 w-12">Align</span>
+            <div className="flex bg-slate-100 dark:bg-black/20 rounded-lg p-0.5 border border-slate-200 dark:border-white/5">
               {[
                 { value: "left", icon: AlignLeft },
                 { value: "center", icon: AlignCenter },
@@ -833,7 +833,7 @@ const TypographyPanel = ({
                   onClick={() => onUpdateText(selectedTextId, { align: value })}
                   className={`p-1.5 rounded-md transition-all ${textOverlays[selectedTextId].align === value
                     ? "bg-[#30919D] text-white shadow-sm"
-                    : "text-white/40 hover:text-white hover:bg-white/5"
+                    : "text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5"
                     }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -844,7 +844,7 @@ const TypographyPanel = ({
 
           {/* Text Effects */}
           <div className="mb-4">
-            <span className="text-xs font-medium text-white/60 block mb-2">Effect</span>
+            <span className="text-xs font-medium text-slate-600 dark:text-white/60 block mb-2">Effect</span>
             <div className="flex flex-wrap gap-1.5">
               {TEXT_EFFECTS.map((effect) => (
                 <button
@@ -854,7 +854,7 @@ const TypographyPanel = ({
                   }
                   className={`px-2.5 py-1.5 text-[10px] rounded-lg border transition-all ${textOverlays[selectedTextId].effect === effect.id
                     ? "bg-[#30919D] text-white border-[#30919D] font-medium"
-                    : "bg-transparent text-white/60 border-white/10 hover:border-white/30 hover:text-white"
+                    : "bg-transparent text-slate-500 dark:text-white/60 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/30 hover:text-slate-900 dark:hover:text-white"
                     }`}
                 >
                   {effect.icon} {effect.name}
@@ -866,9 +866,9 @@ const TypographyPanel = ({
           {/* Text Rotation */}
           <div className="mb-2">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-white/60">Rotation</span>
-              <span className="text-xs font-mono text-white/80 bg-white/5 px-1 py-0.5 rounded">
-                {textOverlays[selectedTextId].rotation || 0}°
+              <span className="text-xs font-medium text-slate-600 dark:text-white/60">Rotation</span>
+              <span className="text-xs font-mono text-slate-700 dark:text-white/80 bg-slate-100 dark:bg-white/5 px-1 py-0.5 rounded">
+                {textOverlays[selectedTextId].rotation || 0}deg
               </span>
             </div>
             <input
@@ -881,7 +881,7 @@ const TypographyPanel = ({
                   rotation: parseInt(e.target.value),
                 })
               }
-              className="w-full accent-[#30919D] h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer mb-2"
+              className="w-full accent-[#30919D] h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer mb-2"
             />
             <div className="flex justify-between gap-1">
               {[-90, -45, 0, 45, 90].map((deg) => (
@@ -891,11 +891,11 @@ const TypographyPanel = ({
                     onUpdateText(selectedTextId, { rotation: deg })
                   }
                   className={`flex-1 px-1 py-1 text-[10px] rounded hover:bg-white/10 transition-colors ${(textOverlays[selectedTextId].rotation || 0) === deg
-                    ? "text-[#30919D] font-bold bg-white/5"
-                    : "text-white/40"
+                    ? "text-[#30919D] font-bold bg-slate-100 dark:bg-white/5"
+                    : "text-slate-500 dark:text-white/40"
                     }`}
                 >
-                  {deg}°
+                  {deg}deg
                 </button>
               ))}
             </div>
@@ -905,7 +905,7 @@ const TypographyPanel = ({
 
       {/* Font Categories */}
       <div className="space-y-2">
-        <h3 className="text-sm font-medium text-[#002147] flex items-center gap-2">
+        <h3 className="text-sm font-medium text-slate-800 dark:text-white/80 flex items-center gap-2">
           <Type className="w-4 h-4" />
           Font Library
         </h3>
@@ -916,19 +916,19 @@ const TypographyPanel = ({
               onClick={() =>
                 setExpandedCategory(expandedCategory === key ? null : key)
               }
-              className={`w-full px-3 py-2 flex items-center justify-between text-left transition-colors ${expandedCategory === key ? "bg-[#30919D]/10" : "hover:bg-[#30919D]/5"
+              className={`w-full px-3 py-2 flex items-center justify-between text-left transition-colors ${expandedCategory === key ? "bg-[#30919D]/10" : "hover:bg-[#30919D]/5 dark:hover:bg-white/5"
                 }`}
             >
               <div className="flex items-center gap-2">
                 <span>{category.icon}</span>
-                <span className="text-sm font-medium text-[#002147]">
+                <span className="text-sm font-medium text-slate-800 dark:text-white/80">
                   {category.name}
                 </span>
               </div>
               {expandedCategory === key ? (
-                <ChevronUp className="w-4 h-4 text-gray-400" />
+                <ChevronUp className="w-4 h-4 text-slate-400 dark:text-white/50" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-slate-400 dark:text-white/50" />
               )}
             </button>
 
@@ -940,8 +940,8 @@ const TypographyPanel = ({
                   exit={{ height: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="p-2 bg-gray-50 space-y-1">
-                    <p className="text-xs text-gray-400 mb-2">
+                  <div className="p-2 bg-slate-50 dark:bg-[#071a30] space-y-1">
+                    <p className="text-xs text-slate-500 dark:text-white/50 mb-2">
                       {category.description}
                     </p>
                     {category.fonts.map((font) => (
@@ -969,10 +969,10 @@ const TypographyPanel = ({
                             });
                           }
                         }}
-                        className="w-full p-2 bg-white rounded-lg border border-[#30919D]/30 hover:border-[#30919D] hover:bg-[#30919D]/10 transition-all text-left group"
+                        className="w-full p-2 bg-white dark:bg-[#0b1f38] rounded-lg border border-[#30919D]/30 hover:border-[#30919D] hover:bg-[#30919D]/10 transition-all text-left group"
                       >
                         <div
-                          className="text-xl text-[#002147] truncate"
+                          className="text-xl text-slate-800 dark:text-white/85 truncate"
                           style={{
                             fontFamily: font.family,
                             fontWeight: font.weight || "400",
@@ -982,10 +982,10 @@ const TypographyPanel = ({
                           {font.preview}
                         </div>
                         <div className="flex items-center justify-between mt-1">
-                          <span className="text-[10px] text-gray-400">
+                          <span className="text-[10px] text-slate-500 dark:text-white/50">
                             {font.name}
                           </span>
-                          <span className="text-[10px] text-gray-500">
+                          <span className="text-[10px] text-slate-500 dark:text-white/50">
                             {font.useCase}
                           </span>
                         </div>
@@ -1027,15 +1027,15 @@ const TypographyPanel = ({
           >
             <div className="space-y-2 p-3 bg-gradient-to-br from-[#30919D]/10 to-[#267a84]/10 rounded-lg">
               {TEXT_EFFECTS.filter((e) => e.id !== "none").map((effect) => (
-                <div key={effect.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <div key={effect.id} className="bg-white dark:bg-[#0b1f38] rounded-lg p-3 border border-slate-200 dark:border-white/10">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-lg">{effect.icon}</span>
-                    <span className="text-sm font-medium text-[#002147]">
+                    <span className="text-sm font-medium text-slate-800 dark:text-white/80">
                       {effect.name}
                     </span>
                   </div>
                   <div
-                    className="text-2xl font-bold text-[#002147]"
+                    className="text-2xl font-bold text-slate-800 dark:text-white/85"
                     style={effect.style}
                   >
                     PREVIEW
@@ -1050,7 +1050,7 @@ const TypographyPanel = ({
       {/* Text Overlays List */}
       {Object.keys(textOverlays).length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          <h3 className="text-sm font-medium text-slate-700 dark:text-white/80 flex items-center gap-2">
             <Layers className="w-4 h-4" />
             Text Layers ({Object.keys(textOverlays).length})
           </h3>
@@ -1059,18 +1059,18 @@ const TypographyPanel = ({
               key={id}
               onClick={() => onSelectText(id)}
               className={`w-full p-2 rounded-lg border text-left transition-all ${selectedTextId === id
-                ? "border-teal-500 bg-teal-50"
-                : "border-gray-200 hover:border-gray-300 bg-white"
+                ? "border-teal-500 bg-teal-50 dark:bg-teal-500/10"
+                : "border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/30 bg-white dark:bg-[#0b1f38]"
                 }`}
             >
               <div
-                className="text-sm truncate"
+                className="text-sm truncate text-slate-800 dark:text-white/85"
                 style={{ fontFamily: overlay.fontFamily }}
               >
                 {overlay.text}
               </div>
-              <div className="text-[10px] text-gray-400 mt-1">
-                {overlay.fontSize}px • Click to edit
+              <div className="text-[10px] text-slate-500 dark:text-white/50 mt-1">
+                {overlay.fontSize}px - Click to edit
               </div>
             </button>
           ))}
@@ -1291,24 +1291,24 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+          className="bg-white dark:bg-[#0b1f38] rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-xl font-semibold text-gray-900">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/10">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
               Final Preview
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors text-slate-600 dark:text-white/70"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Preview */}
-          <div className="p-6 flex justify-center bg-gray-100">
+          <div className="p-6 flex justify-center bg-slate-100 dark:bg-[#001a38]">
             {previewImage ? (
               <img
                 src={previewImage}
@@ -1323,14 +1323,14 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
           </div>
 
           {/* Export Options */}
-          <div className="p-4 border-t bg-gray-50">
+          <div className="p-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#071a30]">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-700 font-medium">Resolution:</span>
+                <span className="text-sm text-slate-700 dark:text-white/70 font-medium">Resolution:</span>
                 <select
                   value={selectedResolution}
                   onChange={(e) => setSelectedResolution(e.target.value)}
-                  className="px-3 py-1.5 rounded-lg border border-gray-300 text-sm text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm text-slate-800 dark:text-white bg-white dark:bg-[#001a38] focus:outline-none focus:ring-2 focus:ring-teal-500"
                 >
                   {Object.entries(EXPORT_RESOLUTIONS).map(([key, res]) => (
                     <option key={key} value={key}>
@@ -1345,12 +1345,12 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
                   variant="outline"
                   onClick={() => handleDownload("png")}
                   disabled={isExporting}
-                  className="bg-white text-[#002147] border-gray-200 hover:bg-gray-50"
+                  className="bg-white dark:bg-white/10 text-[#002147] dark:text-white border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/20"
                 >
                   {isExporting ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin text-[#002147]" />
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin text-[#002147] dark:text-white" />
                   ) : (
-                    <Download className="w-4 h-4 mr-2 text-[#002147]" />
+                    <Download className="w-4 h-4 mr-2 text-[#002147] dark:text-white" />
                   )}
                   Download PNG
                 </Button>
@@ -1358,9 +1358,9 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
                   variant="outline"
                   onClick={() => handleDownload("jpg")}
                   disabled={isExporting}
-                  className="bg-white text-[#002147] border-gray-200 hover:bg-gray-50"
+                  className="bg-white dark:bg-white/10 text-[#002147] dark:text-white border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/20"
                 >
-                  <Download className="w-4 h-4 mr-2 text-[#002147]" />
+                  <Download className="w-4 h-4 mr-2 text-[#002147] dark:text-white" />
                   Download JPG
                 </Button>
               </div>
@@ -1841,18 +1841,18 @@ const VisionBoardEditorPro = () => {
   };
 
   return (
-    <div className="h-screen lms-dashboard-bg overflow-hidden flex">
+    <div className="h-screen lms-dashboard-bg bg-slate-50 dark:bg-[#001229] overflow-hidden flex">
       <DashboardSidebar />
 
       <div className="flex-1 h-full flex flex-col w-full relative pt-4 md:pt-0">
         {/* Header */}
-        <div className="bg-[#001a38]/80 backdrop-blur-md border-b border-white/10 px-4 py-3 flex items-center justify-between gap-4 w-full flex-shrink-0 z-30">
+        <div className="bg-white/85 dark:bg-[#001a38]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 px-4 py-3 flex items-center justify-between gap-4 w-full flex-shrink-0 z-30">
           <div className="flex items-center gap-4 min-w-0 flex-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate("/vision-board-pro/gallery")}
-              className="px-3 text-white/70 hover:text-white hover:bg-white/10"
+              className="px-3 text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-white/70 dark:hover:text-white dark:hover:bg-white/10"
             >
               <ChevronLeft className="w-4 h-4 sm:mr-1" />
               <span className="hidden sm:inline">Back</span>
@@ -1867,7 +1867,7 @@ const VisionBoardEditorPro = () => {
                   handleInstantCheck(val);
                 }}
                 maxLength={TITLE_CHAR_LIMIT}
-                className="border-0 font-semibold text-lg focus-visible:ring-0 w-full min-w-0 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30 p-0 h-auto"
+                className="border-0 font-semibold text-lg focus-visible:ring-0 w-full min-w-0 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 p-0 h-auto"
                 placeholder="Board title..."
               />
               <span className={`text-xs font-medium ${title.length >= TITLE_CHAR_LIMIT ? "text-red-500 dark:text-red-300" : "text-slate-400 dark:text-white/40"}`}>
@@ -1908,7 +1908,7 @@ const VisionBoardEditorPro = () => {
 
         <div className="flex flex-col md:flex-row flex-1 min-h-0 w-full overflow-hidden">
           {/* Mobile Panel Toggle */}
-          <div className="md:hidden flex border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#001a38]/80 backdrop-blur-md z-20 overflow-x-auto flex-shrink-0">
+          <div className="md:hidden flex border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#001a38]/90 backdrop-blur-md z-20 overflow-x-auto flex-shrink-0">
             <button
               onClick={() => setActivePanel("templates")}
               className={`flex-1 min-w-[70px] px-3 py-3 text-xs font-medium transition-colors ${activePanel === "templates"
@@ -1952,7 +1952,26 @@ const VisionBoardEditorPro = () => {
           </div>
 
           {/* Left Panel - Desktop */}
-          <div className="hidden md:block w-72 bg-white/90 dark:bg-[#001a38]/60 backdrop-blur-xl border-r border-slate-200 dark:border-white/10 h-full overflow-y-auto overflow-x-hidden flex-shrink-0 custom-scrollbar">
+          <div className="hidden md:block w-72 bg-white/95 dark:bg-[#001a38]/80 backdrop-blur-xl border-r border-slate-200 dark:border-white/10 h-full overflow-y-auto overflow-x-hidden flex-shrink-0 custom-scrollbar">
+            <div className="p-4 border-b border-slate-200 dark:border-white/10">
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="w-full bg-[#30919D] hover:bg-[#267a84] text-white font-semibold shadow-[0_0_12px_rgba(48,145,157,0.35)] hover:shadow-[0_0_18px_rgba(48,145,157,0.5)]"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save
+                  </>
+                )}
+              </Button>
+            </div>
             {/* Panel Tabs */}
             <div className="grid grid-cols-4 border-b border-slate-200 dark:border-white/10">
               <button
@@ -2206,12 +2225,12 @@ const VisionBoardEditorPro = () => {
           </div>
 
           {/* Mobile Panel Content - Collapsible */}
-          <div className="md:hidden bg-[#001a38]/80 backdrop-blur-md border-b border-white/10 max-h-[40vh] overflow-y-auto">
+          <div className="md:hidden bg-white/95 dark:bg-[#001a38]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 max-h-[40vh] overflow-y-auto">
             <div className="p-4">
               {/* Templates Panel */}
               {activePanel === "templates" && (
                 <div className="space-y-3">
-                  <h3 className="text-xs font-semibold text-white mb-3">Grid Layouts</h3>
+                  <h3 className="text-xs font-semibold text-slate-700 dark:text-white mb-3">Grid Layouts</h3>
                   <TemplateSelector
                     selectedTemplate={templateId}
                     onSelect={handleTemplateChange}
@@ -2235,15 +2254,15 @@ const VisionBoardEditorPro = () => {
               {activePanel === "style" && (
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-xs font-semibold text-white mb-2">Background Color</h3>
+                    <h3 className="text-xs font-semibold text-slate-700 dark:text-white mb-2">Background Color</h3>
                     <div className="grid grid-cols-8 gap-2">
                       {BACKGROUND_COLORS.map((color) => (
                         <button
                           key={color}
                           onClick={() => setBackgroundColor(color)}
                           className={`w-8 h-8 rounded-lg border-2 transition-transform ${backgroundColor === color
-                            ? "border-white scale-110 ring-2 ring-white/20"
-                            : "border-white/10"
+                            ? "border-slate-400 dark:border-white scale-110 ring-2 ring-slate-200 dark:ring-white/20"
+                            : "border-slate-200 dark:border-white/10"
                             }`}
                           style={{ backgroundColor: color }}
                         />
@@ -2251,7 +2270,7 @@ const VisionBoardEditorPro = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xs font-semibold text-white mb-2">Border Radius</h3>
+                    <h3 className="text-xs font-semibold text-slate-700 dark:text-white mb-2">Border Radius</h3>
                     <div className="flex flex-wrap gap-2">
                       {BORDER_RADIUS_PRESETS.map((preset) => (
                         <button
@@ -2259,7 +2278,7 @@ const VisionBoardEditorPro = () => {
                           onClick={() => setBorderRadius(preset.value)}
                           className={`px-3 py-1.5 text-[10px] rounded-lg border ${borderRadius === preset.value
                             ? "bg-[#30919D] border-[#30919D] text-white font-medium"
-                            : "bg-transparent border-white/10 text-white/60"
+                            : "bg-transparent border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/60"
                             }`}
                         >
                           {preset.label}
@@ -2268,7 +2287,7 @@ const VisionBoardEditorPro = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-xs font-semibold text-white mb-2">Gap Size</h3>
+                    <h3 className="text-xs font-semibold text-slate-700 dark:text-white mb-2">Gap Size</h3>
                     <div className="flex flex-wrap gap-2">
                       {GAP_PRESETS.map((preset) => (
                         <button
@@ -2276,7 +2295,7 @@ const VisionBoardEditorPro = () => {
                           onClick={() => setGap(preset.value)}
                           className={`px-3 py-1.5 text-[10px] rounded-lg border ${gap === preset.value
                             ? "bg-[#30919D] border-[#30919D] text-white font-medium"
-                            : "bg-transparent border-white/10 text-white/60"
+                            : "bg-transparent border-slate-200 dark:border-white/10 text-slate-500 dark:text-white/60"
                             }`}
                         >
                           {preset.label}
@@ -2290,7 +2309,7 @@ const VisionBoardEditorPro = () => {
               {/* Settings Panel */}
               {activePanel === "settings" && (
                 <div className="space-y-3">
-                  <h3 className="text-xs font-semibold text-white mb-2">Canvas Size</h3>
+                  <h3 className="text-xs font-semibold text-slate-700 dark:text-white mb-2">Canvas Size</h3>
                   <div className="grid grid-cols-3 gap-2">
                     {Object.entries(ASPECT_RATIOS).map(([key, ratio]) => (
                       <button
@@ -2298,7 +2317,7 @@ const VisionBoardEditorPro = () => {
                         onClick={() => setAspectRatio(key)}
                         className={`px-2 py-2 text-[10px] rounded-lg text-center border ${aspectRatio === key
                           ? "bg-[#30919D]/20 text-[#30919D] font-medium border-[#30919D]"
-                          : "bg-white/5 text-white/50 border-transparent"
+                          : "bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-white/50 border-transparent"
                           }`}
                       >
                         {key}
@@ -2311,14 +2330,14 @@ const VisionBoardEditorPro = () => {
           </div>
 
           {/* Main Canvas Area */}
-          <div className="flex-1 flex flex-col min-h-0 min-w-0 bg-transparent relative">
+          <div className="flex-1 flex flex-col min-h-0 min-w-0 bg-gradient-to-br from-white via-slate-50 to-slate-100 dark:from-[#001229] dark:via-[#001a38] dark:to-[#001229] relative">
             {/* Scrollable Canvas Container */}
             <div className="flex-1 overflow-auto p-2 sm:p-3 md:p-6 pt-4 sm:pt-6 md:pt-8 w-full custom-scrollbar">
               <div className="flex flex-col items-center min-h-full w-full justify-center">
                 {/* Canvas */}
                 <div
                   ref={canvasRef}
-                  className="relative shadow-2xl flex-shrink-0 max-w-full transition-all duration-300 ease-in-out"
+                  className="relative flex-shrink-0 max-w-full transition-all duration-300 ease-in-out border border-slate-200 dark:border-white/10 shadow-[0_20px_50px_-12px_rgba(2,8,23,0.25)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.6)]"
                   style={{
                     width: displayWidth,
                     height: displayHeight,
@@ -2328,7 +2347,6 @@ const VisionBoardEditorPro = () => {
                     overflow: "hidden",
                     position: "relative",
                     isolation: "isolate",
-                    boxShadow: "0 20px 50px -12px rgba(0, 0, 0, 0.5)"
                   }}
                   onClick={() => {
                     setSelectedSlot(null);
@@ -2387,8 +2405,8 @@ const VisionBoardEditorPro = () => {
 
                 {/* Instructions */}
                 {Object.keys(images).length === 0 && (
-                  <div className="mt-8 text-center bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-white/10 max-w-sm">
-                    <p className="text-sm text-white/60 font-medium">
+                  <div className="mt-8 text-center bg-white/80 dark:bg-white/5 backdrop-blur-sm rounded-xl p-4 border border-slate-200 dark:border-white/10 max-w-sm">
+                    <p className="text-sm text-slate-600 dark:text-white/60 font-medium">
                       Select a slot to add images, or drag & drop to get started.
                       Use the tools panel to customize your vision board.
                     </p>
@@ -2398,46 +2416,46 @@ const VisionBoardEditorPro = () => {
             </div>
 
             {/* Fixed Bottom Controls */}
-            <div className="flex-shrink-0 p-2 sm:p-4 bg-[#001a38]/90 backdrop-blur-md border-t border-white/10 relative z-20">
+            <div className="flex-shrink-0 p-2 sm:p-4 bg-white/85 dark:bg-[#001a38]/90 backdrop-blur-md border-t border-slate-200 dark:border-white/10 relative z-20">
               {/* Image Controls - Touch-friendly */}
               {selectedSlot !== null && images[selectedSlot] && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/5 border border-white/10 rounded-xl p-2 sm:p-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-4 shadow-lg backdrop-blur-sm"
+                  className="bg-white/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-2 sm:p-3 flex flex-wrap items-center justify-center gap-1.5 sm:gap-4 shadow-lg backdrop-blur-sm"
                 >
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className="text-xs sm:text-sm text-white/50 hidden sm:inline">Zoom</span>
+                    <span className="text-xs sm:text-sm text-slate-500 dark:text-white/50 hidden sm:inline">Zoom</span>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleZoom("out")}
-                      className="h-9 w-9 sm:h-8 sm:w-8 p-0 active:scale-95 transition-transform bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/30"
+                      className="h-9 w-9 sm:h-8 sm:w-8 p-0 active:scale-95 transition-transform bg-white/80 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/30"
                     >
                       <ZoomOut className="w-4 h-4 sm:w-4 sm:h-4" />
                     </Button>
-                    <span className="text-xs sm:text-sm font-medium w-12 sm:w-12 text-center text-white/90 font-mono bg-white/5 py-1 rounded">
+                    <span className="text-xs sm:text-sm font-medium w-12 sm:w-12 text-center text-slate-700 dark:text-white/90 font-mono bg-slate-100 dark:bg-white/5 py-1 rounded">
                       {Math.round((images[selectedSlot]?.scale || 1) * 100)}%
                     </span>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleZoom("in")}
-                      className="h-9 w-9 sm:h-8 sm:w-8 p-0 active:scale-95 transition-transform bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/30"
+                      className="h-9 w-9 sm:h-8 sm:w-8 p-0 active:scale-95 transition-transform bg-white/80 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/30"
                     >
                       <ZoomIn className="w-4 h-4 sm:w-4 sm:h-4" />
                     </Button>
                   </div>
 
-                  <div className="hidden sm:block w-px h-8 bg-white/10" />
+                  <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-white/10" />
 
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className="text-xs sm:text-sm text-white/50 hidden sm:inline">Rotate</span>
+                    <span className="text-xs sm:text-sm text-slate-500 dark:text-white/50 hidden sm:inline">Rotate</span>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleRotate("ccw")}
-                      className="h-9 w-9 sm:h-8 sm:w-8 p-0 active:scale-95 transition-transform bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/30"
+                      className="h-9 w-9 sm:h-8 sm:w-8 p-0 active:scale-95 transition-transform bg-white/80 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/30"
                     >
                       <RotateCcw className="w-4 h-4 sm:w-4 sm:h-4" />
                     </Button>
@@ -2445,25 +2463,25 @@ const VisionBoardEditorPro = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleRotate("cw")}
-                      className="h-9 w-9 sm:h-8 sm:w-8 p-0 active:scale-95 transition-transform bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/30"
+                      className="h-9 w-9 sm:h-8 sm:w-8 p-0 active:scale-95 transition-transform bg-white/80 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/30"
                     >
                       <RotateCw className="w-4 h-4 sm:w-4 sm:h-4" />
                     </Button>
                   </div>
 
-                  <div className="hidden sm:block w-px h-8 bg-white/10" />
+                  <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-white/10" />
 
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleResetPosition}
-                    className="h-10 sm:h-8 px-3 sm:px-3 active:scale-95 transition-transform bg-white/5 border-white/10 text-white/80 hover:text-white hover:bg-white/10"
+                    className="h-10 sm:h-8 px-3 sm:px-3 active:scale-95 transition-transform bg-white/80 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/80 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
                   >
                     <RefreshCw className="w-3.5 h-3.5 sm:w-3.5 sm:h-3.5 sm:mr-2" />
                     <span className="hidden sm:inline">Reset</span>
                   </Button>
 
-                  <div className="hidden md:block text-xs text-white/40 ml-2">
+                  <div className="hidden md:block text-xs text-slate-500 dark:text-white/40 ml-2">
                     Drag image to reposition
                   </div>
                 </motion.div>
@@ -2474,12 +2492,12 @@ const VisionBoardEditorPro = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white/5 border border-white/10 rounded-xl p-2 sm:p-3 shadow-lg backdrop-blur-sm"
+                  className="bg-white/90 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-2 sm:p-3 shadow-lg backdrop-blur-sm"
                 >
                   <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
                     {/* Font Size */}
                     <div className="flex items-center gap-1 sm:gap-2">
-                      <span className="text-xs sm:text-sm text-white/50">Size</span>
+                      <span className="text-xs sm:text-sm text-slate-500 dark:text-white/50">Size</span>
                       <input
                         type="range"
                         min="12"
@@ -2490,18 +2508,18 @@ const VisionBoardEditorPro = () => {
                             fontSize: parseInt(e.target.value),
                           })
                         }
-                        className="w-16 sm:w-24 h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#30919D]"
+                        className="w-16 sm:w-24 h-1.5 bg-slate-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#30919D]"
                       />
-                      <span className="text-xs sm:text-sm font-medium w-8 sm:w-10 text-white/90 bg-white/5 py-1 rounded text-center">
+                      <span className="text-xs sm:text-sm font-medium w-8 sm:w-10 text-slate-700 dark:text-white/90 bg-slate-100 dark:bg-white/5 py-1 rounded text-center">
                         {textOverlays[selectedTextId]?.fontSize || 32}
                       </span>
                     </div>
 
-                    <div className="hidden sm:block w-px h-8 bg-white/10" />
+                    <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-white/10" />
 
                     {/* Color */}
                     <div className="flex items-center gap-1 sm:gap-2">
-                      <span className="text-xs sm:text-sm text-white/50">Color</span>
+                      <span className="text-xs sm:text-sm text-slate-500 dark:text-white/50">Color</span>
                       <input
                         type="color"
                         value={textOverlays[selectedTextId]?.color || "#000000"}
@@ -2514,11 +2532,11 @@ const VisionBoardEditorPro = () => {
                       />
                     </div>
 
-                    <div className="hidden sm:block w-px h-8 bg-white/10" />
+                    <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-white/10" />
 
                     {/* Font Selection */}
                     <div className="flex items-center gap-1 sm:gap-2">
-                      <span className="text-xs sm:text-sm text-white/50 hidden sm:inline">Font</span>
+                      <span className="text-xs sm:text-sm text-slate-500 dark:text-white/50 hidden sm:inline">Font</span>
                       <select
                         value={
                           textOverlays[selectedTextId]?.fontFamily ||
@@ -2529,7 +2547,7 @@ const VisionBoardEditorPro = () => {
                             fontFamily: e.target.value,
                           })
                         }
-                        className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-white/10 bg-[#001a38] text-white rounded-lg focus:ring-1 focus:ring-[#30919D] focus:outline-none max-w-[120px] sm:max-w-none"
+                        className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-slate-200 dark:border-white/10 bg-white dark:bg-[#001a38] text-slate-700 dark:text-white rounded-lg focus:ring-1 focus:ring-[#30919D] focus:outline-none max-w-[120px] sm:max-w-none"
                         style={{
                           fontFamily:
                             textOverlays[selectedTextId]?.fontFamily ||
@@ -2550,11 +2568,11 @@ const VisionBoardEditorPro = () => {
                       </select>
                     </div>
 
-                    <div className="hidden sm:block w-px h-8 bg-white/10" />
+                    <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-white/10" />
 
                     {/* Effect Selection */}
                     <div className="hidden sm:flex items-center gap-2">
-                      <span className="text-sm text-white/50">Effect</span>
+                      <span className="text-sm text-slate-500 dark:text-white/50">Effect</span>
                       <select
                         value={textOverlays[selectedTextId]?.effect || "none"}
                         onChange={(e) =>
@@ -2562,7 +2580,7 @@ const VisionBoardEditorPro = () => {
                             effect: e.target.value,
                           })
                         }
-                        className="px-2 py-1.5 text-sm border border-white/10 bg-[#001a38] text-white rounded-lg focus:ring-1 focus:ring-[#30919D] focus:outline-none"
+                        className="px-2 py-1.5 text-sm border border-slate-200 dark:border-white/10 bg-white dark:bg-[#001a38] text-slate-700 dark:text-white rounded-lg focus:ring-1 focus:ring-[#30919D] focus:outline-none"
                       >
                         <option value="none">None</option>
                         {TEXT_EFFECTS.map((effect) => (
@@ -2573,13 +2591,13 @@ const VisionBoardEditorPro = () => {
                       </select>
                     </div>
 
-                    <div className="hidden sm:block w-px h-8 bg-white/10" />
+                    <div className="hidden sm:block w-px h-8 bg-slate-200 dark:bg-white/10" />
 
                     {/* Delete Button */}
                     <Button
                       variant="outline"
                       size="sm"
-                      className="text-red-400 hover:text-red-300 bg-white/5 border-white/10 hover:bg-white/10 h-8 min-h-[34px] px-3 sm:px-4"
+                    className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 h-8 min-h-[34px] px-3 sm:px-4"
                       onClick={() => {
                         handleDeleteText(selectedTextId);
                         setSelectedTextId(null);
@@ -2590,17 +2608,17 @@ const VisionBoardEditorPro = () => {
                     </Button>
                   </div>
 
-                  <div className="text-xs text-white/40 mt-2 text-center">
-                    Click text to edit • Drag to reposition
+                  <div className="text-xs text-slate-500 dark:text-white/40 mt-2 text-center">
+                    Click text to edit - Drag to reposition
                   </div>
                 </motion.div>
               )}
 
               {/* No selection message */}
               {selectedSlot === null && !selectedTextId && (
-                <div className="text-center text-white/30 py-4 flex flex-col items-center justify-center gap-2">
-                  <div className="p-3 rounded-full bg-white/5">
-                    <Grid3X3 className="w-5 h-5 opacity-50" />
+                <div className="text-center text-slate-500 dark:text-white/30 py-4 flex flex-col items-center justify-center gap-2">
+                  <div className="p-3 rounded-full bg-slate-100 dark:bg-white/5">
+                    <Grid3X3 className="w-5 h-5 opacity-60" />
                   </div>
                   <p className="text-sm font-medium">Select an image or text to see tools</p>
                 </div>
