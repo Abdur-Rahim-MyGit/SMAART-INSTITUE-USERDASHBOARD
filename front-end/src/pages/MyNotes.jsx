@@ -181,7 +181,8 @@ const MyNotes = () => {
                                             </span>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}
-                                                className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors"
+                                                title="Delete note"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -246,8 +247,22 @@ const MyNotes = () => {
 
                                 {/* Modal Footer */}
                                 <div className="p-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-black/20">
-                                    <div className="text-xs text-slate-400">
-                                        {currentNote.updatedAt && `Last edited: ${formatDate(currentNote.updatedAt)}`}
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-xs text-slate-400">
+                                            {currentNote.updatedAt && `Last edited: ${formatDate(currentNote.updatedAt)}`}
+                                        </div>
+                                        {currentNote.id && (
+                                            <Button
+                                                onClick={() => {
+                                                    handleDeleteNote(currentNote.id);
+                                                    setShowModal(false);
+                                                }}
+                                                variant="outline"
+                                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-2" /> Delete Note
+                                            </Button>
+                                        )}
                                     </div>
                                     <Button onClick={handleSaveNote} className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">
                                         <Save className="w-4 h-4 mr-2" /> Save Note

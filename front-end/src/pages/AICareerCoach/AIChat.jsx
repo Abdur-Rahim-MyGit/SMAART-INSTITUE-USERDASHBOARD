@@ -6,6 +6,7 @@ import DashboardSidebar from '@/components/DashboardSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { toast } from 'sonner';
+import ReactMarkdown from 'react-markdown';
 
 const AIChat = () => {
     const [messages, setMessages] = useState([]);
@@ -112,11 +113,11 @@ const AIChat = () => {
                         {/* Header */}
                         <div className="mb-6 px-4">
                             <button
-                                onClick={() => navigate('/dashboard/ai-career-coach')}
+                                onClick={() => navigate('/dashboard/smaart-toolkit')}
                                 className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors mb-4"
                             >
                                 <ArrowLeft className="w-4 h-4" />
-                                <span className="font-semibold">Back to AI Career Coach</span>
+                                <span className="font-semibold">Back to SMAART Toolkit</span>
                             </button>
 
                             <div className="flex items-center gap-3">
@@ -165,7 +166,33 @@ const AIChat = () => {
                                                         ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800'
                                                         : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200'
                                                     }`}>
-                                                    <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                                                    {message.role === 'user' ? (
+                                                        <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                                                    ) : (
+                                                        <div className="prose prose-sm max-w-none dark:prose-invert">
+                                                            <ReactMarkdown
+                                                                components={{
+                                                                    p: ({ node, ...props }) => <p className="mb-2 last:mb-0 leading-relaxed" {...props} />,
+                                                                    strong: ({ node, ...props }) => <strong className="font-bold text-slate-900 dark:text-white" {...props} />,
+                                                                    ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
+                                                                    ol: ({ node, ...props }) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
+                                                                    li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
+                                                                    h1: ({ node, ...props }) => <h1 className="text-lg font-bold mb-2" {...props} />,
+                                                                    h2: ({ node, ...props }) => <h2 className="text-base font-bold mb-2" {...props} />,
+                                                                    h3: ({ node, ...props }) => <h3 className="text-sm font-bold mb-1" {...props} />,
+                                                                    code: ({ node, inline, ...props }) =>
+                                                                        inline ? (
+                                                                            <code className="bg-slate-200 dark:bg-slate-700 px-1 py-0.5 rounded text-xs font-mono" {...props} />
+                                                                        ) : (
+                                                                            <code className="block bg-slate-200 dark:bg-slate-700 p-2 rounded text-xs font-mono overflow-x-auto" {...props} />
+                                                                        ),
+                                                                    a: ({ node, ...props }) => <a className="text-blue-600 dark:text-blue-400 hover:underline" {...props} target="_blank" rel="noopener noreferrer" />
+                                                                }}
+                                                            >
+                                                                {message.content}
+                                                            </ReactMarkdown>
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 <p className="text-xs text-slate-400 mt-1 px-2">
                                                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

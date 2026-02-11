@@ -10,8 +10,10 @@ import {
     Briefcase,
     GraduationCap,
     Award,
-    Code
+    Code,
+    Printer
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
@@ -69,6 +71,41 @@ const ResumeBuilder = () => {
             navigator.clipboard.writeText(resumeContent);
             toast.success('Resume content copied to clipboard!');
         }
+    };
+
+    const handlePrint = () => {
+        const printContent = document.getElementById('resume-preview');
+        if (!printContent) return;
+
+        const printWindow = window.open('', '', 'width=800,height=900');
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>SMAART Resume - ${targetRole}</title>
+                    <style>
+                        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 40px; }
+                        h1, h2, h3 { color: #1a1a1a; margin-top: 1.5em; margin-bottom: 0.5em; }
+                        h1 { font-size: 24px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                        h2 { font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+                        ul { padding-left: 20px; }
+                        li { margin-bottom: 5px; }
+                        p { margin-bottom: 10px; }
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContent.innerHTML}
+                </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 250);
     };
 
     if (loading) {
@@ -185,20 +222,29 @@ const ResumeBuilder = () => {
                                                 <p className="text-sm text-white/80">For: {targetRole}</p>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={handleCopyToClipboard}
-                                            className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-colors flex items-center gap-2"
-                                        >
-                                            <Download className="w-4 h-4" />
-                                            Copy
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={handlePrint}
+                                                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                                            >
+                                                <Printer className="w-4 h-4" />
+                                                Print / PDF
+                                            </button>
+                                            <button
+                                                onClick={handleCopyToClipboard}
+                                                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                                Copy
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="p-6 md:p-8">
                                     <div className="prose dark:prose-invert max-w-none">
-                                        <div className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed font-mono text-sm bg-slate-50 dark:bg-slate-900 p-6 rounded-lg border border-slate-200 dark:border-slate-700">
-                                            {resumeContent}
+                                        <div id="resume-preview" className="text-slate-700 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-900 p-8 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                                            <ReactMarkdown>{resumeContent}</ReactMarkdown>
                                         </div>
                                     </div>
 

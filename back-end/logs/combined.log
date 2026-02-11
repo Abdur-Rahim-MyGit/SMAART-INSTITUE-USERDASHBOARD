@@ -188,3 +188,21 @@
 {"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-09 16:05:07"}
 {"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-02-09 16:05:59"}
 {"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-09 16:05:59"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-02-09 18:16:16"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-09 18:16:17"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-02-10 17:22:03"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-10 17:22:03"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-02-10 17:25:02"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-02-10 17:25:02"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-10 17:25:03"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-02-11 11:08:58"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-11 11:08:59"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-02-11 11:13:40"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-02-11 11:13:40"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-11 11:13:41"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-02-11 11:14:08"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-11 11:14:08"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-02-11 11:24:52"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-02-11 11:24:53"}
+{"level":"warn","message":"Route /api/coach-sessions?student=695a3fea487c0c5aa91703be not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-02-11 11:29:36","url":"/api/coach-sessions?student=695a3fea487c0c5aa91703be"}
+{"level":"warn","message":"Route /api/coach-sessions?student=695a3fea487c0c5aa91703be not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-02-11 11:35:06","url":"/api/coach-sessions?student=695a3fea487c0c5aa91703be"}
