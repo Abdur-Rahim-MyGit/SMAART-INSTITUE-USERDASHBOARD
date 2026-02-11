@@ -25,6 +25,7 @@ const features = [
         description: 'Have a conversation with your AI career coach. Get personalized advice, ask questions, and receive guidance 24/7.',
         icon: MessageSquare,
         path: '/dashboard/ai-career-coach/chat',
+        state: null,
         color: 'from-purple-500 to-indigo-600',
         iconBg: 'bg-purple-100 dark:bg-purple-900/30',
         iconColor: 'text-purple-600 dark:text-purple-400',
@@ -36,7 +37,8 @@ const features = [
         title: 'Profile Analysis',
         description: 'Get AI-powered insights into your strengths, weaknesses, and career potential based on your skills and experience.',
         icon: User,
-        path: '/dashboard/ai-career-coach/profile',
+        path: '/dashboard/profile-analysis',
+        state: { tab: 'profile' },
         color: 'from-blue-500 to-cyan-600',
         iconBg: 'bg-blue-100 dark:bg-blue-900/30',
         iconColor: 'text-blue-600 dark:text-blue-400',
@@ -48,7 +50,8 @@ const features = [
         title: 'Career Paths',
         description: 'Discover personalized career recommendations tailored to your skills, interests, and professional goals.',
         icon: Target,
-        path: '/dashboard/ai-career-coach/recommendations',
+        path: '/dashboard/profile-analysis',
+        state: { tab: 'career-paths' },
         color: 'from-emerald-500 to-teal-600',
         iconBg: 'bg-emerald-100 dark:bg-emerald-900/30',
         iconColor: 'text-emerald-600 dark:text-emerald-400',
@@ -60,7 +63,8 @@ const features = [
         title: 'Skill Gap Analysis',
         description: 'Identify the exact skills you need to develop for your target role and get a prioritized learning roadmap.',
         icon: TrendingUp,
-        path: '/dashboard/ai-career-coach/skill-gap',
+        path: '/dashboard/profile-analysis',
+        state: { tab: 'skill-gap' },
         color: 'from-amber-500 to-orange-600',
         iconBg: 'bg-amber-100 dark:bg-amber-900/30',
         iconColor: 'text-amber-600 dark:text-amber-400',
@@ -72,7 +76,8 @@ const features = [
         title: 'Learning Plan',
         description: 'Generate a comprehensive 6-month learning plan with courses, projects, and milestones to achieve your goals.',
         icon: BookOpen,
-        path: '/dashboard/ai-career-coach/learning-plan',
+        path: '/dashboard/profile-analysis',
+        state: { tab: 'learning-plan' },
         color: 'from-rose-500 to-pink-600',
         iconBg: 'bg-rose-100 dark:bg-rose-900/30',
         iconColor: 'text-rose-600 dark:text-rose-400',
@@ -84,7 +89,8 @@ const features = [
         title: 'Resume Builder',
         description: 'Create ATS-optimized resume content powered by AI, tailored specifically for your target role.',
         icon: FileText,
-        path: '/dashboard/ai-career-coach/resume',
+        path: '/dashboard/resume-builder',
+        state: null,
         color: 'from-violet-500 to-purple-600',
         iconBg: 'bg-violet-100 dark:bg-violet-900/30',
         iconColor: 'text-violet-600 dark:text-violet-400',
@@ -102,7 +108,7 @@ const FeatureCard = ({ feature, index }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            onClick={() => navigate(feature.path)}
+            onClick={() => navigate(feature.path, { state: feature.state })}
             className="group relative cursor-pointer"
         >
             {/* Glow Effect */}

@@ -1,55 +1,87 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Search, Filter } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Filter, BookOpen, Bookmark, ArrowRight, Loader2 } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
+import { toast } from "sonner";
 
 const Library = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState("all");
 
-  const libraryCategories = [
-    {
-      id: 1,
-      title: "Your Saved Library",
-      description: "Access your personal collection",
-      color: "from-amber-700 to-amber-900",
-      icon: "📚",
-      count: "24 items"
-    },
-    {
-      id: 2,
-      title: "Mindful Practices",
-      description: "Meditation and wellness resources",
-      color: "from-rose-600 to-rose-800",
-      icon: "🧘",
-      count: "18 items"
-    },
-    {
-      id: 3,
-      title: "Library of Things",
-      description: "Tools and resources collection",
-      color: "from-[#30919D] to-[#002147]",
-      icon: "🔧",
-      count: "42 items"
-    },
-    {
-      id: 4,
-      title: "Library Bag",
-      description: "Quick access favorites",
-      color: "from-emerald-600 to-emerald-800",
-      icon: "🎒",
-      count: "15 items"
-    }
+  const categories = [
+    { id: "all", label: "All Books" },
+    { id: "business", label: "Business" },
+    { id: "psychology", label: "Psychology" },
+    { id: "technology", label: "Technology" }
   ];
 
-  return (
-    <div className="min-h-screen">
-      <DashboardSidebar />
+  // Default initial search
+  useEffect(() => {
+    fetchBooks("success");
+  }, []);
 
+  const fetchBooks = async (query) => {
+    setLoading(true);
+    try {
+      // Use Google Books API
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=12&key=`);
+      const data = await res.json();
+
+      if (data.items) {
+        const formatted = data.items.map(item => ({
+          id: item.id,
+          title: item.volumeInfo.title,
+          author: item.volumeInfo.authors?.[0] || "Unknown Author",
+          category: item.volumeInfo.categories?.[0] || "General",
+          rating: item.volumeInfo.averageRating || 4.5,
+          image: item.volumeInfo.imageLinks?.thumbnail?.replace('http:', 'https:') || "https://placehold.co/400x600?text=No+Cover",
+          description: item.volumeInfo.description,
+          link: item.volumeInfo.previewLink
+        }));
+        setBooks(formatted);
+      } else {
+        setBooks([]);
+      }
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      toast.error("Failed to load library resources");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
+    fetchBooks(searchTerm);
+  };
+
+  const filteredBooks = category === "all"
+    ? books
+    : books.filter(book => book.category.toLowerCase().includes(category));
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <DashboardSidebar />
       <div className="min-h-screen transition-all duration-300">
         <DashboardHeader />
 
         <main className="container mx-auto px-4 md:px-6 py-8">
+<<<<<<< HEAD
+          <div className="mb-8">
+            <motion.h1
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-4xl font-display font-bold text-slate-800 dark:text-white mb-2"
+            >
+              Knowledge Library
+            </motion.h1>
+            <p className="text-slate-600 dark:text-slate-400">Unlock a curated repository of knowledge. Explore essential books and articles tailored to accelerate your growth.</p>
+          </div>
+=======
           {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -61,18 +93,35 @@ const Library = () => {
             </h1>
             <p className="text-gray-600 dark:text-slate-400">Explore and manage your learning resources</p>
           </motion.div>
+>>>>>>> origin/main
 
-          {/* Search and Filter Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-6 sm:mb-8 flex flex-col sm:flex-row gap-3 sm:gap-4"
-          >
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
+          {/* Search & Filter */}
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            <form onSubmit={handleSearch} className="flex-1 relative">
               <input
                 type="text"
+<<<<<<< HEAD
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by title, author, or topic..."
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all"
+              />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            </form>
+
+            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+              {categories.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => setCategory(cat.id)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${category === cat.id
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
+                    }`}
+                >
+                  {cat.label}
+                </button>
+=======
                 placeholder="Search library..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -186,9 +235,78 @@ const Library = () => {
                     <p className="text-xs sm:text-sm text-gray-600 dark:text-slate-400">Learning material</p>
                   </div>
                 </motion.div>
+>>>>>>> origin/main
               ))}
             </div>
-          </motion.div>
+          </div>
+
+          {/* Content Grid */}
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                <div key={i} className="h-96 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />
+              ))}
+            </div>
+          ) : filteredBooks.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <AnimatePresence>
+                {filteredBooks.map((book, index) => (
+                  <motion.div
+                    key={book.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="group relative bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700"
+                  >
+                    <div className="aspect-[2/3] overflow-hidden bg-slate-100 relative">
+                      <img
+                        src={book.image}
+                        alt={book.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                        <a
+                          href={book.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full bg-white/20 backdrop-blur-md text-white py-2 rounded-lg font-medium text-center hover:bg-white/30 transition-colors flex items-center justify-center gap-2"
+                        >
+                          Preview <ArrowRight className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="p-4 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                          {book.category}
+                        </span>
+                        <div className="flex items-center gap-1 text-yellow-500 text-xs font-bold">
+                          <Star className="w-3 h-3 fill-current" />
+                          {book.rating}
+                        </div>
+                      </div>
+
+                      <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {book.title}
+                      </h3>
+
+                      <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">
+                        {book.author}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <BookOpen className="w-16 h-16 text-slate-300 mb-4" />
+              <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300">No books found</h3>
+              <p className="text-slate-500">Try adjusting your search terms</p>
+            </div>
+          )}
         </main>
       </div>
     </div>

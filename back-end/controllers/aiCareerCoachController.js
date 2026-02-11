@@ -88,14 +88,23 @@ exports.analyzeProfile = async (req, res) => {
         // Construct Rich Profile Object from Registration Data
         const richProfile = {
             fullName: registration?.fullName || 'User',
-            education: registration?.higherEducation
-                ? `${registration.higherEducation.degree} in ${registration.higherEducation.specialization} (${registration.higherEducation.institutionName})`
-                : (profile?.education || 'Not specified'),
 
-            skills: profile?.skills || [], // Registration doesn't have explicit 'skills' array? It has certificates/projects
+            // Education - handle higherEducation as ARRAY
+            education: (() => {
+                if (registration?.higherEducation && registration.higherEducation.length > 0 && registration.higherEducation[0].degree) {
+                    const hEdu = registration.higherEducation[0];
+                    return `${hEdu.degree} in ${hEdu.specialization} (${hEdu.institutionName})`;
+                } else if (registration?.educationLevel) {
+                    return `${registration.educationLevel} at ${registration.institution || 'Unknown'}`;
+                } else {
+                    return profile?.education || 'Not specified';
+                }
+            })(),
+
+            skills: profile?.skills || [],
 
             experience: registration?.workExperience?.map(exp =>
-                `${exp.jobTitle} at ${exp.organizationName} (${exp.industry}) - ${exp.description}`
+                `${exp.jobTitle} at ${exp.organizationName} (${exp.industry})`
             ).join('; ') || (profile?.experience || 'None'),
 
             projects: registration?.projects?.map(proj =>
@@ -103,18 +112,35 @@ exports.analyzeProfile = async (req, res) => {
             ).join('; ') || 'None',
 
             goals: registration?.careerGoals
-                ? `Short-term: ${registration.careerGoals.shortTerm}, Long-term: ${registration.careerGoals.longTerm}`
+                ? `Short-term: ${registration.careerGoals.shortTerm || 'Not specified'}, Medium-term: ${registration.careerGoals.mediumTerm || 'Not specified'}, Long-term: ${registration.careerGoals.longTerm || 'Not specified'}`
                 : (profile?.goals || 'Not specified'),
 
             interests: registration?.sectorPreferences?.preferredSectors || (profile?.interests || []),
 
             certificates: registration?.certificates?.map(cert =>
                 `${cert.title} from ${cert.issuingOrg}`
-            ).join(', ') || 'None'
+            ).join(', ') || 'None',
+
+            // Add salary expectation and job preferences
+            salaryExpectation: (() => {
+                if (registration?.jobPreferences && registration.jobPreferences.length > 0) {
+                    return registration.jobPreferences[0].expectedSalary || 'Not specified';
+                }
+                return 'Not specified';
+            })(),
+
+            targetRole: (() => {
+                if (registration?.jobPreferences && registration.jobPreferences.length > 0) {
+                    return registration.jobPreferences[0].preferredRole || 'Not specified';
+                }
+                return 'Not specified';
+            })()
         };
 
         // If no skills in AIProfile, try to infer from previous fields? 
         // Or AI will infer from text.
+
+        console.log('🧠 Analyzing Profile Payload:', JSON.stringify(richProfile, null, 2));
 
         const result = await openRouterService.analyzeProfile(richProfile);
 
@@ -380,28 +406,46 @@ exports.chat = async (req, res) => {
         });
 
         // Get user profile for context
+        const Registration = require('../models/Registration');
         const profile = await AIProfile.findOne({ userId: req.user.id });
+        const registration = await Registration.findOne({ userId: req.user.id });
 
-        // Prepare messages for AI
-        const messages = [
-            ...history.map(msg => ({
-                role: msg.role,
-                content: msg.content
-            })),
-            {
-                role: 'user',
-                content: message
-            }
-        ];
+        // Build rich context from registration (handling arrays correctly)
+        const userContext = {
+            name: registration?.fullName || 'User',
+            education: (() => {
+                if (registration?.higherEducation && registration.higherEducation.length > 0 && registration.higherEducation[0].degree) {
+                    const hEdu = registration.higherEducation[0];
+                    return `${hEdu.degree} in ${hEdu.specialization}`;
+                }
+                return registration?.educationLevel || profile?.education || '';
+            })(),
+            currentRole: (() => {
+                if (registration?.workExperience && registration.workExperience.length > 0) {
+                    const exp = registration.workExperience[0];
+                    if (exp.jobTitle && exp.organizationName) {
+                        return `${exp.jobTitle} at ${exp.organizationName}`;
+                    }
+                }
+                return '';
+            })(),
+            goals: registration?.careerGoals
+                ? `Short: ${registration.careerGoals.shortTerm || ''}, Long: ${registration.careerGoals.longTerm || ''}`
+                : (profile?.goals || ''),
+            skills: profile?.skills || [],
+            experienceLevel: profile?.experienceLevel || 'Beginner'
+        };
 
-        console.log('🤖 Calling OpenRouter API...');
+        // Format history for AI service
+        const formattedHistory = history.map(msg => ({
+            role: msg.role,
+            content: msg.content
+        }));
+
+        console.log('🤖 Calling OpenRouter API with context:', userContext.name);
         const result = await openRouterService.answerCareerQuestion(message, {
-            userProfile: profile ? {
-                skills: profile.skills,
-                experience: profile.experienceLevel,
-                goals: profile.goals
-            } : null
-        });
+            userProfile: userContext
+        }, formattedHistory);
 
         console.log('📡 OpenRouter response:', { success: result.success, hasMessage: !!result.message, error: result.error });
 

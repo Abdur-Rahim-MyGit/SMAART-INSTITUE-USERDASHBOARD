@@ -8,7 +8,7 @@ const toolkitSections = [
   {
     id: 1,
     title: "AI Career Chat",
-    description: "Have real-time conversations with your AI career coach. Get personalized advice, career guidance, and strategic insights 24/7 to accelerate your professional growth.",
+    description: "Engage with your intelligent career strategist. Receive real-time, personalized guidance and industry insights 24/7 to accelerate your professional trajectory.",
     icon: MessageSquare,
     path: "/dashboard/ai-career-coach/chat",
     color: "from-purple-400 to-indigo-500",
@@ -19,7 +19,7 @@ const toolkitSections = [
   {
     id: 2,
     title: "Profile Analysis",
-    description: "Complete career profile with AI-powered analysis, career path recommendations, skill gap insights, and personalized learning plans - all in one place.",
+    description: "Transform your career potential with deep AI analysis. Get comprehensive skill gap assessments, role recommendations, and a personalized roadmap to success.",
     icon: User,
     path: "/dashboard/profile-analysis",
     color: "from-blue-400 to-cyan-500",
@@ -30,7 +30,7 @@ const toolkitSections = [
   {
     id: 3,
     title: "SMAART AI Resume Builder",
-    description: "Create ATS-optimized resume content powered by AI. Generate professional summaries, experience descriptions, and keyword-rich content tailored for your target role.",
+    description: "Craft ATS-optimized resumes that stand out. Leverage AI to generate impactful summaries and role-specific content that maximizes your interview chances.",
     icon: FileText,
     path: "/dashboard/resume-builder",
     color: "from-violet-400 to-purple-500",
@@ -41,7 +41,7 @@ const toolkitSections = [
   {
     id: 4,
     title: "Mind Care Sessions",
-    description: "Personalized wellness sessions designed to nurture your mental health and emotional well-being. Connect with experts and discover inner peace.",
+    description: "Nurture your mental well-being with personalized wellness sessions. Access guided meditations, track your mood, and connect with certified experts for inner balance.",
     icon: Heart,
     path: "/dashboard/mindcare-sessions",
     color: "from-rose-400 to-pink-500",
@@ -52,7 +52,7 @@ const toolkitSections = [
   {
     id: 5,
     title: "Library",
-    description: "Access a vast collection of resources, books, articles, and learning materials to expand your knowledge and fuel your personal growth.",
+    description: "Unlock a curated repository of knowledge. Explore essential books, industry articles, and learning tracks tailored to accelerate your personal and professional growth.",
     icon: BookOpen,
     path: "/dashboard/library",
     color: "from-emerald-400 to-teal-500",
@@ -63,7 +63,7 @@ const toolkitSections = [
   {
     id: 6,
     title: "General Dictionary",
-    description: "Your comprehensive reference guide for terminology, concepts, and definitions. Master the vocabulary that empowers your learning journey.",
+    description: "Master professional terminology with our interactive dictionary. Features real-time definitions, audio pronunciation, and daily vocabulary building tools.",
     icon: BookText,
     path: "/dashboard/dictionary",
     color: "from-amber-400 to-orange-500",

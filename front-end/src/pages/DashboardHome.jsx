@@ -24,9 +24,10 @@ import {
   MoreHorizontal,
   Bell,
   Search,
-  Users
+  Users,
+  Trash2
 } from "lucide-react";
-import { getTasks, createTask } from "@/services/taskService";
+import { getTasks, createTask, deleteTask } from "@/services/taskService";
 import useAvatar from '@/hooks/useAvatar';
 import ContinueLearning from '@/components/ContinueLearning';
 import CourseCardSkeleton from '@/components/skeletons/CourseCardSkeleton';
@@ -131,6 +132,26 @@ const DashboardHome = () => {
       setShowNoteModal(false);
     } catch (error) {
       console.error("Failed to save note:", error);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      await deleteTask(noteId);
+
+      // Update local state
+      setCalendarNotes(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(dateKey => {
+          updated[dateKey] = updated[dateKey].filter(note => note.id !== noteId);
+          if (updated[dateKey].length === 0) {
+            delete updated[dateKey];
+          }
+        });
+        return updated;
+      });
+    } catch (error) {
+      console.error("Failed to delete note:", error);
     }
   };
 
@@ -689,8 +710,21 @@ const DashboardHome = () => {
 
                     <div className="grid grid-cols-7 gap-1">
                       {/* Padding for empty days */}
+<<<<<<< HEAD
+                      {Array.from({ length: new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1).getDay() }).map((_, i) => (
+                        <div key={`empty-${i}`} />
+                      ))}
+
+                      {getDaysInMonth(calendarMonth).daysArray.map(day => {
+                        const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
+                        const isToday = date.toDateString() === new Date().toDateString();
+                        const isSelected = date.toDateString() === selectedDate.toDateString();
+                        const hasNotes = calendarNotes[date.toDateString()]?.length > 0;
+
+=======
                       {(() => {
                         const { daysArray, firstDayIndex } = getDaysInMonth(calendarMonth);
+>>>>>>> origin/main
                         return (
                           <>
                             {Array.from({ length: firstDayIndex }).map((_, i) => (
@@ -741,12 +775,22 @@ const DashboardHome = () => {
                             Notes for {selectedDate.getDate()} {selectedDate.toLocaleDateString('en-US', { month: 'short' })}
                           </p>
                           {calendarNotes[selectedDate.toDateString()].map(note => (
-                            <div key={note.id} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50">
+                            <div key={note.id} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 group">
                               <div className="w-1 h-auto self-stretch rounded-full bg-blue-500 flex-shrink-0" />
-                              <div>
+                              <div className="flex-1">
                                 <p className="text-sm font-medium text-slate-900 dark:text-white leading-tight break-words">{note.text}</p>
                                 <p className="text-[10px] text-blue-500 mt-1 font-bold opacity-80">{note.time}</p>
                               </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteNote(note.id);
+                                }}
+                                className="p-1.5 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
+                                title="Delete note"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </div>
                           ))}
                         </div>
