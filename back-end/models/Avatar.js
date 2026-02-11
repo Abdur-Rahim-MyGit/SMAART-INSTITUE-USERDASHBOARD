@@ -42,13 +42,57 @@ const avatarSchema = new mongoose.Schema({
     default: 100
   },
 
-  // Streak for daily logins/activities
+  // ── 7-Day Cycle Streak System ──
+  // Cycle: 6 consecutive activity days + 1 mandatory holiday (day 7)
+  // Missing any of days 1-6 resets the streak to zero
+
+  // Which day of the current cycle the user is on (1-7)
+  streakCycleDay: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 7
+  },
+
+  // How many full 7-day cycles the user has completed
+  streakCyclesCompleted: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+
+  // When the current cycle started
+  streakStartDate: {
+    type: Date,
+    default: null
+  },
+
+  // "YYYY-MM-DD" of the last recorded activity day
+  lastStreakDate: {
+    type: String,
+    default: ''
+  },
+
+  // Whether the user currently has an active streak
+  streakActive: {
+    type: Boolean,
+    default: false
+  },
+
+  // Log of completed cycles
+  streakHistory: [{
+    cycleNumber: Number,
+    startDate: Date,
+    endDate: Date,
+    completedAt: { type: Date, default: Date.now }
+  }],
+
+  // Keep legacy field for backward compat (read-only, computed)
   streak: {
     type: Number,
     default: 0
   },
 
-  // Last activity date for streak calculation
   lastActivityDate: {
     type: Date,
     default: Date.now
@@ -192,24 +236,171 @@ avatarSchema.methods.processLevelUnlock = function(level) {
   return unlockInfo;
 };
 
-// Method to update streak
+/**
+ * Helper: get "YYYY-MM-DD" for a Date in local timezone
+ */
+function toDateStr(d) {
+  const dt = new Date(d);
+  return dt.getFullYear() + '-' +
+    String(dt.getMonth() + 1).padStart(2, '0') + '-' +
+    String(dt.getDate()).padStart(2, '0');
+}
+
+/**
+ * Helper: count calendar days between two "YYYY-MM-DD" strings
+ */
+function daysBetween(dateStrA, dateStrB) {
+  const a = new Date(dateStrA + 'T00:00:00');
+  const b = new Date(dateStrB + 'T00:00:00');
+  return Math.round((b - a) / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * 7-Day Cycle Streak Update
+ * 
+ * Cycle = 6 activity days + 1 holiday (day 7)
+ * - Days 1-6: user MUST be active each consecutive day
+ * - Day 7: mandatory holiday, no activity needed
+ * - After day 7: new cycle begins at day 1
+ * - Missing any day during 1-6: streak resets to zero
+ */
 avatarSchema.methods.updateStreak = async function() {
-  const now = new Date();
-  const lastActivity = new Date(this.lastActivityDate);
-  const diffDays = Math.floor((now - lastActivity) / (1000 * 60 * 60 * 24));
-  
-  if (diffDays === 1) {
-    // Consecutive day - increase streak
-    this.streak += 1;
-  } else if (diffDays > 1) {
-    // Streak broken
-    this.streak = 1;
+  const todayStr = toDateStr(new Date());
+
+  // ── Case 1: Same day ── already counted, just return
+  if (this.lastStreakDate === todayStr) {
+    await this.save();
+    return this.getStreakStatus();
   }
-  // If same day, don't change streak
-  
-  this.lastActivityDate = now;
-  await this.save();
-  return this.streak;
+
+  // ── Case 2: No active streak ── start a brand-new cycle
+  if (!this.streakActive || this.streakCycleDay === 0) {
+    this.streakCycleDay = 1;
+    this.streakActive = true;
+    this.streakStartDate = new Date();
+    this.lastStreakDate = todayStr;
+    this.lastActivityDate = new Date();
+    // Update legacy field
+    this.streak = this.streakCyclesCompleted * 6 + 1;
+    await this.save();
+    return this.getStreakStatus();
+  }
+
+  // ── We have an active streak, check gap ──
+  const gap = daysBetween(this.lastStreakDate, todayStr);
+
+  // Was yesterday the holiday (day 7)?
+  if (this.streakCycleDay === 7) {
+    // Holiday was day 7. The next valid activity day is day 7+1 gap.
+    // gap === 1 means user is here the day after holiday → start new cycle
+    if (gap === 1) {
+      // Complete the old cycle
+      this.streakHistory.push({
+        cycleNumber: this.streakCyclesCompleted + 1,
+        startDate: this.streakStartDate,
+        endDate: new Date(),
+        completedAt: new Date()
+      });
+      this.streakCyclesCompleted += 1;
+      // Start new cycle
+      this.streakCycleDay = 1;
+      this.streakStartDate = new Date();
+      this.lastStreakDate = todayStr;
+      this.lastActivityDate = new Date();
+      this.streak = this.streakCyclesCompleted * 6 + 1;
+      await this.save();
+      return this.getStreakStatus();
+    } else {
+      // Missed the day after holiday → reset
+      this._resetStreak();
+      // But today counts as day 1 of a new streak
+      this.streakCycleDay = 1;
+      this.streakActive = true;
+      this.streakStartDate = new Date();
+      this.lastStreakDate = todayStr;
+      this.lastActivityDate = new Date();
+      this.streak = 1;
+      await this.save();
+      return this.getStreakStatus();
+    }
+  }
+
+  // ── Currently on days 1-6 ──
+  if (gap === 1) {
+    // Consecutive day → advance
+    this.streakCycleDay += 1;
+    this.lastStreakDate = todayStr;
+    this.lastActivityDate = new Date();
+
+    if (this.streakCycleDay === 7) {
+      // Reached the holiday! Don't require activity today.
+      // The holiday auto-completes. Mark it.
+      this.streak = this.streakCyclesCompleted * 6 + 6;
+    } else {
+      this.streak = this.streakCyclesCompleted * 6 + this.streakCycleDay;
+    }
+
+    await this.save();
+    return this.getStreakStatus();
+  } else {
+    // Missed a day during activity period → streak broken
+    this._resetStreak();
+    // Today starts a new attempt
+    this.streakCycleDay = 1;
+    this.streakActive = true;
+    this.streakStartDate = new Date();
+    this.lastStreakDate = todayStr;
+    this.lastActivityDate = new Date();
+    this.streak = 1;
+    await this.save();
+    return this.getStreakStatus();
+  }
+};
+
+/**
+ * Reset streak to zero (internal helper)
+ */
+avatarSchema.methods._resetStreak = function() {
+  this.streakCycleDay = 0;
+  this.streakCyclesCompleted = 0;
+  this.streakActive = false;
+  this.streakStartDate = null;
+  this.streak = 0;
+};
+
+/**
+ * Get full streak status for the API response
+ */
+avatarSchema.methods.getStreakStatus = function() {
+  const cycleDay = this.streakCycleDay || 0;
+  const isHoliday = cycleDay === 7;
+  const cyclesCompleted = this.streakCyclesCompleted || 0;
+  const totalStreakDays = cyclesCompleted * 6 + (cycleDay > 0 && cycleDay <= 6 ? cycleDay : 0);
+  const daysUntilHoliday = cycleDay > 0 && cycleDay < 7 ? 7 - cycleDay : 0;
+
+  // Build a visual progress array for 7 days
+  const cycleProgress = [];
+  for (let i = 1; i <= 7; i++) {
+    if (i <= cycleDay) {
+      cycleProgress.push(i === 7 ? 'holiday' : 'completed');
+    } else if (i === 7) {
+      cycleProgress.push('holiday-pending');
+    } else {
+      cycleProgress.push('pending');
+    }
+  }
+
+  return {
+    cycleDay,
+    isHoliday,
+    isActive: this.streakActive,
+    cyclesCompleted,
+    totalStreakDays,
+    daysUntilHoliday,
+    cycleProgress,
+    lastStreakDate: this.lastStreakDate,
+    streakStartDate: this.streakStartDate
+  };
 };
 
 // Static method to get or create avatar for user

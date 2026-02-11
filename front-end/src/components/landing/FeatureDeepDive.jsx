@@ -3,8 +3,8 @@ import { LineChart, BrainCircuit, Trophy, Target } from "lucide-react";
 
 const FeaturePoint = ({ icon: Icon, title, desc }) => (
     <div className="flex gap-4">
-        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#30919D]/10 flex items-center justify-center border border-[#30919D]/20">
-            <Icon className="w-6 h-6 text-[#30919D]" />
+        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#1a3884]/10 flex items-center justify-center border border-[#1a3884]/20">
+            <Icon className="w-6 h-6 text-[#1a3884]" />
         </div>
         <div>
             <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{title}</h4>
@@ -26,7 +26,7 @@ const FeatureDeepDive = () => {
                         viewport={{ once: true }}
                         className="relative"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-tr from-[#30919D]/20 to-transparent blur-3xl rounded-full" />
+                        <div className="absolute inset-0 bg-gradient-to-tr from-[#1a3884]/20 to-transparent blur-3xl rounded-full" />
                         <div className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl bg-white dark:bg-[#001835]/80 aspect-video group">
                             {/* Placeholder for real screenshot */}
                             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#001226]">
@@ -42,7 +42,7 @@ const FeatureDeepDive = () => {
                                 <span className="text-xs font-bold text-gray-900 dark:text-white">Live AI Analysis</span>
                             </div>
                             <div className="h-1.5 w-32 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                <div className="h-full w-[75%] bg-[#30919D]" />
+                                <div className="h-full w-[75%] bg-[#1a3884]" />
                             </div>
                         </div>
                     </motion.div>
@@ -54,23 +54,23 @@ const FeatureDeepDive = () => {
                         className="space-y-8"
                     >
                         <div>
-                            <span className="text-[#30919D] font-bold tracking-wider text-sm uppercase">Emotional Intelligence</span>
-                            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-2 mb-4">Master Your Mind with The Emotion Couch</h3>
+                            <span className="text-[#1a3884] font-bold tracking-wider text-sm uppercase">Professional & Technical Capability™</span>
+                            <h3 className="text-3xl md:text-4xl font-bold text-[#1a3884] dark:text-white mt-2 mb-4">Campus to Career™</h3>
                             <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-                                Beyond IQ, success requires EQ. Our AI therapist helps students navigate stress, build resilience, and develop the soft skills top employers demand.
+                                Preparing learners for entry into the workforce and aligning their capability with professional practice. We bridge the gap between academic theory and workplace reality.
                             </p>
                         </div>
 
                         <div className="space-y-6">
                             <FeaturePoint
                                 icon={BrainCircuit}
-                                title="Real-time Mood Analysis"
-                                desc="Advanced sentiment tracking that adapts coaching advice based on your current emotional state."
+                                title="Practice-Aligned Learning"
+                                desc="Real-world simulations and industry-standard tools that mirror the actual work environment."
                             />
                             <FeaturePoint
                                 icon={Target}
-                                title="Conflict Resolution Scenarios"
-                                desc="Interactive roleplay scenarios to practice leadership and empathy in a safe environment."
+                                title="Employability Focus"
+                                desc="Direct pathways to meaningful early-career roles with verified capability evidence."
                             />
                         </div>
                     </motion.div>
@@ -85,23 +85,23 @@ const FeatureDeepDive = () => {
                         className="order-2 lg:order-1 space-y-8"
                     >
                         <div>
-                            <span className="text-[#daa520] font-bold tracking-wider text-sm uppercase">Data-Driven Growth</span>
-                            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mt-2 mb-4">Precision Career Mapping</h3>
+                            <span className="text-[#daa520] font-bold tracking-wider text-sm uppercase">Innovation & Impact Capability™</span>
+                            <h3 className="text-3xl md:text-4xl font-bold text-[#1a3884] dark:text-white mt-2 mb-4">Career to Life™</h3>
                             <p className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
-                                Stop guessing. Our deep learning algorithms analyze your performance across 50+ markers to recommend the perfect career trajectory.
+                                Supporting long-term progression, leadership transition, and the ability to create value through innovation. For those ready to shape the future.
                             </p>
                         </div>
 
                         <div className="space-y-6">
                             <FeaturePoint
                                 icon={LineChart}
-                                title="Skill Gap Visualization"
-                                desc="See exactly what skills you're missing for your dream job and get instant course recommendations."
+                                title="Leadership Transition"
+                                desc="Moving from individual contributor to strategic leader with advanced decision-making skills."
                             />
                             <FeaturePoint
                                 icon={Trophy}
-                                title="Verified Achievement Badges"
-                                desc="Earn blockchain-verified micro-credentials recognized by our global partner network."
+                                title="Value Creation"
+                                desc="Entrepreneurial skills and innovation frameworks for the new economy."
                             />
                         </div>
                     </motion.div>

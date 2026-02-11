@@ -15,12 +15,16 @@ import {
   ShieldCheck,
   CheckCheck,
   Sun,
-  Moon
+  Moon,
+  Users,
+  ClipboardCheck
 } from "lucide-react";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
 import ChatbotModal from "@/components/ChatbotModal";
 import { useTheme } from "@/contexts/ThemeContext";
+import blueLogo from "@/assets/blue.png";
+import whiteLogo from "@/assets/white.png";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -31,6 +35,8 @@ const menuItems = [
   { icon: Zap, label: "SMAART Toolkit", path: "/dashboard/smaart-toolkit" },
   { icon: Award, label: "My Certificate", path: "/dashboard/certificate" },
   { icon: ShieldCheck, label: "Verify Certificate", path: "/verify-certificate" },
+  { icon: Users, label: "Community", path: "/dashboard/community" },
+  { icon: ClipboardCheck, label: "My Notes", path: "/dashboard/notes" },
 ];
 
 const bottomMenuItems = [
@@ -125,7 +131,7 @@ const DashboardSidebar = () => {
         { type: 'assessment', title: '📊 Assessment Results Ready', message: 'Your Baseline Assessment results are available.' },
         { type: 'course', title: '📚 New Course Available', message: 'Check out "Leadership Essentials" - now available!' },
         { type: 'achievement', title: '🎉 Level Up!', message: 'You reached Level 5! New avatar items unlocked.' },
-        { type: 'system', title: '👋 Welcome!', message: 'Welcome to SMAART Minds! Start your learning journey today.' }
+        { type: 'system', title: '👋 Welcome!', message: 'Welcome to SMAART Institute! Start your learning journey today.' }
       ];
       const randomNotif = testTypes[Math.floor(Math.random() * testTypes.length)];
 
@@ -194,6 +200,8 @@ const DashboardSidebar = () => {
       {/* Top Navigation Bar */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-slate-200/50 dark:border-white/10 shadow-sm transition-all duration-300">
         <div className="flex items-center justify-between px-6 lg:px-10 h-16">
+
+
           {/* Left: Logo */}
           <div className="flex items-center gap-2">
             <button
@@ -204,18 +212,50 @@ const DashboardSidebar = () => {
             </button>
 
             <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-700 to-blue-500 shadow-lg shadow-blue-500/30 group-hover:scale-105 transition-all duration-300">
-                <span className="font-bold text-lg text-white">S</span>
+              <div className="h-10 w-auto flex items-center justify-center transition-all duration-300">
+                <img
+                  src={theme === 'dark' ? whiteLogo : blueLogo}
+                  alt="SMAART Institute"
+                  className="h-10 w-auto object-contain"
+                />
               </div>
-              <span className="font-bold text-xl tracking-tight text-slate-900 dark:text-white hidden md:block">
-                SMAART<span className="text-blue-600"> Minds</span>
-              </span>
+
             </Link>
           </div>
 
-          {/* Center: Interactive Menu (Desktop) */}
-          <div className="hidden lg:flex flex-1 justify-center">
-            <InteractiveMenu />
+          {/* Center: Desktop Navigation Menu */}
+          <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+            {[
+              { label: 'Home', path: '/dashboard' },
+              { label: 'My Courses', path: '/dashboard/courses' },
+              { label: 'Vision Boards', path: '/dashboard/vision-boards' },
+              { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
+              { label: 'Certificates', path: '/dashboard/certificate' },
+              { label: 'Verify', path: '/verify-certificate' }
+            ].map(item => {
+              const isActive = location.pathname === item.path ||
+                (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
+
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`text-sm font-bold transition-all duration-200 relative group py-1 ${isActive
+                    ? 'text-[#30919D]'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-[#30919D] dark:hover:text-[#30919D]'
+                    }`}
+                >
+                  {item.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#30919D] rounded-full"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right: Actions */}
@@ -254,7 +294,7 @@ const DashboardSidebar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                    className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-96 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                     style={{ zIndex: 9999 }}
                   >
                     {/* Header */}
@@ -379,11 +419,13 @@ const DashboardSidebar = () => {
             {/* Mobile Header */}
             <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <Link to="/" className="flex items-center gap-2" onClick={() => setIsMobileOpen(false)}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-600">
-                  <span className="font-bold text-base text-white">S</span>
-                </div>
+                <img
+                  src={theme === 'dark' ? whiteLogo : blueLogo}
+                  alt="SMAART Institute"
+                  className="h-9 w-auto object-contain"
+                />
                 <span className="font-bold text-lg text-slate-900 dark:text-white">
-                  SMAART<span className="text-blue-600">Minds</span>
+                  SMAART<span className="text-blue-600"> Institute</span>
                 </span>
               </Link>
               <button

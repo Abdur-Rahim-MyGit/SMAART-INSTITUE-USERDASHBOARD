@@ -19,7 +19,8 @@ const Institution = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   // Use the imported video for all IDs for now, or fallback to the specific one if we had distinct videos
-  const videoUrl = videoplayback;
+  // const videoUrl = videoplayback;
+  const videoUrl = "https://res.cloudinary.com/dlpmrdcqp/video/upload/WhatsApp_Video_2026-01-19_at_14.40.50_1_lucryr.mp4";
 
   // Redirect logged-in users to dashboard
   useEffect(() => {
@@ -30,7 +31,7 @@ const Institution = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#002147] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-[#002147] relative overflow-x-hidden transition-colors duration-300">
       <Navbar showLinks={false} />
 
       {/* Background Elements */}
@@ -54,8 +55,8 @@ const Institution = () => {
         />
       </div>
 
-      <main className="min-h-screen flex items-center justify-center px-3 sm:px-4 md:px-6 pt-16 sm:pt-20 md:pt-24 pb-8 sm:pb-10 md:pb-12 relative z-10">
-        <div className="container mx-auto max-w-6xl">
+      <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-8 pt-20 sm:pt-24 pb-8 sm:pb-12 relative z-10">
+        <div className="w-full max-w-6xl mx-auto">
           {/* Back to Home Link */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -72,24 +73,24 @@ const Institution = () => {
             </button>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center w-full max-w-full overflow-hidden">
 
             {/* Welcome Section (Video) */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="relative group"
+              className="relative group w-full max-w-full overflow-hidden box-border"
             >
               <div className="absolute -inset-1 bg-gradient-to-r from-[#30919D] to-[#daa520] rounded-xl sm:rounded-2xl md:rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <div className="relative bg-white dark:bg-[#00152e] backdrop-blur-xl rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl">
-                <div className="relative aspect-video">
+                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                   <video
                     autoPlay
                     loop
                     muted
                     playsInline
-                    className="w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                   >
                     <source src={videoUrl} type="video/mp4" />
                     Your browser does not support the video tag.
@@ -101,7 +102,7 @@ const Institution = () => {
                   {/* Badge */}
                   <div className="absolute top-3 left-3 sm:top-6 sm:left-6 px-2.5 py-1 sm:px-4 sm:py-1.5 bg-[#002147]/80 backdrop-blur-md border border-[#white]/20 rounded-full flex items-center gap-1.5 sm:gap-2 shadow-lg z-20">
                     <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#daa520] animate-pulse shadow-[0_0_10px_rgba(218,165,32,0.5)]" />
-                    <span className="text-[10px] sm:text-xs font-bold text-white tracking-wider uppercase">Chairman's Message</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-white tracking-wider uppercase">Founder's Message</span>
                   </div>
                 </div>
 

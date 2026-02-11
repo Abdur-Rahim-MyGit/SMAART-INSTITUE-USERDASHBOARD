@@ -431,7 +431,7 @@ const Profile = () => {
                         <div className="w-10 h-0.5 bg-[#1a3884] dark:bg-blue-500 mt-1.5"></div>
                       </div>
 
-                      <div className="p-3 grid grid-cols-2 gap-2">
+                      <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {/* Info Cards */}
                         <div className="p-2.5 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700">
                           <div className="flex items-center gap-2">
@@ -504,7 +504,7 @@ const Profile = () => {
                                 <GraduationCap className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
                                 <h4 className="text-xs font-bold text-gray-900 dark:text-white">Higher Education #{index + 1}</h4>
                               </div>
-                              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs">
                                 <div><span className="text-gray-500 dark:text-gray-400">Degree:</span> <span className="font-medium text-gray-900 dark:text-gray-200">{edu.degree}</span></div>
                                 <div><span className="text-gray-500 dark:text-gray-400">Branch:</span> <span className="font-medium text-gray-900 dark:text-gray-200">{edu.specialization}</span></div>
                                 <div className="col-span-2"><span className="text-gray-500 dark:text-gray-400">College:</span> <span className="font-medium text-gray-900 dark:text-gray-200">{edu.institutionName || edu.university}</span></div>
@@ -524,7 +524,7 @@ const Profile = () => {
                           null
                         )}
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {/* 12th Details */}
                           {formData.twelfthDetails && (
                             <div className="p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700">
@@ -583,7 +583,7 @@ const Profile = () => {
                       <div className="p-3 space-y-3">
                         {formData.jobPreferences && Array.isArray(formData.jobPreferences) && formData.jobPreferences.length > 0 ? (
                           formData.jobPreferences.map((job, index) => (
-                            <div key={index} className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-100 dark:border-slate-800 last:border-0 last:mb-0 last:pb-0">
+                            <div key={index} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-100 dark:border-slate-800 last:border-0 last:mb-0 last:pb-0">
                               <div className="p-2.5 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-100 dark:border-slate-700">
                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-0.5">Preferred Role</p>
                                 <p className="text-xs font-medium text-gray-900 dark:text-white">{job.preferredRole}</p>
@@ -788,7 +788,7 @@ const Profile = () => {
                       </div>
 
                       <div className="p-3">
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                           {enrolledCourses.length > 0 ? (
                             enrolledCourses.slice(0, 2).map((enrollment) => (
                               <Link

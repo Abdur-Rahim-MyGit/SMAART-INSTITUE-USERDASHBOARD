@@ -75,34 +75,63 @@
 
 /* ── Header ── */
 .cert-header {
-    text-align: center;
-    margin-bottom: 8mm;
-    /* Drastically reduced from 15mm */
-}
-
-.institute-name {
+    position: relative;
     display: flex;
     justify-content: center;
-    margin-bottom: 2mm;
-    /* Reduced from 5mm */
-    line-height: 1;
+    align-items: flex-start;
+    /* Better vertical control */
+    margin-bottom: 8mm;
+    /* Reduced space before body */
+    padding-top: 0;
+    min-height: 110px;
+    /* Ensure height for logo */
+}
+
+.cert-logo-container {
+    position: absolute;
+    left: -10px;
+    /* Bit left */
+    top: 15px;
+    /* Bit down */
 }
 
 .cert-logo {
-    height: 25mm;
-    /* Reduced further as per user request */
+    height: 40px;
+    /* Compact size */
     width: auto;
     object-fit: contain;
 }
 
-.credential-label {
-    font-size: 8.5pt;
-    /* Slightly larger */
+.cert-title-container {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 65px;
+    /* Bring these elements a bit down */
+}
+
+.cert-org-name {
+    font-family: 'Cinzel', serif;
+    font-size: 34pt;
+    /* BIG title */
     font-weight: 700;
-    letter-spacing: 0.4em;
-    /* Increased spacing for premium look */
+    color: #002147;
+    margin: 0;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.credential-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 0.5em;
+    /* Premium spacing */
     color: #b8860b;
     text-transform: uppercase;
+    margin-top: 8px;
     opacity: 0.9;
 }
 

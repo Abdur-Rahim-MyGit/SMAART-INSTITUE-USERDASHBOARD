@@ -46,6 +46,14 @@ const moduleProgressSchema = new mongoose.Schema({
     dayId: Number,
     taskId: Number,
     completedAt: { type: Date, default: Date.now }
+  }],
+  taskResults: [{
+    dayId: Number,
+    stepId: Number,
+    score: Number,
+    totalPoints: Number,
+    responses: mongoose.Schema.Types.Mixed,
+    completedAt: { type: Date, default: Date.now }
   }]
 });
 

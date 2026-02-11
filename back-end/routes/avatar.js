@@ -57,8 +57,15 @@ router.post('/toggle-accessory', avatarController.toggleAccessory);
 router.post('/set-animation', avatarController.setAnimation);
 
 /**
+ * @route   GET /api/avatar/streak-status
+ * @desc    Get current streak status (7-day cycle)
+ * @access  Private
+ */
+router.get('/streak-status', avatarController.getStreakStatus);
+
+/**
  * @route   POST /api/avatar/update-streak
- * @desc    Update daily streak
+ * @desc    Update daily streak (7-day cycle system)
  * @access  Private
  */
 router.post('/update-streak', avatarController.updateStreak);

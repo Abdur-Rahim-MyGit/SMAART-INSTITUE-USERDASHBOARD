@@ -31,7 +31,7 @@ const CertificateVerification = () => {
                         const pathParts = url.pathname.split('/');
                         certId = pathParts[pathParts.length - 1];
                     }
-                    
+
                     setCertificateId(certId);
                     setIsScanning(false);
                     scanner.clear();
@@ -96,7 +96,7 @@ const CertificateVerification = () => {
         <section id="verify-certificate" className="py-20 sm:py-24 bg-gradient-to-b from-gray-50 to-white dark:from-[#001229] dark:to-[#002147] relative overflow-hidden">
             {/* Background decoration */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[#30919D]/5 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[#1a3884]/5 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#daa520]/5 rounded-full blur-3xl" />
             </div>
 
@@ -133,7 +133,7 @@ const CertificateVerification = () => {
                             <button
                                 onClick={() => { setIsScanning(false); setVerificationResult(null); setError(null); }}
                                 className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${!isScanning
-                                    ? 'bg-[#002147] dark:bg-[#30919D] text-white shadow-lg'
+                                    ? 'bg-[#002147] dark:bg-[#1a3884] text-white shadow-lg border border-[#daa520]'
                                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5'
                                     }`}
                             >
@@ -143,7 +143,7 @@ const CertificateVerification = () => {
                             <button
                                 onClick={() => { setIsScanning(true); setVerificationResult(null); setError(null); }}
                                 className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isScanning
-                                    ? 'bg-[#002147] dark:bg-[#30919D] text-white shadow-lg'
+                                    ? 'bg-[#002147] dark:bg-[#1a3884] text-white shadow-lg border border-[#daa520]'
                                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5'
                                     }`}
                             >
@@ -160,7 +160,7 @@ const CertificateVerification = () => {
                                 exit={{ opacity: 0, height: 0 }}
                                 className="mb-6"
                             >
-                                <div id="reader-landing" className="mx-auto rounded-xl overflow-hidden border-2 border-dashed border-[#30919D]/30"></div>
+                                <div id="reader-landing" className="mx-auto rounded-xl overflow-hidden border-2 border-dashed border-[#daa520]/30"></div>
                                 <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center font-medium">
                                     Position the certificate's QR code within the square
                                 </p>
@@ -176,14 +176,14 @@ const CertificateVerification = () => {
                                         value={certificateId}
                                         onChange={(e) => setCertificateId(e.target.value)}
                                         placeholder="e.g., SMAART-CAP-2025-ABC12"
-                                        className="w-full px-5 py-4 pl-12 rounded-xl border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-[#30919D] focus:border-transparent transition-all text-base"
+                                        className="w-full px-5 py-4 pl-12 rounded-xl border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-[#daa520] focus:border-transparent transition-all text-base"
                                     />
                                     <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 </div>
                                 <button
                                     type="submit"
                                     disabled={isVerifying || !certificateId.trim()}
-                                    className="w-full bg-gradient-to-r from-[#002147] to-[#30919D] hover:from-[#30919D] hover:to-[#002147] text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
+                                    className="w-full bg-gradient-to-r from-[#002147] to-[#1a3884] hover:from-[#1a3884] hover:to-[#002147] text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base border border-[#daa520]"
                                 >
                                     {isVerifying ? (
                                         <>
@@ -230,7 +230,7 @@ const CertificateVerification = () => {
                                     className={`rounded-xl border p-6 ${verificationResult.verified
                                         ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-500/30'
                                         : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-500/30'
-                                    }`}
+                                        }`}
                                 >
                                     {/* Status Header */}
                                     <div className="flex items-center gap-4 mb-6 pb-6 border-b border-green-200 dark:border-green-500/30">
