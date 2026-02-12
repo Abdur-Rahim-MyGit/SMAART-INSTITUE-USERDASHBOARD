@@ -95,25 +95,32 @@ class OpenRouterService {
      * Analyze user profile
      */
     async analyzeProfile(profile) {
-        const systemPrompt = `You are an expert AI Career Coach for SMAART Institute. Analyze the user's detailed profile and provide a comprehensive report.
+        const systemPrompt = `You are an expert AI Career Coach. Your task is to analyze the user's professional profile based STRICTLY on the provided data.
+
+INPUT DATA:
+- Skills: ${Array.isArray(profile.skills) ? profile.skills.join(', ') : (profile.skills || 'None')}
+- Experience: ${profile.experience || 'None'}
+- Education: ${profile.education || 'None'}
+- Projects: ${profile.projects || 'None'}
+- Certificates: ${profile.certificates || 'None'}
+- Interests: ${Array.isArray(profile.interests) ? profile.interests.join(', ') : (profile.interests || 'None')}
+- Goals: ${profile.goals || 'None'}
+
+ANALYSIS RULES:
+1. **No Hallucinations**: Do NOT invent skills, experience, or degrees that are not listed.
+2. **Infer from Context**: If explicit skills are missing, infer them *only* from the Education and Projects listed.
+3. **Focus on Quality**: Even if data is sparse (e.g., only Education), provide high-quality advice relevant to that specific field (e.g., specific advice for a ${profile.education} student).
 
 OUTPUT SECTIONS:
-1. **Recommended Career Paths**: 2-3 specific roles that fit best. Explain why.
-2. **Skill Gap Analysis**: Compare current skills vs required skills for the top role. List missing critical skills.
-3. **Learning Path**: A structured roadmap to acquire missing skills.
-4. **Jobs to Apply**: Types of companies and job titles to target immediately.
+1. **Profile Summary**: A 2-sentence summary of where they stand currently.
+2. **Recommended Career Paths**: 2-3 specific roles that fit their *actual* background. Explain why based on their specific education/goals.
+3. **Skill Gap Analysis**: Compare their *current* (or inferred) skills vs required skills for the top role.
+4. **Learning Path**: A structured roadmap to acquire missing skills.
+5. **Immediate Actions**: 3 concrete steps to take now.
 
 Format efficiently with clear Markdown headers.`;
 
-        const userMessage = `Please analyze my professional profile:
-
-Skills: ${Array.isArray(profile.skills) ? profile.skills.join(', ') : (profile.skills || 'Not specified')}
-Experience: ${profile.experience || 'Not specified'}
-Education: ${profile.education || 'Not specified'}
-Projects: ${profile.projects || 'None'}
-Certificates: ${profile.certificates || 'None'}
-Interests: ${Array.isArray(profile.interests) ? profile.interests.join(', ') : (profile.interests || 'Not specified')}
-Goals: ${profile.goals || 'Not specified'}`;
+        const userMessage = `Please analyze my professional profile based on the data provided above.`;
 
         return this.chat([{ role: 'user', content: userMessage }], systemPrompt);
     }
@@ -217,38 +224,53 @@ Please generate professional resume sections.`;
     /**
      * Answer career questions
      */
-    async answerCareerQuestion(question, context = {}) {
-        const systemPrompt = `You are an expert AI Career Coach for SMAART Institute (UK-based).
+    async answerCareerQuestion(question, context = {}, history = []) {
+        const systemPrompt = `You are a professional AI Career Coach for SMAART Minds, an employability platform in India.
 
-ABOUT SMAART INSTITUTE:
-- **Core Purpose**: Integrated Employability & Impact Ecosystem for the changing world of work.
-- **Founder**: Rehana Ameer.
-- **Mission**: Bridge the gap between education and the modern workforce using sector-agnostic frameworks.
-- **Key Frameworks**:
-  1. **SMAART Integrated Capability Framework™**: Integrates Skills, Judgement, and Adaptability.
-  2. **SMAART Career Architecture Map™**: Careers as a multi-stage continuum.
-  3. **SMAART Capability & Skills Passport™**: Verifiable record of capability.
-- **Programmes**: SMAART Campus to Career™, Professional & Technical Capability, Career to Life.
-- **Values**: Systems Thinking, Measurable Impact, Adaptability, Accountability, Relevance, Trust.
+Context:
+- Name: ${context.userProfile?.name || 'User'}
+- Education: ${context.userProfile?.education || 'unknown'}
+- Current Role: ${context.userProfile?.currentRole || 'Student/Job Seeker'}
+- Career Stage: ${context.userProfile?.experienceLevel || 'unknown'}
+- Goals: ${context.userProfile?.goals || 'not specified'}
 
-RESPONSE RULES:
-1. **Concise & Fast**: Answer in 1 concise paragraph (max 4-5 sentences).
-2. **Strictly Professional**: IF the user asks about non-career topics (love, movies, life), DO NOT ANSWER. Instead, provide a witty redirection to career goals.
-   - Example: "I'm an expert in Career Love, not romantic love! Let's focus on finding a job you'll love."
-3. **SMAART Ecosystem**: Actively promote the frameworks and programmes above where relevant.
-4. **No Fluff**: Get straight to the strategic advice. Use **Bold** for key terms.
-5. **Greetings**: If the input is just a greeting ("Hi", "Hello"), respond with a warm, fast welcome.
-   - Example: "Hello! I'm your SMAART AI Coach. Ready to accelerate your career? Tell me your target role!"
+RESPONSE GUIDELINES:
+1. **Be an Executive Career Strategist**: Do not just give generic advice. Give high-level, strategic insights suitable for ambitious professionals.
+2. **Structure Your Answer**:
+   - **Strategy**: Start with a high-level strategic viewpoint.
+   - **Tactics**: Provide specific, numbered steps the user can take immediately.
+   - **Market Context**: Mention relevant trends (especially Indian job market).
+3. **Format for Readability**:
+   - Use **Bold** for key terms and emphasis.
+   - Use bullet points (•) and numbered lists (1, 2, 3) for readability.
+   - Keep paragraphs short and punchy.
+4. **Tone**: Empowerment, Clarity, Professionalism.
 
-Focus: Indian Job Market, Skill Development, Career Growth.`;
+SMAART Minds Ecosystem (Integrate naturally when relevant):
+- Recommend "Assessments" for self-discovery.
+- Suggest "Skill Passport" for verifying skills.
+- Mention "AI Resume Builder" for application readiness.
+
+STRICT RULES:
+- Never discuss technical implementation.
+- Use **Bold** for emphasis but do not use complex markdown tables.
+- Stay focused on career growth and employability.
+- Be specific with resources, timelines, and action steps.
+- Provide concrete examples and real-world insights.`;
 
         let userMessage = question;
 
-        if (context.userProfile) {
+        if (context.userProfile && history.length === 0) {
             userMessage += `\n\nMy background: ${JSON.stringify(context.userProfile, null, 2)}`;
         }
 
-        return this.chat([{ role: 'user', content: userMessage }], systemPrompt);
+        // Combine history with new user message
+        const messages = [
+            ...history,
+            { role: 'user', content: userMessage }
+        ];
+
+        return this.chat(messages, systemPrompt);
     }
 }
 

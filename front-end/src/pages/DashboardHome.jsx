@@ -24,9 +24,10 @@ import {
   MoreHorizontal,
   Bell,
   Search,
-  Users
+  Users,
+  Trash2
 } from "lucide-react";
-import { getTasks, createTask } from "@/services/taskService";
+import { getTasks, createTask, deleteTask } from "@/services/taskService";
 import useAvatar from '@/hooks/useAvatar';
 import ContinueLearning from '@/components/ContinueLearning';
 import CourseCardSkeleton from '@/components/skeletons/CourseCardSkeleton';
@@ -94,10 +95,16 @@ const DashboardHome = () => {
   const [showNoteModal, setShowNoteModal] = useState(false);
   const [selectedNoteDate, setSelectedNoteDate] = useState(null);
   const [newNote, setNewNote] = useState("");
+  const [selectedNoteTime, setSelectedNoteTime] = useState("12:00");
   const [calendarNotes, setCalendarNotes] = useState({});
 
   const handleDayDoubleClick = (date) => {
     setSelectedNoteDate(date);
+    // Default to current time or next hour
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    setSelectedNoteTime(`${hours}:${minutes}`);
     setShowNoteModal(true);
   };
 
@@ -109,7 +116,7 @@ const DashboardHome = () => {
       const taskData = {
         title: newNote,
         date: selectedNoteDate,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        time: selectedNoteTime,
         type: 'personal',
         status: 'Pending'
       };
@@ -131,6 +138,26 @@ const DashboardHome = () => {
       setShowNoteModal(false);
     } catch (error) {
       console.error("Failed to save note:", error);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      await deleteTask(noteId);
+
+      // Update local state
+      setCalendarNotes(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(dateKey => {
+          updated[dateKey] = updated[dateKey].filter(note => note.id !== noteId);
+          if (updated[dateKey].length === 0) {
+            delete updated[dateKey];
+          }
+        });
+        return updated;
+      });
+    } catch (error) {
+      console.error("Failed to delete note:", error);
     }
   };
 
@@ -691,6 +718,7 @@ const DashboardHome = () => {
                       {/* Padding for empty days */}
                       {(() => {
                         const { daysArray, firstDayIndex } = getDaysInMonth(calendarMonth);
+
                         return (
                           <>
                             {Array.from({ length: firstDayIndex }).map((_, i) => (
@@ -741,30 +769,81 @@ const DashboardHome = () => {
                             Notes for {selectedDate.getDate()} {selectedDate.toLocaleDateString('en-US', { month: 'short' })}
                           </p>
                           {calendarNotes[selectedDate.toDateString()].map(note => (
-                            <div key={note.id} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50">
+                            <div key={note.id} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 group">
                               <div className="w-1 h-auto self-stretch rounded-full bg-blue-500 flex-shrink-0" />
-                              <div>
+                              <div className="flex-1">
                                 <p className="text-sm font-medium text-slate-900 dark:text-white leading-tight break-words">{note.text}</p>
                                 <p className="text-[10px] text-blue-500 mt-1 font-bold opacity-80">{note.time}</p>
                               </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteNote(note.id);
+                                }}
+                                className="p-1.5 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
+                                title="Delete note"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </div>
                           ))}
                         </div>
                       )}
 
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Upcoming Deadlines</p>
-                      {[
-                        { title: 'Project Submission', time: 'Tomorrow, 5:00 PM', type: 'Assessment', color: 'bg-red-500' },
-                        { title: 'Live Mentorship', time: 'Fri, 2:00 PM', type: 'Meeting', color: 'bg-blue-500' }
-                      ].map((event, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/50 transition-colors cursor-pointer">
-                          <div className={`w-1 h-8 rounded-full ${event.color} flex-shrink-0`} />
-                          <div>
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">{event.title}</p>
-                            <p className="text-xs text-slate-500 mt-0.5">{event.time}</p>
+                      {/* Dynamic Upcoming Deadlines */}
+                      {(() => {
+                        const allUpcoming = [];
+                        const now = new Date();
+                        now.setHours(0, 0, 0, 0);
+
+                        Object.entries(calendarNotes).forEach(([dateStr, notes]) => {
+                          const date = new Date(dateStr);
+                          const isSelectedDate = date.toDateString() === selectedDate.toDateString();
+                          
+                          if (date >= now && !isSelectedDate) {
+                            notes.forEach(note => {
+                              allUpcoming.push({ ...note, date });
+                            });
+                          }
+                        });
+
+                        // Sort by date then time
+                        allUpcoming.sort((a, b) => a.date.getTime() - b.date.getTime() || (a.time || '').localeCompare(b.time || ''));
+
+                        const nextThree = allUpcoming.slice(0, 3);
+
+                        if (nextThree.length === 0) return null;
+
+                        return (
+                          <div className="mt-8">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Upcoming Deadlines</p>
+                            <div className="space-y-3">
+                              {nextThree.map((deadline) => (
+                                <div 
+                                  key={deadline.id} 
+                                  onClick={() => {
+                                    setCalendarMonth(new Date(deadline.date));
+                                    setSelectedDate(new Date(deadline.date));
+                                  }}
+                                  className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group shadow-sm bg-white dark:bg-slate-800"
+                                >
+                                  <div className={`w-1 h-8 rounded-full bg-blue-500 flex-shrink-0`} />
+                                  <div className="flex-1 overflow-hidden">
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight truncate">{deadline.text}</p>
+                                    <p className="text-xs text-slate-500 mt-0.5">
+                                      {deadline.date.toDateString() === new Date().toDateString() 
+                                        ? 'Today' 
+                                        : deadline.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {deadline.time || 'All Day'}
+                                    </p>
+                                  </div>
+                                  <ChevronRight size={14} className="text-slate-300 group-hover:text-blue-500 self-center" />
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })()}
+
                     </div>
                   </div>
 
@@ -820,8 +899,23 @@ const DashboardHome = () => {
                   value={newNote}
                   onChange={(e) => setNewNote(e.target.value)}
                   placeholder="Type your note here..."
-                  className="w-full h-32 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none mb-6 text-sm placeholder:text-slate-400 font-medium"
+                  className="w-full h-24 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none mb-4 text-sm placeholder:text-slate-400 font-medium"
                 />
+
+                <div className="mb-6">
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">
+                    Set Time / Deadline
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="time"
+                      value={selectedNoteTime}
+                      onChange={(e) => setSelectedNoteTime(e.target.value)}
+                      className="w-full p-3 pl-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm font-semibold"
+                    />
+                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  </div>
+                </div>
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={() => setShowNoteModal(false)}
