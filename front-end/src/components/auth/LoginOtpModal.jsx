@@ -214,7 +214,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden z-10"
+            className="relative w-full max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[calc(100vh-2rem)]"
           >
             {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#30919D]/5 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
@@ -245,7 +245,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                 </div>
 
                 {/* OTP Form */}
-                <div className="p-4 sm:p-8">
+                <div className="p-4 sm:p-8 overflow-y-auto custom-scrollbar">
                   {/* Screen reader live region for announcements */}
                   <div
                     role="status"

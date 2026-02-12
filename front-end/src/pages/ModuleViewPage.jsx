@@ -1183,6 +1183,7 @@ const ModuleViewPage = () => {
                           duration={getDisplayDuration(selectedModule, selectedDay, activeStep?.duration || day.duration)}
                           initialMaxTime={maxWatchedTime}
                           initialCompleted={isVideoCompleted}
+                          autoPlay={true}
                           onProgressUpdate={(time, completed, dur) => handleVideoProgressUpdate(selectedModule, selectedDay, activeStep?.id || 1, time, completed, dur)}
                           onNext={handleMoveToNext}
                         />

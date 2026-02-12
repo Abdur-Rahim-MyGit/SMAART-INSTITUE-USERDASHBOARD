@@ -7,7 +7,6 @@ import { BrowserRouter } from "react-router-dom";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { UserProvider } from "@/contexts/UserContext";
 import AnimatedRoutes from "./components/AnimatedRoutes";
-import FloatingCommunityButton from "@/components/FloatingCommunityButton";
 import SecurityGuard from "@/components/SecurityGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -25,7 +24,6 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <AnimatedRoutes />
-                <FloatingCommunityButton />
                 <SecurityGuard />
               </BrowserRouter>
             </ErrorBoundary>
