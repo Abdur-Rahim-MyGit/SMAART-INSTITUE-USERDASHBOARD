@@ -912,8 +912,7 @@ const Community = () => {
                             )}
                           </AnimatePresence>
 
-                          {/* Poll Display */}
-                          {discussion.poll && discussion.poll.options && (
+                          {discussion.poll && discussion.poll.options && discussion.poll.options.length > 0 && (
                             <div className="mt-6 p-6 bg-gradient-to-br from-blue-50/50 to-white rounded-3xl border border-blue-100/50 shadow-sm">
                               <div className="flex items-center gap-2 mb-4">
                                 <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
