@@ -301,8 +301,8 @@ const ModuleView = ({ courseId, onBack }) => {
 
   const navigateToDays = (moduleId) => {
     setSelectedModule(moduleId);
-    setSelectedDay(null);
-    navigate(`/dashboard/courses/${courseId}/modules/${moduleId}/days`);
+    setSelectedDay(1);
+    navigate(`/dashboard/courses/${courseId}/modules/${moduleId}/days/1`);
   };
 
   const navigateToDay = (moduleId, dayId) => {
