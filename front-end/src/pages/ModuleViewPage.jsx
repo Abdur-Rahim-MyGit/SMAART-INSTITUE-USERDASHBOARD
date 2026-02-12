@@ -569,6 +569,16 @@ const ModuleViewPage = () => {
 
     // Check if the current requested day is actually unlocked
     const isActuallyUnlocked = isDayUnlocked(selectedModule, dayIndex, mod);
+    
+    // NEW: Strict Module Locking - Only Module 1 is allowed
+    const isModuleAllowed = selectedModule === 1;
+
+    if (!isModuleAllowed) {
+      console.warn(`[RouteGuard] Blocking access to Module ${selectedModule}: Module is LOCKED.`);
+      toast.error("Module is locked! Please start with Module 1.");
+      navigateToModules();
+      return;
+    }
 
     if (!isActuallyUnlocked) {
       console.warn(`[RouteGuard] Blocking access to M${selectedModule} S${selectedDay}: Day is LOCKED.`);
@@ -823,10 +833,6 @@ const ModuleViewPage = () => {
 
   const checkSessionCompletion = (mId, session) => {
     if (!session) return false;
-    
-    // Check if it's a dummy/placeholder day
-    const isDummy = String(session._id).startsWith('dummy-');
-
     // Multi-step session
     if (session.steps && session.steps.length > 0) {
       const completedSteps = session.steps.filter(s =>
@@ -834,16 +840,11 @@ const ModuleViewPage = () => {
       ).length;
       return completedSteps === session.steps.length;
     }
-
     // Legacy session with video
     if (session.videoUrl) {
       const key = `${mId}-${session.id}-1`;
       return videoCompletionMap[key] === true;
     }
-
-    // If it's a dummy day and has no video/steps, it's considered "complete" for progression
-    if (isDummy) return true;
-
     // No video/steps: Check tasks if they exist
     if (session.tasks && session.tasks.length > 0) {
       const completedTasksCount = session.tasks.filter(t => 
@@ -852,6 +853,7 @@ const ModuleViewPage = () => {
       return completedTasksCount === session.tasks.length;
     }
 
+    // Default: If truly empty and no tasks, don't show as done by default
     return false;
   };
 
@@ -1666,7 +1668,7 @@ const ModuleViewPage = () => {
                 // Let's keep modules somewhat sequential or fully open?
                 // User said "click the course 1 it... should also be redigned".
                 // I'll make them all LOOK premium.
-                const isLocked = false; // Unlocking all modules for better UX per recent "open" vibe.
+                const isLocked = index !== 0; // Only the first module is unlocked
 
                 const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -1740,18 +1742,26 @@ const ModuleViewPage = () => {
 
                           {/* Action Button */}
                           <button
-                            onClick={() => navigateToDay(module.id, module.days?.[0]?.id)}
-                            className="w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-all duration-300"
+                            onClick={() => {
+                              if (!isLocked) {
+                                navigateToDay(module.id, module.days?.[0]?.id);
+                              } else {
+                                toast.error("This module is locked! Complete previous modules first.");
+                              }
+                            }}
+                            className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-all duration-300 ${isLocked ? 'cursor-not-allowed opacity-50' : ''}`}
                             style={{
-                              backgroundColor: completed > 0 ? 'transparent' : '#f8fafc',
-                              color: completed > 0 ? config.border : '#64748b',
-                              border: `1px solid ${completed > 0 ? config.border : '#e2e8f0'}`,
+                              backgroundColor: !isLocked && completed > 0 ? 'transparent' : '#f8fafc',
+                              color: !isLocked && completed > 0 ? config.border : '#64748b',
+                              border: `1px solid ${!isLocked && completed > 0 ? config.border : '#e2e8f0'}`,
                             }}
                           >
-                            {completed > 0 ? (
+                            {isLocked ? (
+                              <><Lock size={12} className="mr-1" /> Locked</>
+                            ) : completed > 0 ? (
                               <>Continue Module <ChevronRight size={14} /></>
                             ) : (
-                              <>Start Module <Play size={12} className="ml-1" /></>
+                              <>Start Course <Play size={12} className="ml-1" /></>
                             )}
                           </button>
                         </div>

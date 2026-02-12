@@ -22,7 +22,7 @@ const MyCourses = () => {
       <div className="min-h-screen transition-all duration-300">
         <DashboardHeader />
 
-        <main className="w-full relative py-8 px-4 md:px-0">
+        <main className="w-full relative py-8 px-0 md:px-0">
           <div className="max-w-7xl mx-auto pb-12">
             <motion.div
               initial={{ opacity: 0 }}
