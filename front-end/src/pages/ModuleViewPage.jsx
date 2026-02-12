@@ -823,6 +823,10 @@ const ModuleViewPage = () => {
 
   const checkSessionCompletion = (mId, session) => {
     if (!session) return false;
+    
+    // Check if it's a dummy/placeholder day
+    const isDummy = String(session._id).startsWith('dummy-');
+
     // Multi-step session
     if (session.steps && session.steps.length > 0) {
       const completedSteps = session.steps.filter(s =>
@@ -830,11 +834,16 @@ const ModuleViewPage = () => {
       ).length;
       return completedSteps === session.steps.length;
     }
+
     // Legacy session with video
     if (session.videoUrl) {
       const key = `${mId}-${session.id}-1`;
       return videoCompletionMap[key] === true;
     }
+
+    // If it's a dummy day and has no video/steps, it's considered "complete" for progression
+    if (isDummy) return true;
+
     // No video/steps: Check tasks if they exist
     if (session.tasks && session.tasks.length > 0) {
       const completedTasksCount = session.tasks.filter(t => 
@@ -843,7 +852,6 @@ const ModuleViewPage = () => {
       return completedTasksCount === session.tasks.length;
     }
 
-    // Default: If truly empty and no tasks, don't show as done by default
     return false;
   };
 

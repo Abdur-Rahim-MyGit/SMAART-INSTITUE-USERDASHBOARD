@@ -710,21 +710,9 @@ const DashboardHome = () => {
 
                     <div className="grid grid-cols-7 gap-1">
                       {/* Padding for empty days */}
-<<<<<<< HEAD
-                      {Array.from({ length: new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), 1).getDay() }).map((_, i) => (
-                        <div key={`empty-${i}`} />
-                      ))}
-
-                      {getDaysInMonth(calendarMonth).daysArray.map(day => {
-                        const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
-                        const isToday = date.toDateString() === new Date().toDateString();
-                        const isSelected = date.toDateString() === selectedDate.toDateString();
-                        const hasNotes = calendarNotes[date.toDateString()]?.length > 0;
-
-=======
                       {(() => {
                         const { daysArray, firstDayIndex } = getDaysInMonth(calendarMonth);
->>>>>>> origin/main
+
                         return (
                           <>
                             {Array.from({ length: firstDayIndex }).map((_, i) => (

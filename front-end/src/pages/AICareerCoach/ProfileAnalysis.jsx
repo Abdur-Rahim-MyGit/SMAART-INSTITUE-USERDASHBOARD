@@ -4,7 +4,7 @@ import { Loader2, ArrowLeft, Sparkles, TrendingUp, Target, BookOpen, Brain, Awar
 import ReactMarkdown from 'react-markdown';
 
 import { useNavigate, useLocation } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
+
 import DashboardSidebar from '@/components/DashboardSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';

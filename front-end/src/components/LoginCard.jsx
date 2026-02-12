@@ -296,22 +296,14 @@ const LoginCard = () => {
   // Show institution selector first
   if (showInstitutionSelector) {
     return (
-<<<<<<< HEAD
-      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 md:px-0">
-=======
       <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-2xl mx-auto px-0">
->>>>>>> origin/main
         <InstitutionSelector onSelect={handleInstitutionSelected} />
       </div>
     );
   }
 
   return (
-<<<<<<< HEAD
-    <div className="w-full max-w-md mx-auto space-y-3 sm:space-y-4 md:space-y-6 px-4 sm:px-6 md:px-0">
-=======
     <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto space-y-4 sm:space-y-6">
->>>>>>> origin/main
       {/* Selected Institution Display */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
