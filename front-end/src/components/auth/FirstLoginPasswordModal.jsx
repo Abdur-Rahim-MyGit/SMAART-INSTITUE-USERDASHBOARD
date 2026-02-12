@@ -83,7 +83,7 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="w-full max-w-md bg-gradient-to-b from-[#001a38] to-[#002147] rounded-2xl shadow-2xl border border-teal/20 overflow-hidden"
+          className="w-full max-w-md bg-gradient-to-b from-[#001a38] to-[#002147] rounded-2xl shadow-2xl border border-teal/20 overflow-hidden flex flex-col max-h-[calc(100vh-2rem)]"
         >
           {/* Header */}
           <div className="px-6 py-5 border-b border-teal/20 bg-gradient-to-r from-teal/10 to-transparent">
@@ -101,7 +101,7 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
           </div>
 
           {/* Content */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto custom-scrollbar">
             {/* Info Banner */}
             <div className="p-4 rounded-lg bg-teal/10 border border-teal/30">
               <p className="text-sm text-teal-light flex items-start gap-2">
