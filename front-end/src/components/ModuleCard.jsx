@@ -218,7 +218,7 @@ const ModuleCard = ({ module, index }) => {
         className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-accent to-accent/80 text-primary-foreground font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
       >
         <Play className="w-5 h-5" />
-        {completedTasks === 0 ? 'Start Module' : 'Continue'}
+        {completedTasks === 0 ? 'Start Course' : 'Continue'}
       </motion.button>
     </motion.div>
   );

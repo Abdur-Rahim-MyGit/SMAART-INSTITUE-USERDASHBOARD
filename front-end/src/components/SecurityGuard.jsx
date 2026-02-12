@@ -27,10 +27,10 @@ const SecurityGuard = () => {
     // Check if security should be active based on route
     // Only active for:
     // 1. Specific Assessment pages (sub-routes of /dashboard/assessments/)
-    // 2. Course Content pages (sub-routes of /dashboard/courses/)
+    // 2. Specific Course Day Content (not the roadmap or module list)
     const isProtectedPath = 
       location.pathname.startsWith("/dashboard/assessments/") || 
-      location.pathname.startsWith("/dashboard/courses/");
+      (location.pathname.startsWith("/dashboard/courses/") && location.pathname.includes("/days/"));
 
     // If NOT authenticated OR NOT on a protected path, ensure everything is clean and return
     if (!isAuthenticated || !isProtectedPath) {

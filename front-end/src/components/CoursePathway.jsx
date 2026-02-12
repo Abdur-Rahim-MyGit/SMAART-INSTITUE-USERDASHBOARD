@@ -17,10 +17,10 @@ const CoursePathway = ({ onCourseClick }) => {
   const [isMobile, setIsMobile] = useState(false);
 
   // --- Configuration ---
-  const CARD_WIDTH = 320;
-  const GAP_X = 280; 
+  const CARD_WIDTH = isMobile ? 280 : 320;
+  const GAP_X = isMobile ? 120 : 280; 
   const NODE_X_SPACING = CARD_WIDTH + GAP_X; 
-  const ROAD_Y = 280; // Adjusted for better vertical centering in reduced container
+  const ROAD_Y = isMobile ? 240 : 280; 
 
   const STEPS_CONFIG = [
     { color: "#3B82F6", label: "01" },
@@ -97,14 +97,14 @@ const CoursePathway = ({ onCourseClick }) => {
   };
 
   const getPosition = (index) => ({
-    x: 400 + index * NODE_X_SPACING, 
+    x: (isMobile ? 180 : 400) + index * NODE_X_SPACING, 
     y: ROAD_Y
   });
 
   const generateRoadPath = () => {
     if (courses.length === 0) return "";
-    const startX = getPosition(0).x - 300;
-    const endX = getPosition(courses.length - 1).x + 500;
+    const startX = getPosition(0).x - (isMobile ? 150 : 300);
+    const endX = getPosition(courses.length - 1).x + (isMobile ? 250 : 500);
     return `M ${startX} ${ROAD_Y} L ${endX} ${ROAD_Y}`;
   };
 
@@ -150,10 +150,31 @@ const CoursePathway = ({ onCourseClick }) => {
         </>
       )}
 
+      {/* Mobile Navigation Buttons */}
+      {isMobile && (
+        <div className="fixed bottom-6 left-0 right-0 z-[60] flex justify-center gap-6 px-4">
+          <button
+            onClick={() => scroll('left')}
+            disabled={!canScrollLeft}
+            className={`w-14 h-14 rounded-2xl flex items-center justify-center bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-slate-200 dark:border-slate-700 transition-all active:scale-95 ${!canScrollLeft ? 'opacity-30' : 'text-blue-600 dark:text-blue-400'}`}
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          {canScrollRight && (
+            <button
+              onClick={() => scroll('right')}
+              className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-slate-200 dark:border-slate-700 transition-all active:scale-95 text-blue-600 dark:text-blue-400"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Scrollable Container - Reduced height and padding */}
       <div
         ref={scrollContainerRef}
-        className="w-full h-[550px] overflow-x-auto overflow-y-hidden py-4 relative scrollbar-hide snap-x snap-mandatory perspective-1000"
+        className={`w-full ${isMobile ? 'h-[480px]' : 'h-[550px]'} overflow-x-auto overflow-y-hidden py-4 relative scrollbar-hide snap-x snap-mandatory perspective-1000`}
       >
         <div
           className="relative h-full"
@@ -194,10 +215,10 @@ const CoursePathway = ({ onCourseClick }) => {
           <div
             className="absolute z-10 font-bold text-slate-700 dark:text-white flex flex-col items-center text-center pointer-events-none"
             style={{
-              left: `${getPosition(courses.length - 1).x + 350}px`,
+              left: `${getPosition(courses.length - 1).x + (isMobile ? 180 : 350)}px`,
               top: `${ROAD_Y}px`,
               transform: 'translateY(-50%)',
-              width: '200px'
+              width: isMobile ? '140px' : '200px'
             }}
           >
             <div className="bg-gradient-to-r from-emerald-400 to-green-600 text-white text-[11px] font-bold px-5 py-2 rounded-full mb-3 shadow-lg animate-pulse tracking-widest ring-4 ring-white/50 uppercase">GOAL REACHED</div>
@@ -208,13 +229,13 @@ const CoursePathway = ({ onCourseClick }) => {
           {courses.map((course, index) => {
             const pos = getPosition(index);
             const config = getStepConfig(index);
-            const isActive = true;
+            const isActive = index === 0;
 
             return (
               <div key={course.id || index} className="snap-center">
                 {/* Visual Connector Dot on the Road */}
                 <div 
-                  className="absolute w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-4 z-40 shadow-2xl flex items-center justify-center"
+                  className="absolute w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-4 z-20 shadow-2xl flex items-center justify-center"
                   style={{ 
                     left: `${pos.x}px`, 
                     top: `${pos.y}px`, 
@@ -234,32 +255,42 @@ const CoursePathway = ({ onCourseClick }) => {
                   className="absolute"
                   style={{
                     left: `${pos.x - (CARD_WIDTH / 2)}px`,
-                    top: `${pos.y - 190}px`, // Centered on the road
+                    top: `${pos.y - 240}px`, // Shifted higher to clear the dot
                     width: CARD_WIDTH,
-                    zIndex: 30
+                    zIndex: 50 // Increased z-index to stay on top
                   }}
                 >
-                  <div
-                    onClick={() => onCourseClick(course._id || course.id)}
-                    className="relative group cursor-pointer"
-                  >
-                    <div className="relative overflow-hidden rounded-[2rem] bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 shadow-2xl shadow-slate-200/50 dark:shadow-none hover:border-blue-500/40 transition-all duration-500 group-hover:-translate-y-4">
-                      
-                      {/* Header Color Strip */}
-                      <div className="h-20 bg-gradient-to-br"
-                        style={{
-                          backgroundImage: `linear-gradient(135deg, ${config.color} 0%, ${config.color}dd 100%)`
-                        }}
-                      >
-                        <div className="p-5 flex justify-between items-start">
-                          <div className="bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg text-white text-[10px] font-bold uppercase tracking-widest opacity-90">
-                            Module {config.label}
-                          </div>
-                          <div className="bg-white/95 p-2 rounded-full text-slate-700 shadow-md">
-                            <PlayCircle size={16} className="text-blue-600" fill="currentColor" fillOpacity={0.2} />
+                    <div
+                      onClick={() => {
+                        if (isActive) {
+                          onCourseClick(course._id || course.id);
+                        }
+                      }}
+                      className={`relative group ${isActive ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
+                    >
+                      <div className={`relative overflow-hidden rounded-[2rem] bg-white dark:bg-slate-800 border-2 ${isActive ? 'border-slate-100 dark:border-slate-700 hover:border-blue-500/40' : 'border-slate-200 dark:border-slate-800'} shadow-2xl shadow-slate-200/50 dark:shadow-none transition-all duration-500 ${isActive ? 'group-hover:-translate-y-4' : ''}`}>
+                        
+                        {/* Header Color Strip */}
+                        <div className="h-20 bg-gradient-to-br"
+                          style={{
+                            backgroundImage: isActive 
+                              ? `linear-gradient(135deg, ${config.color} 0%, ${config.color}dd 100%)`
+                              : 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)'
+                          }}
+                        >
+                          <div className="p-5 flex justify-between items-start">
+                            <div className="bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg text-white text-[10px] font-bold uppercase tracking-widest opacity-90">
+                              Module {config.label}
+                            </div>
+                            <div className="bg-white/95 p-2 rounded-full text-slate-700 shadow-md">
+                              {isActive ? (
+                                <PlayCircle size={16} className="text-blue-600" fill="currentColor" fillOpacity={0.2} />
+                              ) : (
+                                <Lock size={16} className="text-slate-400" />
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
 
                       {/* Content */}
                       <div className="p-6">
@@ -279,7 +310,7 @@ const CoursePathway = ({ onCourseClick }) => {
                         </p>
 
                         <button className="w-full py-3 rounded-2xl bg-slate-50 dark:bg-slate-700/50 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-[0.2em] border border-blue-50/50 dark:border-blue-900/30 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2 shadow-sm">
-                          Start Module <ChevronRight size={14} />
+                          {isActive ? 'Start Course' : 'Locked'} <ChevronRight size={14} />
                         </button>
                       </div>
                     </div>
