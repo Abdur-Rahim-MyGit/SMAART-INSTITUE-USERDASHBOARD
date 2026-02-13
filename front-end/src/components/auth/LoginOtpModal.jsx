@@ -52,6 +52,14 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
     setExpirationTime(300);
   }, [currentTempToken]);
 
+  // AUTO-SUBMIT: When all 6 digits are filled, automatically verify
+  useEffect(() => {
+    const otpString = otp.join("");
+    if (otpString.length === 6 && !isLoading && !showForceLogout) {
+      verifyOtp(false);
+    }
+  }, [otp]);
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
