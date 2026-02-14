@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Calendar, User, Hash, TrendingUp, QrCode } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Lock, Zap, Shield, Hash, ScanLine, Database, QrCode } from 'lucide-react';
 import apiCall from '@/services/api';
 import { toast } from 'sonner';
 import { Html5QrcodeScanner } from 'html5-qrcode';
@@ -9,47 +9,87 @@ const CertificateVerification = () => {
     const [certificateId, setCertificateId] = useState('');
     const [verificationResult, setVerificationResult] = useState(null);
     const [isVerifying, setIsVerifying] = useState(false);
-    const [isScanning, setIsScanning] = useState(false);
+    const [activeTab, setActiveTab] = useState('id'); // 'id' or 'scan'
     const [error, setError] = useState(null);
+    const scannerRef = useRef(null);
 
+    // Handle QR Scanner Lifecycle
     useEffect(() => {
         let scanner = null;
-        if (isScanning) {
-            scanner = new Html5QrcodeScanner('reader-landing', {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-                aspectRatio: 1.0
-            });
 
-            scanner.render((decodedText) => {
-                try {
-                    let certId = decodedText;
-                    if (decodedText.includes('/verify-certificate/')) {
-                        certId = decodedText.split('/verify-certificate/').pop();
-                    } else if (decodedText.startsWith('http')) {
-                        const url = new URL(decodedText);
-                        const pathParts = url.pathname.split('/');
-                        certId = pathParts[pathParts.length - 1];
+        if (activeTab === 'scan') {
+            // Include a small delay to ensure the DOM element is mounted by AnimatePresence
+            const timer = setTimeout(() => {
+                const element = document.getElementById('reader-landing');
+                if (element) {
+                    try {
+                        scanner = new Html5QrcodeScanner('reader-landing', {
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 },
+                            aspectRatio: 1.0,
+                            showTorchButtonIfSupported: true
+                        }, false); // verbose=false
+
+                        scanner.render((decodedText) => {
+                            handleScanSuccess(decodedText, scanner);
+                        }, (error) => {
+                            // Ignore scan errors as they happen frequently when no QR is in view
+                        });
+
+                        scannerRef.current = scanner;
+                    } catch (err) {
+                        console.error("Failed to initialize scanner", err);
+                        toast.error("Could not start camera. Please ensure permissions are granted.");
+                        setActiveTab('id');
                     }
-
-                    setCertificateId(certId);
-                    setIsScanning(false);
-                    scanner.clear();
-                    verifyCertificate(certId);
-                } catch (e) {
-                    toast.error("Invalid QR code format");
                 }
-            }, (error) => {
-                // Ignore scan errors
-            });
+            }, 300); // 300ms delay for animation
+            return () => clearTimeout(timer);
         }
 
         return () => {
-            if (scanner) {
-                scanner.clear().catch(err => console.error("Error clearing scanner", err));
+            // Cleanup function
+            if (scannerRef.current) {
+                try {
+                    scannerRef.current.clear().catch(e => console.error("Error clearing scanner", e));
+                } catch (e) {
+                    console.error("Error clearing scanner", e);
+                }
+                scannerRef.current = null;
             }
         };
-    }, [isScanning]);
+    }, [activeTab]);
+
+    const handleScanSuccess = (decodedText, scannerInstance) => {
+        try {
+            let certId = decodedText;
+            // Handle various URL formats if strictly needed, or just extract ID
+            if (decodedText.includes('/verify-certificate/')) {
+                certId = decodedText.split('/verify-certificate/').pop();
+            } else if (decodedText.startsWith('http')) {
+                try {
+                    const url = new URL(decodedText);
+                    const pathParts = url.pathname.split('/');
+                    certId = pathParts[pathParts.length - 1];
+                } catch (e) {
+                    // fallback if URL parsing fails
+                    console.warn("Could not parse URL", e);
+                }
+            }
+
+            // Setup for verification
+            if (scannerInstance) {
+                scannerInstance.clear().catch(e => console.error("Failed to clear", e));
+            }
+            setActiveTab('id'); // Switch back to ID view to show result
+            setCertificateId(certId);
+            verifyCertificate(certId);
+
+        } catch (e) {
+            console.error("Scan Error", e);
+            toast.error("Invalid QR code format");
+        }
+    };
 
     const verifyCertificate = async (certId = certificateId) => {
         if (!certId || certId.trim() === '') {
@@ -62,14 +102,12 @@ const CertificateVerification = () => {
         setVerificationResult(null);
 
         try {
-            const response = await apiCall(`/certificates/verify/${certId.trim()}`, {
-                method: 'GET'
-            });
+            const response = await apiCall(`/certificates/verify/${certId.trim()}`, { method: 'GET' });
 
             if (response.success) {
                 setVerificationResult(response);
                 if (response.verified) {
-                    toast.success('Certificate verified successfully!');
+                    toast.success('Certificate Authenticated Successfully!');
                 } else {
                     toast.warning(response.message);
                 }
@@ -77,11 +115,10 @@ const CertificateVerification = () => {
         } catch (err) {
             console.error('Verification error:', err);
             if (err.response?.status === 404) {
-                setError('Certificate not found. Please check the certificate ID and try again.');
+                setError('Certificate not found. Please check the ID and try again.');
             } else {
-                setError(err.response?.data?.message || 'Failed to verify certificate. Please try again.');
+                setError(err.response?.data?.message || 'Authentication failed.');
             }
-            toast.error('Verification failed');
         } finally {
             setIsVerifying(false);
         }
@@ -93,231 +130,252 @@ const CertificateVerification = () => {
     };
 
     return (
-        <section id="verify-certificate" className="py-20 sm:py-24 bg-gradient-to-b from-gray-50 to-white dark:from-[#001229] dark:to-[#002147] relative overflow-hidden">
+        <section id="verify-certificate" className="py-24 bg-gray-50 dark:bg-[#000F24] relative overflow-hidden transition-colors duration-500">
             {/* Background decoration */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[#1a3884]/5 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#daa520]/5 rounded-full blur-3xl" />
-            </div>
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#daa520]/5 dark:bg-[#daa520]/10 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
             <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
-                {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-12"
-                >
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#daa520] to-[#b8860b] mb-6 shadow-lg shadow-amber-500/20">
-                        <ShieldCheck className="w-8 h-8 text-[#002147]" />
-                    </div>
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                        Verify Certificate
-                    </h2>
-                    <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                        Instantly verify the authenticity of SMAART Institute certificates
-                    </p>
-                </motion.div>
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid lg:grid-cols-12 gap-16 lg:gap-20 items-stretch">
 
-                {/* Verification Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 }}
-                    className="max-w-4xl mx-auto"
-                >
-                    <div className="bg-white dark:bg-[#002147]/50 backdrop-blur-xl rounded-3xl border border-gray-200 dark:border-white/10 p-6 sm:p-8 shadow-2xl">
-                        {/* Mode Toggle */}
-                        <div className="flex gap-3 mb-6">
-                            <button
-                                onClick={() => { setIsScanning(false); setVerificationResult(null); setError(null); }}
-                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${!isScanning
-                                    ? 'bg-[#002147] dark:bg-[#1a3884] text-white shadow-lg border border-[#daa520]'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5'
-                                    }`}
+                        {/* Left Column: Info & Features */}
+                        <div className="lg:col-span-5 flex flex-col justify-center">
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8 }}
                             >
-                                <Hash className="w-4 h-4 inline mr-2" />
-                                Manual Entry
-                            </button>
-                            <button
-                                onClick={() => { setIsScanning(true); setVerificationResult(null); setError(null); }}
-                                className={`flex-1 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isScanning
-                                    ? 'bg-[#002147] dark:bg-[#1a3884] text-white shadow-lg border border-[#daa520]'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5'
-                                    }`}
-                            >
-                                <QrCode className="w-4 h-4 inline mr-2" />
-                                Scan QR Code
-                            </button>
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/10 dark:bg-[#daa520]/10 border border-[#1a3884]/20 dark:border-[#daa520]/20 text-[#1a3884] dark:text-[#daa520] text-xs font-bold uppercase tracking-widest mb-8">
+                                    Official Records
+                                </div>
+                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading leading-tight tracking-tight">
+                                    Certificate <br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#daa520] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300">
+                                        Verification
+                                    </span>
+                                </h2>
+                                <p className="text-gray-600 dark:text-gray-300 text-base mb-10 leading-relaxed max-w-md font-light">
+                                    Verify the authenticity of SMAART Institute credentials instantly. Our secure blockchain-backed verification system ensures trust and credibility.
+                                </p>
+
+                                <div className="space-y-6">
+                                    {[
+                                        { icon: Shield, title: "Tamper Proof", info: "Blockchain Secured", sub: "Immutable verification records" },
+                                        { icon: Zap, title: "Instant Check", info: "Real-time Validation", sub: "Verify in seconds" },
+                                        { icon: Database, title: "Global Access", info: "Centralized Registry", sub: "Access anywhere, anytime" }
+                                    ].map((item, idx) => (
+                                        <motion.div
+                                            key={idx}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            whileInView={{ opacity: 1, x: 0 }}
+                                            viewport={{ once: true }}
+                                            transition={{ delay: 0.2 + idx * 0.1 }}
+                                            className="flex items-center gap-5 p-4 rounded-2xl bg-white dark:bg-[#001835]/80 border border-gray-100 dark:border-white/10 hover:border-[#daa520]/50 dark:hover:border-[#daa520]/50 shadow-sm transition-all duration-300 group backdrop-blur-sm"
+                                        >
+                                            <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center group-hover:bg-[#1a3884] dark:group-hover:bg-[#daa520] group-hover:text-white dark:group-hover:text-[#002147] transition-all duration-300 shadow-inner">
+                                                <item.icon className="w-5 h-5 text-[#1a3884] dark:text-[#daa520] group-hover:text-white dark:group-hover:text-[#002147] transition-colors" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-gray-400 dark:text-gray-500 font-bold text-[9px] uppercase tracking-widest mb-0.5">{item.title}</h4>
+                                                <p className="text-[#002147] dark:text-white font-bold text-base leading-none mb-0.5">{item.info}</p>
+                                                <p className="text-gray-500 dark:text-gray-400 text-[11px] font-light tracking-wide">{item.sub}</p>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </motion.div>
                         </div>
 
-                        {/* QR Scanner */}
-                        {isScanning && (
+                        {/* Right Column: Verification Card */}
+                        <div className="lg:col-span-7">
                             <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="mb-6"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.8 }}
+                                className="h-full"
                             >
-                                <div id="reader-landing" className="mx-auto rounded-xl overflow-hidden border-2 border-dashed border-[#daa520]/30"></div>
-                                <p className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center font-medium">
-                                    Position the certificate's QR code within the square
-                                </p>
-                            </motion.div>
-                        )}
+                                <div className="bg-white dark:bg-[#001835]/90 border border-gray-100 dark:border-white/10 rounded-[2rem] p-1 shadow-2xl relative overflow-hidden h-full flex flex-col backdrop-blur-xl group">
 
-                        {/* Manual Entry Form */}
-                        {!isScanning && (
-                            <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        value={certificateId}
-                                        onChange={(e) => setCertificateId(e.target.value)}
-                                        placeholder="e.g., SMAART-CAP-2025-ABC12"
-                                        className="w-full px-5 py-4 pl-12 rounded-xl border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-[#daa520] focus:border-transparent transition-all text-base"
-                                    />
-                                    <Hash className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                </div>
-                                <button
-                                    type="submit"
-                                    disabled={isVerifying || !certificateId.trim()}
-                                    className="w-full bg-gradient-to-r from-[#002147] to-[#1a3884] hover:from-[#1a3884] hover:to-[#002147] text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base border border-[#daa520]"
-                                >
-                                    {isVerifying ? (
-                                        <>
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                            Verifying...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Search className="w-5 h-5" />
-                                            Verify Certificate
-                                        </>
-                                    )}
-                                </button>
-                            </form>
-                        )}
+                                    {/* Inner Container */}
+                                    <div className="bg-white/50 dark:bg-[#001229]/50 rounded-[1.8rem] flex flex-col h-full overflow-hidden relative border border-gray-50 dark:border-white/5">
 
-                        {/* Error Message */}
-                        <AnimatePresence>
-                            {error && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-xl p-4 mb-6"
-                                >
-                                    <div className="flex items-start gap-3">
-                                        <XCircle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                                        <div>
-                                            <h4 className="font-semibold text-red-900 dark:text-red-200 mb-1">Verification Failed</h4>
-                                            <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+                                        {/* Top Decoration */}
+                                        <div className="h-32 bg-gradient-to-r from-[#1a3884] to-[#0d1f4d] relative overflow-hidden flex-shrink-0">
+                                            <div className="absolute inset-0 bg-[#daa520]/10 pattern-dots" />
+                                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#daa520]/20 rounded-full blur-3xl" />
+                                            <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl" />
+
+                                            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white dark:from-[#001835] to-transparent opacity-20" />
+
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white pb-4">
+                                                <ShieldCheck className="w-10 h-10 mb-2 text-[#daa520]" />
+                                                <h3 className="text-xl font-bold font-heading tracking-wide">Credential Check</h3>
+                                            </div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
 
-                        {/* Verification Result */}
-                        <AnimatePresence>
-                            {verificationResult && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 20 }}
-                                    className={`rounded-xl border p-6 ${verificationResult.verified
-                                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-500/30'
-                                        : 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-500/30'
-                                        }`}
-                                >
-                                    {/* Status Header */}
-                                    <div className="flex items-center gap-4 mb-6 pb-6 border-b border-green-200 dark:border-green-500/30">
-                                        {verificationResult.verified ? (
-                                            <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center shrink-0">
-                                                <CheckCircle2 className="w-7 h-7 text-white" />
-                                            </div>
-                                        ) : (
-                                            <div className="w-12 h-12 rounded-full bg-yellow-500 flex items-center justify-center shrink-0">
-                                                <AlertTriangle className="w-7 h-7 text-white" />
-                                            </div>
-                                        )}
-                                        <div>
-                                            <h3 className={`text-xl font-bold ${verificationResult.verified ? 'text-green-900 dark:text-green-100' : 'text-yellow-900 dark:text-yellow-100'}`}>
-                                                {verificationResult.verified ? 'Certificate Verified' : 'Certificate Invalid'}
-                                            </h3>
-                                            <p className={`text-sm ${verificationResult.verified ? 'text-green-700 dark:text-green-300' : 'text-yellow-700 dark:text-yellow-300'}`}>
-                                                {verificationResult.message}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Certificate Details */}
-                                    {verificationResult.verified && verificationResult.certificate && (
-                                        <div className="space-y-4">
-                                            <div className="grid sm:grid-cols-2 gap-4">
-                                                <div className="bg-white dark:bg-white/5 rounded-lg p-4 border border-green-200 dark:border-green-500/20">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <User className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Recipient</span>
-                                                    </div>
-                                                    <p className="font-bold text-gray-900 dark:text-white">{verificationResult.certificate.fullName}</p>
-                                                    <p className="text-sm text-gray-600 dark:text-gray-400">ID: {verificationResult.certificate.studentId}</p>
-                                                </div>
-
-                                                <div className="bg-white dark:bg-white/5 rounded-lg p-4 border border-green-200 dark:border-green-500/20">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <Award className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Certificate Type</span>
-                                                    </div>
-                                                    <p className="font-bold text-gray-900 dark:text-white">{verificationResult.certificate.certificateTitle}</p>
-                                                </div>
-
-                                                <div className="bg-white dark:bg-white/5 rounded-lg p-4 border border-green-200 dark:border-green-500/20">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <Calendar className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Issue Date</span>
-                                                    </div>
-                                                    <p className="font-bold text-gray-900 dark:text-white">
-                                                        {new Date(verificationResult.certificate.issueDate).toLocaleDateString('en-GB', {
-                                                            day: 'numeric',
-                                                            month: 'long',
-                                                            year: 'numeric'
-                                                        })}
-                                                    </p>
-                                                </div>
-
-                                                <div className="bg-white dark:bg-white/5 rounded-lg p-4 border border-green-200 dark:border-green-500/20">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">Readiness Band</span>
-                                                    </div>
-                                                    <p className="font-bold text-gray-900 dark:text-white">{verificationResult.certificate.readinessBand}</p>
-                                                </div>
+                                        <div className="px-6 md:px-10 pb-10 pt-6 flex-grow flex flex-col -mt-6">
+                                            {/* Tab Switcher */}
+                                            <div className="bg-white dark:bg-[#000F24] p-1 rounded-2xl shadow-lg border border-gray-100 dark:border-white/10 flex mb-8 mx-auto relative z-10 max-w-sm w-full">
+                                                <button
+                                                    onClick={() => { setActiveTab('id'); setVerificationResult(null); setError(null); }}
+                                                    className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'id'
+                                                        ? 'bg-[#1a3884] text-white shadow-md'
+                                                        : 'text-gray-500 hover:text-[#1a3884] dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                                                >
+                                                    <Hash className="w-3.5 h-3.5" />
+                                                    ByID
+                                                </button>
+                                                <button
+                                                    onClick={() => { setActiveTab('scan'); setVerificationResult(null); setError(null); }}
+                                                    className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'scan'
+                                                        ? 'bg-[#daa520] text-[#002147] shadow-md'
+                                                        : 'text-gray-500 hover:text-[#1a3884] dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                                                >
+                                                    <QrCode className="w-3.5 h-3.5" />
+                                                    Scan QR
+                                                </button>
                                             </div>
 
-                                            {/* Validated Skills */}
-                                            {verificationResult.certificate.validatedSkills && verificationResult.certificate.validatedSkills.length > 0 && (
-                                                <div className="bg-white dark:bg-white/5 rounded-lg p-4 border border-green-200 dark:border-green-500/20">
-                                                    <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">Validated Skills</h4>
-                                                    <div className="grid sm:grid-cols-2 gap-2">
-                                                        {verificationResult.certificate.validatedSkills.map((skill, index) => (
-                                                            <div key={index} className="flex items-center gap-2 text-sm">
-                                                                <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0" />
-                                                                <span className="text-gray-900 dark:text-white">{skill.label}</span>
+                                            <div className="flex-grow flex flex-col justify-center">
+                                                <AnimatePresence mode="wait">
+                                                    {activeTab === 'scan' ? (
+                                                        <motion.div
+                                                            key="scanner"
+                                                            initial={{ opacity: 0, scale: 0.95 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            exit={{ opacity: 0, scale: 0.95 }}
+                                                            className="w-full relative py-4"
+                                                        >
+                                                            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">Point your camera at the certificate QR code</p>
+                                                            <div className="rounded-2xl overflow-hidden border-2 border-[#daa520] bg-black relative aspect-square max-w-[300px] mx-auto shadow-2xl">
+                                                                <div id="reader-landing" className="w-full h-full" />
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                                        </motion.div>
+                                                    ) : (
+                                                        <motion.form
+                                                            key="form"
+                                                            initial={{ opacity: 0, x: -20 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            exit={{ opacity: 0, x: 20 }}
+                                                            onSubmit={handleSubmit}
+                                                            className="space-y-6 w-full max-w-sm mx-auto"
+                                                        >
+                                                            <div className="text-center mb-2">
+                                                                <p className="text-sm text-gray-500 dark:text-gray-400">Enter the unique Certificate ID</p>
+                                                            </div>
+                                                            <div className="relative">
+                                                                <input
+                                                                    type="text"
+                                                                    value={certificateId}
+                                                                    onChange={(e) => setCertificateId(e.target.value)}
+                                                                    placeholder="e.g. SMAART-202X-XXXX"
+                                                                    className="w-full h-14 px-4 text-center text-lg font-mono font-bold bg-gray-50 dark:bg-[#000F24] border-2 border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#daa520] focus:ring-0 transition-colors text-[#1a3884] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-700"
+                                                                />
+                                                            </div>
+
+                                                            <button
+                                                                type="submit"
+                                                                disabled={isVerifying || !certificateId.trim()}
+                                                                className="w-full bg-[#1a3884] hover:bg-[#0d1f4d] text-white h-14 rounded-2xl font-bold shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-wide text-sm"
+                                                            >
+                                                                {isVerifying ? (
+                                                                    <Loader2 className="w-5 h-5 animate-spin text-[#daa520]" />
+                                                                ) : (
+                                                                    <>
+                                                                        Verify Now
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        </motion.form>
+                                                    )}
+                                                </AnimatePresence>
+
+                                                {/* Verification Results Overlay */}
+                                                <AnimatePresence>
+                                                    {(verificationResult || error) && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: 50 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            exit={{ opacity: 0, y: 50 }}
+                                                            className="absolute inset-0 bg-white dark:bg-[#001835] z-50 flex flex-col p-6 rounded-[1.8rem]"
+                                                        >
+                                                            <button
+                                                                onClick={() => { setVerificationResult(null); setError(null); }}
+                                                                className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-white/10 rounded-full hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
+                                                            >
+                                                                <XCircle className="w-5 h-5 text-gray-500" />
+                                                            </button>
+
+                                                            <div className="flex-grow flex flex-col items-center justify-center text-center">
+                                                                {error ? (
+                                                                    <div className="space-y-4">
+                                                                        <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                                                                            <XCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
+                                                                        </div>
+                                                                        <h3 className="text-xl font-bold text-red-600 dark:text-red-400">Verification Failed</h3>
+                                                                        <p className="text-gray-600 dark:text-gray-300">{error}</p>
+                                                                        <button
+                                                                            onClick={() => { setVerificationResult(null); setError(null); }}
+                                                                            className="mt-4 px-6 py-2 bg-gray-100 dark:bg-white/10 rounded-lg text-sm font-bold"
+                                                                        >
+                                                                            Try Again
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="w-full space-y-6">
+                                                                        <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto shadow-lg ${verificationResult.verified ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
+                                                                            {verificationResult.verified ? <CheckCircle2 className="w-10 h-10" /> : <AlertTriangle className="w-10 h-10" />}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                                                                                {verificationResult.verified ? 'Valid Certificate' : 'Issue Detected'}
+                                                                            </h3>
+                                                                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                                                {verificationResult.message}
+                                                                            </p>
+                                                                        </div>
+
+                                                                        {verificationResult.verified && verificationResult.certificate && (
+                                                                            <div className="bg-gray-50 dark:bg-[#000F24] p-6 rounded-2xl border border-gray-100 dark:border-white/5 text-left space-y-4 shadow-inner">
+                                                                                <div>
+                                                                                    <label className="text-xs text-gray-400 uppercase tracking-wider font-bold">Recipient</label>
+                                                                                    <p className="text-lg font-bold text-[#1a3884] dark:text-[#daa520]">{verificationResult.certificate.fullName}</p>
+                                                                                </div>
+                                                                                <div className="h-px bg-gray-200 dark:bg-white/10" />
+                                                                                <div>
+                                                                                    <label className="text-xs text-gray-400 uppercase tracking-wider font-bold">Credential</label>
+                                                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{verificationResult.certificate.certificateTitle}</p>
+                                                                                </div>
+                                                                                <div className="grid grid-cols-2 gap-4">
+                                                                                    <div>
+                                                                                        <label className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Issued</label>
+                                                                                        <p className="text-sm font-mono text-gray-700 dark:text-gray-300">{new Date(verificationResult.certificate.issueDate).toLocaleDateString()}</p>
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <label className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Band</label>
+                                                                                        <p className="text-sm font-mono text-gray-700 dark:text-gray-300">{verificationResult.certificate.readinessBand}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
                                         </div>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
                     </div>
-                </motion.div>
+                </div>
             </div>
         </section>
     );

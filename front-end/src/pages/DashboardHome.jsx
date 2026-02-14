@@ -35,6 +35,16 @@ import StatsCardSkeleton from '@/components/skeletons/StatsCardSkeleton';
 import apiCall, { API_BASE_URL } from '@/services/api';
 import useUser from "@/hooks/useUser";
 
+/* Helper function for calendar logic */
+const getDaysInMonth = (date) => {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDayIndex = new Date(year, month, 1).getDay();
+  const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  return { daysArray, firstDayIndex };
+};
+
 const DashboardHome = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -331,12 +341,12 @@ const DashboardHome = () => {
         // Fetch Streak
         let currentStreak = 0;
         try {
-            const streakRes = await apiCall('/avatar/streak-status');
-            if (streakRes.success) {
-                currentStreak = streakRes.data?.totalStreakDays || streakRes.data?.streak || 0;
-            }
+          const streakRes = await apiCall('/avatar/streak-status');
+          if (streakRes.success) {
+            currentStreak = streakRes.data?.totalStreakDays || streakRes.data?.streak || 0;
+          }
         } catch (e) {
-            console.error("Failed to fetch streak", e);
+          console.error("Failed to fetch streak", e);
         }
 
         setStats({
@@ -408,7 +418,7 @@ const DashboardHome = () => {
       {/* Streak Details Modal */}
       {showStreakModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowStreakModal(false)}>
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="bg-transparent w-full max-w-2xl"
@@ -416,7 +426,7 @@ const DashboardHome = () => {
           >
             <ContinueLearning />
             <div className="mt-4 flex justify-center">
-              <button 
+              <button
                 onClick={() => setShowStreakModal(false)}
                 className="px-6 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full font-bold text-sm shadow-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
               >
@@ -470,7 +480,7 @@ const DashboardHome = () => {
                     <div className="text-left">
                       <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 leading-none">Streak</p>
                       <p className="text-sm font-bold text-slate-900 dark:text-white leading-none mt-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                         Day {stats.dayStreak}
+                        Day {stats.dayStreak}
                       </p>
                     </div>
                   </motion.button>
