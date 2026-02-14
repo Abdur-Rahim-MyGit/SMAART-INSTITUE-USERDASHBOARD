@@ -198,7 +198,7 @@ const DashboardSidebar = () => {
   return (
     <>
       {/* Top Navigation Bar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-slate-200/50 dark:border-white/10 shadow-sm transition-all duration-300">
+      <header className="fixed top-0 left-0 right-0 z-[80] bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-slate-200/50 dark:border-white/10 shadow-sm transition-all duration-300">
         <div className="flex items-center justify-between px-6 lg:px-10 h-16">
 
 

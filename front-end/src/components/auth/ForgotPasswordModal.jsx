@@ -192,7 +192,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-md bg-navy border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+                        className="relative w-full max-w-md bg-navy border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[calc(100vh-2rem)]"
                     >
                         {/* Decorative Elements */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-teal/10 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
@@ -241,7 +241,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* Content */}
-                        <div className="p-8">
+                        <div className="p-8 overflow-y-auto custom-scrollbar">
                             {/* Step 1: Email */}
                             {step === 1 && (
                                 <form onSubmit={handleRequestReset} className="space-y-6">
