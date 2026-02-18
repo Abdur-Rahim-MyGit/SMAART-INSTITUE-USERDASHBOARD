@@ -174,7 +174,7 @@ const PassportPreview = () => {
                 className="bg-gradient-to-r from-[#1a3884] to-[#daa520] hover:from-[#daa520] hover:to-[#1a3884] text-white font-bold px-8 py-5 rounded-2xl shadow-xl shadow-[#1a3884]/20 text-lg transition-all duration-300 group"
               >
                 <Download className="mr-3 w-5 h-5 group-hover:-translate-y-1 transition-transform" />
-                Request Sample Passport
+                Get Your Skills Passport
               </Button>
             </motion.div>
           </div>
