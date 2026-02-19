@@ -157,7 +157,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
 
       {/* Title */}
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
+        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
           Title <span className="text-red-400">*</span>
         </label>
         <input
@@ -166,18 +166,18 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           value={formData.title}
           onChange={handleChange}
           placeholder="Brief summary of your issue"
-          className={`w-full px-4 py-3 rounded-xl bg-[#002147] border ${errors.title ? 'border-red-500' : 'border-[#30919D]/30'
-            } text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors`}
+          className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border ${errors.title ? 'border-red-500' : 'border-slate-200 dark:border-[#30919D]/30'
+            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors`}
         />
         {errors.title && (
-          <p className="mt-1 text-sm text-red-400">{errors.title}</p>
+          <p className="mt-1 text-sm text-red-500">{errors.title}</p>
         )}
-        <p className="mt-1 text-xs text-gray-500">{formData.title.length}/100 characters</p>
+        <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">{formData.title.length}/100 characters</p>
       </div>
 
       {/* Category */}
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
+        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
           Category <span className="text-red-400">*</span>
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -190,12 +190,12 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
                 if (errors.category) setErrors(prev => ({ ...prev, category: null }));
               }}
               className={`p-3 rounded-xl border text-left transition-all ${formData.category === cat.value
-                  ? 'border-[#30919D] bg-[#30919D]/20'
-                  : 'border-[#30919D]/30 hover:border-[#30919D]/50'
+                  ? 'border-[#30919D] bg-[#30919D]/10 dark:bg-[#30919D]/20'
+                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-[#30919D]/30 hover:border-[#30919D]/50'
                 }`}
             >
-              <span className="text-white font-medium text-sm">{cat.label}</span>
-              <p className="text-gray-400 text-xs mt-0.5">{cat.description}</p>
+              <span className={`font-medium text-sm ${formData.category === cat.value ? 'text-[#30919D]' : 'text-slate-900 dark:text-white'}`}>{cat.label}</span>
+              <p className="text-slate-500 dark:text-gray-400 text-xs mt-0.5">{cat.description}</p>
             </button>
           ))}
         </div>
@@ -206,7 +206,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
 
       {/* Priority */}
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
+        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
           Priority
         </label>
         <div className="flex gap-3">
@@ -217,7 +217,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
               onClick={() => setFormData(prev => ({ ...prev, priority: pri.value }))}
               className={`px-4 py-2 rounded-xl border transition-all ${formData.priority === pri.value
                   ? pri.color
-                  : 'border-[#30919D]/30 text-gray-400 hover:border-[#30919D]/50'
+                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-[#30919D]/30 text-slate-500 dark:text-gray-400 hover:border-[#30919D]/50'
                 }`}
             >
               {pri.label}
@@ -228,7 +228,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
 
       {/* Description */}
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
+        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
           Description <span className="text-red-400">*</span>
         </label>
         <textarea
@@ -237,41 +237,41 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           onChange={handleChange}
           placeholder="Please describe your issue in detail. Include any steps to reproduce the problem, error messages, or relevant context."
           rows={6}
-          className={`w-full px-4 py-3 rounded-xl bg-[#002147] border ${errors.description ? 'border-red-500' : 'border-[#30919D]/30'
-            } text-white placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors resize-none`}
+          className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border ${errors.description ? 'border-red-500' : 'border-slate-200 dark:border-[#30919D]/30'
+            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors resize-none`}
         />
         {errors.description && (
-          <p className="mt-1 text-sm text-red-400">{errors.description}</p>
+          <p className="mt-1 text-sm text-red-500">{errors.description}</p>
         )}
-        <p className="mt-1 text-xs text-gray-500">{formData.description.length}/2000 characters</p>
+        <p className="mt-1 text-xs text-slate-400 dark:text-gray-500">{formData.description.length}/2000 characters</p>
       </div>
 
       {/* Attachments */}
       <div>
-        <label className="block text-sm font-medium text-white mb-2">
+        <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
           Attachments (Optional)
         </label>
         <div className="flex flex-wrap gap-3">
           {attachments.map((file, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#002147] border border-[#30919D]/30"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-[#002147] border border-slate-200 dark:border-[#30919D]/30"
             >
               <Paperclip className="w-4 h-4 text-[#30919D]" />
-              <span className="text-sm text-gray-300 max-w-[150px] truncate">{file.name}</span>
+              <span className="text-sm text-slate-700 dark:text-gray-300 max-w-[150px] truncate">{file.name}</span>
               <button
                 type="button"
                 onClick={() => removeAttachment(index)}
-                className="text-gray-400 hover:text-red-400 transition-colors"
+                className="text-slate-400 dark:text-gray-400 hover:text-red-500 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           ))}
           {attachments.length < 3 && (
-            <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-[#30919D]/30 cursor-pointer hover:border-[#30919D]/50 transition-colors">
-              <Paperclip className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-gray-400">Add file</span>
+            <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-slate-300 dark:border-[#30919D]/30 cursor-pointer hover:border-[#30919D]/50 transition-colors bg-white dark:bg-transparent">
+              <Paperclip className="w-4 h-4 text-slate-400 dark:text-gray-400" />
+              <span className="text-sm text-slate-500 dark:text-gray-400">Add file</span>
               <input
                 type="file"
                 onChange={handleFileChange}
@@ -282,18 +282,17 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           )}
         </div>
         {errors.attachments && (
-          <p className="mt-2 text-sm text-red-400">{errors.attachments}</p>
+          <p className="mt-2 text-sm text-red-500">{errors.attachments}</p>
         )}
-        <p className="mt-2 text-xs text-gray-500">Max 3 files, 5MB each. Supported: Images, PDF, DOC, TXT</p>
+        <p className="mt-2 text-xs text-slate-400 dark:text-gray-500">Max 3 files, 5MB each. Supported: Images, PDF, DOC, TXT</p>
       </div>
 
-      {/* Actions */}
       <div className="flex justify-end gap-3 pt-4">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2.5 rounded-xl border border-[#30919D]/50 text-gray-400 hover:text-white hover:border-[#30919D] transition-colors"
+            className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-[#30919D]/50 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:border-[#30919D] transition-colors"
           >
             Cancel
           </button>

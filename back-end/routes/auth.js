@@ -236,78 +236,78 @@ router.post('/register',
     body('institution').optional().trim().escape(),
   ],
   async (req, res) => {
-  try {
-    // SECURITY FIX #15: Check validation results
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array()[0].msg });
-    }
-
-    const { fullName, email, mobileNumber, password, institution } = req.body;
-
-    // SECURITY FIX #8: Validate password policy on registration
-    const policyCheck = validatePasswordPolicy(password);
-    if (!policyCheck.isValid) {
-      return res.status(400).json({
-        error: 'Password does not meet requirements',
-        requirements: policyCheck.errors
-      });
-    }
-
-    // Check if user exists
-    let registration = await Registration.findOne({ email });
-    if (registration) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
-
-    // Create new registration
-    registration = new Registration({
-      fullName,
-      email,
-      mobileNumber,
-      password,
-      institution,
-    });
-
-    await registration.save();
-
-    // Send welcome notification
     try {
-      await notifyWelcome(registration._id, fullName);
-      console.log(`🔔 Welcome notification sent to ${fullName}`);
-    } catch (notifyError) {
-      console.error("⚠️ Error sending welcome notification:", notifyError);
+      // SECURITY FIX #15: Check validation results
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array()[0].msg });
+      }
+
+      const { fullName, email, mobileNumber, password, institution } = req.body;
+
+      // SECURITY FIX #8: Validate password policy on registration
+      const policyCheck = validatePasswordPolicy(password);
+      if (!policyCheck.isValid) {
+        return res.status(400).json({
+          error: 'Password does not meet requirements',
+          requirements: policyCheck.errors
+        });
+      }
+
+      // Check if user exists
+      let registration = await Registration.findOne({ email });
+      if (registration) {
+        return res.status(400).json({ error: 'User already exists' });
+      }
+
+      // Create new registration
+      registration = new Registration({
+        fullName,
+        email,
+        mobileNumber,
+        password,
+        institution,
+      });
+
+      await registration.save();
+
+      // Send welcome notification
+      try {
+        await notifyWelcome(registration._id, fullName);
+        console.log(`🔔 Welcome notification sent to ${fullName}`);
+      } catch (notifyError) {
+        console.error("⚠️ Error sending welcome notification:", notifyError);
+      }
+
+      // Create JWT token - SECURITY: Enforce environment secret and reduce expiry
+      const token = jwt.sign(
+        { userId: registration._id, email: registration.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      // Set HttpOnly Cookie - SECURITY FIX #7: Added sameSite
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      });
+
+      res.status(201).json({
+        message: 'User registered successfully',
+        token,
+        user: {
+          id: registration._id,
+          fullName: registration.fullName,
+          email: registration.email,
+          institution: registration.institution,
+        },
+      });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-
-    // Create JWT token - SECURITY: Enforce environment secret and reduce expiry
-    const token = jwt.sign(
-      { userId: registration._id, email: registration.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    // Set HttpOnly Cookie - SECURITY FIX #7: Added sameSite
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    });
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: {
-        id: registration._id,
-        fullName: registration.fullName,
-        email: registration.email,
-        institution: registration.institution,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+  });
 
 // Login - PROTECTED with rate limiting
 router.post('/login',
@@ -848,8 +848,10 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     // Regular login flow - issue JWT token
     // const { token, user } = userData; // OLD WAY - Token is regenerated with session ID
 
+    console.log(`[Auth/OTP] Proceeding with regular login flow for ${loginOtp.email}`);
     const { user } = userData;
     const { forceLogout } = req.body;
+    console.log(`[Auth/OTP] Request body:`, req.body);
 
     // === SECURITY: SINGLE SESSION ENFORCEMENT ===
     // Fetch fresh user record to check currentSessionId
@@ -863,18 +865,18 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
 
     // === SINGLE SESSION ENFORCEMENT ===
     // Check if user is already logged in on another device
-    
+
     // Only check if there's an ACTUAL session ID (not null, not undefined, not empty string)
-    const hasActiveSession = freshUser?.currentSessionId && 
-                             typeof freshUser.currentSessionId === 'string' && 
-                             freshUser.currentSessionId.trim() !== '';
-    
+    const hasActiveSession = freshUser?.currentSessionId &&
+      typeof freshUser.currentSessionId === 'string' &&
+      freshUser.currentSessionId.trim() !== '';
+
     console.log(`[Auth] Session check for ${user._id}:`, {
       currentSessionId: freshUser?.currentSessionId || null,
       hasActiveSession,
       forceLogout: !!forceLogout
     });
-    
+
     if (hasActiveSession && !forceLogout) {
       return res.status(409).json({
         error: 'You are already logged in on another device.',
@@ -1457,8 +1459,8 @@ router.post('/clear-session', async (req, res) => {
     const cleared = results.filter(r => r !== null).length;
     console.log(`[Auth] Cleared session for email ${email} in ${cleared} model(s)`);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `Session cleared for ${email}`,
       modelsCleared: cleared
     });

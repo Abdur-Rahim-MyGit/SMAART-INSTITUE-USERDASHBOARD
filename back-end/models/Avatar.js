@@ -169,49 +169,49 @@ const avatarSchema = new mongoose.Schema({
 });
 
 // Virtual to calculate progress to next level
-avatarSchema.virtual('levelProgress').get(function() {
+avatarSchema.virtual('levelProgress').get(function () {
   return Math.min(100, Math.round((this.xp / this.xpToNextLevel) * 100));
 });
 
 // Method to add XP and handle level-ups
-avatarSchema.methods.addXP = async function(amount) {
+avatarSchema.methods.addXP = async function (amount) {
   this.xp += amount;
-  
+
   const unlocks = [];
-  
+
   // Check for level up
   while (this.xp >= this.xpToNextLevel) {
     this.xp -= this.xpToNextLevel;
     this.level += 1;
-    
+
     // Increase XP requirement for next level (progressive difficulty)
     this.xpToNextLevel = Math.floor(this.xpToNextLevel * 1.5);
-    
+
     // Process unlocks based on new level
     const newUnlock = this.processLevelUnlock(this.level);
     if (newUnlock) {
       unlocks.push(newUnlock);
     }
   }
-  
+
   await this.save();
   return { newLevel: this.level, unlocks };
 };
 
 // Process unlocks based on level
-avatarSchema.methods.processLevelUnlock = function(level) {
+avatarSchema.methods.processLevelUnlock = function (level) {
   const unlockMap = {
     2: { type: 'accessory', item: 'shoes' },
     3: { type: 'accessory', item: 'jacket' },
     4: { type: 'accessory', item: 'glasses' },
     5: { type: 'animation', item: 'celebrate' }
   };
-  
+
   const unlock = unlockMap[level];
   if (!unlock) return null;
-  
+
   let unlockInfo = null;
-  
+
   if (unlock.type === 'accessory') {
     if (!this.accessories[unlock.item].unlocked) {
       this.accessories[unlock.item].unlocked = true;
@@ -224,7 +224,7 @@ avatarSchema.methods.processLevelUnlock = function(level) {
       unlockInfo = { type: 'animation', item: unlock.item, level };
     }
   }
-  
+
   if (unlockInfo) {
     this.unlockHistory.push({
       item: unlock.item,
@@ -232,7 +232,7 @@ avatarSchema.methods.processLevelUnlock = function(level) {
       level
     });
   }
-  
+
   return unlockInfo;
 };
 
@@ -264,7 +264,7 @@ function daysBetween(dateStrA, dateStrB) {
  * - After day 7: new cycle begins at day 1
  * - Missing any day during 1-6: streak resets to zero
  */
-avatarSchema.methods.updateStreak = async function() {
+avatarSchema.methods.updateStreak = async function () {
   const todayStr = toDateStr(new Date());
 
   // ── Case 1: Same day ── already counted, just return
@@ -360,7 +360,7 @@ avatarSchema.methods.updateStreak = async function() {
 /**
  * Reset streak to zero (internal helper)
  */
-avatarSchema.methods._resetStreak = function() {
+avatarSchema.methods._resetStreak = function () {
   this.streakCycleDay = 0;
   this.streakCyclesCompleted = 0;
   this.streakActive = false;
@@ -371,11 +371,11 @@ avatarSchema.methods._resetStreak = function() {
 /**
  * Get full streak status for the API response
  */
-avatarSchema.methods.getStreakStatus = function() {
+avatarSchema.methods.getStreakStatus = function () {
   const cycleDay = this.streakCycleDay || 0;
   const isHoliday = cycleDay === 7;
   const cyclesCompleted = this.streakCyclesCompleted || 0;
-  const totalStreakDays = cyclesCompleted * 6 + (cycleDay > 0 && cycleDay <= 6 ? cycleDay : 0);
+  const totalStreakDays = cyclesCompleted * 6 + (cycleDay > 0 && cycleDay <= 7 ? (cycleDay === 7 ? 6 : cycleDay) : 0);
   const daysUntilHoliday = cycleDay > 0 && cycleDay < 7 ? 7 - cycleDay : 0;
 
   // Build a visual progress array for 7 days
@@ -404,9 +404,9 @@ avatarSchema.methods.getStreakStatus = function() {
 };
 
 // Static method to get or create avatar for user
-avatarSchema.statics.getOrCreate = async function(userId) {
+avatarSchema.statics.getOrCreate = async function (userId) {
   let avatar = await this.findOne({ userId });
-  
+
   if (!avatar) {
     avatar = await this.create({
       userId,
@@ -414,7 +414,7 @@ avatarSchema.statics.getOrCreate = async function(userId) {
       xp: 0
     });
   }
-  
+
   return avatar;
 };
 
