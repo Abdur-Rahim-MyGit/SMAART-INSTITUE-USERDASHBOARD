@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "post api auth send signup otp with valid email",
+    "description": "Test sending signup OTP with a valid email address to ensure the system sends OTP and returns 200 with appropriate message and delivery metadata."
+  },
+  {
+    "id": "TC002",
+    "title": "post api auth send signup otp with invalid email format",
+    "description": "Test sending signup OTP with an invalid email format to verify the system returns 400 with validation error indicating invalid email format."
+  },
+  {
+    "id": "TC003",
+    "title": "post api auth verify signup otp with correct otp",
+    "description": "Test verifying signup OTP with correct OTP to ensure the system returns 200 with verification success."
+  },
+  {
+    "id": "TC004",
+    "title": "post api auth verify signup otp with incorrect or expired otp",
+    "description": "Test verifying signup OTP with incorrect or expired OTP to verify the system returns 400 with error indicating invalid or expired OTP."
+  },
+  {
+    "id": "TC005",
+    "title": "post api auth register with full registration payload",
+    "description": "Test registering a new user with a full registration payload to ensure the system creates the registration record and returns 201 with created registration id and summary."
+  },
+  {
+    "id": "TC006",
+    "title": "post api auth login with registered email",
+    "description": "Test login request with a registered email to verify the system sends login OTP and returns 200 with message and OTP metadata."
+  },
+  {
+    "id": "TC007",
+    "title": "post api auth login with unknown email",
+    "description": "Test login request with an unknown email to ensure the system returns 404 with error 'User not found' or 400 indicating login cannot proceed."
+  },
+  {
+    "id": "TC008",
+    "title": "post api auth verify login otp with valid otp",
+    "description": "Test verifying login OTP with valid OTP to ensure the system returns 200 with JWT token and expiration time."
+  },
+  {
+    "id": "TC009",
+    "title": "post api auth verify login otp with invalid or expired otp",
+    "description": "Test verifying login OTP with invalid or expired OTP to verify the system returns 400 with error indicating invalid or expired OTP."
+  },
+  {
+    "id": "TC010",
+    "title": "post api users register details with full payload",
+    "description": "Test saving comprehensive registration details with full 11-section payload to ensure the system saves the record and returns 201 with saved registration id and summary."
+  }
+]
