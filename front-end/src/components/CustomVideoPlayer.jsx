@@ -213,6 +213,21 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // Listen for security-blur event (from SecurityGuard) to auto-pause video
+  useEffect(() => {
+    const handleSecurityBlur = () => {
+      if (videoRef.current && !videoRef.current.paused) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+        syncProgress(true); // Sync immediately on pause
+        console.log("🔒 Video auto-paused due to security privacy screen.");
+      }
+    };
+
+    window.addEventListener("security-blur", handleSecurityBlur);
+    return () => window.removeEventListener("security-blur", handleSecurityBlur);
+  }, [maxTimeReached, isCompleted]);
+
   // Handle autoPlay on mount
   useEffect(() => {
     if (autoPlay && videoRef.current && !isPlaying) {

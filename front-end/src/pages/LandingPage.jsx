@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
@@ -28,11 +28,21 @@ import CookieConsent from "@/components/CookieConsent";
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showSplash, setShowSplash] = useState(true);
   const [isInstitutionSelectOpen, setIsInstitutionSelectOpen] = useState(false);
 
   // Immediate redirect for logged-in users before any rendering
   const [isReady, setIsReady] = useState(false);
+
+  // Auto-open modal if ?modal=true is in the URL (e.g. from Navbar on verify page)
+  useEffect(() => {
+    if (searchParams.get('modal') === 'true') {
+      setIsInstitutionSelectOpen(true);
+      // Clean the param from the URL without a page reload
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     // Check for forced logout flagging from api.js

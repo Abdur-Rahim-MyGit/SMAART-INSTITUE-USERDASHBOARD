@@ -55,6 +55,8 @@ const SecurityGuard = () => {
         overlayRef.current.style.display = "flex";
       }
       setIsBlurred(true);
+      // Dispatch custom event to notify other components (like video player) to pause
+      window.dispatchEvent(new CustomEvent("security-blur"));
     };
 
     // 1. Disable Right Click
