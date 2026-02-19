@@ -281,18 +281,30 @@ const DashboardHome = () => {
               }
             });
           }
+
+          // NEW: Check for any activity at all (even if 0% progress)
+          let hasActivity = false;
+          if (enrollment.moduleProgress && enrollment.moduleProgress.length > 0) {
+            hasActivity = enrollment.moduleProgress.some(m => {
+              const hasVideo = m.videoProgress && m.videoProgress.some(vp => vp.maxWatchedTime > 0);
+              const hasTasks = m.completedTasks && m.completedTasks.length > 0;
+              const hasQuizzes = m.quizzesTaken && m.quizzesTaken.length > 0;
+              return hasVideo || hasTasks || hasQuizzes;
+            });
+          }
+          enrollment.hasAnyActivity = hasActivity;
         });
 
-        // A course is "Active" only if it has been started (progress > 0) AND not finished (progress < 100)
+        // A course is "Active" if it's in_progress OR has any activity, and not finished
         const activeCoursesCount = courses.filter(c => 
-          (c.status === 'in_progress' || c.status === 'in-progress' || (c.status === 'enrolled' && c.calculatedProgress > 0)) && 
+          (c.status === 'in_progress' || c.status === 'in-progress' || c.hasAnyActivity || c.calculatedProgress > 0) && 
           c.calculatedProgress < 100
         ).length;
 
-        // Find the "Active" course for hero section (prioritize those with some progress)
+        // Find the "Active" course for hero section
         const activeCourseEnrollment = [...courses]
           .filter(e => 
-            (e.status === 'in_progress' || e.status === 'in-progress' || (e.status === 'enrolled' && e.calculatedProgress > 0)) && 
+            (e.status === 'in_progress' || e.status === 'in-progress' || e.hasAnyActivity || e.calculatedProgress > 0) && 
             e.calculatedProgress < 100
           )
           .sort((a, b) =>
@@ -329,7 +341,7 @@ const DashboardHome = () => {
 
                 const videoProgress = modProgress?.videoProgress || [];
                 const completedTasks = modProgress?.completedTasks || [];
-                const daysCount = moduleDoc.days?.length || 6;
+                const daysCount = moduleDoc.days?.length || 0;
 
                 for (let d = 1; d <= daysCount; d++) {
                   const isVidDone = videoProgress.some(vp => vp.dayId === d && vp.isCompleted);

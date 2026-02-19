@@ -12,12 +12,16 @@ const ModuleTasks = () => {
   const navigate = useNavigate();
 
   // Mock module data - in real app this would come from API/context
+  // Mock module data
   const modules = [
-    { id: 1, title: "Module 1", locked: false, tasks: Array.from({ length: 7 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: i < 5 })) },
-    { id: 2, title: "Module 2", locked: false, tasks: Array.from({ length: 8 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: i < 3 })) },
-    { id: 3, title: "Module 3", locked: true, tasks: Array.from({ length: 7 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
-    { id: 4, title: "Module 4", locked: true, tasks: Array.from({ length: 8 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
-  ];
+    { id: 1, title: "Module 1", tasks: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: true })) },
+    { id: 2, title: "Module 2", tasks: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
+    { id: 3, title: "Module 3", tasks: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
+    { id: 4, title: "Module 4", tasks: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
+  ].map((mod, idx, arr) => ({
+    ...mod,
+    locked: idx > 0 && arr[idx-1].tasks.some(t => !t.completed)
+  }));
 
   const module = modules.find(m => m.id === parseInt(moduleId));
 
