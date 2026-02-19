@@ -155,8 +155,8 @@ const ContinueLearning = () => {
               <Flame className="streak-tracker__flame-icon" />
             </div>
             <div>
-              <h3 className="streak-tracker__title">Learning Streak</h3>
-              <p className="streak-tracker__subtitle">
+              <h3 className="streak-tracker__title" data-testid="streak-title">Learning Streak</h3>
+              <p className="streak-tracker__subtitle" data-testid="streak-subtitle">
                 {isHoliday
                   ? "🎉 It's your holiday! Relax and recharge."
                   : isActive
@@ -169,12 +169,12 @@ const ContinueLearning = () => {
 
           <div className="streak-tracker__stats-badges">
             {cyclesCompleted > 0 && (
-              <div className="streak-badge streak-badge--cycles">
+              <div className="streak-badge streak-badge--cycles" data-testid="streak-cycles">
                 <Trophy className="streak-badge__icon" />
                 <span>{cyclesCompleted}</span>
               </div>
             )}
-            <div className={`streak-badge ${isActive ? 'streak-badge--active' : 'streak-badge--inactive'}`}>
+            <div className={`streak-badge ${isActive ? 'streak-badge--active' : 'streak-badge--inactive'}`} data-testid="streak-days">
               <Zap className="streak-badge__icon" />
               <span>{totalStreakDays}d</span>
             </div>
@@ -196,6 +196,8 @@ const ContinueLearning = () => {
                 } ${isCurrentDay ? 'streak-day--current' : ''} ${
                   isHolidayDay ? 'streak-day--holiday' : ''
                 } ${status === 'holiday' ? 'streak-day--holiday-done' : ''}`}
+                data-testid={`streak-day-${index}`}
+                data-status={status}
               >
                 <div className="streak-day__circle">
                   {isCompleted ? (
@@ -231,13 +233,14 @@ const ContinueLearning = () => {
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
+              data-testid="streak-progress-fill"
             />
           </div>
           <div className="streak-progress-labels">
-            <span className="streak-progress-labels__left">
+            <span className="streak-progress-labels__left" data-testid="streak-progress-left">
               {isActive ? `${progressPercent}% to holiday` : 'Not started'}
             </span>
-            <span className="streak-progress-labels__right">
+            <span className="streak-progress-labels__right" data-testid="streak-progress-right">
               {isHoliday ? '🏖️ Holiday!' : `${6 - Math.min(cycleDay, 6)} days left`}
             </span>
           </div>
@@ -246,21 +249,21 @@ const ContinueLearning = () => {
         {/* Status Message */}
         <div className={`streak-tracker__status ${
           !isActive && cycleDay === 0 ? 'streak-tracker__status--warning' : 'streak-tracker__status--info'
-        }`}>
+        }`} data-testid="streak-status-container">
           {!isActive && cycleDay === 0 ? (
             <>
               <AlertTriangle className="streak-status__icon" />
-              <span>No active streak. Log in daily to build your streak!</span>
+              <span data-testid="streak-status-message">No active streak. Log in daily to build your streak!</span>
             </>
           ) : isHoliday ? (
             <>
               <Coffee className="streak-status__icon" />
-              <span>Enjoy your mandatory rest day. Your streak is safe!</span>
+              <span data-testid="streak-status-message">Enjoy your mandatory rest day. Your streak is safe!</span>
             </>
           ) : (
             <>
               <Calendar className="streak-status__icon" />
-              <span>
+              <span data-testid="streak-status-message">
                 {cyclesCompleted > 0
                   ? `${cyclesCompleted} cycle${cyclesCompleted > 1 ? 's' : ''} completed • ${totalStreakDays} total streak days`
                   : `Keep coming back daily! ${6 - Math.min(cycleDay, 6)} more days to earn your holiday.`

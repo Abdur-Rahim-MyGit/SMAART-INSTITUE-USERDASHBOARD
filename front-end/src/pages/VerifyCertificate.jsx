@@ -1,59 +1,62 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Calendar, User, Hash, TrendingUp, ScanLine, ArrowLeft, Download, Share2 } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Calendar, User, Hash, TrendingUp, ScanLine, ArrowLeft, Share2, ImageIcon } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import DashboardSidebar from '@/components/DashboardSidebar';
+import PageTransition from '@/components/PageTransition';
 import apiCall from '@/services/api';
 import { toast } from 'sonner';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
+import useUser from '@/hooks/useUser';
 
 const VerifyCertificate = () => {
     const { certificateId: urlCertId } = useParams();
     const navigate = useNavigate();
+    const { user } = useUser();
+    const isLoggedIn = !!user;
     const [certificateId, setCertificateId] = useState(urlCertId || '');
     const [verificationResult, setVerificationResult] = useState(null);
     const [isVerifying, setIsVerifying] = useState(false);
     const [isScanning, setIsScanning] = useState(false);
     const [error, setError] = useState(null);
+    const [qrScanError, setQrScanError] = useState(null);
+    const [isQrScanning, setIsQrScanning] = useState(false);
+    const fileInputRef = useRef(null);
 
-    useEffect(() => {
-        let scanner = null;
-        if (isScanning) {
-            scanner = new Html5QrcodeScanner('reader-page', {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-                aspectRatio: 1.0
-            });
+    // Handle QR image file selection — decodes QR from a picked image
+    const handleFileSelect = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-            scanner.render((decodedText) => {
-                try {
-                    let certId = decodedText;
-                    if (decodedText.includes('/verify-certificate/')) {
-                        certId = decodedText.split('/verify-certificate/').pop();
-                    } else if (decodedText.startsWith('http')) {
-                        const url = new URL(decodedText);
-                        const pathParts = url.pathname.split('/');
-                        certId = pathParts[pathParts.length - 1];
-                    }
+        setQrScanError(null);
+        setIsQrScanning(true);
 
-                    setCertificateId(certId);
-                    setIsScanning(false);
-                    scanner.clear();
-                    verifyCertificate(certId);
-                } catch (e) {
-                    toast.error("Invalid QR code format");
-                }
-            }, (error) => {
-                // Ignore errors during scan
-            });
-        }
+        try {
+            const html5Qrcode = new Html5Qrcode('qr-file-reader');
+            const decodedText = await html5Qrcode.scanFile(file, false);
 
-        return () => {
-            if (scanner) {
-                scanner.clear().catch(err => console.error("Error clearing scanner", err));
+            let certId = decodedText.trim();
+            if (decodedText.includes('/verify-certificate/')) {
+                certId = decodedText.split('/verify-certificate/').pop().trim();
+            } else if (decodedText.startsWith('http')) {
+                const url = new URL(decodedText);
+                const pathParts = url.pathname.split('/');
+                certId = pathParts[pathParts.length - 1].trim();
             }
-        };
-    }, [isScanning]);
+
+            setCertificateId(certId);
+            setIsScanning(false);
+            verifyCertificate(certId);
+        } catch (err) {
+            console.error('QR scan error:', err);
+            setQrScanError('No QR code found in this image. Please try a clearer photo of the certificate QR code.');
+        } finally {
+            setIsQrScanning(false);
+            // Reset input so the same file can be re-selected
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
 
     useEffect(() => {
         if (urlCertId) {
@@ -101,14 +104,10 @@ const VerifyCertificate = () => {
         verifyCertificate();
     };
 
-    const handlePrint = () => {
-        window.print();
-    };
 
-    return (
-        <div className="min-h-screen bg-gray-50 dark:bg-[#000F24] transition-colors duration-500 font-sans relative overflow-x-hidden">
-            <Navbar showLinks={true} />
-
+    // The core verification UI content (shared between both layouts)
+    const pageContent = (
+        <>
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid-pattern.svg')] opacity-[0.03] dark:opacity-[0.05]"></div>
@@ -116,7 +115,7 @@ const VerifyCertificate = () => {
                 <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#daa520]/5 rounded-full blur-[100px] animate-pulse delay-700"></div>
             </div>
 
-            <main className="relative z-10 container mx-auto px-4 py-8 pt-28 max-w-5xl">
+            <main className={`relative z-10 container mx-auto px-4 py-8 max-w-5xl ${isLoggedIn ? 'pt-8' : 'pt-28'}`}>
 
                 {/* Header Section */}
                 <motion.div
@@ -179,14 +178,51 @@ const VerifyCertificate = () => {
                                         exit={{ opacity: 0, scale: 0.95 }}
                                         className="text-center"
                                     >
-                                        <div className="relative rounded-2xl overflow-hidden border-2 border-dashed border-[#daa520]/50 bg-black/5 dark:bg-black/40 h-72 w-full shadow-inner mb-4">
-                                            <div id="reader-page" className="w-full h-full"></div>
-                                            {/* Scanning Overlay */}
-                                            <div className="absolute inset-0 pointer-events-none border-[20px] border-black/10 dark:border-[#000F24]/50 z-10"></div>
+                                        {/* Hidden file input */}
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={handleFileSelect}
+                                        />
+                                        {/* Hidden element required by Html5Qrcode.scanFile() */}
+                                        <div id="qr-file-reader" className="hidden"></div>
+
+                                        <div className="flex flex-col items-center gap-4 py-4">
+                                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#1a3884]/10 to-[#daa520]/10 border-2 border-dashed border-[#daa520]/40 flex items-center justify-center">
+                                                {isQrScanning
+                                                    ? <Loader2 className="w-8 h-8 text-[#1a3884] dark:text-[#daa520] animate-spin" />
+                                                    : <ImageIcon className="w-8 h-8 text-[#1a3884] dark:text-[#daa520]" />
+                                                }
+                                            </div>
+
+                                            <div className="text-center">
+                                                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                                                    {isQrScanning ? 'Reading QR code...' : 'Select a QR code image'}
+                                                </p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                    Pick a photo of the certificate from your gallery or files
+                                                </p>
+                                            </div>
+
+                                            {qrScanError && (
+                                                <div className="w-full rounded-xl border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-900/10 p-3 flex items-start gap-2">
+                                                    <XCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                                                    <p className="text-xs text-red-700 dark:text-red-300">{qrScanError}</p>
+                                                </div>
+                                            )}
+
+                                            <button
+                                                type="button"
+                                                disabled={isQrScanning}
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#0d1f4d] hover:from-[#2a4d9e] hover:to-[#1a3884] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#1a3884]/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                <ImageIcon className="w-4 h-4" />
+                                                Choose Image
+                                            </button>
                                         </div>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium animate-pulse">
-                                            Position QR code within frame
-                                        </p>
                                     </motion.div>
                                 ) : (
                                     <motion.form
@@ -389,14 +425,9 @@ const VerifyCertificate = () => {
                                                     </div>
                                                 )}
 
-                                                <div className="pt-6 border-t border-gray-100 dark:border-white/10 flex flex-wrap justify-between gap-4">
+                                                <div className="pt-6 border-t border-gray-100 dark:border-white/10">
                                                     <div className="text-xs text-gray-400 dark:text-gray-500 max-w-sm">
                                                         This digital credential is cryptographically secured. Altering this result page is technically impossible without the private keys.
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <button onClick={handlePrint} className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300 flex items-center gap-2 transition-colors">
-                                                            <Download className="w-4 h-4" /> Print Record
-                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -424,6 +455,28 @@ const VerifyCertificate = () => {
                     </motion.div>
                 </div>
             </main>
+        </>
+    );
+
+    // Logged-in users get the dashboard layout (with sidebar)
+    if (isLoggedIn) {
+        return (
+            <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] transition-colors duration-300 font-sans relative overflow-x-hidden">
+                <DashboardSidebar />
+                <PageTransition>
+                    <div className="min-h-screen pb-20 lg:pb-0">
+                        {pageContent}
+                    </div>
+                </PageTransition>
+            </div>
+        );
+    }
+
+    // Guests get the public layout (with landing Navbar)
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-[#000F24] transition-colors duration-500 font-sans relative overflow-x-hidden">
+            <Navbar showLinks={true} />
+            {pageContent}
         </div>
     );
 };

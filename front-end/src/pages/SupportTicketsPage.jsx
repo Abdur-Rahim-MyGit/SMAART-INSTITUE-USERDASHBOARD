@@ -135,20 +135,20 @@ const SupportTicketsPage = () => {
               >
                 {/* Chat Conversation Preview */}
                 {conversationData?.messages && (
-                  <div className="mb-6 p-4 rounded-xl bg-[#30919D]/10 border border-[#30919D]/30">
+                  <div className="mb-6 p-4 rounded-xl bg-[#30919D]/5 dark:bg-[#30919D]/10 border border-[#30919D]/20 dark:border-[#30919D]/30 shadow-sm">
                     <div className="flex items-center gap-2 mb-2">
                       <MessageSquare className="w-4 h-4 text-[#30919D]" />
-                      <span className="text-sm font-medium text-[#30919D]">
+                      <span className="text-sm font-semibold text-[#30919D]">
                         Chat conversation included
                       </span>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-gray-400">
+                    <p className="text-xs text-slate-500 dark:text-gray-400">
                       Your chat history will be automatically attached to this ticket.
                     </p>
                   </div>
                 )}
 
-                <div className="bg-white dark:bg-[#002147]/50 rounded-2xl border border-slate-200 dark:border-[#30919D]/30 p-6 sm:p-8 shadow-xl">
+                <div className="bg-white dark:bg-[#002147]/50 rounded-2xl border border-slate-200 dark:border-[#30919D]/30 p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-none">
                   <TicketForm
                     onSuccess={handleSuccess}
                     onCancel={() => navigate(-1)}
@@ -170,23 +170,23 @@ const SupportTicketsPage = () => {
                     <p>Loading your tickets...</p>
                   </div>
                 ) : tickets.length === 0 ? (
-                  <div className="py-20 text-center bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10">
+                  <div className="py-20 text-center bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm">
                     <div className="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <LifeBuoy className="w-8 h-8 text-slate-400" />
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Tickets Yet</h3>
                     <p className="text-slate-500 dark:text-gray-400 mb-6">You haven't submitted any support requests.</p>
-                    <button onClick={() => setActiveTab('create')} className="px-6 py-2 bg-[#30919D] text-white rounded-lg font-bold">Create Ticket</button>
+                    <button onClick={() => setActiveTab('create')} className="px-6 py-2 bg-[#30919D] text-white rounded-lg font-bold shadow-lg shadow-[#30919D]/20 hover:scale-105 transition-transform">Create Ticket</button>
                   </div>
                 ) : (
                   tickets.map((ticket) => (
-                    <div key={ticket._id} className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-[#30919D]/50 transition-all group">
+                    <div key={ticket._id} className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-[#30919D]/50 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all group">
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <span className="text-xs font-mono text-slate-400 uppercase tracking-widest mb-1 block">#{ticket.ticketId || ticket._id.slice(-6)}</span>
                           <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#30919D] transition-colors">{ticket.title}</h3>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${statusColor(ticket.status)} capitalize`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${statusColor(ticket.status)} capitalize shadow-sm`}>
                           {ticket.status}
                         </span>
                       </div>

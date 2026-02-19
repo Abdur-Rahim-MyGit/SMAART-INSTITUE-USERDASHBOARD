@@ -247,17 +247,57 @@ const DashboardHome = () => {
         }
 
         // Calculate stats and resume point
-        const totalCourses = courses.length;
         let completedModulesCount = 0;
         let totalProgressSum = 0;
         let resumeUrl = '/dashboard/courses';
         let currentModuleTitle = 'Start Learning';
         let lastAccessedTime = 'Never';
 
-        // Find the "Active" course
-        const activeCourseEnrollment = [...courses].sort((a, b) =>
-          new Date(b.lastAccessedAt || 0) - new Date(a.lastAccessedAt || 0)
-        )[0];
+        // Pre-process all courses for stats
+        courses.forEach(enrollment => {
+          let currentProgress = enrollment.progress || 0;
+
+          // Calculate module-based progress regardless of enrollment.progress
+          if (enrollment.moduleProgress && enrollment.course?.modules?.length > 0) {
+            const completedMods = enrollment.moduleProgress.filter(m => m.status === 'completed').length;
+            const totalMods = enrollment.course.modules.length;
+            if (totalMods > 0) {
+              const moduleCalculatedProgress = Math.round((completedMods / totalMods) * 100);
+              // Trust whichever is higher or catch 100% completion if status is stale
+              if (moduleCalculatedProgress > currentProgress || moduleCalculatedProgress === 100) {
+                currentProgress = moduleCalculatedProgress;
+              }
+            }
+          }
+
+          // Attach calculated progress for UI usage
+          enrollment.calculatedProgress = currentProgress;
+          totalProgressSum += currentProgress;
+
+          if (enrollment.moduleProgress && Array.isArray(enrollment.moduleProgress)) {
+            enrollment.moduleProgress.forEach(module => {
+              if (module.status === 'completed') {
+                completedModulesCount++;
+              }
+            });
+          }
+        });
+
+        // A course is "Active" only if it has been started (progress > 0) AND not finished (progress < 100)
+        const activeCoursesCount = courses.filter(c => 
+          (c.status === 'in_progress' || c.status === 'in-progress' || (c.status === 'enrolled' && c.calculatedProgress > 0)) && 
+          c.calculatedProgress < 100
+        ).length;
+
+        // Find the "Active" course for hero section (prioritize those with some progress)
+        const activeCourseEnrollment = [...courses]
+          .filter(e => 
+            (e.status === 'in_progress' || e.status === 'in-progress' || (e.status === 'enrolled' && e.calculatedProgress > 0)) && 
+            e.calculatedProgress < 100
+          )
+          .sort((a, b) =>
+            new Date(b.lastAccessedAt || 0) - new Date(a.lastAccessedAt || 0)
+          )[0];
 
         if (activeCourseEnrollment) {
           const course = activeCourseEnrollment.course;
@@ -314,34 +354,8 @@ const DashboardHome = () => {
           }
         }
 
-        courses.forEach(enrollment => {
-          let currentProgress = enrollment.progress || 0;
-
-          // Fallback: Calculate from completed modules if progress is 0 but modules are done
-          if (currentProgress === 0 && enrollment.moduleProgress && enrollment.course?.modules?.length > 0) {
-            const completedMods = enrollment.moduleProgress.filter(m => m.status === 'completed').length;
-            const totalMods = enrollment.course.modules.length;
-            if (totalMods > 0) {
-              currentProgress = Math.round((completedMods / totalMods) * 100);
-            }
-          }
-
-          // Attach calculated progress for UI usage
-          enrollment.calculatedProgress = currentProgress;
-
-          totalProgressSum += currentProgress;
-
-          if (enrollment.moduleProgress && Array.isArray(enrollment.moduleProgress)) {
-            enrollment.moduleProgress.forEach(module => {
-              if (module.status === 'completed') {
-                completedModulesCount++;
-              }
-            });
-          }
-        });
-
-        const overallProgress = totalCourses > 0
-          ? Math.round(totalProgressSum / totalCourses)
+        const overallProgress = courses.length > 0
+          ? Math.round(totalProgressSum / courses.length)
           : 0;
 
         // Fetch Streak
@@ -356,13 +370,14 @@ const DashboardHome = () => {
         }
 
         setStats({
-          totalCourses,
+          totalCourses: activeCoursesCount,
           completedModules: completedModulesCount,
           baselineScore: baseline?.baselineScore || 0,
           dayStreak: currentStreak,
           resumeUrl,
           currentModuleTitle,
-          lastAccessedTime
+          lastAccessedTime,
+          activeEnrollment: activeCourseEnrollment
         });
 
         setWeeklyProgress(overallProgress);
@@ -376,6 +391,11 @@ const DashboardHome = () => {
 
     if (user && (user.id || user._id)) {
       fetchDashboardData();
+
+      // Refresh data on window focus to handle updates from other tabs
+      const onFocus = () => fetchDashboardData();
+      window.addEventListener('focus', onFocus);
+      return () => window.removeEventListener('focus', onFocus);
     }
   }, [user]);
 
@@ -541,14 +561,6 @@ const DashboardHome = () => {
                               <Play className="w-4 h-4 fill-white dark:fill-slate-900" />
                               {enrolledCourses.length > 0 ? "Resume Learning" : "Browse Library"}
                             </motion.button>
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => navigate('/dashboard/performance')}
-                              className="px-6 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg font-medium text-sm border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/20 transition-colors backdrop-blur-sm"
-                            >
-                              View Analytics
-                            </motion.button>
                           </div>
                         </div>
 
@@ -624,7 +636,7 @@ const DashboardHome = () => {
 
                     {dashboardLoading ? (
                       <CourseCardSkeleton />
-                    ) : enrolledCourses.length > 0 ? (
+                    ) : stats.activeEnrollment ? (
                       <motion.div
                         whileHover={{ scale: 1.005 }}
                         className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col md:flex-row"
@@ -632,7 +644,7 @@ const DashboardHome = () => {
                         {/* Image Section */}
                         <div className="md:w-1/3 relative h-48 md:h-auto group cursor-pointer" onClick={() => navigate(stats.resumeUrl)}>
                           <img
-                            src={enrolledCourses[0].course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"}
+                            src={stats.activeEnrollment.course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"}
                             alt="Course"
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                           />
@@ -653,23 +665,23 @@ const DashboardHome = () => {
                           </div>
 
                           <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-1">
-                            {enrolledCourses[0].course?.title || 'Advanced Leadership & Management'}
+                            {stats.activeEnrollment.course?.title || 'Advanced Leadership & Management'}
                           </h4>
 
                           <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-2 leading-relaxed">
-                            {enrolledCourses[0].course?.description || 'Learn to lead effective teams and manage complex projects with confidence.'}
+                            {stats.activeEnrollment.course?.description || 'Learn to lead effective teams and manage complex projects with confidence.'}
                           </p>
 
                           <div className="flex items-center gap-4">
                             <div className="flex-1">
                               <div className="flex justify-between text-xs font-semibold text-slate-500 mb-1.5">
                                 <span>Progress</span>
-                                <span className="text-slate-900 dark:text-white">{enrolledCourses[0].calculatedProgress || 0}%</span>
+                                <span className="text-slate-900 dark:text-white">{stats.activeEnrollment.calculatedProgress || 0}%</span>
                               </div>
                               <div className="w-full bg-slate-100 dark:bg-slate-700/50 rounded-full h-2">
                                 <div
                                   className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
-                                  style={{ width: `${enrolledCourses[0].calculatedProgress || 0}%` }}
+                                  style={{ width: `${stats.activeEnrollment.calculatedProgress || 0}%` }}
                                 />
                               </div>
                             </div>

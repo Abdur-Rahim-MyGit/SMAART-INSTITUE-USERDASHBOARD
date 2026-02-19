@@ -140,7 +140,13 @@ export const apiCall = async (endpoint, options = {}) => {
         localStorage.removeItem("user"); // FIX #4: Clear localStorage too
 
         // Use window.location to force redirect and UI reset
-        if (!window.location.pathname.includes('/login')) {
+        // FIXED: Only redirect if NOT on a public route where 401 is expected/allowed
+        const publicRoutes = ['/verify-certificate', '/verify-badge'];
+        const isPublicRoute = publicRoutes.some(route =>
+          window.location.pathname === route || window.location.pathname.startsWith(`${route}/`)
+        );
+
+        if (!window.location.pathname.includes('/login') && !isPublicRoute) {
           window.location.href = '/';
         }
 
@@ -152,7 +158,7 @@ export const apiCall = async (endpoint, options = {}) => {
       try {
         responseData = JSON.parse(responseText);
       } catch (e) {
-        console.error("Failed to parse response JSON:", responseText.slice(0, 100));
+        console.log("Response parsing info (non-JSON):", responseText.slice(0, 100));
       }
 
       if (!response.ok) {
