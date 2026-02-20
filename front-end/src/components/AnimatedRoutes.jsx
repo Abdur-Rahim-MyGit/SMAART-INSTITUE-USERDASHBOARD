@@ -55,16 +55,16 @@ import AssessmentFlowGuard from '@/components/AssessmentFlowGuard';
 const PageLoader = () => (
     <div className="min-h-screen bg-[#001229] flex flex-col items-center justify-center">
         <div className="relative w-20 h-20 mb-4">
-            <div className="absolute inset-0 border-4 border-[#30919D]/20 rounded-2xl rotate-45" />
-            <div className="absolute inset-0 border-4 border-t-[#30919D] rounded-2xl rotate-45 animate-spin" />
+            <div className="absolute inset-0 border-4 border-[#1a3884]/20 rounded-2xl rotate-45" />
+            <div className="absolute inset-0 border-4 border-t-[#1a3884] rounded-2xl rotate-45 animate-spin" />
             <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[#30919D] font-bold text-2xl -rotate-45">S</span>
+                <span className="text-[#1a3884] font-bold text-2xl -rotate-45">S</span>
             </div>
         </div>
         <div className="flex gap-1">
-            <div className="w-2 h-2 bg-[#30919D] rounded-full animate-bounce [animation-delay:-0.3s]" />
-            <div className="w-2 h-2 bg-[#30919D] rounded-full animate-bounce [animation-delay:-0.15s]" />
-            <div className="w-2 h-2 bg-[#30919D] rounded-full animate-bounce" />
+            <div className="w-2 h-2 bg-[#1a3884] rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <div className="w-2 h-2 bg-[#1a3884] rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <div className="w-2 h-2 bg-[#1a3884] rounded-full animate-bounce" />
         </div>
     </div>
 );
@@ -154,3 +154,4 @@ const AnimatedRoutes = () => {
 };
 
 export default AnimatedRoutes;
+

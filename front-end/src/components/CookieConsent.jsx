@@ -42,7 +42,7 @@ const CookieConsent = () => {
                         </Button>
                         <Button
                             onClick={acceptCookies}
-                            className="bg-[#30919D] hover:bg-[#267a84] text-white"
+                            className="bg-[#1a3884] hover:bg-[#132c6b] text-white"
                         >
                             Accept All
                         </Button>
@@ -60,3 +60,5 @@ const CookieConsent = () => {
 };
 
 export default CookieConsent;
+
+

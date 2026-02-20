@@ -27,7 +27,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
 
   const handleNavItemClick = (item) => {
     const sectionId = item.toLowerCase().replace(/\s+/g, '-');
-    
+
     // Special case for Verify Certificate - direct route exists
     if (item === "Verify Certificate") {
       navigate("/verify-certificate");
@@ -103,7 +103,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 </button>
                 <button
                   onClick={() => onSignupClick ? onSignupClick() : navigate('/?modal=true')}
-                  className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#267d87] hover:from-[#132c6b] hover:to-[#1e6169] text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 border border-[#daa520]/30"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 border border-[#daa520]/30"
                 >
                   Get Started
                 </button>
@@ -111,15 +111,30 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
             </div>
           )}
 
-          {/* Mobile Menu Button */}
-          {showLinks && (
+          {/* Mobile Controls */}
+          <div className="flex items-center gap-2 md:hidden">
             <button
-              className="md:hidden p-2 text-gray-600 dark:text-white"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-300"
+              aria-label="Toggle theme"
             >
-              {mobileMenuOpen ? <X /> : <Menu />}
+              {theme === 'dark' ? (
+                <Sun className="w-6 h-6 text-yellow-500 fill-yellow-500" />
+              ) : (
+                <Moon className="w-6 h-6 text-[#1a3884]" />
+              )}
             </button>
-          )}
+
+            {showLinks && (
+              <button
+                className="p-2 rounded-lg text-[#1a3884] dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle mobile menu"
+              >
+                {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

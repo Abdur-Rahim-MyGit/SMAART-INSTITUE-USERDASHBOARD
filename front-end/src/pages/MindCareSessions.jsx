@@ -223,8 +223,8 @@ const MindCareSessions = () => {
               {/* Page Header */}
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-xl bg-[#30919D]/20">
-                    <Heart className="w-6 h-6 text-[#30919D]" />
+                  <div className="p-2 rounded-xl bg-[#1a3884]/20">
+                    <Heart className="w-6 h-6 text-[#1a3884]" />
                   </div>
                   <h1 className="text-2xl sm:text-3xl font-bold text-[#002147]">Mind Care Sessions</h1>
                 </div>
@@ -240,14 +240,14 @@ const MindCareSessions = () => {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${activeTab === tab.id
-                        ? "bg-[#30919D] text-white"
+                        ? "bg-[#1a3884] text-white"
                         : "bg-white text-gray-500 hover:text-[#002147] border border-gray-200"
                         }`}
                     >
                       <Icon className="w-4 h-4" />
                       {tab.label}
                       {tab.id === "sessions" && sessions.length > 0 && (
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${activeTab === tab.id ? "bg-white/20" : "bg-[#30919D]/10 text-[#30919D]"}`}>
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${activeTab === tab.id ? "bg-white/20" : "bg-[#1a3884]/10 text-[#1a3884]"}`}>
                           {sessions.length}
                         </span>
                       )}
@@ -273,14 +273,14 @@ const MindCareSessions = () => {
                       <button
                         onClick={fetchMySessions}
                         disabled={isLoading}
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-gray-500 hover:text-[#002147] hover:border-[#30919D] transition-colors"
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-gray-500 hover:text-[#002147] hover:border-[#1a3884] transition-colors"
                       >
                         <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
                         Refresh
                       </button>
                       <button
                         onClick={() => setActiveTab("request")}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#30919D] text-white font-medium hover:bg-[#30919D]/90 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/90 transition-colors"
                       >
                         <Plus className="w-4 h-4" />
                         Request Session
@@ -290,7 +290,7 @@ const MindCareSessions = () => {
                     {/* Sessions List */}
                     {isLoading ? (
                       <div className="flex flex-col items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 text-[#30919D] animate-spin mb-3" />
+                        <Loader2 className="w-8 h-8 text-[#1a3884] animate-spin mb-3" />
                         <p className="text-gray-500">Loading sessions...</p>
                       </div>
                     ) : sessions.length === 0 ? (
@@ -300,7 +300,7 @@ const MindCareSessions = () => {
                         <p className="text-gray-500 text-sm mb-4">Request a coaching session to get started</p>
                         <button
                           onClick={() => setActiveTab("request")}
-                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#30919D] text-white hover:bg-[#30919D]/90 transition-colors"
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white hover:bg-[#1a3884]/90 transition-colors"
                         >
                           <Plus className="w-4 h-4" />
                           Request Session
@@ -318,7 +318,7 @@ const MindCareSessions = () => {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.05 }}
-                              className="p-4 rounded-xl bg-white border border-gray-200 hover:border-[#30919D]/50 transition-colors cursor-pointer"
+                              className="p-4 rounded-xl bg-white border border-gray-200 hover:border-[#1a3884]/50 transition-colors cursor-pointer"
                               onClick={() => setSelectedSession(session)}
                             >
                               <div className="flex flex-wrap items-start justify-between gap-4">
@@ -358,7 +358,7 @@ const MindCareSessions = () => {
                                         setSelectedSession(session);
                                         setShowFeedbackModal(true);
                                       }}
-                                      className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-[#30919D]/10 text-[#30919D] hover:bg-[#30919D]/20 transition-colors"
+                                      className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-[#1a3884]/10 text-[#1a3884] hover:bg-[#1a3884]/20 transition-colors"
                                     >
                                       <Star className="w-4 h-4" />
                                       Give Feedback
@@ -416,16 +416,16 @@ const MindCareSessions = () => {
                                   type="button"
                                   onClick={() => setSelectedDomain(domain.id)}
                                   className={`p-4 rounded-xl text-left transition-all ${selectedDomain === domain.id
-                                    ? "bg-[#30919D]/10 border-2 border-[#30919D]"
+                                    ? "bg-[#1a3884]/10 border-2 border-[#1a3884]"
                                     : "bg-gray-50 border-2 border-transparent hover:border-gray-200"
                                     }`}
                                 >
                                   <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg ${selectedDomain === domain.id ? "bg-[#30919D]/20" : "bg-white"}`}>
-                                      <Icon className={`w-5 h-5 ${selectedDomain === domain.id ? "text-[#30919D]" : "text-gray-400"}`} />
+                                    <div className={`p-2 rounded-lg ${selectedDomain === domain.id ? "bg-[#1a3884]/20" : "bg-white"}`}>
+                                      <Icon className={`w-5 h-5 ${selectedDomain === domain.id ? "text-[#1a3884]" : "text-gray-400"}`} />
                                     </div>
                                     <div>
-                                      <p className={`font-medium ${selectedDomain === domain.id ? "text-[#30919D]" : "text-[#002147]"}`}>
+                                      <p className={`font-medium ${selectedDomain === domain.id ? "text-[#1a3884]" : "text-[#002147]"}`}>
                                         {domain.label}
                                       </p>
                                       <p className="text-xs text-gray-500">{domain.description}</p>
@@ -447,7 +447,7 @@ const MindCareSessions = () => {
                             onChange={(e) => setIssueDescription(e.target.value)}
                             placeholder="Please describe what you'd like to discuss in the session..."
                             rows={4}
-                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors resize-none"
+                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none"
                           />
                         </div>
 
@@ -460,7 +460,7 @@ const MindCareSessions = () => {
                             <select
                               value={selectedCoach}
                               onChange={(e) => setSelectedCoach(e.target.value)}
-                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#30919D] focus:outline-none transition-colors"
+                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
                             >
                               <option value="">Any available coach</option>
                               {coaches.map((coach) => (
@@ -483,7 +483,7 @@ const MindCareSessions = () => {
                               value={preferredDate}
                               onChange={(e) => setPreferredDate(e.target.value)}
                               min={new Date().toISOString().split("T")[0]}
-                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#30919D] focus:outline-none transition-colors"
+                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
                             />
                           </div>
                           <div>
@@ -494,7 +494,7 @@ const MindCareSessions = () => {
                               type="time"
                               value={preferredTime}
                               onChange={(e) => setPreferredTime(e.target.value)}
-                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#30919D] focus:outline-none transition-colors"
+                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
                             />
                           </div>
                         </div>
@@ -511,7 +511,7 @@ const MindCareSessions = () => {
                           <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#30919D] text-white font-medium hover:bg-[#30919D]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {isSubmitting ? (
                               <Loader2 className="w-5 h-5 animate-spin" />
@@ -578,7 +578,7 @@ const MindCareSessions = () => {
                 onChange={(e) => setFeedbackComment(e.target.value)}
                 placeholder="Share your experience (optional)..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors resize-none mb-6"
+                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none mb-6"
               />
 
               {/* Actions */}
@@ -592,7 +592,7 @@ const MindCareSessions = () => {
                 <button
                   onClick={handleSubmitFeedback}
                   disabled={feedbackRating === 0}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#30919D] text-white font-medium hover:bg-[#30919D]/90 transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/90 transition-colors disabled:opacity-50"
                 >
                   Submit Feedback
                 </button>
@@ -606,3 +606,4 @@ const MindCareSessions = () => {
 };
 
 export default MindCareSessions;
+

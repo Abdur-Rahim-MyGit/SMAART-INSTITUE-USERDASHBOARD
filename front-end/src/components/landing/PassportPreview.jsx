@@ -53,7 +53,7 @@ const PassportPreview = () => {
                 <div className="p-5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5 border-b border-gray-100 dark:border-white/10 relative z-10">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-white dark:bg-[#002147] rounded-xl flex items-center justify-center p-1.5 border border-gray-100 dark:border-white/10 shadow-lg">
-                      <div className="w-full h-full bg-gradient-to-br from-[#1a3884] to-[#267a84] rounded-lg flex items-center justify-center">
+                      <div className="w-full h-full bg-gradient-to-br from-[#1a3884] to-[#132c6b] rounded-lg flex items-center justify-center">
                         <img src={whiteLogo} alt="Logo" className="w-8 h-8 object-contain" />
                       </div>
                     </div>
@@ -129,7 +129,7 @@ const PassportPreview = () => {
               className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-[#1a3884] dark:text-white tracking-tight font-heading leading-tight"
             >
               SMAART Capability & <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#40b5c4]">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#2a4d9e]">
                 Skills Passport™
               </span>
             </motion.h2>
@@ -186,3 +186,4 @@ const PassportPreview = () => {
 };
 
 export default PassportPreview;
+

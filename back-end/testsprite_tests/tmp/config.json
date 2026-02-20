@@ -1,0 +1,18 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:5000",
+  "backendAuthType": "public",
+  "executionArgs": {
+    "projectName": "SMAART-INSTITUE-USERDASHBOARD",
+    "projectPath": "c:\\Users\\vishw_b\\Desktop\\SMAART INSTITUTE\\SMAART-INSTITUE-USERDASHBOARD\\back-end",
+    "testIds": [],
+    "additionalInstruction": "Run a random test from the generated plan to verify full integration.",
+    "envs": {
+      "API_KEY": "sk-user-Adov03b5U0AMC-DtvVPcQjZTdbAnu5kYRFHiPp29zIoXeKJMdcL2LniRZO-wc29cl3YZmaW65HtzBSelBsd0Q8hHqvkUPFr7B5DXkfOHaI7DKflic1PVBlPvqi5ItQp5lTI"
+    }
+  },
+  "serverPort": 55355,
+  "proxy": "http://0ec93462-8ac2-4390-a15f-a9194789b2b0:pWDAC4b43SgAB1WNBJ7uzrw71CzF0e6j@tun.testsprite.com:8080"
+}

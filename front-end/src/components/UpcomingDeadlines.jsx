@@ -36,7 +36,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                 </div>
                 <button
                     onClick={() => setIsAdding(!isAdding)}
-                    className="p-1 text-gray-400 hover:text-[#30919D] transition-colors"
+                    className="p-1 text-gray-400 hover:text-[#1a3884] transition-colors"
                 >
                     <Plus className={`w-4 h-4 transition-transform ${isAdding ? 'rotate-45' : ''}`} />
                 </button>
@@ -58,12 +58,12 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                 value={newTaskTitle}
                                 onChange={(e) => setNewTaskTitle(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-                                className="flex-1 px-3 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-xs focus:outline-none focus:border-[#30919D] dark:text-white"
+                                className="flex-1 px-3 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-xs focus:outline-none focus:border-[#1a3884] dark:text-white"
                                 autoFocus
                             />
                             <button
                                 onClick={handleAdd}
-                                className="px-3 py-2 bg-[#30919D] text-white rounded-xl text-xs font-bold shadow-lg shadow-[#30919D]/20 hover:bg-[#287a84]"
+                                className="px-3 py-2 bg-[#1a3884] text-white rounded-xl text-xs font-bold shadow-lg shadow-[#1a3884]/20 hover:bg-[#287a84]"
                             >
                                 Add
                             </button>
@@ -80,7 +80,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                             <Calendar className="w-6 h-6 text-gray-300" />
                         </div>
                         <p className="text-xs text-gray-400">No upcoming deadlines.</p>
-                        <button onClick={() => setIsAdding(true)} className="text-xs text-[#30919D] font-bold mt-2 hover:underline">Add a task</button>
+                        <button onClick={() => setIsAdding(true)} className="text-xs text-[#1a3884] font-bold mt-2 hover:underline">Add a task</button>
                     </div>
                 ) : (
                     <>
@@ -92,8 +92,8 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                     onClick={() => onToggleTask(task)}
                                     className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                                         task.status === "Completed" 
-                                        ? 'bg-[#30919D] border-[#30919D] text-white' 
-                                        : 'border-gray-300 dark:border-gray-600 hover:border-[#30919D] hover:bg-[#30919D]/10'
+                                        ? 'bg-[#1a3884] border-[#1a3884] text-white' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-[#1a3884] hover:bg-[#1a3884]/10'
                                     }`}
                                 >
                                     {task.status === "Completed" && <CheckCircle2 className="w-3 h-3" />}
@@ -136,7 +136,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                                 <CheckCircle2 className="w-3 h-3" />
                                             </div>
                                             <span className="text-xs text-gray-500 line-through decoration-gray-400 flex-1">{task.title}</span>
-                                            <button onClick={() => onToggleTask(task)} className="text-[10px] text-gray-400 hover:text-[#30919D] hover:underline">Undo</button>
+                                            <button onClick={() => onToggleTask(task)} className="text-[10px] text-gray-400 hover:text-[#1a3884] hover:underline">Undo</button>
                                         </div>
                                     ))}
                                 </div>
@@ -150,3 +150,4 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
 };
 
 export default UpcomingDeadlines;
+

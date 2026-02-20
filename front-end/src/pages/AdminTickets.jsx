@@ -139,8 +139,8 @@ const AdminTickets = () => {
             {/* Page Header */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-xl bg-[#30919D]/20">
-                  <Ticket className="w-6 h-6 text-[#30919D]" />
+                <div className="p-2 rounded-xl bg-[#1a3884]/20">
+                  <Ticket className="w-6 h-6 text-[#1a3884]" />
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white">Ticket Management</h1>
               </div>
@@ -210,21 +210,21 @@ const AdminTickets = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search by ticket ID or title..."
-                    className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#002147] border border-[#30919D]/30 text-white placeholder-gray-500 focus:border-[#30919D] focus:outline-none transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-xl bg-[#002147] border border-[#1a3884]/30 text-white placeholder-gray-500 focus:border-[#1a3884] focus:outline-none transition-colors"
                   />
                 </form>
                 <button
                   onClick={() => setShowFilters(!showFilters)}
                   className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors ${
                     showFilters || activeFiltersCount
-                      ? "border-[#30919D] text-[#30919D]"
-                      : "border-[#30919D]/30 text-gray-400 hover:text-white"
+                      ? "border-[#1a3884] text-[#1a3884]"
+                      : "border-[#1a3884]/30 text-gray-400 hover:text-white"
                   }`}
                 >
                   <Filter className="w-5 h-5" />
                   Filters
                   {activeFiltersCount > 0 && (
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-[#30919D]/20">
+                    <span className="px-2 py-0.5 text-xs rounded-full bg-[#1a3884]/20">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -232,7 +232,7 @@ const AdminTickets = () => {
                 <button
                   onClick={() => fetchTickets()}
                   disabled={isLoading}
-                  className="p-3 rounded-xl border border-[#30919D]/30 text-gray-400 hover:text-white hover:border-[#30919D] transition-colors"
+                  className="p-3 rounded-xl border border-[#1a3884]/30 text-gray-400 hover:text-white hover:border-[#1a3884] transition-colors"
                 >
                   <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
                 </button>
@@ -247,7 +247,7 @@ const AdminTickets = () => {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30 space-y-4">
+                    <div className="p-4 rounded-xl bg-[#002147] border border-[#1a3884]/30 space-y-4">
                       {/* Status Filter */}
                       <div>
                         <label className="text-xs text-gray-500 mb-2 block">Status</label>
@@ -258,7 +258,7 @@ const AdminTickets = () => {
                               onClick={() => handleFilterChange('status', option.value)}
                               className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                 filters.status === option.value
-                                  ? "bg-[#30919D] text-white"
+                                  ? "bg-[#1a3884] text-white"
                                   : "bg-[#001229] text-gray-400 hover:text-white"
                               }`}
                             >
@@ -279,7 +279,7 @@ const AdminTickets = () => {
                               onClick={() => handleFilterChange('priority', option.value)}
                               className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                 filters.priority === option.value
-                                  ? "bg-[#30919D] text-white"
+                                  ? "bg-[#1a3884] text-white"
                                   : "bg-[#001229] text-gray-400 hover:text-white"
                               }`}
                             >
@@ -300,7 +300,7 @@ const AdminTickets = () => {
                               onClick={() => handleFilterChange('category', option.value)}
                               className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                 filters.category === option.value
-                                  ? "bg-[#30919D] text-white"
+                                  ? "bg-[#1a3884] text-white"
                                   : "bg-[#001229] text-gray-400 hover:text-white"
                               }`}
                             >
@@ -314,7 +314,7 @@ const AdminTickets = () => {
                       {activeFiltersCount > 0 && (
                         <button
                           onClick={clearFilters}
-                          className="text-sm text-[#30919D] hover:text-[#30919D]/80 transition-colors"
+                          className="text-sm text-[#1a3884] hover:text-[#1a3884]/80 transition-colors"
                         >
                           Clear all filters
                         </button>
@@ -328,11 +328,11 @@ const AdminTickets = () => {
             {/* Tickets List */}
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-16">
-                <Loader2 className="w-10 h-10 text-[#30919D] animate-spin mb-4" />
+                <Loader2 className="w-10 h-10 text-[#1a3884] animate-spin mb-4" />
                 <p className="text-gray-400">Loading tickets...</p>
               </div>
             ) : tickets.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 rounded-xl bg-[#002147] border border-[#30919D]/30">
+              <div className="flex flex-col items-center justify-center py-16 rounded-xl bg-[#002147] border border-[#1a3884]/30">
                 <Inbox className="w-16 h-16 text-gray-500 mb-4" />
                 <h3 className="text-xl text-white font-medium mb-2">No tickets found</h3>
                 <p className="text-gray-400 text-sm">
@@ -356,7 +356,7 @@ const AdminTickets = () => {
 
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (
-                  <div className="flex items-center justify-between mt-6 pt-6 border-t border-[#30919D]/20">
+                  <div className="flex items-center justify-between mt-6 pt-6 border-t border-[#1a3884]/20">
                     <span className="text-sm text-gray-400">
                       Showing {((pagination.page - 1) * pagination.limit) + 1} -{' '}
                       {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
@@ -368,7 +368,7 @@ const AdminTickets = () => {
                           fetchTickets();
                         }}
                         disabled={pagination.page === 1}
-                        className="px-4 py-2 rounded-lg border border-[#30919D]/30 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-4 py-2 rounded-lg border border-[#1a3884]/30 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         Previous
                       </button>
@@ -378,7 +378,7 @@ const AdminTickets = () => {
                           fetchTickets();
                         }}
                         disabled={pagination.page === pagination.totalPages}
-                        className="px-4 py-2 rounded-lg border border-[#30919D]/30 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-4 py-2 rounded-lg border border-[#1a3884]/30 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         Next
                       </button>
@@ -407,3 +407,4 @@ const AdminTickets = () => {
 };
 
 export default AdminTickets;
+

@@ -15,8 +15,8 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
           onClick={() => onSelect(template.id)}
           className={`relative p-2 rounded-xl border-2 transition-all duration-300 aspect-square group overflow-hidden ${
             selectedTemplate === template.id
-              ? "border-[#30919D] bg-[#30919D]/10 shadow-lg shadow-[#30919D]/20"
-              : "border-slate-200 dark:border-white/10 hover:border-[#30919D]/50 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10"
+              ? "border-[#1a3884] bg-[#1a3884]/10 shadow-lg shadow-[#1a3884]/20"
+              : "border-slate-200 dark:border-white/10 hover:border-[#1a3884]/50 bg-white dark:bg-white/5 hover:bg-slate-50 dark:hover:bg-white/10"
           }`}
         >
           {/* Mini preview of template */}
@@ -26,7 +26,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
                 key={i}
                 className={`absolute transition-all duration-300 ${
                   selectedTemplate === template.id
-                    ? "bg-[#30919D]/60"
+                    ? "bg-[#1a3884]/60"
                     : "bg-slate-300 dark:bg-white/20"
                 }`}
                 style={{
@@ -42,7 +42,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl" />
           {selectedTemplate === template.id && (
-            <div className="absolute -top-1 -right-1 w-6 h-6 bg-[#30919D] rounded-full flex items-center justify-center shadow-md ring-2 ring-white dark:ring-[#001a38]">
+            <div className="absolute -top-1 -right-1 w-6 h-6 bg-[#1a3884] rounded-full flex items-center justify-center shadow-md ring-2 ring-white dark:ring-[#001a38]">
               <Check className="w-3.5 h-3.5 text-white" />
             </div>
           )}
@@ -53,3 +53,4 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
 };
 
 export default TemplateSelector;
+

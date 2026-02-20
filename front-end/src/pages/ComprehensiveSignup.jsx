@@ -391,8 +391,8 @@ const ComprehensiveSignup = () => {
     } catch (error) { console.error("Submission error:", error); toast.error(error.message || "Failed to submit"); setIsLoading(false); }
   };
 
-  const inputClass = "h-12 rounded-xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:border-[#30919D] mt-2 transition-all duration-200 shadow-sm dark:shadow-none placeholder:text-slate-400 dark:placeholder:text-white/20";
-  const selectClass = "w-full h-12 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B1120] px-3 text-slate-900 dark:text-white mt-2 transition-all duration-200 shadow-sm dark:shadow-none focus:border-[#30919D]";
+  const inputClass = "h-12 rounded-xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white focus:border-[#1a3884] mt-2 transition-all duration-200 shadow-sm dark:shadow-none placeholder:text-slate-400 dark:placeholder:text-white/20";
+  const selectClass = "w-full h-12 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B1120] px-3 text-slate-900 dark:text-white mt-2 transition-all duration-200 shadow-sm dark:shadow-none focus:border-[#1a3884]";
   const textareaClass = "w-full h-24 rounded-xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white mt-2 p-3 resize-none transition-all duration-200 shadow-sm dark:shadow-none";
   const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
   const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25+ LPA"];
@@ -417,7 +417,7 @@ const ComprehensiveSignup = () => {
   return (
     <div className="min-h-screen py-8 px-4 bg-slate-50 dark:bg-[#001229] relative overflow-hidden text-slate-900 dark:text-white transition-colors duration-300">
       <div className="fixed inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20">
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-blue-100 dark:bg-[#30919D]/10 blur-[120px]" />
+        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-blue-100 dark:bg-[#1a3884]/10 blur-[120px]" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-100 dark:bg-blue-900/10 blur-[100px]" />
       </div>
       <div className="max-w-5xl mx-auto relative z-10">
@@ -872,3 +872,4 @@ const ComprehensiveSignup = () => {
 };
 
 export default ComprehensiveSignup;
+

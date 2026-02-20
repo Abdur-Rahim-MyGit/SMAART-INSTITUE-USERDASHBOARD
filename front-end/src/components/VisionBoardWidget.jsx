@@ -206,7 +206,7 @@ const VisionBoardWidget = () => {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Sparkles className="w-16 h-16 text-[#30919D]/30" />
+              <Sparkles className="w-16 h-16 text-[#1a3884]/30" />
             </div>
           )}
 
@@ -252,7 +252,7 @@ const VisionBoardWidget = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[#001a38] rounded-xl max-w-md w-full p-6 shadow-2xl border border-[#30919D]/30"
+              className="bg-[#001a38] rounded-xl max-w-md w-full p-6 shadow-2xl border border-[#1a3884]/30"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-center w-12 h-12 bg-red-500/20 rounded-full mx-auto mb-4">
@@ -268,7 +268,7 @@ const VisionBoardWidget = () => {
               <div className="flex gap-3">
                 <Button
                   variant="outline"
-                  className="flex-1 border-[#30919D]/50 text-white hover:bg-[#30919D]/20"
+                  className="flex-1 border-[#1a3884]/50 text-white hover:bg-[#1a3884]/20"
                   onClick={() => setShowRemoveConfirm(false)}
                 >
                   Cancel
@@ -290,3 +290,4 @@ const VisionBoardWidget = () => {
 };
 
 export default VisionBoardWidget;
+

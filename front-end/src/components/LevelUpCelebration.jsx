@@ -29,7 +29,7 @@ const UNLOCK_CONFIG = {
     icon: Footprints,
     name: 'Stylish Shoes',
     description: 'Your avatar now has cool new kicks!',
-    color: '#30919D',
+    color: '#1a3884',
     level: 2
   },
   jacket: {
@@ -94,7 +94,7 @@ const LevelUpCelebration = ({
               recycle={false}
               numberOfPieces={300}
               gravity={0.2}
-              colors={['#30919D', '#daa520', '#ff6b6b', '#4ecdc4', '#fff']}
+              colors={['#1a3884', '#daa520', '#ff6b6b', '#4ecdc4', '#fff']}
             />
           )}
 
@@ -113,7 +113,7 @@ const LevelUpCelebration = ({
               exit={{ scale: 0.5, opacity: 0, y: 50 }}
               transition={{ type: 'spring', damping: 15 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative bg-gradient-to-b from-[#002147] to-[#001229] rounded-3xl border border-[#30919D]/30 p-8 max-w-md w-full overflow-hidden"
+              className="relative bg-gradient-to-b from-[#002147] to-[#001229] rounded-3xl border border-[#1a3884]/30 p-8 max-w-md w-full overflow-hidden"
             >
               {/* Close button */}
               <button
@@ -134,7 +134,7 @@ const LevelUpCelebration = ({
                     rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
                     scale: { duration: 2, repeat: Infinity }
                   }}
-                  className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-[#30919D]/10 blur-3xl"
+                  className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-[#1a3884]/10 blur-3xl"
                 />
                 <motion.div
                   animate={{ 
@@ -189,7 +189,7 @@ const LevelUpCelebration = ({
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#30919D]/20 rounded-full mb-6"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1a3884]/20 rounded-full mb-6"
                   >
                     <Sparkles className="w-4 h-4 text-[#daa520]" />
                     <span className="text-[#daa520] font-bold">+{xpGained} XP</span>
@@ -223,7 +223,7 @@ const LevelUpCelebration = ({
                       {unlock.type === 'accessory' ? 'New Accessory Unlocked!' : 'New Animation Unlocked!'}
                     </h3>
                     
-                    <p className="text-[#30919D] font-semibold text-lg mb-2">
+                    <p className="text-[#1a3884] font-semibold text-lg mb-2">
                       {unlockInfo.name}
                     </p>
                     
@@ -241,7 +241,7 @@ const LevelUpCelebration = ({
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={onClose}
-                  className="mt-6 px-8 py-3 bg-gradient-to-r from-[#30919D] to-[#267a84] text-white font-bold rounded-xl shadow-lg shadow-[#30919D]/30 hover:shadow-[#30919D]/50 transition-shadow"
+                  className="mt-6 px-8 py-3 bg-gradient-to-r from-[#1a3884] to-[#132c6b] text-white font-bold rounded-xl shadow-lg shadow-[#1a3884]/30 hover:shadow-[#1a3884]/50 transition-shadow"
                 >
                   Continue
                 </motion.button>
@@ -255,3 +255,5 @@ const LevelUpCelebration = ({
 };
 
 export default LevelUpCelebration;
+
+

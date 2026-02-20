@@ -12,12 +12,16 @@ const ModuleTasks = () => {
   const navigate = useNavigate();
 
   // Mock module data - in real app this would come from API/context
+  // Mock module data
   const modules = [
-    { id: 1, title: "Module 1", locked: false, tasks: Array.from({ length: 7 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: i < 5 })) },
-    { id: 2, title: "Module 2", locked: false, tasks: Array.from({ length: 8 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: i < 3 })) },
-    { id: 3, title: "Module 3", locked: true, tasks: Array.from({ length: 7 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
-    { id: 4, title: "Module 4", locked: true, tasks: Array.from({ length: 8 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
-  ];
+    { id: 1, title: "Module 1", tasks: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: true })) },
+    { id: 2, title: "Module 2", tasks: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
+    { id: 3, title: "Module 3", tasks: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
+    { id: 4, title: "Module 4", tasks: Array.from({ length: 3 }, (_, i) => ({ id: i + 1, title: `Task ${i + 1}`, completed: false })) },
+  ].map((mod, idx, arr) => ({
+    ...mod,
+    locked: idx > 0 && arr[idx-1].tasks.some(t => !t.completed)
+  }));
 
   const module = modules.find(m => m.id === parseInt(moduleId));
 
@@ -123,7 +127,7 @@ const ModuleTasks = () => {
                 <h1 className="text-4xl font-display font-bold" style={{ color: '#002147' }}>
                   {module.title}
                 </h1>
-                <p className="text-lg font-semibold" style={{ color: '#30919D' }}>{moduleInfo.day} • {moduleInfo.title}</p>
+                <p className="text-lg font-semibold" style={{ color: '#1a3884' }}>{moduleInfo.day} • {moduleInfo.title}</p>
               </div>
             </div>
 
@@ -144,7 +148,7 @@ const ModuleTasks = () => {
                   <h2 className="text-2xl font-display font-bold mb-3" style={{ color: '#002147' }}>
                     {moduleInfo.title}
                   </h2>
-                  <p className="leading-relaxed mb-6" style={{ color: '#30919D' }}>
+                  <p className="leading-relaxed mb-6" style={{ color: '#1a3884' }}>
                     {moduleInfo.description}
                   </p>
 
@@ -154,7 +158,7 @@ const ModuleTasks = () => {
                       <span style={{ color: '#002147' }}>Duration: {moduleInfo.duration}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-5 h-5" style={{ color: '#30919D' }} />
+                      <Calendar className="w-5 h-5" style={{ color: '#1a3884' }} />
                       <span style={{ color: '#002147' }}>{module.tasks.length} Tasks</span>
                     </div>
                   </div>
@@ -172,7 +176,7 @@ const ModuleTasks = () => {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-semibold" style={{ color: '#002147' }}>Progress Overview</h3>
-                <span className="font-bold text-lg" style={{ color: '#30919D' }}>
+                <span className="font-bold text-lg" style={{ color: '#1a3884' }}>
                   {completedTasks} / {module.tasks.length} completed
                 </span>
               </div>
@@ -187,7 +191,7 @@ const ModuleTasks = () => {
                 />
               </div>
 
-              <p className="text-sm mt-2" style={{ color: '#30919D' }}>
+              <p className="text-sm mt-2" style={{ color: '#1a3884' }}>
                 {progressPercentage === 100 ? 'Module completed! 🎉' : `${Math.round(progressPercentage)}% complete`}
               </p>
             </motion.div>
@@ -223,7 +227,7 @@ const ModuleTasks = () => {
 
                     <div className="flex items-center gap-3 flex-1">
                       {task.completed ? (
-                        <CheckCircle2 className="w-5 h-5" style={{ color: '#30919D' }} />
+                        <CheckCircle2 className="w-5 h-5" style={{ color: '#1a3884' }} />
                       ) : (
                         <Circle className="w-5 h-5" style={{ color: '#daa520' }} />
                       )}
@@ -231,7 +235,7 @@ const ModuleTasks = () => {
                       <span className={`font-medium transition-colors ${task.completed
                           ? "line-through"
                           : ""
-                        }`} style={{ color: task.completed ? '#30919D' : '#002147' }}>
+                        }`} style={{ color: task.completed ? '#1a3884' : '#002147' }}>
                         Task {index + 1}
                       </span>
                     </div>
@@ -241,7 +245,7 @@ const ModuleTasks = () => {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         className="text-sm font-medium px-3 py-1 rounded-full"
-                        style={{ color: '#30919D', backgroundColor: 'rgba(48, 145, 157, 0.1)' }}
+                        style={{ color: '#1a3884', backgroundColor: 'rgba(26, 56, 132, 0.1)' }}
                       >
                         Completed
                       </motion.div>
@@ -287,3 +291,5 @@ const ModuleTasks = () => {
 };
 
 export default ModuleTasks;
+
+
