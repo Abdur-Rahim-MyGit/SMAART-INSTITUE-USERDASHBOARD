@@ -16,8 +16,8 @@
     --popover: 212 90% 18%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 174 53% 40%;
-    /* Teal #30919D */
+    --primary: 223 67% 31%;
+    /* Blue #1a3884 */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 43 74% 49%;
@@ -35,7 +35,7 @@
 
     --border: 212 30% 25%;
     --input: 212 30% 25%;
-    --ring: 174 53% 40%;
+    --ring: 223 67% 31%;
 
     --radius: 0.5rem;
 
@@ -50,8 +50,8 @@
     --lms-text: 0 0% 20%;
     --lms-text-muted: 0 0% 50%;
     --lms-border: 184 30% 90%;
-    --lms-accent: 174 53% 40%;
-    /* #30919D */
+    --lms-accent: 223 67% 31%;
+    /* #1a3884 */
   }
 }
 
@@ -128,11 +128,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-[#30919D]/20 dark:bg-white/10 rounded-full transition-colors;
+    @apply bg-[#1a3884]/20 dark:bg-white/10 rounded-full transition-colors;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-[#30919D]/40 dark:bg-white/20;
+    @apply bg-[#1a3884]/40 dark:bg-white/20;
   }
 
   /* Allow text selection and restore cursor/caret in inputs and textareas */

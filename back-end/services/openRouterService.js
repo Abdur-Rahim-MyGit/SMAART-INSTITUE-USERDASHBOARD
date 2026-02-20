@@ -199,24 +199,34 @@ Please provide a structured roadmap.`;
      * Generate resume content
      */
     async generateResume(profile, targetRole) {
-        const systemPrompt = `You are a professional resume writer. Create ATS-optimized resume content for the target role. Include:
-1. Professional summary (3-4 sentences)
-2. Key skills section
-3. Work experience descriptions (using action verbs and metrics)
-4. Achievement highlights
-5. Keywords for ATS optimization
+        const systemPrompt = `You are an elite Professional Resume Writer. Your task is to generate a COMPLETE, ready-to-use resume for the user.
+        
+IMPORTANCE: Use the user's ACTUAL NAME and details provided in the profile.
+        
+STRUCTURE:
+1. HEADER: Full Name (Centered, Large), Professional Title (Target Role), and Contact Information.
+2. PROFESSIONAL SUMMARY: A compelling 3-4 sentence paragraph highlighting their career trajectory.
+3. CORE COMPETENCIES: A categorized list of their skills.
+4. PROFESSIONAL EXPERIENCE: Detailed descriptions of their work history using the "Action Verb + Task + Result" formula.
+5. PROJECTS & ACHIEVEMENTS: Highlights from their registered projects and certificates.
+6. EDUCATION: Their degree and institution info.
 
-Format professionally and focus on impact.`;
+FORMATTING: Output in clean, professional Markdown. Use horizontal lines (---) between sections. Use Bold for job titles and bullet points for responsibilities.`;
 
-        const userMessage = `Create resume content for ${targetRole}:
+        const userMessage = `Generate my master resume for the role of "${targetRole}".
+        
+MY DATA:
+- NAME: ${profile.fullName || 'User'}
+- EDUCATION: ${profile.education || 'Pending'}
+- SKILLS: ${profile.skills?.join(', ') || 'To be added'}
+- EXPERIENCE: ${profile.experience || 'Not specified'}
+- PROJECTS: ${profile.projects || 'None listed'}
+- CERTIFICATIONS: ${profile.certificates || 'None'}
+- INSTITUTION: ${profile.college || 'SMAART Institute'}
+- DEPARTMENT: ${profile.department || 'General'}
+- GOALS: ${profile.goals || 'Career growth'}
 
-My Background:
-- Skills: ${profile.skills?.join(', ') || 'To be added'}
-- Experience: ${profile.experience || 'To be added'}
-- Education: ${profile.education || 'To be added'}
-- Achievements: ${profile.achievements || 'To be added'}
-
-Please generate professional resume sections.`;
+Please write the resume as if you are me. Ensure my name "${profile.fullName}" is the very first thing at the top.`;
 
         return this.chat([{ role: 'user', content: userMessage }], systemPrompt);
     }

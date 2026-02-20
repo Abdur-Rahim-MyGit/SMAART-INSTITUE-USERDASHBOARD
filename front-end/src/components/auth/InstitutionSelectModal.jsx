@@ -25,19 +25,19 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
             className="relative w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden z-10 bg-white dark:bg-[#00152e] border border-gray-200 dark:border-white/10 mx-2 sm:mx-0"
           >
             {/* Ambient Background Glows */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#30919D]/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#1a3884]/10 rounded-full blur-[80px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#daa520]/10 rounded-full blur-[80px] pointer-events-none" />
 
             {/* Header */}
             <div className="relative p-6 sm:p-8 text-center border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 backdrop-blur-sm">
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-[#30919D] hover:text-white dark:hover:bg-[#30919D] transition-all duration-300 group"
+                className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-[#1a3884] hover:text-white dark:hover:bg-[#1a3884] transition-all duration-300 group"
               >
                 <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
               </button>
 
-              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#30919D]/10 dark:bg-[#30919D]/20 text-[#30919D] mb-4 shadow-inner ring-1 ring-[#30919D]/20">
+              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#1a3884]/10 dark:bg-[#1a3884]/20 text-[#1a3884] mb-4 shadow-inner ring-1 ring-[#1a3884]/20">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -63,3 +63,4 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
 };
 
 export default InstitutionSelectModal;
+

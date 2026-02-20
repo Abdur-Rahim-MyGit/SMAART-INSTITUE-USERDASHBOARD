@@ -52,7 +52,7 @@ const SignupSuccess = () => {
           <Link to="/" className="block">
             <Button 
               className="w-full text-white font-semibold py-2.5 sm:py-3 text-sm sm:text-base rounded-lg transition-all hover:shadow-lg"
-              style={{ background: 'linear-gradient(to right, #30919D, #002147)' }}
+              style={{ background: 'linear-gradient(to right, #1a3884, #002147)' }}
             >
               Try logging in now!
             </Button>
@@ -64,3 +64,4 @@ const SignupSuccess = () => {
 };
 
 export default SignupSuccess;
+

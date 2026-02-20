@@ -70,7 +70,7 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.01 }}
       onClick={() => onClick?.(ticket)}
-      className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/30 hover:border-[#30919D] transition-all cursor-pointer group"
+      className="p-4 rounded-xl bg-[#002147] border border-[#1a3884]/30 hover:border-[#1a3884] transition-all cursor-pointer group"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
@@ -86,7 +86,7 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
           </div>
 
           {/* Title */}
-          <h3 className="text-white font-medium mb-1 truncate group-hover:text-[#30919D] transition-colors">
+          <h3 className="text-white font-medium mb-1 truncate group-hover:text-[#1a3884] transition-colors">
             {ticket.title}
           </h3>
 
@@ -121,7 +121,7 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
 
           {/* User info (for admin view) */}
           {showUser && ticket.userId && (
-            <div className="mt-3 pt-3 border-t border-[#30919D]/10">
+            <div className="mt-3 pt-3 border-t border-[#1a3884]/10">
               <div className="flex items-center gap-2">
                 {ticket.userId.profileImage ? (
                   <img 
@@ -130,8 +130,8 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
                     className="w-6 h-6 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-6 h-6 rounded-full bg-[#30919D]/20 flex items-center justify-center">
-                    <span className="text-[10px] text-[#30919D] font-medium">
+                  <div className="w-6 h-6 rounded-full bg-[#1a3884]/20 flex items-center justify-center">
+                    <span className="text-[10px] text-[#1a3884] font-medium">
                       {ticket.userId.fullName?.charAt(0)?.toUpperCase()}
                     </span>
                   </div>
@@ -144,10 +144,11 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
         </div>
 
         {/* Arrow indicator */}
-        <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[#30919D] transition-colors flex-shrink-0" />
+        <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[#1a3884] transition-colors flex-shrink-0" />
       </div>
     </motion.div>
   );
 };
 
 export default TicketCard;
+

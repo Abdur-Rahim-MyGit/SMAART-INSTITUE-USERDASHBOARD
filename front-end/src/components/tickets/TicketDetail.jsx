@@ -111,10 +111,10 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-[#001229] border border-[#30919D]/30 flex flex-col"
+        className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-[#001229] border border-[#1a3884]/30 flex flex-col"
       >
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-[#30919D]/20">
+        <div className="p-4 sm:p-6 border-b border-[#1a3884]/20">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -138,14 +138,14 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           {/* Meta Info */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-3 rounded-xl bg-[#002147] border border-[#30919D]/20">
+            <div className="p-3 rounded-xl bg-[#002147] border border-[#1a3884]/20">
               <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                 <Tag className="w-3 h-3" />
                 Category
               </div>
               <span className="text-white text-sm font-medium">{categoryConfig.label}</span>
             </div>
-            <div className={`p-3 rounded-xl ${priorityConfig.bg} border border-[#30919D]/20`}>
+            <div className={`p-3 rounded-xl ${priorityConfig.bg} border border-[#1a3884]/20`}>
               <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                 <AlertTriangle className="w-3 h-3" />
                 Priority
@@ -154,7 +154,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
                 {priorityConfig.label}
               </span>
             </div>
-            <div className="p-3 rounded-xl bg-[#002147] border border-[#30919D]/20">
+            <div className="p-3 rounded-xl bg-[#002147] border border-[#1a3884]/20">
               <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                 <Clock className="w-3 h-3" />
                 Created
@@ -163,7 +163,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
                 {formatDate(ticket.createdAt)}
               </span>
             </div>
-            <div className="p-3 rounded-xl bg-[#002147] border border-[#30919D]/20">
+            <div className="p-3 rounded-xl bg-[#002147] border border-[#1a3884]/20">
               <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                 <User className="w-3 h-3" />
                 Submitted by
@@ -177,7 +177,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
           {/* Description */}
           <div>
             <h3 className="text-sm font-medium text-gray-400 mb-2">Description</h3>
-            <div className="p-4 rounded-xl bg-[#002147] border border-[#30919D]/20">
+            <div className="p-4 rounded-xl bg-[#002147] border border-[#1a3884]/20">
               <p className="text-white whitespace-pre-wrap">{ticket.description}</p>
             </div>
           </div>
@@ -195,13 +195,13 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
                     key={index}
                     href={file.path}
                     download={file.originalName}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#002147] border border-[#30919D]/30 hover:border-[#30919D] transition-colors group"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#002147] border border-[#1a3884]/30 hover:border-[#1a3884] transition-colors group"
                   >
-                    <Paperclip className="w-4 h-4 text-[#30919D]" />
+                    <Paperclip className="w-4 h-4 text-[#1a3884]" />
                     <span className="text-sm text-gray-300 max-w-[150px] truncate">
                       {file.originalName || file.filename}
                     </span>
-                    <Download className="w-4 h-4 text-gray-500 group-hover:text-[#30919D] transition-colors" />
+                    <Download className="w-4 h-4 text-gray-500 group-hover:text-[#1a3884] transition-colors" />
                   </a>
                 ))}
               </div>
@@ -216,7 +216,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
             </h3>
             <div className="space-y-3">
               {ticket.responses?.length === 0 ? (
-                <div className="p-4 rounded-xl bg-[#002147]/50 border border-dashed border-[#30919D]/20 text-center">
+                <div className="p-4 rounded-xl bg-[#002147]/50 border border-dashed border-[#1a3884]/20 text-center">
                   <p className="text-gray-500 text-sm">No responses yet</p>
                 </div>
               ) : (
@@ -226,11 +226,11 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-4 rounded-xl bg-[#30919D]/10 border border-[#30919D]/20"
+                    className="p-4 rounded-xl bg-[#1a3884]/10 border border-[#1a3884]/20"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-6 h-6 rounded-full bg-[#30919D]/30 flex items-center justify-center">
-                        <span className="text-[10px] text-[#30919D] font-medium">
+                      <div className="w-6 h-6 rounded-full bg-[#1a3884]/30 flex items-center justify-center">
+                        <span className="text-[10px] text-[#1a3884] font-medium">
                           {response.respondedBy?.fullName?.charAt(0)?.toUpperCase() || 'A'}
                         </span>
                       </div>
@@ -252,7 +252,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
 
           {/* Admin Reply Section */}
           {isAdmin && (
-            <div className="pt-4 border-t border-[#30919D]/20">
+            <div className="pt-4 border-t border-[#1a3884]/20">
               <h3 className="text-sm font-medium text-gray-400 mb-3">Admin Actions</h3>
 
               {/* Status Update */}
@@ -266,7 +266,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
                       className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${
                         selectedStatus === key
                           ? config.color
-                          : 'border-[#30919D]/30 text-gray-400 hover:border-[#30919D]/50'
+                          : 'border-[#1a3884]/30 text-gray-400 hover:border-[#1a3884]/50'
                       }`}
                     >
                       {config.label}
@@ -282,12 +282,12 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
                   onChange={(e) => setReplyMessage(e.target.value)}
                   placeholder="Type your response..."
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl bg-[#002147] border border-[#30919D]/30 text-white placeholder-gray-500 focus:border-[#30919D] focus:outline-none transition-colors resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-[#002147] border border-[#1a3884]/30 text-white placeholder-gray-500 focus:border-[#1a3884] focus:outline-none transition-colors resize-none"
                 />
                 <button
                   onClick={handleSubmitReply}
                   disabled={isSubmitting || (!replyMessage.trim() && selectedStatus === ticket.status)}
-                  className="absolute bottom-3 right-3 p-2 rounded-lg bg-[#30919D] text-white hover:bg-[#30919D]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="absolute bottom-3 right-3 p-2 rounded-lg bg-[#1a3884] text-white hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -303,14 +303,14 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#30919D]/20 bg-[#002147]/50">
+        <div className="p-4 border-t border-[#1a3884]/20 bg-[#002147]/50">
           <div className="flex justify-between items-center">
             <span className="text-xs text-gray-500">
               Last updated: {formatDate(ticket.updatedAt)}
             </span>
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-[#30919D]/50 text-gray-400 hover:text-white hover:border-[#30919D] transition-colors"
+              className="px-4 py-2 rounded-lg border border-[#1a3884]/50 text-gray-400 hover:text-white hover:border-[#1a3884] transition-colors"
             >
               Close
             </button>
@@ -322,3 +322,4 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
 };
 
 export default TicketDetail;
+

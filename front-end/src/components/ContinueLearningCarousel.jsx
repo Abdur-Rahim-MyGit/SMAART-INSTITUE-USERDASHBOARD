@@ -57,7 +57,7 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-8">
-                <div className="w-6 h-6 border-3 border-t-[#30919D] border-r-transparent border-b-[#30919D] border-l-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 border-3 border-t-[#1a3884] border-r-transparent border-b-[#1a3884] border-l-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -73,20 +73,20 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2 className="text-xl font-bold text-[#002147] dark:text-white">
-                        Jump Back In <span className="text-[#30919D] ml-2">Progress 🚀</span>
+                        Jump Back In <span className="text-[#1a3884] ml-2">Progress 🚀</span>
                     </h2>
                     <p className="text-xs text-gray-400 font-medium">Continue from where you left off</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={() => scrollCarousel('left')}
-                        className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-[#30919D] hover:text-white flex items-center justify-center transition-all duration-300"
+                        className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-[#1a3884] hover:text-white flex items-center justify-center transition-all duration-300"
                     >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                         onClick={() => scrollCarousel('right')}
-                        className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-[#30919D] hover:text-white flex items-center justify-center transition-all duration-300"
+                        className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-[#1a3884] hover:text-white flex items-center justify-center transition-all duration-300"
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>
@@ -120,14 +120,14 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
 
                             {/* Dynamic Overlays */}
                             <div className="absolute inset-0 bg-gradient-to-t from-[#00152E] via-black/20 to-transparent" />
-                            <div className="absolute inset-0 bg-[#30919D]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="absolute inset-0 bg-[#1a3884]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                             {/* Bottom Info Section */}
                             <div className="absolute inset-x-0 bottom-0 p-5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                                <span className="inline-block px-2 py-0.5 rounded-lg bg-white/10 backdrop-blur-md text-[#30919D] text-[9px] font-black uppercase tracking-widest mb-2 border border-white/10">
+                                <span className="inline-block px-2 py-0.5 rounded-lg bg-white/10 backdrop-blur-md text-[#1a3884] text-[9px] font-black uppercase tracking-widest mb-2 border border-white/10">
                                     COURSE
                                 </span>
-                                <h3 className="text-white font-black text-lg mb-2 line-clamp-1 group-hover:text-[#30919D] transition-colors">
+                                <h3 className="text-white font-black text-lg mb-2 line-clamp-1 group-hover:text-[#1a3884] transition-colors">
                                     {course.title || "Untitled Milestone"}
                                 </h3>
 
@@ -144,7 +144,7 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
                                         initial={{ width: 0 }}
                                         animate={{ width: `${progress || 45}%` }}
                                         transition={{ delay: 0.5, duration: 1, ease: "circOut" }}
-                                        className="h-full rounded-full bg-gradient-to-r from-[#30919D] to-[#40B5C4]"
+                                        className="h-full rounded-full bg-gradient-to-r from-[#1a3884] to-[#2a4d9e]"
                                     />
                                 </div>
                             </div>
@@ -162,3 +162,5 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
 };
 
 export default ContinueLearningCarousel;
+
+

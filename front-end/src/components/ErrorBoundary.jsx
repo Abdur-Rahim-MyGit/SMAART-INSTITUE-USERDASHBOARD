@@ -57,7 +57,7 @@ class ErrorBoundary extends Component {
                         <div className="flex gap-3">
                             <button
                                 onClick={this.handleReset}
-                                className="flex-1 px-6 py-3 bg-[#30919D] text-white rounded-xl font-semibold hover:bg-[#287a84] transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#30919D]/20"
+                                className="flex-1 px-6 py-3 bg-[#1a3884] text-white rounded-xl font-semibold hover:bg-[#287a84] transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#1a3884]/20"
                             >
                                 <RefreshCw className="w-4 h-4" />
                                 Refresh Page
@@ -75,7 +75,7 @@ class ErrorBoundary extends Component {
                             If this problem persists, please{' '}
                             <a
                                 href="/dashboard/support"
-                                className="text-[#30919D] hover:underline font-semibold"
+                                className="text-[#1a3884] hover:underline font-semibold"
                             >
                                 contact support
                             </a>
@@ -90,3 +90,4 @@ class ErrorBoundary extends Component {
 }
 
 export default ErrorBoundary;
+

@@ -55,13 +55,13 @@ const ClimbingStairs = ({ modules = [] }) => {
               initial={{ pathLength: 0 }}
               animate={{ pathLength: completedCount / totalSteps }}
               transition={{ duration: 1.5, ease: "easeInOut" }}
-              className="drop-shadow-[0_0_15px_rgba(48,145,157,0.6)]"
+              className="drop-shadow-[0_0_15px_rgba(26,56,132,0.6)]"
             />
 
             {/* Gradient definition */}
             <defs>
               <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#30919D" />
+                <stop offset="0%" stopColor="#1a3884" />
                 <stop offset="50%" stopColor="#daa520" />
                 <stop offset="100%" stopColor="#daa520" />
               </linearGradient>
@@ -85,10 +85,10 @@ const ClimbingStairs = ({ modules = [] }) => {
                     cx={pos.x}
                     cy={pos.y}
                     r="8"
-                    fill={isCompleted ? "#30919D" : "rgba(48, 145, 157, 0.1)"}
+                    fill={isCompleted ? "#1a3884" : "rgba(26, 56, 132, 0.1)"}
                     stroke={isCompleted ? "#daa520" : "rgba(255, 255, 255, 0.1)"}
                     strokeWidth="2"
-                    className={isCompleted ? "drop-shadow-[0_0_15px_rgba(48,145,157,0.8)]" : ""}
+                    className={isCompleted ? "drop-shadow-[0_0_15px_rgba(26,56,132,0.8)]" : ""}
                   />
                   {/* Stage label below each step */}
                   <text
@@ -127,7 +127,7 @@ const ClimbingStairs = ({ modules = [] }) => {
               <g filter="url(#flagGlow)">
                 <path
                   d="M 1100 -120 L 1190 -120 L 1190 -180 L 1100 -180 Z"
-                  fill="#30919D"
+                  fill="#1a3884"
                   stroke="#daa520"
                   strokeWidth="2"
                 />
@@ -257,3 +257,5 @@ const ClimbingStairs = ({ modules = [] }) => {
 };
 
 export default ClimbingStairs;
+
+
