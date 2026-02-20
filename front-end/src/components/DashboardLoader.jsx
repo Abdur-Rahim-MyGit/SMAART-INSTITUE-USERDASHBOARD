@@ -143,7 +143,7 @@ const DashboardLoader = ({ onComplete }) => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
                     >
-                        Smaart<span className="text-[#1a3884]">Minds</span>
+                        SMAART <span className="text-[#1a3884]">Institute</span>
                     </motion.h1>
 
                     <motion.div
