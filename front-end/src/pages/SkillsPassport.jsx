@@ -6,8 +6,10 @@ import { assessmentApi } from "@/services/assessmentApi";
 import SkillsPassportSkeleton from "@/components/skeletons/SkillsPassportSkeleton";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import { toast as sonnerToast } from "sonner";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const SkillsPassport = () => {
+    const { theme } = useTheme();
     const [activeTab, setActiveTab] = useState("baseline");
     const [baselineResult, setBaselineResult] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -113,22 +115,22 @@ const SkillsPassport = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white flex overflow-hidden font-sans">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 font-sans transition-colors duration-300">
             <DashboardSidebar />
 
-            <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                <main className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div className="relative">
+                <main className="w-full py-8 px-4 md:px-8">
                     {isLoading ? (
                         <SkillsPassportSkeleton />
                     ) : (
                         <div className="max-w-5xl mx-auto">
                             <header className="mb-8">
-                                <h1 className="text-3xl font-bold text-[#002147]">Skills Passport</h1>
-                                <p className="text-slate-500 mt-1">Track your competency growth across assessments.</p>
+                                <h1 className="text-3xl font-bold text-[#002147] dark:text-white">Skills Passport</h1>
+                                <p className="text-slate-500 dark:text-slate-400 mt-1.5">Track your competency growth across assessments.</p>
                             </header>
 
                             {/* Tabs */}
-                            <div className="flex flex-wrap gap-2 mb-8 bg-slate-50 p-1.5 rounded-xl shadow-sm border border-slate-100 w-fit">
+                            <div className="flex flex-wrap gap-2 mb-8 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 w-fit transition-colors">
                                 {[
                                     { id: "baseline", label: "Baseline Test" },
                                     { id: "test2", label: "Test 2" },
@@ -139,8 +141,8 @@ const SkillsPassport = () => {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${activeTab === tab.id
-                                            ? "bg-[#002147] text-white shadow-md"
-                                            : "text-slate-500 hover:text-slate-900 hover:bg-white"
+                                            ? "bg-[#002147] dark:bg-blue-600 text-white shadow-md shadow-[#002147]/10 dark:shadow-blue-900/20"
+                                            : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700"
                                             }`}
                                     >
                                         {tab.label}
@@ -154,13 +156,13 @@ const SkillsPassport = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.3 }}
-                                className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden"
+                                className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"
                             >
                                 {/* Header */}
-                                <div className="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/30">
                                     <div>
-                                        <h2 className="text-xl font-bold text-slate-800">{currentData.title}</h2>
-                                        <p className="text-sm text-slate-500 font-medium">
+                                        <h2 className="text-xl font-bold text-slate-800 dark:text-white font-sans">{currentData.title}</h2>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium font-sans">
                                             {isLoading ? "Loading status..." : `Completed: ${currentData.date}`}
                                         </p>
                                     </div>
@@ -168,7 +170,7 @@ const SkillsPassport = () => {
                                         <div className="text-3xl font-black text-[#30919D]">
                                             {currentData.average}%
                                         </div>
-                                        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Average</div>
+                                        <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Average</div>
                                     </div>
                                 </div>
 
@@ -178,8 +180,8 @@ const SkillsPassport = () => {
                                         <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
                                             <Briefcase className="w-8 h-8" />
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-800 mb-2">Assessment Not Completed</h3>
-                                        <p className="text-slate-500 max-w-md mb-8">
+                                        <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Assessment Not Completed</h3>
+                                        <p className="text-slate-500 dark:text-slate-400 max-w-md mb-8">
                                             {activeTab === 'baseline'
                                                 ? "Complete your T1 Baseline Assessment to unlock your competency profile and see your starting point."
                                                 : "This assessment milestone is not yet available. Keep progressing to unlock it."}
@@ -194,24 +196,25 @@ const SkillsPassport = () => {
                                         )}
                                     </div>
                                 ) : (
-                                    <div className="grid lg:grid-cols-5 bg-white">
+                                    <div className="grid lg:grid-cols-5 bg-white dark:bg-slate-800">
                                         {/* Left: Radar Chart */}
-                                        <div className="lg:col-span-2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-slate-100 flex flex-col items-center justify-center bg-slate-50/30">
+                                        <div className="lg:col-span-2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-slate-100 dark:border-slate-700 flex flex-col items-center justify-center bg-slate-50/30 dark:bg-slate-900/20">
                                             <div className="relative w-full max-w-[320px] aspect-square">
                                                 <RadarChart
                                                     data={quotientsInfo.map(q => ({
                                                         id: q.id,
                                                         value: currentData.scores[q.id] || 0
                                                     }))}
+                                                    theme={theme}
                                                 />
                                             </div>
                                             <div className="mt-6 text-center">
-                                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Competency Profile</p>
+                                                <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Competency Profile</p>
                                             </div>
                                         </div>
 
                                         {/* Right: List of Quotients */}
-                                        <div className="lg:col-span-3 p-6 md:p-8 space-y-5">
+                                        <div className="lg:col-span-3 p-6 md:p-8 space-y-6 bg-white dark:bg-slate-800 transition-colors">
                                             {quotientsInfo.map((q) => {
                                                 const score = currentData.scores[q.id] || 0;
                                                 const Icon = q.icon;
@@ -220,24 +223,24 @@ const SkillsPassport = () => {
                                                     <div key={q.id}>
                                                         <div className="flex items-end justify-between mb-2">
                                                             <div className="flex items-center gap-3">
-                                                                <div className={`p-1.5 rounded-md bg-white border border-slate-100 text-[#30919D] shadow-sm`}>
+                                                                <div className={`p-1.5 rounded-md bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 text-[#30919D] shadow-sm`}>
                                                                     <Icon className="w-4 h-4" />
                                                                 </div>
                                                                 <div>
-                                                                    <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">{q.id}</span>
-                                                                    <h3 className="text-sm font-bold text-slate-700">{q.name}</h3>
+                                                                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block uppercase tracking-wider">{q.id}</span>
+                                                                    <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">{q.name}</h3>
                                                                 </div>
                                                             </div>
-                                                            <span className="text-base font-bold text-[#002147]">{score}%</span>
+                                                            <span className="text-base font-bold text-[#002147] dark:text-blue-400">{score}%</span>
                                                         </div>
 
                                                         {/* Progress Bar */}
-                                                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${score}%` }}
                                                                 transition={{ duration: 1, ease: "easeOut" }}
-                                                                className={`h-full rounded-full ${score > 0 ? 'bg-[#30919D]' : 'bg-slate-200'}`}
+                                                                className={`h-full rounded-full ${score > 0 ? 'bg-gradient-to-r from-[#30919D] to-blue-500' : 'bg-slate-200 dark:bg-slate-600'}`}
                                                             />
                                                         </div>
                                                     </div>
@@ -248,13 +251,13 @@ const SkillsPassport = () => {
                                 )}
 
                                 {/* Footer Action */}
-                                <div className="p-6 border-t border-slate-100 bg-slate-50/30 flex justify-end">
+                                <div className="p-6 border-t border-slate-100 dark:border-slate-700 bg-slate-50/30 dark:bg-slate-900/30 flex justify-end">
                                     <button
                                         onClick={handleDownloadReport}
                                         disabled={currentData.status === "Pending"}
-                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold transition-all text-sm shadow-sm ${currentData.status === "Pending"
-                                            ? "bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
-                                            : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+                                        className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold transition-all text-sm shadow-sm ${currentData.status === "Pending"
+                                            ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed border border-slate-200 dark:border-slate-700"
+                                            : "bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 hover:border-slate-300 dark:hover:border-slate-500"
                                             }`}
                                     >
                                         <Download className="w-4 h-4" />
@@ -271,7 +274,8 @@ const SkillsPassport = () => {
 };
 
 // Helper Component for Radar Chart
-const RadarChart = ({ data }) => {
+const RadarChart = ({ data, theme }) => {
+    const isDark = theme === 'dark';
     const size = 300;
     const center = size / 2;
     const radius = 100;
@@ -303,9 +307,10 @@ const RadarChart = ({ data }) => {
                     key={i}
                     d={getPath(Array(totalAxes).fill(pct), radius)}
                     fill="none"
-                    stroke="#e2e8f0" // slate-200
+                    stroke={isDark ? "currentColor" : "#e2e8f0"} // slate-200
                     strokeWidth="1"
                     strokeDasharray={i === 0 ? "none" : "4 4"}
+                    className={isDark ? "text-slate-700" : ""}
                 />
             ))}
 
@@ -319,7 +324,8 @@ const RadarChart = ({ data }) => {
                         y1={center}
                         x2={point.x}
                         y2={point.y}
-                        stroke="#e2e8f0"
+                        stroke={isDark ? "currentColor" : "#e2e8f0"}
+                        className={isDark ? "text-slate-700" : ""}
                         strokeWidth="1"
                     />
                 );
@@ -367,7 +373,7 @@ const RadarChart = ({ data }) => {
                         dominantBaseline="middle"
                         fontSize="11"
                         fontWeight="bold"
-                        fill="#64748b" // slate-500
+                        fill={isDark ? "#94a3b8" : "#64748b"} // slate-400 : slate-500
                         className="uppercase"
                     >
                         {d.id}

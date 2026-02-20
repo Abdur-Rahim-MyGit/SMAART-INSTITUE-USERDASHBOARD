@@ -1,43 +1,54 @@
 import { Link } from "react-router-dom";
-import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin, ArrowUp } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const Footer = () => {
     const { theme } = useTheme();
     const currentYear = new Date().getFullYear();
 
+    // Define premium styling for both themes
+    const footerBg = theme === 'dark' ? 'bg-[#000F24]' : 'bg-white';
+    const footerText = theme === 'dark' ? 'text-gray-400' : 'text-gray-600';
+    const headingColor = theme === 'dark' ? 'text-white' : 'text-[#1a3884]';
+    const borderColor = theme === 'dark' ? 'border-white/10' : 'border-gray-100';
+    const subTextColor = theme === 'dark' ? 'text-gray-500' : 'text-gray-400';
+
+    // Icon styles
+    const iconClass = theme === 'dark'
+        ? 'bg-white/5 text-gray-400 hover:bg-[#daa520] hover:text-[#000F24]'
+        : 'bg-[#1a3884]/5 text-[#1a3884] hover:bg-[#1a3884] hover:text-white';
+
+    // Logo Box styles
+    const logoBoxClass = theme === 'dark'
+        ? 'bg-[#1a3884] border-[#1a3884]/50 shadow-lg shadow-[#1a3884]/20'
+        : 'bg-[#1a3884] text-white border-transparent shadow-lg shadow-[#1a3884]/20';
+
     return (
-        <footer className={`border-t pt-16 pb-8 transition-colors duration-300 ${theme === 'dark'
-            ? 'bg-white border-gray-200 text-slate-900'
-            : 'bg-[#1a3884] border-[#daa520]/30 text-gray-300'
-            }`}>
+        <footer className={`border-t pt-20 pb-10 transition-colors duration-500 relative ${footerBg} ${borderColor} ${footerText}`}>
+            {/* Decorative Top Border */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#daa520]/50 to-transparent" />
+
             <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     {/* Brand Column */}
                     <div className="space-y-6">
                         <Link to="/" className="flex items-center gap-3 group">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-lg transition-all duration-300 border ${theme === 'dark'
-                                ? 'bg-[#1a3884] border-[#1a3884]'
-                                : 'bg-white/10 group-hover:bg-white/20 border-[#daa520]/50'
-                                }`}>
-                                <span className={`font-heading font-bold text-xl ${theme === 'dark' ? 'text-white' : 'text-white'}`}>S</span>
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 border ${logoBoxClass}`}>
+                                <span className="font-heading font-bold text-2xl text-white">S</span>
                             </div>
                             <div className="flex flex-col">
-                                <span className={`text-lg font-bold tracking-tight leading-none transition-colors ${theme === 'dark' ? 'text-[#1a3884]' : 'text-white'
-                                    }`}>
+                                <span className={`text-xl font-bold tracking-tight leading-none transition-colors ${theme === 'dark' ? 'text-white' : 'text-[#1a3884]'}`}>
                                     SMAART<span className="text-[#daa520]"> Institute</span>
                                 </span>
-                                <span className={`text-[10px] uppercase tracking-widest leading-none mt-1 ${theme === 'dark' ? 'text-slate-500' : 'text-gray-300'
-                                    }`}>
+                                <span className={`text-[10px] uppercase tracking-widest leading-none mt-1.5 font-semibold ${subTextColor}`}>
                                     Employability & Impact
                                 </span>
                             </div>
                         </Link>
-                        <p className={`text-sm leading-relaxed transition-colors ${theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
-                            }`}>
+                        <p className="text-sm leading-relaxed max-w-xs font-light">
                             An Integrated Employability & Impact Ecosystem. Building capability for the changing world of work.
                         </p>
-                        <div className="flex gap-4">
+                        <div className="flex gap-3">
                             {[
                                 { Icon: Facebook, url: "https://facebook.com/smaartminds" },
                                 { Icon: Twitter, url: "https://twitter.com/smaartminds" },
@@ -49,12 +60,9 @@ const Footer = () => {
                                     href={social.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 border ${theme === 'dark'
-                                            ? 'bg-slate-100 text-slate-600 hover:bg-[#1a3884] hover:text-white border-slate-200'
-                                            : 'bg-white/10 text-gray-300 hover:bg-[#daa520] hover:text-[#1a3884] border-white/10'
-                                        }`}
+                                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 border border-transparent ${iconClass}`}
                                 >
-                                    <social.Icon className="w-4 h-4" />
+                                    <social.Icon className="w-5 h-5" />
                                 </a>
                             ))}
                         </div>
@@ -62,9 +70,8 @@ const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className={`font-bold mb-6 transition-colors ${theme === 'dark' ? 'text-[#1a3884]' : 'text-white'
-                            }`}>Quick Links</h3>
-                        <ul className="space-y-3">
+                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>Quick Links</h3>
+                        <ul className="space-y-4">
                             {[
                                 { name: "Services", id: "services" },
                                 { name: "How It Works", id: "how-it-works" },
@@ -78,12 +85,9 @@ const Footer = () => {
                                             const element = document.getElementById(item.id);
                                             if (element) element.scrollIntoView({ behavior: 'smooth' });
                                         }}
-                                        className={`text-sm transition-colors flex items-center gap-2 group ${theme === 'dark'
-                                                ? 'text-slate-600 hover:text-[#1a3884]'
-                                                : 'text-gray-300 hover:text-[#daa520]'
-                                            }`}
+                                        className={`text-sm transition-colors flex items-center gap-3 group font-medium hover:text-[#daa520]`}
                                     >
-                                        <span className="w-1 h-1 rounded-full bg-[#daa520]/50 group-hover:bg-[#daa520] transition-colors" />
+                                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-[#daa520]/50 group-hover:bg-[#daa520]' : 'bg-[#1a3884]/30 group-hover:bg-[#daa520]'}`} />
                                         {item.name}
                                     </button>
                                 </li>
@@ -93,19 +97,15 @@ const Footer = () => {
 
                     {/* Legal */}
                     <div>
-                        <h3 className={`font-bold mb-6 transition-colors ${theme === 'dark' ? 'text-[#1a3884]' : 'text-white'
-                            }`}>Legal</h3>
-                        <ul className="space-y-3">
+                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>Legal</h3>
+                        <ul className="space-y-4">
                             {["Privacy Policy", "Terms of Service", "Cookie Policy", "Data Protection"].map((item) => (
                                 <li key={item}>
                                     <Link
                                         to="#"
-                                        className={`text-sm transition-colors flex items-center gap-2 group ${theme === 'dark'
-                                                ? 'text-slate-600 hover:text-[#1a3884]'
-                                                : 'text-gray-300 hover:text-[#daa520]'
-                                            }`}
+                                        className={`text-sm transition-colors flex items-center gap-3 group font-medium hover:text-[#daa520]`}
                                     >
-                                        <span className="w-1 h-1 rounded-full bg-[#daa520]/50 group-hover:bg-[#daa520] transition-colors" />
+                                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-[#daa520]/50 group-hover:bg-[#daa520]' : 'bg-[#1a3884]/30 group-hover:bg-[#daa520]'}`} />
                                         {item}
                                     </Link>
                                 </li>
@@ -115,78 +115,38 @@ const Footer = () => {
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className={`font-bold mb-6 transition-colors ${theme === 'dark' ? 'text-[#1a3884]' : 'text-white'
-                            }`}>Contact Us</h3>
-
-                        {/* India Office */}
-                        <div className="mb-6">
-                            <h4 className="text-[#daa520] font-semibold text-sm mb-3">India</h4>
-                            <ul className="space-y-3">
-                                <li className={`text-sm transition-colors ${theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
-                                    }`}>
-                                    <div className={`font-medium mb-1 ${theme === 'dark' ? 'text-[#1a3884]' : 'text-white'
-                                        }`}>SMAART Healthcare</div>
-                                    <div>IGreat DigiHealth Private Limited</div>
-                                </li>
-                                <li className={`flex items-start gap-3 text-sm transition-colors ${theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
-                                    }`}>
-                                    <MapPin className="w-5 h-5 text-[#daa520] shrink-0 mt-0.5" />
-                                    <span>123-124 Ispahani Centre, Nungambakkam, Chennai 600034, India</span>
-                                </li>
-                                <li className={`flex items-center gap-3 text-sm transition-colors ${theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
-                                    }`}>
-                                    <Phone className="w-5 h-5 text-[#daa520] shrink-0" />
-                                    <span>+91-6383930215</span>
-                                </li>
-                                <li className={`flex items-center gap-3 text-sm transition-colors ${theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
-                                    }`}>
-                                    <Mail className="w-5 h-5 text-[#daa520] shrink-0" />
-                                    <a href="mailto:hello@smaartinstitute.org" className="hover:text-[#daa520] transition-colors">
-                                        hello@smaartinstitute.org
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        {/* UK Office */}
-                        <div>
-                            <h4 className="text-[#daa520] font-semibold text-sm mb-3">United Kingdom</h4>
-                            <ul className="space-y-3">
-                                <li className={`text-sm transition-colors ${theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
-                                    }`}>
-                                    <div className={`font-medium mb-1 ${theme === 'dark' ? 'text-[#1a3884]' : 'text-white'
-                                        }`}>Smart Health Clinics Limited</div>
-                                </li>
-                                <li className={`flex items-start gap-3 text-sm transition-colors ${theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
-                                    }`}>
-                                    <MapPin className="w-5 h-5 text-[#daa520] shrink-0 mt-0.5" />
-                                    <span>53 Salisbury Road, London, United Kingdom TW4 7NW</span>
-                                </li>
-                                <li className={`flex items-center gap-3 text-sm transition-colors ${theme === 'dark' ? 'text-slate-600' : 'text-gray-300'
-                                    }`}>
-                                    <Mail className="w-5 h-5 text-[#daa520] shrink-0" />
-                                    <a href="mailto:hello@smaartinstitute.org" className="hover:text-[#daa520] transition-colors">
-                                        hello@smaartinstitute.org
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>Contact Us</h3>
+                        <ul className="space-y-6">
+                            <li className="flex items-start gap-4">
+                                <MapPin className="w-5 h-5 text-[#daa520] shrink-0 mt-0.5" />
+                                <span className="text-sm leading-relaxed">Nungambakkam, Chennai<br />600034, India</span>
+                            </li>
+                            <li className="flex items-center gap-4">
+                                <Mail className="w-5 h-5 text-[#daa520] shrink-0" />
+                                <a href="mailto:hello@smaartinstitute.org" className="text-sm hover:text-[#daa520] transition-colors">hello@smaartinstitute.org</a>
+                            </li>
+                            <li className="flex items-center gap-4">
+                                <Phone className="w-5 h-5 text-[#daa520] shrink-0" />
+                                <a href="tel:+916383930215" className="text-sm hover:text-[#daa520] transition-colors">+91-6383930215</a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 transition-colors">
-                    <p className="text-gray-400 dark:text-gray-500 text-sm">
+                <div className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 ${borderColor}`}>
+                    <p className={`text-xs ${subTextColor}`}>
                         &copy; {currentYear} SMAART Institute. All rights reserved.
                     </p>
-                    <div className="flex items-center gap-2 text-gray-400 dark:text-gray-500 text-xs">
-                        <span>Designed with</span>
-                        <span className="text-red-500">♥</span>
-                        <span>for Excellence</span>
-                    </div>
+                    <button
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className={`text-xs font-semibold flex items-center gap-2 transition-colors ${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-[#1a3884] hover:text-[#daa520]'}`}
+                    >
+                        Back to Top <ArrowUp className="w-3 h-3" />
+                    </button>
                 </div>
             </div>
-        </footer >
+        </footer>
     );
 };
 

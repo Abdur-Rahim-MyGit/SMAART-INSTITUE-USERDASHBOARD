@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Confetti from 'react-confetti';
 
-const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, onProgressUpdate, onNext }, ref) => {
+const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onNext }, ref) => {
 
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -212,6 +212,18 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
+
+  // Handle autoPlay on mount
+  useEffect(() => {
+    if (autoPlay && videoRef.current && !isPlaying) {
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.warn("Autoplay was prevented by the browser. Requires manual interaction.", error);
+        });
+      }
+    }
+  }, [autoPlay]);
 
   // Check PiP support
   useEffect(() => {

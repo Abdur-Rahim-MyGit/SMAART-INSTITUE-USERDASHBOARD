@@ -741,8 +741,8 @@ const ModuleViewPage = () => {
 
   const navigateToDays = (moduleId) => {
     setSelectedModule(moduleId);
-    setSelectedDay(null);
-    navigate(`/dashboard/courses/${courseId}/modules/${moduleId}/days`);
+    setSelectedDay(1);
+    navigate(`/dashboard/courses/${courseId}/modules/${moduleId}/days/1`);
   };
 
   const navigateToDay = (moduleId, dayId) => {
@@ -835,10 +835,11 @@ const ModuleViewPage = () => {
     if (!session) return false;
     // Multi-step session
     if (session.steps && session.steps.length > 0) {
-      const completedSteps = session.steps.filter(s =>
+      const requiredSteps = session.steps.filter(s => s.isRequired !== false);
+      const completedRequiredSteps = requiredSteps.filter(s =>
         videoCompletionMap[`${mId}-${session.id}-${s.id}`] === true
-      ).length;
-      return completedSteps === session.steps.length;
+      );
+      return completedRequiredSteps.length === requiredSteps.length;
     }
     // Legacy session with video
     if (session.videoUrl) {
@@ -873,6 +874,18 @@ const ModuleViewPage = () => {
     }
 
     return true;
+  };
+
+  const isStepUnlocked = (mId, dId, stepIndex, steps) => {
+    // First step in any day is always unlocked if the day itself is unlocked
+    if (stepIndex === 0) return true;
+    
+    // STRICT SEQUENTIAL LOCK: Step N is unlocked ONLY if Step N-1 is complete.
+    const prevStep = steps[stepIndex - 1];
+    if (!prevStep) return true;
+
+    const prevStepKey = `${mId}-${dId}-${prevStep.id}`;
+    return videoCompletionMap[prevStepKey] === true;
   };
 
   // Show loading state while fetching modules
@@ -1183,6 +1196,7 @@ const ModuleViewPage = () => {
                           duration={getDisplayDuration(selectedModule, selectedDay, activeStep?.duration || day.duration)}
                           initialMaxTime={maxWatchedTime}
                           initialCompleted={isVideoCompleted}
+                          autoPlay={true}
                           onProgressUpdate={(time, completed, dur) => handleVideoProgressUpdate(selectedModule, selectedDay, activeStep?.id || 1, time, completed, dur)}
                           onNext={handleMoveToNext}
                         />
@@ -1359,10 +1373,11 @@ const ModuleViewPage = () => {
                                     className="overflow-hidden bg-slate-50/50 dark:bg-slate-900/30 rounded-xl px-2 py-1 ml-4 border-l-2 border-slate-200 dark:border-slate-800"
                                   >
                                     <div className="space-y-1.5 py-3">
-                                      {(d.steps || []).map((step) => {
+                                      {(d.steps || []).map((step, idx) => {
                                         const stepKey = `${selectedModule}-${d.id}-${step.id}`;
                                         const isActiveStep = String(activeStep?.id) === String(step.id);
                                         const isStepCompleted = videoCompletionMap[stepKey] === true;
+                                        const isUnlocked = isStepUnlocked(selectedModule, d.id, idx, d.steps);
                                         const stepProgress = videoProgressMap[stepKey] || 0;
                                         const stepDuration = videoDurationMap[stepKey] || step.duration || 0;
                                         const progressPercent = stepDuration > 0 ? Math.min(100, (stepProgress / stepDuration) * 100) : 0;
@@ -1370,15 +1385,30 @@ const ModuleViewPage = () => {
                                         return (
                                           <button
                                             key={step.id}
-                                            onClick={() => setSelectedStepId(step.id)}
+                                            onClick={() => {
+                                              if (isUnlocked) {
+                                                setSelectedStepId(step.id);
+                                              } else {
+                                                toast.error("Finish previous step to unlock!");
+                                              }
+                                            }}
+                                            disabled={!isUnlocked}
                                             className={`flex items-start gap-3 w-full text-left p-2 rounded-lg transition-all ${
                                               isActiveStep
                                                 ? 'bg-white dark:bg-white/10 shadow-sm border border-slate-200 dark:border-white/10'
-                                                : 'hover:bg-white/50 dark:hover:bg-white/5'
+                                                : !isUnlocked
+                                                  ? 'opacity-40 cursor-not-allowed'
+                                                  : 'hover:bg-white/50 dark:hover:bg-white/5'
                                             }`}
                                           >
-                                            <div className={`mt-0.5 shrink-0 transition-colors ${isStepCompleted ? 'text-emerald-500' : isActiveStep ? 'text-[#0891b2] dark:text-[#30919D]' : 'text-slate-400'}`}>
-                                              {isStepCompleted ? <CheckCircle2 size={14} /> : <Play size={14} className={isActiveStep ? 'fill-current' : ''} />}
+                                            <div className={`mt-0.5 shrink-0 transition-colors ${
+                                              isStepCompleted ? 'text-emerald-500' : 
+                                              isActiveStep ? 'text-[#0891b2] dark:text-[#30919D]' : 
+                                              !isUnlocked ? 'text-slate-500' : 'text-slate-400'
+                                            }`}>
+                                              {isStepCompleted ? <CheckCircle2 size={14} /> : 
+                                               !isUnlocked ? <Lock size={12} /> :
+                                               <Play size={14} className={isActiveStep ? 'fill-current' : ''} />}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                               <p className={`text-[11px] font-bold truncate ${isStepCompleted ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}`}>

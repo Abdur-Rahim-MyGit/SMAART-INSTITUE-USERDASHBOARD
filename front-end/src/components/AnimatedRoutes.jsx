@@ -103,7 +103,6 @@ const AnimatedRoutes = () => {
                     <Route path="/profile" element={<AssessmentFlowGuard><Profile /></AssessmentFlowGuard>} />
                     <Route path="/module/:courseId/:moduleId" element={<AssessmentFlowGuard><ModuleViewPage /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/courses/:courseId/modules" element={<AssessmentFlowGuard><ModuleViewPage /></AssessmentFlowGuard>} />
-                    <Route path="/dashboard/courses/:courseId/modules/:moduleId/days" element={<AssessmentFlowGuard><ModuleViewPage /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/courses/:courseId/modules/:moduleId/days/:dayId" element={<AssessmentFlowGuard><ModuleViewPage /></AssessmentFlowGuard>} />
                     <Route path="/quotients" element={<AssessmentFlowGuard><QuotientsGrid /></AssessmentFlowGuard>} />
                     <Route path="/vision-board" element={<AssessmentFlowGuard><VisionBoardGalleryPro /></AssessmentFlowGuard>} />
