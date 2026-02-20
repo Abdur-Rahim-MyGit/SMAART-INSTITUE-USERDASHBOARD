@@ -166,8 +166,8 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           value={formData.title}
           onChange={handleChange}
           placeholder="Brief summary of your issue"
-          className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border ${errors.title ? 'border-red-500' : 'border-slate-200 dark:border-[#30919D]/30'
-            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors`}
+          className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border ${errors.title ? 'border-red-500' : 'border-slate-200 dark:border-[#1a3884]/30'
+            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors`}
         />
         {errors.title && (
           <p className="mt-1 text-sm text-red-500">{errors.title}</p>
@@ -190,11 +190,11 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
                 if (errors.category) setErrors(prev => ({ ...prev, category: null }));
               }}
               className={`p-3 rounded-xl border text-left transition-all ${formData.category === cat.value
-                  ? 'border-[#30919D] bg-[#30919D]/10 dark:bg-[#30919D]/20'
-                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-[#30919D]/30 hover:border-[#30919D]/50'
+                  ? 'border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20'
+                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-[#1a3884]/30 hover:border-[#1a3884]/50'
                 }`}
             >
-              <span className={`font-medium text-sm ${formData.category === cat.value ? 'text-[#30919D]' : 'text-slate-900 dark:text-white'}`}>{cat.label}</span>
+              <span className={`font-medium text-sm ${formData.category === cat.value ? 'text-[#1a3884]' : 'text-slate-900 dark:text-white'}`}>{cat.label}</span>
               <p className="text-slate-500 dark:text-gray-400 text-xs mt-0.5">{cat.description}</p>
             </button>
           ))}
@@ -217,7 +217,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
               onClick={() => setFormData(prev => ({ ...prev, priority: pri.value }))}
               className={`px-4 py-2 rounded-xl border transition-all ${formData.priority === pri.value
                   ? pri.color
-                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-[#30919D]/30 text-slate-500 dark:text-gray-400 hover:border-[#30919D]/50'
+                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-[#1a3884]/30 text-slate-500 dark:text-gray-400 hover:border-[#1a3884]/50'
                 }`}
             >
               {pri.label}
@@ -237,8 +237,8 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           onChange={handleChange}
           placeholder="Please describe your issue in detail. Include any steps to reproduce the problem, error messages, or relevant context."
           rows={6}
-          className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border ${errors.description ? 'border-red-500' : 'border-slate-200 dark:border-[#30919D]/30'
-            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:border-[#30919D] focus:outline-none transition-colors resize-none`}
+          className={`w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border ${errors.description ? 'border-red-500' : 'border-slate-200 dark:border-[#1a3884]/30'
+            } text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none`}
         />
         {errors.description && (
           <p className="mt-1 text-sm text-red-500">{errors.description}</p>
@@ -255,9 +255,9 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           {attachments.map((file, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-[#002147] border border-slate-200 dark:border-[#30919D]/30"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 dark:bg-[#002147] border border-slate-200 dark:border-[#1a3884]/30"
             >
-              <Paperclip className="w-4 h-4 text-[#30919D]" />
+              <Paperclip className="w-4 h-4 text-[#1a3884]" />
               <span className="text-sm text-slate-700 dark:text-gray-300 max-w-[150px] truncate">{file.name}</span>
               <button
                 type="button"
@@ -269,7 +269,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
             </div>
           ))}
           {attachments.length < 3 && (
-            <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-slate-300 dark:border-[#30919D]/30 cursor-pointer hover:border-[#30919D]/50 transition-colors bg-white dark:bg-transparent">
+            <label className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-slate-300 dark:border-[#1a3884]/30 cursor-pointer hover:border-[#1a3884]/50 transition-colors bg-white dark:bg-transparent">
               <Paperclip className="w-4 h-4 text-slate-400 dark:text-gray-400" />
               <span className="text-sm text-slate-500 dark:text-gray-400">Add file</span>
               <input
@@ -292,7 +292,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-[#30919D]/50 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:border-[#30919D] transition-colors"
+            className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-[#1a3884]/50 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:border-[#1a3884] transition-colors"
           >
             Cancel
           </button>
@@ -300,7 +300,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#30919D] text-white font-medium hover:bg-[#30919D]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <>
@@ -320,3 +320,4 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
 };
 
 export default TicketForm;
+

@@ -37,11 +37,11 @@ const AssessmentBanner = ({ title = "ONBOARDING" }) => {
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
-      className="relative w-full rounded-3xl overflow-hidden mb-8 border border-[#30919D]/20 shadow-lg bg-white"
+      className="relative w-full rounded-3xl overflow-hidden mb-8 border border-[#1a3884]/20 shadow-lg bg-white"
     >
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-white">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#30919D]/5 to-transparent opacity-50" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1a3884]/5 to-transparent opacity-50" />
       </div>
 
       {/* Content */}
@@ -61,3 +61,4 @@ const AssessmentBanner = ({ title = "ONBOARDING" }) => {
 };
 
 export default AssessmentBanner;
+

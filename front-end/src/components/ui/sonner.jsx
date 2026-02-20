@@ -11,14 +11,14 @@ const Toaster = ({ ...props }) => {
       toastOptions={{
         style: {
           background: '#002147',
-          border: '1px solid #30919D',
+          border: '1px solid #1a3884',
           color: 'white',
-          boxShadow: '0 0 15px rgba(48,145,157,0.3)',
+          boxShadow: '0 0 15px rgba(26,56,132,0.3)',
         },
         classNames: {
-          toast: "group toast bg-[#002147] text-white border-[#30919D] shadow-[0_0_15px_rgba(48,145,157,0.3)]",
+          toast: "group toast bg-[#002147] text-white border-[#1a3884] shadow-[0_0_15px_rgba(26,56,132,0.3)]",
           description: "text-white/80",
-          actionButton: "bg-[#30919D] text-white",
+          actionButton: "bg-[#1a3884] text-white",
           cancelButton: "bg-[#daa520] text-[#002147]",
         },
       }}
@@ -28,3 +28,5 @@ const Toaster = ({ ...props }) => {
 };
 
 export { Toaster, toast };
+
+

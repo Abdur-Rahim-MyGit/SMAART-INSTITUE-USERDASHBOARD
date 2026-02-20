@@ -116,7 +116,7 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
         {/* Header */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2 text-sm font-bold text-[#0891b2] dark:text-[#30919D] uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-sm font-bold text-[#0891b2] dark:text-[#1a3884] uppercase tracking-wider">
               <Award size={18} />
               <span>Vocational Competence Assessment</span>
             </div>
@@ -161,7 +161,7 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
               onClick={() => setSelectedScenario(scenario.id)}
               className={`px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 ${
                 selectedScenario === scenario.id
-                  ? 'bg-white dark:bg-slate-700 text-[#0891b2] dark:text-[#30919D] shadow-sm'
+                  ? 'bg-white dark:bg-slate-700 text-[#0891b2] dark:text-[#1a3884] shadow-sm'
                   : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
@@ -182,9 +182,9 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
               className="space-y-6"
             >
               {/* Scenario Description */}
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border-l-4 border-l-[#0891b2] dark:border-l-[#30919D]">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border-l-4 border-l-[#0891b2] dark:border-l-[#1a3884]">
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                  <FileText className="text-[#0891b2] dark:text-[#30919D]" size={20} />
+                  <FileText className="text-[#0891b2] dark:text-[#1a3884]" size={20} />
                   Operational Scenario
                 </h3>
                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed italic">
@@ -245,7 +245,7 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
 
               <button
                 onClick={handleSubmit}
-                className="w-full py-4 bg-[#0891b2] dark:bg-[#30919D] hover:bg-[#0a7a8f] dark:hover:bg-[#2a7d88] text-white font-extrabold rounded-2xl shadow-lg shadow-[#0891b2]/20 transition-all flex items-center justify-center gap-2 group"
+                className="w-full py-4 bg-[#0891b2] dark:bg-[#1a3884] hover:bg-[#0a7a8f] dark:hover:bg-[#2a7d88] text-white font-extrabold rounded-2xl shadow-lg shadow-[#0891b2]/20 transition-all flex items-center justify-center gap-2 group"
               >
                 Submit Evidence for Scenario
                 <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -257,7 +257,7 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border-t-8 border-t-[#0891b2] dark:border-t-[#30919D] relative overflow-hidden"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border-t-8 border-t-[#0891b2] dark:border-t-[#1a3884] relative overflow-hidden"
             >
               {/* NVQ Watermark/Background Decoration */}
               <div className="absolute top-0 right-0 p-12 opacity-[0.03] rotate-12 bg-[#0891b2] rounded-full translate-x-1/2 -translate-y-1/2 w-64 h-64 pointer-events-none" />
@@ -365,3 +365,4 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
 };
 
 export default SubmissionTask;
+

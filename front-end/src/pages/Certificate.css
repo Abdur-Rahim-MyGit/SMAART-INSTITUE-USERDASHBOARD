@@ -39,7 +39,7 @@
     font-family: 'Inter', sans-serif;
     font-weight: 900;
     font-size: 80pt;
-    color: rgba(48, 145, 157, 0.02);
+    color: rgba(26, 56, 132, 0.02);
     pointer-events: none;
     user-select: none;
     text-transform: uppercase;
@@ -57,7 +57,7 @@
     /* Inner gold pinstripe */
     background-image:
         radial-gradient(circle at 10% 10%, rgba(212, 175, 55, 0.01) 0%, transparent 5%),
-        radial-gradient(circle at 90% 90%, rgba(48, 145, 157, 0.01) 0%, transparent 5%);
+        radial-gradient(circle at 90% 90%, rgba(26, 56, 132, 0.01) 0%, transparent 5%);
     background-size: 100px 100px;
     z-index: 10;
 }
@@ -390,7 +390,7 @@
 }
 
 .teal-accent span {
-    color: #30919D;
+    color: #1a3884;
     font-weight: 700;
 }
 
@@ -587,3 +587,4 @@
     color: #b8860b;
     opacity: 0.05 !important;
 }
+

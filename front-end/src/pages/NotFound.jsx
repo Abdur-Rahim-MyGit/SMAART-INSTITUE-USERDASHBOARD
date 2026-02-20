@@ -18,7 +18,7 @@ const NotFound = () => {
         
         <Link
           to="/"
-          className="inline-block px-8 py-3 bg-[#30919D] text-white font-semibold rounded-lg shadow-lg hover:bg-[#267a84] transition-all hover:scale-105"
+          className="inline-block px-8 py-3 bg-[#1a3884] text-white font-semibold rounded-lg shadow-lg hover:bg-[#132c6b] transition-all hover:scale-105"
         >
           Return Home
         </Link>
@@ -28,3 +28,5 @@ const NotFound = () => {
 };
 
 export default NotFound;
+
+

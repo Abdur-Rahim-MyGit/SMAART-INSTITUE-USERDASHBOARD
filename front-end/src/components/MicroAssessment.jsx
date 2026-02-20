@@ -165,7 +165,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-3 md:p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
         <div>
           <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2 text-white">
-            <Trophy className="text-[#30919D] drop-shadow-lg" size={28} />
+            <Trophy className="text-[#1a3884] drop-shadow-lg" size={28} />
             {assessmentData.title || "Micro-Assessment"}
           </h2>
           <p className="text-white/80 text-[10px] md:text-sm mt-0.5 hidden sm:block">Test your knowledge</p>
@@ -186,7 +186,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
         {/* INTRO STEP */}
         {step === 'intro' && (
           <div className="text-center space-y-3 md:space-y-6 py-4 md:py-8">
-            <div className="w-16 h-16 md:w-20 md:h-20 bg-[#30919D]/10 rounded-full flex items-center justify-center mx-auto text-[#30919D] mb-2 md:mb-6">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-[#1a3884]/10 rounded-full flex items-center justify-center mx-auto text-[#1a3884] mb-2 md:mb-6">
                <AlertCircle className="w-10 h-10 md:w-12 md:h-12" />
             </div>
             <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">Ready for the Assessment?</h3>
@@ -197,7 +197,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
             </p>
             <button
               onClick={handleStart}
-              className="w-full sm:w-auto px-8 py-3 bg-[#30919D] hover:bg-[#25737d] text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#30919D]/30"
+              className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#25737d] text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#1a3884]/30"
             >
               Start Assessment
             </button>
@@ -215,7 +215,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                </div>
                <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
                  <motion.div 
-                   className="h-full bg-[#30919D]"
+                   className="h-full bg-[#1a3884]"
                    initial={{ width: 0 }}
                    animate={{ width: `${((currentQuestionIndex + 1) / shuffledQuestions.length) * 100}%` }}
                  />
@@ -245,8 +245,8 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                         else btnClass += "border-gray-200 dark:border-slate-800 opacity-50";
                      } else {
                         btnClass += isSelected 
-                          ? "border-[#30919D] bg-[#30919D]/10 text-[#0e5c65] dark:text-[#30919D] dark:bg-[#30919D]/20" 
-                          : "border-gray-200 dark:border-slate-700 hover:border-[#30919D]/50 hover:bg-slate-50 dark:hover:bg-slate-800";
+                          ? "border-[#1a3884] bg-[#1a3884]/10 text-[#0e5c65] dark:text-[#1a3884] dark:bg-[#1a3884]/20" 
+                          : "border-gray-200 dark:border-slate-700 hover:border-[#1a3884]/50 hover:bg-slate-50 dark:hover:bg-slate-800";
                      }
 
                      return (
@@ -261,7 +261,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                              w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
                              ${showExplanation && isCorrect ? 'border-green-500 bg-green-500 text-white' : ''}
                              ${showExplanation && isSelected && !isCorrect ? 'border-red-500 bg-red-500 text-white' : ''}
-                             ${!showExplanation && isSelected ? 'border-[#30919D] bg-[#30919D]' : 'border-gray-300 dark:border-slate-600'}
+                             ${!showExplanation && isSelected ? 'border-[#1a3884] bg-[#1a3884]' : 'border-gray-300 dark:border-slate-600'}
                            `}>
                               {showExplanation && isCorrect && <CheckCircle2 size={14} />}
                               {showExplanation && isSelected && !isCorrect && <XCircle size={14} />}
@@ -309,7 +309,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
              <div className="flex justify-between items-center mb-6">
                 <button 
                     onClick={() => setStep('result')}
-                    className="text-sm font-bold text-[#30919D] flex items-center gap-1 hover:underline"
+                    className="text-sm font-bold text-[#1a3884] flex items-center gap-1 hover:underline"
                 >
                     Back to Results
                 </button>
@@ -414,13 +414,13 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                         setCurrentQuestionIndex(0);
                         setStep('review');
                     }}
-                    className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-slate-800 border-2 border-[#30919D] text-[#30919D] rounded-xl font-bold shadow-sm transition-all hover:bg-[#30919D]/5"
+                    className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-slate-800 border-2 border-[#1a3884] text-[#1a3884] rounded-xl font-bold shadow-sm transition-all hover:bg-[#1a3884]/5"
                   >
                     Review Responses
                   </button>
                   <button
                     onClick={() => onComplete(score)}
-                    className="w-full sm:w-auto px-8 py-3 bg-[#30919D] hover:bg-[#25737d] text-white rounded-xl font-bold shadow-lg shadow-[#30919D]/30 transition-all"
+                    className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#25737d] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
                   >
                     Continue to Next Step
                   </button>
@@ -433,3 +433,4 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 };
 
 export default MicroAssessment;
+

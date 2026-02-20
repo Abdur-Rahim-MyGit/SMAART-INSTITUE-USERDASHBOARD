@@ -241,15 +241,15 @@ const DashboardSidebar = () => {
                   key={item.path}
                   to={item.path}
                   className={`text-sm font-bold transition-all duration-200 relative group py-1 ${isActive
-                    ? 'text-[#30919D]'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-[#30919D] dark:hover:text-[#30919D]'
+                    ? 'text-[#1a3884]'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-[#1a3884] dark:hover:text-[#1a3884]'
                     }`}
                 >
                   {item.label}
                   {isActive && (
                     <motion.span
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#30919D] rounded-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1a3884] rounded-full"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -549,3 +549,4 @@ const DashboardSidebar = () => {
 };
 
 export default DashboardSidebar;
+

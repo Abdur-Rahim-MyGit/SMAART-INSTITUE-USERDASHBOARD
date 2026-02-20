@@ -154,7 +154,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
             <div className="bg-gradient-to-br from-white via-slate-50 to-white dark:from-[#0B1120] dark:via-[#001229] dark:to-[#0B1120] rounded-[2.5rem] border-2 border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden relative">
                 {/* Animated Background */}
                 <div className="absolute inset-0 opacity-30 dark:opacity-20">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#30919D]/20 to-emerald-500/20 rounded-full blur-3xl animate-pulse" />
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#1a3884]/20 to-emerald-500/20 rounded-full blur-3xl animate-pulse" />
                     <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-purple-500/10 to-blue-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
                 </div>
 
@@ -271,7 +271,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                                         initial={{ y: 50, opacity: 0, scale: 0.9 }}
                                         animate={{ y: 0, opacity: 1, scale: 1 }}
                                         transition={{ delay: 0.7 + index * 0.1, type: "spring" }}
-                                        className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-[#30919D]/50 hover:shadow-2xl hover:shadow-[#30919D]/10 transition-all duration-300 overflow-hidden"
+                                        className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-[#1a3884]/50 hover:shadow-2xl hover:shadow-[#1a3884]/10 transition-all duration-300 overflow-hidden"
                                     >
                                         {/* Hover Gradient Effect */}
                                         <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
@@ -347,7 +347,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                                 );
                             }) : (
                                 <div className="col-span-3 text-center py-12">
-                                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#30919D] border-t-transparent mx-auto mb-4" />
+                                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1a3884] border-t-transparent mx-auto mb-4" />
                                     <p className="text-slate-400 text-lg">Processing your profile...</p>
                                 </div>
                             )}
@@ -373,7 +373,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
 
                         <button
                             onClick={() => navigate("/dashboard")}
-                            className="group relative px-8 py-4 bg-gradient-to-r from-[#30919D] to-[#277a84] text-white rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-3 w-full sm:w-auto overflow-hidden"
+                            className="group relative px-8 py-4 bg-gradient-to-r from-[#1a3884] to-[#277a84] text-white rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-3 w-full sm:w-auto overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-[#277a84] to-[#1e5f68] opacity-0 group-hover:opacity-100 transition-opacity" />
                             <TrendingUp className="w-5 h-5 relative z-10" />
@@ -424,3 +424,4 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
 };
 
 export { T1ResultsDisplay, downloadReport, getBandColor, quotientInfo };
+

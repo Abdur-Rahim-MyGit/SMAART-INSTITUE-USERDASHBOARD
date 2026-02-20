@@ -45,7 +45,7 @@ const SplashScreen = ({ onComplete }) => {
                                         y1={`${node.y}%`}
                                         x2={`${otherNode.x}%`}
                                         y2={`${otherNode.y}%`}
-                                        stroke="#40B5C4" // Teal connections
+                                        stroke="#2a4d9e" // Teal connections
                                         strokeWidth="0.5"
                                         initial={{ pathLength: 0, opacity: 0 }}
                                         animate={{ pathLength: 1, opacity: [0.2, 0.5, 0.2] }}
@@ -93,7 +93,7 @@ const SplashScreen = ({ onComplete }) => {
                         <motion.path
                             d="M50 10 L80 150 L50 140 L20 150 Z"
                             fill="none"
-                            stroke="#40B5C4" // Teal Outline
+                            stroke="#2a4d9e" // Teal Outline
                             strokeWidth="0.8"
                             initial={{ pathLength: 0, opacity: 0 }}
                             animate={{ pathLength: 1, opacity: 1 }}
@@ -103,7 +103,7 @@ const SplashScreen = ({ onComplete }) => {
                         {/* Internal Structure Lines */}
                         <motion.path
                             d="M50 10 L50 140 M50 10 L35 145 M50 10 L65 145"
-                            stroke="#40B5C4"
+                            stroke="#2a4d9e"
                             strokeWidth="0.3"
                             strokeOpacity="0.5"
                             initial={{ pathLength: 0 }}
@@ -220,3 +220,4 @@ const SplashScreen = ({ onComplete }) => {
 };
 
 export default SplashScreen;
+

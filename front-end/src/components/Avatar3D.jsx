@@ -35,7 +35,7 @@ const Loader = () => {
   return (
     <Html center>
       <div className="flex flex-col items-center gap-2">
-        <div className="w-16 h-16 border-4 border-[#30919D]/30 border-t-[#30919D] rounded-full animate-spin" />
+        <div className="w-16 h-16 border-4 border-[#1a3884]/30 border-t-[#1a3884] rounded-full animate-spin" />
         <p className="text-white text-sm">{progress.toFixed(0)}%</p>
       </div>
     </Html>
@@ -62,7 +62,7 @@ const ProceduralAvatar = ({ accessories = {}, celebrating = false }) => {
   });
   
   const skinColor = "#f5d6bc";
-  const shirtColor = "#30919D";
+  const shirtColor = "#1a3884";
   const pantsColor = "#002147";
   
   return (
@@ -223,7 +223,7 @@ const LevelIndicator = ({ level, xp, xpToNext }) => {
     <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
       <Html position={[0, 1.5, 0]} center distanceFactor={5}>
         <div className="flex flex-col items-center pointer-events-none select-none">
-          <div className="bg-gradient-to-r from-[#30919D] to-[#267a84] px-4 py-1.5 rounded-full shadow-lg">
+          <div className="bg-gradient-to-r from-[#1a3884] to-[#132c6b] px-4 py-1.5 rounded-full shadow-lg">
             <span className="text-white font-bold text-sm">Level {level}</span>
           </div>
           <div className="mt-1 w-20 h-1.5 bg-white/20 rounded-full overflow-hidden">
@@ -253,7 +253,7 @@ const CelebrationParticles = ({ active }) => {
           (Math.random() - 0.5) * 3
         ],
         speed: 0.5 + Math.random() * 1.5,
-        color: ['#30919D', '#daa520', '#ff6b6b', '#4ecdc4'][Math.floor(Math.random() * 4)]
+        color: ['#1a3884', '#daa520', '#ff6b6b', '#4ecdc4'][Math.floor(Math.random() * 4)]
       });
     }
     return temp;
@@ -444,3 +444,5 @@ export const preloadAvatar = (url) => {
 };
 
 export default Avatar3D;
+
+

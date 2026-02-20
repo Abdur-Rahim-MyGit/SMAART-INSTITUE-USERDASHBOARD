@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 
 // Unified badge style - single teal/navy design
 const badgeStyle = {
-    gradient: 'from-[#30919D] via-[#287a84] to-[#002147]',
-    glow: 'shadow-[#30919D]/30',
+    gradient: 'from-[#1a3884] via-[#287a84] to-[#002147]',
+    glow: 'shadow-[#1a3884]/30',
     bgGlow: 'bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20',
-    borderColor: 'border-[#30919D]',
+    borderColor: 'border-[#1a3884]',
     textColor: 'text-[#002147] dark:text-teal-300',
 };
 
@@ -104,3 +104,4 @@ const BadgeCard = ({ badge, onClick, isLocked = false }) => {
 };
 
 export default BadgeCard;
+

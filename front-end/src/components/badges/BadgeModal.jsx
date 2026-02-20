@@ -7,10 +7,10 @@ import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 
 const unifiedStyle = {
-    gradient: 'from-[#30919D] via-[#287a84] to-[#002147]',
+    gradient: 'from-[#1a3884] via-[#287a84] to-[#002147]',
     bgGradient: 'from-teal-50 to-blue-50 dark:from-teal-950/20 dark:to-blue-950/20',
     textColor: 'text-[#002147] dark:text-teal-300',
-    borderColor: 'border-[#30919D]',
+    borderColor: 'border-[#1a3884]',
     icon: FaShieldAlt,
 };
 
@@ -248,7 +248,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     href={verificationUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 px-5 py-2 bg-[#30919D] hover:bg-[#287a84] text-white rounded-lg transition-colors font-medium text-sm"
+                                    className="flex items-center gap-2 px-5 py-2 bg-[#1a3884] hover:bg-[#287a84] text-white rounded-lg transition-colors font-medium text-sm"
                                 >
                                     <FaExternalLinkAlt className="w-4 h-4" />
                                     Verify Badge
@@ -263,3 +263,4 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
 };
 
 export default BadgeModal;
+
