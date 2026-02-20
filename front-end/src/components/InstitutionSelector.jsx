@@ -127,7 +127,7 @@ const InstitutionSelector = ({ onSelect }) => {
       <div className="relative z-50">
 
         {/* Ambient background glow for the selector area */}
-        <div className="absolute -inset-4 bg-[#30919D]/5 dark:bg-[#30919D]/10 rounded-[2rem] blur-2xl pointer-events-none -z-10" />
+        <div className="absolute -inset-4 bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-[2rem] blur-2xl pointer-events-none -z-10" />
 
         {/* Results List - Above Input with premium styling */}
         <AnimatePresence>
@@ -155,16 +155,16 @@ const InstitutionSelector = ({ onSelect }) => {
                       }}
                       whileHover={{ x: 4 }}
                       className={`flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3 cursor-pointer rounded-lg sm:rounded-xl transition-all duration-200 group border ${index === focusedIndex
-                        ? "bg-[#30919D]/10 border-[#30919D]/20 shadow-sm"
+                        ? "bg-[#1a3884]/10 border-[#1a3884]/20 shadow-sm"
                         : "border-transparent hover:bg-gray-50 dark:hover:bg-white/5 hover:border-gray-200 dark:hover:border-white/10"
                         }`}
                     >
-                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors shadow-inner ${index === focusedIndex ? "bg-[#30919D] text-white" : "bg-gray-100 dark:bg-white/5 text-[#30919D]"
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors shadow-inner ${index === focusedIndex ? "bg-[#1a3884] text-white" : "bg-gray-100 dark:bg-white/5 text-[#1a3884]"
                         }`}>
                         <Building2 className="h-5 w-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-bold text-[#002147] dark:text-white truncate group-hover:text-[#30919D] transition-colors text-sm sm:text-base">
+                        <div className="font-bold text-[#002147] dark:text-white truncate group-hover:text-[#1a3884] transition-colors text-sm sm:text-base">
                           {college.collegeName}
                         </div>
                         {college.address && (
@@ -191,7 +191,7 @@ const InstitutionSelector = ({ onSelect }) => {
           >
             {loading ? (
               <div className="flex flex-col items-center gap-3">
-                <RefreshCw className="h-6 w-6 text-[#30919D] animate-spin" />
+                <RefreshCw className="h-6 w-6 text-[#1a3884] animate-spin" />
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Searching global database...</p>
               </div>
             ) : error ? (
@@ -217,11 +217,11 @@ const InstitutionSelector = ({ onSelect }) => {
 
         {/* Input Wrapper */}
         <div className="relative group">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#30919D] to-[#daa520] rounded-2xl opacity-0 group-focus-within:opacity-20 blur-xl transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1a3884] to-[#daa520] rounded-2xl opacity-0 group-focus-within:opacity-20 blur-xl transition-opacity duration-500" />
 
           <div className="relative flex items-center">
             <div className="absolute left-4 z-20 pointer-events-none">
-              <Search className={`h-5 w-5 transition-colors duration-300 ${searchTerm ? 'text-[#30919D]' : 'text-gray-400'}`} />
+              <Search className={`h-5 w-5 transition-colors duration-300 ${searchTerm ? 'text-[#1a3884]' : 'text-gray-400'}`} />
             </div>
 
             <Input
@@ -232,12 +232,12 @@ const InstitutionSelector = ({ onSelect }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 200)}
-              className="w-full h-12 sm:h-14 pl-11 pr-11 text-sm sm:text-base bg-white/80 dark:bg-[#002147]/80 backdrop-blur-xl border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-[#30919D] focus:ring-4 focus:ring-[#30919D]/10 rounded-xl sm:rounded-2xl font-semibold shadow-lg group-hover:shadow-xl transition-all duration-300"
+              className="w-full h-12 sm:h-14 pl-11 pr-11 text-sm sm:text-base bg-white dark:bg-[#002147] border-none text-[#1a3884] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-xl sm:rounded-2xl font-semibold shadow-lg group-hover:shadow-xl transition-all duration-300"
             />
 
             {loading && (
               <div className="absolute right-4 z-20">
-                <div className="w-5 h-5 border-2 border-[#30919D]/30 border-t-[#30919D] rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-[#1a3884]/30 border-t-[#1a3884] rounded-full animate-spin" />
               </div>
             )}
 
@@ -261,3 +261,4 @@ const InstitutionSelector = ({ onSelect }) => {
 };
 
 export default InstitutionSelector;
+

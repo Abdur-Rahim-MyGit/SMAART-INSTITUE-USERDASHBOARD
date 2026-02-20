@@ -52,7 +52,7 @@ const TypographyPanel = ({
             rotation: 0,
           })
         }
-        className="w-full py-3 bg-gradient-to-r from-[#30919D] to-[#267a84] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:from-[#267a84] hover:to-[#1f6670] transition-all shadow-md hover:shadow-[#30919D]/40 hover:-translate-y-0.5"
+        className="w-full py-3 bg-gradient-to-r from-[#1a3884] to-[#132c6b] text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:from-[#132c6b] hover:to-[#1f6670] transition-all shadow-md hover:shadow-[#1a3884]/40 hover:-translate-y-0.5"
       >
         <Plus className="w-5 h-5" />
         Add Text
@@ -62,7 +62,7 @@ const TypographyPanel = ({
       {selectedTextId && textOverlays[selectedTextId] && (
         <div className="bg-white dark:bg-white/5 rounded-xl p-4 border border-slate-200 dark:border-white/10 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-[#30919D] flex items-center gap-2">
+            <span className="text-sm font-semibold text-[#1a3884] flex items-center gap-2">
               <Type className="w-4 h-4" /> Edit Text
             </span>
             <button
@@ -79,7 +79,7 @@ const TypographyPanel = ({
             onChange={(e) =>
               onUpdateText(selectedTextId, { text: e.target.value })
             }
-            className="w-full px-3 py-2 text-sm border rounded-lg mb-4 bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30 focus:border-[#30919D]/50 focus:ring-1 focus:ring-[#30919D]/50 outline-none transition-all"
+            className="w-full px-3 py-2 text-sm border rounded-lg mb-4 bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/30 focus:border-[#1a3884]/50 focus:ring-1 focus:ring-[#1a3884]/50 outline-none transition-all"
             placeholder="Enter your text..."
           />
 
@@ -96,7 +96,7 @@ const TypographyPanel = ({
                   fontSize: parseInt(e.target.value),
                 })
               }
-              className="flex-1 accent-[#30919D] h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer"
+              className="flex-1 accent-[#1a3884] h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer"
             />
             <span className="text-xs font-mono text-slate-700 dark:text-white/80 w-8 text-right bg-slate-100 dark:bg-white/5 px-1 py-0.5 rounded">
               {textOverlays[selectedTextId].fontSize}
@@ -142,7 +142,7 @@ const TypographyPanel = ({
                   key={value}
                   onClick={() => onUpdateText(selectedTextId, { align: value })}
                   className={`p-1.5 rounded-md transition-all ${textOverlays[selectedTextId].align === value
-                    ? "bg-[#30919D] text-white shadow-sm"
+                    ? "bg-[#1a3884] text-white shadow-sm"
                     : "text-slate-500 dark:text-white/40 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5"
                     }`}
                 >
@@ -163,7 +163,7 @@ const TypographyPanel = ({
                     onUpdateText(selectedTextId, { effect: effect.id })
                   }
                   className={`px-2 py-1 text-[10px] rounded-lg border transition-all ${textOverlays[selectedTextId].effect === effect.id
-                    ? "bg-[#30919D] text-white border-[#30919D] font-medium"
+                    ? "bg-[#1a3884] text-white border-[#1a3884] font-medium"
                     : "bg-transparent text-slate-500 dark:text-white/60 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/30 hover:text-slate-900 dark:hover:text-white"
                     }`}
                 >
@@ -191,7 +191,7 @@ const TypographyPanel = ({
                   rotation: parseInt(e.target.value),
                 })
               }
-              className="w-full accent-[#30919D] h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer mb-2"
+              className="w-full accent-[#1a3884] h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer mb-2"
             />
           </div>
         </div>
@@ -298,7 +298,7 @@ const TypographyPanel = ({
               key={id}
               onClick={() => onSelectText(id)}
               className={`w-full px-3 py-2 rounded-lg border text-left transition-all flex items-center justify-between group ${selectedTextId === id
-                ? "border-[#30919D] bg-[#30919D]/5"
+                ? "border-[#1a3884] bg-[#1a3884]/5"
                 : "border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/30 bg-white dark:bg-white/5"
                 }`}
             >
@@ -328,3 +328,5 @@ const TypographyPanel = ({
 };
 
 export default TypographyPanel;
+
+

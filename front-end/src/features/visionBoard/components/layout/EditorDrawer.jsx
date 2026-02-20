@@ -49,10 +49,10 @@ const EditorDrawer = ({
       {/* Drawer Header */}
       <div className="h-10 lg:h-14 border-b border-slate-200 dark:border-white/10 flex items-center justify-between px-4 bg-slate-50 dark:bg-white/5 rounded-t-2xl lg:rounded-none">
         <h3 className="font-semibold text-sm lg:text-base text-slate-800 dark:text-white capitalize flex items-center gap-2">
-           {activePanel === 'templates' && <Type className="w-4 h-4 text-[#30919D]" />} {/* Using Type icon as placeholder for templates if LayoutTemplate is not imported, or just reuse an existing one. Actually LayoutTemplate was not imported in this file. Let's check imports. */}
-           {activePanel === 'style' && <Palette className="w-4 h-4 text-[#30919D]" />}
-           {activePanel === 'text' && <Type className="w-4 h-4 text-[#30919D]" />}
-           {activePanel === 'settings' && <Settings2 className="w-4 h-4 text-[#30919D]" />}
+           {activePanel === 'templates' && <Type className="w-4 h-4 text-[#1a3884]" />} {/* Using Type icon as placeholder for templates if LayoutTemplate is not imported, or just reuse an existing one. Actually LayoutTemplate was not imported in this file. Let's check imports. */}
+           {activePanel === 'style' && <Palette className="w-4 h-4 text-[#1a3884]" />}
+           {activePanel === 'text' && <Type className="w-4 h-4 text-[#1a3884]" />}
+           {activePanel === 'settings' && <Settings2 className="w-4 h-4 text-[#1a3884]" />}
            {activePanel}
         </h3>
         <button onClick={closeDrawer} className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors">
@@ -114,7 +114,7 @@ const EditorDrawer = ({
                         key={key}
                         onClick={() => setAspectRatio(key)}
                         className={`px-3 py-3 text-xs rounded-xl transition-all text-left border ${aspectRatio === key
-                        ? "bg-[#30919D]/20 text-[#30919D] font-medium border-[#30919D]"
+                        ? "bg-[#1a3884]/20 text-[#1a3884] font-medium border-[#1a3884]"
                         : "bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-white/50 border-transparent hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white"
                         }`}
                     >
@@ -196,3 +196,4 @@ const EditorDrawer = ({
 };
 
 export default EditorDrawer;
+

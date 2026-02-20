@@ -889,7 +889,7 @@ const Profile = () => {
               {/* Profile Photo Section */}
               <div className="flex flex-col items-center mb-6">
                 <div className="relative mb-3">
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#30919D] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
                     {editData.profilePhoto ? (
                       <img
                         src={editData.profilePhoto}
@@ -903,7 +903,7 @@ const Profile = () => {
                     )}
                   </div>
                   {/* Camera button overlay */}
-                  <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#30919D] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#277a84] transition-colors shadow-md">
+                  <label className="absolute bottom-0 right-0 w-8 h-8 bg-[#1a3884] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#277a84] transition-colors shadow-md">
                     {uploadingPhoto ? (
                       <Loader2 className="w-4 h-4 text-white animate-spin" />
                     ) : (
@@ -932,7 +932,7 @@ const Profile = () => {
                 <button
                   onClick={handleSaveProfile}
                   disabled={savingProfile || uploadingPhoto || !editData.profilePhoto}
-                  className="flex-1 py-2.5 px-4 bg-[#30919D] text-white rounded-lg font-medium hover:bg-[#277a84] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 px-4 bg-[#1a3884] text-white rounded-lg font-medium hover:bg-[#277a84] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {savingProfile ? (
                     <>
@@ -956,3 +956,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

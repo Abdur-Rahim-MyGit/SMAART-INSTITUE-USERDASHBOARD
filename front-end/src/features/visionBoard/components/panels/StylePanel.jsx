@@ -57,7 +57,7 @@ const StylePanel = ({
       <div>
         <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex justify-between">
           <span>Corner Radius</span>
-          <span className="text-[#30919D]">{borderRadius}px</span>
+          <span className="text-[#1a3884]">{borderRadius}px</span>
         </h3>
         <div className="flex gap-2 flex-wrap">
           {BORDER_RADIUS_PRESETS.map((preset) => (
@@ -65,7 +65,7 @@ const StylePanel = ({
               key={preset.value}
               onClick={() => setBorderRadius(preset.value)}
               className={`px-3 py-1.5 text-xs rounded-lg transition-colors border ${borderRadius === preset.value
-                ? "bg-[#30919D] border-[#30919D] text-white font-medium shadow-lg shadow-[#30919D]/20"
+                ? "bg-[#1a3884] border-[#1a3884] text-white font-medium shadow-lg shadow-[#1a3884]/20"
                 : "bg-transparent border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/60 hover:bg-slate-50 dark:hover:bg-white/5 hover:border-slate-300 dark:hover:border-white/30"
                 }`}
             >
@@ -79,7 +79,7 @@ const StylePanel = ({
       <div>
         <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex justify-between">
           <span>Gap Spacing</span>
-          <span className="text-[#30919D]">{gap}px</span>
+          <span className="text-[#1a3884]">{gap}px</span>
         </h3>
         <div className="flex gap-2 flex-wrap">
           {GAP_PRESETS.map((preset) => (
@@ -87,7 +87,7 @@ const StylePanel = ({
               key={preset.value}
               onClick={() => setGap(preset.value)}
               className={`px-3 py-1.5 text-xs rounded-lg transition-colors border ${gap === preset.value
-                ? "bg-[#30919D] border-[#30919D] text-white font-medium shadow-lg shadow-[#30919D]/20"
+                ? "bg-[#1a3884] border-[#1a3884] text-white font-medium shadow-lg shadow-[#1a3884]/20"
                 : "bg-transparent border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/60 hover:bg-slate-50 dark:hover:bg-white/5 hover:border-slate-300 dark:hover:border-white/30"
                 }`}
             >
@@ -122,7 +122,7 @@ const StylePanel = ({
                   onClick={() =>
                     backgroundInputRef.current?.click()
                   }
-                  className="px-3 py-1.5 bg-[#30919D] rounded-lg text-xs font-medium text-white hover:bg-[#267a84] shadow-lg"
+                  className="px-3 py-1.5 bg-[#1a3884] rounded-lg text-xs font-medium text-white hover:bg-[#132c6b] shadow-lg"
                 >
                   Change
                 </button>
@@ -138,10 +138,10 @@ const StylePanel = ({
         ) : (
           <button
             onClick={() => backgroundInputRef.current?.click()}
-            className="w-full py-8 border border-dashed border-slate-300 dark:border-white/20 rounded-xl hover:border-[#30919D]/50 hover:bg-[#30919D]/5 transition-all flex flex-col items-center justify-center gap-2 group"
+            className="w-full py-8 border border-dashed border-slate-300 dark:border-white/20 rounded-xl hover:border-[#1a3884]/50 hover:bg-[#1a3884]/5 transition-all flex flex-col items-center justify-center gap-2 group"
           >
-            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#30919D]/20 transition-colors">
-              <ImageIcon className="w-5 h-5 text-slate-400 dark:text-white/40 group-hover:text-[#30919D]" />
+            <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-[#1a3884]/20 transition-colors">
+              <ImageIcon className="w-5 h-5 text-slate-400 dark:text-white/40 group-hover:text-[#1a3884]" />
             </div>
             <span className="text-xs text-slate-500 dark:text-white/40 group-hover:text-slate-800 dark:group-hover:text-white/70">
               Upload Background
@@ -154,3 +154,5 @@ const StylePanel = ({
 };
 
 export default StylePanel;
+
+

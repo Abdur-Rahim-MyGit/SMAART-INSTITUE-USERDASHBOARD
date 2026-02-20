@@ -134,7 +134,7 @@ const ContactForm = () => {
               >
                 <div className="bg-white dark:bg-[#001835]/90 border border-gray-100 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full flex flex-col backdrop-blur-xl">
                   {/* Decorative Elements */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#30919D]/10 to-transparent pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#1a3884]/10 to-transparent pointer-events-none" />
                   <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#daa520]/10 to-transparent pointer-events-none" />
 
                   {isSuccess ? (
@@ -261,3 +261,4 @@ const ContactForm = () => {
 };
 
 export default ContactForm;
+

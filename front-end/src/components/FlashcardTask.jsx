@@ -75,7 +75,7 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
             >
               {/* Front */}
               <div
-                className="absolute inset-0 bg-gradient-to-br from-[#0891b2] to-[#0a7a8f] dark:from-[#30919D] dark:to-[#2a7d88] rounded-2xl shadow-2xl flex items-center justify-center p-8"
+                className="absolute inset-0 bg-gradient-to-br from-[#0891b2] to-[#0a7a8f] dark:from-[#1a3884] dark:to-[#2a7d88] rounded-2xl shadow-2xl flex items-center justify-center p-8"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <div className="text-center space-y-4">
@@ -138,7 +138,7 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
           {!hasMarkedComplete ? (
             <button
               onClick={handleMarkComplete}
-              className="w-full max-w-md px-6 py-3 bg-[#0891b2] dark:bg-[#30919D] hover:bg-[#0a7a8f] dark:hover:bg-[#2a7d88] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+              className="w-full max-w-md px-6 py-3 bg-[#0891b2] dark:bg-[#1a3884] hover:bg-[#0a7a8f] dark:hover:bg-[#2a7d88] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
             >
               <CheckCircle2 size={20} />
               Mark as Complete
@@ -176,3 +176,4 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
 };
 
 export default FlashcardTask;
+

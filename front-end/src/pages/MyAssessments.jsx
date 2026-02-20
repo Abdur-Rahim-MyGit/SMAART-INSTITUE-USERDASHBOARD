@@ -8,10 +8,10 @@ import { assessmentApi } from "@/services/assessmentApi";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import useUser from "@/hooks/useUser";
 
-// Theme colors: Navy (#002147), Teal (#30919D), White
+// Theme colors: Navy (#002147), Teal (#1a3884), White
 const THEME = {
   navy: '#002147',
-  teal: '#30919D',
+  teal: '#1a3884',
   white: '#FFFFFF'
 };
 
@@ -373,3 +373,4 @@ const MyAssessments = () => {
 };
 
 export default MyAssessments;
+

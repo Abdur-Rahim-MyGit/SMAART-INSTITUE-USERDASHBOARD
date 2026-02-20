@@ -46,7 +46,7 @@ const IntroScreen = ({ lines, onFinish }) => {
             <div 
               key={idx} 
               className={`h-0.5 sm:h-1 rounded-full transition-all duration-300 ${
-                idx === currentLineIndex ? 'w-6 sm:w-8 bg-[#30919D]' : 'w-1.5 sm:w-2 bg-slate-700'
+                idx === currentLineIndex ? 'w-6 sm:w-8 bg-[#1a3884]' : 'w-1.5 sm:w-2 bg-slate-700'
               }`} 
             />
           ))}
@@ -72,7 +72,7 @@ const IntroScreen = ({ lines, onFinish }) => {
         <div className="flex flex-col items-center gap-3 sm:gap-4 mt-4 sm:mt-8">
           <button
             onClick={handleNext}
-            className="group flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#30919D] hover:bg-[#2a7d88] text-white rounded-full text-sm sm:text-base font-bold transition-all shadow-lg hover:shadow-[#30919D]/20 active:scale-95"
+            className="group flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#1a3884] hover:bg-[#2a7d88] text-white rounded-full text-sm sm:text-base font-bold transition-all shadow-lg hover:shadow-[#1a3884]/20 active:scale-95"
           >
             {currentLineIndex === lines.length - 1 ? 'Start Video' : 'Next'} 
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform sm:w-[18px] sm:h-[18px]" />
@@ -895,7 +895,7 @@ const ModuleViewPage = () => {
       <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0B1120 0%, #1a2332 50%, #0B1120 100%)' }}>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#30919D] mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a3884] mx-auto mb-4"></div>
             <p className="text-gray-300">Loading course content...</p>
           </div>
         </div>
@@ -916,7 +916,7 @@ const ModuleViewPage = () => {
             onClick={() => navigate('/dashboard/courses')}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-[#30919D] hover:bg-[#2a7d88] text-white rounded-xl font-bold transition-all"
+            className="px-6 py-3 bg-[#1a3884] hover:bg-[#2a7d88] text-white rounded-xl font-bold transition-all"
           >
             Back to My Courses
           </motion.button>
@@ -940,7 +940,7 @@ const ModuleViewPage = () => {
                 onClick={() => navigateToModules()}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border-2 border-[#30919D] text-white hover:bg-[#30919D]/20 transition-all font-bold"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border-2 border-[#1a3884] text-white hover:bg-[#1a3884]/20 transition-all font-bold"
               >
                 <ArrowLeft className="w-5 h-5" /> Back to Modules
               </motion.button>
@@ -995,7 +995,7 @@ const ModuleViewPage = () => {
                   <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest uppercase text-slate-500 mb-1">
                     <span>Module ID: {String(module.id).padStart(2, '0')}-{String(day.id).padStart(2, '0')}</span>
                     <span className="w-px h-3 bg-slate-300 dark:bg-slate-700"></span>
-                    <span className="flex items-center gap-1 text-[#0891b2] dark:text-[#30919D] bg-[#0891b2]/10 dark:bg-[#30919D]/10 px-2 py-0.5 rounded border border-[#0891b2]/20 dark:border-[#30919D]/20">
+                    <span className="flex items-center gap-1 text-[#0891b2] dark:text-[#1a3884] bg-[#0891b2]/10 dark:bg-[#1a3884]/10 px-2 py-0.5 rounded border border-[#0891b2]/20 dark:border-[#1a3884]/20">
                       <ShieldCheck size={10} /> High Value Module
                     </span>
                   </div>
@@ -1215,7 +1215,7 @@ const ModuleViewPage = () => {
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${(activeTab === tab || (activeStep?.type === 'assessment' && tab === 'overview'))
-                          ? 'text-slate-900 dark:text-white border-[#0891b2] dark:border-[#30919D]'
+                          ? 'text-slate-900 dark:text-white border-[#0891b2] dark:border-[#1a3884]'
                           : 'text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-600 dark:hover:text-slate-300'
                           }`}
                       >
@@ -1257,7 +1257,7 @@ const ModuleViewPage = () => {
                                             <div key={idx} className="flex gap-2 group/line hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-colors -mx-1.5">
                                                 <button 
                                                     onClick={() => playerRef.current?.seekTo(totalSeconds)}
-                                                    className="shrink-0 text-[#0891b2] dark:text-[#30919D] font-mono text-xs font-bold bg-[#0891b2]/10 dark:bg-[#30919D]/10 px-1.5 py-0.5 rounded h-fit hover:bg-[#0891b2]/20 transition-colors cursor-pointer"
+                                                    className="shrink-0 text-[#0891b2] dark:text-[#1a3884] font-mono text-xs font-bold bg-[#0891b2]/10 dark:bg-[#1a3884]/10 px-1.5 py-0.5 rounded h-fit hover:bg-[#0891b2]/20 transition-colors cursor-pointer"
                                                 >
                                                     {match[1]}:{match[2]}
                                                 </button>
@@ -1297,7 +1297,7 @@ const ModuleViewPage = () => {
 
                   {/* Key Concept Box (Mission Brief) */}
                   <div className="bg-slate-50 dark:bg-[#1e293b]/40 border border-slate-200 dark:border-slate-700/50 rounded-xl p-4 mb-6 relative z-10 backdrop-blur-sm">
-                    <h3 className="text-[#0891b2] dark:text-[#30919D] font-bold text-[11px] uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <h3 className="text-[#0891b2] dark:text-[#1a3884] font-bold text-[11px] uppercase tracking-wider mb-2 flex items-center gap-2">
                       <Lightbulb size={12} /> Mission Brief
                     </h3>
                     <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed italic">
@@ -1404,7 +1404,7 @@ const ModuleViewPage = () => {
                                           >
                                             <div className={`mt-0.5 shrink-0 transition-colors ${
                                               isStepCompleted ? 'text-emerald-500' : 
-                                              isActiveStep ? 'text-[#0891b2] dark:text-[#30919D]' : 
+                                              isActiveStep ? 'text-[#0891b2] dark:text-[#1a3884]' : 
                                               !isUnlocked ? 'text-slate-500' : 'text-slate-400'
                                             }`}>
                                               {isStepCompleted ? <CheckCircle2 size={14} /> : 
@@ -1417,7 +1417,7 @@ const ModuleViewPage = () => {
                                               </p>
                                               {!isStepCompleted && progressPercent > 0 && (
                                                 <div className="mt-1 w-full h-0.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                                  <motion.div className="h-full bg-[#0891b2] dark:bg-[#30919D]" initial={{ width: 0 }} animate={{ width: `${progressPercent}%` }} />
+                                                  <motion.div className="h-full bg-[#0891b2] dark:bg-[#1a3884]" initial={{ width: 0 }} animate={{ width: `${progressPercent}%` }} />
                                                 </div>
                                               )}
                                             </div>
@@ -1825,3 +1825,4 @@ const ModuleViewPage = () => {
 };
 
 export default ModuleViewPage;
+

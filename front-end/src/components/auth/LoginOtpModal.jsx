@@ -226,7 +226,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
             className="relative w-full max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[calc(100vh-2rem)]"
           >
             {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#30919D]/5 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#1a3884]/5 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#daa520]/5 rounded-full blur-[50px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
             {/* Content Switcher: Normal OTP or Force Logout Confirmation */}
@@ -241,15 +241,15 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                   >
                     <X className="w-6 h-6" aria-hidden="true" />
                   </button>
-                  <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-[#30919D]/20 to-[#30919D]/5 rounded-2xl sm:rounded-3xl border border-[#30919D]/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg shadow-[#30919D]/10">
-                    <Mail className="w-8 h-8 sm:w-12 sm:h-12 text-[#30919D]" />
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-br from-[#1a3884]/20 to-[#1a3884]/5 rounded-2xl sm:rounded-3xl border border-[#1a3884]/20 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg shadow-[#1a3884]/10">
+                    <Mail className="w-8 h-8 sm:w-12 sm:h-12 text-[#1a3884]" />
                   </div>
                   <h2 className="text-xl sm:text-3xl font-display font-bold text-[#002147] mb-2">
                     Verify Your Email
                   </h2>
                   <p className="text-gray-500">
                     We've sent a 6-digit code to<br />
-                    <span className="text-[#30919D] font-medium">{email}</span>
+                    <span className="text-[#1a3884] font-medium">{email}</span>
                   </p>
                 </div>
 
@@ -288,7 +288,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                             aria-label={`Digit ${index + 1} of 6`}
                             aria-describedby="otp-helper"
                             autoComplete="one-time-code"
-                            className="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl text-[#002147] focus:border-[#30919D] focus:ring-2 focus:ring-[#30919D]/30 transition-all duration-300 outline-none"
+                            className="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold bg-gray-50 border border-gray-200 rounded-lg sm:rounded-xl text-[#002147] focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/30 transition-all duration-300 outline-none"
                           />
                         ))}
                       </div>
@@ -302,7 +302,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-[#30919D] to-[#267a84] hover:from-[#267a84] hover:to-[#30919D] text-white font-bold py-6 rounded-xl shadow-lg shadow-[#30919D]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+                      className="w-full bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#1a3884] text-white font-bold py-6 rounded-xl shadow-lg shadow-[#1a3884]/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                       disabled={isLoading || otp.join("").length !== 6}
                     >
                       {isLoading ? (
@@ -322,7 +322,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     <button
                       onClick={handleResend}
                       disabled={resendCooldown > 0 || isResending}
-                      className="inline-flex items-center gap-2 text-[#30919D] hover:text-[#267a84] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                      className="inline-flex items-center gap-2 text-[#1a3884] hover:text-[#132c6b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                     >
                       {isResending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -390,3 +390,5 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 };
 
 export default LoginOtpModal;
+
+

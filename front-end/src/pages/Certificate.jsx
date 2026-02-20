@@ -269,10 +269,10 @@ const Certificate = () => {
                                         <button
                                             key={cert.id}
                                             onClick={() => setSelectedType(cert)}
-                                            className="group relative w-full p-6 rounded-2xl bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-slate-700 hover:border-[#30919D] dark:hover:border-[#30919D] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
+                                            className="group relative w-full p-6 rounded-2xl bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-slate-700 hover:border-[#1a3884] dark:hover:border-[#1a3884] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-[#30919D]/10 text-[#30919D] transition-colors">
+                                                <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-[#1a3884]/10 text-[#1a3884] transition-colors">
                                                     <Award className="w-6 h-6" />
                                                 </div>
                                                 <div className="flex-1">
@@ -284,7 +284,7 @@ const Certificate = () => {
                                                         Verified Level 1 Credential
                                                     </p>
                                                 </div>
-                                                <div className="text-[#30919D] font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                                <div className="text-[#1a3884] font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
                                                     VIEW SECURE <span className="text-lg">→</span>
                                                 </div>
                                             </div>
@@ -296,7 +296,7 @@ const Certificate = () => {
                                 <div className="mt-8 text-center">
                                     <a
                                         href="/verify-certificate"
-                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#30919D] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#30919D] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#1a3884] text-white font-bold shadow-lg hover:shadow-xl transition-all"
                                     >
                                         <ShieldCheck className="w-5 h-5" />
                                         Verify a Certificate
@@ -317,7 +317,7 @@ const Certificate = () => {
                                 <div className="mt-8 text-center">
                                     <a
                                         href="/verify-badge"
-                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#30919D] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#30919D] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#1a3884] text-white font-bold shadow-lg hover:shadow-xl transition-all"
                                     >
                                         <Medal className="w-5 h-5" />
                                         Verify a Badge
@@ -493,3 +493,4 @@ const Certificate = () => {
 };
 
 export default Certificate;
+

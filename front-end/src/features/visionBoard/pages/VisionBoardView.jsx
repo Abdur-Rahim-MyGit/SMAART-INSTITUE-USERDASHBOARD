@@ -262,7 +262,7 @@ const VisionBoardView = () => {
               </Button>
               <Button
                 onClick={() => navigate(`/vision-board/edit/${id}`)}
-                className="bg-[#30919D] hover:bg-[#267a84] text-[#002147] shadow-[0_0_15px_rgba(48,145,157,0.5)] hover:shadow-[0_0_25px_rgba(48,145,157,0.7)]"
+                className="bg-[#1a3884] hover:bg-[#132c6b] text-[#002147] shadow-[0_0_15px_rgba(26,56,132,0.5)] hover:shadow-[0_0_25px_rgba(26,56,132,0.7)]"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit
@@ -321,3 +321,5 @@ const VisionBoardView = () => {
 };
 
 export default VisionBoardView;
+
+

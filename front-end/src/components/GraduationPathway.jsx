@@ -180,7 +180,7 @@ const GraduationPathway = ({ onCourseClick }) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 text-[#30919D] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#1a3884] animate-spin" />
         <span className="ml-3 text-gray-500">Loading courses...</span>
       </div>
     );
@@ -191,7 +191,7 @@ const GraduationPathway = ({ onCourseClick }) => {
     return (
       <div className="text-center py-20">
         <p className="text-red-500">{error}</p>
-        <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-[#30919D] text-white rounded-lg">Retry</button>
+        <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-[#1a3884] text-white rounded-lg">Retry</button>
       </div>
     );
   }
@@ -283,8 +283,8 @@ const GraduationPathway = ({ onCourseClick }) => {
                 >
                   <div className="flex flex-col items-center text-center">
                     <span className={`text-xs font-bold uppercase tracking-widest mb-1 px-3 py-1 rounded-full ${
-                      isCompleted ? 'bg-[#30919D] text-white shadow-sm' : 
-                      isInProgress ? 'bg-[#30919D] text-white shadow-sm' : 
+                      isCompleted ? 'bg-[#1a3884] text-white shadow-sm' : 
+                      isInProgress ? 'bg-[#1a3884] text-white shadow-sm' : 
                       'bg-gray-100 text-gray-400'
                     }`}>
                       Unit {courseIdx + 1}
@@ -295,17 +295,17 @@ const GraduationPathway = ({ onCourseClick }) => {
                     <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-4">
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                         <circle cx="50" cy="50" r="42" fill="none" stroke="#E5E7EB" strokeWidth="8" />
-                        <circle cx="50" cy="50" r="42" fill="none" stroke={isCompleted ? '#30919D' : isInProgress ? '#30919D' : '#9CA3AF'} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${progressPercent * 2.64} ${264 - progressPercent * 2.64}`} className="transition-all duration-1000" />
+                        <circle cx="50" cy="50" r="42" fill="none" stroke={isCompleted ? '#1a3884' : isInProgress ? '#1a3884' : '#9CA3AF'} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${progressPercent * 2.64} ${264 - progressPercent * 2.64}`} className="transition-all duration-1000" />
                       </svg>
 
                       {/* Progress Text */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <BookOpen className={`w-6 h-6 ${isCompleted ? 'text-[#30919D]' : isInProgress ? 'text-[#30919D]' : 'text-gray-400'}`} />
-                        <span className={`text-xs font-bold mt-1 ${isCompleted ? 'text-[#30919D]' : isInProgress ? 'text-[#30919D]' : 'text-gray-400'}`}>{totalModules > 0 ? `${completedModules}/${totalModules}` : '—'}</span>
+                        <BookOpen className={`w-6 h-6 ${isCompleted ? 'text-[#1a3884]' : isInProgress ? 'text-[#1a3884]' : 'text-gray-400'}`} />
+                        <span className={`text-xs font-bold mt-1 ${isCompleted ? 'text-[#1a3884]' : isInProgress ? 'text-[#1a3884]' : 'text-gray-400'}`}>{totalModules > 0 ? `${completedModules}/${totalModules}` : '—'}</span>
                       </div>
                     </div>
 
-                    <div className="mt-4 text-gray-400 hover:text-[#30919D] transition-colors">
+                    <div className="mt-4 text-gray-400 hover:text-[#1a3884] transition-colors">
                       {isExpanded ? <ChevronUp className="w-6 h-6" /> : <ChevronDown className="w-6 h-6" />}
                     </div>
                   </div>
@@ -322,7 +322,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                       className="p-6 border-t border-gray-100 bg-gradient-to-br from-blue-50/30 to-purple-50/30"
                     >
                       <h3 className="text-sm font-bold text-[#002147] uppercase mb-2 flex items-center gap-2">
-                        <span className="w-1 h-4 bg-[#30919D] rounded-full"></span>
+                        <span className="w-1 h-4 bg-[#1a3884] rounded-full"></span>
                         About This Course
                       </h3>
                       <p className="text-sm text-gray-600 leading-relaxed">
@@ -345,7 +345,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                   >
                     {loadingModules[courseId] && (
                       <div className="flex items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 text-[#30919D] animate-spin" />
+                        <Loader2 className="w-8 h-8 text-[#1a3884] animate-spin" />
                         <span className="ml-3 text-gray-500">Loading modules...</span>
                       </div>
                     )}
@@ -413,15 +413,15 @@ const GraduationPathway = ({ onCourseClick }) => {
                               <div 
                                 onClick={() => toggleModule(moduleKey)}
                                 className={`flex items-center justify-between p-4 cursor-pointer transition-all hover:bg-gray-50 ${
-                                  isModuleInProgress ? 'border-l-4 border-l-[#30919D]' : 
-                                  isModuleCompleted ? 'border-l-4 border-l-[#30919D]' : ''
+                                  isModuleInProgress ? 'border-l-4 border-l-[#1a3884]' : 
+                                  isModuleCompleted ? 'border-l-4 border-l-[#1a3884]' : ''
                                 }`}
                               >
                                 <div className="flex items-center gap-4">
                                   {/* Module Number Badge */}
                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                                    isModuleCompleted ? 'bg-[#30919D] text-white' :
-                                    isModuleInProgress ? 'bg-[#30919D] text-white' :
+                                    isModuleCompleted ? 'bg-[#1a3884] text-white' :
+                                    isModuleInProgress ? 'bg-[#1a3884] text-white' :
                                     'bg-gray-100 text-[#002147]'
                                   }`}>
                                     M{module.sequence || moduleIdx + 1}
@@ -438,7 +438,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                                         {days.length} Days
                                       </span>
                                       {completedDays > 0 && (
-                                        <span className="flex items-center gap-1 text-[#30919D]">
+                                        <span className="flex items-center gap-1 text-[#1a3884]">
                                           <Check className="w-3 h-3" />
                                           {completedDays}/{days.length} complete
                                         </span>
@@ -455,7 +455,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                                       <circle cx="18" cy="18" r="14" fill="none" stroke="#E5E7EB" strokeWidth="3" />
                                       <circle 
                                         cx="18" cy="18" r="14" fill="none" 
-                                        stroke={isModuleInProgress || isModuleCompleted ? '#30919D' : '#9CA3AF'} 
+                                        stroke={isModuleInProgress || isModuleCompleted ? '#1a3884' : '#9CA3AF'} 
                                         strokeWidth="3" 
                                         strokeLinecap="round" 
                                         strokeDasharray={`${(completedDays / (days.length || 1)) * 88} ${88 - (completedDays / (days.length || 1)) * 88}`}
@@ -509,9 +509,9 @@ const GraduationPathway = ({ onCourseClick }) => {
                                               whileHover={isDayActive ? { scale: 1.05 } : {}}
                                               whileTap={isDayActive ? { scale: 0.95 } : {}}
                                               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                                                isDayCompleted ? 'bg-[#30919D] text-white shadow-sm' :
-                                                isDayInProgress ? 'bg-[#30919D] text-white shadow-md hover:shadow-lg' :
-                                                isDayActive ? 'bg-white text-[#002147] border border-gray-200 hover:border-[#30919D] hover:bg-[#30919D]/5' :
+                                                isDayCompleted ? 'bg-[#1a3884] text-white shadow-sm' :
+                                                isDayInProgress ? 'bg-[#1a3884] text-white shadow-md hover:shadow-lg' :
+                                                isDayActive ? 'bg-white text-[#002147] border border-gray-200 hover:border-[#1a3884] hover:bg-[#1a3884]/5' :
                                                 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                               }`}
                                               disabled={!isDayActive}
@@ -538,7 +538,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                     {/* Unit Label at Bottom */}
                     {!loadingModules[courseId] && modules.length > 0 && (
                       <div className="mt-6 text-center">
-                        <span className="text-sm text-[#30919D] uppercase tracking-wider">
+                        <span className="text-sm text-[#1a3884] uppercase tracking-wider">
                           Unit {courseIdx + 1}
                         </span>
                       </div>
@@ -555,3 +555,4 @@ const GraduationPathway = ({ onCourseClick }) => {
 };
 
 export default GraduationPathway;
+

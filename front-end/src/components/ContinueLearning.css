@@ -480,14 +480,14 @@
 }
 
 :is(.dark) .streak-day--completed .streak-day__circle {
-  border-color: #30919D;
-  background: rgba(48, 145, 157, 0.1);
+  border-color: #1a3884;
+  background: rgba(26, 56, 132, 0.1);
 }
 
 :is(.dark) .streak-day--current .streak-day__circle {
-  border-color: #30919D;
-  background: rgba(48, 145, 157, 0.15);
-  box-shadow: 0 0 0 4px rgba(48, 145, 157, 0.1);
+  border-color: #1a3884;
+  background: rgba(26, 56, 132, 0.15);
+  box-shadow: 0 0 0 4px rgba(26, 56, 132, 0.1);
 }
 
 :is(.dark) .streak-day--holiday .streak-day__circle {
@@ -501,20 +501,20 @@
 }
 
 :is(.dark) .streak-day__icon--check {
-  color: #30919D;
+  color: #1a3884;
 }
 
 :is(.dark) .streak-day__icon--current {
-  color: #30919D;
-  fill: #30919D;
+  color: #1a3884;
+  fill: #1a3884;
 }
 
 :is(.dark) .streak-day--completed .streak-day__label {
-  color: #30919D;
+  color: #1a3884;
 }
 
 :is(.dark) .streak-day--current .streak-day__label {
-  color: #30919D;
+  color: #1a3884;
 }
 
 :is(.dark) .streak-progress-bar {
@@ -522,13 +522,13 @@
 }
 
 :is(.dark) .streak-progress-bar__fill {
-  background: linear-gradient(90deg, #30919D, #22d3ee);
+  background: linear-gradient(90deg, #1a3884, #22d3ee);
 }
 
 :is(.dark) .streak-tracker__status--info {
-  background: rgba(48, 145, 157, 0.1);
+  background: rgba(26, 56, 132, 0.1);
   color: #22d3ee;
-  border-color: rgba(48, 145, 157, 0.2);
+  border-color: rgba(26, 56, 132, 0.2);
 }
 
 :is(.dark) .streak-tracker__status--warning {
@@ -584,3 +584,4 @@
     padding: 28px 24px;
   }
 }
+

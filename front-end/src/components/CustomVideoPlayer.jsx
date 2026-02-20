@@ -403,7 +403,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
           <VolumeX className="w-12 h-12 text-gray-400" />
         </div>
         <h3 className="text-xl font-bold mb-2" style={{ color: '#002147' }}>Video Unavailable</h3>
-        <p className="text-sm max-w-xs text-center" style={{ color: '#30919D' }}>
+        <p className="text-sm max-w-xs text-center" style={{ color: '#1a3884' }}>
           {hasError ? "We encountered an error loading this video source." : "No valid video URL was provided for this lesson."}
         </p>
       </div>
@@ -496,7 +496,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
               <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1.5 bg-white/20 rounded-full overflow-hidden">
                 {/* Progress Bar */}
                 <div
-                  className="h-full bg-gradient-to-r from-[#30919D] to-[#287a84]"
+                  className="h-full bg-gradient-to-r from-[#1a3884] to-[#287a84]"
                   style={{ width: `${(currentTime / videoDuration) * 100}%` }}
                 />
               </div>
@@ -523,13 +523,13 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
             <div className="flex items-center justify-between gap-1 sm:gap-4">
               <div className="flex items-center gap-1 sm:gap-4">
                 {/* Play/Pause */}
-                <button onClick={togglePlay} className="hover:text-[#30919D] transition-colors p-1 text-white">
+                <button onClick={togglePlay} className="hover:text-[#1a3884] transition-colors p-1 text-white">
                   {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6 fill-current" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />}
                 </button>
 
                 {/* Volume Control */}
                 <div className="flex items-center gap-1 sm:gap-2 group/volume">
-                  <button onClick={toggleMute} className="hover:text-[#30919D] transition-colors p-1 text-white">
+                  <button onClick={toggleMute} className="hover:text-[#1a3884] transition-colors p-1 text-white">
                     {isMuted || volume === 0 ? <VolumeX className="w-5 h-5 sm:w-6 sm:h-6" /> : <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />}
                   </button>
                   <div className="w-0 group-hover/volume:w-20 overflow-hidden transition-all duration-300 flex items-center h-8">
@@ -540,7 +540,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                       step="0.05"
                       value={isMuted ? 0 : volume}
                       onChange={handleVolumeChange}
-                      className="w-full accent-[#30919D] h-1"
+                      className="w-full accent-[#1a3884] h-1"
                     />
                   </div>
                 </div>
@@ -556,7 +556,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
               <div className="flex items-center gap-2 sm:gap-4">
                 {/* Title / Info - Only shown when wide enough */}
                 <div className="hidden lg:block">
-                  <span className="text-[10px] font-bold uppercase tracking-widest mr-2 text-[#30919D]">Now Playing</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest mr-2 text-[#1a3884]">Now Playing</span>
                   <span className="text-sm font-semibold truncate max-w-[200px] inline-block align-middle text-white">{title}</span>
                 </div>
 
@@ -569,7 +569,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                         setShowSpeedMenu(!showSpeedMenu);
                       }
                     }}
-                    className={`transition-colors p-1 flex items-center gap-1 ${isCompleted ? 'hover:text-[#30919D] cursor-pointer text-white' : 'opacity-40 cursor-not-allowed text-white/60'
+                    className={`transition-colors p-1 flex items-center gap-1 ${isCompleted ? 'hover:text-[#1a3884] cursor-pointer text-white' : 'opacity-40 cursor-not-allowed text-white/60'
                       }`}
                     title={isCompleted ? 'Playback Speed' : '🔒 Complete video to unlock'}
                   >
@@ -612,7 +612,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                         togglePiP();
                       }
                     }}
-                    className={`transition-colors p-1 ${isCompleted ? 'hover:text-[#30919D] cursor-pointer text-white' : 'opacity-40 cursor-not-allowed text-white/60'
+                    className={`transition-colors p-1 ${isCompleted ? 'hover:text-[#1a3884] cursor-pointer text-white' : 'opacity-40 cursor-not-allowed text-white/60'
                       }`}
                     title={isCompleted ? 'Picture-in-Picture' : '🔒 Complete video to unlock'}
                   >
@@ -621,7 +621,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 )}
 
                 {/* Fullscreen */}
-                <button onClick={toggleFullscreen} className="hover:text-[#30919D] transition-colors p-1.5 sm:p-1 text-white">
+                <button onClick={toggleFullscreen} className="hover:text-[#1a3884] transition-colors p-1.5 sm:p-1 text-white">
                   {isFullscreen ? <Minimize className="w-5 h-5 sm:w-6 sm:h-6" /> : <Maximize className="w-5 h-5 sm:w-6 sm:h-6" />}
                 </button>
               </div>
@@ -651,7 +651,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                 recycle={false}
                 numberOfPieces={400}
                 gravity={0.15}
-                colors={['#30919D', '#002147', '#FFD700', '#FFFFFF', '#4ADE80']}
+                colors={['#1a3884', '#002147', '#FFD700', '#FFFFFF', '#4ADE80']}
               />
             </div>
 
@@ -663,7 +663,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
               className="relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 max-w-sm w-full shadow-2xl border border-white/20"
             >
               {/* Glowing Background Effect behind the card */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#30919D]/20 to-[#002147]/20 rounded-2xl blur-xl -z-10" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#1a3884]/20 to-[#002147]/20 rounded-2xl blur-xl -z-10" />
 
               {/* Animated Icon */}
               <div className="w-24 h-24 mx-auto mb-6 relative">
@@ -747,7 +747,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     setShowSuccess(false);
                     if (onNext) onNext();
                   }}
-                  className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#30919D] to-[#287a84] text-white font-bold hover:shadow-lg hover:shadow-[#30919D]/40 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
+                  className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#287a84] text-white font-bold hover:shadow-lg hover:shadow-[#1a3884]/40 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
                 >
                   Next Lesson
                   <Play className="w-4 h-4 fill-current" />
@@ -762,3 +762,4 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
 });
 
 export default CustomVideoPlayer;
+
