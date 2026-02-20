@@ -34,7 +34,6 @@ export const loadNSFWModel = async () => {
   nsfwModelPromise = (async () => {
     try {
       nsfwModel = await nsfwjs.load();
-      console.log('✅ NSFW.js model loaded');
       return nsfwModel;
     } catch (error) {
       console.error('Failed to load NSFW.js model:', error);
@@ -93,7 +92,6 @@ export const loadCocoModel = async () => {
   cocoModelPromise = (async () => {
     try {
       cocoModel = await cocoSsd.load();
-      console.log('✅ COCO-SSD model loaded');
       return cocoModel;
     } catch (error) {
       console.error('Failed to load COCO-SSD model:', error);
@@ -172,20 +170,14 @@ const checkImageText = async (imageSource) => {
   try {
     const extractedText = await extractTextFromImage(imageSource);
     
-    console.log('[Image OCR] Extracted text:', extractedText);
-    
     if (!extractedText || extractedText.trim().length === 0) {
-      console.log('[Image OCR] No text found in image');
       return { flagged: false, extractedText: '' };
     }
 
     // Use existing text moderation with exactMatch=false for OCR (catches substrings)
     const moderationResult = moderateText(extractedText, false);
     
-    console.log('[Image OCR] Moderation result:', moderationResult);
-    
     if (!moderationResult.isClean) {
-      console.log('[Image OCR] FLAGGED! Words:', moderationResult.flaggedWords);
       return {
         flagged: true,
         reason: `Image contains inappropriate text: "${moderationResult.flaggedWords.join(', ')}"`,

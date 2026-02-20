@@ -138,7 +138,7 @@ const EditorDrawer = ({
             <div className="space-y-4">
                 <div 
                     className="border-2 border-dashed border-slate-300 dark:border-white/20 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
-           
+                    onClick={() => document.getElementById('upload-input')?.click()}
                 >
                     <input 
                         id="upload-input"
@@ -163,6 +163,7 @@ const EditorDrawer = ({
                                     key={i} 
                                     className="aspect-square bg-slate-100 dark:bg-white/5 rounded-lg overflow-hidden cursor-move relative group"
                                     onDragStart={(e) => {
+                                        e.dataTransfer.setData("text/uri-list", img);
                                         e.dataTransfer.setData("image/url", img);
                                     }}
                                     draggable

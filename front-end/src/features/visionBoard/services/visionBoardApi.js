@@ -43,6 +43,7 @@ export const createVisionBoard = async (data) => {
   const response = await fetch(`${API_BASE_URL}/vision-board`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ ...data, userId }),
   });
 
@@ -60,7 +61,9 @@ export const getAllVisionBoards = async () => {
   const userId = getUserId();
   if (!userId) throw new Error("User not authenticated");
 
-  const response = await fetch(`${API_BASE_URL}/vision-board?userId=${userId}`);
+  const response = await fetch(`${API_BASE_URL}/vision-board?userId=${userId}`, {
+    credentials: "include",
+  });
   const result = await response.json();
 
   if (!result.success) {
@@ -73,7 +76,9 @@ export const getAllVisionBoards = async () => {
  * Get a single vision board by ID
  */
 export const getVisionBoard = async (id) => {
-  const response = await fetch(`${API_BASE_URL}/vision-board/${id}`);
+  const response = await fetch(`${API_BASE_URL}/vision-board/${id}`, {
+    credentials: "include",
+  });
   const result = await response.json();
 
   if (!result.success) {
@@ -89,6 +94,7 @@ export const updateVisionBoard = async (id, data) => {
   const response = await fetch(`${API_BASE_URL}/vision-board/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
@@ -105,6 +111,7 @@ export const updateVisionBoard = async (id, data) => {
 export const deleteVisionBoard = async (id) => {
   const response = await fetch(`${API_BASE_URL}/vision-board/${id}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
   const result = await response.json();
@@ -120,6 +127,7 @@ export const deleteVisionBoard = async (id) => {
 export const duplicateVisionBoard = async (id) => {
   const response = await fetch(`${API_BASE_URL}/vision-board/${id}/duplicate`, {
     method: "POST",
+    credentials: "include",
   });
 
   const result = await response.json();

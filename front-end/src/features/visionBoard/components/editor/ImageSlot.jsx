@@ -24,6 +24,7 @@ const ImageSlot = ({
   const [initialScale, setInitialScale] = useState(1);
 
   // Gap in percentage based on canvas width
+  // Convert pixel gap to approximate percentage offset (canvas base ~600px, so gap/6 ≈ gap as %)
   const gapPercent = gap / 6; // Convert gap pixels to percentage
 
   const handleFileSelect = (e) => {
@@ -41,6 +42,8 @@ const ImageSlot = ({
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // First check for files dragged from the OS
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
@@ -48,6 +51,13 @@ const ImageSlot = ({
         onImageUpload(slot.id, event.target.result);
       };
       reader.readAsDataURL(file);
+      return;
+    }
+
+    // Then check for base64/URL data dragged from the Uploads panel
+    const imageUrl = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("image/url");
+    if (imageUrl) {
+      onImageUpload(slot.id, imageUrl);
     }
   };
 
