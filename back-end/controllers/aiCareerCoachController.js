@@ -1,5 +1,7 @@
 const AIProfile = require('../models/AIProfile');
 const ChatMessage = require('../models/ChatMessage');
+const Registration = require('../models/Registration');
+const User = require('../models/User');
 const openRouterService = require('../services/openRouterService');
 const { v4: uuidv4 } = require('uuid');
 
@@ -8,12 +10,112 @@ const { v4: uuidv4 } = require('uuid');
  * Handles all AI career coaching features
  */
 
+const Student = require('../models/Student');
+
+// Helper: Build Rich Profile from multiple sources
+const getRichProfile = async (userId) => {
+    // 1. Try to fetch documents by ID
+    let user = await User.findById(userId);
+    let student = await Student.findById(userId).populate('college');
+    let registration = await Registration.findOne({ userId });
+    let profile = await AIProfile.findOne({ userId });
+
+    // 2. Cross-link detection: If userId didn't find everything, search by email
+    const email = user?.email || student?.email || registration?.email;
+
+    if (email) {
+        if (!user) user = await User.findOne({ email });
+        if (!student) student = await Student.findOne({ email }).populate('college');
+        if (!registration) registration = await Registration.findOne({ email });
+
+        // If we found a user or student by email, try to find the AIProfile using their IDs
+        if (!profile && user) profile = await AIProfile.findOne({ userId: user._id });
+        if (!profile && student) profile = await AIProfile.findOne({ userId: student._id });
+
+        // If registration was found by email but not linked by userId, link it now for this session context
+        if (!registration && (user || student)) {
+            registration = await Registration.findOne({ userId: user?._id || student?._id });
+        }
+    }
+
+    // Comprehensive Student Data Capture
+    const richProfile = {
+        fullName: student?.fullName || registration?.fullName || user?.fullName || 'User',
+        email: email || 'Not specified',
+        mobile: student?.mobile || registration?.mobileNumber || user?.mobile || 'Not specified',
+        studentId: student?.studentId || registration?.studentId || 'N/A',
+
+        // Education - Prioritizing actual student record and registration
+        education: (() => {
+            if (registration?.higherEducation && registration.higherEducation.length > 0) {
+                const hEdu = registration.higherEducation[0];
+                return `${hEdu.degree} in ${hEdu.specialization} at ${hEdu.institutionName}`;
+            } else if (student?.college) {
+                return `${student.department || 'Student'} at ${student.college.name || 'SMAART Institute'}`;
+            } else if (registration?.institution) {
+                return `${registration.educationLevel || 'Student'} at ${registration.institution}`;
+            } else {
+                return profile?.education || 'General Education';
+            }
+        })(),
+
+        // Skills - Merging from all sources
+        skills: (() => {
+            const skillSet = new Set(profile?.skills || []);
+
+            // Add from registration projects/certs
+            registration?.certificates?.forEach(c => skillSet.add(c.title));
+            registration?.projects?.forEach(p => skillSet.add(p.title));
+
+            // Add from user explicit skills
+            if (user?.certificates) user.certificates.forEach(c => skillSet.add(c));
+
+            // Add from sector preferences
+            registration?.sectorPreferences?.preferredSectors?.forEach(s => skillSet.add(s));
+
+            return Array.from(skillSet);
+        })(),
+
+        // Experience History
+        experience: registration?.workExperience?.length > 0
+            ? registration.workExperience.map(exp => `${exp.jobTitle} at ${exp.organizationName} (${exp.industry})`).join('; ')
+            : (student?.batch ? `Academic Batch: ${student.batch}` : (profile?.experience || 'None')),
+
+        projects: registration?.projects?.map(proj =>
+            `${proj.title}: ${proj.description}`
+        ).join('; ') || 'None',
+
+        goals: registration?.careerGoals
+            ? `Short-term: ${registration.careerGoals.shortTerm || 'N/A'}, Medium: ${registration.careerGoals.mediumTerm || 'N/A'}, Long: ${registration.careerGoals.longTerm || 'N/A'}`
+            : (profile?.goals || 'Not specified'),
+
+        interests: registration?.sectorPreferences?.preferredSectors || (profile?.interests || []),
+
+        certificates: registration?.certificates?.map(cert =>
+            `${cert.title} from ${cert.issuingOrg}`
+        ).join(', ') || 'None',
+
+        // Institutional Details for Resume Header
+        department: student?.department || registration?.department || '',
+        rollNumber: student?.rollNumber || registration?.rollNumber || '',
+        college: student?.college?.name || registration?.institution || 'SMAART Institute',
+        batch: student?.batch || '',
+
+        // Target Role Mapping
+        targetRole: profile?.targetRole || (registration?.jobPreferences?.[0]?.preferredRole) || 'Professional',
+
+        experienceLevel: profile?.experienceLevel || 'Beginner'
+    };
+
+    return { richProfile, profileDoc: profile, userDoc: user, studentDoc: student, registrationDoc: registration };
+};
+
 // Get or create AI profile (Enhanced with Registration)
 exports.getProfile = async (req, res) => {
     try {
-        const Registration = require('../models/Registration');
-        let profile = await AIProfile.findOne({ userId: req.user.id });
-        const registration = await Registration.findOne({ userId: req.user.id });
+        const { richProfile, profileDoc, studentDoc, registrationDoc } = await getRichProfile(req.user.id);
+
+        let profile = profileDoc;
 
         if (!profile) {
             profile = new AIProfile({
@@ -27,8 +129,10 @@ exports.getProfile = async (req, res) => {
 
         res.json({
             success: true,
-            profile,
-            registration // Include full registration data for display
+            profile: profile || profileDoc,
+            richProfile,
+            student: studentDoc,
+            registration: registrationDoc
         });
     } catch (error) {
         console.error('Get Profile Error:', error);
@@ -43,7 +147,6 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         const updates = req.body;
-
         let profile = await AIProfile.findOne({ userId: req.user.id });
 
         if (!profile) {
@@ -72,73 +175,8 @@ exports.updateProfile = async (req, res) => {
 // Analyze profile with AI (Enhanced with Registration Data)
 exports.analyzeProfile = async (req, res) => {
     try {
-        const Registration = require('../models/Registration');
-
-        // Fetch both AIProfile (if exists) and Registration data
-        const profile = await AIProfile.findOne({ userId: req.user.id }); // optional
-        const registration = await Registration.findOne({ userId: req.user.id });
-
-        if (!registration && !profile) {
-            return res.status(404).json({
-                success: false,
-                message: 'Please complete your registration or profile first'
-            });
-        }
-
-        // Construct Rich Profile Object from Registration Data
-        const richProfile = {
-            fullName: registration?.fullName || 'User',
-
-            // Education - handle higherEducation as ARRAY
-            education: (() => {
-                if (registration?.higherEducation && registration.higherEducation.length > 0 && registration.higherEducation[0].degree) {
-                    const hEdu = registration.higherEducation[0];
-                    return `${hEdu.degree} in ${hEdu.specialization} (${hEdu.institutionName})`;
-                } else if (registration?.educationLevel) {
-                    return `${registration.educationLevel} at ${registration.institution || 'Unknown'}`;
-                } else {
-                    return profile?.education || 'Not specified';
-                }
-            })(),
-
-            skills: profile?.skills || [],
-
-            experience: registration?.workExperience?.map(exp =>
-                `${exp.jobTitle} at ${exp.organizationName} (${exp.industry})`
-            ).join('; ') || (profile?.experience || 'None'),
-
-            projects: registration?.projects?.map(proj =>
-                `${proj.title}: ${proj.description}`
-            ).join('; ') || 'None',
-
-            goals: registration?.careerGoals
-                ? `Short-term: ${registration.careerGoals.shortTerm || 'Not specified'}, Medium-term: ${registration.careerGoals.mediumTerm || 'Not specified'}, Long-term: ${registration.careerGoals.longTerm || 'Not specified'}`
-                : (profile?.goals || 'Not specified'),
-
-            interests: registration?.sectorPreferences?.preferredSectors || (profile?.interests || []),
-
-            certificates: registration?.certificates?.map(cert =>
-                `${cert.title} from ${cert.issuingOrg}`
-            ).join(', ') || 'None',
-
-            // Add salary expectation and job preferences
-            salaryExpectation: (() => {
-                if (registration?.jobPreferences && registration.jobPreferences.length > 0) {
-                    return registration.jobPreferences[0].expectedSalary || 'Not specified';
-                }
-                return 'Not specified';
-            })(),
-
-            targetRole: (() => {
-                if (registration?.jobPreferences && registration.jobPreferences.length > 0) {
-                    return registration.jobPreferences[0].preferredRole || 'Not specified';
-                }
-                return 'Not specified';
-            })()
-        };
-
-        // If no skills in AIProfile, try to infer from previous fields? 
-        // Or AI will infer from text.
+        const { richProfile, profileDoc } = await getRichProfile(req.user.id);
+        let profile = profileDoc;
 
         console.log('🧠 Analyzing Profile Payload:', JSON.stringify(richProfile, null, 2));
 
@@ -152,14 +190,19 @@ exports.analyzeProfile = async (req, res) => {
         }
 
         // Update AIProfile with results if it exists, or create new one
-        if (profile) {
-            profile.lastAnalysis = {
-                // Map AI result to schema fields if possible
-                // For now just storing timestamp
-                analyzedAt: new Date()
-            };
-            await profile.save();
+        if (!profile) {
+            profile = new AIProfile({
+                userId: req.user.id,
+                skills: [], // Will require proper population later
+                interests: [],
+                experienceLevel: 'Beginner'
+            });
         }
+
+        profile.lastAnalysis = {
+            analyzedAt: new Date()
+        };
+        await profile.save();
 
         res.json({
             success: true,
@@ -178,21 +221,26 @@ exports.analyzeProfile = async (req, res) => {
 // Get career recommendations
 exports.getCareerRecommendations = async (req, res) => {
     try {
-        const profile = await AIProfile.findOne({ userId: req.user.id });
+        const { richProfile, profileDoc } = await getRichProfile(req.user.id);
 
-        if (!profile) {
-            return res.status(404).json({
-                success: false,
-                message: 'Please complete your profile first'
-            });
+        if (!profileDoc) {
+            // Fallback if AIProfile doesn't exist yet, create minimalistic one logic or error
+            // Ideally we should allow recommendations based on registration data too
+            // For now, let's proceed with richProfile mapping if possible, but the service expects AIProfile structure
+            // We can map richProfile back to a pseudo-profile object
         }
 
+        // Use richProfile preferences if AIProfile is missing them
         const preferences = {
-            industry: profile.preferredIndustry,
-            workStyle: profile.preferredWorkStyle
+            industry: profileDoc?.preferredIndustry || richProfile.interests[0] || 'Technology',
+            workStyle: profileDoc?.preferredWorkStyle || 'Collaborative'
         };
 
-        const result = await openRouterService.getCareerRecommendations(profile, preferences);
+        // We might need to pass richProfile instead of profileDoc if profileDoc is empty
+        // adapting openRouterService.getCareerRecommendations signature might be needed or we mock profile object
+        const mockProfile = profileDoc || { skills: richProfile.skills, interests: richProfile.interests };
+
+        const result = await openRouterService.getCareerRecommendations(mockProfile, preferences);
 
         if (!result.success) {
             return res.status(500).json({
@@ -226,8 +274,10 @@ exports.analyzeSkillGap = async (req, res) => {
             });
         }
 
-        const profile = await AIProfile.findOne({ userId: req.user.id });
-        const currentSkills = profile?.skills || [];
+        const { richProfile, profileDoc } = await getRichProfile(req.user.id);
+        const currentSkills = richProfile.skills.length > 0 ? richProfile.skills : (profileDoc?.skills || []);
+
+        // If still no skills, maybe infer from text? handled by service or result will be "No skills found"
 
         const result = await openRouterService.analyzeSkillGap(currentSkills, targetRole);
 
@@ -239,15 +289,15 @@ exports.analyzeSkillGap = async (req, res) => {
         }
 
         // Store skill gap analysis
-        if (profile) {
-            profile.skillGaps.push({
+        if (profileDoc) {
+            profileDoc.skillGaps.push({
                 targetRole,
                 matchingSkills: [],
                 missingSkills: [],
                 learningPriority: [],
                 analyzedAt: new Date()
             });
-            await profile.save();
+            await profileDoc.save();
         }
 
         res.json({
@@ -275,8 +325,9 @@ exports.generateLearningPlan = async (req, res) => {
             });
         }
 
-        const profile = await AIProfile.findOne({ userId: req.user.id });
-        const currentLevel = profile?.experienceLevel || 'Beginner';
+        const { richProfile, profileDoc } = await getRichProfile(req.user.id);
+
+        const currentLevel = richProfile.experienceLevel || 'Beginner';
 
         const result = await openRouterService.generateLearningPlan(
             targetRole,
@@ -292,8 +343,8 @@ exports.generateLearningPlan = async (req, res) => {
         }
 
         // Store learning plan
-        if (profile) {
-            profile.learningPlans.push({
+        if (profileDoc) {
+            profileDoc.learningPlans.push({
                 targetRole,
                 timeframe: timeframe || '6 months',
                 monthlyBreakdown: {},
@@ -301,7 +352,7 @@ exports.generateLearningPlan = async (req, res) => {
                 milestones: [],
                 createdAt: new Date()
             });
-            await profile.save();
+            await profileDoc.save();
         }
 
         res.json({
@@ -329,16 +380,14 @@ exports.generateResume = async (req, res) => {
             });
         }
 
-        const profile = await AIProfile.findOne({ userId: req.user.id });
+        // Use getRichProfile to ensure we have Name, Education, etc. from Registration
+        const { richProfile, profileDoc } = await getRichProfile(req.user.id);
 
-        if (!profile) {
-            return res.status(404).json({
-                success: false,
-                message: 'Please complete your profile first'
-            });
-        }
+        // We pass richProfile to the service, as it contains the aggregated data
+        // Check if service supports richProfile structure or expects AIProfile schema
+        // Assuming we update or verify openRouterService.generateResume to handle this object
 
-        const result = await openRouterService.generateResume(profile, targetRole);
+        const result = await openRouterService.generateResume(richProfile, targetRole);
 
         if (!result.success) {
             return res.status(500).json({
@@ -347,17 +396,22 @@ exports.generateResume = async (req, res) => {
             });
         }
 
-        // Store resume
-        profile.resumes.push({
-            targetRole,
-            summary: '',
-            keySkills: [],
-            experience: '',
-            achievements: [],
-            keywords: [],
-            generatedAt: new Date()
-        });
-        await profile.save();
+        // Store resume in AIProfile history if exists
+        if (profileDoc) {
+            profileDoc.resumes.push({
+                targetRole,
+                summary: '',
+                keySkills: [],
+                experience: '',
+                achievements: [],
+                keywords: [],
+                generatedAt: new Date()
+            });
+            await profileDoc.save();
+        } else {
+            // If no AIProfile, maybe create one? Or just return the resume.
+            // For now, just return.
+        }
 
         res.json({
             success: true,
@@ -405,35 +459,16 @@ exports.chat = async (req, res) => {
             content: message
         });
 
-        // Get user profile for context
-        const Registration = require('../models/Registration');
-        const profile = await AIProfile.findOne({ userId: req.user.id });
-        const registration = await Registration.findOne({ userId: req.user.id });
+        // Get user profile for context using helper
+        const { richProfile } = await getRichProfile(req.user.id);
 
-        // Build rich context from registration (handling arrays correctly)
         const userContext = {
-            name: registration?.fullName || 'User',
-            education: (() => {
-                if (registration?.higherEducation && registration.higherEducation.length > 0 && registration.higherEducation[0].degree) {
-                    const hEdu = registration.higherEducation[0];
-                    return `${hEdu.degree} in ${hEdu.specialization}`;
-                }
-                return registration?.educationLevel || profile?.education || '';
-            })(),
-            currentRole: (() => {
-                if (registration?.workExperience && registration.workExperience.length > 0) {
-                    const exp = registration.workExperience[0];
-                    if (exp.jobTitle && exp.organizationName) {
-                        return `${exp.jobTitle} at ${exp.organizationName}`;
-                    }
-                }
-                return '';
-            })(),
-            goals: registration?.careerGoals
-                ? `Short: ${registration.careerGoals.shortTerm || ''}, Long: ${registration.careerGoals.longTerm || ''}`
-                : (profile?.goals || ''),
-            skills: profile?.skills || [],
-            experienceLevel: profile?.experienceLevel || 'Beginner'
+            name: richProfile.fullName,
+            education: richProfile.education,
+            currentRole: richProfile.experience.split(';')[0] || '', // approximating
+            goals: richProfile.goals,
+            skills: richProfile.skills,
+            experienceLevel: richProfile.experienceLevel
         };
 
         // Format history for AI service

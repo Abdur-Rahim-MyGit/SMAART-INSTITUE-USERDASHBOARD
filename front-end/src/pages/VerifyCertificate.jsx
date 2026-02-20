@@ -89,10 +89,10 @@ const VerifyCertificate = () => {
             }
         } catch (err) {
             console.error('Verification error:', err);
-            if (err.response?.status === 404) {
+            if (err.status === 404) {
                 setError('Certificate not found. Please check the ID and try again.');
             } else {
-                setError(err.response?.data?.message || 'Authentication failed. Please try again.');
+                setError(err.data?.message || err.message || 'Authentication failed. Please try again.');
             }
         } finally {
             setIsVerifying(false);
@@ -313,8 +313,8 @@ const VerifyCertificate = () => {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     className={`relative rounded-3xl overflow-hidden border shadow-2xl transition-all duration-500 ${verificationResult.verified
-                                            ? 'bg-white dark:bg-[#001835]/90 border-[#daa520]/30 shadow-[#daa520]/10'
-                                            : 'bg-white dark:bg-[#001835]/90 border-yellow-500/30'
+                                        ? 'bg-white dark:bg-[#001835]/90 border-[#daa520]/30 shadow-[#daa520]/10'
+                                        : 'bg-white dark:bg-[#001835]/90 border-yellow-500/30'
                                         }`}
                                 >
                                     {/* Ornamental Header */}

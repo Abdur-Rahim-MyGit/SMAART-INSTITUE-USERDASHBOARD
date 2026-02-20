@@ -22,10 +22,10 @@ import {
   Brain
 } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
-import PageTransition from "@/components/PageTransition";
+import DashboardHeader from "@/components/DashboardHeader";
+import { apiCall } from "@/services/api";
+import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const DOMAINS = [
   { id: "academic", label: "Academic", icon: BookOpen, description: "Get help with studies, assignments, and learning strategies" },
@@ -43,6 +43,7 @@ const STATUS_COLORS = {
 };
 
 const MindCareSessions = () => {
+  const { user } = useUser();
   const [activeTab, setActiveTab] = useState("sessions"); // sessions | request
   const [sessions, setSessions] = useState([]);
   const [coaches, setCoaches] = useState([]);
@@ -67,23 +68,17 @@ const MindCareSessions = () => {
     { id: "request", label: "Request Session", icon: Plus }
   ];
 
-  // Get user from sessionStorage
-  const getUser = () => {
-    const userData = sessionStorage.getItem("user");
-    return userData ? JSON.parse(userData) : null;
-  };
+
 
   // Fetch user's sessions
   const fetchMySessions = async () => {
+    if (!user?._id && !user?.id) return;
     setIsLoading(true);
     try {
-      const user = getUser();
-      if (!user?.id) return;
-
-      const response = await fetch(`${API_BASE_URL}/coach-sessions?student=${user.id}`);
-      const data = await response.json();
-      if (data.success) {
-        setSessions(data.data || []);
+      const studentId = user._id || user.id;
+      const response = await apiCall(`/coachSessions?student=${studentId}`);
+      if (response.success) {
+        setSessions(response.data || []);
       }
     } catch (error) {
       console.error("Error fetching sessions:", error);
@@ -96,32 +91,24 @@ const MindCareSessions = () => {
   // Fetch available coaches with Fallback
   const fetchCoaches = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/coaches?status=active`);
-      // If API fails or returns 404, we catch error below.
-      // If it returns 200 but empty data, we check data.data length.
-
-      const data = await response.json();
-      if (data.success && data.data && data.data.length > 0) {
-        setCoaches(data.data);
+      const response = await apiCall(`/coaches?status=active`);
+      if (response.success && response.data && response.data.length > 0) {
+        setCoaches(response.data);
       } else {
-        throw new Error("No coaches found");
+        setCoaches(MOCK_COACHES);
       }
     } catch (error) {
-      console.warn("Using mock coaches data due to API error:", error);
-      // Fallback Mock Data
-      setCoaches([
-        { _id: "1", name: "Dr. Sarah Johnson", specialization: "Stress Management" },
-        { _id: "2", name: "Rajesh Kumar", specialization: "Career Counseling" },
-        { _id: "3", name: "Emily Chen", specialization: "Mindfulness Coach" },
-        { _id: "4", name: "Dr. A. Patel", specialization: "Academic Performance" }
-      ]);
+      console.error("Error fetching coaches, using mock data:", error);
+      setCoaches(MOCK_COACHES);
     }
   };
 
   useEffect(() => {
-    fetchMySessions();
-    fetchCoaches();
-  }, []);
+    if (user) {
+      fetchMySessions();
+      fetchCoaches();
+    }
+  }, [user]);
 
   // Submit session request
   const handleSubmitRequest = async (e) => {
@@ -138,44 +125,40 @@ const MindCareSessions = () => {
 
     setIsSubmitting(true);
     try {
-      const user = getUser();
-      if (!user?.id) {
+      const studentId = user?._id || user?.id;
+      if (!studentId) {
         toast.error("Please login to request a session");
         return;
       }
 
       const requestData = {
-        student: user.id,
+        student: studentId,
         domain: selectedDomain,
         notes: issueDescription,
         coach: selectedCoach || undefined,
-        college: "000000000000000000000000", // Placeholder - should come from user's college
-        scheduledDate: preferredDate && preferredTime ? new Date(`${preferredDate}T${preferredTime}`) : undefined
+        college: user?.college?._id || user?.college || "000000000000000000000000",
+        scheduledDate: preferredDate && preferredTime ? new Date(`${preferredDate}T${preferredTime}`) : undefined,
+        status: "requested"
       };
 
-      const response = await fetch(`${API_BASE_URL}/coach-sessions`, {
+      const response = await apiCall(`/coachSessions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData)
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success("Session request submitted successfully!");
+      if (response.success) {
+        toast.success("Care session requested successfully!");
+        setIssueDescription("");
         setSelectedDomain(null);
         setSelectedCoach("");
-        setIssueDescription("");
         setPreferredDate("");
         setPreferredTime("");
         setActiveTab("sessions");
         fetchMySessions();
-      } else {
-        toast.error(data.error || "Failed to submit request");
       }
     } catch (error) {
       console.error("Error submitting request:", error);
-      toast.error("Failed to submit request");
+      toast.error(error.message || "Failed to submit request");
     } finally {
       setIsSubmitting(false);
     }
@@ -189,7 +172,7 @@ const MindCareSessions = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/coach-sessions/${selectedSession._id}`, {
+      const response = await fetch(`${API_BASE_URL}/coachSessions/${selectedSession._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
