@@ -78,7 +78,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeac
           <img
             src={board.collageImage}
             alt={board.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-contain bg-slate-200 dark:bg-slate-950 transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
@@ -253,7 +253,7 @@ const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
             </Button>
             <Button
               variant="destructive"
-              className="flex-1 bg-red-600 hover:bg-red-700 text-[#002147]"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
               onClick={onConfirm}
               disabled={isDeleting}
             >
@@ -388,7 +388,7 @@ const ViewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange }) 
             {isCurrentVision ? (
               <Button
                 onClick={handleDisableVision}
-                className="bg-red-600 hover:bg-red-700 text-[#002147] font-semibold"
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold"
               >
                 <EyeOff className="w-4 h-4 mr-2" />
                 Disable Vision
@@ -396,7 +396,7 @@ const ViewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange }) 
             ) : (
               <Button
                 onClick={handleSetAsVision}
-                className="bg-[#1a3884] hover:bg-[#132c6b] text-[#002147] font-semibold shadow-[0_0_15px_rgba(26,56,132,0.4)]"
+                className="bg-[#1a3884] hover:bg-[#132c6b] text-white font-semibold shadow-[0_0_15px_rgba(26,56,132,0.4)]"
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Enable as Vision
@@ -482,16 +482,9 @@ const VisionBoardGalleryPro = () => {
     try {
       setIsLoading(true);
 
-      // Log user info for debugging
-      const user = JSON.parse(
-        sessionStorage.getItem("user") || "{}"
-      );
-      console.log('[VisionBoard] Loading boards for user:', { id: user._id || user.id, email: user.email, fullName: user.fullName });
-
       // API will fetch correct user ID by email if missing from session
 
       const result = await getAllVisionBoards();
-      console.log('[VisionBoard] Loaded boards:', result.data?.length || 0, 'boards');
       setBoards(result.data || []);
       setMaxAllowed(result.maxAllowed || 3);
       setCanCreateMore(result.canCreateMore !== false);
@@ -516,17 +509,14 @@ const VisionBoardGalleryPro = () => {
   };
 
   const handleInstantCheck = (text, fieldName) => {
-    // Use aggressive substring matching for rapid real-time feedback
-    const result = moderateText(text, false);
+    // Use exact word-boundary matching to avoid false positives
+    const result = moderateText(text, true);
     if (!result.isClean) {
       toast({
         title: "Inappropriate Content",
-        description: `Your ${fieldName} contains inappropriate language. Actions have been blocked for safety.`,
+        description: `Your ${fieldName} contains inappropriate language. Please revise it.`,
         variant: "destructive",
       });
-      setShowCreateModal(false);
-      setNewTitle("");
-      setNewDescription("");
       return true;
     }
     return false;

@@ -1,3 +1,8 @@
+/**
+ * @deprecated This component is NOT currently rendered anywhere.
+ * Image selection controls are handled inline within ImageSlot.jsx.
+ * Kept for potential future use — do not import without integrating into the editor layout.
+ */
 import React from "react";
 import { ZoomIn, ZoomOut, RotateCw, Trash2, RefreshCw } from "lucide-react";
 

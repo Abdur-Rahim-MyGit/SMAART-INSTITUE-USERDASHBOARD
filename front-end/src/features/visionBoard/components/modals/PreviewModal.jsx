@@ -16,7 +16,11 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
 
   useEffect(() => {
     if (isOpen && canvasRef.current) {
+      setPreviewImage(null); // Clear stale preview before generating new one
       generatePreview();
+    }
+    if (!isOpen) {
+      setPreviewImage(null); // Free memory when modal is closed
     }
   }, [isOpen]);
 

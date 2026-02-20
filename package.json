@@ -1,5 +1,8 @@
 {
   "dependencies": {
     "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "md-to-pdf": "^5.2.5"
   }
 }

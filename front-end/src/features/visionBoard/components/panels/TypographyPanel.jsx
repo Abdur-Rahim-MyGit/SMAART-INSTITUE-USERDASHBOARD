@@ -31,12 +31,6 @@ const TypographyPanel = ({
 
   return (
     <div className="space-y-4">
-      {/* Google Fonts Link - Typically this should be in index.html or proper head management, but keeping here as requested */}
-      <link
-        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Pacifico&family=Great+Vibes&family=Montserrat:wght@200;400;700;900&family=Oswald:wght@400;700&family=Anton&family=Bebas+Neue&family=Raleway:wght@200;400&family=Quicksand:wght@300;400;500&family=Poppins:wght@300;400;500;600&family=Inter:wght@300;400;500&family=Permanent+Marker&family=Indie+Flower&family=Amatic+SC:wght@400;700&family=Special+Elite&family=Lobster&family=Righteous&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poiret+One&family=Sacramento&family=Satisfy&display=swap"
-        rel="stylesheet"
-      />
-
       {/* Add Text Button */}
       <button
         onClick={() =>
