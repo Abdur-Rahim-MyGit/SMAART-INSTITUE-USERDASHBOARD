@@ -209,13 +209,13 @@ const ModuleView = ({ courseId, onBack }) => {
       title: `Module ${i + 1}`,
       description: `Module ${i + 1} description`,
       duration: `${5 + i} hours`,
-      days: Array.from({ length: 7 }, (_, j) => ({
+      days: Array.from({ length: 3 }, (_, j) => ({
         id: j + 1,
         dayNumber: j + 1,
         title: `Day ${j + 1}`,
         description: `Topic for Day ${j + 1}`,
         duration: "45 minutes",
-        dayType: j < 6 ? 'course' : 'catchup',
+        dayType: 'course',
         tasks: Array.from({ length: 5 }, (_, k) => ({
           id: k + 1,
           title: `Task ${k + 1}`,

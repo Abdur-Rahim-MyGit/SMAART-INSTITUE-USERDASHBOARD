@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -9,6 +9,9 @@ import whiteLogo from "@/assets/white.png";
 
 const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navItems = ["Services", "How It Works", "Testimonials", "FAQ", "Verify Certificate", "Contact"];
@@ -22,12 +25,25 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    // Convert "How It Works" to "how-it-works" format
-    const id = sectionId.toLowerCase().replace(/\s+/g, '-');
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+  const handleNavItemClick = (item) => {
+    const sectionId = item.toLowerCase().replace(/\s+/g, '-');
+    
+    // Special case for Verify Certificate - direct route exists
+    if (item === "Verify Certificate") {
+      navigate("/verify-certificate");
+      setMobileMenuOpen(false);
+      return;
+    }
+
+    if (location.pathname === "/") {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        setMobileMenuOpen(false);
+      }
+    } else {
+      // Navigate to landing page with anchor
+      navigate(`/#${sectionId}`);
       setMobileMenuOpen(false);
     }
   };
@@ -58,7 +74,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
               {navItems.map((item) => (
                 <button
                   key={item}
-                  onClick={() => scrollToSection(item)}
+                  onClick={() => handleNavItemClick(item)}
                   className={`text-sm font-semibold transition-all duration-300 relative group ${scrolled ? 'text-[#1a3884] dark:text-gray-300 hover:text-[#daa520] dark:hover:text-[#daa520]' : 'text-[#1a3884] dark:text-gray-200 hover:text-[#daa520] dark:hover:text-[#daa520]'}`}
                 >
                   {item}
@@ -80,13 +96,13 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 </button>
 
                 <button
-                  onClick={onLoginClick}
+                  onClick={() => onLoginClick ? onLoginClick() : navigate('/?modal=true')}
                   className={`text-sm font-semibold transition-colors px-4 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 ${scrolled ? 'text-[#1a3884] dark:text-white' : 'text-[#1a3884] dark:text-white'}`}
                 >
                   Log in
                 </button>
                 <button
-                  onClick={onSignupClick}
+                  onClick={() => onSignupClick ? onSignupClick() : navigate('/?modal=true')}
                   className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#267d87] hover:from-[#132c6b] hover:to-[#1e6169] text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 border border-[#daa520]/30"
                 >
                   Get Started
@@ -119,7 +135,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
             {navItems.map((item) => (
               <button
                 key={item}
-                onClick={() => scrollToSection(item)}
+                onClick={() => handleNavItemClick(item)}
                 className="text-left text-gray-600 dark:text-gray-300 hover:text-[#daa520] dark:hover:text-[#daa520] font-medium py-2 border-b border-gray-50 dark:border-white/5"
               >
                 {item}
@@ -127,13 +143,13 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
             ))}
             <div className="pt-4 flex flex-col gap-3">
               <button
-                onClick={onLoginClick}
+                onClick={() => onLoginClick ? onLoginClick() : navigate('/?modal=true')}
                 className="w-full py-3 text-center text-[#1a3884] dark:text-white font-semibold border border-gray-200 dark:border-white/10 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
               >
                 Log in
               </button>
               <button
-                onClick={onSignupClick}
+                onClick={() => onSignupClick ? onSignupClick() : navigate('/?modal=true')}
                 className="w-full py-3 text-center bg-[#1a3884] text-white font-bold rounded-xl hover:bg-[#132c6b] transition-colors shadow-lg shadow-[#1a3884]/20"
               >
                 Get Started

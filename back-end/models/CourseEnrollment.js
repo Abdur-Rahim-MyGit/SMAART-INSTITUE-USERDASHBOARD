@@ -155,8 +155,8 @@ courseEnrollmentSchema.pre('save', async function (next) {
         let completedDaysCount = 0;
 
         course.modules.forEach(mod => {
-          // Denominator floor is 6 sessions per module (per UI framework)
-          const modExpected = Math.max(6, mod.days ? mod.days.length : 0);
+          // Use actual day count as denominator
+          const modExpected = mod.days ? mod.days.length : 0;
           totalExpectedDays += modExpected;
 
           // Find matching moduleProgress
@@ -199,28 +199,41 @@ courseEnrollmentSchema.pre('save', async function (next) {
         this.progress = totalExpectedDays > 0
           ? Math.min(100, Math.round((completedDaysCount / totalExpectedDays) * 100))
           : 0;
+
+        // --- NEW: Detect "any activity" to mark as in_progress immediately ---
+        let hasAnyActivity = false;
+        if (this.moduleProgress && this.moduleProgress.length > 0) {
+          hasAnyActivity = this.moduleProgress.some(m => {
+            const hasVideoActivity = m.videoProgress && m.videoProgress.some(vp => vp.maxWatchedTime > 0);
+            const hasTaskActivity = m.completedTasks && m.completedTasks.length > 0;
+            const hasQuizActivity = m.quizzesTaken && m.quizzesTaken.length > 0;
+            const hasReflectionActivity = m.reflectionsSubmitted && m.reflectionsSubmitted.length > 0;
+            return hasVideoActivity || hasTaskActivity || hasQuizActivity || hasReflectionActivity;
+          });
+        }
+
+        // Update status based on progress and activity
+        if (this.progress === 100) {
+          this.status = 'completed';
+          if (!this.completionDate) {
+            this.completionDate = new Date();
+          }
+        } else if (this.progress > 0 || hasAnyActivity) {
+          this.status = 'in_progress';
+          // If previously completed but now new modules added, reset completion date
+          this.completionDate = undefined;
+        } else {
+          this.status = 'enrolled';
+          this.completionDate = undefined;
+        }
+
+        next();
       } else {
         // Log warning but don't fallback to flawed moduleProgress.length
         console.warn(`[ProgressFix] Skipping progress update: Course ${this.course} not found or has no modules.`);
       }
     } else {
       this.progress = 0;
-    }
-
-    // Update status based on progress
-    if (this.progress === 0) {
-      this.status = 'enrolled';
-    } else if (this.progress === 100) {
-      this.status = 'completed';
-      if (!this.completionDate) {
-        this.completionDate = new Date();
-      }
-    } else {
-      this.status = 'in_progress';
-      // If previously completed but now new modules added, reset completion date
-      if (this.status !== 'completed') {
-        this.completionDate = undefined;
-      }
     }
 
     next();

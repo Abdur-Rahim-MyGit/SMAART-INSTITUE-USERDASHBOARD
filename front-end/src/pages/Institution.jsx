@@ -20,7 +20,7 @@ const Institution = () => {
   const navigate = useNavigate();
   // Use the imported video for all IDs for now, or fallback to the specific one if we had distinct videos
   // const videoUrl = videoplayback;
-  const videoUrl = "https://res.cloudinary.com/dlpmrdcqp/video/upload/WhatsApp_Video_2026-01-19_at_14.40.50_1_lucryr.mp4";
+  const videoUrl = "https://player.cloudinary.com/embed/?cloud_name=dlpmrdcqp&public_id=videoplayback_xt7in8";
 
   // Redirect logged-in users to dashboard
   useEffect(() => {
@@ -85,16 +85,13 @@ const Institution = () => {
               <div className="absolute -inset-1 bg-gradient-to-r from-[#30919D] to-[#daa520] rounded-xl sm:rounded-2xl md:rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <div className="relative bg-white dark:bg-[#00152e] backdrop-blur-xl rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl">
                 <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                  <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover"
-                  >
-                    <source src={videoUrl} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+                  <iframe
+                    src={videoUrl}
+                    className="absolute inset-0 w-full h-full border-0"
+                    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                    title="Institution Login Video"
+                  />
 
                   {/* Overlay Gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#00152e]/90 via-transparent to-transparent pointer-events-none" />

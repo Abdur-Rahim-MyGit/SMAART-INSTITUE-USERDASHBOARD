@@ -182,7 +182,7 @@ const checkSkillCompletionBadges = async (userId, moduleId, skillName) => {
         for (const badge of allBadges) {
             // For specific skill badges
             if (badge.criteria.type === 'skill_completion') {
-                 const result = await awardBadge(userId, badge._id, {
+                const result = await awardBadge(userId, badge._id, {
                     skillId: moduleId,
                     skillName: skillName,
                     completionDate: new Date()
@@ -191,21 +191,21 @@ const checkSkillCompletionBadges = async (userId, moduleId, skillName) => {
             }
             // For generic module counting badges (e.g., "Complete 5 Skills")
             else if (badge.criteria.type === 'module_completion') {
-                 // Check how many modules the user has completed total
-                 // This would require an aggregation count on CourseEnrollments
-                 // For now, we'll skip complex counting unless requested
-                 const currentCount = await getCompletedModulesCount(userId);
-                 if (currentCount >= badge.criteria.moduleCount) {
-                     const result = await awardBadge(userId, badge._id, {
+                // Check how many modules the user has completed total
+                // This would require an aggregation count on CourseEnrollments
+                // For now, we'll skip complex counting unless requested
+                const currentCount = await getCompletedModulesCount(userId);
+                if (currentCount >= badge.criteria.moduleCount) {
+                    const result = await awardBadge(userId, badge._id, {
                         type: 'milestone',
                         count: currentCount,
                         completionDate: new Date()
                     });
                     if (result.newlyEarned) awardedBadges.push(result);
-                 }
+                }
             }
         }
-        
+
         return awardedBadges;
     } catch (error) {
         console.error('Error checking skill badges:', error);
@@ -216,7 +216,7 @@ const checkSkillCompletionBadges = async (userId, moduleId, skillName) => {
 const getCompletedModulesCount = async (userId) => {
     // Helper to count completed modules across all enrollments
     // Implementation omitted for brevity, returning 1 for now to unblock specific badges
-    return 1; 
+    return 1;
 };
 
 /**
@@ -289,6 +289,7 @@ const getUserBadges = async (userId) => {
         userBadges.forEach(ub => {
             if (ub.badgeId) {
                 userBadgeMap.set(ub.badgeId.badgeId, {
+                    _id: ub._id, // Store achievement ID
                     isEarned: ub.isEarned,
                     earnedDate: ub.earnedDate,
                     progress: ub.progress,
@@ -308,6 +309,7 @@ const getUserBadges = async (userId) => {
 
                 if (!userBadgeMap.has(normalizedId)) {
                     userBadgeMap.set(normalizedId, {
+                        _id: lb._id, // Store the legacy subdocument ID
                         isEarned: true,
                         earnedDate: lb.earnedAt || lb.earnedDate,
                         progress: { current: 1, target: 1, percentage: 100 },
@@ -330,7 +332,7 @@ const getUserBadges = async (userId) => {
 
             return {
                 id: badge.badgeId,
-                _id: badge._id,
+                _id: userBadge ? userBadge._id : (userBadge?.isLegacy ? userBadge._id : badge._id), // Use achievement _id if earned
                 title: badge.title,
                 description: badge.description,
                 category: badge.category,
@@ -352,6 +354,7 @@ const getUserBadges = async (userId) => {
             if (!badges.some(b => b.id === bid)) {
                 badges.push({
                     id: bid,
+                    _id: ub._id, // Use achievement ID
                     title: ub.title || bid,
                     description: ub.description || '',
                     category: ub.category || 'special',

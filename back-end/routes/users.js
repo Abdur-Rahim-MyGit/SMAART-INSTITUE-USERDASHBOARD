@@ -739,18 +739,55 @@ router.get('/verify-badge/:badgeId', async (req, res) => {
       return res.status(400).json({ error: 'Invalid Badge ID format' });
     }
 
-    let user = await User.findOne({ "badges._id": badgeId });
+    const UserBadge = require('../models/UserBadge');
+    // Fetch userBadge without populating userId initially to preserve the ID if it's a Student
+    let userBadge = await UserBadge.findById(badgeId).populate('badgeId');
+
     let badge = null;
     let ownerName = '';
 
-    if (user) {
-      badge = user.badges.id(badgeId);
-      ownerName = user.fullName;
+    if (userBadge) {
+      // New system (standalone UserBadge collection)
+      const MasterBadge = require('../models/Badge');
+      const Student = require('../models/Student');
+      const User = require('../models/User');
+
+      badge = {
+        _id: userBadge._id,
+        badgeId: userBadge.badgeId?.badgeId,
+        title: userBadge.badgeId?.title,
+        description: userBadge.badgeId?.description,
+        tier: userBadge.badgeId?.tier,
+        xp: userBadge.badgeId?.xp,
+        earnedDate: userBadge.earnedAt || userBadge.earnedDate,
+        category: userBadge.badgeId?.category
+      };
+
+      // Try to get owner name from Student or User collections
+      const userId = userBadge.userId;
+      if (userId) {
+        const student = await Student.findById(userId);
+        if (student) {
+          ownerName = student.fullName;
+        } else {
+          const userDoc = await User.findById(userId);
+          ownerName = userDoc ? userDoc.fullName : 'SMAART Learner';
+        }
+      } else {
+        ownerName = 'SMAART Learner';
+      }
     } else {
-      user = await Student.findOne({ "badges._id": badgeId });
+      // Legacy system (embedded badges)
+      let user = await User.findOne({ "badges._id": badgeId });
       if (user) {
         badge = user.badges.id(badgeId);
         ownerName = user.fullName;
+      } else {
+        user = await Student.findOne({ "badges._id": badgeId });
+        if (user) {
+          badge = user.badges.id(badgeId);
+          ownerName = user.fullName;
+        }
       }
     }
 

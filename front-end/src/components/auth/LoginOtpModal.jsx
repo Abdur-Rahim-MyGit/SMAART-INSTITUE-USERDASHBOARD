@@ -16,7 +16,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
   // Force Logout State
   const [showForceLogout, setShowForceLogout] = useState(false);
-  const [forceLogouMessage, setForceLogoutMessage] = useState("");
+  const [forceLogoutMessage, setForceLogoutMessage] = useState("");
 
   const inputRefs = useRef([]);
 
@@ -121,11 +121,12 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
       }
       onSuccess(data);
     } catch (error) {
-      console.error("OTP verification error detail:", error);
+      console.log("OTP verification error info:", error);
 
       // Handle Force Logout Requirement
-      if (error.data?.requiresForceLogout) {
-        setForceLogoutMessage(error.message);
+      if (error.status === 409 || error.data?.requiresForceLogout) {
+        console.log("Detecting 409/Force Logout requirement:", error.data);
+        setForceLogoutMessage(error.message || error.data?.message || "You are already logged in on another device.");
         setShowForceLogout(true);
         setIsLoading(false);
         return;
@@ -355,7 +356,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Active Session Detected</h3>
                 <p className="text-gray-600 mb-8 max-w-[280px] mx-auto leading-relaxed">
-                  {forceLogouMessage || "You are already logged in on another device."}
+                  {forceLogoutMessage || "You are already logged in on another device."}
                 </p>
 
                 <div className="space-y-3">
