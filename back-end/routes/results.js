@@ -3,7 +3,6 @@ const Result = require('../models/Result');
 const Assessment = require('../models/Assessment');
 const { protect } = require('../middleware/auth');
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions } = require('../utils/questionShuffler');
-const { checkAssessmentBadges } = require('../utils/badgeUtils');
 const { notifyAssessmentComplete } = require('../services/notificationService');
 
 const router = express.Router();
@@ -563,21 +562,6 @@ router.post('/:resultId/submit', async (req, res) => {
         }
 
 
-        // Check for Assessment Badges
-        try {
-            const badgesEarned = await checkAssessmentBadges(
-                result.userId,
-                result.assessmentCode || assessment?.assessmentCode,
-                percentage
-            );
-
-            if (badgesEarned && badgesEarned.length > 0) {
-                console.log(`🏆 Awarded ${badgesEarned.length} badges for assessment ${result.assessmentId}`);
-                responseData.badgesEarned = badgesEarned;
-            }
-        } catch (badgeError) {
-            console.error("⚠️ Error checking assessment badges:", badgeError);
-        }
 
         // Send notification for assessment completion
         try {

@@ -37,6 +37,8 @@ const userBadgeSchema = new mongoose.Schema({
         // Store additional context about how the badge was earned
         courseId: mongoose.Schema.Types.ObjectId,
         courseName: String,
+        moduleId: mongoose.Schema.Types.ObjectId,
+        moduleName: String,
         assessmentCode: String,
         score: Number,
         percentile: Number,
@@ -56,8 +58,8 @@ const userBadgeSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Compound index to prevent duplicate badges for same user
-userBadgeSchema.index({ userId: 1, badgeId: 1 }, { unique: true });
+// Index to speed up lookups for a user's badges
+userBadgeSchema.index({ userId: 1, badgeId: 1 });
 userBadgeSchema.index({ userId: 1, isEarned: 1 });
 userBadgeSchema.index({ userId: 1, earnedDate: -1 });
 
