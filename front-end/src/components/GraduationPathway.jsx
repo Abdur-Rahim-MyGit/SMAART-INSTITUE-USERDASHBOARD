@@ -48,13 +48,13 @@ const GraduationPathway = ({ onCourseClick }) => {
     return `Embark on an enriching learning journey with ${courseTitle}. This carefully designed course provides comprehensive knowledge, practical skills, and engaging content to help you achieve your educational goals and unlock new opportunities.`;
   };
 
-  // NEW: Fill placeholder days to ensure 6 sessions are always shown
+  // NEW: Fill placeholder days to ensure 3 sessions are always shown
   const fillPlaceholderDays = (module, moduleNum) => {
     const existingDaysCount = module.days ? module.days.length : 0;
-    if (existingDaysCount >= 6) return module.days || [];
+    if (existingDaysCount >= 3) return module.days || [];
 
     const days = module.days ? [...module.days] : [];
-    for (let i = existingDaysCount + 1; i <= 6; i++) {
+    for (let i = existingDaysCount + 1; i <= 3; i++) {
         days.push({
             id: i,
             dayNumber: i,
@@ -116,7 +116,7 @@ const GraduationPathway = ({ onCourseClick }) => {
           coursesData.forEach((course, cIdx) => {
             const courseId = course._id || course.id;
             if (course.modules && course.modules.length > 0) {
-              // Apply placeholder days to all modules for consistent 6-session UI
+              // Apply placeholder days to all modules for consistent 3-session UI
               const formattedModules = course.modules.map((m, mIdx) => ({
                  ...m,
                  days: fillPlaceholderDays(m, mIdx + 1)
@@ -219,8 +219,8 @@ const GraduationPathway = ({ onCourseClick }) => {
         let completedDisplayDays = 0;
 
         modules.forEach((mod, mIdx) => {
-          // Denominator matches UI count (min 6)
-          const modTotalDays = Math.max(6, mod.days?.length || 0);
+          // Use actual day count
+          const modTotalDays = mod.days?.length || 0;
           totalDisplayDays += modTotalDays;
 
           const modProgress = enrollment?.moduleProgress?.find(mp => 
@@ -357,19 +357,9 @@ const GraduationPathway = ({ onCourseClick }) => {
                     {!loadingModules[courseId] && modules.length > 0 && (
                       <div className="space-y-3">
                         {modules.map((module, moduleIdx) => {
-                          const modProgress = enrollment?.moduleProgress?.find(mp => 
-                            mp.module === module._id || mp.module?._id === module._id
-                          );
-                          
-                          const isModuleCompleted = modProgress?.status === 'completed';
-                          const isModuleInProgress = (modProgress?.status === 'in_progress' || modProgress?.status === 'not_started') && (moduleIdx === 0 || enrollment?.moduleProgress?.[moduleIdx-1]?.status === 'completed');
-                          const isModuleActive = isModuleCompleted || isModuleInProgress;
-                          
                           const days = module.days || [];
-                          const moduleKey = `${courseId}-${moduleIdx}`;
-                          const isExpanded = expandedModules.includes(moduleKey);
                           
-                          // Use the same 1-based logic for day completion
+                          // Calculate completion locally for immediate UI feedback
                           let completedDays = 0;
                           days.forEach((day, dIdx) => {
                             const dId = day.dayNumber || dIdx + 1;
@@ -379,6 +369,37 @@ const GraduationPathway = ({ onCourseClick }) => {
                             const taskCondition = hasTasks ? isTaskDone : true;
                             if (isVidDone && taskCondition) completedDays++;
                           });
+
+                          const isModuleCompletedLocally = completedDays > 0 && completedDays >= days.length;
+                          const isModuleCompleted = modProgress?.status === 'completed' || isModuleCompletedLocally;
+
+                          // Check previous module completion
+                          const prevModuleId = moduleIdx > 0 ? modules[moduleIdx - 1]._id : null;
+                          const prevModProgress = prevModuleId ? enrollment?.moduleProgress?.find(mp => 
+                            mp.module === prevModuleId || mp.module?._id === prevModuleId
+                          ) : null;
+                          
+                          // Calculate previous module completion locally too
+                          let prevCompletedDays = 0;
+                          if (moduleIdx > 0) {
+                             const prevModule = modules[moduleIdx - 1];
+                             const prevDays = prevModule.days || [];
+                             prevDays.forEach((day, dIdx) => {
+                                const dId = day.dayNumber || dIdx + 1;
+                                const isVidDone = prevModProgress?.videoProgress?.some(vp => vp.dayId === dId && vp.isCompleted);
+                                const isTaskDone = prevModProgress?.completedTasks?.some(ct => ct.dayId === dId);
+                                const hasTasks = day.tasks?.length > 0;
+                                const taskCondition = hasTasks ? isTaskDone : true;
+                                if (isVidDone && taskCondition) prevCompletedDays++;
+                             });
+                          }
+                          const isPrevModuleCompleted = moduleIdx === 0 || (prevModProgress?.status === 'completed') || (prevCompletedDays > 0 && prevCompletedDays >= (modules[moduleIdx-1]?.days?.length || 3));
+
+                          const isModuleInProgress = (modProgress?.status === 'in_progress' || modProgress?.status === 'not_started' || (enrollment?.progress > 0 && !modProgress)) && isPrevModuleCompleted;
+                          const isModuleActive = isModuleCompleted || isModuleInProgress;
+                          
+                          const moduleKey = `${courseId}-${moduleIdx}`;
+                          const isExpanded = expandedModules.includes(moduleKey);
 
                           return (
                             <motion.div
@@ -441,7 +462,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                                       />
                                     </svg>
                                     <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#002147]">
-                                      {Math.round((completedDays / Math.max(6, days.length)) * 100)}%
+                                      {Math.round((completedDays / (days.length || 3)) * 100)}%
                                     </span>
                                   </div>
 

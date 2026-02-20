@@ -148,7 +148,7 @@ const ModuleViewPage = () => {
             description: module.description || 'No description available',
             duration: module.timeAllocation ? `${module.timeAllocation} minutes` : 'Duration not specified',
             sequence: module.sequence || index + 1,
-            days: Array.from({ length: Math.max(6, module.days?.length || 0) }, (_, dayIndex) => {
+            days: Array.from({ length: Math.max(3, module.days?.length || 0) }, (_, dayIndex) => {
               const day = module.days?.[dayIndex]; // Existing day or undefined
               const id = dayIndex + 1;
 
@@ -570,15 +570,16 @@ const ModuleViewPage = () => {
     // Check if the current requested day is actually unlocked
     const isActuallyUnlocked = isDayUnlocked(selectedModule, dayIndex, mod);
     
-    // NEW: Strict Module Locking - Only Module 1 is allowed
-    const isModuleAllowed = selectedModule === 1;
-
-    if (!isModuleAllowed) {
-      console.warn(`[RouteGuard] Blocking access to Module ${selectedModule}: Module is LOCKED.`);
-      toast.error("Module is locked! Please start with Module 1.");
-      navigateToModules();
-      return;
-    }
+    // NEW: Dynamic Module Unlocking - Module 1 is allowed, others if previous is done
+    const isModuleAllowed = selectedModule === 1 || (() => {
+      const prevMod = modules.find(m => m.id === selectedModule - 1);
+      if (!prevMod) return false;
+      // We need to check enrollment progress for previous module
+      const enrollmentData = sessionStorage.getItem(`enrollment_${courseId}`); // Check if we have cached enrollment
+      // Or use the state we fetched in fetchData
+      // For now, let's look at the modules state which should be updated with completion status
+      return getModuleCompletedCount(selectedModule - 1).completed >= (prevMod.days?.length || 3);
+    })();
 
     if (!isActuallyUnlocked) {
       console.warn(`[RouteGuard] Blocking access to M${selectedModule} S${selectedDay}: Day is LOCKED.`);
@@ -597,13 +598,13 @@ const ModuleViewPage = () => {
       title: `Module ${i + 1}`,
       description: `Module ${i + 1} description`,
       duration: `${5 + i} hours`,
-      days: Array.from({ length: 7 }, (_, j) => ({
+      days: Array.from({ length: 3 }, (_, j) => ({
         id: j + 1,
         dayNumber: j + 1,
         title: `Session ${j + 1}`,
         description: `Topic for Day ${j + 1}`,
         duration: "45 minutes",
-        dayType: j < 6 ? 'course' : 'catchup',
+        dayType: 'course',
         videoUrl: null, // No video for placeholder data
         videoTitle: `Session ${j + 1} Lesson`,
         videoDescription: "Content not yet available. Please contact your instructor.",
@@ -801,11 +802,11 @@ const ModuleViewPage = () => {
   const getModuleCompletedCount = (moduleId) => {
     const module = modules.find(m => m.id === moduleId);
     if (!module) {
-      return { completed: 0, total: 6 };
+      return { completed: 0, total: 3 };
     }
 
-    // Use the same logic as the UI for total days (usually 6)
-    const totalDays = Math.max(6, module.days?.length || 0);
+    // Use the same logic as the UI for total days (usually 3)
+    const totalDays = Math.max(3, module.days?.length || 0);
     let completedDays = 0;
 
     // Count completed real days
@@ -1698,7 +1699,12 @@ const ModuleViewPage = () => {
                 // Let's keep modules somewhat sequential or fully open?
                 // User said "click the course 1 it... should also be redigned".
                 // I'll make them all LOOK premium.
-                const isLocked = index !== 0; // Only the first module is unlocked
+                const isLocked = index !== 0 && (() => {
+                  const prevMod = modules[index - 1];
+                  if (!prevMod) return true;
+                  const { completed, total } = getModuleCompletedCount(prevMod.id);
+                  return completed < total;
+                })();
 
                 const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
 

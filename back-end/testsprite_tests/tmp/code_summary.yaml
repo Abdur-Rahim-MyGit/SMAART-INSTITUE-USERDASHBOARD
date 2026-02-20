@@ -1,0 +1,56 @@
+version: "2"
+type: backend
+tech_stack:
+  - nodejs
+  - express
+  - mongodb
+  - mongoose
+features:
+  - name: Authentication API
+    description: User registration, login, and OTP verification
+    files:
+      - routes/auth.js
+      - models/User.js
+      - models/Registration.js
+      - models/LoginOtp.js
+    endpoints:
+      - method: POST
+        path: /api/auth/send-signup-otp
+        description: Send OTP for signup verification
+        auth_required: false
+      - method: POST
+        path: /api/auth/verify-signup-otp
+        description: Verify signup OTP
+        auth_required: false
+      - method: POST
+        path: /api/auth/register
+        description: Register a new user
+        auth_required: false
+      - method: POST
+        path: /api/auth/login
+        description: Login user and send OTP
+        auth_required: false
+      - method: POST
+        path: /api/auth/verify-login-otp
+        description: Verify login OTP and return JWT
+        auth_required: false
+  - name: User Management API
+    description: Profile management and user data retrieval
+    files:
+      - routes/users.js
+      - models/User.js
+      - models/Registration.js
+    endpoints:
+      - method: POST
+        path: /api/users/register-details
+        description: Save comprehensive registration details
+        auth_required: false
+      - method: PATCH
+        path: /api/users/register-section
+        description: Update individual registration sections
+        auth_required: false
+      - method: GET
+        path: /api/users/register-details/:email
+        description: Get registration details by email
+        auth_required: false
+known_limitations: []
