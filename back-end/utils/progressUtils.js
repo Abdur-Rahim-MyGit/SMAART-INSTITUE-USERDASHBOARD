@@ -9,49 +9,64 @@
 const isSessionCompleted = async (enrollment, course, moduleDoc, dayId) => {
     try {
         const dayIdInt = parseInt(dayId);
-        const dayObj = moduleDoc.days.find(d => d.dayNumber === dayIdInt);
-        if (!dayObj) return false;
-
         const mProg = enrollment.moduleProgress.find(mp => mp.module.toString() === moduleDoc._id.toString());
         if (!mProg) return false;
 
-        // Define required steps for this day from the course schema
-        const requiredSteps = dayObj.steps ? dayObj.steps.filter(s => s.isRequired !== false) : [];
+        // A day is considered completed if there is ANY completed activity for that dayId
+        // This matches the logic in CourseEnrollment.js pre-save hook
 
-        // If no steps defined, we look at VideoContent (legacy/alternative structure)
-        if (requiredSteps.length === 0) {
-            // Check if there are videos in VideoContent
-            const videosInDay = dayObj.VideoContent || [];
-            if (videosInDay.length > 0) {
-                // If there are videos, ensure at least one is completed for this day
-                return mProg.videoProgress && mProg.videoProgress.some(vp =>
-                    vp.dayId === dayIdInt && vp.isCompleted
-                );
-            }
-            return true;
-        }
+        // 1. Check videos
+        const hasVideoDone = mProg.videoProgress && mProg.videoProgress.some(vp =>
+            vp.dayId === dayIdInt && vp.isCompleted
+        );
+        if (hasVideoDone) return true;
 
-        for (const step of requiredSteps) {
-            if (step.type === 'video') {
-                const isDone = mProg.videoProgress && mProg.videoProgress.some(vp =>
-                    vp.dayId === dayIdInt && vp.stepId === step.stepNumber && vp.isCompleted
-                );
-                if (!isDone) return false;
-            } else if (['quiz', 'assessment', 'assignment', 'submission', 'reflection', 'flashcards', 'flashcard'].includes(step.type)) {
-                // These are typically tracked in completedTasks
-                const isDone = mProg.completedTasks && mProg.completedTasks.some(ct =>
-                    ct.dayId === dayIdInt && ct.taskId === step.stepNumber
-                );
-                if (!isDone) return false;
-            }
-        }
-        return true;
+        // 2. Check tasks/quizzes/etc
+        const hasTaskDone = mProg.completedTasks && mProg.completedTasks.some(ct =>
+            ct.dayId === dayIdInt
+        );
+        if (hasTaskDone) return true;
+
+        const hasTaskResult = mProg.taskResults && mProg.taskResults.some(tr =>
+            tr.dayId === dayIdInt
+        );
+        if (hasTaskResult) return true;
+
+        const hasQuizDone = mProg.quizzesTaken && mProg.quizzesTaken.some(qt =>
+            qt.dayId === dayIdInt
+        );
+        if (hasQuizDone) return true;
+
+        return false;
     } catch (err) {
         console.error('Error in isSessionCompleted:', err);
         return false;
     }
 };
 
+/**
+ * Check if all required activities for an entire module are completed
+ * @param {Object} enrollment - Enrollment document
+ * @param {Object} course - Course document
+ * @param {Object} moduleDoc - Current module document
+ * @returns {Promise<Boolean>}
+ */
+const isModuleCompleted = async (enrollment, course, moduleDoc) => {
+    try {
+        if (!moduleDoc.days || moduleDoc.days.length === 0) return false;
+
+        for (const day of moduleDoc.days) {
+            const isDone = await isSessionCompleted(enrollment, course, moduleDoc, day.dayNumber);
+            if (!isDone) return false;
+        }
+        return true;
+    } catch (err) {
+        console.error('Error in isModuleCompleted:', err);
+        return false;
+    }
+};
+
 module.exports = {
-    isSessionCompleted
+    isSessionCompleted,
+    isModuleCompleted
 };

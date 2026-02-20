@@ -5,8 +5,7 @@ const { protect } = require('../middleware/auth');
 const {
     getUserBadges,
     getUserBadgeStats,
-    awardBadge,
-    updateBadgeProgress
+    awardBadge
 } = require('../utils/badgeUtils');
 const { notifyBadgeEarned } = require('../services/notificationService');
 
@@ -174,37 +173,6 @@ router.post('/award', async (req, res) => {
     }
 });
 
-/**
- * PUT /api/badges/user/:userId/progress
- * Update progress for a badge
- */
-router.put('/user/:userId/progress', async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const { badgeId, currentProgress } = req.body;
-
-        if (!badgeId || currentProgress === undefined) {
-            return res.status(400).json({
-                success: false,
-                error: 'badgeId and currentProgress are required'
-            });
-        }
-
-        const userBadge = await updateBadgeProgress(userId, badgeId, currentProgress);
-
-        res.json({
-            success: true,
-            data: userBadge
-        });
-    } catch (error) {
-        console.error('Error updating badge progress:', error);
-        res.status(500).json({
-            success: false,
-            error: 'Failed to update badge progress',
-            message: error.message
-        });
-    }
-});
 
 /**
  * PUT /api/badges/user/:userId/:badgeId/view
