@@ -60,7 +60,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
     if (loading) {
         return (
             <div className="fixed inset-0 z-[9999] bg-[#002147] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-t-[#30919D] border-r-transparent border-b-[#daa520] border-l-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-t-[#1a3884] border-r-transparent border-b-[#daa520] border-l-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -79,7 +79,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
                 <div className="absolute inset-0 bg-gradient-to-br from-[#002147] via-[#001a38] to-[#002147]" />
 
                 {/* Decorative elements */}
-                <div className="absolute top-10 left-10 text-[#30919D]/20 text-6xl font-black tracking-wider">VISION</div>
+                <div className="absolute top-10 left-10 text-[#1a3884]/20 text-6xl font-black tracking-wider">VISION</div>
                 <div className="absolute bottom-10 right-10 text-[#daa520]/20 text-6xl font-black tracking-wider">MANIFEST</div>
 
                 {/* Main Vision Board Container */}
@@ -90,7 +90,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
                     className="relative w-[96vw] max-w-[95vw] h-[85vh]"
                 >
                     {/* The Vision Board Image */}
-                    <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border-4 border-[#30919D]/30">
+                    <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border-4 border-[#1a3884]/30">
                         <img
                             src={vision.image}
                             alt={vision.title || "My Vision"}
@@ -123,7 +123,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: 0.7 }}
-                                className="text-[#30919D] text-lg font-medium"
+                                className="text-[#1a3884] text-lg font-medium"
                             >
                                 Visualize • Believe • Achieve
                             </motion.p>
@@ -148,7 +148,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
                         initial={{ width: "100%" }}
                         animate={{ width: "0%" }}
                         transition={{ duration: duration / 1000, ease: "linear" }}
-                        className="h-full bg-gradient-to-r from-[#30919D] to-[#daa520]"
+                        className="h-full bg-gradient-to-r from-[#1a3884] to-[#daa520]"
                     />
                 </div>
             </motion.div>
@@ -157,3 +157,4 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
 };
 
 export default VisionBoardSplash;
+

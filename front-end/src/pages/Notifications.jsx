@@ -307,7 +307,7 @@ const Notifications = () => {
             <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#30919D] to-[#002147] rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#1a3884] to-[#002147] rounded-xl flex items-center justify-center">
                     <Bell className="w-6 h-6 text-white" />
                   </div>
                   <div>
@@ -329,7 +329,7 @@ const Notifications = () => {
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllAsRead}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#30919D] hover:bg-[#30919D]/10 rounded-lg transition-colors"
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#1a3884] hover:bg-[#1a3884]/10 rounded-lg transition-colors"
                     >
                       <CheckCheck className="w-4 h-4" />
                       <span className="hidden sm:inline">Mark all read</span>
@@ -370,7 +370,7 @@ const Notifications = () => {
                   Unread
                   {unreadCount > 0 && (
                     <span className={`px-1.5 py-0.5 text-xs rounded-full ${
-                      filter === 'unread' ? 'bg-white/20' : 'bg-[#30919D] text-white'
+                      filter === 'unread' ? 'bg-white/20' : 'bg-[#1a3884] text-white'
                     }`}>
                       {unreadCount}
                     </span>
@@ -388,7 +388,7 @@ const Notifications = () => {
               transition={{ delay: 0.1 }}
               className="mb-6"
             >
-              <div className="bg-gradient-to-r from-[#002147] to-[#30919D] rounded-xl p-5 text-white shadow-lg">
+              <div className="bg-gradient-to-r from-[#002147] to-[#1a3884] rounded-xl p-5 text-white shadow-lg">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h2 className="text-lg font-semibold">Welcome back, {summary.fullName}!</h2>
@@ -449,7 +449,7 @@ const Notifications = () => {
           {/* Content */}
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <div className="w-10 h-10 border-3 border-[#30919D] border-t-transparent rounded-full animate-spin" />
+              <div className="w-10 h-10 border-3 border-[#1a3884] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : notifications.length === 0 ? (
             <motion.div
@@ -501,11 +501,11 @@ const Notifications = () => {
                             {/* Icon */}
                             <div
                               className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                              style={{ backgroundColor: `${notification.color || '#30919D'}15` }}
+                              style={{ backgroundColor: `${notification.color || '#1a3884'}15` }}
                             >
                               <IconComponent
                                 className="w-6 h-6"
-                                style={{ color: notification.color || '#30919D' }}
+                                style={{ color: notification.color || '#1a3884' }}
                               />
                             </div>
 
@@ -525,7 +525,7 @@ const Notifications = () => {
                                     {formatTimeAgo(notification.createdAt)}
                                   </span>
                                   {!notification.isRead && (
-                                    <div className="w-2 h-2 bg-[#30919D] rounded-full ml-auto mt-1" />
+                                    <div className="w-2 h-2 bg-[#1a3884] rounded-full ml-auto mt-1" />
                                   )}
                                 </div>
                               </div>
@@ -544,7 +544,7 @@ const Notifications = () => {
                                   e.stopPropagation();
                                   markAsRead(notification._id);
                                 }}
-                                className="p-2 text-gray-400 hover:text-[#30919D] hover:bg-[#30919D]/10 rounded-lg transition-colors"
+                                className="p-2 text-gray-400 hover:text-[#1a3884] hover:bg-[#1a3884]/10 rounded-lg transition-colors"
                                 title="Mark as read"
                               >
                                 <Check className="w-4 h-4" />
@@ -589,3 +589,4 @@ const Notifications = () => {
 };
 
 export default Notifications;
+

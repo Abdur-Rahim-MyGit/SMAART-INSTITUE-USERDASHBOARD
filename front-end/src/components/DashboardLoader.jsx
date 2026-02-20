@@ -54,7 +54,7 @@ const DashboardLoader = ({ onComplete }) => {
                         <motion.path
                             d="M50 10 L80 150 L50 140 L20 150 Z"
                             fill="none"
-                            stroke="#30919D"
+                            stroke="#1a3884"
                             strokeWidth="1.5"
                             initial={{ pathLength: 0, opacity: 0 }}
                             animate={{ pathLength: 1, opacity: 1 }}
@@ -64,7 +64,7 @@ const DashboardLoader = ({ onComplete }) => {
                         {/* Internal Structure Lines */}
                         <motion.path
                             d="M50 10 L50 140 M50 10 L35 145 M50 10 L65 145"
-                            stroke="#30919D"
+                            stroke="#1a3884"
                             strokeWidth="0.5"
                             strokeOpacity="0.5"
                             initial={{ pathLength: 0 }}
@@ -143,7 +143,7 @@ const DashboardLoader = ({ onComplete }) => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
                     >
-                        Smaart<span className="text-[#30919D]">Minds</span>
+                        Smaart<span className="text-[#1a3884]">Minds</span>
                     </motion.h1>
 
                     <motion.div
@@ -160,7 +160,7 @@ const DashboardLoader = ({ onComplete }) => {
                 {/* Progress Bar */}
                 <div className="w-48 h-1 bg-slate-800 rounded-full mt-8 overflow-hidden relative">
                     <motion.div
-                        className="h-full bg-gradient-to-r from-[#30919D] to-cyan-400"
+                        className="h-full bg-gradient-to-r from-[#1a3884] to-cyan-400"
                         initial={{ width: "0%" }}
                         animate={{ width: `${progress}%` }}
                         transition={{ type: "tween", ease: "linear", duration: 0.1 }}
@@ -176,3 +176,4 @@ const DashboardLoader = ({ onComplete }) => {
 };
 
 export default DashboardLoader;
+

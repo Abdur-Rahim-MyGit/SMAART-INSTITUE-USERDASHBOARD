@@ -93,7 +93,7 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
                           onClick={() => !submitted && setAnswers({ ...answers, [question.id]: val })}
                           className={`flex-1 h-12 rounded-lg border-2 transition-all font-bold flex items-center justify-center ${
                             isSelected
-                              ? 'border-[#0891b2] dark:border-[#30919D] bg-[#0891b2] text-white shadow-lg scale-105'
+                              ? 'border-[#0891b2] dark:border-[#1a3884] bg-[#0891b2] text-white shadow-lg scale-105'
                               : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
                           } ${submitted ? 'cursor-default' : 'cursor-pointer hover:scale-105 active:scale-95'}`}
                         >
@@ -112,7 +112,7 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
                           onClick={() => !submitted && setAnswers({ ...answers, [question.id]: option.text })}
                           className={`w-full text-left p-3 rounded-lg border-2 transition-all flex items-center justify-between ${
                             isSelected
-                              ? 'border-[#0891b2] dark:border-[#30919D] bg-[#0891b2]/10 dark:bg-[#30919D]/10'
+                              ? 'border-[#0891b2] dark:border-[#1a3884] bg-[#0891b2]/10 dark:bg-[#1a3884]/10'
                               : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                           } ${submitted ? 'cursor-default' : 'cursor-pointer'}`}
                         >
@@ -120,7 +120,7 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
                             {option.text}
                           </span>
                           {isSelected && (
-                            <div className="w-4 h-4 rounded-full border-4 border-[#0891b2] dark:border-[#30919D]" />
+                            <div className="w-4 h-4 rounded-full border-4 border-[#0891b2] dark:border-[#1a3884]" />
                           )}
                         </button>
                       );
@@ -133,7 +133,7 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
                     disabled={submitted}
                     placeholder="Type your reflection here..."
                     rows={6}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-[#0891b2] dark:focus:border-[#30919D] focus:outline-none transition-colors resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-[#0891b2] dark:focus:border-[#1a3884] focus:outline-none transition-colors resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 )}
               </label>
@@ -145,7 +145,7 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
         {!submitted && (
           <button
             onClick={handleSubmit}
-            className="w-full py-3 bg-[#0891b2] dark:bg-[#30919D] hover:bg-[#0a7a8f] dark:hover:bg-[#2a7d88] text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-[#0891b2] dark:bg-[#1a3884] hover:bg-[#0a7a8f] dark:hover:bg-[#2a7d88] text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2"
           >
             <Send size={18} />
             Submit Reflection
@@ -168,3 +168,4 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
 };
 
 export default ReflectionTask;
+

@@ -396,7 +396,7 @@ const ViewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange }) 
             ) : (
               <Button
                 onClick={handleSetAsVision}
-                className="bg-[#30919D] hover:bg-[#267a84] text-[#002147] font-semibold shadow-[0_0_15px_rgba(48,145,157,0.4)]"
+                className="bg-[#1a3884] hover:bg-[#132c6b] text-[#002147] font-semibold shadow-[0_0_15px_rgba(26,56,132,0.4)]"
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Enable as Vision
@@ -917,3 +917,5 @@ const VisionBoardGalleryPro = () => {
 };
 
 export default VisionBoardGalleryPro;
+
+

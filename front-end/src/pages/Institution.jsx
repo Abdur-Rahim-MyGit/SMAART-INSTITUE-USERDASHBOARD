@@ -36,17 +36,17 @@ const Institution = () => {
 
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[#30919D]/5 blur-[120px]" />
+        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[#1a3884]/5 blur-[120px]" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gray-100 dark:bg-white/5 blur-[100px]" />
         <div className="absolute top-[20%] left-[10%] w-2 h-2 bg-[#daa520]/30 rounded-full animate-pulse" />
-        <div className="absolute bottom-[30%] right-[20%] w-3 h-3 bg-[#30919D]/20 rounded-full animate-pulse delay-700" />
+        <div className="absolute bottom-[30%] right-[20%] w-3 h-3 bg-[#1a3884]/20 rounded-full animate-pulse delay-700" />
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] dark:opacity-[0.05]" />
 
         {/* New Dynamic Blobs */}
         <motion.div
           animate={{ x: [0, 50, 0], y: [0, 30, 0], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#30919D]/5 rounded-full blur-[80px]"
+          className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#1a3884]/5 rounded-full blur-[80px]"
         />
         <motion.div
           animate={{ x: [0, -30, 0], y: [0, 50, 0], opacity: [0.2, 0.5, 0.2] }}
@@ -65,7 +65,7 @@ const Institution = () => {
           >
             <button
               onClick={() => navigate("/")}
-              className="group flex items-center gap-2 text-gray-400 hover:text-[#30919D] transition-colors text-xs sm:text-sm font-bold uppercase tracking-widest min-h-[44px] py-2"
+              className="group flex items-center gap-2 text-gray-400 hover:text-[#1a3884] transition-colors text-xs sm:text-sm font-bold uppercase tracking-widest min-h-[44px] py-2"
             >
               <ArrowLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5 group-hover:-translate-x-1 transition-transform" />
               <span className="hidden xs:inline">Back to Marketplace</span>
@@ -82,7 +82,7 @@ const Institution = () => {
               transition={{ delay: 0.2 }}
               className="relative group w-full max-w-full overflow-hidden box-border"
             >
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#30919D] to-[#daa520] rounded-xl sm:rounded-2xl md:rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#daa520] rounded-xl sm:rounded-2xl md:rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <div className="relative bg-white dark:bg-[#00152e] backdrop-blur-xl rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl">
                 <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                   <iframe
@@ -107,14 +107,14 @@ const Institution = () => {
                   <div className="flex items-start justify-between gap-3 sm:gap-4">
                     <div>
                       <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 font-heading tracking-tight">
-                        Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#30919D] to-[#002147] dark:to-[#4dbdc9]">Excellence</span>
+                        Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#002147] dark:to-[#4dbdc9]">Excellence</span>
                       </h2>
                       <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-xs sm:text-sm md:text-base font-light">
                         Discover a world of opportunities and unlock your true potential with our comprehensive learning ecosystem.
                       </p>
                     </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-[#30919D]/10 dark:bg-[#30919D]/20 flex items-center justify-center border border-[#30919D]/20 shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <Play className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#30919D] fill-[#30919D]" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-[#1a3884]/10 dark:bg-[#1a3884]/20 flex items-center justify-center border border-[#1a3884]/20 shrink-0 group-hover:scale-110 transition-transform duration-300">
+                      <Play className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1a3884] fill-[#1a3884]" />
                     </div>
                   </div>
                 </div>
@@ -137,3 +137,4 @@ const Institution = () => {
 };
 
 export default Institution;
+

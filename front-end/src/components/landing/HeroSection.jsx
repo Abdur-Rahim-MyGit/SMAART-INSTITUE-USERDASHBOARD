@@ -132,11 +132,11 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#30919D]/10 dark:bg-[#30919D]/20 border border-[#30919D]/30 dark:border-[#30919D]/40 mb-12 backdrop-blur-sm"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1a3884]/10 dark:bg-[#1a3884]/20 border border-[#1a3884]/30 dark:border-[#1a3884]/40 mb-12 backdrop-blur-sm"
             >
               <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#30919D] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#30919D]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1a3884] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1a3884]"></span>
               </span>
               <span className="text-sm font-semibold text-[#1a3884] dark:text-[#67e8f5] tracking-wide">Skills Passport Integration Live</span>
             </motion.div>
@@ -182,7 +182,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
                     element.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="group relative px-8 py-4 bg-gradient-to-r from-[#1a3884] to-[#267d87] hover:from-[#132c6b] hover:to-[#1e6169] text-white rounded-xl font-bold text-base transition-all duration-300 shadow-[0_0_20px_rgba(26,56,132,0.3)] hover:shadow-[0_0_30px_rgba(26,56,132,0.5)] hover:-translate-y-1 w-full sm:w-auto overflow-hidden border border-[#daa520]/50"
+                className="group relative px-8 py-4 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white rounded-xl font-bold text-base transition-all duration-300 shadow-[0_0_20px_rgba(26,56,132,0.3)] hover:shadow-[0_0_30px_rgba(26,56,132,0.5)] hover:-translate-y-1 w-full sm:w-auto overflow-hidden border border-[#daa520]/50"
               >
                 <div className="absolute inset-0 overflow-hidden rounded-xl">
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -280,3 +280,4 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
 };
 
 export default HeroSection;
+

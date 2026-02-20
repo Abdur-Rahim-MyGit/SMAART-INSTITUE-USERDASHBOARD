@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import DashboardHeader from "@/components/DashboardHeader";
@@ -12,10 +12,10 @@ import BadgeModal from "@/components/badges/BadgeModal";
 const getBandColor = (level) => {
   // Uniform professional styling with Brand Colors
   const style = {
-    bg: 'bg-[#30919D]/5 dark:bg-[#30919D]/10',
-    text: 'text-[#30919D] dark:text-[#30919D]',
-    badge: 'bg-[#30919D]/10 text-[#30919D] border-[#30919D]/20',
-    bar: 'bg-[#30919D]', // Brand Teal
+    bg: 'bg-[#1a3884]/5 dark:bg-[#1a3884]/10',
+    text: 'text-[#1a3884] dark:text-[#1a3884]',
+    badge: 'bg-[#1a3884]/10 text-[#1a3884] border-[#1a3884]/20',
+    bar: 'bg-[#1a3884]', // Brand Teal
     glow: 'shadow-sm inner-shadow'
   };
 
@@ -151,11 +151,11 @@ const BaseLineTest = () => {
   // Check authentication and fetch assessment on mount
   useEffect(() => {
     const initializeAssessment = async () => {
-      console.log("ðŸ› ï¸ Initializing Base Line Test...");
+      console.log("🛠️ Initializing Base Line Test...");
       try {
         const userData = sessionStorage.getItem("user");
         if (!userData) {
-          console.warn("âš ï¸ No user data found in session, redirecting to login");
+          console.warn("⚠️ No user data found in session, redirecting to login");
           navigate("/");
           return;
         }
@@ -170,17 +170,17 @@ const BaseLineTest = () => {
         }
 
         // NEW: CRITICAL - Do not allow re-taking if baseline already exists
-        console.log("ðŸ” Checking for existing baseline results...");
+        console.log("🔍 Checking for existing baseline results...");
         const baselineCheck = await assessmentApi.getBaseLineResults(userId).catch(() => ({ success: false }));
         if (baselineCheck.success && baselineCheck.data) {
-          console.warn("âœ… Baseline already completed. Redirecting...");
+          console.warn("✅ Baseline already completed. Redirecting...");
           toast.info("You have already completed your baseline assessment.");
           navigate("/dashboard/assessments", { replace: true });
           return;
         }
 
         // Fetch Base Line assessment by code
-        console.log("ðŸ“¡ Fetching assessment details for ASM00001...");
+        console.log("📡 Fetching assessment details for ASM00001...");
         const assessmentResponse = await assessmentApi.getByCode("ASM00001");
 
         if (!assessmentResponse.success) {
@@ -188,7 +188,7 @@ const BaseLineTest = () => {
         }
 
         setAssessment(assessmentResponse.data);
-        console.log("âœ… Assessment details loaded:", assessmentResponse.data.assessmentName);
+        console.log("✅ Assessment details loaded:", assessmentResponse.data.assessmentName);
 
         // Start the assessment
         if (!assessmentResponse.data._id) {
@@ -196,7 +196,7 @@ const BaseLineTest = () => {
         }
 
         const assessmentId = assessmentResponse.data._id;
-        console.log(`ðŸ“¡ Starting assessment session for ID: ${assessmentId}`);
+        console.log(`📡 Starting assessment session for ID: ${assessmentId}`);
 
         // Set a timeout for the start request to prevent hanging
         const startPromise = assessmentApi.startAssessment(assessmentId, userId);
@@ -210,12 +210,12 @@ const BaseLineTest = () => {
           throw new Error(startResponse.error || "Failed to start assessment session");
         }
 
-        console.log("âœ… Assessment session started, Result ID:", startResponse.data.resultId);
+        console.log("✅ Assessment session started, Result ID:", startResponse.data.resultId);
         setResultId(startResponse.data.resultId);
 
         // Ensure questions are in order (defensive check)
         const fetchedQuestions = startResponse.data.questions || [];
-        console.log(`ðŸ“š Received ${fetchedQuestions.length} questions`);
+        console.log(`📚 Received ${fetchedQuestions.length} questions`);
 
         const sortedQuestions = [...fetchedQuestions].sort((a, b) => (a.order || 0) - (b.order || 0));
         // Limit to 36 questions as requested
@@ -224,7 +224,7 @@ const BaseLineTest = () => {
 
         // PERSISTENCE: Restore previous answers if any
         if (startResponse.data.responses && startResponse.data.responses.length > 0) {
-          console.log(`ðŸ’¾ Restoring ${startResponse.data.responses.length} previous responses...`);
+          console.log(`💾 Restoring ${startResponse.data.responses.length} previous responses...`);
           const answersMap = {};
           startResponse.data.responses.forEach(r => {
             answersMap[r.questionId] = r.selectedValue;
@@ -242,11 +242,11 @@ const BaseLineTest = () => {
         }
 
       } catch (err) {
-        console.error("âŒ Error initializing assessment:", err);
+        console.error("❌ Error initializing assessment:", err);
         setError(err.message || "Failed to load assessment. Please try refreshing the page.");
       } finally {
         setLoading(false);
-        console.log("ðŸ Initialization complete, loading set to false.");
+        console.log("🏁 Initialization complete, loading set to false.");
       }
     };
 
@@ -288,11 +288,11 @@ const BaseLineTest = () => {
       );
 
       if (!response.success) {
-        console.error("âŒ Failed to save answer to backend");
+        console.error("❌ Failed to save answer to backend");
         // Revert UI if needed? Usually for assessments we just keep trying or log it
       }
     } catch (err) {
-      console.error("âŒ Error saving answer:", err);
+      console.error("❌ Error saving answer:", err);
     } finally {
       setSavingAnswer(false);
     }
@@ -420,7 +420,7 @@ const BaseLineTest = () => {
   if (loading) return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#001229] flex items-center justify-center transition-colors duration-300">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#30919D] mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1a3884] mx-auto mb-4"></div>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">Loading Base Line Test...</p>
       </div>
     </div>
@@ -429,10 +429,10 @@ const BaseLineTest = () => {
   if (error) return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#001229] flex items-center justify-center p-4 transition-colors duration-300">
       <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#0B1120] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
-        <div className="text-red-500 text-5xl mb-4">âš ï¸</div>
+        <div className="text-red-500 text-5xl mb-4">⚠️</div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Error</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
-        <button onClick={() => navigate("/dashboard/assessments")} className="px-6 py-2 bg-[#30919D] text-white rounded-lg hover:bg-[#277a84] font-medium transition-colors">
+        <button onClick={() => navigate("/dashboard/assessments")} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg hover:bg-[#277a84] font-medium transition-colors">
           Back to Assessments
         </button>
       </div>
@@ -448,32 +448,32 @@ const BaseLineTest = () => {
             {/* Main Question Area */}
             <div className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-[#0B1120] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden relative">
               {/* Background gradient effect */}
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#30919D]/5 rounded-full blur-[100px] pointer-events-none" />
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3884]/5 rounded-full blur-[100px] pointer-events-none" />
 
               <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0B1120] relative z-10">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Base Line Test <span className="text-[#30919D]">T1</span></h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Base Line Test <span className="text-[#1a3884]">T1</span></h2>
                   <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
-                    Time: <span className="font-mono text-[#30919D]">{Math.floor(timeElapsed / 1000)}s</span>
+                    Time: <span className="font-mono text-[#1a3884]">{Math.floor(timeElapsed / 1000)}s</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-[#30919D]"
+                      className="h-full bg-[#1a3884]"
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: 0.5 }}
                     />
                   </div>
-                  <span className="text-xs font-bold text-[#30919D] min-w-[3rem] text-right">{progress}%</span>
+                  <span className="text-xs font-bold text-[#1a3884] min-w-[3rem] text-right">{progress}%</span>
                 </div>
               </div>
 
               <div className="p-6 md:p-8 flex-1 relative z-10 flex flex-col justify-center">
                 <div className="mb-8 text-center">
-                  <span className="inline-block px-3 py-1 rounded-full bg-[#30919D]/10 text-[#30919D] text-xs font-bold uppercase tracking-widest mb-3">
+                  <span className="inline-block px-3 py-1 rounded-full bg-[#1a3884]/10 text-[#1a3884] text-xs font-bold uppercase tracking-widest mb-3">
                     Question {index + 1} / {questions.length}
                   </span>
                   <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
@@ -489,18 +489,18 @@ const BaseLineTest = () => {
                         key={option.value}
                         onClick={() => selectOption(option.value)}
                         className={`group relative p-3 md:p-5 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-left hover:scale-[1.01] active:scale-[0.99] ${isSelected
-                          ? 'border-[#30919D] bg-[#30919D]/10 shadow-[0_0_30px_-10px_rgba(48,145,157,0.3)]'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-[#30919D]/50 hover:bg-slate-50 dark:hover:bg-slate-800'
+                          ? 'border-[#1a3884] bg-[#1a3884]/10 shadow-[0_0_30px_-10px_rgba(26,56,132,0.3)]'
+                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-[#1a3884]/50 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                       >
                         <div className="flex items-center gap-3 md:gap-4">
                           <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-2 flex items-center justify-center font-bold text-sm md:text-base shrink-0 transition-colors shadow-sm ${isSelected
-                            ? 'bg-[#30919D] border-[#30919D] text-white'
-                            : 'border-slate-300 dark:border-slate-600 text-slate-400 dark:text-slate-500 group-hover:border-[#30919D] group-hover:text-[#30919D]'
+                            ? 'bg-[#1a3884] border-[#1a3884] text-white'
+                            : 'border-slate-300 dark:border-slate-600 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] group-hover:text-[#1a3884]'
                             }`}>
                             {option.value}
                           </div>
-                          <span className={`text-sm md:text-base font-medium transition-colors ${isSelected ? 'text-[#30919D]' : 'text-slate-700 dark:text-slate-200'}`}>
+                          <span className={`text-sm md:text-base font-medium transition-colors ${isSelected ? 'text-[#1a3884]' : 'text-slate-700 dark:text-slate-200'}`}>
                             {option.label}
                           </span>
                         </div>
@@ -519,9 +519,9 @@ const BaseLineTest = () => {
                         exit={{ opacity: 0, scale: 0.9 }}
                         onClick={nextQ}
                         disabled={timeElapsed < 5000}
-                        className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#30919D]/20 transition-all flex items-center gap-2 ${timeElapsed < 5000
+                        className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#1a3884]/20 transition-all flex items-center gap-2 ${timeElapsed < 5000
                           ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-                          : 'bg-[#30919D] text-white hover:bg-[#277a84] hover:shadow-2xl hover:-translate-y-1'
+                          : 'bg-[#1a3884] text-white hover:bg-[#277a84] hover:shadow-2xl hover:-translate-y-1'
                           }`}
                       >
                         {timeElapsed < 5000 ? (
@@ -566,7 +566,7 @@ const BaseLineTest = () => {
             <div className="lg:w-80 bg-white dark:bg-[#0B1120] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
               <div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                  <Target className="text-[#30919D]" size={20} /> Question Map
+                  <Target className="text-[#1a3884]" size={20} /> Question Map
                 </h4>
                 <div className="grid grid-cols-6 gap-2 max-h-[300px] md:max-h-[400px] overflow-y-auto p-1 custom-scrollbar">
                   {questions.map((q, idx) => (
@@ -575,9 +575,9 @@ const BaseLineTest = () => {
                       onClick={() => { /* Optional: Allow navigating back to answered questions? For now kept disabled/visual only based on original code 'prevQ' disabled */ }}
                       className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all cursor-default relative group
                         ${index === idx
-                          ? 'bg-[#30919D] text-white shadow-md scale-105 border-2 border-[#1a5f66]'
+                          ? 'bg-[#1a3884] text-white shadow-md scale-105 border-2 border-[#1a5f66]'
                           : selectedAnswers[q._id]
-                            ? 'bg-[#30919D]/10 text-[#30919D] border border-[#30919D]/30'
+                            ? 'bg-[#1a3884]/10 text-[#1a3884] border border-[#1a3884]/30'
                             : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-transparent'
                         }`}
                     >
@@ -593,7 +593,7 @@ const BaseLineTest = () => {
 
               <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#30919D]" /> Answered</span>
+                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884]" /> Answered</span>
                   <span className="font-bold text-slate-900 dark:text-white">{Object.keys(selectedAnswers).length}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -609,7 +609,7 @@ const BaseLineTest = () => {
                   onClick={async () => {
                     try {
                       const btn = document.activeElement;
-                      btn.innerText = "âš¡ Running...";
+                      btn.innerText = "⚡ Running...";
                       btn.disabled = true;
 
                       const unanswered = questions.filter(q => !selectedAnswers[q._id]);
@@ -637,7 +637,7 @@ const BaseLineTest = () => {
                   }}
                   className="w-full py-2 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
                 >
-                  âš¡ Auto-Fill (Dev)
+                  ⚡ Auto-Fill (Dev)
                 </button>
               </div>
             </div>
@@ -659,7 +659,7 @@ const BaseLineTest = () => {
                 </h2>
                 <div className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                   <span>Result ID: T1-{user?.studentId || 'REF'}</span>
-                  <span>•</span>
+                  <span>�</span>
                   <span>S_baseline</span>
                 </div>
               </div>
@@ -774,7 +774,7 @@ const BaseLineTest = () => {
                     );
                   }) : (
                     <div className="col-span-3 text-center py-12">
-                      <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#30919D] border-t-transparent mx-auto mb-4" />
+                      <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1a3884] border-t-transparent mx-auto mb-4" />
                       <p className="text-slate-400 text-lg">Processing your profile...</p>
                     </div>
                   )}
@@ -829,7 +829,7 @@ const BaseLineTest = () => {
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">Don't Leave Yet!</h3>
               <p className="text-slate-500 dark:text-slate-400 text-center mb-8">You're solving the questions brilliantly. Leaving now will pause your progress. Finish strong!</p>
               <div className="flex flex-col gap-3">
-                <button onClick={() => setShowExitWarning(false)} className="w-full py-4 bg-[#30919D] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Get Back to Test</button>
+                <button onClick={() => setShowExitWarning(false)} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Get Back to Test</button>
                 <button onClick={() => navigate("/dashboard/assessments")} className="w-full py-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold transition-colors">Exit Anyway</button>
               </div>
             </motion.div>
@@ -857,4 +857,6 @@ const BaseLineTest = () => {
 };
 
 export default BaseLineTest;
+
+
 

@@ -167,7 +167,7 @@ const SkillsPassport = () => {
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-3xl font-black text-[#30919D]">
+                                        <div className="text-3xl font-black text-[#1a3884]">
                                             {currentData.average}%
                                         </div>
                                         <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Average</div>
@@ -223,7 +223,7 @@ const SkillsPassport = () => {
                                                     <div key={q.id}>
                                                         <div className="flex items-end justify-between mb-2">
                                                             <div className="flex items-center gap-3">
-                                                                <div className={`p-1.5 rounded-md bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 text-[#30919D] shadow-sm`}>
+                                                                <div className={`p-1.5 rounded-md bg-white dark:bg-slate-700 border border-slate-100 dark:border-slate-600 text-[#1a3884] shadow-sm`}>
                                                                     <Icon className="w-4 h-4" />
                                                                 </div>
                                                                 <div>
@@ -240,7 +240,7 @@ const SkillsPassport = () => {
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${score}%` }}
                                                                 transition={{ duration: 1, ease: "easeOut" }}
-                                                                className={`h-full rounded-full ${score > 0 ? 'bg-gradient-to-r from-[#30919D] to-blue-500' : 'bg-slate-200 dark:bg-slate-600'}`}
+                                                                className={`h-full rounded-full ${score > 0 ? 'bg-gradient-to-r from-[#1a3884] to-blue-500' : 'bg-slate-200 dark:bg-slate-600'}`}
                                                             />
                                                         </div>
                                                     </div>
@@ -337,8 +337,8 @@ const RadarChart = ({ data, theme }) => {
                 animate={{ pathLength: 1, opacity: 1 }}
                 transition={{ duration: 1.5, ease: "easeInOut" }}
                 d={getPath(data.map(d => d.value), radius)}
-                fill="rgba(48, 145, 157, 0.15)" // Brand Teal low opacity
-                stroke="#30919D"
+                fill="rgba(26, 56, 132, 0.15)" // Brand Teal low opacity
+                stroke="#1a3884"
                 strokeWidth="2"
             />
 
@@ -354,7 +354,7 @@ const RadarChart = ({ data, theme }) => {
                         cx={point.x}
                         cy={point.y}
                         r="3.5"
-                        fill="#30919D"
+                        fill="#1a3884"
                         stroke="white"
                         strokeWidth="2"
                     />
@@ -385,3 +385,5 @@ const RadarChart = ({ data, theme }) => {
 };
 
 export default SkillsPassport;
+
+

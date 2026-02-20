@@ -107,12 +107,12 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="w-full max-w-2xl h-[600px] bg-gradient-to-br from-[#001a38] to-[#002447] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#30919D]/30"
+          className="w-full max-w-2xl h-[600px] bg-gradient-to-br from-[#001a38] to-[#002447] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#1a3884]/30"
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-[#30919D]/30 bg-[#001a38]/50">
+          <div className="flex items-center justify-between p-4 border-b border-[#1a3884]/30 bg-[#001a38]/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#30919D] to-[#267a84] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -139,7 +139,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
               >
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-3 ${message.role === 'user'
-                      ? 'bg-gradient-to-br from-[#30919D] to-[#267a84] text-white'
+                      ? 'bg-gradient-to-br from-[#1a3884] to-[#132c6b] text-white'
                       : message.isError
                         ? 'bg-red-500/20 text-red-200 border border-red-500/30'
                         : 'bg-white/10 text-gray-100 border border-white/10'
@@ -162,7 +162,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
               >
                 <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/10">
                   <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-[#30919D]" />
+                    <Loader2 className="w-4 h-4 animate-spin text-[#1a3884]" />
                     <span className="text-sm text-gray-300">Thinking...</span>
                   </div>
                 </div>
@@ -199,7 +199,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
           )}
 
           {/* Input */}
-          <div className="p-4 border-t border-[#30919D]/30 bg-[#001a38]/50">
+          <div className="p-4 border-t border-[#1a3884]/30 bg-[#001a38]/50">
             <div className="flex gap-2">
               <Input
                 value={inputMessage}
@@ -207,12 +207,12 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
                 disabled={isLoading}
-                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-[#30919D]"
+                className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-[#1a3884]"
               />
               <Button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
-                className="bg-gradient-to-r from-[#30919D] to-[#267a84] hover:from-[#267a84] hover:to-[#1f6670]"
+                className="bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#1f6670]"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -232,3 +232,5 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
 };
 
 export default ChatbotModal;
+
+

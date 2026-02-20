@@ -234,7 +234,7 @@ const AssessmentFlowGuard = ({ children }) => {
         {splashComplete && loading && (
           <div className="flex flex-col items-center justify-center min-h-screen bg-[#001229]">
             <div className="flex items-center">
-              <Loader2 className="w-12 h-12 text-[#30919D] animate-spin" />
+              <Loader2 className="w-12 h-12 text-[#1a3884] animate-spin" />
               <p className="ml-4 text-white font-medium">Finalizing setup...</p>
             </div>
             {/* Developer Skip Button - SECURITY FIX #5: Only shown in dev mode */}
@@ -288,4 +288,5 @@ const AssessmentFlowGuard = ({ children }) => {
 };
 
 export default AssessmentFlowGuard;
+
 

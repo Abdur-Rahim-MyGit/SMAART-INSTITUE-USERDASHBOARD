@@ -159,7 +159,7 @@ const VerifyBadge = () => {
             <div className="w-full max-w-2xl">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#30919D] to-[#287a84] flex items-center justify-center shadow-lg">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#287a84] flex items-center justify-center shadow-lg">
                         <FaShieldAlt className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-bold text-[#002147] dark:text-white mb-2">
@@ -187,7 +187,7 @@ const VerifyBadge = () => {
                                 value={manualId}
                                 onChange={(e) => setManualId(e.target.value)}
                                 placeholder="e.g., BADGE-CRQ-2026-001"
-                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:ring-2 focus:ring-[#30919D] focus:border-transparent outline-none transition-all"
+                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:ring-2 focus:ring-[#1a3884] focus:border-transparent outline-none transition-all"
                             />
                             <button
                                 type="submit"
@@ -207,7 +207,7 @@ const VerifyBadge = () => {
                         animate={{ opacity: 1 }}
                         className="text-center py-12"
                     >
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-[#30919D] border-t-transparent animate-spin" />
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full border-4 border-[#1a3884] border-t-transparent animate-spin" />
                         <p className="text-slate-500 dark:text-slate-400">Verifying badge...</p>
                     </motion.div>
                 )}
@@ -441,3 +441,4 @@ const VerifyBadge = () => {
 };
 
 export default VerifyBadge;
+

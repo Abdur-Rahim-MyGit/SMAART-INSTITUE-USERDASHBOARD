@@ -19,7 +19,7 @@ import { assessmentApi } from "@/services/assessmentApi";
 
 const THEME = {
   navy: '#002147',
-  teal: '#30919D',
+  teal: '#1a3884',
   white: '#FFFFFF'
 };
 
@@ -124,7 +124,7 @@ const QuotientsGrid = () => {
                 <p className="text-gray-400 mb-6">You need to complete the T1 Baseline Assessment to see your quotients.</p>
                 <a
                   href="/dashboard/assessments/baseline"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#30919D] text-white rounded-xl font-bold hover:opacity-90 transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#1a3884] text-white rounded-xl font-bold hover:opacity-90 transition-all"
                 >
                   Take Assessment <ChevronRight size={18} />
                 </a>
@@ -138,7 +138,7 @@ const QuotientsGrid = () => {
                       key={q.id}
                       whileHover={{ y: -5 }}
                       onClick={() => setSelectedQuotient({ ...q, ...scoreData })}
-                      className="bg-[#002147] border border-gray-800 rounded-3xl p-6 cursor-pointer group hover:border-[#30919D]/50 transition-all"
+                      className="bg-[#002147] border border-gray-800 rounded-3xl p-6 cursor-pointer group hover:border-[#1a3884]/50 transition-all"
                     >
                       <div className="flex items-center justify-between mb-6">
                         <div
@@ -213,7 +213,7 @@ const QuotientsGrid = () => {
                 <div className="mb-8">
                   <div className="flex items-center gap-3 mb-2">
                     <h2 className="text-2xl font-bold text-white">{selectedQuotient.title}</h2>
-                    <span className="px-3 py-1 rounded-full bg-[#30919D]/10 text-[#30919D] text-xs font-bold uppercase tracking-widest">
+                    <span className="px-3 py-1 rounded-full bg-[#1a3884]/10 text-[#1a3884] text-xs font-bold uppercase tracking-widest">
                       {selectedQuotient.id}
                     </span>
                   </div>
@@ -255,3 +255,4 @@ const QuotientsGrid = () => {
 };
 
 export default QuotientsGrid;
+
