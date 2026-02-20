@@ -114,10 +114,10 @@ const CertificateVerification = () => {
             }
         } catch (err) {
             console.error('Verification error:', err);
-            if (err.response?.status === 404) {
+            if (err.status === 404) {
                 setError('Certificate not found. Please check the ID and try again.');
             } else {
-                setError(err.response?.data?.message || 'Authentication failed.');
+                setError(err.data?.message || err.message || 'Authentication failed.');
             }
         } finally {
             setIsVerifying(false);

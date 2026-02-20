@@ -1,112 +1,51 @@
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { apiCall } from './api';
 
 /**
  * AI Career Coach API Service
- * Handles all API calls for AI Career Coach features
+ * Uses the same apiCall utility as the rest of the app for consistent auth handling.
  */
-
-// Create axios instance with auth headers
-const createAuthHeaders = () => {
-    const token = sessionStorage.getItem('token');
-    return {
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : ''
-        }
-    };
-};
-
 const aiCareerCoachApi = {
+
     // Profile Management
-    getProfile: async () => {
-        const response = await axios.get(
-            `${API_BASE_URL}/ai-career-coach/profile`,
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    getProfile: () => apiCall('/ai-career-coach/profile', { method: 'GET' }),
 
-    updateProfile: async (profileData) => {
-        const response = await axios.put(
-            `${API_BASE_URL}/ai-career-coach/profile`,
-            profileData,
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    updateProfile: (profileData) => apiCall('/ai-career-coach/profile', {
+        method: 'PUT',
+        body: JSON.stringify(profileData)
+    }),
 
-    analyzeProfile: async () => {
-        const response = await axios.post(
-            `${API_BASE_URL}/ai-career-coach/profile/analyze`,
-            {},
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    analyzeProfile: () => apiCall('/ai-career-coach/profile/analyze', {
+        method: 'POST',
+        body: JSON.stringify({})
+    }),
 
     // Career Features
-    getCareerRecommendations: async () => {
-        const response = await axios.get(
-            `${API_BASE_URL}/ai-career-coach/recommendations`,
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    getCareerRecommendations: () => apiCall('/ai-career-coach/recommendations', { method: 'GET' }),
 
-    analyzeSkillGap: async (targetRole) => {
-        const response = await axios.post(
-            `${API_BASE_URL}/ai-career-coach/skill-gap`,
-            { targetRole },
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    analyzeSkillGap: (targetRole) => apiCall('/ai-career-coach/skill-gap', {
+        method: 'POST',
+        body: JSON.stringify({ targetRole })
+    }),
 
-    generateLearningPlan: async (targetRole, timeframe = '6 months') => {
-        const response = await axios.post(
-            `${API_BASE_URL}/ai-career-coach/learning-plan`,
-            { targetRole, timeframe },
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    generateLearningPlan: (targetRole, timeframe = '6 months') => apiCall('/ai-career-coach/learning-plan', {
+        method: 'POST',
+        body: JSON.stringify({ targetRole, timeframe })
+    }),
 
-    generateResume: async (targetRole) => {
-        const response = await axios.post(
-            `${API_BASE_URL}/ai-career-coach/resume`,
-            { targetRole },
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    generateResume: (targetRole) => apiCall('/ai-career-coach/resume', {
+        method: 'POST',
+        body: JSON.stringify({ targetRole })
+    }),
 
     // Chat Features
-    sendChatMessage: async (message, sessionId = null) => {
-        const response = await axios.post(
-            `${API_BASE_URL}/ai-career-coach/chat`,
-            { message, sessionId },
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    sendChatMessage: (message, sessionId = null) => apiCall('/ai-career-coach/chat', {
+        method: 'POST',
+        body: JSON.stringify({ message, sessionId })
+    }),
 
-    getChatHistory: async (sessionId) => {
-        const response = await axios.get(
-            `${API_BASE_URL}/ai-career-coach/chat/${sessionId}`,
-            createAuthHeaders()
-        );
-        return response.data;
-    },
+    getChatHistory: (sessionId) => apiCall(`/ai-career-coach/chat/${sessionId}`, { method: 'GET' }),
 
-    getChatSessions: async () => {
-        const response = await axios.get(
-            `${API_BASE_URL}/ai-career-coach/chat/sessions`,
-            createAuthHeaders()
-        );
-        return response.data;
-    }
+    getChatSessions: () => apiCall('/ai-career-coach/chat/sessions', { method: 'GET' }),
 };
 
 export default aiCareerCoachApi;

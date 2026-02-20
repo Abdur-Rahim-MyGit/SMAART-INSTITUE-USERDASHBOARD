@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, BookOpen, Bookmark, ArrowRight, Loader2 } from "lucide-react";
+import { Search, Filter, BookOpen, Bookmark, ArrowRight, Loader2, Star } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { toast } from "sonner";
@@ -20,14 +20,58 @@ const Library = () => {
 
   // Default initial search
   useEffect(() => {
-    fetchBooks("success");
+    fetchBooks("career development");
   }, []);
+
+  /* Fallback content for when API fails or returns no results */
+  const FALLBACK_BOOKS = [
+    {
+      id: "fb1",
+      title: "Atomic Habits",
+      author: "James Clear",
+      category: "Psychology",
+      rating: 4.8,
+      image: "https://m.media-amazon.com/images/I/81wgcld4wxL.jpg",
+      description: "An easy & proven way to build good habits & break bad ones.",
+      link: "https://jamesclear.com/atomic-habits"
+    },
+    {
+      id: "fb2",
+      title: "Deep Work",
+      author: "Cal Newport",
+      category: "Productivity",
+      rating: 4.6,
+      image: "https://m.media-amazon.com/images/I/41-a20c+r9L._SX322_BO1,204,203,200_.jpg",
+      description: "Rules for focused success in a distracted world.",
+      link: "https://www.calnewport.com/books/deep-work/"
+    },
+    {
+      id: "fb3",
+      title: "Mindset",
+      author: "Carol S. Dweck",
+      category: "Psychology",
+      rating: 4.6,
+      image: "https://m.media-amazon.com/images/I/71oD1zRxGSL.jpg",
+      description: "The new psychology of success.",
+      link: "https://www.amazon.com/Mindset-Psychology-Carol-S-Dweck/dp/0345472322"
+    },
+    {
+      id: "fb4",
+      title: "Designing Your Life",
+      author: "Bill Burnett & Dave Evans",
+      category: "Career",
+      rating: 4.5,
+      image: "https://m.media-amazon.com/images/I/81f5f4iH+4L.jpg",
+      description: "How to build a well-lived, joyful life.",
+      link: "https://designingyour.life/"
+    }
+  ];
 
   const fetchBooks = async (query) => {
     setLoading(true);
     try {
       // Use Google Books API
-      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=12&key=`);
+      const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=12`);
       const data = await res.json();
 
       if (data.items) {
@@ -43,11 +87,12 @@ const Library = () => {
         }));
         setBooks(formatted);
       } else {
-        setBooks([]);
+        setBooks(FALLBACK_BOOKS);
       }
     } catch (error) {
       console.error("Error fetching books:", error);
-      toast.error("Failed to load library resources");
+      toast.error("Using offline library resources");
+      setBooks(FALLBACK_BOOKS);
     } finally {
       setLoading(false);
     }
@@ -100,8 +145,8 @@ const Library = () => {
                   key={cat.id}
                   onClick={() => setCategory(cat.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${category === cat.id
-                      ? "bg-blue-600 text-white shadow-md"
-                      : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
                     }`}
                 >
                   {cat.label}
