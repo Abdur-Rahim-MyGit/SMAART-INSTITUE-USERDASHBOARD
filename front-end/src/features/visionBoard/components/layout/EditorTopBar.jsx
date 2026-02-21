@@ -4,14 +4,10 @@ import {
   ChevronLeft,
   Undo2,
   Redo2,
+  Eye,
   Cloud,
-  Check,
   Save,
   Loader2,
-  Eye,
-  Download,
-  Share2,
-  MoreHorizontal
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,15 +42,7 @@ const EditorTopBar = ({
           <ChevronLeft className="w-5 h-5" />
           <span className="font-semibold text-sm hidden sm:block">Home</span>
         </Link>
-        <div className="h-6 w-px bg-white/20 hidden sm:block"></div>
-        <div className="hidden md:flex items-center gap-1">
-          <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white h-8 px-2 text-xs font-normal">
-            File
-          </Button>
-          <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white h-8 px-2 text-xs font-normal">
-            Resize
-          </Button>
-        </div>
+
         
         {/* Undo/Redo - often in the header for Canva-like apps */}
         <div className="hidden sm:flex items-center gap-1 ml-2">
@@ -139,7 +127,7 @@ const EditorTopBar = ({
             className="bg-white text-[#363795] hover:bg-slate-100 h-9 px-4 font-semibold gap-2"
             onClick={onPreview}
         >
-            <Download className="w-4 h-4" />
+            <Eye className="w-4 h-4" />
             <span className="hidden sm:inline">Export</span>
         </Button>
       </div>

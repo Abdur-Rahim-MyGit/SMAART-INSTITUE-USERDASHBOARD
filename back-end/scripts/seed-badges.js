@@ -7,78 +7,37 @@ const path = require('path');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const badges = [
-    // --- Course Completion Badges ---
     {
-        badgeId: 'COURSE_COMPLETION_1',
-        title: 'First Step',
-        description: 'Completed your first course!',
-        category: 'learning',
-        tier: 'bronze',
-        xp: 100,
-        icon: 'Trophy',
-        color: '#CD7F32',
-        criteria: {
-            type: 'course_completion',
-            moduleCount: 1
-        },
-        rarity: 'common',
-        displayOrder: 1
-    },
-    {
-        badgeId: 'COURSE_FnB_MASTER',
-        title: 'F&B Service Expert',
-        description: 'Completed the F&B Service course successfully.',
-        category: 'certification',
-        tier: 'gold',
-        xp: 500,
-        icon: 'Medal',
-        color: '#FFD700',
-        criteria: {
-            type: 'course_completion',
-            // We will match this by course code in the code logic usually, 
-            // but here we might need a specific way to link it. 
-            // For now, let's assume the system awards this by ID if passed explicitly.
-            customRule: 'exact_course_code:FNB-001'
-        },
-        rarity: 'rare',
-        displayOrder: 2
-    },
-
-    // --- Assessment Badges ---
-    {
-        badgeId: 'ASSESSMENT_T1_PRO',
-        title: 'Cognitive Champion',
-        description: 'Scored above 80% in the T1 Assessment.',
-        category: 'assessment',
+        badgeId: 'MOD-COMPLETE',
+        title: 'Module Master',
+        description: 'Awarded for completing a course module successfully.',
+        category: 'capability',
         tier: 'silver',
         xp: 300,
-        icon: 'Brain',
-        color: '#C0C0C0',
+        icon: 'Award',
+        color: '#C0C0C0', // Silver
         criteria: {
-            type: 'assessment_score',
-            assessmentCode: 'ASM00001',
-            minScore: 80
+            type: 'module_completion'
         },
         rarity: 'uncommon',
-        displayOrder: 3
+        displayOrder: 1,
+        isActive: true
     },
-
-    // --- Streak Badges ---
     {
-        badgeId: 'STREAK_3_DAYS',
-        title: 'Consistency is Key',
-        description: 'Logged in and learned for 3 consecutive days.',
-        category: 'streak',
-        tier: 'bronze',
-        xp: 50,
-        icon: 'Flame',
-        color: '#CD7F32',
+        badgeId: 'CRS-COMPLETE',
+        title: 'Course Conqueror',
+        description: 'Awarded for completing an entire course successfully.',
+        category: 'capacity',
+        tier: 'gold',
+        xp: 500,
+        icon: 'Trophy',
+        color: '#FFD700', // Gold
         criteria: {
-            type: 'streak',
-            streakDays: 3
+            type: 'course_completion'
         },
-        rarity: 'common',
-        displayOrder: 10
+        rarity: 'rare',
+        displayOrder: 2,
+        isActive: true
     }
 ];
 

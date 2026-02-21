@@ -55,6 +55,7 @@ async function checkUserProgress(email) {
                     console.log(`    Enrollment ID: ${e._id}`);
                     console.log(`    Progress: ${e.progress}%`);
                     console.log(`    Module Progress Count: ${e.moduleProgress?.length || 0}`);
+                    console.log(`    Full Module Progress: ${JSON.stringify(e.moduleProgress, null, 2)}`);
                 });
             }
         }

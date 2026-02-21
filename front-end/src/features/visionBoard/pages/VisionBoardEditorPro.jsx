@@ -154,21 +154,16 @@ const VisionBoardEditorPro = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [isModelLoading, setIsModelLoading] = useState(false);
-  
-  // History State for Undo/Redo (Basic implementation)
-  const [history, setHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
 
   const handleInstantCheck = (text) => {
-    // Use aggressive substring matching for instant feedback during typing
-    const result = moderateText(text, false);
+    // Use exact word-boundary matching to avoid false positives (e.g. "class" matching "ass")
+    const result = moderateText(text, true);
     if (!result.isClean) {
       toast({
         title: "Inappropriate Content",
-        description: "Your text contains inappropriate language. Actions have been blocked for safety.",
+        description: "Your text contains inappropriate language. Please revise it.",
         variant: "destructive",
       });
-      navigate("/vision-board-pro/gallery");
       return true;
     }
     return false;
@@ -409,22 +404,53 @@ const VisionBoardEditorPro = () => {
       setSelectedSlot(null); // Deselect before capture
       setSelectedTextId(null); // Deselect text before capture
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Wait for React to re-render the DOM without selection borders
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
-      const exportScale = currentRatio.width / canvasRef.current.offsetWidth;
+      // Capture canvas using "Clone & Append" strategy to strictly enforce dimensions and ignore zoom
+      const collageBase64 = await new Promise(async (resolve, reject) => {
+        try {
+          const originalCanvas = canvasRef.current;
+          if (!originalCanvas) throw new Error("Canvas element not found");
 
-      // Capture canvas as SINGLE MERGED COLLAGE IMAGE at full resolution
-      const canvas = await html2canvas(canvasRef.current, {
-        scale: exportScale,
-        useCORS: true,
-        allowTaint: true,
-        logging: false,
-        backgroundColor: null,
-        width: canvasRef.current.offsetWidth,
-        height: canvasRef.current.offsetHeight,
+          // Clone the canvas node
+          const clone = originalCanvas.cloneNode(true);
+          
+          // Force exact pixel dimensions and reset transforms on the clone
+          clone.style.transform = "none";
+          clone.style.width = `${currentRatio.width}px`;
+          clone.style.height = `${currentRatio.height}px`;
+          // Position off-screen but part of DOM so html2canvas can render it
+          clone.style.position = "fixed";
+          clone.style.top = "0"; // Must be within viewport for some renderers, but z-index hides it
+          clone.style.left = "0";
+          clone.style.zIndex = "-9999";
+          clone.style.margin = "0";
+          // Ensure background is captured if set
+          if (!backgroundColor || backgroundColor === 'transparent') {
+             clone.style.backgroundColor = '#ffffff'; 
+          }
+
+          document.body.appendChild(clone);
+
+          const canvas = await html2canvas(clone, {
+            scale: 1, // 1:1 of the forced pixel size
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            backgroundColor: null, // We set it on the element
+            width: currentRatio.width,
+            height: currentRatio.height,
+            windowWidth: currentRatio.width, // Hint for full visibility
+            windowHeight: currentRatio.height
+          });
+
+          document.body.removeChild(clone);
+          resolve(canvas.toDataURL("image/png", 1.0));
+        } catch (err) {
+          reject(err);
+        }
       });
-
-      const collageBase64 = canvas.toDataURL("image/png", 1.0);
 
       // Check authentication before saving
       const userStr = sessionStorage.getItem("user");
@@ -502,7 +528,7 @@ const VisionBoardEditorPro = () => {
         isSaving={isSaving}
         onPreview={() => setShowPreview(true)}
         handleInstantCheck={handleInstantCheck}
-        // Undo/Redo placeholders
+        // TODO: Implement undo/redo history tracking
         onUndo={() => {}}
         onRedo={() => {}}
         canUndo={false}

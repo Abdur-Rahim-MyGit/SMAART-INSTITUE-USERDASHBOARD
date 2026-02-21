@@ -12,7 +12,6 @@ let cachedUserId = null;
 // Function to reset the cached user ID (call when user logs in/out)
 export const resetUserIdCache = () => {
   cachedUserId = null;
-  console.log('[VisionBoardProApi] User ID cache cleared');
 };
 
 // Helper to get user ID - fetches from backend if missing
@@ -33,7 +32,6 @@ const getUserId = async () => {
     }
 
     if (!userStr || userStr === '{}' || userStr === 'undefined' || userStr === 'null') {
-      console.log('[VisionBoardProApi] No user found in storage');
       return null;
     }
 
@@ -41,7 +39,6 @@ const getUserId = async () => {
     let userId = user._id || user.id || null;
 
     if (userId) {
-      console.log('[VisionBoardProApi] Found userId:', userId, 'from', source);
       cachedUserId = userId;
       return userId;
     }
@@ -55,7 +52,6 @@ const getUserId = async () => {
 
         if (data.success && data.data && data.data._id) {
           userId = data.data._id;
-          console.log('[VisionBoardProApi] Fetched real userId from backend:', userId);
 
           // Update the user object with the real ID
           user.id = userId;
@@ -82,10 +78,6 @@ const apiCall = async (endpoint, options = {}) => {
 
   // Validate userId exists - this is expected when user isn't logged in
   if (!userId) {
-    console.log('[VisionBoardProApi] No userId found, storage:', {
-      session: sessionStorage.getItem("user"),
-      local: localStorage.getItem("user")
-    });
     throw new Error("User not authenticated. Please log in to access vision boards.");
   }
 

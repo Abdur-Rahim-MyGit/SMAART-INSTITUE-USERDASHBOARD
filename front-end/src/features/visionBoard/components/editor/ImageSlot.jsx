@@ -24,6 +24,7 @@ const ImageSlot = ({
   const [initialScale, setInitialScale] = useState(1);
 
   // Gap in percentage based on canvas width
+  // Convert pixel gap to approximate percentage offset (canvas base ~600px, so gap/6 ≈ gap as %)
   const gapPercent = gap / 6; // Convert gap pixels to percentage
 
   const handleFileSelect = (e) => {
@@ -41,6 +42,8 @@ const ImageSlot = ({
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // First check for files dragged from the OS
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
@@ -48,6 +51,13 @@ const ImageSlot = ({
         onImageUpload(slot.id, event.target.result);
       };
       reader.readAsDataURL(file);
+      return;
+    }
+
+    // Then check for base64/URL data dragged from the Uploads panel
+    const imageUrl = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("image/url");
+    if (imageUrl) {
+      onImageUpload(slot.id, imageUrl);
     }
   };
 
@@ -180,7 +190,7 @@ const ImageSlot = ({
       ref={slotRef}
       style={slotStyle}
       className={`relative transition-all ${isSelected ? "ring-2 ring-teal-500 ring-offset-2" : ""
-        } ${!image ? "bg-slate-100/80 hover:bg-slate-200/80 dark:bg-white/5 dark:hover:bg-white/10" : ""}`}
+        } ${!image ? "bg-slate-200/80 hover:bg-slate-300/80" : ""}`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect(slot.id);
@@ -323,7 +333,7 @@ const ImageSlot = ({
       ) : (
         // Empty slot - tap/click to upload (mobile-friendly)
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer text-slate-500 hover:text-slate-600 active:bg-slate-200/60 dark:text-white/60 dark:hover:text-white/80 dark:active:bg-white/10 transition-colors"
+          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer text-slate-500 hover:text-slate-600 active:bg-slate-300/60 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             fileInputRef.current?.click();

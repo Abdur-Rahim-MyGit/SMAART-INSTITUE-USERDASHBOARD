@@ -194,7 +194,7 @@ const SplashScreen = ({ onComplete }) => {
                             transition={{ delay: 2.2, duration: 0.8 }}
                             className="text-teal-light"
                         >
-                            MINDS
+                            Institute
                         </motion.span>
                     </h1>
 

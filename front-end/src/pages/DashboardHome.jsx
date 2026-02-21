@@ -59,10 +59,12 @@ const DashboardHome = () => {
     totalCourses: 0,
     completedModules: 0,
     baselineScore: 0,
-    dayStreak: 0
+    dayStreak: 0,
+    currentModuleName: "No Active Module",
+    currentModuleProgress: 0
   });
   const [dashboardLoading, setDashboardLoading] = useState(true);
-  const [weeklyProgress, setWeeklyProgress] = useState(0);
+  const [moduleProgress, setModuleProgress] = useState(0);
 
   // Animation Variants - Smoother, more professional
   const containerVariants = {
@@ -255,24 +257,46 @@ const DashboardHome = () => {
 
         // Pre-process all courses for stats
         courses.forEach(enrollment => {
-          let currentProgress = enrollment.progress || 0;
-
-          // Calculate module-based progress regardless of enrollment.progress
-          if (enrollment.moduleProgress && enrollment.course?.modules?.length > 0) {
-            const completedMods = enrollment.moduleProgress.filter(m => m.status === 'completed').length;
-            const totalMods = enrollment.course.modules.length;
-            if (totalMods > 0) {
-              const moduleCalculatedProgress = Math.round((completedMods / totalMods) * 100);
-              // Trust whichever is higher or catch 100% completion if status is stale
-              if (moduleCalculatedProgress > currentProgress || moduleCalculatedProgress === 100) {
-                currentProgress = moduleCalculatedProgress;
-              }
-            }
+          const course = enrollment.course;
+          if (!course || !course.modules || course.modules.length === 0) {
+            enrollment.calculatedProgress = enrollment.progress || 0;
+            totalProgressSum += enrollment.calculatedProgress;
+            return;
           }
 
-          // Attach calculated progress for UI usage
-          enrollment.calculatedProgress = currentProgress;
-          totalProgressSum += currentProgress;
+          let totalExpectedDays = 0;
+          let completedDaysCount = 0;
+
+          course.modules.forEach(mod => {
+            const modExpected = mod.days ? mod.days.length : 0;
+            totalExpectedDays += modExpected;
+
+            const mProg = (enrollment.moduleProgress || []).find(mp =>
+              (mp.module === mod._id || mp.module?._id === mod._id)
+            );
+
+            if (mProg) {
+              const completedInMod = new Set();
+              if (mProg.videoProgress) {
+                mProg.videoProgress.forEach(vp => {
+                  if (vp.isCompleted) completedInMod.add(vp.dayId);
+                });
+              }
+              if (mProg.completedTasks) {
+                mProg.completedTasks.forEach(ct => {
+                  completedInMod.add(ct.dayId);
+                });
+              }
+              completedDaysCount += completedInMod.size;
+            }
+          });
+
+          const granularProgress = totalExpectedDays > 0
+            ? Math.round((completedDaysCount / totalExpectedDays) * 100)
+            : 0;
+
+          enrollment.calculatedProgress = granularProgress;
+          totalProgressSum += granularProgress;
 
           if (enrollment.moduleProgress && Array.isArray(enrollment.moduleProgress)) {
             enrollment.moduleProgress.forEach(module => {
@@ -297,14 +321,14 @@ const DashboardHome = () => {
 
         // A course is "Active" if it's in_progress OR has any activity, and not finished
         const activeCoursesCount = courses.filter(c => 
-          (c.status === 'in_progress' || c.status === 'in-progress' || c.hasAnyActivity || c.calculatedProgress > 0) && 
+          (c.status === 'in_progress' || c.status === 'in-progress' || c.status === 'enrolled' || c.hasAnyActivity || c.calculatedProgress > 0) && 
           c.calculatedProgress < 100
         ).length;
 
         // Find the "Active" course for hero section
         const activeCourseEnrollment = [...courses]
           .filter(e => 
-            (e.status === 'in_progress' || e.status === 'in-progress' || e.hasAnyActivity || e.calculatedProgress > 0) && 
+            (e.status === 'in_progress' || e.status === 'in-progress' || e.status === 'enrolled' || e.hasAnyActivity || e.calculatedProgress > 0) && 
             e.calculatedProgress < 100
           )
           .sort((a, b) =>
@@ -370,6 +394,48 @@ const DashboardHome = () => {
           ? Math.round(totalProgressSum / courses.length)
           : 0;
 
+        // Calculate current module progress specifically
+        let currentModuleProgressVal = 0;
+        let currentModuleName = "Start Learning";
+
+        if (activeCourseEnrollment) {
+          const course = activeCourseEnrollment.course;
+          const enrollment = activeCourseEnrollment;
+          
+          // Find the first incomplete module
+          const currentMod = course.modules.find((m, idx) => {
+            const mIdx = idx + 1;
+            const modProg = (enrollment.moduleProgress || []).find(
+              mp => mp.module === m._id || mp.module?._id === m._id
+            );
+            return !modProg || modProg.status !== 'completed';
+          }) || course.modules[0];
+
+          if (currentMod) {
+            currentModuleName = currentMod.title || "Current Module";
+            const modProg = (enrollment.moduleProgress || []).find(
+              mp => mp.module === currentMod._id || mp.module?._id === currentMod._id
+            );
+
+            if (modProg) {
+              const completedInMod = new Set();
+              if (modProg.videoProgress) {
+                modProg.videoProgress.forEach(vp => {
+                  if (vp.isCompleted) completedInMod.add(vp.dayId);
+                });
+              }
+              if (modProg.completedTasks) {
+                modProg.completedTasks.forEach(ct => {
+                  completedInMod.add(ct.dayId);
+                });
+              }
+
+              const totalDays = currentMod.days?.length || 1;
+              currentModuleProgressVal = Math.round((completedInMod.size / totalDays) * 100);
+            }
+          }
+        }
+
         // Fetch Streak
         let currentStreak = 0;
         try {
@@ -389,10 +455,12 @@ const DashboardHome = () => {
           resumeUrl,
           currentModuleTitle,
           lastAccessedTime,
-          activeEnrollment: activeCourseEnrollment
+          activeEnrollment: activeCourseEnrollment,
+          currentModuleName,
+          currentModuleProgress: currentModuleProgressVal
         });
 
-        setWeeklyProgress(overallProgress);
+        setModuleProgress(currentModuleProgressVal);
 
       } catch (error) {
         console.error('Failed to fetch dashboard data:', error);
@@ -548,7 +616,7 @@ const DashboardHome = () => {
                         <div className="md:w-3/4">
                           <div className="flex items-center gap-2 mb-4">
                             <span className="w-8 h-1 bg-blue-500 rounded-full"></span>
-                            <p className="text-blue-600 dark:text-blue-200 text-xs font-bold uppercase tracking-widest">Weekly Performance</p>
+                            <p className="text-blue-600 dark:text-blue-200 text-xs font-bold uppercase tracking-widest">Module Progress</p>
                           </div>
 
                           <h2 className="text-2xl md:text-3xl font-bold mb-4 leading-tight text-slate-900 dark:text-white">
@@ -559,7 +627,7 @@ const DashboardHome = () => {
 
                           <p className="text-slate-600 dark:text-slate-300 mb-8 max-w-lg leading-relaxed text-sm">
                             {enrolledCourses.length > 0
-                              ? `You have completed ${stats.completedModules} modules this week. Resume your latest course to maintain your streak.`
+                              ? `You are currently working on "${stats.currentModuleName}". Resume your session to continue your progress.`
                               : "Start your professional journey today by exploring our industry-standard courses."}
                           </p>
 
@@ -587,12 +655,12 @@ const DashboardHome = () => {
                               strokeWidth="6"
                               strokeLinecap="round"
                               strokeDasharray={`${2 * Math.PI * 45}`}
-                              strokeDashoffset={`${2 * Math.PI * 45 * (1 - weeklyProgress / 100)}`}
+                              strokeDashoffset={`${2 * Math.PI * 45 * (1 - moduleProgress / 100)}`}
                               className="transition-all duration-1000 ease-out"
                             />
                           </svg>
                           <div className="absolute text-center">
-                            <span className="text-2xl font-bold block text-slate-900 dark:text-white">{weeklyProgress}%</span>
+                            <span className="text-2xl font-bold block text-slate-900 dark:text-white">{moduleProgress}%</span>
                             <span className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-semibold">Done</span>
                           </div>
                         </div>

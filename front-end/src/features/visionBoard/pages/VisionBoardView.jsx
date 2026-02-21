@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import html2canvas from "html2canvas";
 import DashboardSidebar from "@/components/DashboardSidebar";
@@ -12,7 +12,7 @@ import {
   Calendar,
   Clock,
 } from "lucide-react";
-import { getVisionBoard } from "../services/visionBoardApi";
+import { getVisionBoard } from "../services/visionBoardProApi";
 
 const VisionBoardView = () => {
   const navigate = useNavigate();
@@ -24,6 +24,12 @@ const VisionBoardView = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
   const [scale, setScale] = useState(1);
+
+  // Derive canvas dimensions from board data
+  // The Pro editor saves canvasSettings at the top level, NOT under boardData
+  const canvasSettings = useMemo(() => board?.canvasSettings || board?.boardData || {}, [board]);
+  const canvasWidth = canvasSettings.width || canvasSettings.canvasWidth || 1200;
+  const canvasHeight = canvasSettings.height || canvasSettings.canvasHeight || 800;
 
   useEffect(() => {
     loadBoard();
@@ -57,7 +63,7 @@ const VisionBoardView = () => {
         description: "Failed to load vision board",
         variant: "destructive",
       });
-      navigate("/vision-board/gallery");
+      navigate("/vision-board-pro/gallery");
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +107,10 @@ const VisionBoardView = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    if (!dateString) return "Unknown date";
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return "Unknown date";
+    return d.toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -109,7 +118,10 @@ const VisionBoardView = () => {
   };
 
   const formatTime = (dateString) => {
-    return new Date(dateString).toLocaleTimeString("en-US", {
+    if (!dateString) return "";
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
     });
@@ -201,14 +213,11 @@ const VisionBoardView = () => {
     );
   }
 
-  const boardData = board.boardData || {};
-  const elements = boardData.elements || [];
-  const background = boardData.background || {
-    type: "color",
-    value: "#ffffff",
-  };
-  const canvasWidth = boardData.canvasWidth || 1200;
-  const canvasHeight = boardData.canvasHeight || 800;
+  // Pro editor saves a pre-rendered collageImage; legacy editor saves elements array
+  const collageImage = board.collageImage || null;
+  const elements = board.boardData?.elements || [];
+  const bgColor = canvasSettings.backgroundColor || board.boardData?.background?.value || "#ffffff";
+  const bgImage = canvasSettings.backgroundImage || (board.boardData?.background?.type === "image" ? board.boardData.background.value : null);
 
   const scaledWidth = canvasWidth * scale;
   const scaledHeight = canvasHeight * scale;
@@ -225,7 +234,7 @@ const VisionBoardView = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate("/vision-board/gallery")}
+                onClick={() => navigate("/vision-board-pro/gallery")}
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Back to Gallery
@@ -240,10 +249,12 @@ const VisionBoardView = () => {
                     <Calendar className="w-3 h-3" />
                     {formatDate(board.createdAt)}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {formatTime(board.createdAt)}
-                  </span>
+                  {formatTime(board.createdAt) && (
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {formatTime(board.createdAt)}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -261,8 +272,8 @@ const VisionBoardView = () => {
                 Download PNG
               </Button>
               <Button
-                onClick={() => navigate(`/vision-board/edit/${id}`)}
-                className="bg-[#1a3884] hover:bg-[#132c6b] text-[#002147] shadow-[0_0_15px_rgba(26,56,132,0.5)] hover:shadow-[0_0_25px_rgba(26,56,132,0.7)]"
+                onClick={() => navigate(`/vision-board-pro/create`, { state: { editBoardId: id } })}
+                className="bg-[#1a3884] hover:bg-[#132c6b] text-white shadow-[0_0_15px_rgba(26,56,132,0.5)] hover:shadow-[0_0_25px_rgba(26,56,132,0.7)]"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit
@@ -277,37 +288,49 @@ const VisionBoardView = () => {
         {/* Canvas Display */}
         <div className="flex-1 p-4 sm:p-6 overflow-auto">
           <div className="flex justify-center">
-            <div
-              className="relative"
-              style={{ width: scaledWidth, height: scaledHeight, overflow: "hidden" }}
-            >
+            {/* Pro boards have a pre-rendered collageImage, legacy boards use elements */}
+            {collageImage ? (
               <div
                 ref={canvasRef}
                 className="relative rounded-xl shadow-lg overflow-hidden"
-                style={{
-                  width: canvasWidth,
-                  height: canvasHeight,
-                  transform: `scale(${scale})`,
-                  transformOrigin: "top left",
-                  backgroundColor:
-                    background.type === "color" ? background.value : "#ffffff",
-                  backgroundImage:
-                    background.type === "image"
-                      ? `url(${background.value})`
-                      : "none",
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
+                style={{ maxWidth: '100%', maxHeight: '75vh' }}
               >
-                {elements.map(renderElement)}
-
-                {elements.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                    <p>This vision board is empty</p>
-                  </div>
-                )}
+                <img
+                  src={collageImage}
+                  alt={board.title}
+                  className="w-full h-full object-contain rounded-xl"
+                  style={{ maxHeight: '75vh' }}
+                />
               </div>
-            </div>
+            ) : (
+              <div
+                className="relative"
+                style={{ width: scaledWidth, height: scaledHeight, overflow: "hidden" }}
+              >
+                <div
+                  ref={canvasRef}
+                  className="relative rounded-xl shadow-lg overflow-hidden"
+                  style={{
+                    width: canvasWidth,
+                    height: canvasHeight,
+                    transform: `scale(${scale})`,
+                    transformOrigin: "top left",
+                    backgroundColor: bgColor,
+                    backgroundImage: bgImage ? `url(${bgImage})` : "none",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  {elements.map(renderElement)}
+
+                  {elements.length === 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                      <p>This vision board is empty</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

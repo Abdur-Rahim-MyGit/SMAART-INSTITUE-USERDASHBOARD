@@ -8,17 +8,23 @@ import * as toxicity from '@tensorflow-models/toxicity';
 
 // Banned words list - explicit, offensive, and inappropriate terms
 const BANNED_WORDS = [
-  // ... (keep existing BANNED_WORDS)
+  // Sexual / pornographic content
   "porn", "pornography", "xxx", "nude", "naked", "sex", "sexy", "erotic", "nsfw", "adult",
   "explicit", "hentai", "fetish", "orgasm", "masturbat", "genital", "penis", "vagina",
-  "boob", "breast", "nipple", "ass", "butt", "dick", "cock", "pussy", "whore", "slut",
-  "hooker", "prostitut", "kill", "murder", "suicide", "death", "dead", "die", "blood",
-  "gore", "torture", "assault", "abuse", "violent", "weapon", "gun", "shoot", "stab",
-  "knife", "bomb", "terrorist", "terror", "nigger", "nigga", "faggot", "fag", "retard",
-  "spic", "chink", "kike", "nazi", "hitler", "kkk", "racist", "racism", "cocaine",
-  "heroin", "meth", "crack", "weed", "marijuana", "drug", "overdose", "junkie", "fuck",
-  "shit", "bitch", "damn", "cunt", "bastard", "asshole", "motherfuck", "bullshit",
-  "piss", "selfharm", "self-harm", "cutting", "anorex", "bulimi"
+  "boob", "nipple", "dick", "cock", "pussy", "whore", "slut",
+  "hooker", "prostitut",
+  // Extreme violence
+  "murder", "suicide", "torture", "assault",
+  "terrorist", "terror",
+  // Slurs and hate speech
+  "nigger", "nigga", "faggot", "fag", "retard",
+  "spic", "chink", "kike", "nazi", "hitler", "kkk",
+  // Hard drugs
+  "cocaine", "heroin", "meth", "overdose",
+  // Strong profanity
+  "fuck", "shit", "bitch", "cunt", "bastard", "asshole", "motherfuck", "bullshit",
+  // Self-harm
+  "selfharm", "self-harm", "anorex", "bulimi"
 ];
 
 // Leet speak replacements
