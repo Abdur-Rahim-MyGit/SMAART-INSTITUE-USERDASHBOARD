@@ -73,7 +73,7 @@ The SMAART Toolkit is fully functional with all 6 tools properly configured and 
 - **Status:** FUNCTIONAL
 - **Features:**
   - Resource collection
-  - Books and articles
+  - Books and articles with external links
   - Learning materials
 - **Backend API:** ✅ Connected
 
