@@ -62,6 +62,22 @@ const LandingPage = () => {
       }, 500);
     }
 
+    // Check for intentional cross-tab logout
+    if (sessionStorage.getItem('logged_out_other_tab')) {
+      setTimeout(() => {
+        toast.success("You have been logged out from another tab.", {
+          duration: 5000,
+          position: 'top-center',
+          style: {
+            border: '2px solid #10b981',
+            backgroundColor: '#d1fae5',
+            color: '#065f46'
+          }
+        });
+        sessionStorage.removeItem('logged_out_other_tab');
+      }, 500);
+    }
+
     const userData = sessionStorage.getItem("user");
     if (userData) {
       navigate("/dashboard", { replace: true });
