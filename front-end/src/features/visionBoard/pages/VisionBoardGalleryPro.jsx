@@ -427,7 +427,6 @@ const VisionBoardGalleryPro = () => {
 
   const [boards, setBoards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [deleteBoard, setDeleteBoard] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [viewBoard, setViewBoard] = useState(null);
@@ -687,10 +686,6 @@ const VisionBoardGalleryPro = () => {
     }
   };
 
-  // Filter boards by search
-  const filteredBoards = boards.filter((board) =>
-    board.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
@@ -716,17 +711,7 @@ const VisionBoardGalleryPro = () => {
             </div>
 
             {/* Actions Toolbar */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-              <div className="relative w-full md:w-96 group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search your dreams..."
-                  className="pl-10 bg-white dark:bg-[#1e293b] border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 rounded-xl focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm h-12"
-                />
-              </div>
-
+            <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-8">
               <div className="flex items-center gap-4 w-full md:w-auto">
                 <div className="hidden md:flex items-center text-xs font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-[#1e293b] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
                   {boards.length} / {maxAllowed} Boards Used
@@ -759,7 +744,7 @@ const VisionBoardGalleryPro = () => {
                 </div>
                 <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">No vision boards found</h3>
                 <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-8">
-                  {searchQuery ? "Try adjusting your search terms." : "Start your journey by creating your first vision board today."}
+                  Start your journey by creating your first vision board today.
                 </p>
                 <Button onClick={handleCreateNew} className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-8 h-12 font-bold shadow-lg hover:shadow-blue-500/25">
                   <Plus className="w-5 h-5 mr-2" /> Create Board
@@ -768,7 +753,7 @@ const VisionBoardGalleryPro = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 <AnimatePresence>
-                  {filteredBoards.map(board => (
+                  {boards.map(board => (
                     <BoardCard
                       key={board._id}
                       board={board}

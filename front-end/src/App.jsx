@@ -9,6 +9,7 @@ import { UserProvider } from "@/contexts/UserContext";
 import AnimatedRoutes from "./components/AnimatedRoutes";
 import SecurityGuard from "@/components/SecurityGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import SingleTabGuard from "@/components/SingleTabGuard";
 
 
 const queryClient = new QueryClient();
@@ -23,8 +24,10 @@ const App = () => (
               <Toaster />
               <Sonner />
               <BrowserRouter>
-                <AnimatedRoutes />
-                <SecurityGuard />
+                <SingleTabGuard>
+                  <AnimatedRoutes />
+                  <SecurityGuard />
+                </SingleTabGuard>
               </BrowserRouter>
             </ErrorBoundary>
           </SidebarProvider>
