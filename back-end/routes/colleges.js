@@ -12,23 +12,54 @@ router.get('/', searchLimiter, async (req, res) => {
     // SECURITY FIX: Only return active colleges (case-insensitive)
     let query = { status: { $regex: '^active$', $options: 'i' } };
 
-    // If search term provided, use text search
+    let colleges = [];
     if (search) {
-      query = {
+      const searchLower = search.trim().toLowerCase();
+      const searchRegex = new RegExp(searchLower, 'i');
+      const prefixRegex = new RegExp('^' + searchLower, 'i');
+
+      // 1. Fetch prefix matches first (Name or Code starts with search)
+      const prefixMatches = await College.find({
         ...query,
         $or: [
-          { collegeName: { $regex: search, $options: 'i' } },
-          { collegeCode: { $regex: search, $options: 'i' } },
-          { 'address.city': { $regex: search, $options: 'i' } },
-          { 'address.state': { $regex: search, $options: 'i' } }
+          { collegeName: prefixRegex },
+          { collegeCode: prefixRegex }
         ]
-      };
-    }
+      })
+        .select('collegeName collegeCode address institutionType affiliation status')
+        .sort({ collegeName: 1 })
+        .limit(parseInt(limit));
 
-    const colleges = await College.find(query)
-      .select('collegeName collegeCode address institutionType affiliation status')
-      .sort({ collegeName: 1 })
-      .limit(parseInt(limit));
+      colleges = [...prefixMatches];
+
+      // 2. If we need more results, fetch substring matches
+      if (colleges.length < parseInt(limit)) {
+        const remainingLimit = parseInt(limit) - colleges.length;
+        const prefixIds = prefixMatches.map(c => c._id);
+
+        const substringMatches = await College.find({
+          ...query,
+          _id: { $nin: prefixIds },
+          $or: [
+            { collegeName: searchRegex },
+            { collegeCode: searchRegex },
+            { 'address.city': searchRegex },
+            { 'address.state': searchRegex }
+          ]
+        })
+          .select('collegeName collegeCode address institutionType affiliation status')
+          .sort({ collegeName: 1 })
+          .limit(remainingLimit);
+
+        colleges = [...colleges, ...substringMatches];
+      }
+    } else {
+      // Default: regular fetch
+      colleges = await College.find(query)
+        .select('collegeName collegeCode address institutionType affiliation status')
+        .sort({ collegeName: 1 })
+        .limit(parseInt(limit));
+    }
 
     res.json({
       success: true,

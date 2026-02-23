@@ -316,11 +316,11 @@ const LoginCard = () => {
           </div>
           <div className="min-w-0 flex-1">
             <h3 className="font-bold text-[#002147] dark:text-white text-xs sm:text-sm md:text-base truncate tracking-tight">{selectedInstitution?.name}</h3>
-            {selectedInstitution?.code && (
+            {selectedInstitution?.location?.city && (
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 truncate font-medium">
-                {selectedInstitution.code}
-                {selectedInstitution?.location?.city && (
-                  <span className="opacity-60"> • {selectedInstitution.location.city}</span>
+                {selectedInstitution.location.city}
+                {selectedInstitution?.location?.state && (
+                  <span className="opacity-60">, {selectedInstitution.location.state}</span>
                 )}
               </p>
             )}
