@@ -36,7 +36,7 @@ const ModuleView = ({ courseId, onBack }) => {
             _id: module._id, // Keep MongoDB _id for reference
             title: module.title || `Module ${index + 1}`,
             description: module.description || 'No description available',
-            duration: module.timeAllocation ? `${module.timeAllocation} minutes` : 'Duration not specified',
+            duration: module.timeAllocation ? `${module.timeAllocation} minutes` : '3 Days',
             sequence: module.sequence || index + 1,
             days: module.days && module.days.length > 0 
               ? module.days.map((day, dayIndex) => ({
@@ -81,7 +81,7 @@ const ModuleView = ({ courseId, onBack }) => {
                       day.summaryVideo.forEach(item => totalMinutes += parseToMinutes(item.duration));
                     }
 
-                    if (totalMinutes === 0) return '45 minutes';
+                    if (totalMinutes === 0) return '3 Days';
                     
                     if (totalMinutes >= 60) {
                       const hours = Math.floor(totalMinutes / 60);
@@ -128,7 +128,7 @@ const ModuleView = ({ courseId, onBack }) => {
                   dayNumber: i + 1,
                   title: `Day ${i + 1}`,
                   description: `Topic for Day ${i + 1}`,
-                  duration: "45 minutes",
+                  duration: "3 Days",
                   dayType: i < 6 ? 'course' : 'catchup',
                   tasks: Array.from({ length: 5 }, (_, j) => ({
                     id: j + 1,
@@ -214,7 +214,7 @@ const ModuleView = ({ courseId, onBack }) => {
         dayNumber: j + 1,
         title: `Day ${j + 1}`,
         description: `Topic for Day ${j + 1}`,
-        duration: "45 minutes",
+        duration: "3 Days",
         dayType: 'course',
         tasks: Array.from({ length: 5 }, (_, k) => ({
           id: k + 1,

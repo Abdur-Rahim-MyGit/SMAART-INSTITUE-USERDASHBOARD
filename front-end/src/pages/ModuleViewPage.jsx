@@ -14,6 +14,7 @@ import MicroAssessment from "@/components/MicroAssessment";
 import SubmissionTask from "@/components/SubmissionTask";
 import ReflectionTask from "@/components/ReflectionTask";
 import FlashcardTask from "@/components/FlashcardTask";
+import ModulePathway from "@/components/ModulePathway";
 
 const IntroScreen = ({ lines, onFinish }) => {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
@@ -830,6 +831,22 @@ const ModuleViewPage = () => {
       return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
     }
     return defaultDuration;
+  };
+
+  const formatCourseDuration = (numModules) => {
+    const totalDays = numModules * 3;
+    if (totalDays === 0) return "0 Days";
+
+    const weeks = Math.floor(totalDays / 7);
+    const remainingDays = totalDays % 7;
+
+    if (weeks > 0) {
+      if (remainingDays === 0) {
+        return `${weeks} Week${weeks > 1 ? 's' : ''}`;
+      }
+      return `${weeks} Week${weeks > 1 ? 's' : ''} ${remainingDays} Day${remainingDays > 1 ? 's' : ''}`;
+    }
+    return `${totalDays} Day${totalDays > 1 ? 's' : ''}`;
   };
 
   const checkSessionCompletion = (mId, session) => {
@@ -1680,134 +1697,20 @@ const ModuleViewPage = () => {
                   <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     <Clock size={16} />
                   </div>
-                  <div>
+                   <div>
                     <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Duration</p>
-                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">6 Weeks</p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{formatCourseDuration(modules.length)}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Modules Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative pb-20">
-              {modules.map((module, index) => {
-                const config = MODULE_COLORS[index % MODULE_COLORS.length];
-                const { completed, total } = getModuleCompletedCount(module.id);
-                // Unlock logic: First module unlocked, OR previous module has progress/done
-                // Simplified: Unlocked if index==0, or strict sequential check
-                // For "Free Roam" requested earlier by user for Courses, do we apply to modules too?
-                // Let's keep modules somewhat sequential or fully open?
-                // User said "click the course 1 it... should also be redigned".
-                // I'll make them all LOOK premium.
-                const isLocked = index !== 0 && (() => {
-                  const prevMod = modules[index - 1];
-                  if (!prevMod) return true;
-                  const { completed, total } = getModuleCompletedCount(prevMod.id);
-                  return completed < total;
-                })();
-
-                const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-                return (
-                  <motion.div
-                    key={module.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group relative flex flex-col h-full"
-                  >
-                    {/* Card Container */}
-                    <div className={`
-                      relative flex-1 flex flex-col overflow-hidden rounded-3xl
-                      bg-white dark:bg-[#1e293b]
-                      border border-slate-200 dark:border-slate-700
-                      shadow-lg shadow-slate-200/50 dark:shadow-none
-                      transition-all duration-300
-                      group-hover:translate-y-[-4px] group-hover:shadow-xl group-hover:border-blue-500/30
-                    `}>
-                      {/* Ambient Glow */}
-                      <div
-                        className="absolute top-0 right-0 w-64 h-64 opacity-5 dark:opacity-[0.08] rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 transition-opacity group-hover:opacity-15"
-                        style={{ background: config.border }}
-                      />
-
-                      {/* Card Content */}
-                      <div className="p-6 md:p-8 flex flex-col h-full relative z-10">
-
-                        {/* Header: Icon & ID */}
-                        <div className="flex justify-between items-start mb-6">
-                          <div
-                            className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg"
-                            style={{ backgroundColor: config.border, boxShadow: `0 8px 20px -6px ${config.border}` }}
-                          >
-                            <BookOpen size={24} />
-                          </div>
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 py-1 px-2 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-                            Module {String(module.id).padStart(2, '0')}
-                          </span>
-                        </div>
-
-                        {/* Title & Description */}
-                        <div className="mb-6 flex-1">
-                          <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                            {module.title}
-                          </h3>
-                          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3">
-                            {module.description || "In-depth training session."}
-                          </p>
-                        </div>
-
-                        {/* Progress Section */}
-                        <div className="mt-auto space-y-4">
-                          {total > 0 && (
-                            <div className="space-y-1.5">
-                              <div className="flex justify-between text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                                <span>Progress</span>
-                                <span>{progressPercent}%</span>
-                              </div>
-                              <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${progressPercent}%` }}
-                                  className="h-full rounded-full"
-                                  style={{ backgroundColor: config.border }}
-                                />
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Action Button */}
-                          <button
-                            onClick={() => {
-                              if (!isLocked) {
-                                navigateToDay(module.id, module.days?.[0]?.id);
-                              } else {
-                                toast.error("This module is locked! Complete previous modules first.");
-                              }
-                            }}
-                            className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-xs uppercase tracking-wider transition-all duration-300 ${isLocked ? 'cursor-not-allowed opacity-50' : ''}`}
-                            style={{
-                              backgroundColor: !isLocked && completed > 0 ? 'transparent' : '#f8fafc',
-                              color: !isLocked && completed > 0 ? config.border : '#64748b',
-                              border: `1px solid ${!isLocked && completed > 0 ? config.border : '#e2e8f0'}`,
-                            }}
-                          >
-                            {isLocked ? (
-                              <><Lock size={12} className="mr-1" /> Locked</>
-                            ) : completed > 0 ? (
-                              <>Continue Module <ChevronRight size={14} /></>
-                            ) : (
-                              <>Start Course <Play size={12} className="ml-1" /></>
-                            )}
-                          </button>
-                        </div>
-
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
+            {/* Module Pathway (Roadmap View) */}
+            <ModulePathway 
+              modules={modules}
+              onModuleClick={(mod) => navigateToDay(mod.id, mod.days?.[0]?.id)}
+              getModuleCompletedCount={getModuleCompletedCount}
+            />
 
           </motion.div>
         </main>
