@@ -22,7 +22,7 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
             animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 30 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden z-10 bg-white dark:bg-[#00152e] border border-gray-200 dark:border-white/10 mx-2 sm:mx-0"
+            className="relative w-full max-w-2xl rounded-3xl shadow-2xl z-10 bg-white dark:bg-[#00152e] border border-gray-200 dark:border-white/10 mx-2 sm:mx-0"
           >
             {/* Ambient Background Glows */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#1a3884]/10 rounded-full blur-[80px] pointer-events-none" />
