@@ -12,7 +12,6 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
     { id: "templates", icon: LayoutTemplate, label: "Design" },
     { id: "text", icon: Type, label: "Text" },
     { id: "style", icon: Palette, label: "Style" },
-    { id: "uploads", icon: Upload, label: "Uploads" },
     { id: "settings", icon: Settings2, label: "Settings" },
   ];
 
