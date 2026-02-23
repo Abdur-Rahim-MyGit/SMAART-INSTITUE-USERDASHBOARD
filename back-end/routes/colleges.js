@@ -15,8 +15,9 @@ router.get('/', searchLimiter, async (req, res) => {
     let colleges = [];
     if (search) {
       const searchLower = search.trim().toLowerCase();
-      const searchRegex = new RegExp(searchLower, 'i');
-      const prefixRegex = new RegExp('^' + searchLower, 'i');
+      const escapedSearch = searchLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const searchRegex = new RegExp('\\b' + escapedSearch, 'i');
+      const prefixRegex = new RegExp('^' + escapedSearch, 'i');
 
       // 1. Fetch prefix matches first (Name or Code starts with search)
       const prefixMatches = await College.find({
@@ -41,10 +42,7 @@ router.get('/', searchLimiter, async (req, res) => {
           ...query,
           _id: { $nin: prefixIds },
           $or: [
-            { collegeName: searchRegex },
-            { collegeCode: searchRegex },
-            { 'address.city': searchRegex },
-            { 'address.state': searchRegex }
+            { collegeName: searchRegex }
           ]
         })
           .select('collegeName collegeCode address institutionType affiliation status')
