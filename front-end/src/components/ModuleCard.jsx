@@ -11,40 +11,40 @@ const ModuleCard = ({ module, index }) => {
   const getModuleDescription = (moduleId) => {
     const descriptions = {
       1: {
-        day: "Week 1",
+        day: "Module 1",
         title: "Foundation & Setup",
         description: "Begin your learning journey with essential concepts and foundational knowledge. This module covers the basic principles and sets up your understanding for advanced topics.",
-        duration: "45 minutes",
+        duration: "3 Days",
         tasks: 7
       },
       2: {
-        day: "Week 2", 
+        day: "Module 2", 
         title: "Core Concepts",
         description: "Dive deeper into the core concepts and methodologies. Build upon your foundation with practical applications and real-world examples.",
-        duration: "60 minutes",
+        duration: "3 Days",
         tasks: 8
       },
       3: {
-        day: "Week 3",
+        day: "Module 3",
         title: "Advanced Applications",
         description: "Apply your knowledge to complex scenarios and advanced use cases. Develop critical thinking and problem-solving skills.",
-        duration: "75 minutes", 
+        duration: "3 Days", 
         tasks: 7
       },
       4: {
-        day: "Week 4",
+        day: "Module 4",
         title: "Integration & Practice",
         description: "Integrate all learned concepts and practice through comprehensive exercises. Prepare for real-world implementation.",
-        duration: "90 minutes",
+        duration: "3 Days",
         tasks: 8
       }
     };
     
     return descriptions[moduleId] || {
-      day: `Week ${moduleId}`,
+      day: `Module ${moduleId}`,
       title: `Module ${moduleId}`,
       description: "Continue your learning journey with new concepts and practical applications.",
-      duration: "60 minutes",
+      duration: "3 Days",
       tasks: module.tasks.length
     };
   };
