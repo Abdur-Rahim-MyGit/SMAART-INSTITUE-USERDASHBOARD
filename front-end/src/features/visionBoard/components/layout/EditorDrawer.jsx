@@ -61,7 +61,7 @@ const EditorDrawer = ({
       </div>
 
       {/* Drawer Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 pb-8 lg:pb-24">
         
         {/* Templates Panel */}
         {activePanel === "templates" && (

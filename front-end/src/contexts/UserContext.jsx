@@ -14,6 +14,12 @@ export const UserProvider = ({ children }) => {
       if (response.ok) {
         const data = await response.json();
         setUser(prev => {
+          // If the user has been logged out (or is currently logging out),
+          // don't resurrect the session by injecting background fetch data.
+          if (!prev) {
+            return null;
+          }
+
           // Destructure to exclude document IDs from registration data
           const { _id, id, ...otherDetails } = data;
           
@@ -24,9 +30,8 @@ export const UserProvider = ({ children }) => {
             gender: data.gender || prev?.gender,
             email: data.email || prev?.email,
           };
-          // Persist the updated user data to both storages (FIX #4: dual storage sync)
+          // Persist the updated user data only to sessionStorage
           sessionStorage.setItem("user", JSON.stringify(updated));
-          localStorage.setItem("user", JSON.stringify(updated));
           return updated;
         });
       }
@@ -50,6 +55,30 @@ export const UserProvider = ({ children }) => {
     };
 
     initUser();
+
+    // Multi-tab sync listener via localStorage
+    const handleStorageChange = (e) => {
+      if (e.key === "logout-event") {
+        console.log("[UserContext] Cross-tab logout detected. Redirecting to login.");
+        
+        // Clear storages safely
+        sessionStorage.clear();
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        
+        // Set a flag so the LandingPage can show a clean toast message
+        sessionStorage.setItem("logged_out_other_tab", "true");
+        
+        // Force navigation to the root explicitly using replace
+        // NOTE: We intentionally bypass `setUser(null)` here. 
+        // Calling `setUser(null)` triggers a synchronous React re-render of the entire tree,
+        // which can cause an ErrorBoundary crash (HMR context mismatch) while the browser is trying to redirect.
+        window.location.replace("/");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [fetchUserDetails]);
 
   const refreshUser = useCallback(async () => {
@@ -89,8 +118,14 @@ export const UserProvider = ({ children }) => {
     
     // Clear local storage
     console.log('[Logout] Clearing local storage...');
+    
+    // Broadcast logout to other tabs via localStorage
+    localStorage.setItem('logout-event', Date.now().toString());
+
     sessionStorage.clear();
-    localStorage.clear();
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    
     setUser(null);
     console.log('[Logout] Logout complete');
   }, []);
@@ -105,7 +140,14 @@ export const UserProvider = ({ children }) => {
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error('useUser must be used within a UserProvider');
+    console.warn('⚠️ useUser was called outside UserProvider (or Vite HMR split the context). Returning fallback to avoid crash during teardown.');
+    return { 
+      user: null, 
+      loading: false, 
+      setUser: () => {}, 
+      refreshUser: () => {}, 
+      logout: () => {} 
+    };
   }
   return context;
 };

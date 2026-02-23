@@ -125,8 +125,8 @@ const LoginCard = () => {
 
       // Direct login for first-time users (no OTP required)
       sessionStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("user", JSON.stringify(data.user));
       sessionStorage.setItem("token", data.token);
+
       setUser(data.user);
 
       toast.success("Login successful!");
@@ -228,7 +228,7 @@ const LoginCard = () => {
     // Regular login success
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("user", JSON.stringify(data.user));
+    
     setUser(data.user);
     setShowOtpModal(false);
 
@@ -259,7 +259,7 @@ const LoginCard = () => {
   const handlePasswordChangeSuccess = (data, redirectToDashboard = false) => {
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("user", JSON.stringify(data.user));
+    
     setUser(data.user);
     setShowPasswordChangeModal(false);
     setPasswordChangeData({ tempToken: "", email: "", fullName: "" });

@@ -12,8 +12,8 @@ export const useAuth = () => {
 
     useEffect(() => {
         try {
-            // FIX #4: Read sessionStorage first, fall back to localStorage
-            const userData = sessionStorage.getItem("user") || localStorage.getItem("user");
+            // Only read from sessionStorage to keep tabs isolated
+            const userData = sessionStorage.getItem("user");
             if (userData) {
                 const parsedUser = JSON.parse(userData);
                 setUser(parsedUser);
