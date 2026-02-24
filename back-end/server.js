@@ -103,6 +103,7 @@ app.use('/api/registrations', require('./routes/registrations'));
 app.use('/api/assessments', require('./routes/assessments'));
 app.use('/api/results', require('./routes/results'));
 app.use('/api/baselineresults', require('./routes/baselineresults'));
+app.use('/api/stageresults', require('./routes/stageresults'));
 app.use('/api/courses', require('./routes/courses'));
 app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/courseEnrollments', require('./routes/courseEnrollments'));
