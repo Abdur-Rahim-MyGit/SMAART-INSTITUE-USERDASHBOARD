@@ -442,12 +442,12 @@ router.post('/:resultId/submit', async (req, res) => {
 
             // Initialize Quotient Buckets
             const quotientScores = {
-                'CRQ': { earned: 0, total: 0 },
-                'SRQ': { earned: 0, total: 0 },
-                'LQ': { earned: 0, total: 0 },
-                'SIQ': { earned: 0, total: 0 },
-                'PEQ': { earned: 0, total: 0 },
-                'DAQ': { earned: 0, total: 0 }
+                'CRQ': { earned: 0, possible: 0 },
+                'SRQ': { earned: 0, possible: 0 },
+                'LQ': { earned: 0, possible: 0 },
+                'SIQ': { earned: 0, possible: 0 },
+                'PEQ': { earned: 0, possible: 0 },
+                'DAQ': { earned: 0, possible: 0 }
             };
 
             const selectedAnswers = [];
@@ -462,7 +462,7 @@ router.post('/:resultId/submit', async (req, res) => {
                 const quotient = (question.quotient || 'CRQ').toUpperCase();
 
                 if (quotientScores[quotient]) {
-                    quotientScores[quotient].total += 1;
+                    quotientScores[quotient].possible += 1;
 
                     // Check correctness
                     const isCorrect = question.correctAnswer === r.selectedValue;
@@ -491,16 +491,16 @@ router.post('/:resultId/submit', async (req, res) => {
             let totalAnswered = 0;
 
             for (const [key, data] of Object.entries(quotientScores)) {
-                if (data.total > 0) {
-                    const pct = Math.round((data.earned / data.total) * 100);
+                if (data.possible > 0) {
+                    const pct = Math.round((data.earned / data.possible) * 100);
                     finalProfile[key] = {
                         rawScore: pct,
                         level: determineLevel(pct),
                         earned: data.earned,
-                        possible: data.total
+                        possible: data.possible
                     };
                     totalCorrect += data.earned;
-                    totalAnswered += data.total;
+                    totalAnswered += data.possible;
                 }
             }
 
