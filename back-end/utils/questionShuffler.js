@@ -60,10 +60,10 @@ function selectStratifiedQuestions(allQuestions, userId) {
 
     // Group questions by Quotient and Difficulty
     const pools = {};
+    const quotientPools = {}; // Quotient -> All available questions for that quotient
 
     allQuestions.forEach(q => {
-        // Ensure properties exist
-        if (!q.quotient || !q.difficultyLevel) return;
+        if (!q.quotient) return;
 
         const qt = q.quotient.toUpperCase();
         const diff = normalizeDifficulty(q.difficultyLevel);
@@ -71,12 +71,16 @@ function selectStratifiedQuestions(allQuestions, userId) {
 
         if (!pools[key]) pools[key] = [];
         pools[key].push(q);
+
+        if (!quotientPools[qt]) quotientPools[qt] = [];
+        quotientPools[qt].push(q);
     });
 
     let selectedQuestions = [];
     const matrix = T1_DISTRIBUTION.quotients;
+    const deficits = []; // Track where we couldn't meet the target
 
-    // Iterate through configuration matrix
+    // Pass 1: Ideal selection according to matrix
     for (const [quotient, difficulties] of Object.entries(matrix)) {
         for (const [diffLevel, requiredCount] of Object.entries(difficulties)) {
             const key = `${quotient}_${diffLevel}`;
@@ -84,25 +88,52 @@ function selectStratifiedQuestions(allQuestions, userId) {
 
             if (pool.length < requiredCount) {
                 console.warn(`⚠️ Warning: Insufficient questions for ${key}. Required: ${requiredCount}, Available: ${pool.length}`);
-                // In production, you might error out. Here, we take what we have.
+                // Take whatever is available
                 selectedQuestions.push(...pool);
+                // Record deficit to be filled later
+                deficits.push({
+                    quotient,
+                    missing: requiredCount - pool.length,
+                    alreadySelectedIds: new Set(pool.map(q => q._id.toString()))
+                });
             } else {
-                // Shuffle this specific pool deterministically
-                // Use userId + key to ensure different shuffle per group
                 const groupSeed = `${userId}_${key}`;
                 const shuffledPool = shuffleArrayDeterministic(pool, groupSeed);
-
-                // Select top N
                 const selected = shuffledPool.slice(0, requiredCount);
                 selectedQuestions.push(...selected);
             }
         }
     }
 
-    console.log(`✅ Selected ${selectedQuestions.length} questions (Stratified)`);
+    // Pass 2: Fill deficits from the same quotient (using other difficulties)
+    if (deficits.length > 0) {
+        console.log(`🔧 Attempting to fill ${deficits.length} distribution gaps...`);
+        const currentlySelectedIds = new Set(selectedQuestions.map(q => q._id.toString()));
 
-    // Final shuffle to mix quotients (so they don't appear in chunks)
-    // Use simple userId seed for final mix
+        deficits.forEach(deficit => {
+            const pool = quotientPools[deficit.quotient] || [];
+            // Find questions in this quotient that aren't already selected
+            const availableExtras = pool.filter(q => !currentlySelectedIds.has(q._id.toString()));
+
+            if (availableExtras.length > 0) {
+                // Shuffle extras deterministically
+                const shuffledExtras = shuffleArrayDeterministic(availableExtras, `${userId}_${deficit.quotient}_extra`);
+                const toTake = Math.min(deficit.missing, shuffledExtras.length);
+                const extras = shuffledExtras.slice(0, toTake);
+
+                selectedQuestions.push(...extras);
+                extras.forEach(e => currentlySelectedIds.add(e._id.toString()));
+
+                console.log(`✅ Filled gap for ${deficit.quotient}: borrowed ${toTake} questions from other difficulties.`);
+            } else {
+                console.error(`🚨 Critical: No more questions available for quotient ${deficit.quotient}!`);
+            }
+        });
+    }
+
+    console.log(`✅ Final Selected Count: ${selectedQuestions.length} questions`);
+
+    // Final shuffle to mix quotients
     return shuffleArrayDeterministic(selectedQuestions, userId);
 }
 
