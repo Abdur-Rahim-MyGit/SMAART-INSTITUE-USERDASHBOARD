@@ -161,6 +161,34 @@ const registrationSchema = new mongoose.Schema({
   lastLogin: { type: Date, default: null },
   previousLogin: { type: Date, default: null },
   
+  // Streak data - Sunday-based weekly cycle
+  streakData: {
+    // Which day of the current week the user is on (1-6 for Mon-Sat)
+    streakCycleDay: { type: Number, default: 0, min: 0, max: 6 },
+    // How many full weeks the user has completed
+    streakCyclesCompleted: { type: Number, default: 0, min: 0 },
+    // When the current cycle started
+    streakStartDate: { type: Date, default: null },
+    // "YYYY-MM-DD" of the last recorded activity day
+    lastStreakDate: { type: String, default: '' },
+    // Whether the user currently has an active streak
+    streakActive: { type: Boolean, default: false },
+    // Total consecutive days (excluding Sundays)
+    totalStreakDays: { type: Number, default: 0 },
+    // Log of completed weeks
+    streakHistory: [{
+      cycleNumber: Number,
+      startDate: Date,
+      endDate: Date,
+      completedAt: { type: Date, default: Date.now }
+    }],
+    // Sundays taken as holidays
+    sundayHolidays: [{
+      date: String,
+      completedAt: { type: Date, default: Date.now }
+    }]
+  },
+  
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

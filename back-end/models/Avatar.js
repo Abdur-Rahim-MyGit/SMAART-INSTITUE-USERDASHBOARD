@@ -87,6 +87,12 @@ const avatarSchema = new mongoose.Schema({
     completedAt: { type: Date, default: Date.now }
   }],
 
+  // Sunday holidays tracking
+  sundayHolidays: [{
+    date: String,
+    completedAt: { type: Date, default: Date.now }
+  }],
+
   // Keep legacy field for backward compat (read-only, computed)
   streak: {
     type: Number,
@@ -247,6 +253,14 @@ function toDateStr(d) {
 }
 
 /**
+ * Helper: Check if a date is Sunday (0 = Sunday)
+ */
+function isSunday(dateStr) {
+  const date = new Date(dateStr + 'T12:00:00');
+  return date.getDay() === 0;
+}
+
+/**
  * Helper: count calendar days between two "YYYY-MM-DD" strings
  */
 function daysBetween(dateStrA, dateStrB) {
@@ -256,105 +270,102 @@ function daysBetween(dateStrA, dateStrB) {
 }
 
 /**
- * 7-Day Cycle Streak Update
+ * 7-Day Cycle Streak Update (Strict Calendar Weekly Schedule)
  * 
- * Cycle = 6 activity days + 1 holiday (day 7)
- * - Days 1-6: user MUST be active each consecutive day
- * - Day 7: mandatory holiday, no activity needed
- * - After day 7: new cycle begins at day 1
- * - Missing any day during 1-6: streak resets to zero
+ * Monday = Day 1, Tuesday = Day 2, ..., Saturday = Day 6, Sunday = Day 7 (Holiday)
+ * - Users MUST be active on the specific calendar days they visit.
+ * - Missing a day resets the continuous streak counter, but the visual cycle progress
+ *   is strictly tied to the current week's Monday-Sunday calendar layout.
  */
 avatarSchema.methods.updateStreak = async function () {
   const todayStr = toDateStr(new Date());
-
-  // ── Case 1: Same day ── already counted, just return
+  const todayDateObj = new Date(todayStr + 'T12:00:00');
+  
+  // Convert 0=Sun, 1=Mon... to 1=Mon, ..., 7=Sun
+  let currentWeekday = todayDateObj.getDay();
+  currentWeekday = currentWeekday === 0 ? 7 : currentWeekday;
   if (this.lastStreakDate === todayStr) {
     await this.save();
     return this.getStreakStatus();
   }
 
-  // ── Case 2: No active streak ── start a brand-new cycle
-  if (!this.streakActive || this.streakCycleDay === 0) {
-    this.streakCycleDay = 1;
-    this.streakActive = true;
-    this.streakStartDate = new Date();
-    this.lastStreakDate = todayStr;
-    this.lastActivityDate = new Date();
-    // Update legacy field
-    this.streak = this.streakCyclesCompleted * 6 + 1;
-    await this.save();
-    return this.getStreakStatus();
-  }
+  const todayIsSunday = currentWeekday === 7;
 
-  // ── We have an active streak, check gap ──
-  const gap = daysBetween(this.lastStreakDate, todayStr);
-
-  // Was yesterday the holiday (day 7)?
-  if (this.streakCycleDay === 7) {
-    // Holiday was day 7. The next valid activity day is day 7+1 gap.
-    // gap === 1 means user is here the day after holiday → start new cycle
-    if (gap === 1) {
-      // Complete the old cycle
-      this.streakHistory.push({
-        cycleNumber: this.streakCyclesCompleted + 1,
-        startDate: this.streakStartDate,
-        endDate: new Date(),
-        completedAt: new Date()
-      });
-      this.streakCyclesCompleted += 1;
-      // Start new cycle
-      this.streakCycleDay = 1;
-      this.streakStartDate = new Date();
+  // ── Case 2: Today is Sunday (Holiday) ──
+  if (todayIsSunday) {
+    if (this.streakActive) {
       this.lastStreakDate = todayStr;
       this.lastActivityDate = new Date();
-      this.streak = this.streakCyclesCompleted * 6 + 1;
-      await this.save();
-      return this.getStreakStatus();
+      if (!this.sundayHolidays) this.sundayHolidays = [];
+      if (!this.sundayHolidays.includes(todayStr)) this.sundayHolidays.push(todayStr);
     } else {
-      // Missed the day after holiday → reset
-      this._resetStreak();
-      // But today counts as day 1 of a new streak
-      this.streakCycleDay = 1;
       this.streakActive = true;
       this.streakStartDate = new Date();
       this.lastStreakDate = todayStr;
       this.lastActivityDate = new Date();
-      this.streak = 1;
-      await this.save();
-      return this.getStreakStatus();
     }
-  }
-
-  // ── Currently on days 1-6 ──
-  if (gap === 1) {
-    // Consecutive day → advance
-    this.streakCycleDay += 1;
-    this.lastStreakDate = todayStr;
-    this.lastActivityDate = new Date();
-
-    if (this.streakCycleDay === 7) {
-      // Reached the holiday! Don't require activity today.
-      // The holiday auto-completes. Mark it.
-      this.streak = this.streakCyclesCompleted * 6 + 6;
-    } else {
-      this.streak = this.streakCyclesCompleted * 6 + this.streakCycleDay;
-    }
-
+    
+    // Set internal cycle tracking to exactly Sunday (Day 7)
+    this.streakCycleDay = 7; 
     await this.save();
     return this.getStreakStatus();
-  } else {
-    // Missed a day during activity period → streak broken
+  }
+
+  // ── Case 3: We are on an Activity Day (Mon-Sat) ──
+  const gap = this.lastStreakDate ? daysBetween(this.lastStreakDate, todayStr) : null;
+  const lastDateObj = this.lastStreakDate ? new Date(this.lastStreakDate + 'T12:00:00') : null;
+  const lastWasSunday = lastDateObj ? lastDateObj.getDay() === 0 : false;
+  const lastWasSaturday = lastDateObj ? lastDateObj.getDay() === 6 : false;
+
+  let validSequence = false;
+  if (gap === 1) {
+    validSequence = true; // normal consecutive day
+  } else if (gap === 2 && lastWasSaturday) {
+    validSequence = true; // graceful skip over Sunday
+  }
+
+  // If previous activity was from a different week entirely, we implicitly reset the cycle tracking
+  let isNewWeek = false;
+  if (gap && gap >= currentWeekday) {
+     isNewWeek = true;
+  }
+
+  // ── Broken Streak: missed days within a week or crossed weeks without preserving ──
+  if (!this.streakActive || !validSequence) {
     this._resetStreak();
-    // Today starts a new attempt
-    this.streakCycleDay = 1;
     this.streakActive = true;
     this.streakStartDate = new Date();
     this.lastStreakDate = todayStr;
     this.lastActivityDate = new Date();
+    this.streakCycleDay = currentWeekday; // Strictly assign to actual day of week
     this.streak = 1;
     await this.save();
     return this.getStreakStatus();
   }
+
+  // ── Continue an active streak ──
+  // Check if they successfully completed the ENTIRE week (Mon-Sat)
+  if (this.streakCycleDay === 6 && currentWeekday === 1 && validSequence) {
+    // Starting a new week after completing the previous 6-day stretch!
+    this.streakHistory.push({
+      cycleNumber: this.streakCyclesCompleted + 1,
+      startDate: this.streakStartDate,
+      endDate: new Date(),
+      completedAt: new Date()
+    });
+    this.streakCyclesCompleted += 1;
+    this.streakStartDate = new Date();
+  }
+
+  // Visually lock the cycle to exactly what day of the week it is
+  this.streakCycleDay = currentWeekday;
+  
+  this.lastStreakDate = todayStr;
+  this.lastActivityDate = new Date();
+  this.streak = this.streakCyclesCompleted * 6 + this.streakCycleDay;
+
+  await this.save();
+  return this.getStreakStatus();
 };
 
 /**
@@ -369,34 +380,78 @@ avatarSchema.methods._resetStreak = function () {
 };
 
 /**
- * Get full streak status for the API response
+ * Get full streak status for the API response (Sunday-based strict calendar)
  */
 avatarSchema.methods.getStreakStatus = function () {
-  const cycleDay = this.streakCycleDay || 0;
-  const isHoliday = cycleDay === 7;
   const cyclesCompleted = this.streakCyclesCompleted || 0;
-  const totalStreakDays = cyclesCompleted * 6 + (cycleDay > 0 && cycleDay <= 7 ? (cycleDay === 7 ? 6 : cycleDay) : 0);
-  const daysUntilHoliday = cycleDay > 0 && cycleDay < 7 ? 7 - cycleDay : 0;
+  
+  // What calendar day is it actually right now?
+  const todayStr = toDateStr(new Date());
+  const todayDateObj = new Date(todayStr + 'T12:00:00');
+  let currentWeekday = todayDateObj.getDay();
+  currentWeekday = currentWeekday === 0 ? 7 : currentWeekday; // 1=Mon ... 7=Sun
 
-  // Build a visual progress array for 7 days
+  // Evaluate the actual continuous streak number logically
+  // If the last activity is from before this week (and they missed days),
+  // they only have a streak of what they completed this week, or 0.
+  const gap = this.lastStreakDate ? daysBetween(this.lastStreakDate, todayStr) : null;
+  let activeStreakCount = 0;
+  
+  if (this.streakActive && gap !== null && gap <= 2) {
+      activeStreakCount = (cyclesCompleted * 6) + (this.streakCycleDay === 7 ? 6 : this.streakCycleDay);
+  }
+
+  // Check if today is Sunday
+  const todayIsSunday = currentWeekday === 7;
+  const lastWasSunday = this.lastStreakDate ? isSunday(this.lastStreakDate) : false;
+  const isHoliday = todayIsSunday && this.streakActive;
+  
+  // Days until next Sunday
+  const daysUntilSunday = 7 - currentWeekday;
+
+  // Build a visual progress array specifically for Mon-Sun fixed boxes!
   const cycleProgress = [];
-  for (let i = 1; i <= 7; i++) {
-    if (i <= cycleDay) {
-      cycleProgress.push(i === 7 ? 'holiday' : 'completed');
-    } else if (i === 7) {
-      cycleProgress.push('holiday-pending');
+  
+  // Is this specific user active continuously in the CURRENT week?
+  // We check if their streak is active AND if their streakCycleDay correlates 
+  // with current calendar week to see if we color in the past days.
+  const hasActiveWeeklyStreak = this.streakActive && (gap !== null && gap < currentWeekday);
+
+  // Build Mon -> Sat blocks
+  for (let i = 1; i <= 6; i++) {
+    if (i < currentWeekday) {
+       // Past days in the current week
+       if (hasActiveWeeklyStreak && this.streakCycleDay >= i) {
+          cycleProgress.push('completed');
+       } else {
+          // They missed this day earlier in the current week
+          cycleProgress.push('missed'); 
+       }
+    } else if (i === currentWeekday && !todayIsSunday) {
+       // Today!
+       cycleProgress.push('current');
     } else {
-      cycleProgress.push('pending');
+       // Future days in current week
+       cycleProgress.push('pending');
     }
+  }
+  
+  // Add Sunday (holiday) status
+  if (currentWeekday === 7) {
+    cycleProgress.push('holiday'); // Currently enjoying holiday
+  } else if (gap === 0 && todayIsSunday) {
+    cycleProgress.push('holiday'); // Claimed holiday
+  } else {
+    cycleProgress.push('holiday-pending'); // Holiday is in the future
   }
 
   return {
-    cycleDay,
+    cycleDay: currentWeekday, // Visual cycle always aligns with current weekday
     isHoliday,
     isActive: this.streakActive,
     cyclesCompleted,
-    totalStreakDays,
-    daysUntilHoliday,
+    totalStreakDays: activeStreakCount,
+    daysUntilHoliday: daysUntilSunday,
     cycleProgress,
     lastStreakDate: this.lastStreakDate,
     streakStartDate: this.streakStartDate
