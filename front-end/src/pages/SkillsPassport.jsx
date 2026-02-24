@@ -41,12 +41,12 @@ const SkillsPassport = () => {
 
     // Quotients definition (Aligned with Backend/T1ResultsDisplay)
     const quotientsInfo = [
-        { id: 'CRQ', name: "Cognitive Readiness", icon: Brain, color: "text-purple-600", bar: "bg-purple-600" },
-        { id: 'SRQ', name: "Social Readiness", icon: Users, color: "text-blue-600", bar: "bg-blue-600" },
-        { id: 'LQ', name: "Learning Quotient", icon: BookOpen, color: "text-indigo-600", bar: "bg-indigo-600" },
-        { id: 'SIQ', name: "Self-Identity", icon: Target, color: "text-rose-600", bar: "bg-rose-600" },
-        { id: 'PEQ', name: "Physical & Emotional", icon: Heart, color: "text-emerald-600", bar: "bg-emerald-600" },
-        { id: 'DAQ', name: "Digital Age", icon: Monitor, color: "text-cyan-600", bar: "bg-cyan-600" },
+        { id: 'CRQ', name: "Cognitive Reasoning", icon: Brain, color: "text-purple-600", bar: "bg-purple-600" },
+        { id: 'SRQ', name: "Self-regulation & Drive", icon: Heart, color: "text-blue-600", bar: "bg-blue-600" },
+        { id: 'LQ', name: "Learning Agility", icon: BookOpen, color: "text-indigo-600", bar: "bg-indigo-600" },
+        { id: 'SIQ', name: "Social Interaction", icon: Users, color: "text-rose-600", bar: "bg-rose-600" },
+        { id: 'PEQ', name: "Professional Execution", icon: Briefcase, color: "text-emerald-600", bar: "bg-emerald-600" },
+        { id: 'DAQ', name: "Digital & AI Literacy", icon: Monitor, color: "text-cyan-600", bar: "bg-cyan-600" },
     ];
 
     // Format Scores from Data

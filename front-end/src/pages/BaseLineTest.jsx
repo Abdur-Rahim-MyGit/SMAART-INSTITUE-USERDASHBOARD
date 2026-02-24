@@ -166,7 +166,9 @@ const BaseLineTest = () => {
   // Check authentication and fetch assessment on mount
   useEffect(() => {
     const initializeAssessment = async () => {
-      console.log(`Initializing ${stageConfig.title} (${stageKey})...`);
+      const isReportMode = window.location.pathname.endsWith('/report');
+      console.log(`Initializing ${stageConfig.title} (${stageKey}) - Report Mode: ${isReportMode}...`);
+      
       try {
         const userData = sessionStorage.getItem("user");
         if (!userData) {
@@ -184,14 +186,27 @@ const BaseLineTest = () => {
           throw new Error("User ID not found. Please log in again.");
         }
 
-        // CRITICAL - Do not allow re-taking if stage already completed
+        // CRITICAL - If in report mode or if stage already completed, fetch results
         console.log(`Checking for existing ${stageKey} results...`);
         const stageCheck = await assessmentApi.getStageResult(userId, stageKey).catch(() => ({ success: false }));
+        
         if (stageCheck.success && stageCheck.data) {
-          console.warn(`${stageKey} already completed. Redirecting...`);
-          toast.info(`You have already completed the ${stageConfig.title}.`);
-          navigate("/dashboard/assessments", { replace: true });
-          return;
+          if (isReportMode) {
+            console.log("✅ Result found in report mode, displaying resultsUI");
+            setTestResults(stageCheck.data);
+            setSubmitted(true);
+            setLoading(false);
+            return;
+          } else {
+            console.warn(`${stageKey} already completed. Redirecting...`);
+            toast.info(`You have already completed the ${stageConfig.title}.`);
+            navigate("/dashboard/assessment-centre", { replace: true });
+            return;
+          }
+        }
+
+        if (isReportMode) {
+          throw new Error(`Report not found for ${stageConfig.title}. Have you completed it yet?`);
         }
 
         // Fetch assessment by stage code
@@ -266,7 +281,7 @@ const BaseLineTest = () => {
     };
 
     initializeAssessment();
-  }, [navigate]);
+  }, [navigate, stageKey]);
 
   // Timer: Reset when question changes
   useEffect(() => {
@@ -447,7 +462,7 @@ const BaseLineTest = () => {
         <div className="text-red-500 text-5xl mb-4">⚠</div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Error</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
-        <button onClick={() => navigate("/dashboard/assessments")} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg hover:bg-[#277a84] font-medium transition-colors">
+        <button onClick={() => navigate("/dashboard/assessment-centre")} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg hover:bg-[#277a84] font-medium transition-colors">
           Back to Assessments
         </button>
       </div>
@@ -820,7 +835,7 @@ const BaseLineTest = () => {
                 </button>
 
                 <button
-                  onClick={() => navigate("/dashboard/assessments")}
+                  onClick={() => navigate("/dashboard/assessment-centre")}
                   className="px-6 py-3 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-medium transition-colors"
                 >
                   All Assessments
@@ -845,7 +860,7 @@ const BaseLineTest = () => {
               <p className="text-slate-500 dark:text-slate-400 text-center mb-8">You're solving the questions brilliantly. Leaving now will pause your progress. Finish strong!</p>
               <div className="flex flex-col gap-3">
                 <button onClick={() => setShowExitWarning(false)} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Get Back to Test</button>
-                <button onClick={() => navigate("/dashboard/assessments")} className="w-full py-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold transition-colors">Exit Anyway</button>
+                <button onClick={() => navigate("/dashboard/assessment-centre")} className="w-full py-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold transition-colors">Exit Anyway</button>
               </div>
             </motion.div>
           </div>

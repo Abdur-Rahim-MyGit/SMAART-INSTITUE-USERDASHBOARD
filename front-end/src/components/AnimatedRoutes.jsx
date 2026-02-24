@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { lazy, Suspense } from 'react';
 
@@ -98,8 +98,8 @@ const AnimatedRoutes = () => {
                     <Route path="/my-courses" element={<AssessmentFlowGuard><MyCourses /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/courses" element={<AssessmentFlowGuard><MyCourses /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/notes" element={<AssessmentFlowGuard><MyNotes /></AssessmentFlowGuard>} />
-                    <Route path="/my-assessments" element={<AssessmentFlowGuard><MyAssessments /></AssessmentFlowGuard>} />
-                    <Route path="/dashboard/assessments" element={<AssessmentFlowGuard><MyAssessments /></AssessmentFlowGuard>} />
+                    <Route path="/my-assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
+                    <Route path="/dashboard/assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
                     <Route path="/skills-passport" element={<AssessmentFlowGuard><SkillsPassport /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/skills-passport" element={<AssessmentFlowGuard><SkillsPassport /></AssessmentFlowGuard>} />
                     <Route path="/profile" element={<AssessmentFlowGuard><Profile /></AssessmentFlowGuard>} />
@@ -148,6 +148,7 @@ const AnimatedRoutes = () => {
                     <Route path="/dashboard/assessment-centre" element={<AssessmentFlowGuard><AssessmentsDashboard /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/assessments/baseline" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
                     <Route path="/assessment/:stage" element={<BaseLineTest />} />
+                    <Route path="/assessment/:stage/report" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
                     <Route path="/analysis" element={<AssessmentFlowGuard><Analysis /></AssessmentFlowGuard>} />
                     <Route path="/motivational" element={<AssessmentFlowGuard><Motivational /></AssessmentFlowGuard>} />
 

@@ -55,12 +55,12 @@ const getBandColor = (level) => {
 
 // Quotient information
 const quotientInfo = {
-    CRQ: { name: 'Cognitive Readiness', fullName: 'Cognitive Readiness Quotient', icon: '🧠', desc: 'Critical thinking & problem solving abilities' },
-    SRQ: { name: 'Social Readiness', fullName: 'Social Readiness Quotient', icon: '🤝', desc: 'Interpersonal & communication skills' },
-    LQ: { name: 'Learning Quotient', fullName: 'Learning Quotient', icon: '📚', desc: 'Adaptability & knowledge acquisition' },
-    SIQ: { name: 'Self-Identity', fullName: 'Self-Identity Quotient', icon: '🎯', desc: 'Self-awareness & personal values' },
-    PEQ: { name: 'Physical & Emotional', fullName: 'Physical & Emotional Quotient', icon: '💪', desc: 'Wellness & emotional intelligence' },
-    DAQ: { name: 'Digital Age', fullName: 'Digital Age Quotient', icon: '💻', desc: 'Tech literacy & digital fluency' }
+    CRQ: { name: 'Cognitive Reasoning', fullName: 'Cognitive Reasoning Quotient', icon: '🧠', desc: 'Critical thinking & logical reasoning' },
+    SRQ: { name: 'Self-regulation & Drive', fullName: 'Self-regulation & Drive Quotient', icon: '🤝', desc: 'Motivation, resilience & emotional control' },
+    LQ: { name: 'Learning Agility', fullName: 'Learning Agility Quotient', icon: '📚', desc: 'Adaptability & continuous learning' },
+    SIQ: { name: 'Social Interaction', fullName: 'Social Interaction Quotient', icon: '🎯', desc: 'Collaboration, empathy & communication' },
+    PEQ: { name: 'Professional Execution', fullName: 'Professional Execution Quotient', icon: '💪', desc: 'Work ethic, reliability & delivery' },
+    DAQ: { name: 'Digital & AI Literacy', fullName: 'Digital & AI Literacy Quotient', icon: '💻', desc: 'Tech proficiency & AI readiness' }
 };
 
 // Download report function
@@ -69,9 +69,9 @@ const downloadReport = (user, testResults) => {
         studentName: user?.fullName || 'Student',
         studentId: user?.studentId || user?.email || 'N/A',
         date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
-        baselineScore: testResults?.baselineScore || 0,
+        baselineScore: testResults?.stageScore ?? testResults?.baselineScore ?? 0,
         stageBand: testResults?.stageBand || 'Emerging',
-        quotients: testResults?.t1Profile || {}
+        quotients: testResults?.quotientProfile || testResults?.t1Profile || {}
     };
 
     let report = `╔═══════════════════════════════════════════════════════════════════╗\n`;
@@ -222,7 +222,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                                     transition={{ delay: 0.7, type: "spring", stiffness: 150 }}
                                     className="text-8xl md:text-9xl font-black text-white tracking-tighter drop-shadow-2xl"
                                 >
-                                    {testResults?.baselineScore || 0}
+                                    {testResults?.stageScore ?? testResults?.baselineScore ?? 0}
                                 </motion.div>
                                 <div className="text-left pb-4">
                                     <div className="text-4xl text-white/70 font-bold">/100</div>
@@ -261,7 +261,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                         </motion.h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {testResults?.t1Profile ? Object.entries(testResults.t1Profile).map(([quotient, data], index) => {
+                            {(testResults?.quotientProfile || testResults?.t1Profile) ? Object.entries(testResults?.quotientProfile || testResults?.t1Profile).map(([quotient, data], index) => {
                                 const info = quotientInfo[quotient];
                                 const colors = getBandColor(data.level);
 
@@ -381,7 +381,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                         </button>
 
                         <button
-                            onClick={() => navigate("/dashboard/assessments")}
+                            onClick={() => navigate("/dashboard/assessment-centre")}
                             className="px-8 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-slate-50 dark:hover:bg-slate-700 hover:scale-105 transition-all duration-300 border-2 border-slate-200 dark:border-slate-700 w-full sm:w-auto"
                         >
                             All Assessments
