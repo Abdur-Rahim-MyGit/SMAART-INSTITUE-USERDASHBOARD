@@ -1,10 +1,21 @@
 import { motion } from "framer-motion";
-import { Heart, BookOpen, BookText, ArrowRight, MessageSquare, User, FileText, Brain } from "lucide-react";
+import { Heart, BookOpen, BookText, ArrowRight, MessageSquare, User, FileText, Brain, Shield } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { useNavigate } from "react-router-dom";
 
 const toolkitSections = [
+  {
+    id: 0,
+    title: "SMAART Wallet",
+    description: "Your professional vault — securely store and showcase your certificates, badges, course progress, and key learning flashcards all in one centralized place.",
+    icon: Shield,
+    path: "/dashboard/smaart-wallet",
+    color: "from-[#1a3884] to-[#2d5dc7]",
+    iconColor: "text-[#1a3884]",
+    badge: "Vault",
+    badgeColor: "from-[#1a3884] to-[#2d5dc7]"
+  },
   {
     id: 1,
     title: "AI Career Chat",
