@@ -17,7 +17,8 @@ import {
   Sun,
   Moon,
   Users,
-  ClipboardCheck
+  ClipboardCheck,
+  Brain
 } from "lucide-react";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
@@ -31,6 +32,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
 const menuItems = [
   { icon: Home, label: "Home", path: "/dashboard" },
   { icon: BookOpen, label: "My Courses", path: "/dashboard/courses" },
+  { icon: Brain, label: "Assessment Centre", path: "/dashboard/assessment-centre" },
   { icon: Lightbulb, label: "Vision Boards", path: "/dashboard/vision-boards" },
   { icon: Zap, label: "SMAART Toolkit", path: "/dashboard/smaart-toolkit" },
   { icon: Award, label: "My Certificate", path: "/dashboard/certificate" },
@@ -228,6 +230,7 @@ const DashboardSidebar = () => {
             {[
               { label: 'Home', path: '/dashboard' },
               { label: 'My Courses', path: '/dashboard/courses' },
+              { label: 'Assessments', path: '/dashboard/assessment-centre' },
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
               { label: 'Certificates', path: '/dashboard/certificate' },

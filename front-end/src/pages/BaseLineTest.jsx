@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DashboardHeader from "@/components/DashboardHeader";
 import { assessmentApi } from "@/services/assessmentApi";
 import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
+
+// Stage configuration map
+const STAGE_MAP = {
+  T1: { code: 'ASM00001', name: 'Baseline', title: 'Base Line Test', questionLimit: 36 },
+  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34 },
+  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36 },
+  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34 },
+};
 
 // Helper function to get band colors - MINIMAL MONOCHROME THEME
 const getBandColor = (level) => {
@@ -97,6 +105,13 @@ const downloadReport = (user, testResults) => {
 
 const BaseLineTest = () => {
   const navigate = useNavigate();
+  const { stage: urlStage } = useParams();
+
+  // Determine which stage we're running
+  const stageKey = (urlStage || 'T1').toUpperCase();
+  const stageConfig = STAGE_MAP[stageKey] || STAGE_MAP.T1;
+  const assessmentCode = stageConfig.code;
+  const questionLimit = stageConfig.questionLimit;
 
   // State management
   const [user, setUser] = useState(null);
@@ -151,11 +166,11 @@ const BaseLineTest = () => {
   // Check authentication and fetch assessment on mount
   useEffect(() => {
     const initializeAssessment = async () => {
-      console.log("🛠️ Initializing Base Line Test...");
+      console.log(`Initializing ${stageConfig.title} (${stageKey})...`);
       try {
         const userData = sessionStorage.getItem("user");
         if (!userData) {
-          console.warn("⚠️ No user data found in session, redirecting to login");
+          console.warn("⚠ No user data found in session, redirecting to login");
           navigate("/");
           return;
         }
@@ -169,22 +184,22 @@ const BaseLineTest = () => {
           throw new Error("User ID not found. Please log in again.");
         }
 
-        // NEW: CRITICAL - Do not allow re-taking if baseline already exists
-        console.log("🔍 Checking for existing baseline results...");
-        const baselineCheck = await assessmentApi.getBaseLineResults(userId).catch(() => ({ success: false }));
-        if (baselineCheck.success && baselineCheck.data) {
-          console.warn("✅ Baseline already completed. Redirecting...");
-          toast.info("You have already completed your baseline assessment.");
+        // CRITICAL - Do not allow re-taking if stage already completed
+        console.log(`Checking for existing ${stageKey} results...`);
+        const stageCheck = await assessmentApi.getStageResult(userId, stageKey).catch(() => ({ success: false }));
+        if (stageCheck.success && stageCheck.data) {
+          console.warn(`${stageKey} already completed. Redirecting...`);
+          toast.info(`You have already completed the ${stageConfig.title}.`);
           navigate("/dashboard/assessments", { replace: true });
           return;
         }
 
-        // Fetch Base Line assessment by code
-        console.log("📡 Fetching assessment details for ASM00001...");
-        const assessmentResponse = await assessmentApi.getByCode("ASM00001");
+        // Fetch assessment by stage code
+        console.log(`Fetching assessment details for ${assessmentCode}...`);
+        const assessmentResponse = await assessmentApi.getByCode(assessmentCode);
 
         if (!assessmentResponse.success) {
-          throw new Error("Failed to fetch Base Line Test details");
+          throw new Error(`Failed to fetch ${stageConfig.title} details`);
         }
 
         setAssessment(assessmentResponse.data);
@@ -218,8 +233,8 @@ const BaseLineTest = () => {
         console.log(`📚 Received ${fetchedQuestions.length} questions`);
 
         const sortedQuestions = [...fetchedQuestions].sort((a, b) => (a.order || 0) - (b.order || 0));
-        // Limit to 36 questions as requested
-        const limitedQuestions = sortedQuestions.slice(0, 36);
+        // Limit to stage-specific question count
+        const limitedQuestions = sortedQuestions.slice(0, questionLimit);
         setQuestions(limitedQuestions);
 
         // PERSISTENCE: Restore previous answers if any
@@ -421,7 +436,7 @@ const BaseLineTest = () => {
     <div className="min-h-screen bg-slate-50 dark:bg-[#001229] flex items-center justify-center transition-colors duration-300">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1a3884] mx-auto mb-4"></div>
-        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">Loading Base Line Test...</p>
+        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">Loading {stageConfig.title}...</p>
       </div>
     </div>
   );
@@ -429,7 +444,7 @@ const BaseLineTest = () => {
   if (error) return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#001229] flex items-center justify-center p-4 transition-colors duration-300">
       <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#0B1120] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
-        <div className="text-red-500 text-5xl mb-4">⚠️</div>
+        <div className="text-red-500 text-5xl mb-4">⚠</div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Error</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
         <button onClick={() => navigate("/dashboard/assessments")} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg hover:bg-[#277a84] font-medium transition-colors">
@@ -452,7 +467,7 @@ const BaseLineTest = () => {
 
               <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0B1120] relative z-10">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">Base Line Test <span className="text-[#1a3884]">T1</span></h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
                   <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
                     Time: <span className="font-mono text-[#1a3884]">{Math.floor(timeElapsed / 1000)}s</span>
                   </div>
@@ -655,12 +670,12 @@ const BaseLineTest = () => {
               <div className="text-center mb-10 border-b border-slate-100 dark:border-slate-800 pb-8">
 
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  Baseline Established
+                  {stageKey === 'T1' ? 'Baseline Established' : `${stageConfig.name} Assessment Complete`}
                 </h2>
                 <div className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
-                  <span>Result ID: T1-{user?.studentId || 'REF'}</span>
-                  <span>�</span>
-                  <span>S_baseline</span>
+                  <span>Result ID: {stageKey}-{user?.studentId || 'REF'}</span>
+                  <span>|</span>
+                  <span>S_{stageConfig.name.toLowerCase()}</span>
                 </div>
               </div>
 
@@ -669,7 +684,7 @@ const BaseLineTest = () => {
                 <div className="text-center md:text-right">
                   <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Overall Score</div>
                   <div className="text-5xl font-bold text-slate-900 dark:text-white">
-                    {testResults?.baselineScore}
+                    {testResults?.stageScore || testResults?.baselineScore}
                     <span className="text-2xl text-slate-400 ml-1">/100</span>
                   </div>
                 </div>
@@ -696,7 +711,7 @@ const BaseLineTest = () => {
                 </motion.h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {testResults?.t1Profile ? Object.entries(testResults.t1Profile).map(([quotient, data], index) => {
+                  {(testResults?.quotientProfile || testResults?.t1Profile) ? Object.entries(testResults?.quotientProfile || testResults?.t1Profile).map(([quotient, data], index) => {
                     const info = quotientInfo[quotient];
                     const colors = getBandColor(data.level);
 

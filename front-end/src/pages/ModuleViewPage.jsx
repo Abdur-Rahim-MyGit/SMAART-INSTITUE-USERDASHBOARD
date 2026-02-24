@@ -15,6 +15,7 @@ import SubmissionTask from "@/components/SubmissionTask";
 import ReflectionTask from "@/components/ReflectionTask";
 import FlashcardTask from "@/components/FlashcardTask";
 import ModulePathway from "@/components/ModulePathway";
+import FloatingDictionary from "@/components/FloatingDictionary";
 
 const IntroScreen = ({ lines, onFinish }) => {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
@@ -44,11 +45,10 @@ const IntroScreen = ({ lines, onFinish }) => {
         {/* Progress Dots */}
         <div className="flex justify-center gap-1.5 sm:gap-2 mb-2 sm:mb-4">
           {lines.map((_, idx) => (
-            <div 
-              key={idx} 
-              className={`h-0.5 sm:h-1 rounded-full transition-all duration-300 ${
-                idx === currentLineIndex ? 'w-6 sm:w-8 bg-[#1a3884]' : 'w-1.5 sm:w-2 bg-slate-700'
-              }`} 
+            <div
+              key={idx}
+              className={`h-0.5 sm:h-1 rounded-full transition-all duration-300 ${idx === currentLineIndex ? 'w-6 sm:w-8 bg-[#1a3884]' : 'w-1.5 sm:w-2 bg-slate-700'
+                }`}
             />
           ))}
         </div>
@@ -75,10 +75,10 @@ const IntroScreen = ({ lines, onFinish }) => {
             onClick={handleNext}
             className="group flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-2.5 sm:py-3 bg-[#1a3884] hover:bg-[#2a7d88] text-white rounded-full text-sm sm:text-base font-bold transition-all shadow-lg hover:shadow-[#1a3884]/20 active:scale-95"
           >
-            {currentLineIndex === lines.length - 1 ? 'Start Video' : 'Next'} 
+            {currentLineIndex === lines.length - 1 ? 'Start Video' : 'Next'}
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform sm:w-[18px] sm:h-[18px]" />
           </button>
-          
+
           <span className="text-[9px] sm:text-[10px] text-slate-500 uppercase tracking-widest font-bold hidden xs:block">
             Press Enter or Space to continue
           </span>
@@ -385,34 +385,34 @@ const ModuleViewPage = () => {
               // --- INJECT MICRO-ASSESSMENTS ---
               // Check if module has microAssessments for this day
               if (module.microAssessments && Array.isArray(module.microAssessments)) {
-                 const dayAssessments = module.microAssessments.filter(ma => ma.dayId === (dayIndex + 1));
-                 dayAssessments.forEach(ma => {
-                    // Check if step ID conflicts? 
-                    // Usually we want it after the video. If video is step 1, this should be step 2.
-                    // If step 2 already exists (from legacy steps?), we should decide order.
-                    // For now, assume it appends or uses its defined stepId if valid.
-                    
-                    const stepId = ma.stepId || steps.length + 1;
-                    // Check if step exists
-                    const existingStepIndex = steps.findIndex(s => s.id === stepId);
-                    
-                    const assessmentStep = {
-                        id: stepId,
-                        _id: ma._id,
-                        title: ma.title || "Micro-Assessment",
-                        type: 'assessment',
-                        content: ma, // Store full assessment data
-                        isCompleted: false
-                    };
+                const dayAssessments = module.microAssessments.filter(ma => ma.dayId === (dayIndex + 1));
+                dayAssessments.forEach(ma => {
+                  // Check if step ID conflicts? 
+                  // Usually we want it after the video. If video is step 1, this should be step 2.
+                  // If step 2 already exists (from legacy steps?), we should decide order.
+                  // For now, assume it appends or uses its defined stepId if valid.
 
-                    if (existingStepIndex > -1) {
-                        steps[existingStepIndex] = assessmentStep;
-                    } else {
-                        steps.push(assessmentStep);
-                    }
-                    // Sort steps by ID to ensure correct order
-                    steps.sort((a, b) => a.id - b.id);
-                 });
+                  const stepId = ma.stepId || steps.length + 1;
+                  // Check if step exists
+                  const existingStepIndex = steps.findIndex(s => s.id === stepId);
+
+                  const assessmentStep = {
+                    id: stepId,
+                    _id: ma._id,
+                    title: ma.title || "Micro-Assessment",
+                    type: 'assessment',
+                    content: ma, // Store full assessment data
+                    isCompleted: false
+                  };
+
+                  if (existingStepIndex > -1) {
+                    steps[existingStepIndex] = assessmentStep;
+                  } else {
+                    steps.push(assessmentStep);
+                  }
+                  // Sort steps by ID to ensure correct order
+                  steps.sort((a, b) => a.id - b.id);
+                });
               }
 
               // Extract and transform video URL (Legacy fallback for other components if needed)
@@ -487,46 +487,46 @@ const ModuleViewPage = () => {
                       // Map task results (includes MicroAssessments, Reflections, etc.)
                       if (mp.taskResults) {
                         mp.taskResults.forEach(tr => {
-                            const key = `${modId}-${tr.dayId}-${tr.stepId}`;
-                            resultsMap[key] = {
-                                score: tr.score,
-                                totalPoints: tr.totalPoints || 10,
-                                responses: tr.responses
-                            };
-                            videoComp[key] = true; // Mark as done in UI
+                          const key = `${modId}-${tr.dayId}-${tr.stepId}`;
+                          resultsMap[key] = {
+                            score: tr.score,
+                            totalPoints: tr.totalPoints || 10,
+                            responses: tr.responses
+                          };
+                          videoComp[key] = true; // Mark as done in UI
                         });
                       }
 
                       // Map QUIZ progress to step completion
                       if (mp.quizzesTaken) {
-                          mp.quizzesTaken.forEach(qt => {
-                              // We need to know which step this quiz corresponds to.
-                              // Since we don't store stepId in quizzesTaken array explicitly in the updated schema plan 
-                              // (wait, the plan said update quizzesTaken but didn't specify linking back to stepId easily without ID match)
-                              // However, if we identify quizzes by ID, we can match.
-                              // OR, simpler: The assessment step in frontend has an ID.
-                              // Let's assume for this specific flow, if we have a quiz score for this module/day, it marks the assessment step complete.
-                              
-                              // Use course data to find the step ID for this quiz? 
-                              // Or simply: in `fetchedModules` generation, we assigned IDs.
-                              // If we simply rely on the fact that if a quiz matches, it's done.
-                              
-                              // ALTERNATIVE: The `updateQuizProgress` endpoint updates `quizzesTaken`.
-                              // We can infer completion if score exists.
-                              
-                              // BUT, to map it to `videoCompletionMap` (which drives the UI ticks), we need the step Key.
-                              // We iterate modules -> microAssessments to find the matching quiz ID.
-                              const moduleDef = course.modules[modIndex];
-                              if (moduleDef && moduleDef.microAssessments) {
-                                  const assessment = moduleDef.microAssessments.find(ma => ma._id && qt.quizId && ma._id.toString() === qt.quizId.toString());
-                                  if (assessment || (qt.quizId && qt.quizId.toString() === 'micro-assessment-day-3')) { // Fallback ID
-                                       const ma = assessment || { dayId: 3, stepId: 2 }; // Fallback hardcode if using legacy ID
-                                       const key = `${modId}-${ma.dayId}-${ma.stepId}`;
-                                       videoComp[key] = true;
-                                       videoProg[key] = qt.score;
-                                  }
-                              }
-                          });
+                        mp.quizzesTaken.forEach(qt => {
+                          // We need to know which step this quiz corresponds to.
+                          // Since we don't store stepId in quizzesTaken array explicitly in the updated schema plan 
+                          // (wait, the plan said update quizzesTaken but didn't specify linking back to stepId easily without ID match)
+                          // However, if we identify quizzes by ID, we can match.
+                          // OR, simpler: The assessment step in frontend has an ID.
+                          // Let's assume for this specific flow, if we have a quiz score for this module/day, it marks the assessment step complete.
+
+                          // Use course data to find the step ID for this quiz? 
+                          // Or simply: in `fetchedModules` generation, we assigned IDs.
+                          // If we simply rely on the fact that if a quiz matches, it's done.
+
+                          // ALTERNATIVE: The `updateQuizProgress` endpoint updates `quizzesTaken`.
+                          // We can infer completion if score exists.
+
+                          // BUT, to map it to `videoCompletionMap` (which drives the UI ticks), we need the step Key.
+                          // We iterate modules -> microAssessments to find the matching quiz ID.
+                          const moduleDef = course.modules[modIndex];
+                          if (moduleDef && moduleDef.microAssessments) {
+                            const assessment = moduleDef.microAssessments.find(ma => ma._id && qt.quizId && ma._id.toString() === qt.quizId.toString());
+                            if (assessment || (qt.quizId && qt.quizId.toString() === 'micro-assessment-day-3')) { // Fallback ID
+                              const ma = assessment || { dayId: 3, stepId: 2 }; // Fallback hardcode if using legacy ID
+                              const key = `${modId}-${ma.dayId}-${ma.stepId}`;
+                              videoComp[key] = true;
+                              videoProg[key] = qt.score;
+                            }
+                          }
+                        });
                       }
                     }
                   });
@@ -570,7 +570,7 @@ const ModuleViewPage = () => {
 
     // Check if the current requested day is actually unlocked
     const isActuallyUnlocked = isDayUnlocked(selectedModule, dayIndex, mod);
-    
+
     // NEW: Dynamic Module Unlocking - Module 1 is allowed, others if previous is done
     const isModuleAllowed = selectedModule === 1 || (() => {
       const prevMod = modules.find(m => m.id === selectedModule - 1);
@@ -758,13 +758,13 @@ const ModuleViewPage = () => {
     const currentModule = modules.find(m => m.id === selectedModule);
     const currentDay = currentModule?.days?.find(d => d.id === selectedDay);
     const steps = currentDay?.steps || [];
-    
+
     // Find index of current step
     // Note: selectedStepId might be null if using defaultActiveStep
     // Robustly find active step's ID first
     const activeStepId = selectedStepId || steps.find(s => {
-        const key = `${selectedModule}-${selectedDay}-${s.id}`;
-        return !videoCompletionMap[key];
+      const key = `${selectedModule}-${selectedDay}-${s.id}`;
+      return !videoCompletionMap[key];
     })?.id || steps[steps.length - 1]?.id;
 
     const currentStepIndex = steps.findIndex(s => String(s.id) === String(activeStepId));
@@ -792,7 +792,7 @@ const ModuleViewPage = () => {
     const mod = modules.find(m => m.id === moduleId);
     if (!mod || !mod.days) return 0;
     const day = mod.days.find(d => d.id === dayId);
-    
+
     // If it's a dummy day (no day object in DB), it's zero progress
     if (!day) return 0;
 
@@ -866,7 +866,7 @@ const ModuleViewPage = () => {
     }
     // No video/steps: Check tasks if they exist
     if (session.tasks && session.tasks.length > 0) {
-      const completedTasksCount = session.tasks.filter(t => 
+      const completedTasksCount = session.tasks.filter(t =>
         completedTasks[`${mId}-${session.id}-${t.id}`] === true
       ).length;
       return completedTasksCount === session.tasks.length;
@@ -897,7 +897,7 @@ const ModuleViewPage = () => {
   const isStepUnlocked = (mId, dId, stepIndex, steps) => {
     // First step in any day is always unlocked if the day itself is unlocked
     if (stepIndex === 0) return true;
-    
+
     // STRICT SEQUENTIAL LOCK: Step N is unlocked ONLY if Step N-1 is complete.
     const prevStep = steps[stepIndex - 1];
     if (!prevStep) return true;
@@ -1027,198 +1027,198 @@ const ModuleViewPage = () => {
               <div className="lg:col-span-8 space-y-6">
                 <div className={`relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-black shadow-2xl group ${['assessment', 'submission', 'reflection', 'flashcard'].includes(activeStep?.type) ? 'aspect-auto min-h-[400px]' : 'aspect-video'}`}>
                   {activeStep?.type === 'assessment' ? (
-                     <div className="w-full h-full bg-slate-100 dark:bg-slate-900 overflow-y-auto">
-                        <MicroAssessment
-                            assessmentData={activeStep.content}
-                            courseCode={courseData.courseCode}
-                            moduleId={selectedModule}
-                            dayId={selectedDay}
-                            studentId={currentUser?._id || currentUser?.id}
-                            initialResult={(() => {
-                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
-                                const result = taskResultsMap[key];
-                                if (result || videoCompletionMap[key]) {
-                                    return {
-                                        score: result?.score || videoProgressMap[key] || 0,
-                                        totalPoints: result?.totalPoints || 5,
-                                        responses: result?.responses || null,
-                                        isCompleted: true
-                                    };
-                                }
-                                return null;
-                            })()}
-                            onComplete={async (score) => {
-                                // Mark locally as complete and save score
-                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
-                                setVideoCompletionMap(prev => ({...prev, [key]: true}));
-                                if (score !== undefined) {
-                                    setVideoProgressMap(prev => ({...prev, [key]: score}));
-                                }
-                                toast.success("Assessment Completed!");
-                                
-                                // Sequential navigation
-                                setTimeout(() => {
-                                    handleMoveToNext();
-                                }, 1500); 
-                            }}
-                        />
-                     </div>
+                    <div className="w-full h-full bg-slate-100 dark:bg-slate-900 overflow-y-auto">
+                      <MicroAssessment
+                        assessmentData={activeStep.content}
+                        courseCode={courseData.courseCode}
+                        moduleId={selectedModule}
+                        dayId={selectedDay}
+                        studentId={currentUser?._id || currentUser?.id}
+                        initialResult={(() => {
+                          const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                          const result = taskResultsMap[key];
+                          if (result || videoCompletionMap[key]) {
+                            return {
+                              score: result?.score || videoProgressMap[key] || 0,
+                              totalPoints: result?.totalPoints || 5,
+                              responses: result?.responses || null,
+                              isCompleted: true
+                            };
+                          }
+                          return null;
+                        })()}
+                        onComplete={async (score) => {
+                          // Mark locally as complete and save score
+                          const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                          setVideoCompletionMap(prev => ({ ...prev, [key]: true }));
+                          if (score !== undefined) {
+                            setVideoProgressMap(prev => ({ ...prev, [key]: score }));
+                          }
+                          toast.success("Assessment Completed!");
+
+                          // Sequential navigation
+                          setTimeout(() => {
+                            handleMoveToNext();
+                          }, 1500);
+                        }}
+                      />
+                    </div>
                   ) : activeStep?.type === 'submission' ? (
-                     <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
-                        <SubmissionTask
-                            content={activeStep.content}
-                            isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
-                            initialResult={(() => {
-                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
-                                const result = taskResultsMap[key];
-                                if (result || videoCompletionMap[key]) {
-                                    return {
-                                        score: result?.score || videoProgressMap[key] || 0,
-                                        totalPoints: result?.totalPoints || 10,
-                                        responses: result?.responses || null,
-                                        isCompleted: true
-                                    };
-                                }
-                                return null;
-                            })()}
-                            onComplete={(score, totalPoints, responses) => {
-                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
-                                setVideoCompletionMap(prev => ({...prev, [key]: true}));
-                                if (score !== undefined) {
-                                    setVideoProgressMap(prev => ({...prev, [key]: score}));
-                                    
-                                    // Save task result with score AND responses to backend
-                                    if (currentUser && courseData) {
-                                        const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
-                                        
-                                        // Update local results map immediately for persistence in the current session
-                                        setTaskResultsMap(prev => ({
-                                            ...prev,
-                                            [key]: {
-                                                score: score,
-                                                totalPoints: totalPoints || 10,
-                                                responses: responses
-                                            }
-                                        }));
+                    <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
+                      <SubmissionTask
+                        content={activeStep.content}
+                        isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
+                        initialResult={(() => {
+                          const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                          const result = taskResultsMap[key];
+                          if (result || videoCompletionMap[key]) {
+                            return {
+                              score: result?.score || videoProgressMap[key] || 0,
+                              totalPoints: result?.totalPoints || 10,
+                              responses: result?.responses || null,
+                              isCompleted: true
+                            };
+                          }
+                          return null;
+                        })()}
+                        onComplete={(score, totalPoints, responses) => {
+                          const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                          setVideoCompletionMap(prev => ({ ...prev, [key]: true }));
+                          if (score !== undefined) {
+                            setVideoProgressMap(prev => ({ ...prev, [key]: score }));
 
-                                        courseEnrollmentAPI.updateTaskResult({
-                                            studentId: currentUser._id || currentUser.id,
-                                            courseCode: courseCode,
-                                            moduleId: selectedModule,
-                                            dayId: selectedDay,
-                                            stepId: activeStep.id,
-                                            score: score,
-                                            totalPoints: totalPoints || 10,
-                                            responses: responses
-                                        }).then(response => {
-                                            if (response.badgesEarned && response.badgesEarned.length > 0) {
-                                                handleBadgesEarned(response.badgesEarned);
-                                            }
-                                        }).catch(err => console.error("Failed to save task score:", err));
-                                    }
+                            // Save task result with score AND responses to backend
+                            if (currentUser && courseData) {
+                              const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
+
+                              // Update local results map immediately for persistence in the current session
+                              setTaskResultsMap(prev => ({
+                                ...prev,
+                                [key]: {
+                                  score: score,
+                                  totalPoints: totalPoints || 10,
+                                  responses: responses
                                 }
-                                // Only auto-navigate when ALL scenarios are complete
-                                if (responses?.allScenariosComplete) {
-                                    setTimeout(() => handleMoveToNext(), 1500);
+                              }));
+
+                              courseEnrollmentAPI.updateTaskResult({
+                                studentId: currentUser._id || currentUser.id,
+                                courseCode: courseCode,
+                                moduleId: selectedModule,
+                                dayId: selectedDay,
+                                stepId: activeStep.id,
+                                score: score,
+                                totalPoints: totalPoints || 10,
+                                responses: responses
+                              }).then(response => {
+                                if (response.badgesEarned && response.badgesEarned.length > 0) {
+                                  handleBadgesEarned(response.badgesEarned);
                                 }
-                            }}
-                        />
-                     </div>
+                              }).catch(err => console.error("Failed to save task score:", err));
+                            }
+                          }
+                          // Only auto-navigate when ALL scenarios are complete
+                          if (responses?.allScenariosComplete) {
+                            setTimeout(() => handleMoveToNext(), 1500);
+                          }
+                        }}
+                      />
+                    </div>
                   ) : activeStep?.type === 'reflection' ? (
-                     <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
-                        <ReflectionTask
-                            content={activeStep.content}
-                            isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
-                            initialResult={(() => {
-                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
-                                const result = taskResultsMap[key];
-                                if (result || videoCompletionMap[key]) {
-                                    return {
-                                        score: result?.score || videoProgressMap[key] || 0,
-                                        totalPoints: result?.totalPoints || 10,
-                                        responses: result?.responses || null,
-                                        isCompleted: true
-                                    };
-                                }
-                                return null;
-                            })()}
-                            onComplete={(result) => {
-                                const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
-                                setVideoCompletionMap(prev => ({...prev, [key]: true}));
-                                
-                                // Save NVQ Reflection Result to Backend
-                                if (currentUser && courseData && result.score !== undefined) {
-                                    const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
-                                    
-                                    // Update local results map immediately
-                                    setTaskResultsMap(prev => ({
-                                        ...prev,
-                                        [key]: {
-                                            score: result.score,
-                                            totalPoints: result.totalPoints,
-                                            responses: result.answers
-                                        }
-                                    }));
+                    <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
+                      <ReflectionTask
+                        content={activeStep.content}
+                        isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
+                        initialResult={(() => {
+                          const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                          const result = taskResultsMap[key];
+                          if (result || videoCompletionMap[key]) {
+                            return {
+                              score: result?.score || videoProgressMap[key] || 0,
+                              totalPoints: result?.totalPoints || 10,
+                              responses: result?.responses || null,
+                              isCompleted: true
+                            };
+                          }
+                          return null;
+                        })()}
+                        onComplete={(result) => {
+                          const key = `${selectedModule}-${selectedDay}-${activeStep.id}`;
+                          setVideoCompletionMap(prev => ({ ...prev, [key]: true }));
 
-                                    courseEnrollmentAPI.updateTaskResult({
-                                        studentId: currentUser._id || currentUser.id,
-                                        courseCode: courseCode,
-                                        moduleId: selectedModule,
-                                        dayId: selectedDay,
-                                        stepId: activeStep.id,
-                                        score: result.score,
-                                        totalPoints: result.totalPoints,
-                                        responses: result.answers
-                                    }).then(response => {
-                                        if (response.badgesEarned && response.badgesEarned.length > 0) {
-                                            handleBadgesEarned(response.badgesEarned);
-                                        }
-                                        toast.success("Reflection submitted and saved!");
-                                        setTimeout(() => handleMoveToNext(), 1500);
-                                    }).catch(err => {
-                                        console.error("Failed to save reflection:", err);
-                                        toast.error("Reflection saved locally, but failed to sync.");
-                                        setTimeout(() => handleMoveToNext(), 1500);
-                                    });
-                                } else {
-                                    toast.success("Reflection submitted!");
-                                    setTimeout(() => handleMoveToNext(), 1000);
-                                }
-                            }}
-                        />
-                     </div>
+                          // Save NVQ Reflection Result to Backend
+                          if (currentUser && courseData && result.score !== undefined) {
+                            const courseCode = courseData.courseCode || `CRS${String(courseId).padStart(5, '0')}`;
+
+                            // Update local results map immediately
+                            setTaskResultsMap(prev => ({
+                              ...prev,
+                              [key]: {
+                                score: result.score,
+                                totalPoints: result.totalPoints,
+                                responses: result.answers
+                              }
+                            }));
+
+                            courseEnrollmentAPI.updateTaskResult({
+                              studentId: currentUser._id || currentUser.id,
+                              courseCode: courseCode,
+                              moduleId: selectedModule,
+                              dayId: selectedDay,
+                              stepId: activeStep.id,
+                              score: result.score,
+                              totalPoints: result.totalPoints,
+                              responses: result.answers
+                            }).then(response => {
+                              if (response.badgesEarned && response.badgesEarned.length > 0) {
+                                handleBadgesEarned(response.badgesEarned);
+                              }
+                              toast.success("Reflection submitted and saved!");
+                              setTimeout(() => handleMoveToNext(), 1500);
+                            }).catch(err => {
+                              console.error("Failed to save reflection:", err);
+                              toast.error("Reflection saved locally, but failed to sync.");
+                              setTimeout(() => handleMoveToNext(), 1500);
+                            });
+                          } else {
+                            toast.success("Reflection submitted!");
+                            setTimeout(() => handleMoveToNext(), 1000);
+                          }
+                        }}
+                      />
+                    </div>
                   ) : activeStep?.type === 'flashcard' ? (
-                     <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
-                        <FlashcardTask
-                            content={activeStep.content}
-                            isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
-                            onComplete={() => {
-                                // Save completion to backend
-                                handleVideoProgressUpdate(selectedModule, selectedDay, activeStep.id, 1, true, 1);
-                                toast.success("Flash cards reviewed!");
-                                setTimeout(() => handleMoveToNext(), 1000);
-                            }}
-                        />
-                     </div>
+                    <div className="w-full h-full bg-white dark:bg-slate-900 overflow-y-auto">
+                      <FlashcardTask
+                        content={activeStep.content}
+                        isCompleted={videoCompletionMap[`${selectedModule}-${selectedDay}-${activeStep.id}`]}
+                        onComplete={() => {
+                          // Save completion to backend
+                          handleVideoProgressUpdate(selectedModule, selectedDay, activeStep.id, 1, true, 1);
+                          toast.success("Flash cards reviewed!");
+                          setTimeout(() => handleMoveToNext(), 1000);
+                        }}
+                      />
+                    </div>
                   ) : (
-                      activeStep?.introText?.length > 0 && !finishedIntros[activeStepKey] ? (
-                        <IntroScreen 
-                          lines={activeStep.introText} 
-                          onFinish={() => setFinishedIntros(prev => ({...prev, [activeStepKey]: true}))} 
-                        />
-                      ) : (
-                        <CustomVideoPlayer
-                          ref={playerRef}
-                          videoUrl={activeStep?.videoUrl || day.videoUrl}
-                          title={activeStep?.title || day.videoTitle || day.title}
-                          duration={getDisplayDuration(selectedModule, selectedDay, activeStep?.duration || day.duration)}
-                          initialMaxTime={maxWatchedTime}
-                          initialCompleted={isVideoCompleted}
-                          autoPlay={true}
-                          onProgressUpdate={(time, completed, dur) => handleVideoProgressUpdate(selectedModule, selectedDay, activeStep?.id || 1, time, completed, dur)}
-                          onNext={handleMoveToNext}
-                        />
-                      )
+                    activeStep?.introText?.length > 0 && !finishedIntros[activeStepKey] ? (
+                      <IntroScreen
+                        lines={activeStep.introText}
+                        onFinish={() => setFinishedIntros(prev => ({ ...prev, [activeStepKey]: true }))}
+                      />
+                    ) : (
+                      <CustomVideoPlayer
+                        ref={playerRef}
+                        videoUrl={activeStep?.videoUrl || day.videoUrl}
+                        title={activeStep?.title || day.videoTitle || day.title}
+                        duration={getDisplayDuration(selectedModule, selectedDay, activeStep?.duration || day.duration)}
+                        initialMaxTime={maxWatchedTime}
+                        initialCompleted={isVideoCompleted}
+                        autoPlay={true}
+                        onProgressUpdate={(time, completed, dur) => handleVideoProgressUpdate(selectedModule, selectedDay, activeStep?.id || 1, time, completed, dur)}
+                        onNext={handleMoveToNext}
+                      />
+                    )
                   )}
                 </div>
 
@@ -1228,17 +1228,17 @@ const ModuleViewPage = () => {
                     {['overview', 'transcription']
                       .filter(tab => tab !== 'transcription' || activeStep?.type !== 'assessment')
                       .map((tab) => (
-                      <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${(activeTab === tab || (activeStep?.type === 'assessment' && tab === 'overview'))
-                          ? 'text-slate-900 dark:text-white border-[#0891b2] dark:border-[#1a3884]'
-                          : 'text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-600 dark:hover:text-slate-300'
-                          }`}
-                      >
-                        {tab}
-                      </button>
-                    ))}
+                        <button
+                          key={tab}
+                          onClick={() => setActiveTab(tab)}
+                          className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${(activeTab === tab || (activeStep?.type === 'assessment' && tab === 'overview'))
+                            ? 'text-slate-900 dark:text-white border-[#0891b2] dark:border-[#1a3884]'
+                            : 'text-slate-400 dark:text-slate-500 border-transparent hover:text-slate-600 dark:hover:text-slate-300'
+                            }`}
+                        >
+                          {tab}
+                        </button>
+                      ))}
                   </div>
 
                   <AnimatePresence mode="wait">
@@ -1258,38 +1258,38 @@ const ModuleViewPage = () => {
                       >
                         <h3 className="text-slate-900 dark:text-white font-bold mb-2 text-base">Transcription</h3>
                         <div className="space-y-2">
-                            {day.videoTranscription ? (
-                                day.videoTranscription.split('\n').map((line, idx) => {
-                                    if (!line.trim()) return null;
-                                    
-                                    // Check for timestamp [mm:ss]
-                                    const match = line.match(/^\[(\d{2}):(\d{2})\](.*)/);
-                                    if (match) {
-                                        const minutes = parseInt(match[1]);
-                                        const seconds = parseInt(match[2]);
-                                        const totalSeconds = minutes * 60 + seconds;
-                                        const text = match[3];
+                          {day.videoTranscription ? (
+                            day.videoTranscription.split('\n').map((line, idx) => {
+                              if (!line.trim()) return null;
 
-                                        return (
-                                            <div key={idx} className="flex gap-2 group/line hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-colors -mx-1.5">
-                                                <button 
-                                                    onClick={() => playerRef.current?.seekTo(totalSeconds)}
-                                                    className="shrink-0 text-[#0891b2] dark:text-[#1a3884] font-mono text-xs font-bold bg-[#0891b2]/10 dark:bg-[#1a3884]/10 px-1.5 py-0.5 rounded h-fit hover:bg-[#0891b2]/20 transition-colors cursor-pointer"
-                                                >
-                                                    {match[1]}:{match[2]}
-                                                </button>
-                                                <p className="flex-1 text-slate-600 dark:text-slate-400 group-hover/line:text-slate-900 dark:group-hover/line:text-slate-200 transition-colors">
-                                                    {text}
-                                                </p>
-                                            </div>
-                                        );
-                                    }
-                                    
-                                    return <p key={idx} className="mb-2">{line}</p>;
-                                })
-                            ) : (
-                                <p>No transcription available for this session.</p>
-                            )}
+                              // Check for timestamp [mm:ss]
+                              const match = line.match(/^\[(\d{2}):(\d{2})\](.*)/);
+                              if (match) {
+                                const minutes = parseInt(match[1]);
+                                const seconds = parseInt(match[2]);
+                                const totalSeconds = minutes * 60 + seconds;
+                                const text = match[3];
+
+                                return (
+                                  <div key={idx} className="flex gap-2 group/line hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-colors -mx-1.5">
+                                    <button
+                                      onClick={() => playerRef.current?.seekTo(totalSeconds)}
+                                      className="shrink-0 text-[#0891b2] dark:text-[#1a3884] font-mono text-xs font-bold bg-[#0891b2]/10 dark:bg-[#1a3884]/10 px-1.5 py-0.5 rounded h-fit hover:bg-[#0891b2]/20 transition-colors cursor-pointer"
+                                    >
+                                      {match[1]}:{match[2]}
+                                    </button>
+                                    <p className="flex-1 text-slate-600 dark:text-slate-400 group-hover/line:text-slate-900 dark:group-hover/line:text-slate-200 transition-colors">
+                                      {text}
+                                    </p>
+                                  </div>
+                                );
+                              }
+
+                              return <p key={idx} className="mb-2">{line}</p>;
+                            })
+                          ) : (
+                            <p>No transcription available for this session.</p>
+                          )}
                         </div>
                       </motion.div>
                     )}
@@ -1332,122 +1332,120 @@ const ModuleViewPage = () => {
                     </div>
 
                     <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-1 -mr-2">
-                       {module.days.map((d, idx) => {
-                          const isCurrentHeader = d.id === day.id;
-                          const isCompletedDay = checkSessionCompletion(selectedModule, d);
-                          const isDayUnlockedStatus = isDayUnlocked(selectedModule, idx, module);
-                          
-                          return (
-                            <div key={d.id} className="space-y-1">
-                              {idx === 3 && (
-                                <div className="py-4 flex items-center gap-4 px-2">
-                                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent"></div>
-                                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-600">Breakthrough Point</span>
-                                  <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent"></div>
-                                </div>
-                              )}
-                              {/* DAY HEADER (Accordion Toggle) */}
-                              <button
-                                onClick={() => {
-                                  if (isDayUnlockedStatus) {
-                                    navigateToDay(selectedModule, d.id);
-                                  } else {
-                                    toast.error("Finish previous session's videos to unlock!");
-                                  }
-                                }}
-                                className={`w-full text-left px-3 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${isCurrentHeader
-                                  ? 'bg-slate-900 text-white shadow-md'
-                                  : !isDayUnlockedStatus
-                                    ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60'
-                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
-                                  }`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <div className={`
+                      {module.days.map((d, idx) => {
+                        const isCurrentHeader = d.id === day.id;
+                        const isCompletedDay = checkSessionCompletion(selectedModule, d);
+                        const isDayUnlockedStatus = isDayUnlocked(selectedModule, idx, module);
+
+                        return (
+                          <div key={d.id} className="space-y-1">
+                            {idx === 3 && (
+                              <div className="py-4 flex items-center gap-4 px-2">
+                                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent"></div>
+                                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-600">Breakthrough Point</span>
+                                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent"></div>
+                              </div>
+                            )}
+                            {/* DAY HEADER (Accordion Toggle) */}
+                            <button
+                              onClick={() => {
+                                if (isDayUnlockedStatus) {
+                                  navigateToDay(selectedModule, d.id);
+                                } else {
+                                  toast.error("Finish previous session's videos to unlock!");
+                                }
+                              }}
+                              className={`w-full text-left px-3 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-between group ${isCurrentHeader
+                                ? 'bg-slate-900 text-white shadow-md'
+                                : !isDayUnlockedStatus
+                                  ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60'
+                                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 border border-transparent hover:border-slate-200 dark:hover:border-slate-700'
+                                }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`
                                        flex items-center justify-center w-6 h-6 rounded-lg text-[10px] font-bold border transition-colors
                                        ${isCurrentHeader
-                                      ? 'bg-white/20 text-white border-white/20'
-                                      : !isDayUnlockedStatus
-                                        ? 'bg-slate-50 dark:bg-slate-900 text-slate-300 border-slate-200 dark:border-slate-800'
-                                        : isCompletedDay
-                                          ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
-                                          : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700'
-                                    }
+                                    ? 'bg-white/20 text-white border-white/20'
+                                    : !isDayUnlockedStatus
+                                      ? 'bg-slate-50 dark:bg-slate-900 text-slate-300 border-slate-200 dark:border-slate-800'
+                                      : isCompletedDay
+                                        ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-400 border-slate-200 dark:border-slate-700'
+                                  }
                                      `}>
-                                    {!isDayUnlockedStatus ? <Lock size={12} /> : (isCompletedDay ? <CheckCircle2 size={12} /> : d.id)}
-                                  </div>
-                                  <span className="uppercase tracking-wide">Session {d.id}: {d.title}</span>
+                                  {!isDayUnlockedStatus ? <Lock size={12} /> : (isCompletedDay ? <CheckCircle2 size={12} /> : d.id)}
                                 </div>
-                                <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${isCurrentHeader ? 'rotate-90' : 'opacity-40'}`} />
-                              </button>
+                                <span className="uppercase tracking-wide">Session {d.id}: {d.title}</span>
+                              </div>
+                              <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${isCurrentHeader ? 'rotate-90' : 'opacity-40'}`} />
+                            </button>
 
-                              {/* DAY CONTENT (Phases & Steps) */}
-                              <AnimatePresence>
-                                {isCurrentHeader && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="overflow-hidden bg-slate-50/50 dark:bg-slate-900/30 rounded-xl px-2 py-1 ml-4 border-l-2 border-slate-200 dark:border-slate-800"
-                                  >
-                                    <div className="space-y-1.5 py-3">
-                                      {(d.steps || []).map((step, idx) => {
-                                        const stepKey = `${selectedModule}-${d.id}-${step.id}`;
-                                        const isActiveStep = String(activeStep?.id) === String(step.id);
-                                        const isStepCompleted = videoCompletionMap[stepKey] === true;
-                                        const isUnlocked = isStepUnlocked(selectedModule, d.id, idx, d.steps);
-                                        const stepProgress = videoProgressMap[stepKey] || 0;
-                                        const stepDuration = videoDurationMap[stepKey] || step.duration || 0;
-                                        const progressPercent = stepDuration > 0 ? Math.min(100, (stepProgress / stepDuration) * 100) : 0;
+                            {/* DAY CONTENT (Phases & Steps) */}
+                            <AnimatePresence>
+                              {isCurrentHeader && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="overflow-hidden bg-slate-50/50 dark:bg-slate-900/30 rounded-xl px-2 py-1 ml-4 border-l-2 border-slate-200 dark:border-slate-800"
+                                >
+                                  <div className="space-y-1.5 py-3">
+                                    {(d.steps || []).map((step, idx) => {
+                                      const stepKey = `${selectedModule}-${d.id}-${step.id}`;
+                                      const isActiveStep = String(activeStep?.id) === String(step.id);
+                                      const isStepCompleted = videoCompletionMap[stepKey] === true;
+                                      const isUnlocked = isStepUnlocked(selectedModule, d.id, idx, d.steps);
+                                      const stepProgress = videoProgressMap[stepKey] || 0;
+                                      const stepDuration = videoDurationMap[stepKey] || step.duration || 0;
+                                      const progressPercent = stepDuration > 0 ? Math.min(100, (stepProgress / stepDuration) * 100) : 0;
 
-                                        return (
-                                          <button
-                                            key={step.id}
-                                            onClick={() => {
-                                              if (isUnlocked) {
-                                                setSelectedStepId(step.id);
-                                              } else {
-                                                toast.error("Finish previous step to unlock!");
-                                              }
-                                            }}
-                                            disabled={!isUnlocked}
-                                            className={`flex items-start gap-3 w-full text-left p-2 rounded-lg transition-all ${
-                                              isActiveStep
-                                                ? 'bg-white dark:bg-white/10 shadow-sm border border-slate-200 dark:border-white/10'
-                                                : !isUnlocked
-                                                  ? 'opacity-40 cursor-not-allowed'
-                                                  : 'hover:bg-white/50 dark:hover:bg-white/5'
+                                      return (
+                                        <button
+                                          key={step.id}
+                                          onClick={() => {
+                                            if (isUnlocked) {
+                                              setSelectedStepId(step.id);
+                                            } else {
+                                              toast.error("Finish previous step to unlock!");
+                                            }
+                                          }}
+                                          disabled={!isUnlocked}
+                                          className={`flex items-start gap-3 w-full text-left p-2 rounded-lg transition-all ${isActiveStep
+                                              ? 'bg-white dark:bg-white/10 shadow-sm border border-slate-200 dark:border-white/10'
+                                              : !isUnlocked
+                                                ? 'opacity-40 cursor-not-allowed'
+                                                : 'hover:bg-white/50 dark:hover:bg-white/5'
                                             }`}
-                                          >
-                                            <div className={`mt-0.5 shrink-0 transition-colors ${
-                                              isStepCompleted ? 'text-emerald-500' : 
-                                              isActiveStep ? 'text-[#0891b2] dark:text-[#1a3884]' : 
-                                              !isUnlocked ? 'text-slate-500' : 'text-slate-400'
+                                        >
+                                          <div className={`mt-0.5 shrink-0 transition-colors ${isStepCompleted ? 'text-emerald-500' :
+                                              isActiveStep ? 'text-[#0891b2] dark:text-[#1a3884]' :
+                                                !isUnlocked ? 'text-slate-500' : 'text-slate-400'
                                             }`}>
-                                              {isStepCompleted ? <CheckCircle2 size={14} /> : 
-                                               !isUnlocked ? <Lock size={12} /> :
-                                               <Play size={14} className={isActiveStep ? 'fill-current' : ''} />}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                              <p className={`text-[11px] font-bold truncate ${isStepCompleted ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}`}>
-                                                {step.title}
-                                              </p>
-                                              {!isStepCompleted && progressPercent > 0 && (
-                                                <div className="mt-1 w-full h-0.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                                  <motion.div className="h-full bg-[#0891b2] dark:bg-[#1a3884]" initial={{ width: 0 }} animate={{ width: `${progressPercent}%` }} />
-                                                </div>
-                                              )}
-                                            </div>
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </div>
-                          );
-                       })}
+                                            {isStepCompleted ? <CheckCircle2 size={14} /> :
+                                              !isUnlocked ? <Lock size={12} /> :
+                                                <Play size={14} className={isActiveStep ? 'fill-current' : ''} />}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <p className={`text-[11px] font-bold truncate ${isStepCompleted ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                                              {step.title}
+                                            </p>
+                                            {!isStepCompleted && progressPercent > 0 && (
+                                              <div className="mt-1 w-full h-0.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                <motion.div className="h-full bg-[#0891b2] dark:bg-[#1a3884]" initial={{ width: 0 }} animate={{ width: `${progressPercent}%` }} />
+                                              </div>
+                                            )}
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -1457,6 +1455,7 @@ const ModuleViewPage = () => {
 
           </main>
         </div>
+        <FloatingDictionary />
       </div>
     );
   }
@@ -1697,7 +1696,7 @@ const ModuleViewPage = () => {
                   <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
                     <Clock size={16} />
                   </div>
-                   <div>
+                  <div>
                     <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Duration</p>
                     <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{formatCourseDuration(modules.length)}</p>
                   </div>
@@ -1706,7 +1705,7 @@ const ModuleViewPage = () => {
             </div>
 
             {/* Module Pathway (Roadmap View) */}
-            <ModulePathway 
+            <ModulePathway
               modules={modules}
               onModuleClick={(mod) => navigateToDay(mod.id, mod.days?.[0]?.id)}
               getModuleCompletedCount={getModuleCompletedCount}
@@ -1723,6 +1722,7 @@ const ModuleViewPage = () => {
         badge={earnedBadge}
         userName={currentUser?.fullName || 'Student'}
       />
+      <FloatingDictionary />
     </div >
   );
 };

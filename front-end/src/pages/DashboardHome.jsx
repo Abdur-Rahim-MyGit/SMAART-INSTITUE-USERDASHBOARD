@@ -320,15 +320,15 @@ const DashboardHome = () => {
         });
 
         // A course is "Active" if it's in_progress OR has any activity, and not finished
-        const activeCoursesCount = courses.filter(c => 
-          (c.status === 'in_progress' || c.status === 'in-progress' || c.status === 'enrolled' || c.hasAnyActivity || c.calculatedProgress > 0) && 
+        const activeCoursesCount = courses.filter(c =>
+          (c.status === 'in_progress' || c.status === 'in-progress' || c.status === 'enrolled' || c.hasAnyActivity || c.calculatedProgress > 0) &&
           c.calculatedProgress < 100
         ).length;
 
         // Find the "Active" course for hero section
         const activeCourseEnrollment = [...courses]
-          .filter(e => 
-            (e.status === 'in_progress' || e.status === 'in-progress' || e.status === 'enrolled' || e.hasAnyActivity || e.calculatedProgress > 0) && 
+          .filter(e =>
+            (e.status === 'in_progress' || e.status === 'in-progress' || e.status === 'enrolled' || e.hasAnyActivity || e.calculatedProgress > 0) &&
             e.calculatedProgress < 100
           )
           .sort((a, b) =>
@@ -401,7 +401,7 @@ const DashboardHome = () => {
         if (activeCourseEnrollment) {
           const course = activeCourseEnrollment.course;
           const enrollment = activeCourseEnrollment;
-          
+
           // Find the first incomplete module
           const currentMod = course.modules.find((m, idx) => {
             const mIdx = idx + 1;
@@ -901,7 +901,7 @@ const DashboardHome = () => {
                         Object.entries(calendarNotes).forEach(([dateStr, notes]) => {
                           const date = new Date(dateStr);
                           const isSelectedDate = date.toDateString() === selectedDate.toDateString();
-                          
+
                           if (date >= now && !isSelectedDate) {
                             notes.forEach(note => {
                               allUpcoming.push({ ...note, date });
@@ -921,8 +921,8 @@ const DashboardHome = () => {
                             <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Upcoming Deadlines</p>
                             <div className="space-y-3">
                               {nextThree.map((deadline) => (
-                                <div 
-                                  key={deadline.id} 
+                                <div
+                                  key={deadline.id}
                                   onClick={() => {
                                     setCalendarMonth(new Date(deadline.date));
                                     setSelectedDate(new Date(deadline.date));
@@ -933,8 +933,8 @@ const DashboardHome = () => {
                                   <div className="flex-1 overflow-hidden">
                                     <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight truncate">{deadline.text}</p>
                                     <p className="text-xs text-slate-500 mt-0.5">
-                                      {deadline.date.toDateString() === new Date().toDateString() 
-                                        ? 'Today' 
+                                      {deadline.date.toDateString() === new Date().toDateString()
+                                        ? 'Today'
                                         : deadline.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {deadline.time || 'All Day'}
                                     </p>
                                   </div>

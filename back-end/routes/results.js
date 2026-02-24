@@ -2,17 +2,18 @@ const express = require('express');
 const Result = require('../models/Result');
 const Assessment = require('../models/Assessment');
 const { protect } = require('../middleware/auth');
-const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions } = require('../utils/questionShuffler');
+const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions, selectStratifiedQuestionsForStage } = require('../utils/questionShuffler');
 const { notifyAssessmentComplete } = require('../services/notificationService');
+const { getStageByCode, STAGE_DISTRIBUTIONS } = require('../config/stage_distributions');
 
 const router = express.Router();
 
-console.log("✅ Results Route Loaded with T1 Fixes (V2)");
+console.log("✅ Results Route Loaded with Multi-Stage Support (T1-T4)");
 
 // Apply protection to all result routes
 router.use(protect);
 
-// Fisher-Yates shuffle algorithm (non-deterministic - for non-T1 assessments)
+// Fisher-Yates shuffle algorithm (non-deterministic - for non-stage assessments)
 function shuffleArray(array) {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -21,6 +22,17 @@ function shuffleArray(array) {
     }
     return shuffled;
 }
+
+/**
+ * Helper: Determine band level from percentage
+ */
+const determineLevel = (pct) => {
+    if (pct >= 81) return 'Advanced';
+    if (pct >= 61) return 'Strong';
+    if (pct >= 41) return 'Progressing';
+    if (pct >= 21) return 'Developing';
+    return 'Emerging';
+};
 
 // Start a new assessment attempt
 router.get('/assessment/:assessmentId/start', async (req, res) => {
@@ -61,6 +73,11 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             completionStatus: 'in-progress'
         });
 
+        // Detect which stage this assessment belongs to
+        const stageInfo = getStageByCode(assessment.assessmentCode);
+        const stageKey = stageInfo ? stageInfo.stage : null;
+        const expectedQuestions = stageInfo ? stageInfo.totalQuestions : assessment.questions.length;
+
         if (existingResult) {
             console.log(`🔄 [DEBUG] Resuming result ${existingResult._id}`);
             console.log(`📊 [DEBUG] Assessment ID: ${assessmentId}, Name: ${assessment.assessmentName}, Qs in Assm: ${assessment.questions ? assessment.questions.length : 'NULL'}`);
@@ -100,8 +117,6 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                     order: q.order || idx
                 }));
 
-                // CLEANUP: If we are rescuing the session, we should also clean the responses
-                // otherwise old/dead IDs from previous broken sessions will stick around
                 const validIds = new Set(assessment.questions.map(q => q._id.toString()));
                 const originalResponseCount = existingResult.responses.length;
 
@@ -116,7 +131,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 }
             }
 
-            // Failsafe 3: If STILL 0, try to re-fetch questions directly from DB for sanity
+            // Failsafe 3: If STILL 0, try to re-fetch questions directly from DB
             if (questions.length === 0) {
                 console.log("🚨 [DEBUG] CRITICAL: Questions still 0. Re-fetching directly...");
                 const freshAssessment = await Assessment.findById(assessment._id).lean();
@@ -131,15 +146,10 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 }
             }
 
-            // FIX: If resuming a T1 assessment that was created with full question set (300) instead of 36
-            const isT1Resume = assessment.assessmentCode === 'ASM00001' ||
-                (assessment.assessmentName && assessment.assessmentName.toLowerCase().includes('baseline'));
-
-            if (isT1Resume && existingResult.totalQuestions > 36) {
-                console.log(`⚠️ [FIX] Resumed T1 session has incorrect totalQuestions (${existingResult.totalQuestions}). Fixing to 36.`);
-                existingResult.totalQuestions = 36;
-                // If the user has more than 36 questions in questionOrder, strictly speaking we should probably trim them 
-                // but usually the frontend slices them anyway. The critical part is totalQuestions for validation.
+            // FIX: If resuming a stage assessment with incorrect totalQuestions
+            if (stageKey && existingResult.totalQuestions > expectedQuestions) {
+                console.log(`⚠️ [FIX] Resumed ${stageKey} session has incorrect totalQuestions (${existingResult.totalQuestions}). Fixing to ${expectedQuestions}.`);
+                existingResult.totalQuestions = expectedQuestions;
                 await existingResult.save();
             }
 
@@ -159,34 +169,45 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
 
         console.log(`✨ Creating new attempt for assessment ${assessment.assessmentCode}`);
 
-        // Check if this is T1 Baseline Assessment
-        const isT1Assessment = assessment.assessmentCode === 'ASM00001' ||
-            assessment.questionCategory === 'T1' ||
-            assessment.assessmentName?.toLowerCase().includes('baseline');
-
-        let questionIds;
         let shuffledQuestionIds;
         let totalQuestions;
 
-        if (isT1Assessment) {
-            // T1 Assessment: Stratified Sampling (36 questions)
-            console.log(`🎯 T1 Assessment detected - Using Stratified Sampling for user ${userId}`);
+        if (stageKey) {
+            // Stage Assessment: Stratified Sampling
+            console.log(`🎯 ${stageKey} Assessment detected - Using Stratified Sampling for user ${userId}`);
 
-            // Perform stratified selection using the full question objects
-            // This ensures we get the exact 7/6/6/6/7/4 distribution across difficulties
-            const selectedQuestions = selectStratifiedQuestions(assessment.questions, userId);
+            // Fetch previously attempted question IDs for this user (from completed results of this assessment)
+            const previousResults = await Result.find({
+                userId,
+                assessmentId,
+                completionStatus: 'completed'
+            }).select('questionOrder');
 
-            // Extract IDs for the result record
+            const previousQuestionIds = [];
+            previousResults.forEach(r => {
+                if (r.questionOrder) {
+                    r.questionOrder.forEach(qId => previousQuestionIds.push(qId));
+                }
+            });
+
+            // Perform stratified selection
+            const selectedQuestions = selectStratifiedQuestionsForStage(
+                assessment.questions,
+                userId,
+                stageKey,
+                previousQuestionIds
+            );
+
             shuffledQuestionIds = selectedQuestions.map(q => q._id);
             totalQuestions = selectedQuestions.length;
 
-            console.log(`✅ Stratified selection complete. Count: ${totalQuestions}`);
-            if (totalQuestions !== 36) {
-                console.warn(`⚠️ Warning: Expected 36 questions, got ${totalQuestions}. Check Question Bank tagging.`);
+            console.log(`✅ Stratified selection complete for ${stageKey}. Count: ${totalQuestions}`);
+            if (totalQuestions !== expectedQuestions) {
+                console.warn(`⚠️ Warning: Expected ${expectedQuestions} questions, got ${totalQuestions}. Check Question Bank tagging.`);
             }
         } else {
             // Other assessments: Random shuffle, all questions
-            questionIds = assessment.questions.map(q => q._id);
+            const questionIds = assessment.questions.map(q => q._id);
             shuffledQuestionIds = shuffleArray(questionIds);
             totalQuestions = assessment.questions.length;
         }
@@ -204,7 +225,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
 
         await result.save();
 
-        // Map shuffled IDs to actual question data (O(1) lookup)
+        // Map shuffled IDs to actual question data
         const shuffledQuestions = shuffledQuestionIds.map(qId => {
             const idStr = qId.toString();
             const question = questionMap.get(idStr);
@@ -225,7 +246,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
             data: {
                 resultId: result._id,
                 questions: shuffledQuestions,
-                totalQuestions: assessment.questions.length
+                totalQuestions: totalQuestions
             }
         });
     } catch (err) {
@@ -349,19 +370,26 @@ router.post('/:resultId/submit', async (req, res) => {
             });
         }
 
-        // T1 Baseline Assessment Specific Fix (Migration/Legacy Support)
-        // If we are strictly at 36 answers and expected 300, it's definitely the T1 Baseline configuration issue.
-        if (result.totalQuestions === 300 && result.responses.length === 36) {
-            console.log(`🔧 [FIX] Forced T1 Baseline Correction: 36/300 detected for result ${resultId}`);
-            result.totalQuestions = 36;
+        // Fetch the assessment
+        const assessment = await Assessment.findById(result.assessmentId);
+        console.log('🔍 Assessment details:', {
+            code: assessment?.assessmentCode,
+            name: assessment?.assessmentName,
+            description: assessment?.description
+        });
+
+        // Detect stage
+        const stageInfo = getStageByCode(assessment?.assessmentCode);
+
+        // Fix totalQuestions for stage assessments if mismatched
+        if (stageInfo && result.totalQuestions > stageInfo.totalQuestions && result.responses.length >= stageInfo.totalQuestions) {
+            console.log(`🔧 [FIX] Correcting ${stageInfo.stage} Assessment totalQuestions from ${result.totalQuestions} to ${stageInfo.totalQuestions} for result ${resultId}`);
+            result.totalQuestions = stageInfo.totalQuestions;
         }
 
-        // Fallback for other mismatches if identified as T1 Baseline
-        const isT1Assessment = result.assessmentCode === 'ASM00001' ||
-            (result.assessmentName && result.assessmentName.toLowerCase().includes('baseline'));
-
-        if (isT1Assessment && result.totalQuestions > 36 && result.responses.length >= 36) {
-            console.log(`🔧 [FIX] Correcting T1 Assessment totalQuestions from ${result.totalQuestions} to 36 for result ${resultId}`);
+        // Legacy T1 fix
+        if (result.totalQuestions === 300 && result.responses.length === 36) {
+            console.log(`🔧 [FIX] Forced T1 Baseline Correction: 36/300 detected for result ${resultId}`);
             result.totalQuestions = 36;
         }
 
@@ -384,21 +412,8 @@ router.post('/:resultId/submit', async (req, res) => {
 
         await result.save();
 
-        // Check if this is a Big Five assessment
-        const assessment = await Assessment.findById(result.assessmentId);
-        console.log('🔍 Assessment details:', {
-            code: assessment?.assessmentCode,
-            name: assessment?.assessmentName,
-            description: assessment?.description
-        });
-
-        // Big Five logic disabled for now as ASM00001 is used for Base Line Test - T1
-        const isBig5 = false; // assessment && assessment.assessmentCode === "ASM00001";
-
-
         // Calculate total score for generic assessments
         const calculatedScore = result.responses.reduce((sum, r) => sum + (r.score || 0), 0);
-        // Default max score is totalQuestions * 1 (assuming 1 point per question)
         const maxScore = result.totalQuestions;
         let percentage = maxScore > 0 ? Math.round((calculatedScore / maxScore) * 100) : 0;
 
@@ -412,24 +427,17 @@ router.post('/:resultId/submit', async (req, res) => {
             percentage: percentage
         };
 
-        // Check if this is T1 Assessment
-        const isT1Baseline = assessment.assessmentCode === 'ASM00001' ||
-            assessment.questionCategory === 'T1' ||
-            assessment.assessmentName?.toLowerCase().includes('baseline');
-
-        if (isT1Baseline) {
-            console.log('📊 Calculating T1 Baseline and Quotient Scores...');
+        // Process stage-specific scoring
+        if (stageInfo) {
+            console.log(`📊 Calculating ${stageInfo.stage} (${stageInfo.name}) Quotient Scores...`);
 
             // Fetch full question details for quotient mapping
-            // Start by fetching the original assessment to get quotient tags
             const fullAssessment = await Assessment.findById(result.assessmentId);
 
-            // Map QuestionId -> Quotient
-            const questionQuotientMap = {};
+            // Map QuestionId -> Question details
+            const questionDetailsMap = {};
             fullAssessment.questions.forEach(q => {
-                if (q.quotient) {
-                    questionQuotientMap[q._id.toString()] = q.quotient.toUpperCase();
-                }
+                questionDetailsMap[q._id.toString()] = q;
             });
 
             // Initialize Quotient Buckets
@@ -442,29 +450,45 @@ router.post('/:resultId/submit', async (req, res) => {
                 'DAQ': { earned: 0, total: 0 }
             };
 
+            const selectedAnswers = [];
+
             // Aggregate Scores
             result.responses.forEach(r => {
                 const qId = r.questionId.toString();
-                const quotient = questionQuotientMap[qId];
+                const question = questionDetailsMap[qId];
 
-                if (quotient && quotientScores[quotient]) {
-                    quotientScores[quotient].total += 1; // max score per question is 1
-                    quotientScores[quotient].earned += (r.score || 0);
+                if (!question) return;
+
+                const quotient = (question.quotient || 'CRQ').toUpperCase();
+
+                if (quotientScores[quotient]) {
+                    quotientScores[quotient].total += 1;
+
+                    // Check correctness
+                    const isCorrect = question.correctAnswer === r.selectedValue;
+                    if (isCorrect) {
+                        quotientScores[quotient].earned += 1;
+                    }
+
+                    // Update response record
+                    r.isCorrect = isCorrect;
+                    r.score = isCorrect ? 1 : 0;
+
+                    selectedAnswers.push({
+                        questionId: r.questionId,
+                        selectedValue: r.selectedValue,
+                        isCorrect
+                    });
                 }
             });
 
+            // Save updated isCorrect flags
+            await result.save();
+
             // Calculate Percentages & Levels
             const finalProfile = {};
-            let totalPercentageSum = 0;
-            let quotientCount = 0;
-
-            const determineLevel = (pct) => {
-                if (pct >= 81) return 'Advanced';
-                if (pct >= 61) return 'Strong';
-                if (pct >= 41) return 'Progressing';
-                if (pct >= 21) return 'Developing';
-                return 'Emerging';
-            };
+            let totalCorrect = 0;
+            let totalAnswered = 0;
 
             for (const [key, data] of Object.entries(quotientScores)) {
                 if (data.total > 0) {
@@ -475,93 +499,124 @@ router.post('/:resultId/submit', async (req, res) => {
                         earned: data.earned,
                         possible: data.total
                     };
-                    totalPercentageSum += pct;
-                    quotientCount++;
+                    totalCorrect += data.earned;
+                    totalAnswered += data.total;
                 }
             }
 
-            // Calculate Baseline Score (Simple Average of Quotients)
-            // This prevents questions from larger buckets dominating the score
-            const baselineScore = quotientCount > 0 ? Math.round(totalPercentageSum / quotientCount) : 0;
+            // Calculate Stage Score using the weighted formula
+            const stageScore = stageInfo.weightedFormula
+                ? stageInfo.weightedFormula(quotientScores)
+                : (totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0);
 
-            console.log('✅ T1 Profile Calculated:', finalProfile);
-            console.log('🏆 Baseline Score:', baselineScore);
+            const stageBand = determineLevel(stageScore);
+            const passed = stageScore >= 40; // Pass threshold
+
+            console.log(`✅ ${stageInfo.stage} Profile Calculated:`, finalProfile);
+            console.log(`🏆 ${stageInfo.stage} Score: ${stageScore}, Band: ${stageBand}, Passed: ${passed}`);
 
             // Append to response
-            responseData.t1Profile = finalProfile;
-            responseData.baselineScore = baselineScore;
-            responseData.stageBand = determineLevel(baselineScore);
-            responseData.assessmentType = 'T1_BASELINE';
+            responseData.t1Profile = finalProfile; // Keep backward compat key for frontend
+            responseData.quotientProfile = finalProfile;
+            responseData.baselineScore = stageScore; // Keep backward compat
+            responseData.stageScore = stageScore;
+            responseData.stageBand = stageBand;
+            responseData.passed = passed;
+            responseData.stage = stageInfo.stage;
+            responseData.assessmentType = `${stageInfo.stage}_${stageInfo.name.toUpperCase()}`;
 
             // Set percentage for badge checking
-            percentage = baselineScore;
+            percentage = stageScore;
 
-            // Save T1 results to BaseLineResult collection
+            // Save to StageResult collection
             try {
-                const BaseLineResult = require('../models/BaseLineResult');
+                const StageResult = require('../models/StageResult');
 
-                const baselineResult = new BaseLineResult({
+                const stageResult = new StageResult({
                     userId: result.userId,
                     resultId: result._id,
-                    baselineScore: baselineScore,
-                    stageBand: determineLevel(baselineScore),
-                    t1Profile: finalProfile,
-                    score: calculatedScore,
-                    totalScore: maxScore,
-                    percentage: percentage,
-                    assessmentType: 'T1_BASELINE'
+                    stage: stageInfo.stage,
+                    stageScore,
+                    stageBand,
+                    passed,
+                    quotientProfile: finalProfile,
+                    questionIds: result.questionOrder,
+                    selectedAnswers,
+                    score: totalCorrect,
+                    totalScore: totalAnswered,
+                    percentage: totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0,
+                    totalQuestions: result.totalQuestions,
+                    timeTaken,
+                    assessmentCode: assessment.assessmentCode,
+                    assessmentType: `${stageInfo.stage}_${stageInfo.name.toUpperCase()}`
                 });
 
-                await baselineResult.save();
-                console.log('✅ BaseLineResult saved to database:', baselineResult._id);
-
-                responseData.baselineResultId = baselineResult._id;
+                await stageResult.save();
+                console.log(`✅ StageResult saved for ${stageInfo.stage}:`, stageResult._id);
+                responseData.stageResultId = stageResult._id;
             } catch (saveError) {
-                console.error('❌ Error saving BaseLineResult:', saveError);
-                // Don't fail the entire request if saving fails, just log it
+                console.error(`❌ Error saving StageResult for ${stageInfo.stage}:`, saveError);
+            }
+
+            // Also save to BaseLineResult for T1 backward compatibility
+            if (stageInfo.stage === 'T1') {
+                try {
+                    const BaseLineResult = require('../models/BaseLineResult');
+
+                    const baselineResult = new BaseLineResult({
+                        userId: result.userId,
+                        resultId: result._id,
+                        baselineScore: stageScore,
+                        stageBand,
+                        t1Profile: finalProfile,
+                        score: totalCorrect,
+                        totalScore: totalAnswered,
+                        percentage: totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0,
+                        assessmentType: 'T1_BASELINE'
+                    });
+
+                    await baselineResult.save();
+                    console.log('✅ BaseLineResult saved (backward compat):', baselineResult._id);
+                    responseData.baselineResultId = baselineResult._id;
+                } catch (blError) {
+                    console.error('❌ Error saving BaseLineResult:', blError);
+                }
+            }
+        } else {
+            // Non-stage assessment - original generic logic
+            // Check if this is a Base Line Test (MCQ based) - Legacy
+            const isBaseLineTest = assessment && (assessment.assessmentCode === "ASM99999-T1" || assessment.assessmentCode === "ASM00001");
+            if (isBaseLineTest) {
+                try {
+                    const BaseLineResult = require('../models/BaseLineResult');
+                    const baselineUtils = require('../utils/baselineUtils');
+
+                    console.log('📊 Calculating refined Base Line scores...');
+                    const profileData = baselineUtils.calculateBaseLineProfile(assessment, result);
+
+                    await result.save();
+
+                    const baseLineResult = new BaseLineResult({
+                        userId: result.userId,
+                        resultId: result._id,
+                        ...profileData
+                    });
+
+                    await baseLineResult.save();
+                    console.log('✅ Refined Base Line Result saved successfully:', baseLineResult._id);
+
+                    Object.assign(responseData, profileData);
+                    percentage = profileData.baselineScore || 0;
+                } catch (blError) {
+                    console.error('Error calculating Base Line scores:', blError);
+                    return res.status(500).json({
+                        success: false,
+                        error: 'Failed to calculate Base Line scores',
+                        message: blError.message
+                    });
+                }
             }
         }
-
-
-
-        // Check if this is a Base Line Test (MCQ based)
-        const isBaseLineTest = assessment && (assessment.assessmentCode === "ASM99999-T1" || assessment.assessmentCode === "ASM00001");
-        if (isBaseLineTest) {
-            try {
-                const BaseLineResult = require('../models/BaseLineResult');
-                const baselineUtils = require('../utils/baselineUtils');
-
-                console.log('📊 Calculating refined Base Line scores...');
-                const profileData = baselineUtils.calculateBaseLineProfile(assessment, result);
-
-                // Explicitly save the main result document to persist updated response.isCorrect
-                await result.save();
-
-                const baseLineResult = new BaseLineResult({
-                    userId: result.userId,
-                    resultId: result._id,
-                    ...profileData
-                });
-
-                await baseLineResult.save();
-                console.log('✅ Refined Base Line Result saved successfully:', baseLineResult._id);
-
-                // Add all calculated fields to responseData
-                Object.assign(responseData, profileData);
-
-                // Set percentage for badge checking
-                percentage = profileData.baselineScore || 0;
-            } catch (blError) {
-                console.error('Error calculating Base Line scores:', blError);
-                return res.status(500).json({
-                    success: false,
-                    error: 'Failed to calculate Base Line scores',
-                    message: blError.message
-                });
-            }
-        }
-
-
 
         // Send notification for assessment completion
         try {
