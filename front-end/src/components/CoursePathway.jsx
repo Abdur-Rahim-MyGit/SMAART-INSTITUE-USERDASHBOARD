@@ -152,7 +152,7 @@ const CoursePathway = ({ onCourseClick }) => {
 
       {/* Mobile Navigation Buttons */}
       {isMobile && (
-        <div className="fixed bottom-6 left-0 right-0 z-[60] flex justify-center gap-6 px-4">
+        <div className="fixed bottom-6 left-0 right-0 z-40 flex justify-center gap-6 px-4">
           <button
             onClick={() => scroll('left')}
             disabled={!canScrollLeft}
@@ -257,7 +257,7 @@ const CoursePathway = ({ onCourseClick }) => {
                     left: `${pos.x - (CARD_WIDTH / 2)}px`,
                     top: `${pos.y - 240}px`, // Shifted higher to clear the dot
                     width: CARD_WIDTH,
-                    zIndex: 50 // Increased z-index to stay on top
+                    zIndex: 30 // Lowered slightly so it stays below overlay menus
                   }}
                 >
                     <div

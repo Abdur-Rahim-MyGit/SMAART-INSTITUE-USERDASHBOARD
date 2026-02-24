@@ -1,11 +1,11 @@
 /**
- * ContinueLearning - 7-Day Cycle Streak Tracker
+ * ContinueLearning - Sunday-based Streak Tracker
  * 
- * Displays the user's streak progress through a 7-day cycle:
- * - Days 1-6: Required activity days
- * - Day 7: Mandatory holiday / rest day
+ * Displays the user's streak progress through a weekly cycle:
+ * - Days 1-6: Required activity days (Mon-Sat)
+ * - Sunday: Mandatory holiday / rest day
  * - Missing any day resets streak to zero
- * - Completing a cycle awards bonus XP
+ * - Completing a week awards bonus XP
  */
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,7 +24,20 @@ import {
 import "./ContinueLearning.css";
 import apiCall from "@/services/api";
 
-const DAY_LABELS = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Holiday'];
+// Get day labels based on current locale
+const getDayLabels = () => {
+  const monday = new Date(2025, 0, 6); // A Monday
+  const labels = [];
+  for (let i = 0; i < 6; i++) {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
+    labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+  }
+  labels.push('Sun'); // Sunday
+  return labels;
+};
+
+const DAY_LABELS = getDayLabels();
 
 const ContinueLearning = () => {
   const [streakData, setStreakData] = useState(null);
@@ -119,7 +132,7 @@ const ContinueLearning = () => {
     cycleProgress = ['pending', 'pending', 'pending', 'pending', 'pending', 'pending', 'holiday-pending']
   } = streakData || {};
 
-  const progressPercent = cycleDay > 0 ? Math.round((Math.min(cycleDay, 6) / 6) * 100) : 0;
+  const progressPercent = cycleDay > 0 ? Math.round((cycleDay / 6) * 100) : 0;
 
   return (
     <>
@@ -140,7 +153,7 @@ const ContinueLearning = () => {
             >
               <PartyPopper className="streak-celebration-icon" />
               <h3>Cycle Complete!</h3>
-              <p>You've completed {cyclesCompleted} full cycle{cyclesCompleted !== 1 ? 's' : ''}! Enjoy your holiday.</p>
+              <p>You've completed {cyclesCompleted} full cycle{cyclesCompleted !== 1 ? 's' : ''}! Enjoy your Sunday rest.</p>
               <div className="streak-celebration-xp">+50 XP Bonus</div>
             </motion.div>
           </motion.div>
@@ -158,9 +171,9 @@ const ContinueLearning = () => {
               <h3 className="streak-tracker__title" data-testid="streak-title">Learning Streak</h3>
               <p className="streak-tracker__subtitle" data-testid="streak-subtitle">
                 {isHoliday
-                  ? "🎉 It's your holiday! Relax and recharge."
+                  ? "🎉 It's Sunday! Enjoy your rest day."
                   : isActive
-                    ? `Day ${cycleDay} of 7 • ${daysUntilHoliday} day${daysUntilHoliday !== 1 ? 's' : ''} until holiday`
+                    ? `Day ${cycleDay} of 6 • ${daysUntilHoliday} day${daysUntilHoliday !== 1 ? 's' : ''} until Sunday`
                     : "Start your streak today!"
                 }
               </p>
@@ -185,8 +198,12 @@ const ContinueLearning = () => {
         <div className="streak-tracker__days">
           {cycleProgress.map((status, index) => {
             const isCurrentDay = index + 1 === cycleDay;
-            const isHolidayDay = index === 6;
+            const isHolidayDay = index === 6; // Sunday is the 7th element (index 6)
+            
+            // Re-evaluate visual logic based on the status explicitly provided by backend
             const isCompleted = status === 'completed' || status === 'holiday';
+            const isMissed = status === 'missed';
+            const isPending = status === 'pending' || status === 'holiday-pending';
 
             return (
               <div
@@ -194,6 +211,8 @@ const ContinueLearning = () => {
                 className={`streak-day ${
                   isCompleted ? 'streak-day--completed' : ''
                 } ${isCurrentDay ? 'streak-day--current' : ''} ${
+                  isMissed ? 'streak-day--missed opacity-50' : ''
+                } ${
                   isHolidayDay ? 'streak-day--holiday' : ''
                 } ${status === 'holiday' ? 'streak-day--holiday-done' : ''}`}
                 data-testid={`streak-day-${index}`}
@@ -206,8 +225,12 @@ const ContinueLearning = () => {
                     ) : (
                       <CheckCircle2 className="streak-day__icon streak-day__icon--check" />
                     )
+                  ) : isMissed ? (
+                    <div className="streak-day__icon-wrap flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full"></div>
+                    </div>
                   ) : isHolidayDay ? (
-                    <Coffee className="streak-day__icon streak-day__icon--holiday-pending" />
+                    <Coffee className="streak-day__icon streak-day__icon--holiday-pending opacity-50" />
                   ) : isCurrentDay ? (
                     <motion.div
                       animate={{ scale: [1, 1.2, 1] }}
@@ -216,7 +239,7 @@ const ContinueLearning = () => {
                       <Star className="streak-day__icon streak-day__icon--current" />
                     </motion.div>
                   ) : (
-                    <Circle className="streak-day__icon streak-day__icon--pending" />
+                    <Circle className="streak-day__icon streak-day__icon--pending opacity-30" />
                   )}
                 </div>
                 <span className="streak-day__label">{DAY_LABELS[index]}</span>
@@ -238,10 +261,10 @@ const ContinueLearning = () => {
           </div>
           <div className="streak-progress-labels">
             <span className="streak-progress-labels__left" data-testid="streak-progress-left">
-              {isActive ? `${progressPercent}% to holiday` : 'Not started'}
+              {isActive ? `${progressPercent}% to Sunday` : 'Not started'}
             </span>
             <span className="streak-progress-labels__right" data-testid="streak-progress-right">
-              {isHoliday ? '🏖️ Holiday!' : `${6 - Math.min(cycleDay, 6)} days left`}
+              {isHoliday ? '🏖️ Sunday Rest!' : `${6 - cycleDay} days left`}
             </span>
           </div>
         </div>
@@ -258,7 +281,7 @@ const ContinueLearning = () => {
           ) : isHoliday ? (
             <>
               <Coffee className="streak-status__icon" />
-              <span data-testid="streak-status-message">Enjoy your mandatory rest day. Your streak is safe!</span>
+              <span data-testid="streak-status-message">Enjoy your Sunday rest day. Your streak is safe!</span>
             </>
           ) : (
             <>
@@ -266,7 +289,7 @@ const ContinueLearning = () => {
               <span data-testid="streak-status-message">
                 {cyclesCompleted > 0
                   ? `${cyclesCompleted} cycle${cyclesCompleted > 1 ? 's' : ''} completed • ${totalStreakDays} total streak days`
-                  : `Keep coming back daily! ${6 - Math.min(cycleDay, 6)} more days to earn your holiday.`
+                  : `Keep coming back daily! ${6 - cycleDay} more days to earn your Sunday rest.`
                 }
               </span>
             </>

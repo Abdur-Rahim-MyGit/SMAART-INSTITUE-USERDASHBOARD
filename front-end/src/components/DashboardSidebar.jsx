@@ -297,7 +297,7 @@ const DashboardSidebar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-96 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                    className="absolute -right-12 sm:right-0 mt-2 w-[300px] sm:w-96 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                     style={{ zIndex: 9999 }}
                   >
                     {/* Header */}
@@ -403,7 +403,7 @@ const DashboardSidebar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[90] lg:hidden"
             onClick={() => setIsMobileOpen(false)}
           />
         )}
@@ -417,7 +417,7 @@ const DashboardSidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 h-screen w-[280px] flex flex-col z-50 lg:hidden bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-2xl"
+            className="fixed left-0 top-0 h-screen w-[280px] flex flex-col z-[100] lg:hidden bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-2xl"
           >
             {/* Mobile Header */}
             <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">

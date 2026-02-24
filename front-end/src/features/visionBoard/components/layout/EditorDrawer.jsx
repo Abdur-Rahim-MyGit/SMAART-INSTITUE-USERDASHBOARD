@@ -133,51 +133,7 @@ const EditorDrawer = ({
             </div>
         )}
 
-        {/* Uploads Panel */}
-        {activePanel === "uploads" && (
-            <div className="space-y-4">
-                <div 
-                    className="border-2 border-dashed border-slate-300 dark:border-white/20 rounded-xl p-6 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
-                    onClick={() => document.getElementById('upload-input')?.click()}
-                >
-                    <input 
-                        id="upload-input"
-                        type="file" 
-                        accept="image/*" 
-                        className="hidden" 
-                        onChange={handleUserUpload} 
-                    />
-                    <div className="bg-teal-50 dark:bg-teal-500/20 p-3 rounded-full mb-3">
-                        <Upload className="w-6 h-6 text-teal-600 dark:text-teal-400" />
-                    </div>
-                    <p className="text-sm font-medium text-slate-700 dark:text-white mb-1">Upload Media</p>
-                    <p className="text-xs text-slate-500 dark:text-white/50">Click to browse</p>
-                </div>
 
-                <div className="pt-4 border-t border-slate-200 dark:border-white/10">
-                    <h4 className="text-xs font-semibold text-slate-500 dark:text-white/50 uppercase tracking-wider mb-3">Your Uploads</h4>
-                    {userUploads && userUploads.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-2">
-                            {userUploads.map((img, i) => (
-                                <div 
-                                    key={i} 
-                                    className="aspect-square bg-slate-100 dark:bg-white/5 rounded-lg overflow-hidden cursor-move relative group"
-                                    onDragStart={(e) => {
-                                        e.dataTransfer.setData("text/uri-list", img);
-                                        e.dataTransfer.setData("image/url", img);
-                                    }}
-                                    draggable
-                                >
-                                    <img src={img} alt={`Upload ${i}`} className="w-full h-full object-cover" />
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-xs text-slate-400 italic text-center py-8">No uploaded images yet.</p>
-                    )}
-                </div>
-            </div>
-        )}
 
 
 

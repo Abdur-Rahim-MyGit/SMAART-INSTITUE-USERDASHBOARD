@@ -323,29 +323,60 @@ exports.setAnimation = async (req, res) => {
 
 /**
  * POST /api/avatar/update-streak
- * Update daily streak using 7-day cycle system
- * Cycle = 6 activity days + 1 mandatory holiday (day 7)
+ * Update daily streak using Sunday-based weekly cycle system
+ * Cycle = 6 activity days (Mon-Sat) + Sunday as mandatory holiday
+ * 
+ * NOTE: Streak data is stored in both Avatar AND Registration models
+ * for comprehensive student tracking
  */
 exports.updateStreak = async (req, res) => {
   try {
     const userId = req.user.id;
 
+    // Get previous cycles completed before update
+    const avatarBefore = await Avatar.findOne({ userId });
+    const prevCyclesCompleted = avatarBefore?.streakCyclesCompleted || 0;
+
     const avatar = await Avatar.getOrCreate(userId);
     const streakStatus = await avatar.updateStreak();
 
-    // Bonus XP for completing a full cycle
+    // Also update streak in Registration model for student data tracking
+    const Registration = require('../models/Registration');
+    const user = await User.findById(userId);
+    
+    if (user) {
+      // Find registration by email
+      const registration = await Registration.findOne({ email: user.email });
+      if (registration) {
+        // Sync streak data to Registration
+        registration.streakData = {
+          streakCycleDay: avatar.streakCycleDay,
+          streakCyclesCompleted: avatar.streakCyclesCompleted,
+          streakStartDate: avatar.streakStartDate,
+          lastStreakDate: avatar.lastStreakDate,
+          streakActive: avatar.streakActive,
+          totalStreakDays: streakStatus.totalStreakDays,
+          streakHistory: avatar.streakHistory,
+          sundayHolidays: avatar.sundayHolidays || []
+        };
+        await registration.save();
+      }
+    }
+
+    // Bonus XP for completing a full week (cycle)
     let bonusXP = 0;
     let isMilestone = false;
 
-    if (streakStatus.cycleDay === 7 && streakStatus.isActive) {
-      bonusXP = 50; // Cycle completion bonus
+    // Check if a new cycle was completed
+    if (streakStatus.cyclesCompleted > prevCyclesCompleted) {
+      bonusXP = 50; // Week completion bonus
       isMilestone = true;
       await avatar.addXP(bonusXP);
     }
 
-    // Extra bonus for multi-cycle milestones
+    // Extra bonus for multi-cycle milestones (every 4 weeks)
     if (streakStatus.cyclesCompleted > 0 && streakStatus.cyclesCompleted % 4 === 0 && streakStatus.cycleDay === 1) {
-      bonusXP += 200; // Monthly milestone (4 cycles ≈ 28 days)
+      bonusXP += 200; // Monthly milestone (4 weeks ≈ 28 days)
       isMilestone = true;
       await avatar.addXP(200);
     }
@@ -354,7 +385,7 @@ exports.updateStreak = async (req, res) => {
     if (isMilestone) {
       try {
         await notifyStreakMilestone(userId, streakStatus.totalStreakDays, bonusXP);
-        console.log(`🔔 Streak milestone: ${streakStatus.cyclesCompleted} cycles, +${bonusXP} XP`);
+        console.log(`🔔 Streak milestone: ${streakStatus.cyclesCompleted} weeks, +${bonusXP} XP`);
       } catch (notifyError) {
         console.error("⚠️ Error sending streak notification:", notifyError);
       }
@@ -383,6 +414,9 @@ exports.updateStreak = async (req, res) => {
 /**
  * GET /api/avatar/streak-status
  * Get the current streak status without modifying it
+ * 
+ * NOTE: Returns streak data synced from Avatar model
+ * Streak data is also available in Registration model for student records
  */
 exports.getStreakStatus = async (req, res) => {
   try {
@@ -390,13 +424,27 @@ exports.getStreakStatus = async (req, res) => {
     const avatar = await Avatar.getOrCreate(userId);
     const streakStatus = avatar.getStreakStatus();
 
+    // Also get streak data from Registration (if available)
+    const Registration = require('../models/Registration');
+    const user = await User.findById(userId);
+    let registrationStreak = null;
+    
+    if (user) {
+      const registration = await Registration.findOne({ email: user.email });
+      if (registration && registration.streakData) {
+        registrationStreak = registration.streakData;
+      }
+    }
+
     res.json({
       success: true,
       data: {
         ...streakStatus,
         streak: avatar.streak,
         level: avatar.level,
-        xp: avatar.xp
+        xp: avatar.xp,
+        // Include registration streak data for reference
+        registrationStreakData: registrationStreak
       }
     });
   } catch (error) {
