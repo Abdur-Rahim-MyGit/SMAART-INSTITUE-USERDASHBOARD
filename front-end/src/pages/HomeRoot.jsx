@@ -1,0 +1,7 @@
+import LandingPage from "./LandingPage";
+
+const Landing = () => {
+  return <LandingPage />;
+};
+
+export default Landing;
