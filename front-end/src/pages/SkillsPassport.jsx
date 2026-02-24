@@ -108,17 +108,18 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto"
+            className="fixed inset-0 z-50 overflow-y-auto"
             style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
             onClick={onClose}
         >
+            <div className="flex min-h-full items-start justify-center py-8 px-4">
             <motion.div
                 initial={{ opacity: 0, y: 60, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 40, scale: 0.96 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 24 }}
                 onClick={e => e.stopPropagation()}
-                className="relative w-full max-w-2xl mx-4 my-8 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(56,189,248,0.18)]"
+                className="relative w-full max-w-2xl rounded-3xl shadow-[0_0_80px_rgba(56,189,248,0.18)]"
                 ref={cardRef}
                 style={{ background: 'linear-gradient(160deg,#0d1b3e 0%,#060e22 60%,#0a1628 100%)', border: '1.5px solid rgba(56,189,248,0.18)' }}
             >
@@ -256,6 +257,7 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg,transparent,rgba(56,189,248,0.3),transparent)' }} />
             </motion.div>
+            </div>
         </motion.div>
     );
 };
@@ -264,6 +266,7 @@ const SkillsPassport = () => {
     const { theme } = useTheme();
     const [activeTab, setActiveTab] = useState("baseline");
     const [baselineResult, setBaselineResult] = useState(null);
+    const [stageResults, setStageResults] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [showPassport, setShowPassport] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -275,7 +278,7 @@ const SkillsPassport = () => {
         }
     }, []);
 
-    // Fetch baseline data
+    // Fetch baseline + all stage results in parallel
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -284,14 +287,22 @@ const SkillsPassport = () => {
                     const user = JSON.parse(userStr);
                     const userId = user._id || user.id;
                     if (userId) {
-                        const response = await assessmentApi.getBaseLineResults(userId);
-                        if (response && response.success) {
-                            setBaselineResult(response.data);
+                        // Fetch both sets of results in parallel
+                        const [baselineRes, stageRes] = await Promise.allSettled([
+                            assessmentApi.getBaseLineResults(userId),
+                            assessmentApi.getStageResults(userId),
+                        ]);
+
+                        if (baselineRes.status === 'fulfilled' && baselineRes.value?.success) {
+                            setBaselineResult(baselineRes.value.data);
+                        }
+                        if (stageRes.status === 'fulfilled' && stageRes.value?.success) {
+                            setStageResults(stageRes.value.data || {});
                         }
                     }
                 }
             } catch (err) {
-                // Squelch error to prevent console crash
+                console.error('Skills Passport fetch error:', err);
             } finally {
                 setIsLoading(false);
             }
@@ -310,56 +321,60 @@ const SkillsPassport = () => {
         { id: 'DAQ', name: "Digital & AI Literacy", icon: Monitor, color: "text-cyan-600", bar: "bg-cyan-600" },
     ];
 
-    // Format Scores from Data
+    // Helper: extract 6-quotient scores from a quotientProfile object
     const getScores = (profile) => {
         if (!profile) return { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 };
         return {
-            CRQ: profile.CRQ?.rawScore || 0,
-            SRQ: profile.SRQ?.rawScore || 0,
-            LQ: profile.LQ?.rawScore || 0,
-            SIQ: profile.SIQ?.rawScore || 0,
-            PEQ: profile.PEQ?.rawScore || 0,
-            DAQ: profile.DAQ?.rawScore || 0
+            CRQ: profile.CRQ?.rawScore ?? profile.CRQ?.percentage ?? 0,
+            SRQ: profile.SRQ?.rawScore ?? profile.SRQ?.percentage ?? 0,
+            LQ:  profile.LQ?.rawScore  ?? profile.LQ?.percentage  ?? 0,
+            SIQ: profile.SIQ?.rawScore ?? profile.SIQ?.percentage ?? 0,
+            PEQ: profile.PEQ?.rawScore ?? profile.PEQ?.percentage ?? 0,
+            DAQ: profile.DAQ?.rawScore ?? profile.DAQ?.percentage ?? 0,
+        };
+    };
+
+    // Helper: build a tab data object from a stage result or return a "Pending" placeholder
+    const buildTabData = (title, stageKey, fallbackResult = null) => {
+        const r = stageResults[stageKey] || fallbackResult;
+        if (!r) {
+            return { title, date: 'Pending', scores: getScores(null), status: 'Pending', average: 0, result: null };
+        }
+        return {
+            title,
+            date: r.completedAt ? new Date(r.completedAt).toLocaleDateString() : 'Completed',
+            scores: getScores(r.quotientProfile),
+            status: 'Completed',
+            average: Math.round(r.stageScore || r.percentage || 0),
+            stageBand: r.stageBand,
+            result: r,
         };
     };
 
     // Data for Tabs
     const testData = {
-        baseline: {
-            title: "T1 Assessment",
-            date: baselineResult ? new Date(baselineResult.createdAt).toLocaleDateString() : "Not Completed",
-            scores: getScores(baselineResult?.t1Profile),
-            status: baselineResult ? "Completed" : "Pending",
-            average: baselineResult?.baselineScore || 0
-        },
-        test2: {
-            title: "T2 Assessment",
-            date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
-            status: "Pending",
-            average: 0
-        },
-        test3: {
-            title: "T3 Assessment",
-            date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
-            status: "Pending",
-            average: 0
-        },
-        test4: {
-            title: "T4 Assessment",
-            date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
-            status: "Pending",
-            average: 0
-        }
+        baseline: baselineResult
+            ? {
+                title: 'T1 Assessment',
+                date: new Date(baselineResult.createdAt).toLocaleDateString(),
+                scores: getScores(baselineResult.t1Profile),
+                status: 'Completed',
+                average: Math.round(baselineResult.baselineScore || 0),
+                stageBand: baselineResult.stageBand,
+                result: baselineResult,
+              }
+            : { title: 'T1 Assessment', date: 'Pending', scores: getScores(null), status: 'Pending', average: 0, result: null },
+        test2: buildTabData('T2 Assessment', 'T2'),
+        test3: buildTabData('T3 Assessment', 'T3'),
+        test4: buildTabData('T4 Assessment', 'T4'),
     };
 
     const currentData = testData[activeTab];
 
     const handleDownloadReport = () => {
-        if (!baselineResult) {
-            sonnerToast.error("Please complete the assessment to download your report.");
+        const currentData = testData[activeTab];
+        if (!currentData.result) {
+            sonnerToast.error("Please complete this assessment to download your report.");
             return;
         }
 
@@ -367,7 +382,7 @@ const SkillsPassport = () => {
             const userStr = sessionStorage.getItem("user");
             if (userStr) {
                 const user = JSON.parse(userStr);
-                generateAssessmentReport(user, baselineResult);
+                generateAssessmentReport(user, currentData.result);
             }
         } catch (error) {
             console.error("Error generating report:", error);
@@ -443,7 +458,7 @@ const SkillsPassport = () => {
                                     <div>
                                         <h2 className="text-xl font-bold text-slate-800 dark:text-white font-sans">{currentData.title}</h2>
                                         <p className="text-sm text-slate-500 dark:text-slate-400 font-medium font-sans">
-                                            {isLoading ? "Loading status..." : `Completed: ${currentData.date}`}
+                                            {isLoading ? "Loading status..." : currentData.status === 'Completed' ? `Completed: ${currentData.date}` : 'Completed: Pending'}
                                         </p>
                                     </div>
                                     <div className="text-right">
@@ -451,6 +466,11 @@ const SkillsPassport = () => {
                                             {currentData.average}%
                                         </div>
                                         <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Average</div>
+                                        {currentData.stageBand && (
+                                            <div className="text-xs font-semibold text-blue-500 dark:text-blue-400 mt-0.5 uppercase tracking-wide">
+                                                {currentData.stageBand}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
