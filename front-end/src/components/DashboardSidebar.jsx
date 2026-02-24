@@ -8,6 +8,8 @@ import {
   X,
   Lightbulb,
   Zap,
+  Brain,
+  Wallet,
   Home,
   Settings,
   HelpCircle,
@@ -17,8 +19,7 @@ import {
   Sun,
   Moon,
   Users,
-  ClipboardCheck,
-  Brain
+  ClipboardCheck
 } from "lucide-react";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
@@ -35,8 +36,7 @@ const menuItems = [
   { icon: Brain, label: "Assessment Centre", path: "/dashboard/assessment-centre" },
   { icon: Lightbulb, label: "Vision Boards", path: "/dashboard/vision-boards" },
   { icon: Zap, label: "SMAART Toolkit", path: "/dashboard/smaart-toolkit" },
-  { icon: Award, label: "My Certificate", path: "/dashboard/certificate" },
-  { icon: ShieldCheck, label: "Verify Certificate", path: "/verify-certificate" },
+  { icon: Wallet, label: "SMAART Wallet", path: "/dashboard/smaart-wallet" },
   { icon: Users, label: "Community", path: "/dashboard/community" },
   { icon: ClipboardCheck, label: "My Notes", path: "/dashboard/notes" },
 ];
@@ -229,12 +229,11 @@ const DashboardSidebar = () => {
           <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
             {[
               { label: 'Home', path: '/dashboard' },
-              { label: 'My Courses', path: '/dashboard/courses' },
+              { label: 'Courses', path: '/dashboard/courses' },
               { label: 'Assessments', path: '/dashboard/assessment-centre' },
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
-              { label: 'Certificates', path: '/dashboard/certificate' },
-              { label: 'Verify', path: '/verify-certificate' }
+              { label: 'Wallet', path: '/dashboard/smaart-wallet' }
             ].map(item => {
               const isActive = location.pathname === item.path ||
                 (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
