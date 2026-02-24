@@ -13,6 +13,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const inputRefs = useRef([]);
 
@@ -319,14 +320,21 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                         </button>
                                     </div>
-                                    <div>
+                                    <div className="relative">
                                         <input
-                                            type={showPassword ? "text" : "password"}
+                                            type={showConfirmPassword ? "text" : "password"}
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             placeholder="Confirm new password"
-                                            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-teal focus:ring-2 focus:ring-teal/30 transition-all outline-none"
+                                            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/40 focus:border-teal focus:ring-2 focus:ring-teal/30 transition-all outline-none pr-12"
                                         />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+                                        >
+                                            {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                        </button>
                                     </div>
                                     {/* SECURITY FIX #8: Password requirements display */}
                                     {newPassword.length > 0 && (
