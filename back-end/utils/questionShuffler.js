@@ -88,8 +88,7 @@ function selectStratifiedQuestionsForStage(allQuestions, userId, stageKey, previ
     const fallbackPools = {}; // For questions that were previously attempted
 
     allQuestions.forEach(q => {
-        // Ensure properties exist
-        if (!q.quotient || !q.difficultyLevel) return;
+        if (!q.quotient) return;
 
         const qt = q.quotient.toUpperCase();
         const diff = normalizeDifficulty(q.difficultyLevel);
@@ -109,7 +108,7 @@ function selectStratifiedQuestionsForStage(allQuestions, userId, stageKey, previ
     const selectedIds = new Set(); // Track selected IDs to prevent duplicates
     const matrix = stage.quotients;
 
-    // Iterate through configuration matrix
+    // Pass 1: Ideal selection according to matrix
     for (const [quotient, difficulties] of Object.entries(matrix)) {
         for (const [diffLevel, requiredCount] of Object.entries(difficulties)) {
             const key = `${quotient}_${diffLevel}`;
