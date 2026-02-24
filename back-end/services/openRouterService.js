@@ -13,7 +13,7 @@ class OpenRouterService {
     /**
      * Send a chat message to AI
      */
-    async chat(messages, systemPrompt = null) {
+    async chat(messages, systemPrompt = null, options = {}) {
         try {
             console.log('🔑 OpenRouter API Key:', OPENROUTER_API_KEY ? `${OPENROUTER_API_KEY.substring(0, 20)}...` : 'NOT SET');
             console.log('🤖 AI Model:', AI_MODEL);
@@ -55,8 +55,8 @@ class OpenRouterService {
             // Only add parameters if supported by model (Llama supports them, Google might not)
             // For safety with unknown models, we can omit them or be conservative
             if (!AI_MODEL.includes('google')) {
-                requestBody.temperature = 0.7;
-                requestBody.max_tokens = 2000;
+                requestBody.temperature = options.temperature || 0.7;
+                requestBody.max_tokens = options.max_tokens || 4000;
             }
 
             const response = await axios.post(
@@ -69,7 +69,7 @@ class OpenRouterService {
                         'HTTP-Referer': 'https://smaartminds.com',
                         'X-Title': 'SMAART Minds Career Coach'
                     },
-                    timeout: 30000
+                    timeout: options.timeout || 60000
                 }
             );
 

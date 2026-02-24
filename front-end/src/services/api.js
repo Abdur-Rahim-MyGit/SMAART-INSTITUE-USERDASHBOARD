@@ -97,7 +97,8 @@ if (typeof document !== 'undefined') {
 }
 
 export const apiCall = async (endpoint, options = {}) => {
-  const timeout = 30000; // 30 seconds timeout - increased to prevent "signal aborted" on slow operations like sending emails
+  const timeout = options.timeout || 30000; // Default 30s, allow custom timeout for long operations
+  delete options.timeout; // Remove from fetch options
 
   const performCall = async (baseUrl, customTimeout = timeout) => {
     const controller = new AbortController();

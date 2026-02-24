@@ -1,0 +1,141 @@
+=== UNIQUE SECTORS ===
+FINANCIAL SERVICES & BANKING
+TECHNOLOGY, SOFTWARE & DIGITAL PRODUCTS
+DATA, ANALYTICS & AI GOVERNANCE
+HEALTHCARE, LIFE SCIENCES & DIGITAL HEALTH
+MANAGEMENT CONSULTING & PROFESSIONAL SERVICES
+HUMAN RESOURCES, TALENT & ORGANISATIONAL DEVELOPMENT
+MARKETING, ADVERTISING, MEDIA & COMMUNICATIONS
+OPERATIONS, SUPPLY CHAIN, MANUFACTURING & ENGINEERING
+ENERGY, ENVIRONMENT & SUSTAINABILITY
+EDUCATION, LEARNING DESIGN & EDTECH
+AGRICULTURE, FOOD TECHNOLOGY & RURAL DEVELOPMENT
+GOVERNMENT, PUBLIC POLICY, SOCIAL SECTOR & DEFENCE
+CREATIVE INDUSTRIES, DESIGN & ARCHITECTURE
+SPACE TECHNOLOGY, DEEP TECH & FRONTIER ROLES (2026–2030)
+
+=== CAREER LEVELS ===
+Entry Level (0-2 yrs)
+Mid Level (3-7 yrs)
+Senior Level (7-15 yrs)
+Leadership (15+ yrs)
+
+=== SECTORS IN AI SKILLS FILE ===
+INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT
+DATA ANALYTICS, BUSINESS INTELLIGENCE & REPORTING
+ARTIFICIAL INTELLIGENCE, MACHINE LEARNING & DATA SCIENCE
+DIGITAL MARKETING, E-COMMERCE & CONTENT
+FINANCE, ACCOUNTING & FINANCIAL MANAGEMENT
+SUPPLY CHAIN, LOGISTICS & OPERATIONS MANAGEMENT
+SALES, CRM & CUSTOMER SUCCESS
+PROJECT MANAGEMENT, PRODUCT MANAGEMENT & AGILE
+HUMAN RESOURCES, TALENT ACQUISITION & LEARNING & DEVELOPMENT
+ENGINEERING, MANUFACTURING & DESIGN TECHNOLOGY
+HEALTHCARE, PUBLIC HEALTH & ALLIED HEALTH
+CREATIVE, DESIGN, UX & MEDIA
+CYBERSECURITY & INFORMATION SECURITY
+LEGAL, COMPLIANCE & GOVERNANCE
+EDUCATION, EDTECH & LEARNING TECHNOLOGY
+
+=== UNIQUE ROLES (first 50) IN AI SKILLS ===
+Software Developer / Full Stack Developer
+IT Support Analyst / Helpdesk Technician
+DevOps Engineer / Cloud Engineer
+Data Analyst / Reporting Analyst
+Business Analyst / MIS Analyst
+Machine Learning Engineer / AI Engineer
+Prompt Engineer / AI Operations Analyst
+Digital Marketing Analyst / SEO Specialist
+Social Media Manager / Content Creator
+Financial Analyst / FP&A Analyst
+Accounts Executive / Bookkeeper
+Supply Chain Analyst / Demand Planner
+Sales Executive / Business Development Executive
+Project Manager / PMO Analyst
+Product Manager / Product Owner
+Talent Acquisition Specialist / HR Executive
+L&D Coordinator / Instructional Designer
+Design Engineer / CAD Designer
+Quality Engineer / Manufacturing Engineer
+Healthcare Administrator / Hospital Operations Analyst
+UX/UI Designer
+SOC Analyst / Cybersecurity Analyst
+Legal Analyst / Compliance Analyst
+EdTech Product Manager / Learning Experience Designer
+
+=== SECTORS IN DEEP INTELLIGENCE ===
+Financial Services
+Technology
+Data & Analytics
+Healthcare
+Consulting
+Human Resources
+Marketing
+Operations
+Energy
+Education
+Agriculture
+Government
+Creative
+Frontier Tech
+
+=== JOB FAMILIES ===
+Retail & Commercial Banking
+Investment Banking & Capital Markets
+Insurance
+Fintech & Digital Payments
+ESG Finance & Sustainable Investment
+Software Engineering & Development
+Data Engineering & Architecture
+Artificial Intelligence & Machine Learning
+Cloud Computing & Infrastructure
+Cybersecurity & Information Security
+Product Management (Technology)
+UX/UI Design & User Research
+Business Intelligence & Analytics
+People Analytics
+AI Governance, Ethics & Policy
+Hospital Administration & Healthcare Management
+Health Informatics & Digital Health
+Pharmaceuticals & Drug Development
+Mental Health & Psychological Services
+Strategy & Management Consulting
+Accounting & Chartered Accountancy
+Legal & Corporate Law
+Human Resources Business Partnering
+Learning & Development (Corporate)
+Digital Marketing & Growth
+Content, Media & Journalism
+Supply Chain & Logistics
+Manufacturing & Industrial Engineering
+Civil, Construction & Infrastructure Engineering
+Renewable Energy & Clean Technology
+ESG, Corporate Sustainability & Climate
+Environmental Science & Natural Resources
+School & Higher Education
+EdTech, Learning Technology & Corporate Training
+AgriTech & Precision Agriculture
+Food Technology & Food Safety
+Public Administration & Government Services
+Public Policy, Think Tanks & Development
+Architecture, Urban Design & Planning
+Film, OTT, Gaming & Interactive Media
+Space Technology & Aerospace
+Quantum Computing & Quantum Technologies
+Biotechnology, Genomics & Synthetic Biology
+Robotics & Autonomous Systems
+Extended Reality (AR/VR/XR) & Spatial Computing
+
+=== DOMAINS IN CERTIFICATIONS ===
+INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT
+CLOUD COMPUTING
+CYBERSECURITY
+DATA ANALYTICS, BUSINESS INTELLIGENCE & DATA SCIENCE
+ARTIFICIAL INTELLIGENCE & MACHINE LEARNING
+DIGITAL MARKETING, E-COMMERCE & CONTENT
+FINANCE, ACCOUNTING & FINANCIAL MANAGEMENT
+SUPPLY CHAIN, LOGISTICS & OPERATIONS MANAGEMENT
+SALES, CRM & CUSTOMER SUCCESS
+PROJECT MANAGEMENT, AGILE & PRODUCT MANAGEMENT
+HUMAN RESOURCES, PEOPLE MANAGEMENT & LEARNING & DEVELOPMENT
+ENGINEERING, MANUFACTURING & DESIGN TECHNOLOGY

@@ -1,0 +1,182 @@
+
+================================================================================
+FILE: ABC_AI_Skills_Tools_Reference_Database_v1.xlsx
+Sheets: AI_Tools, AI_Skills_Required, Core_Tech_Skills, Certifications, Human_Intelligence_Skills, All_Data_By_Role, Summary
+================================================================================
+
+--- Sheet: "AI_Tools" | Rows: 188 ---
+Headers: ["Sector","Role","Salary","Demand","AI Tool Name","Tool Description","FREE / PAID"]
+Row 1: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","GitHub Copilot","AI pair programmer — autocomplete code, generate functions, explain existing code","PAID"]
+Row 2: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Cursor","AI-first code editor — chat with your codebase, refactor with AI instructions","PAID"]
+Row 3: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Amazon CodeWhisperer","AWS-integrated AI code suggestions — free tier for individuals","FREE"]
+
+--- Sheet: "AI_Skills_Required" | Rows: 151 ---
+Headers: ["Sector","Role","Salary","Demand","AI Skill Required"]
+Row 1: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Prompt engineering for code generation — writing precise prompts that produce clean, usable code"]
+Row 2: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","AI output review and debugging — validating AI-generated code for bugs, security flaws, and logic errors"]
+Row 3: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","AI-assisted code review and refactoring — improving existing codebases with AI analysis"]
+
+--- Sheet: "Core_Tech_Skills" | Rows: 199 ---
+Headers: ["Sector","Role","Salary","Demand","Core Technical Skill"]
+Row 1: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Python or JavaScript / TypeScript as primary language"]
+Row 2: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","React / Vue / Angular for front-end development"]
+Row 3: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","REST API design, development and consumption"]
+
+--- Sheet: "Certifications" | Rows: 132 ---
+Headers: ["Sector","Role","Salary","Demand","Certification Name","Provider","Cost / Access"]
+Row 1: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Google IT Automation with Python Certificate","Google / Coursera","FREE with scholarship"]
+Row 2: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Meta Front-End Developer Certificate","Meta / Coursera","₹2,500/mo Coursera"]
+Row 3: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Meta Back-End Developer Certificate","Meta / Coursera","₹2,500/mo Coursera"]
+
+--- Sheet: "Human_Intelligence_Skills" | Rows: 345 ---
+Headers: ["Sector","Role","Salary","Demand","HI Quotient","Quotient Code","Task / Application"]
+Row 1: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Critical Reasoning","CRQ","Decomposing complex problems into solvable components"]
+Row 2: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Critical Reasoning","CRQ","Debugging logic systematically"]
+Row 3: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","Critical Reasoning","CRQ","Evaluating technical trade-offs objectively"]
+
+--- Sheet: "All_Data_By_Role" | Rows: 1178 ---
+Headers: ["Sector","Role","Salary","Demand","Category","Item / Field","Detail / Value","Tag"]
+Row 1: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030"]
+Row 2: ["","","","▸ AI TOOLS TO MASTER","","","",""]
+Row 3: ["INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer / Full Stack Developer","₹4–20 LPA","Very High — 25%+ growth 2024–2030","AI Tool","GitHub Copilot","AI pair programmer — autocomplete code, generate functions, explain existing code","PAID"]
+
+--- Sheet: "Summary" | Rows: 12 ---
+Headers: ["Sheet","Description","Total Rows"]
+Row 1: ["AI_Tools","One row per AI tool per role — FREE/PAID tagged, with description",187]
+Row 2: ["AI_Skills_Required","One row per AI skill per role",150]
+Row 3: ["Core_Tech_Skills","One row per core technical skill per role",198]
+
+================================================================================
+FILE: ABC_Technical_Skills_Directory_v1.xlsx
+Sheets: All_Certifications, FREE_Certifications, Free_Learn_Paid_Cert, PAID_Certifications, By_Domain, By_Job_Title, By_Company, Summary
+================================================================================
+
+--- Sheet: "All_Certifications" | Rows: 150 ---
+Headers: ["Domain No.","Domain Name","Target Job Roles (Domain)","Company / Issuer","Certification / Course Name","Level","Cost","FREE / PAID Tier","Duration","Job Titles It Targets","Where to Access"]
+Row 1: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer, Systems Analyst, IT Support Specialist, Network Engineer, Junior Developer, Technical Support Analyst","Google","IT Support Professional Certificate","Entry","FREE*","FREE","6 mo","IT Support Analyst, Helpdesk Technician, Technical Support Specialist","grow.google/certificates · Via Coursera (*scholarship available)"]
+Row 2: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer, Systems Analyst, IT Support Specialist, Network Engineer, Junior Developer, Technical Support Analyst","Google","IT Automation with Python Certificate","Foundation","FREE*","FREE","6 mo","Junior Python Developer, IT Automation Specialist, Systems Administrator","grow.google/certificates · Coursera"]
+Row 3: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Software Developer, Systems Analyst, IT Support Specialist, Network Engineer, Junior Developer, Technical Support Analyst","Microsoft","Azure Fundamentals (AZ-900)","Entry","FREE learn | ₹8,000 exam","FREE to Learn / Paid to Certify","8–10 hrs","Cloud Support, Junior Cloud Associate, IT Generalist","learn.microsoft.com (free prep + exam)"]
+
+--- Sheet: "FREE_Certifications" | Rows: 65 ---
+Headers: ["Domain No.","Domain Name","Company / Issuer","Certification / Course Name","Level","Cost","Duration","Job Titles It Targets","Where to Access"]
+Row 1: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Google","IT Support Professional Certificate","Entry","FREE*","6 mo","IT Support Analyst, Helpdesk Technician, Technical Support Specialist","grow.google/certificates · Via Coursera (*scholarship available)"]
+Row 2: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Google","IT Automation with Python Certificate","Foundation","FREE*","6 mo","Junior Python Developer, IT Automation Specialist, Systems Administrator","grow.google/certificates · Coursera"]
+Row 3: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Cisco","Cisco NetAcad — Introduction to Networks","Entry","FREE","80 hrs","Network Technician, Junior Network Engineer, IT Support","netacad.com (free registration)"]
+
+--- Sheet: "Free_Learn_Paid_Cert" | Rows: 59 ---
+Headers: ["Domain No.","Domain Name","Company / Issuer","Certification / Course Name","Level","Cost","Duration","Job Titles It Targets","Where to Access"]
+Row 1: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Microsoft","Azure Fundamentals (AZ-900)","Entry","FREE learn | ₹8,000 exam","8–10 hrs","Cloud Support, Junior Cloud Associate, IT Generalist","learn.microsoft.com (free prep + exam)"]
+Row 2: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Microsoft","Microsoft 365 Fundamentals (MS-900)","Entry","FREE learn | ₹6,500 exam","6–8 hrs","IT Support, Office 365 Admin, Helpdesk","learn.microsoft.com"]
+Row 3: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Cisco","CCNA — Cisco Certified Network Associate","Intermediate","FREE learn | ₹25,000 exam","6–12 mo","Network Engineer, Network Administrator, NOC Engineer","netacad.com + cisco.com/c/en/us/training-events"]
+
+--- Sheet: "PAID_Certifications" | Rows: 28 ---
+Headers: ["Domain No.","Domain Name","Company / Issuer","Certification / Course Name","Level","Cost","Duration","Job Titles It Targets","Where to Access"]
+Row 1: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Meta","Meta Front-End Developer Certificate","Entry-Mid","₹2,500/mo | (Coursera)","7 mo","Front-End Developer, Web Developer, UI Developer","coursera.org/professional-certificates/meta-front-end-developer"]
+Row 2: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Meta","Meta Back-End Developer Certificate","Intermediate","₹2,500/mo | (Coursera)","8 mo","Back-End Developer, API Developer, Software Engineer","coursera.org/professional-certificates/meta-back-end-developer"]
+Row 3: ["2","CLOUD COMPUTING","IBM","IBM Cloud Professional Developer Certificate","Mid","₹2,500/mo Coursera","4 mo","Cloud Developer, Application Developer, DevOps","coursera.org — IBM"]
+
+--- Sheet: "By_Domain" | Rows: 173 ---
+Headers: ["Domain No.","Domain Name","Company / Issuer","Certification / Course Name","Level","Cost","FREE/PAID Tier","Duration","Job Titles It Targets","Where to Access"]
+Row 1: ["DOMAIN 1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Target Roles: Software Developer, Systems Analyst, IT Support Specialist, Network Engineer, Junior Developer, Tech"]
+Row 2: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Google","IT Support Professional Certificate","Entry","FREE*","FREE","6 mo","IT Support Analyst, Helpdesk Technician, Technical Support Specialist","grow.google/certificates · Via Coursera (*scholarship available)"]
+Row 3: ["1","INFORMATION TECHNOLOGY & SOFTWARE DEVELOPMENT","Google","IT Automation with Python Certificate","Foundation","FREE*","FREE","6 mo","Junior Python Developer, IT Automation Specialist, Systems Administrator","grow.google/certificates · Coursera"]
+
+--- Sheet: "By_Job_Title" | Rows: 403 ---
+Headers: ["Job Title","Domain","Company / Issuer","Certification / Course Name","Level","Cost","FREE/PAID Tier","Duration","Where to Access"]
+Row 1: ["3D Modelling Analyst","ENGINEERING, MANUFACTURING & DESIGN TECHNOLOGY","Autodesk","Autodesk Certified User — Fusion 360","Entry","FREE learn | ₹8,000 exam","FREE to Learn / Paid to Certify","20 hrs","autodesk.com/certification"]
+Row 2: ["AI Analyst","DATA ANALYTICS, BUSINESS INTELLIGENCE & DATA SCIENCE","IBM","Data Science Professional Certificate","Intermediate","₹2,500/mo | Coursera","PAID","11 mo","coursera.org — IBM"]
+Row 3: ["AI Analyst","ARTIFICIAL INTELLIGENCE & MACHINE LEARNING","Google","AI Essentials","Entry","FREE","FREE","10 hrs","grow.google/certificates (free, no Coursera fee)"]
+
+--- Sheet: "By_Company" | Rows: 150 ---
+Headers: ["Company / Issuer","Domain","Certification / Course Name","Level","Cost","FREE/PAID Tier","Duration","Job Titles It Targets","Where to Access"]
+Row 1: ["(ISC)²","CYBERSECURITY","Certified in Cybersecurity (CC)","Entry","FREE (exam+course) | Free till 2025","FREE to Learn / Paid to Certify","40 hrs","SOC Analyst, Security Analyst, Entry-level CISO support","isc2.org — 1 million certification initiative"]
+Row 2: ["ACCA","FINANCE, ACCOUNTING & FINANCIAL MANAGEMENT","FutureLearn — ACCA Intro to Finance","Foundation","FREE (audit)","FREE","4 wks","Accounts Executive, Finance Assistant, Junior Analyst","futurelearn.com — ACCA partnership"]
+Row 3: ["Aha!","PROJECT MANAGEMENT, AGILE & PRODUCT MANAGEMENT","Product Management Certification","Intermediate","FREE","FREE","10 hrs","Product Manager, Senior PM, Product Owner","aha.io/learn/online-courses"]
+
+--- Sheet: "Summary" | Rows: 29 ---
+Headers: ["Sheet","Description","Total Rows"]
+Row 1: ["All_Certifications","Master database — every cert, one row, all fields, all domains",149]
+Row 2: ["FREE_Certifications","Only certs that are completely FREE (no paid exam required)",64]
+Row 3: ["Free_Learn_Paid_Cert","Free learning content but requires paid exam to certify",58]
+
+================================================================================
+FILE: SMAART_Job_Families_Master.xlsx
+Sheets: Existing_Roles_One_Per_Row, Future_Emerging_One_Per_Row, All_Roles_Combined, Legend
+================================================================================
+
+--- Sheet: "Existing_Roles_One_Per_Row" | Rows: 757 ---
+Headers: ["Sector No.","Sector Name","JF Code","Job Family Name","JF Status","Career Level","Role Title","Industry Context"]
+Row 1: ["1","FINANCIAL SERVICES & BANKING","FS-01","Retail & Commercial Banking","CURRENT","Entry Level (0-2 yrs)","Bank Teller","India: ~1.5M employed in scheduled commercial banks (RBI 2024)"]
+Row 2: ["1","FINANCIAL SERVICES & BANKING","FS-01","Retail & Commercial Banking","CURRENT","Entry Level (0-2 yrs)","Customer Service Rep","India: ~1.5M employed in scheduled commercial banks (RBI 2024)"]
+Row 3: ["1","FINANCIAL SERVICES & BANKING","FS-01","Retail & Commercial Banking","CURRENT","Entry Level (0-2 yrs)","Loans Processing Officer","India: ~1.5M employed in scheduled commercial banks (RBI 2024)"]
+
+--- Sheet: "Future_Emerging_One_Per_Row" | Rows: 120 ---
+Headers: ["Sector No.","Sector Name","JF Code","Job Family Name","JF Status","Role Title","Role Status","Role Description","Industry Context","Evidence / Sources"]
+Row 1: ["1","FINANCIAL SERVICES & BANKING","FS-01","Retail & Commercial Banking","CURRENT","AI-Augmented Relationship Manager","EMERGING","Hybrid role using AI tools for client intelligence; RMs using AI tools rising rapidly — NASSCOM 2024","India: ~1.5M employed in scheduled commercial banks (RBI 2024)","RBI Annual Report 2023-24; IBA HR in Banking Survey 2024; NASSCOM Banking Tech Report 2024"]
+Row 2: ["1","FINANCIAL SERVICES & BANKING","FS-01","Retail & Commercial Banking","CURRENT","Financial Inclusion Specialist","EMERGING","Serving unbanked populations via digital channels; India has 190M unbanked adults — World Bank 2023","India: ~1.5M employed in scheduled commercial banks (RBI 2024)","RBI Annual Report 2023-24; IBA HR in Banking Survey 2024; NASSCOM Banking Tech Report 2024"]
+Row 3: ["1","FINANCIAL SERVICES & BANKING","FS-02","Investment Banking & Capital Markets","CURRENT","AI-Driven Quantitative Analyst","EMERGING","Automated model building using ML; demand up 47% YoY — LinkedIn Talent Insights India 2024","India: NSE/BSE ecosystem; SEBI registered: ~15,000 intermediary firms","SEBI Annual Report 2023-24; NSE Data; CFA Institute India Demand Survey 2024; LinkedIn Jobs on the Rise India 2024"]
+
+--- Sheet: "All_Roles_Combined" | Rows: 876 ---
+Headers: ["Sector No.","Sector Name","JF Code","Job Family Name","JF Status","Career Level","Role Title","Role Status","Role Description","Industry Context","Evidence"]
+Row 1: ["1","FINANCIAL SERVICES & BANKING","FS-01","Retail & Commercial Banking","CURRENT","Entry Level (0-2 yrs)","Bank Teller","CURRENT","","India: ~1.5M employed in scheduled commercial banks (RBI 2024)",""]
+Row 2: ["1","FINANCIAL SERVICES & BANKING","FS-01","Retail & Commercial Banking","CURRENT","Entry Level (0-2 yrs)","Customer Service Rep","CURRENT","","India: ~1.5M employed in scheduled commercial banks (RBI 2024)",""]
+Row 3: ["1","FINANCIAL SERVICES & BANKING","FS-01","Retail & Commercial Banking","CURRENT","Entry Level (0-2 yrs)","Loans Processing Officer","CURRENT","","India: ~1.5M employed in scheduled commercial banks (RBI 2024)",""]
+
+--- Sheet: "Legend" | Rows: 13 ---
+Headers: ["SMAART JOB FAMILIES — LEGEND"]
+Row 1: []
+Row 2: ["COLOR CODING"]
+Row 3: ["CURRENT","Role exists now with active job market"]
+
+================================================================================
+FILE: SMAART_Job_Family_Deep_Intelligence_Complete.xlsx
+Sheets: Qualifications, Technical_Skills, Human_Judgement_Skills, AI_Tools_Required, AI_Automated_Tasks, How_Job_Changes, Human_Tasks_That_Remain, Summary
+================================================================================
+
+--- Sheet: "Qualifications" | Rows: 245 ---
+Headers: ["JF Code","Job Family Name","Sector","Qualification / Degree","Notes / Relevance"]
+Row 1: ["FS-01","Retail & Commercial Banking","Financial Services","B.Com / BBA / BA Economics / B.Sc Mathematics","Minimum entry for clerk/officer grade; IBPS PO/clerk exam for PSB entry"]
+Row 2: ["FS-01","Retail & Commercial Banking","Financial Services","MBA Finance (preferred for RM/managerial track)","IIM/top B-school MBA significantly accelerates promotion timeline"]
+Row 3: ["FS-01","Retail & Commercial Banking","Financial Services","JAIIB/CAIIB (Indian Institute of Banking & Finance)","Mandatory for confirmed officers in PSBs; covers banking law, credit, risk"]
+
+--- Sheet: "Technical_Skills" | Rows: 346 ---
+Headers: ["JF Code","Job Family Name","Sector","Priority","Technical Skill / Tool","Proficiency Level"]
+Row 1: ["FS-01","Retail & Commercial Banking","Financial Services","P1","Core Banking Software (Finacle, BaNCS, Temenos)","Intermediate"]
+Row 2: ["FS-01","Retail & Commercial Banking","Financial Services","P2","Credit appraisal & financial statement analysis","Intermediate"]
+Row 3: ["FS-01","Retail & Commercial Banking","Financial Services","P3","KYC/AML compliance tools (Actimize, Oracle FCCM)","Basic–Intermediate"]
+
+--- Sheet: "Human_Judgement_Skills" | Rows: 276 ---
+Headers: ["JF Code","Job Family Name","Sector","Human Judgement Skill","Specific Job Tasks This Skill Applies To"]
+Row 1: ["FS-01","Retail & Commercial Banking","Financial Services","Ethical Judgement","Identifying and refusing fraudulent loan applications despite sales pressure; advising customers against unsuitable products; managing conflicts of interest between bank targets and customer welfare"]
+Row 2: ["FS-01","Retail & Commercial Banking","Financial Services","Analytical Reasoning","Assessing creditworthiness of a business where financials are ambiguous; evaluating collateral quality; identifying suspicious transaction patterns beyond rule-based alerts"]
+Row 3: ["FS-01","Retail & Commercial Banking","Financial Services","Emotional Intelligence","Supporting a customer in financial distress without triggering embarrassment; managing angry customers during disputes; building trust with high-net-worth clients"]
+
+--- Sheet: "AI_Tools_Required" | Rows: 228 ---
+Headers: ["JF Code","Job Family Name","Sector","AI Tool / Platform","Use Case / Purpose"]
+Row 1: ["FS-01","Retail & Commercial Banking","Financial Services","AI-powered credit scoring (CIBIL AI, Experian AI, internal ML models)","Automated first-pass credit assessment; RMs must interpret and challenge outputs"]
+Row 2: ["FS-01","Retail & Commercial Banking","Financial Services","AI chatbots (IBM Watson, bank-specific)","First-line customer service; officer handles escalations requiring judgement"]
+Row 3: ["FS-01","Retail & Commercial Banking","Financial Services","Microsoft Copilot","Credit report drafting, meeting notes, compliance document preparation"]
+
+--- Sheet: "AI_Automated_Tasks" | Rows: 295 ---
+Headers: ["JF Code","Job Family Name","Sector","Task Being Automated by AI"]
+Row 1: ["FS-01","Retail & Commercial Banking","Financial Services","Routine KYC document verification and data entry"]
+Row 2: ["FS-01","Retail & Commercial Banking","Financial Services","Standard credit scoring for individuals and small businesses"]
+Row 3: ["FS-01","Retail & Commercial Banking","Financial Services","Account statement generation and reconciliation"]
+
+--- Sheet: "How_Job_Changes" | Rows: 46 ---
+Headers: ["JF Code","Job Family Name","Sector","How This Job Fundamentally Changes (AI Era)"]
+Row 1: ["FS-01","Retail & Commercial Banking","Financial Services","The RM role shifts from transaction processing to relationship intelligence. The primary value of the banker becomes trust, contextual judgement, and the ability to advise clients in complex situations AI cannot navigate. Volume of manual documentation collapses; time spent on genuine client advisory increases. Branch footfall declines; digital + in-person hybrid relationship management becomes standard."]
+Row 2: ["FS-02","Investment Banking & Capital Markets","Financial Services","The analyst role collapses from 3 years of grunt work to 12–18 months before moving to value-adding analysis. AI handles the data assembly that previously defined Analyst and Associate years. The premium shifts entirely to investment judgement, client relationship intelligence, and the ability to construct novel ideas. Research publication becomes faster but more differentiated — AI produces the data framework; the analyst must provide the insight layer no model can generate."]
+Row 3: ["FS-03","Insurance","Financial Services","Claims and underwriting roles bifurcate: AI handles the volume of standard cases; professionals focus exclusively on complex, novel, and disputed cases. The actuary role shifts from model building to model governance — ensuring AI pricing models are fair, accurate, and regulatorily compliant. Product design becomes more creative as real-time data enables parametric and personalised products impossible before."]
+
+--- Sheet: "Human_Tasks_That_Remain" | Rows: 226 ---
+Headers: ["JF Code","Job Family Name","Sector","Human Judgement Task That Cannot Be Automated"]
+Row 1: ["FS-01","Retail & Commercial Banking","Financial Services","Complex credit decisions for MSMEs with informal income: Analytical Reasoning, Ethical Judgement, Commercial Awareness — evaluating businesses where AI models have no reliable data pattern"]
+Row 2: ["FS-01","Retail & Commercial Banking","Financial Services","Managing distressed borrowers through restructuring: Emotional Intelligence, Resilience, Collaborative Leadership — navigating human crisis while protecting bank interests"]
+Row 3: ["FS-01","Retail & Commercial Banking","Financial Services","Building and maintaining high-value client relationships: Communication & Persuasion, Emotional Intelligence, Self-Awareness — AI cannot replicate relational trust built over years"]
+
+--- Sheet: "Summary" | Rows: 10 ---
+Headers: ["Sheet Name","Description","Total Rows"]
+Row 1: ["Qualifications","One row per qualification/degree per job family",244]
+Row 2: ["Technical_Skills","One row per technical skill with priority & proficiency level",345]
+Row 3: ["Human_Judgement_Skills","One row per human judgement skill with real task description",275]
