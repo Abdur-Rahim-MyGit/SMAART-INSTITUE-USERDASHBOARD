@@ -31,6 +31,7 @@ const SignupInitial = lazy(() => import('@/pages/SignupInitial'));
 const VerifyOTP = lazy(() => import('@/pages/VerifyOTP'));
 const SignupSuccess = lazy(() => import('@/pages/SignupSuccess'));
 const BaseLineTest = lazy(() => import('@/pages/BaseLineTest'));
+const AssessmentsDashboard = lazy(() => import('@/pages/AssessmentsDashboard'));
 const Analysis = lazy(() => import('@/pages/Analysis'));
 const Motivational = lazy(() => import('@/pages/Motivational'));
 const Settings = lazy(() => import('@/pages/Settings'));
@@ -42,6 +43,7 @@ const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
 const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
 const Performance = lazy(() => import('@/pages/Performance'));
+const SMAARTWallet = lazy(() => import('@/pages/SMAARTWallet'));
 
 // AI Career Coach pages
 const AIChat = lazy(() => import('@/pages/AICareerCoach/AIChat'));
@@ -115,6 +117,8 @@ const AnimatedRoutes = () => {
                     <Route path="/dashboard/dictionary" element={<AssessmentFlowGuard><GeneralDictionary /></AssessmentFlowGuard>} />
                     <Route path="/smaart-toolkit" element={<AssessmentFlowGuard><SMAArtToolkit /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/smaart-toolkit" element={<AssessmentFlowGuard><SMAArtToolkit /></AssessmentFlowGuard>} />
+                    <Route path="/smaart-wallet" element={<AssessmentFlowGuard><SMAARTWallet /></AssessmentFlowGuard>} />
+                    <Route path="/dashboard/smaart-wallet" element={<AssessmentFlowGuard><SMAARTWallet /></AssessmentFlowGuard>} />
                     <Route path="/community" element={<AssessmentFlowGuard><Community /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/community" element={<AssessmentFlowGuard><Community /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/groups" element={<AssessmentFlowGuard><StudentGroups /></AssessmentFlowGuard>} />
@@ -141,7 +145,9 @@ const AnimatedRoutes = () => {
 
 
                     {/* Assessment Routes */}
+                    <Route path="/dashboard/assessment-centre" element={<AssessmentFlowGuard><AssessmentsDashboard /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/assessments/baseline" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
+                    <Route path="/assessment/:stage" element={<BaseLineTest />} />
                     <Route path="/analysis" element={<AssessmentFlowGuard><Analysis /></AssessmentFlowGuard>} />
                     <Route path="/motivational" element={<AssessmentFlowGuard><Motivational /></AssessmentFlowGuard>} />
 

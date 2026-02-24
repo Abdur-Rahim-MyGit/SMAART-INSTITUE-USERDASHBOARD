@@ -5,6 +5,7 @@ import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import GraduationPathway from "@/components/GraduationPathway";
 import CoursePathway from "@/components/CoursePathway";
+import FloatingDictionary from "@/components/FloatingDictionary";
 import { useNavigate } from "react-router-dom";
 
 const MyCourses = () => {
@@ -35,6 +36,7 @@ const MyCourses = () => {
           </div>
         </main>
       </div>
+      <FloatingDictionary />
     </div>
   );
 };

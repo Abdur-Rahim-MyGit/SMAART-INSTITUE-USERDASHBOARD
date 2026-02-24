@@ -91,11 +91,39 @@ export const assessmentApi = {
     },
 
     /**
-     * Get Base Line results for a user
+     * Get Base Line results for a user (Legacy T1)
      * @param {string} userId - User ID
      * @returns {Promise} Base Line results
      */
     getBaseLineResults: async (userId) => {
         return apiCall(`/baselineresults/user/${userId}`);
+    },
+
+    /**
+     * Get all stage results for a user (T1-T4)
+     * @param {string} userId - User ID
+     * @returns {Promise} Map of stage -> result data
+     */
+    getStageResults: async (userId) => {
+        return apiCall(`/stageresults/user/${userId}`);
+    },
+
+    /**
+     * Get stage result for a specific stage
+     * @param {string} userId - User ID
+     * @param {string} stage - Stage key: 'T1', 'T2', 'T3', 'T4'
+     * @returns {Promise} Stage result data
+     */
+    getStageResult: async (userId, stage) => {
+        return apiCall(`/stageresults/user/${userId}/stage/${stage}`);
+    },
+
+    /**
+     * Get completion status for all stages
+     * @param {string} userId - User ID
+     * @returns {Promise} Status map per stage
+     */
+    getStageStatus: async (userId) => {
+        return apiCall(`/stageresults/user/${userId}/status`);
     },
 };

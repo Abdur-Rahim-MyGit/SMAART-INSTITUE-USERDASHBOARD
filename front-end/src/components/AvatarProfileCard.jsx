@@ -65,7 +65,7 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
   const {
     avatarData,
   } = useAvatar();
-  
+
   // Get logout from UserContext to properly clear backend session
   const { logout } = useUser();
 
@@ -205,26 +205,16 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
             <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all relative z-10" />
           </button>
 
-          {/* Feature Action: Skills Passport (Gold) */}
+          {/* Feature Action: Skills Passport */}
           <button
             onClick={() => navigate('/dashboard/skills-passport')}
-            className="group relative w-full py-3 rounded-xl overflow-hidden transition-transform active:scale-[0.98]"
+            className="group relative w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 active:scale-[0.98] overflow-hidden"
           >
-            {/* Animated Gold Gradient Background */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#FFD700] via-[#FDB931] to-[#FFD700] bg-[length:200%_100%] animate-shimmer" />
-
-            {/* Glow Effect */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/20 transition-opacity duration-300" />
-
-            <div className="relative flex items-center justify-center gap-2 text-[#463202]">
-              <Trophy className="w-4 h-4 fill-[#463202]" />
+            <div className="relative flex items-center justify-center gap-2">
+              <Trophy className="w-4 h-4" />
               <span className="text-sm font-bold uppercase tracking-wide">Skills Passport</span>
+              <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
             </div>
-
-            {/* Sparkle Particle */}
-            <span className="absolute top-0 right-0 p-2 animate-pulse">
-              <Star className="w-3 h-3 text-white fill-white rotate-12" />
-            </span>
           </button>
 
           {/* Secondary Action: Logout */}
@@ -241,17 +231,6 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
           </button>
         </div>
       </div>
-
-      {/* Custom Styles for Shimmer */}
-      <style>{`
-        @keyframes shimmer {
-          0% { background-position: 100% 0; }
-          100% { background-position: -100% 0; }
-        }
-        .animate-shimmer {
-          animation: shimmer 3s linear infinite;
-        }
-      `}</style>
     </motion.div>
   );
 };
