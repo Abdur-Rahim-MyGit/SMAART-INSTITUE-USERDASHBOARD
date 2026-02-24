@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import useUser from "@/hooks/useUser";
 import apiCall, { coursesAPI } from "@/services/api";
 import { assessmentApi } from "@/services/assessmentApi";
+import BadgeGallery from "@/components/badges/BadgeGallery";
+import CertificateVerification from "@/components/landing/CertificateVerification";
 
 /* ══════════════════════════════════════
    SMAART Wallet – Your Professional Vault
@@ -205,116 +207,75 @@ const SMAARTWallet = () => {
 
                                 {/* ════════ CERTIFICATES TAB ════════ */}
                                 {activeTab === "certificates" && (
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Your Certificates</h3>
-                                            <button
-                                                onClick={() => navigate("/dashboard/certificate")}
-                                                className="text-sm font-semibold text-[#1a3884] dark:text-blue-400 hover:underline flex items-center gap-1"
-                                            >
-                                                View & Download <ChevronRight className="w-4 h-4" />
-                                            </button>
-                                        </div>
-
-                                        <div className="grid sm:grid-cols-2 gap-4">
-                                            {certificateTypes.map((cert, i) => (
-                                                <motion.div
-                                                    key={cert.id}
-                                                    initial={{ opacity: 0, y: 16 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: i * 0.08 }}
+                                    <div className="space-y-8">
+                                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                                            <div className="flex items-center justify-between mb-6">
+                                                <div className="flex items-center gap-3">
+                                                    <Award className="w-6 h-6 text-amber-600" />
+                                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Professional Credentials</h3>
+                                                </div>
+                                                <button
                                                     onClick={() => navigate("/dashboard/certificate")}
-                                                    className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-md transition-all group"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-[#2d5dc7] transition-colors"
                                                 >
-                                                    <div className="flex items-start gap-4">
-                                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-sm">
-                                                            <Award className="w-6 h-6 text-white" />
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <h4 className="text-sm font-bold text-slate-800 dark:text-white leading-tight mb-1 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
-                                                                {cert.title}
-                                                            </h4>
-                                                            <div className="flex items-center gap-2 mt-2">
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
-                                                                    {cert.code}
-                                                                </span>
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400">
-                                                                    {cert.level}
-                                                                </span>
+                                                    <Download className="w-4 h-4" /> Download Centre
+                                                </button>
+                                            </div>
+
+                                            <div className="grid sm:grid-cols-2 gap-4">
+                                                {certificateTypes.map((cert, i) => (
+                                                    <motion.div
+                                                        key={cert.id}
+                                                        initial={{ opacity: 0, y: 16 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: i * 0.08 }}
+                                                        onClick={() => navigate("/dashboard/certificate")}
+                                                        className="bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-100 dark:border-slate-700 p-5 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-md transition-all group"
+                                                    >
+                                                        <div className="flex items-start gap-4">
+                                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                                <Award className="w-6 h-6 text-white" />
                                                             </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h4 className="text-sm font-bold text-slate-800 dark:text-white leading-tight mb-1 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
+                                                                    {cert.title}
+                                                                </h4>
+                                                                <div className="flex items-center gap-2 mt-2">
+                                                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                                                        {cert.code}
+                                                                    </span>
+                                                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400">
+                                                                        {cert.level}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1" />
                                                         </div>
-                                                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors flex-shrink-0 mt-1" />
-                                                    </div>
-                                                </motion.div>
-                                            ))}
+                                                    </motion.div>
+                                                ))}
+                                            </div>
                                         </div>
 
-                                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5 text-center">
-                                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
-                                                Generate, download, and verify your SMAART professional certificates
-                                            </p>
-                                            <button
-                                                onClick={() => navigate("/dashboard/certificate")}
-                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border-2 border-[#1a3884] dark:border-blue-500 text-[#1a3884] dark:text-blue-400 text-sm font-bold hover:bg-[#1a3884]/5 dark:hover:bg-blue-500/10 transition-colors"
-                                            >
-                                                <Download className="w-4 h-4" /> Go to Certificate Centre
-                                            </button>
+                                        {/* Verification Section */}
+                                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                                            <div className="p-6 border-b border-slate-100 dark:border-slate-700">
+                                                <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                                    <Shield className="w-5 h-5 text-emerald-600" />
+                                                    Credential Verification
+                                                </h3>
+                                                <p className="text-sm text-slate-500 dark:text-slate-400">Verify any SMAART certificate using its unique ID or QR code.</p>
+                                            </div>
+                                            <div className="p-0">
+                                                <CertificateVerification />
+                                            </div>
                                         </div>
                                     </div>
                                 )}
 
                                 {/* ════════ BADGES TAB ════════ */}
                                 {activeTab === "badges" && (
-                                    <div className="space-y-5">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Badges & Achievements</h3>
-                                            <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                                                {badges.length} Earned
-                                            </span>
-                                        </div>
-
-                                        {badges.length > 0 ? (
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                                                {badges.map((badge, i) => (
-                                                    <motion.div
-                                                        key={badge.badgeId || i}
-                                                        initial={{ opacity: 0, scale: 0.9 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        transition={{ delay: i * 0.06 }}
-                                                        className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 text-center hover:shadow-md hover:border-amber-300 dark:hover:border-amber-500/30 transition-all cursor-pointer"
-                                                    >
-                                                        <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                                                            <Star className="w-7 h-7 text-white fill-white" />
-                                                        </div>
-                                                        <h4 className="text-sm font-bold text-slate-800 dark:text-white mb-1 line-clamp-2">
-                                                            {badge.name || badge.title || `Badge #${i + 1}`}
-                                                        </h4>
-                                                        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
-                                                            {badge.earnedAt ? new Date(badge.earnedAt).toLocaleDateString() : "Earned"}
-                                                        </p>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-10 text-center">
-                                                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-50 dark:bg-slate-700 flex items-center justify-center">
-                                                    <Trophy className="w-8 h-8 text-slate-300 dark:text-slate-600" />
-                                                </div>
-                                                <h4 className="text-base font-bold text-slate-800 dark:text-white mb-1">No Badges Yet</h4>
-                                                <p className="text-sm text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
-                                                    Complete course activities, assessments, and tasks to earn professional badges that showcase your skills.
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5 text-center">
-                                            <button
-                                                onClick={() => navigate("/dashboard/certificate")}
-                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border-2 border-[#1a3884] dark:border-blue-500 text-[#1a3884] dark:text-blue-400 text-sm font-bold hover:bg-[#1a3884]/5 dark:hover:bg-blue-500/10 transition-colors"
-                                            >
-                                                <Trophy className="w-4 h-4" /> View Full Badge Gallery
-                                            </button>
-                                        </div>
+                                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                                        <BadgeGallery badges={badges} userName={user?.fullName || "Student"} />
                                     </div>
                                 )}
 
