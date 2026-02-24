@@ -29,6 +29,7 @@ const SecurityGuard = () => {
     // 1. Specific Assessment pages (sub-routes of /dashboard/assessments/)
     // 2. Specific Course Day Content (not the roadmap or module list)
     const isProtectedPath = 
+      location.pathname.startsWith("/assessment/") || 
       location.pathname.startsWith("/dashboard/assessments/") || 
       (location.pathname.startsWith("/dashboard/courses/") && location.pathname.includes("/days/"));
 

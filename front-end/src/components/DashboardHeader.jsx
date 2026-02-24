@@ -14,7 +14,7 @@ const DashboardHeader = () => {
       '/dashboard': 'Home',
       '/dashboard/home': 'Home',
       '/dashboard/courses': 'My Courses',
-      '/dashboard/assessments': 'Assessments',
+      '/dashboard/assessment-centre': 'Assessments',
       '/dashboard/assessments/baseline': 'Base Line Test',
       '/dashboard/community': 'Community',
       '/dashboard/profile': 'Profile',

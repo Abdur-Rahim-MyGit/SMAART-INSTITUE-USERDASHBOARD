@@ -62,45 +62,45 @@ const QuotientsGrid = () => {
   const quotients = [
     {
       id: 'CRQ',
-      title: 'Cognitive Readiness',
+      title: 'Cognitive Reasoning',
       icon: Brain,
       color: '#60A5FA',
-      description: 'Ability to effectively handle complex cognitive tasks and mental processing.'
+      description: 'Critical thinking & logical reasoning capabilities.'
     },
     {
       id: 'SRQ',
-      title: 'Social Readiness',
+      title: 'Self-regulation & Drive',
       icon: Activity,
       color: '#F87171',
-      description: 'Capacity for interpersonal interaction and social adaptability.'
+      description: 'Motivation, resilience & emotional control.'
     },
     {
       id: 'LQ',
-      title: 'Learning Quotient',
+      title: 'Learning Agility',
       icon: BookOpen,
       color: '#34D399',
-      description: 'Efficiency in acquiring new knowledge and skills.'
+      description: 'Adaptability & continuous learning.'
     },
     {
       id: 'SIQ',
-      title: 'Self-Identity',
+      title: 'Social Interaction',
       icon: Target,
       color: '#FBBF24',
-      description: 'Understanding of oneself and personal career alignment.'
+      description: 'Collaboration, empathy & communication.'
     },
     {
       id: 'PEQ',
-      title: 'Physical & Emotional',
+      title: 'Professional Execution',
       icon: Zap,
       color: '#A78BFA',
-      description: 'Resilience and management of physical and emotional states.'
+      description: 'Work ethic, reliability & delivery.'
     },
     {
       id: 'DAQ',
-      title: 'Digital Age Quotient',
+      title: 'Digital & AI Literacy',
       icon: Cpu,
       color: '#F472B6',
-      description: 'Competency in navigating digital tools and automated environments.'
+      description: 'Tech proficiency & AI readiness.'
     }
   ];
 

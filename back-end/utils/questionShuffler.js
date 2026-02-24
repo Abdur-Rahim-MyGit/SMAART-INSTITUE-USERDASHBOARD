@@ -108,37 +108,58 @@ function selectStratifiedQuestionsForStage(allQuestions, userId, stageKey, previ
     const selectedIds = new Set(); // Track selected IDs to prevent duplicates
     const matrix = stage.quotients;
 
-    // Pass 1: Ideal selection according to matrix
+    // Pass 1: Selection with difficulty fallback
     for (const [quotient, difficulties] of Object.entries(matrix)) {
+        // Build a combined pool for this quotient for fallback purposes
+        const quotientWidePool = [];
+        const diffs = ['easy', 'medium', 'hard'];
+        diffs.forEach(d => {
+            const k = `${quotient}_${d}`;
+            const p = pools[k] || [];
+            if (p.length === 0) {
+                // If fresh pool empty, try fallback pool (all questions)
+                (fallbackPools[k] || []).forEach(q => quotientWidePool.push(q));
+            } else {
+                p.forEach(q => quotientWidePool.push(q));
+            }
+        });
+
+        // Shuffle the quotient-wide fallback pool
+        const quotientSeed = `${userId}_${stageKey}_${quotient}_fallback`;
+        const shuffledQuotientPool = shuffleArrayDeterministic(quotientWidePool, quotientSeed);
+        let fallbackIndex = 0;
+
         for (const [diffLevel, requiredCount] of Object.entries(difficulties)) {
             const key = `${quotient}_${diffLevel}`;
             let pool = pools[key] || [];
 
-            // If not enough fresh questions, fall back to all questions
+            // If not enough fresh questions, fall back to all questions in this difficulty
             if (pool.length < requiredCount) {
-                console.warn(`⚠️ Insufficient fresh questions for ${key}. Fresh: ${pool.length}, Required: ${requiredCount}. Using fallback pool.`);
+                console.warn(`⚠️ Insufficient fresh questions for ${key}. Using difficulty fallback pool.`);
                 pool = fallbackPools[key] || [];
             }
 
-            if (pool.length < requiredCount) {
-                console.warn(`⚠️ Warning: Insufficient questions for ${key}. Required: ${requiredCount}, Available: ${pool.length}`);
-                // Take what we have, avoiding duplicates
-                pool.forEach(q => {
-                    const qId = q._id.toString();
-                    if (!selectedIds.has(qId)) {
-                        selectedQuestions.push(q);
-                        selectedIds.add(qId);
-                    }
-                });
-            } else {
-                // Shuffle this specific pool deterministically
-                const groupSeed = `${userId}_${stageKey}_${key}`;
-                const shuffledPool = shuffleArrayDeterministic(pool, groupSeed);
+            // Shuffle this specific pool
+            const groupSeed = `${userId}_${stageKey}_${key}`;
+            const shuffledPool = shuffleArrayDeterministic(pool, groupSeed);
 
-                // Select top N, avoiding duplicates
-                let count = 0;
-                for (const q of shuffledPool) {
-                    if (count >= requiredCount) break;
+            let count = 0;
+            // 1. Try to take from the specific difficulty pool
+            for (const q of shuffledPool) {
+                if (count >= requiredCount) break;
+                const qId = q._id.toString();
+                if (!selectedIds.has(qId)) {
+                    selectedQuestions.push(q);
+                    selectedIds.add(qId);
+                    count++;
+                }
+            }
+
+            // 2. If still short, take from anything available in the SAME QUOTIENT
+            if (count < requiredCount) {
+                console.warn(`⚠️ Still short ${requiredCount - count} questions for ${key}. Pulling from other difficulties in ${quotient}.`);
+                while (count < requiredCount && fallbackIndex < shuffledQuotientPool.length) {
+                    const q = shuffledQuotientPool[fallbackIndex++];
                     const qId = q._id.toString();
                     if (!selectedIds.has(qId)) {
                         selectedQuestions.push(q);
@@ -147,13 +168,34 @@ function selectStratifiedQuestionsForStage(allQuestions, userId, stageKey, previ
                     }
                 }
             }
+
+            if (count < requiredCount) {
+                console.error(`🚨 CRITICAL: Could not find enough questions for quotient ${quotient} even with broad fallback!`);
+            }
         }
     }
 
     console.log(`✅ Selected ${selectedQuestions.length} questions (Stratified for ${stageKey})`);
 
+    // Pass 2: Global Fallback (Guarantee total count)
+    if (selectedQuestions.length < stage.totalQuestions) {
+        console.warn(`⚠️ FINAL FALLBACK ACTIVE: Still short ${stage.totalQuestions - selectedQuestions.length} questions. Pulling from entire pool.`);
+
+        const globalSeed = `${userId}_${stageKey}_global_fallback`;
+        const shuffledGlobalPool = shuffleArrayDeterministic(allQuestions, globalSeed);
+
+        for (const q of shuffledGlobalPool) {
+            if (selectedQuestions.length >= stage.totalQuestions) break;
+            const qId = q._id.toString();
+            if (!selectedIds.has(qId)) {
+                selectedQuestions.push(q);
+                selectedIds.add(qId);
+            }
+        }
+    }
+
     if (selectedQuestions.length !== stage.totalQuestions) {
-        console.warn(`⚠️ Expected ${stage.totalQuestions} questions, got ${selectedQuestions.length}. Check Question Bank tagging for stage ${stageKey}.`);
+        console.warn(`⚠️ Warning: Expected ${stage.totalQuestions} questions, but only ${selectedQuestions.length} exist in the entire pool for ${stageKey}.`);
     }
 
     // Final shuffle to mix quotients (so they don't appear in chunks)

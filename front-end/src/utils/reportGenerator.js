@@ -3,12 +3,12 @@ import { toast } from "sonner";
 
 // Quotient information with full names and descriptions
 const quotientInfo = {
-    CRQ: { name: 'Cognitive Readiness', fullName: 'Cognitive Readiness Quotient', desc: 'Critical thinking & problem solving' },
-    SRQ: { name: 'Social Readiness', fullName: 'Social Readiness Quotient', desc: 'Interpersonal & communication skills' },
-    LQ: { name: 'Learning Quotient', fullName: 'Learning Quotient', desc: 'Adaptability & knowledge acquisition' },
-    SIQ: { name: 'Self-Identity', fullName: 'Self-Identity Quotient', desc: 'Self-awareness & personal values' },
-    PEQ: { name: 'Physical & Emotional', fullName: 'Physical & Emotional Quotient', desc: 'Wellness & emotional intelligence' },
-    DAQ: { name: 'Digital Age', fullName: 'Digital Age Quotient', desc: 'Tech literacy & digital fluency' }
+    CRQ: { name: 'Cognitive Reasoning', fullName: 'Cognitive Reasoning Quotient', desc: 'Critical thinking & logical reasoning' },
+    SRQ: { name: 'Self-regulation & Drive', fullName: 'Self-regulation & Drive Quotient', desc: 'Motivation, resilience & emotional control' },
+    LQ: { name: 'Learning Agility', fullName: 'Learning Agility Quotient', desc: 'Adaptability & continuous learning' },
+    SIQ: { name: 'Social Interaction', fullName: 'Social Interaction Quotient', desc: 'Collaboration, empathy & communication' },
+    PEQ: { name: 'Professional Execution', fullName: 'Professional Execution Quotient', desc: 'Work ethic, reliability & delivery' },
+    DAQ: { name: 'Digital & AI Literacy', fullName: 'Digital & AI Literacy Quotient', desc: 'Tech proficiency & AI readiness' }
 };
 
 // Helper: Get score color based on percentage
@@ -147,11 +147,12 @@ export const generateAssessmentReport = (user, testResults) => {
     doc.setTextColor(...navy);
     doc.text("Readiness Profile Index", margin, 65);
 
-    const baselineScore = testResults?.baselineScore || 0;
+    const baselineScore = testResults?.stageScore ?? testResults?.baselineScore ?? 0;
 
     doc.setFontSize(10);
     doc.setTextColor(...grey);
     doc.text(`Current Band: ${testResults?.stageBand || 'N/A'}`, margin, 71);
+    doc.text(`${testResults?.stage === 'T1' ? 'Baseline' : testResults?.stage === 'T2' ? 'Capacity' : testResults?.stage === 'T3' ? 'Capability' : testResults?.stage === 'T4' ? 'Leadership' : 'Assessment'} Report`, pageWidth - margin, 71, { align: 'right' });
 
     const barWidth = pageWidth - (margin * 2);
     doc.setFillColor(245, 245, 245);
@@ -160,12 +161,19 @@ export const generateAssessmentReport = (user, testResults) => {
     doc.setFillColor(...getScoreColor(baselineScore));
     if (fillWidth > 0) doc.roundedRect(margin, 73, fillWidth, 8, 2, 2, 'F');
 
+    // Score Text on Bar
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(255, 255, 255);
+    doc.text(`${baselineScore}/100`, margin + (barWidth / 2), 79, { align: 'center' });
+
     // 3. Executive Summary (Very Condensed)
     doc.setFontSize(12);
     doc.setTextColor(...navy);
     doc.text("Executive Summary", margin, 92);
 
-    const summaryText = `Based on your analysis, you exhibit an '${testResults?.stageBand || 'Emerging'}' level of readiness. This profile integrates your performance across six specialized quotients. Your scores suggest a foundation that can be significantly enhanced through targeted growth in the lower-performing areas identified below.`;
+    const stageName = testResults?.stage === 'T1' ? 'Baseline' : testResults?.stage === 'T2' ? 'Capacity' : testResults?.stage === 'T3' ? 'Capability' : testResults?.stage === 'T4' ? 'Leadership' : 'Assessment';
+    const summaryText = `Based on your ${stageName} analysis, you exhibit an '${testResults?.stageBand || 'Emerging'}' level of readiness. This profile integrates your performance across six specialized quotients. Your scores suggest a foundation that can be significantly enhanced through targeted growth in the lower-performing areas identified below.`;
     doc.setFontSize(9);
     doc.setTextColor(70, 70, 70);
     doc.setFont("helvetica", "normal");
@@ -173,7 +181,7 @@ export const generateAssessmentReport = (user, testResults) => {
     doc.text(splitSummary, margin, 98);
 
     // 4. Quotient Breakdown (2-Column Layout)
-    const quotients = testResults?.t1Profile || {};
+    const quotients = testResults?.quotientProfile || testResults?.t1Profile || {};
     const quotientKeys = Object.keys(quotients);
     const colWidth = (pageWidth - (margin * 2) - 10) / 2; // 10mm gap
     let yPos = 120;
@@ -222,7 +230,8 @@ export const generateAssessmentReport = (user, testResults) => {
     addFooter();
 
     // Save
-    doc.save(`SMAART_Analysis_${user?.studentId || 'Report'}.pdf`);
+    const fileStageName = testResults?.stage === 'T1' ? 'Baseline' : testResults?.stage === 'T2' ? 'Capacity' : testResults?.stage === 'T3' ? 'Capability' : testResults?.stage === 'T4' ? 'Leadership' : 'Report';
+    doc.save(`SMAART_${fileStageName}_Analysis_${user?.studentId || 'Report'}.pdf`);
     toast.success('📥 AI Report downloaded successfully!');
 };
 
