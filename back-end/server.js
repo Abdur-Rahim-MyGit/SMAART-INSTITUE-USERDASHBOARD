@@ -153,6 +153,17 @@ app.get('/api/ai-career-coach/chat/:sessionId', authMiddleware, aiCareerCoachCon
 
 logger.info('✅ AI Career Coach Routes Loaded (Inline)');
 
+// Career Intelligence Routes (Career Data Fetcher)
+const careerIntelligenceController = require('./controllers/careerIntelligenceController');
+app.post('/api/career-intelligence/generate', authMiddleware, careerIntelligenceController.generateCareerReport);
+app.get('/api/career-intelligence/reports', authMiddleware, careerIntelligenceController.getReports);
+app.get('/api/career-intelligence/latest', authMiddleware, careerIntelligenceController.getLatestReport);
+app.get('/api/career-intelligence/excel-data', authMiddleware, careerIntelligenceController.getExcelData);
+app.get('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.getReportById);
+app.delete('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.deleteReport);
+app.post('/api/career-intelligence/refresh-cache', authMiddleware, careerIntelligenceController.refreshExcelCache);
+logger.info('✅ Career Intelligence Routes Loaded (Excel + AI Engine)');
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });

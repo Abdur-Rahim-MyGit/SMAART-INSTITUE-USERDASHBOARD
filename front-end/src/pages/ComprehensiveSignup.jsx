@@ -58,6 +58,27 @@ const ComprehensiveSignup = () => {
     if (userData?.department) { setPersonalDetails(prev => ({ ...prev, department: userData.department })); setPreFilledFields(prev => ({ ...prev, department: true })); }
   }, [navigate]);
 
+  const [excelData, setExcelData] = useState({ sectors: [], roles: [] });
+  const [roleSuggestions, setRoleSuggestions] = useState([]);
+  const [activeSearchIndex, setActiveSearchIndex] = useState(null);
+
+  useEffect(() => {
+    const fetchExcelData = async () => {
+      try {
+        const data = await apiCall('/career-intelligence/excel-data');
+        if (data) {
+          setExcelData({
+            sectors: data.masterSectors || [],
+            roles: data.allRoles || []
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching career data:", error);
+      }
+    };
+    fetchExcelData();
+  }, []);
+
   const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null });
   const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", marksheet: null });
@@ -70,6 +91,18 @@ const ComprehensiveSignup = () => {
   const [workExperience, setWorkExperience] = useState({ isApplicable: true, items: [{ id: Date.now(), experienceType: "", organizationName: "", jobTitle: "", industry: "", startDate: "", endDate: "", currentlyWorking: false, keyResponsibilities: "", significantAccomplishments: "", documents: { offerLetter: null, appointmentLetter: null, appreciationLetter: null, experienceLetter: null }, selectedDocs: [], githubLink: "" }] });
   const [projects, setProjects] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", doneIn: "", institution: "", companyName: "", teamType: "", startDate: "", endDate: "", currentlyWorking: false, description: "", significantAchievements: "", projectUrl: "" }] });
   const [certificates, setCertificates] = useState({ isApplicable: true, items: [{ id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }] }); // added verificationUrl
+
+  const suggestionsRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
+        setRoleSuggestions([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const steps = [
     { title: "Profile", icon: <User className="w-4 h-4" /> },
@@ -395,8 +428,11 @@ const ComprehensiveSignup = () => {
   const selectClass = "w-full h-12 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B1120] px-3 text-slate-900 dark:text-white mt-2 transition-all duration-200 shadow-sm dark:shadow-none focus:border-[#1a3884]";
   const textareaClass = "w-full h-24 rounded-xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white mt-2 p-3 resize-none transition-all duration-200 shadow-sm dark:shadow-none";
   const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
-  const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25+ LPA"];
-  const sectorOptions = ["Information Technology & Digital Services", "Artificial Intelligence & Data Science", "Renewable Energy & Clean Technology", "Healthcare & Digital Health", "Pharmaceuticals & Biotechnology", "Financial Technology (FinTech)", "E-commerce & Digital Retail", "Professional & Consulting Services", "Manufacturing & Advanced Manufacturing", "Logistics, Supply Chain & E-Mobility", "Cybersecurity & Information Security", "EdTech & Online Learning", "Media, Gaming & Digital Content", "AgriTech & Food Technology", "Sustainability, ESG & Environmental Services", "Other"];
+  const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25-35 LPA", "35-50 LPA", "50+ LPA", "Negotiable"];
+  // Use Excel data sectors if available, otherwise fallback to defaults
+  const sectorOptions = excelData.sectors.length > 0
+    ? [...excelData.sectors, "Other"]
+    : ["Information Technology & Digital Services", "Artificial Intelligence & Data Science", "Renewable Energy & Clean Technology", "Healthcare & Digital Health", "Pharmaceuticals & Biotechnology", "Financial Technology (FinTech)", "E-commerce & Digital Retail", "Professional & Consulting Services", "Manufacturing & Advanced Manufacturing", "Logistics, Supply Chain & E-Mobility", "Cybersecurity & Information Security", "EdTech & Online Learning", "Media, Gaming & Digital Content", "AgriTech & Food Technology", "Sustainability, ESG & Environmental Services", "Other"];
 
   if (isSuccess) {
     return (
@@ -465,24 +501,9 @@ const ComprehensiveSignup = () => {
                   <div><Label>Choose ur domain *</Label>
                     <select value={personalDetails.educationLevel} onChange={(e) => setPersonalDetails({ ...personalDetails, educationLevel: e.target.value, customDomain: '' })} className={selectClass}>
                       <option value="">Select Domain</option>
-                      <option value="Arts, Humanities & Social Sciences">Arts, Humanities & Social Sciences</option>
-                      <option value="Science & Mathematics">Science & Mathematics</option>
-                      <option value="Engineering & Technology">Engineering & Technology</option>
-                      <option value="Computer Science, IT & AI">Computer Science, IT & AI</option>
-                      <option value="Commerce, Business & Management">Commerce, Business & Management</option>
-                      <option value="Medical & Health Sciences">Medical & Health Sciences</option>
-                      <option value="Law & Legal Studies">Law & Legal Studies</option>
-                      <option value="Education & Teaching">Education & Teaching</option>
-                      <option value="Agriculture & Allied Sciences">Agriculture & Allied Sciences</option>
-                      <option value="Design, Creative & Performing Arts">Design, Creative & Performing Arts</option>
-                      <option value="Media, Journalism & Communication">Media, Journalism & Communication</option>
-                      <option value="Environmental & Life Sciences">Environmental & Life Sciences</option>
-                      <option value="Psychology & Behavioral Sciences">Psychology & Behavioral Sciences</option>
-                      <option value="Hospitality, Tourism & Sports">Hospitality, Tourism & Sports</option>
-                      <option value="Banking, Finance & Entrepreneurship">Banking, Finance & Entrepreneurship</option>
-                      <option value="Vocational & Technical Trades">Vocational & Technical Trades</option>
-                      <option value="Public Policy & International Relations">Public Policy & International Relations</option>
-                      <option value="Other">Other</option>
+                      {sectorOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
                     </select>
                   </div>
                   {personalDetails.educationLevel === "Other" && (
@@ -597,8 +618,62 @@ const ComprehensiveSignup = () => {
                     {jobPreferences.items.length > 1 && <button onClick={() => removeJobPref(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Pref #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Job Role / Position*</Label><Input value={item.preferredRole} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredRole = e.target.value; setJobPreferences(n); }} className={inputClass} /></div>
-                      <div><Label>Type *</Label><select value={item.jobType} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].jobType = e.target.value; setJobPreferences(n); }} className={selectClass}><option value="">Select</option><option value="full-time">Full-Time</option><option value="internship">Part-Time</option><option value="internship">Internship Full-Time</option><option value="internship">Internship Part-Time</option><option value="internship">Freelance</option></select></div>
+                      <div className="relative">
+                        <Label>Job Role / Position*</Label>
+                        <Input
+                          value={item.preferredRole}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const n = { ...jobPreferences, items: [...jobPreferences.items] };
+                            n.items[index].preferredRole = val;
+                            setJobPreferences(n);
+
+                            // Update suggestions
+                            if (val.length > 1) {
+                              const matches = excelData.roles
+                                .filter(r => r.toLowerCase().includes(val.toLowerCase()))
+                                .slice(0, 10);
+                              setRoleSuggestions(matches);
+                              setActiveSearchIndex(index);
+                            } else {
+                              setRoleSuggestions([]);
+                            }
+                          }}
+                          onFocus={() => setActiveSearchIndex(index)}
+                          className={inputClass}
+                          placeholder="Search or enter your preferred role"
+                        />
+                        {activeSearchIndex === index && roleSuggestions.length > 0 && (
+                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto no-scrollbar ring-1 ring-black/5">
+                            <div className="p-2 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-3">
+                              SMAART Role Suggestions
+                            </div>
+                            {roleSuggestions.map((suggestion, sIdx) => (
+                              <button
+                                key={sIdx}
+                                className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 dark:hover:bg-white/5 border-b border-slate-50 dark:border-white/5 last:border-0 transition-colors"
+                                onClick={() => {
+                                  const n = { ...jobPreferences, items: [...jobPreferences.items] };
+                                  n.items[index].preferredRole = suggestion;
+                                  setJobPreferences(n);
+                                  setRoleSuggestions([]);
+                                }}
+                              >
+                                {suggestion}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div><Label>Type *</Label><select value={item.jobType} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].jobType = e.target.value; setJobPreferences(n); }} className={selectClass}>
+                        <option value="">Select</option>
+                        <option value="full-time">Full-Time</option>
+                        <option value="part-time">Part-Time</option>
+                        <option value="internship-full">Internship (Full-Time)</option>
+                        <option value="internship-part">Internship (Part-Time)</option>
+                        <option value="freelance">Freelance / Gig Work</option>
+                        <option value="remote">Fully Remote / Distributed</option>
+                      </select></div>
                       <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div><Label>Location Preference 1*</Label><Input value={item.preferredLocation1} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation1 = e.target.value; setJobPreferences(n); }} className={inputClass} placeholder="e.g. Remote" /></div>
                         <div><Label>Location Preference 2</Label><Input value={item.preferredLocation2} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation2 = e.target.value; setJobPreferences(n); }} className={inputClass} placeholder="e.g. Bangalore" /></div>

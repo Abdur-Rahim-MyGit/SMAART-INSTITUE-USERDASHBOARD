@@ -1,0 +1,16 @@
+{
+  "role": "Software Developer / Full Stack Developer",
+  "exact": true,
+  "sector": "TECHNOLOGY, SOFTWARE & DIGITAL PRODUCTS",
+  "jobFamily": "Software Engineering & Development",
+  "aiToolsCount": 9,
+  "hiSkillsCount": 15,
+  "techSkillsCount": 10,
+  "certsCount": 18,
+  "freeCertsCount": 10,
+  "emergingRolesCount": 38,
+  "existingRolesCount": 222,
+  "automatedTasksCount": 7,
+  "humanTasksCount": 5,
+  "qualificationsCount": 5
+}

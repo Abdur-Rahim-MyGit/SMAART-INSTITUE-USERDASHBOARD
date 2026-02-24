@@ -1,0 +1,16 @@
+❌ meta-llama/llama-3.2-3b-instruct:free | 429 | Provider returned error
+❌ meta-llama/llama-3.2-1b-instruct:free | 404 | No endpoints found for meta-llama/llama-3.2-1b-instruct:free
+❌ meta-llama/llama-3.1-8b-instruct:free | 404 | No endpoints found for meta-llama/llama-3.1-8b-instruct:free
+❌ mistralai/mistral-7b-instruct:free | 404 | No endpoints found for mistralai/mistral-7b-instruct:free.
+❌ qwen/qwen-2.5-7b-instruct:free | 404 | No endpoints found for qwen/qwen-2.5-7b-instruct:free.
+❌ google/gemma-2-9b-it:free | 404 | No endpoints found for google/gemma-2-9b-it:free.
+❌ google/gemini-2.0-flash-exp:free | 404 | No endpoints found for google/gemini-2.0-flash-exp:free.
+❌ deepseek/deepseek-r1-distill-llama-8b:free | 404 | No endpoints found for deepseek/deepseek-r1-distill-llama-8b
+✅ nvidia/nemotron-3-nano-30b-a3b:free | content_len=0 | completion=50 | reasoning=54 | preview: 
+❌ microsoft/phi-3-mini-128k-instruct:free | 404 | No endpoints found for microsoft/phi-3-mini-128k-instruct:fr
+❌ openchat/openchat-7b:free | 404 | No endpoints found for openchat/openchat-7b:free.
+❌ huggingfaceh4/zephyr-7b-beta:free | 404 | No endpoints found for huggingfaceh4/zephyr-7b-beta:free.
+❌ nousresearch/hermes-3-llama-3.1-405b:free | 429 | Provider returned error
+❌ qwen/qwen-2.5-coder-32b-instruct:free | 404 | No endpoints found for qwen/qwen-2.5-coder-32b-instruct:free
+❌ deepseek/deepseek-chat-v3-0324:free | 404 | No endpoints found for deepseek/deepseek-chat-v3-0324:free.
+❌ deepseek/deepseek-r1:free | 404 | No endpoints found for deepseek/deepseek-r1:free.

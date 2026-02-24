@@ -34,7 +34,8 @@
     "nodemailer": "^7.0.12",
     "openai": "^6.18.0",
     "uuid": "^13.0.0",
-    "winston": "^3.19.0"
+    "winston": "^3.19.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
