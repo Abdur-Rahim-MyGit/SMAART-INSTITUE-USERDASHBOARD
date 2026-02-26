@@ -49,16 +49,25 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
     const circumference = 2 * Math.PI * 54;
     const dashOffset = circumference - (score / 100) * circumference;
 
-    // Export: capture the card node as a pixel-perfect screenshot → PDF
+    // Export: capture the card pixel-perfect, excluding buttons
     const handleExport = async () => {
         if (!cardRef.current) return;
         setIsExporting(true);
+
+        // Temporarily hide elements we don't want in the PDF (collapse their space)
+        const excluded = cardRef.current.querySelectorAll('[data-pdf-exclude]');
+        const prevDisplay = [];
+        excluded.forEach((el, i) => {
+            prevDisplay[i] = el.style.display;
+            el.style.display = 'none';
+        });
+
         try {
             const html2canvas = (await import('html2canvas')).default;
             const { jsPDF } = await import('jspdf');
 
             const canvas = await html2canvas(cardRef.current, {
-                scale: 2,
+                scale: 3,
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#060e22',
@@ -70,7 +79,7 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
             const pageW = pdf.internal.pageSize.getWidth();
             const pageH = pdf.internal.pageSize.getHeight();
 
-            // Scale image to fit page width, keep aspect ratio
+            // Fit width, centre vertically if shorter than page
             const imgW = pageW;
             const imgH = (canvas.height * pageW) / canvas.width;
             const yOffset = imgH < pageH ? (pageH - imgH) / 2 : 0;
@@ -80,6 +89,8 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
         } catch (err) {
             console.error('PDF export failed:', err);
         } finally {
+            // Restore hidden elements
+            excluded.forEach((el, i) => { el.style.display = prevDisplay[i]; });
             setIsExporting(false);
         }
     };
@@ -108,7 +119,7 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto"
+            className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto py-6"
             style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
             onClick={onClose}
         >
@@ -126,16 +137,16 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
 
                 {/* Header */}
                 <div className="relative px-8 pt-10 pb-6 text-center">
-                    <button onClick={onClose} className="absolute top-5 left-5 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ color: '#94a3b8', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <button data-pdf-exclude onClick={onClose} className="absolute top-5 left-5 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ color: '#94a3b8', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
                         <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
                     </button>
-                    <button onClick={onClose} className="absolute top-5 right-5 p-2 rounded-full hover:bg-white/10" style={{ color: '#64748b' }}>
+                    <button data-pdf-exclude onClick={onClose} className="absolute top-5 right-5 p-2 rounded-full hover:bg-white/10" style={{ color: '#64748b' }}>
                         <X className="w-4 h-4" />
                     </button>
                     <h1 className="text-3xl font-black tracking-tight mb-1" style={{ color: '#f1f5f9' }}>Digital Skills Passport</h1>
                     <p className="text-sm" style={{ color: '#64748b' }}>Verified Career Identity & Competency Credential</p>
-                    {/* Action buttons — hidden during PDF capture via data-html2canvas-ignore */}
-                    <div data-html2canvas-ignore className="flex items-center justify-center gap-3 mt-5 flex-wrap">
+                    {/* Action buttons — physically hidden during PDF capture */}
+                    <div data-pdf-exclude className="flex items-center justify-center gap-3 mt-5 flex-wrap">
                         <button
                             onClick={handleExport}
                             disabled={isExporting}
@@ -197,37 +208,49 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
                                     <p className="text-xs font-bold tracking-widest uppercase mt-2" style={{ color: '#38bdf8' }}>Global Readiness</p>
                                 </div>
                             </div>
-                            {/* Right */}
-                            <div className="md:w-[58%] px-5 py-5">
+                            {/* Right — skill proficiency with real progress bars */}
+                            <div className="md:w-[58%] px-5 py-5 flex flex-col">
                                 <div className="flex items-center gap-2 mb-4">
-                                    <Target className="w-4 h-4" style={{ color: '#38bdf8' }} />
+                                    <Target className="w-4 h-4 flex-shrink-0" style={{ color: '#38bdf8' }} />
                                     <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#e2e8f0' }}>Skill Proficiency</h3>
                                 </div>
-                                <div className="flex flex-col gap-2 mb-5">
+                                <div className="flex flex-col gap-3">
                                     {t1Profile && quotientsInfo.map((q, i) => {
                                         const quotientData = t1Profile[q.id];
                                         if (!quotientData) return null;
-                                        const { text: levelText, color: levelColor } = getQuotientLevel(quotientData.rawScore);
+                                        const { text: levelText, color: levelClr } = getQuotientLevel(quotientData.rawScore);
                                         return (
-                                            <motion.div key={q.id} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.05 * i }} className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: '#cbd5e1' }}>
-                                                <span>{q.name} ({quotientData.rawScore}%)</span>
-                                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold" style={{ background: `${levelColor}20`, color: levelColor }}>{levelText}</span>
+                                            <motion.div
+                                                key={q.id}
+                                                initial={{ opacity: 0, x: 16 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: 0.05 * i }}
+                                                className="flex flex-col gap-1"
+                                            >
+                                                {/* Row header */}
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs font-semibold" style={{ color: '#cbd5e1' }}>
+                                                        {q.name}
+                                                        <span className="ml-1 font-bold" style={{ color: '#94a3b8' }}>({quotientData.rawScore}%)</span>
+                                                    </span>
+                                                    <span
+                                                        className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                                                        style={{ background: `${levelClr}22`, color: levelClr, border: `1px solid ${levelClr}55` }}
+                                                    >
+                                                        {levelText}
+                                                    </span>
+                                                </div>
+                                                {/* Progress bar */}
+                                                <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                                                    <motion.div
+                                                        className="h-full rounded-full"
+                                                        style={{ background: `linear-gradient(90deg, ${levelClr}cc, ${levelClr})` }}
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: `${quotientData.rawScore}%` }}
+                                                        transition={{ duration: 1, ease: 'easeOut', delay: 0.1 + 0.06 * i }}
+                                                    />
+                                                </div>
                                             </motion.div>
-                                        );
-                                    })}
-                                </div>
-                                <p className="text-[10px] uppercase tracking-widest font-bold mb-2" style={{ color: '#64748b' }}>Assessment Quotients</p>
-                                <div className="flex flex-col gap-1">
-                                    {t1Profile && quotientsInfo.map(q => {
-                                        const quotientData = t1Profile[q.id];
-                                        if (!quotientData) return null;
-                                        const { text: levelText } = getQuotientLevel(quotientData.rawScore);
-                                        return (
-                                            <div key={q.id} className="flex items-center gap-2">
-                                                <span className="text-xs font-black w-9 flex-shrink-0" style={{ color: '#f1f5f9' }}>{q.id}</span>
-                                                <span className="text-xs" style={{ color: '#94a3b8' }}>– {q.name}</span>
-                                                <span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{levelText}</span>
-                                            </div>
                                         );
                                     })}
                                 </div>
