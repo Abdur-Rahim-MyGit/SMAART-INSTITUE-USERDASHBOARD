@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Heart, BookOpen, BookText, ArrowRight, MessageSquare, User, FileText, Brain, Shield } from "lucide-react";
+import { Heart, BookOpen, BookText, ArrowRight, MessageSquare, User, FileText, Brain, Shield, Database } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,17 @@ const toolkitSections = [
     badgeColor: "from-[#1a3884] to-[#2d5dc7]"
   },
   {
+    id: 7,
+    title: "Career Intelligence Agent",
+    description: "AI-powered Career Intelligence Engine — get personalized career roadmaps, skill gap analysis, job recommendations, and market insights powered by structured data + GPT AI.",
+    icon: Database,
+    path: "/dashboard/career-data-fetcher",
+    color: "from-indigo-500 to-pink-500",
+    iconColor: "text-indigo-500",
+    badge: "AI + Data",
+    badgeColor: "from-indigo-600 to-pink-600"
+  },
+  {
     id: 1,
     title: "AI Career Chat",
     description: "Engage with your intelligent career strategist. Receive real-time, personalized guidance and industry insights 24/7 to accelerate your professional trajectory.",
@@ -26,17 +37,6 @@ const toolkitSections = [
     iconColor: "text-purple-500",
     badge: "AI Powered",
     badgeColor: "from-purple-600 to-indigo-600"
-  },
-  {
-    id: 2,
-    title: "Profile Analysis",
-    description: "Transform your career potential with deep AI analysis. Get comprehensive skill gap assessments, role recommendations, and a personalized roadmap to success.",
-    icon: User,
-    path: "/dashboard/profile-analysis",
-    color: "from-blue-400 to-cyan-500",
-    iconColor: "text-blue-500",
-    badge: "Comprehensive",
-    badgeColor: "from-blue-600 to-cyan-600"
   },
   {
     id: 3,
@@ -50,15 +50,26 @@ const toolkitSections = [
     badgeColor: "from-violet-600 to-purple-600"
   },
   {
-    id: 4,
-    title: "Mind Care Sessions",
-    description: "Nurture your mental well-being with personalized wellness sessions. Access guided meditations, track your mood, and connect with certified experts for inner balance.",
-    icon: Heart,
-    path: "/dashboard/mindcare-sessions",
-    color: "from-rose-400 to-pink-500",
-    iconColor: "text-rose-500",
-    badge: "Wellness",
-    badgeColor: "from-rose-600 to-pink-600"
+    id: 2,
+    title: "Profile Analysis",
+    description: "Transform your career potential with deep AI analysis. Get comprehensive skill gap assessments, role recommendations, and a personalized roadmap to success.",
+    icon: User,
+    path: "/dashboard/profile-analysis",
+    color: "from-blue-400 to-cyan-500",
+    iconColor: "text-blue-500",
+    badge: "Comprehensive",
+    badgeColor: "from-blue-600 to-cyan-600"
+  },
+  {
+    id: 6,
+    title: "General Dictionary",
+    description: "Master professional terminology with our interactive dictionary. Features real-time definitions, audio pronunciation, and daily vocabulary building tools.",
+    icon: BookText,
+    path: "/dashboard/dictionary",
+    color: "from-amber-400 to-orange-500",
+    iconColor: "text-amber-500",
+    badge: "Reference",
+    badgeColor: "from-amber-600 to-orange-600"
   },
   {
     id: 5,
@@ -72,15 +83,15 @@ const toolkitSections = [
     badgeColor: "from-emerald-600 to-teal-600"
   },
   {
-    id: 6,
-    title: "General Dictionary",
-    description: "Master professional terminology with our interactive dictionary. Features real-time definitions, audio pronunciation, and daily vocabulary building tools.",
-    icon: BookText,
-    path: "/dashboard/dictionary",
-    color: "from-amber-400 to-orange-500",
-    iconColor: "text-amber-500",
-    badge: "Reference",
-    badgeColor: "from-amber-600 to-orange-600"
+    id: 4,
+    title: "Mind Care Sessions",
+    description: "Nurture your mental well-being with personalized wellness sessions. Access guided meditations, track your mood, and connect with certified experts for inner balance.",
+    icon: Heart,
+    path: "/dashboard/mindcare-sessions",
+    color: "from-rose-400 to-pink-500",
+    iconColor: "text-rose-500",
+    badge: "Wellness",
+    badgeColor: "from-rose-600 to-pink-600"
   },
 ];
 

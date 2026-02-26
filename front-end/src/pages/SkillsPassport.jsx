@@ -123,162 +123,164 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
             style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
             onClick={onClose}
         >
-            <motion.div
-                initial={{ opacity: 0, y: 60, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 40, scale: 0.96 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 24 }}
-                onClick={e => e.stopPropagation()}
-                className="relative w-full max-w-2xl mx-4 my-8 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(56,189,248,0.18)]"
-                ref={cardRef}
-                style={{ background: 'linear-gradient(160deg,#0d1b3e 0%,#060e22 60%,#0a1628 100%)', border: '1.5px solid rgba(56,189,248,0.18)' }}
-            >
-                <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg,transparent,#38bdf8,#818cf8,transparent)' }} />
+            <div className="flex min-h-full items-start justify-center py-8 px-4">
+                <motion.div
+                    initial={{ opacity: 0, y: 60, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 40, scale: 0.96 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 24 }}
+                    onClick={e => e.stopPropagation()}
+                    className="relative w-full max-w-2xl rounded-3xl shadow-[0_0_80px_rgba(56,189,248,0.18)]"
+                    ref={cardRef}
+                    style={{ background: 'linear-gradient(160deg,#0d1b3e 0%,#060e22 60%,#0a1628 100%)', border: '1.5px solid rgba(56,189,248,0.18)' }}
+                >
+                    <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg,transparent,#38bdf8,#818cf8,transparent)' }} />
 
-                {/* Header */}
-                <div className="relative px-8 pt-10 pb-6 text-center">
-                    <button data-pdf-exclude onClick={onClose} className="absolute top-5 left-5 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ color: '#94a3b8', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
-                    </button>
-                    <button data-pdf-exclude onClick={onClose} className="absolute top-5 right-5 p-2 rounded-full hover:bg-white/10" style={{ color: '#64748b' }}>
-                        <X className="w-4 h-4" />
-                    </button>
-                    <h1 className="text-3xl font-black tracking-tight mb-1" style={{ color: '#f1f5f9' }}>Digital Skills Passport</h1>
-                    <p className="text-sm" style={{ color: '#64748b' }}>Verified Career Identity & Competency Credential</p>
-                    {/* Action buttons — physically hidden during PDF capture */}
-                    <div data-pdf-exclude className="flex items-center justify-center gap-3 mt-5 flex-wrap">
-                        <button
-                            onClick={handleExport}
-                            disabled={isExporting}
-                            className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold hover:opacity-90 hover:-translate-y-0.5 transition-all disabled:opacity-60"
-                            style={{ background: 'linear-gradient(135deg,#4f46e5,#818cf8)', color: '#fff', boxShadow: '0 4px 20px rgba(99,102,241,0.35)' }}
-                        >
-                            <Download className="w-4 h-4" />
-                            {isExporting ? 'Exporting...' : 'Export Credential'}
+                    {/* Header */}
+                    <div className="relative px-8 pt-10 pb-6 text-center">
+                        <button data-pdf-exclude onClick={onClose} className="absolute top-5 left-5 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg" style={{ color: '#94a3b8', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                            <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
                         </button>
-                        <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}>
-                            <BarChart2 className="w-4 h-4" /> View Reports
+                        <button data-pdf-exclude onClick={onClose} className="absolute top-5 right-5 p-2 rounded-full hover:bg-white/10" style={{ color: '#64748b' }}>
+                            <X className="w-4 h-4" />
                         </button>
-                        <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}>
-                            <Share2 className="w-4 h-4" /> Share Profile
-                        </button>
-                    </div>
-                </div>
-
-                {/* Identity bar */}
-                <div className="mx-6 mb-4 rounded-2xl px-5 py-4 flex items-center justify-between" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div className="flex items-center gap-3">
-                        <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(56,189,248,0.12)', border: '1.5px solid rgba(56,189,248,0.3)' }}>
-                            <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#38bdf8" strokeWidth="1.5" /><path d="M8 12h8M12 8v8" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" /></svg>
-                        </div>
-                        <div>
-                            <p className="font-bold text-sm" style={{ color: '#f1f5f9' }}>{userName}</p>
-                            <span className="flex items-center gap-1 text-xs font-bold" style={{ color: '#10b981' }}><CheckCircle className="w-3 h-3" />VERIFIED</span>
+                        <h1 className="text-3xl font-black tracking-tight mb-1" style={{ color: '#f1f5f9' }}>Digital Skills Passport</h1>
+                        <p className="text-sm" style={{ color: '#64748b' }}>Verified Career Identity & Competency Credential</p>
+                        {/* Action buttons — physically hidden during PDF capture */}
+                        <div data-pdf-exclude className="flex items-center justify-center gap-3 mt-5 flex-wrap">
+                            <button
+                                onClick={handleExport}
+                                disabled={isExporting}
+                                className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold hover:opacity-90 hover:-translate-y-0.5 transition-all disabled:opacity-60"
+                                style={{ background: 'linear-gradient(135deg,#4f46e5,#818cf8)', color: '#fff', boxShadow: '0 4px 20px rgba(99,102,241,0.35)' }}
+                            >
+                                <Download className="w-4 h-4" />
+                                {isExporting ? 'Exporting...' : 'Export Credential'}
+                            </button>
+                            <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}>
+                                <BarChart2 className="w-4 h-4" /> View Reports
+                            </button>
+                            <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}>
+                                <Share2 className="w-4 h-4" /> Share Profile
+                            </button>
                         </div>
                     </div>
-                    <div className="text-right">
-                        <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: '#38bdf8', opacity: 0.7 }}>Identity Ref</p>
-                        <p className="text-lg font-black tracking-widest" style={{ color: '#38bdf8' }}>{identityRef}</p>
-                    </div>
-                </div>
 
-                {/* Body */}
-                <div className="mx-6 mb-4 rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                    {baselineResult ? (
-                        <div className="flex flex-col md:flex-row">
-                            {/* Left */}
-                            <div className="md:w-[42%] flex flex-col items-center px-5 py-5 border-b md:border-b-0 md:border-r" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
-                                <div className="relative w-32 h-32 mb-4">
-                                    <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle,rgba(56,189,248,0.15) 0%,transparent 75%)' }} />
-                                    <img src={spImage} alt="SMAART AI" className="w-full h-full object-cover rounded-2xl" style={{ border: '2px solid rgba(56,189,248,0.25)' }} />
-                                </div>
-                                <div className="w-full space-y-2 mb-4">
-                                    {stageBand && <div className="flex items-center gap-2"><Target className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} /><span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Rank</span><span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{stageBand.toUpperCase()}</span></div>}
-                                    <div className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} /><span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Loc</span><span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{user?.location || 'Remote, Earth'}</span></div>
-                                    <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} /><span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Exp</span><span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{user?.experience || 'SMAART Institute'}</span></div>
-                                    <div className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} /><span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Join</span><span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{joinYear}</span></div>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                    <svg width="110" height="110" viewBox="0 0 120 120">
-                                        <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(56,189,248,0.1)" strokeWidth="10" />
-                                        <motion.circle cx="60" cy="60" r="54" fill="none" stroke="url(#rg)" strokeWidth="10" strokeLinecap="round"
-                                            strokeDasharray={circumference} initial={{ strokeDashoffset: circumference }} animate={{ strokeDashoffset: dashOffset }} transition={{ duration: 1.5, ease: 'easeOut' }} transform="rotate(-90 60 60)" />
-                                        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#38bdf8" /><stop offset="100%" stopColor="#818cf8" /></linearGradient></defs>
-                                    </svg>
-                                    <p className="text-xs font-bold tracking-widest uppercase mt-2" style={{ color: '#38bdf8' }}>Global Readiness</p>
-                                </div>
+                    {/* Identity bar */}
+                    <div className="mx-6 mb-4 rounded-2xl px-5 py-4 flex items-center justify-between" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(56,189,248,0.12)', border: '1.5px solid rgba(56,189,248,0.3)' }}>
+                                <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#38bdf8" strokeWidth="1.5" /><path d="M8 12h8M12 8v8" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" /></svg>
                             </div>
-                            {/* Right — skill proficiency with real progress bars */}
-                            <div className="md:w-[58%] px-5 py-5 flex flex-col">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <Target className="w-4 h-4 flex-shrink-0" style={{ color: '#38bdf8' }} />
-                                    <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#e2e8f0' }}>Skill Proficiency</h3>
-                                </div>
-                                <div className="flex flex-col gap-3">
-                                    {t1Profile && quotientsInfo.map((q, i) => {
-                                        const quotientData = t1Profile[q.id];
-                                        if (!quotientData) return null;
-                                        const { text: levelText, color: levelClr } = getQuotientLevel(quotientData.rawScore);
-                                        return (
-                                            <motion.div
-                                                key={q.id}
-                                                initial={{ opacity: 0, x: 16 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: 0.05 * i }}
-                                                className="flex flex-col gap-1"
-                                            >
-                                                {/* Row header */}
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-xs font-semibold" style={{ color: '#cbd5e1' }}>
-                                                        {q.name}
-                                                        <span className="ml-1 font-bold" style={{ color: '#94a3b8' }}>({quotientData.rawScore}%)</span>
-                                                    </span>
-                                                    <span
-                                                        className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
-                                                        style={{ background: `${levelClr}22`, color: levelClr, border: `1px solid ${levelClr}55` }}
-                                                    >
-                                                        {levelText}
-                                                    </span>
-                                                </div>
-                                                {/* Progress bar */}
-                                                <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
-                                                    <motion.div
-                                                        className="h-full rounded-full"
-                                                        style={{ background: `linear-gradient(90deg, ${levelClr}cc, ${levelClr})` }}
-                                                        initial={{ width: 0 }}
-                                                        animate={{ width: `${quotientData.rawScore}%` }}
-                                                        transition={{ duration: 1, ease: 'easeOut', delay: 0.1 + 0.06 * i }}
-                                                    />
-                                                </div>
-                                            </motion.div>
-                                        );
-                                    })}
-                                </div>
+                            <div>
+                                <p className="font-bold text-sm" style={{ color: '#f1f5f9' }}>{userName}</p>
+                                <span className="flex items-center gap-1 text-xs font-bold" style={{ color: '#10b981' }}><CheckCircle className="w-3 h-3" />VERIFIED</span>
                             </div>
                         </div>
-                    ) : (
-                        <div className="p-12 flex flex-col items-center justify-center text-center min-h-[300px]">
-                            <Shield className="w-12 h-12 mb-4" style={{ color: '#64748b' }} />
-                            <p className="text-lg font-semibold mb-2" style={{ color: '#f1f5f9' }}>Assessment Not Yet Completed</p>
-                            <p className="text-sm" style={{ color: '#94a3b8' }}>Please complete your baseline assessment to view your Digital Skills Passport.</p>
+                        <div className="text-right">
+                            <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: '#38bdf8', opacity: 0.7 }}>Identity Ref</p>
+                            <p className="text-lg font-black tracking-widest" style={{ color: '#38bdf8' }}>{identityRef}</p>
                         </div>
-                    )}
-                </div>
+                    </div>
 
-                {/* Footer */}
-                <div className="mx-6 mb-6 rounded-2xl flex items-center justify-between px-5 py-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                    <div className="flex items-center gap-2">
-                        <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#475569' }}>Issued by</span>
-                        <span className="text-sm font-bold" style={{ color: '#94a3b8' }}>SMAART Minds AI</span>
+                    {/* Body */}
+                    <div className="mx-6 mb-4 rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        {baselineResult ? (
+                            <div className="flex flex-col md:flex-row">
+                                {/* Left */}
+                                <div className="md:w-[42%] flex flex-col items-center px-5 py-5 border-b md:border-b-0 md:border-r" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+                                    <div className="relative w-32 h-32 mb-4">
+                                        <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle,rgba(56,189,248,0.15) 0%,transparent 75%)' }} />
+                                        <img src={spImage} alt="SMAART AI" className="w-full h-full object-cover rounded-2xl" style={{ border: '2px solid rgba(56,189,248,0.25)' }} />
+                                    </div>
+                                    <div className="w-full space-y-2 mb-4">
+                                        {stageBand && <div className="flex items-center gap-2"><Target className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} /><span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Rank</span><span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{stageBand.toUpperCase()}</span></div>}
+                                        <div className="flex items-center gap-2"><MapPin className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} /><span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Loc</span><span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{user?.location || 'Remote, Earth'}</span></div>
+                                        <div className="flex items-center gap-2"><Briefcase className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} /><span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Exp</span><span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{user?.experience || 'SMAART Institute'}</span></div>
+                                        <div className="flex items-center gap-2"><Calendar className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} /><span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Join</span><span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{joinYear}</span></div>
+                                    </div>
+                                    <div className="flex flex-col items-center">
+                                        <svg width="110" height="110" viewBox="0 0 120 120">
+                                            <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(56,189,248,0.1)" strokeWidth="10" />
+                                            <motion.circle cx="60" cy="60" r="54" fill="none" stroke="url(#rg)" strokeWidth="10" strokeLinecap="round"
+                                                strokeDasharray={circumference} initial={{ strokeDashoffset: circumference }} animate={{ strokeDashoffset: dashOffset }} transition={{ duration: 1.5, ease: 'easeOut' }} transform="rotate(-90 60 60)" />
+                                            <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#38bdf8" /><stop offset="100%" stopColor="#818cf8" /></linearGradient></defs>
+                                        </svg>
+                                        <p className="text-xs font-bold tracking-widest uppercase mt-2" style={{ color: '#38bdf8' }}>Global Readiness</p>
+                                    </div>
+                                </div>
+                                {/* Right — skill proficiency with real progress bars */}
+                                <div className="md:w-[58%] px-5 py-5 flex flex-col">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <Target className="w-4 h-4 flex-shrink-0" style={{ color: '#38bdf8' }} />
+                                        <h3 className="text-xs font-bold uppercase tracking-widest" style={{ color: '#e2e8f0' }}>Skill Proficiency</h3>
+                                    </div>
+                                    <div className="flex flex-col gap-3">
+                                        {t1Profile && quotientsInfo.map((q, i) => {
+                                            const quotientData = t1Profile[q.id];
+                                            if (!quotientData) return null;
+                                            const { text: levelText, color: levelClr } = getQuotientLevel(quotientData.rawScore);
+                                            return (
+                                                <motion.div
+                                                    key={q.id}
+                                                    initial={{ opacity: 0, x: 16 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    transition={{ delay: 0.05 * i }}
+                                                    className="flex flex-col gap-1"
+                                                >
+                                                    {/* Row header */}
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-xs font-semibold" style={{ color: '#cbd5e1' }}>
+                                                            {q.name}
+                                                            <span className="ml-1 font-bold" style={{ color: '#94a3b8' }}>({quotientData.rawScore}%)</span>
+                                                        </span>
+                                                        <span
+                                                            className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
+                                                            style={{ background: `${levelClr}22`, color: levelClr, border: `1px solid ${levelClr}55` }}
+                                                        >
+                                                            {levelText}
+                                                        </span>
+                                                    </div>
+                                                    {/* Progress bar */}
+                                                    <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                                                        <motion.div
+                                                            className="h-full rounded-full"
+                                                            style={{ background: `linear-gradient(90deg, ${levelClr}cc, ${levelClr})` }}
+                                                            initial={{ width: 0 }}
+                                                            animate={{ width: `${quotientData.rawScore}%` }}
+                                                            transition={{ duration: 1, ease: 'easeOut', delay: 0.1 + 0.06 * i }}
+                                                        />
+                                                    </div>
+                                                </motion.div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="p-12 flex flex-col items-center justify-center text-center min-h-[300px]">
+                                <Shield className="w-12 h-12 mb-4" style={{ color: '#64748b' }} />
+                                <p className="text-lg font-semibold mb-2" style={{ color: '#f1f5f9' }}>Assessment Not Yet Completed</p>
+                                <p className="text-sm" style={{ color: '#94a3b8' }}>Please complete your baseline assessment to view your Digital Skills Passport.</p>
+                            </div>
+                        )}
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#38bdf8' }} />
-                        <span className="text-xs font-bold" style={{ color: '#38bdf8' }}>AI Verified</span>
-                        <span className="text-xs" style={{ color: '#475569' }}>• {verifiedDate}</span>
+
+                    {/* Footer */}
+                    <div className="mx-6 mb-6 rounded-2xl flex items-center justify-between px-5 py-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#475569' }}>Issued by</span>
+                            <span className="text-sm font-bold" style={{ color: '#94a3b8' }}>SMAART Minds AI</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#38bdf8' }} />
+                            <span className="text-xs font-bold" style={{ color: '#38bdf8' }}>AI Verified</span>
+                            <span className="text-xs" style={{ color: '#475569' }}>• {verifiedDate}</span>
+                        </div>
                     </div>
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg,transparent,rgba(56,189,248,0.3),transparent)' }} />
-            </motion.div>
+                    <div className="absolute bottom-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg,transparent,rgba(56,189,248,0.3),transparent)' }} />
+                </motion.div>
+            </div>
         </motion.div>
     );
 };
@@ -287,6 +289,7 @@ const SkillsPassport = () => {
     const { theme } = useTheme();
     const [activeTab, setActiveTab] = useState("baseline");
     const [baselineResult, setBaselineResult] = useState(null);
+    const [stageResults, setStageResults] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [showPassport, setShowPassport] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
@@ -298,7 +301,7 @@ const SkillsPassport = () => {
         }
     }, []);
 
-    // Fetch baseline data
+    // Fetch baseline + all stage results in parallel
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -307,14 +310,22 @@ const SkillsPassport = () => {
                     const user = JSON.parse(userStr);
                     const userId = user._id || user.id;
                     if (userId) {
-                        const response = await assessmentApi.getBaseLineResults(userId);
-                        if (response && response.success) {
-                            setBaselineResult(response.data);
+                        // Fetch both sets of results in parallel
+                        const [baselineRes, stageRes] = await Promise.allSettled([
+                            assessmentApi.getBaseLineResults(userId),
+                            assessmentApi.getStageResults(userId),
+                        ]);
+
+                        if (baselineRes.status === 'fulfilled' && baselineRes.value?.success) {
+                            setBaselineResult(baselineRes.value.data);
+                        }
+                        if (stageRes.status === 'fulfilled' && stageRes.value?.success) {
+                            setStageResults(stageRes.value.data || {});
                         }
                     }
                 }
             } catch (err) {
-                // Squelch error to prevent console crash
+                console.error('Skills Passport fetch error:', err);
             } finally {
                 setIsLoading(false);
             }
@@ -333,56 +344,60 @@ const SkillsPassport = () => {
         { id: 'DAQ', name: "Digital & AI Literacy", icon: Monitor, color: "text-cyan-600", bar: "bg-cyan-600" },
     ];
 
-    // Format Scores from Data
+    // Helper: extract 6-quotient scores from a quotientProfile object
     const getScores = (profile) => {
         if (!profile) return { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 };
         return {
-            CRQ: profile.CRQ?.rawScore || 0,
-            SRQ: profile.SRQ?.rawScore || 0,
-            LQ: profile.LQ?.rawScore || 0,
-            SIQ: profile.SIQ?.rawScore || 0,
-            PEQ: profile.PEQ?.rawScore || 0,
-            DAQ: profile.DAQ?.rawScore || 0
+            CRQ: profile.CRQ?.rawScore ?? profile.CRQ?.percentage ?? 0,
+            SRQ: profile.SRQ?.rawScore ?? profile.SRQ?.percentage ?? 0,
+            LQ: profile.LQ?.rawScore ?? profile.LQ?.percentage ?? 0,
+            SIQ: profile.SIQ?.rawScore ?? profile.SIQ?.percentage ?? 0,
+            PEQ: profile.PEQ?.rawScore ?? profile.PEQ?.percentage ?? 0,
+            DAQ: profile.DAQ?.rawScore ?? profile.DAQ?.percentage ?? 0,
+        };
+    };
+
+    // Helper: build a tab data object from a stage result or return a "Pending" placeholder
+    const buildTabData = (title, stageKey, fallbackResult = null) => {
+        const r = stageResults[stageKey] || fallbackResult;
+        if (!r) {
+            return { title, date: 'Pending', scores: getScores(null), status: 'Pending', average: 0, result: null };
+        }
+        return {
+            title,
+            date: r.completedAt ? new Date(r.completedAt).toLocaleDateString() : 'Completed',
+            scores: getScores(r.quotientProfile),
+            status: 'Completed',
+            average: Math.round(r.stageScore || r.percentage || 0),
+            stageBand: r.stageBand,
+            result: r,
         };
     };
 
     // Data for Tabs
     const testData = {
-        baseline: {
-            title: "T1 Assessment",
-            date: baselineResult ? new Date(baselineResult.createdAt).toLocaleDateString() : "Not Completed",
-            scores: getScores(baselineResult?.t1Profile),
-            status: baselineResult ? "Completed" : "Pending",
-            average: baselineResult?.baselineScore || 0
-        },
-        test2: {
-            title: "T2 Assessment",
-            date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
-            status: "Pending",
-            average: 0
-        },
-        test3: {
-            title: "T3 Assessment",
-            date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
-            status: "Pending",
-            average: 0
-        },
-        test4: {
-            title: "T4 Assessment",
-            date: "Pending",
-            scores: { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 },
-            status: "Pending",
-            average: 0
-        }
+        baseline: baselineResult
+            ? {
+                title: 'T1 Assessment',
+                date: new Date(baselineResult.createdAt).toLocaleDateString(),
+                scores: getScores(baselineResult.t1Profile),
+                status: 'Completed',
+                average: Math.round(baselineResult.baselineScore || 0),
+                stageBand: baselineResult.stageBand,
+                result: baselineResult,
+            }
+            : { title: 'T1 Assessment', date: 'Pending', scores: getScores(null), status: 'Pending', average: 0, result: null },
+        test2: buildTabData('T2 Assessment', 'T2'),
+        test3: buildTabData('T3 Assessment', 'T3'),
+        test4: buildTabData('T4 Assessment', 'T4'),
     };
 
     const currentData = testData[activeTab];
 
     const handleDownloadReport = () => {
-        if (!baselineResult) {
-            sonnerToast.error("Please complete the assessment to download your report.");
+        const currentData = testData[activeTab];
+        if (!currentData.result) {
+            sonnerToast.error("Please complete this assessment to download your report.");
             return;
         }
 
@@ -390,7 +405,7 @@ const SkillsPassport = () => {
             const userStr = sessionStorage.getItem("user");
             if (userStr) {
                 const user = JSON.parse(userStr);
-                generateAssessmentReport(user, baselineResult);
+                generateAssessmentReport(user, currentData.result);
             }
         } catch (error) {
             console.error("Error generating report:", error);
@@ -466,7 +481,7 @@ const SkillsPassport = () => {
                                     <div>
                                         <h2 className="text-xl font-bold text-slate-800 dark:text-white font-sans">{currentData.title}</h2>
                                         <p className="text-sm text-slate-500 dark:text-slate-400 font-medium font-sans">
-                                            {isLoading ? "Loading status..." : `Completed: ${currentData.date}`}
+                                            {isLoading ? "Loading status..." : currentData.status === 'Completed' ? `Completed: ${currentData.date}` : 'Completed: Pending'}
                                         </p>
                                     </div>
                                     <div className="text-right">
@@ -474,6 +489,11 @@ const SkillsPassport = () => {
                                             {currentData.average}%
                                         </div>
                                         <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Average</div>
+                                        {currentData.stageBand && (
+                                            <div className="text-xs font-semibold text-blue-500 dark:text-blue-400 mt-0.5 uppercase tracking-wide">
+                                                {currentData.stageBand}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 

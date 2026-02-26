@@ -1,0 +1,15 @@
+Role: Software Developer / Full Stack Developer Exact: true
+AI Tools: 9
+AI Skills: 7
+Tech Skills: 10
+Certifications: 6
+HI Skills: 15
+---
+Sector Roles: 222
+Emerging: 38
+---
+JF: Software Engineering & Development
+JF Quals: 5
+JF Tech: 10
+JF Auto: 7
+JF Human: 5
