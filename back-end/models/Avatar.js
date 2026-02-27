@@ -397,7 +397,13 @@ avatarSchema.methods.getStreakStatus = function () {
   const gap = this.lastStreakDate ? daysBetween(this.lastStreakDate, todayStr) : null;
   let activeStreakCount = 0;
   
-  if (this.streakActive && gap !== null && gap <= 2) {
+  // NEW users (registered today) should have 1 day streak, not the cycle day
+  const isNewStreakToday = this.streakStartDate && toDateStr(this.streakStartDate) === todayStr;
+  
+  if (isNewStreakToday) {
+    // New user who registered today - only 1 day
+    activeStreakCount = 1;
+  } else if (this.streakActive && gap !== null && gap <= 2) {
       activeStreakCount = (cyclesCompleted * 6) + (this.streakCycleDay === 7 ? 6 : this.streakCycleDay);
   }
 
@@ -413,15 +419,18 @@ avatarSchema.methods.getStreakStatus = function () {
   const cycleProgress = [];
   
   // Is this specific user active continuously in the CURRENT week?
-  // We check if their streak is active AND if their streakCycleDay correlates 
-  // with current calendar week to see if we color in the past days.
-  const hasActiveWeeklyStreak = this.streakActive && (gap !== null && gap < currentWeekday);
+  // For NEW users (registered today), they shouldn't have past days marked as completed
+  const hasConsecutiveDays = gap !== null && gap <= 2 && this.streakActive;
+  const hasActiveWeeklyStreak = hasConsecutiveDays && !isNewStreakToday;
 
   // Build Mon -> Sat blocks
   for (let i = 1; i <= 6; i++) {
     if (i < currentWeekday) {
        // Past days in the current week
-       if (hasActiveWeeklyStreak && this.streakCycleDay >= i) {
+       // NEW users (registered today) should have past days as missed
+       if (isNewStreakToday) {
+          cycleProgress.push('missed');
+       } else if (hasActiveWeeklyStreak && this.streakCycleDay >= i) {
           cycleProgress.push('completed');
        } else {
           // They missed this day earlier in the current week
