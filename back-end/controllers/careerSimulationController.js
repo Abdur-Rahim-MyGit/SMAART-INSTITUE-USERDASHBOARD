@@ -1,5 +1,6 @@
 const CareerIntelligence = require('../models/CareerIntelligence');
 const excelDataLoader = require('../services/excelDataLoader');
+const excelExportService = require('../services/excelExportService');
 
 /**
  * Career Simulation Engine Controller — v1.0
@@ -402,9 +403,10 @@ const runSimulation = async (req, res) => {
 const getSimulationBatches = async (req, res) => {
     try {
         const userId = req.user.id || req.user._id;
+        const mongoose = require('mongoose');
 
         const batches = await CareerIntelligence.aggregate([
-            { $match: { userId: require('mongoose').Types.ObjectId(userId), isSimulated: true } },
+            { $match: { userId: new mongoose.Types.ObjectId(userId), isSimulated: true } },
             {
                 $group: {
                     _id: '$simulationBatchId',
@@ -425,4 +427,41 @@ const getSimulationBatches = async (req, res) => {
     }
 };
 
-module.exports = { runSimulation, getSimulationBatches };
+// ═══════════════════════════════════════════
+// CONTROLLER: POST /api/career-intelligence/export-excel
+// Appends reports to the AI AGNEENT OUTPUT.xlsx file
+// ═══════════════════════════════════════════
+const exportToExcel = async (req, res) => {
+    try {
+        const { reportId, batchId } = req.body;
+        const userId = req.user.id || req.user._id;
+
+        let query = { userId: new require('mongoose').Types.ObjectId(userId) };
+        if (batchId) {
+            query.simulationBatchId = batchId;
+        } else if (reportId) {
+            query._id = reportId;
+        } else {
+            return res.status(400).json({ error: 'Either reportId or batchId is required' });
+        }
+
+        const reports = await CareerIntelligence.find(query).lean();
+
+        if (!reports || reports.length === 0) {
+            return res.status(404).json({ error: 'No reports found matching criteria' });
+        }
+
+        const result = excelExportService.exportToExcel(reports);
+
+        return res.status(200).json({
+            message: `Successfully exported ${result.count} reports to Excel`,
+            count: result.count,
+            path: 'AI AGNEENT OUTPUT.xlsx'
+        });
+    } catch (error) {
+        console.error('❌ Excel Export Error:', error);
+        return res.status(500).json({ error: 'Failed to export to Excel', details: error.message });
+    }
+};
+
+module.exports = { runSimulation, getSimulationBatches, exportToExcel };

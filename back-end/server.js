@@ -167,6 +167,7 @@ app.post('/api/career-intelligence/refresh-cache', authMiddleware, careerIntelli
 const careerSimulationController = require('./controllers/careerSimulationController');
 app.post('/api/career-intelligence/simulate', authMiddleware, careerSimulationController.runSimulation);
 app.get('/api/career-intelligence/simulate/batches', authMiddleware, careerSimulationController.getSimulationBatches);
+app.post('/api/career-intelligence/export-excel', authMiddleware, careerSimulationController.exportToExcel);
 
 logger.info('✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)');
 

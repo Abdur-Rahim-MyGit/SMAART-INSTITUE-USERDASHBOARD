@@ -55,6 +55,13 @@ const careerIntelligenceApi = {
     // Get all simulation batches
     getSimulationBatches: () =>
         apiCall('/career-intelligence/simulate/batches'),
+
+    // Export to Excel (singular report or batch ID)
+    exportToExcel: (params) =>
+        apiCall('/career-intelligence/export-excel', {
+            method: 'POST',
+            body: JSON.stringify(params),
+        }),
 };
 
 export default careerIntelligenceApi;

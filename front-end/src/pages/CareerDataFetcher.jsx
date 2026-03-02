@@ -5,7 +5,7 @@ import {
     ArrowRight, ArrowLeft, Loader2, CheckCircle2, Sparkles, TrendingUp,
     BookOpen, Shield, Zap, Users, Award, BarChart3, Download, ChevronDown,
     ChevronUp, RefreshCw, Clock, Star, Lightbulb, Rocket, FileText, Plus,
-    Code, Cpu, Heart, Globe, Layers, PieChart, Activity, AlertTriangle, Lock
+    Code, Cpu, Heart, Globe, Layers, PieChart, Activity, AlertTriangle, Lock, Table
 } from 'lucide-react';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
@@ -100,7 +100,7 @@ const FormTextarea = ({ label, name, value, onChange, placeholder, required, ico
                 placeholder={placeholder}
                 required={required}
                 rows={3}
-                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 hover:border-slate-300 dark:hover:border-slate-500 resize-none`}
+                className={`w - full ${Icon ? 'pl-12' : 'pl-4'} pr - 4 py - 3.5 rounded - xl border - 2 border - slate - 200 dark: border - slate - 600 bg - white dark: bg - slate - 800 text - slate - 800 dark: text - white placeholder - slate - 400 transition - all duration - 300 focus: outline - none focus: border - indigo - 500 focus: ring - 4 focus: ring - indigo - 500 / 10 hover: border - slate - 300 dark: hover: border - slate - 500 resize - none`}
             />
         </div>
     </div>
@@ -157,7 +157,7 @@ const ReportSection = ({ title, icon: Icon, color, children, delay = 0 }) => {
                 className="w-full px-6 py-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
             >
                 <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${color} text-white shadow-lg`}>
+                    <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center bg - gradient - to - br ${color} text - white shadow - lg`}>
                         <Icon size={22} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
@@ -197,7 +197,7 @@ const SkillTag = ({ text, variant = 'default' }) => {
     };
 
     return (
-        <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold border ${variants[variant]} transition-all duration-200 hover:scale-105`}>
+        <span className={`inline - flex items - center px - 3 py - 1.5 rounded - lg text - xs font - semibold border ${variants[variant]} transition - all duration - 200 hover: scale - 105`}>
             {text}
         </span>
     );
@@ -212,7 +212,7 @@ const PriorityBadge = ({ priority }) => {
     };
 
     return (
-        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${colors[priority] || colors.Medium}`}>
+        <span className={`px - 2 py - 0.5 rounded - md text - [10px] font - bold uppercase tracking - wider border ${colors[priority] || colors.Medium} `}>
             {priority}
         </span>
     );
@@ -235,6 +235,7 @@ const CareerDataFetcher = () => {
     const [isSimulating, setIsSimulating] = useState(false);
     const [simResult, setSimResult] = useState(null);
     const [showSimPanel, setShowSimPanel] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     const [formData, setFormData] = useState({
         shortTermGoal: '',
@@ -413,6 +414,18 @@ const CareerDataFetcher = () => {
     };
 
 
+    // ── Excel Export Handler ──
+    const handleExportToExcel = async (params) => {
+        setIsExporting(true);
+        try {
+            const data = await careerIntelligenceApi.exportToExcel(params);
+            toast.success(data.message || '✅ Successfully exported to Excel!');
+        } catch (err) {
+            toast.error(err.message || 'Export failed. Please try again.');
+        } finally {
+            setIsExporting(false);
+        }
+    };
     const handleDownloadPDF = async () => {
         if (!report || !reportRef.current) return;
 
@@ -437,7 +450,7 @@ const CareerDataFetcher = () => {
             });
 
             pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / 2, canvas.height / 2);
-            pdf.save(`SMAART-Career-Report-${report.careerInput?.interestedJobRole || 'Intelligence'}.pdf`);
+            pdf.save(`SMAART - Career - Report - ${report.careerInput?.interestedJobRole || 'Intelligence'}.pdf`);
 
             toast.success("Report downloaded successfully!", { id: toastId });
         } catch (err) {
@@ -622,6 +635,14 @@ const CareerDataFetcher = () => {
                     <button onClick={handleDownloadPDF} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl ml-auto">
                         <Download size={16} /> Download Report
                     </button>
+                    <button
+                        onClick={() => handleExportToExcel({ reportId: report._id || report.id })}
+                        disabled={isExporting}
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm transition-all shadow-lg shadow-amber-500/30 hover:shadow-xl"
+                    >
+                        {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Table size={16} />}
+                        Convert into Excel
+                    </button>
                 </div>
 
                 {/* 1. Technical Skills */}
@@ -676,7 +697,7 @@ const CareerDataFetcher = () => {
                                         <div key={i} className="p-3 rounded-xl bg-purple-50 dark:bg-purple-500/5 border border-purple-100 dark:border-purple-500/10">
                                             <div className="flex items-center justify-between mb-1">
                                                 <span className="font-semibold text-sm text-purple-800 dark:text-purple-200">{tool.name}</span>
-                                                <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${tool.costType?.includes('FREE') ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'}`}>{tool.costType || 'N/A'}</span>
+                                                <span className={`text - [9px] font - bold px - 2 py - 0.5 rounded - full ${tool.costType?.includes('FREE') ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'} `}>{tool.costType || 'N/A'}</span>
                                             </div>
                                             <p className="text-[11px] text-purple-600 dark:text-purple-400">{tool.description}</p>
                                         </div>
@@ -728,7 +749,7 @@ const CareerDataFetcher = () => {
                                         {jobs.map((job, i) => (
                                             <div key={i} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700">
                                                 <div className="flex items-center gap-2 mb-1.5">
-                                                    <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${colors[level]}`} />
+                                                    <div className={`w - 2 h - 2 rounded - full bg - gradient - to - r ${colors[level]} `} />
                                                     <span className="font-semibold text-sm text-slate-800 dark:text-white">{job.title}</span>
                                                 </div>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400 pl-4">{job.description}</p>
@@ -801,7 +822,7 @@ const CareerDataFetcher = () => {
                             ].map((item, i) => (
                                 <div key={i} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700">
                                     <div className="flex items-center gap-2 mb-2">
-                                        <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.color} text-white flex items-center justify-center`}>
+                                        <div className={`w - 8 h - 8 rounded - lg bg - gradient - to - br ${item.color} text - white flex items - center justify - center`}>
                                             <item.icon size={14} />
                                         </div>
                                         <span className="font-bold text-sm text-slate-800 dark:text-white">{item.label}</span>
@@ -938,15 +959,15 @@ const CareerDataFetcher = () => {
                                 <button
                                     key={r.id || r._id}
                                     onClick={() => viewReport(r)}
-                                    className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${(r.id || r._id) === (report.id || report._id)
+                                    className={`w - full flex items - center justify - between p - 3 rounded - xl border transition - all ${(r.id || r._id) === (report.id || report._id)
                                         ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10'
                                         : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                                        }`}
+                                        } `}
                                 >
                                     <div className="flex items-center gap-3">
                                         <span className="text-sm font-semibold text-slate-800 dark:text-white">v{r.version}</span>
                                         <span className="text-xs text-slate-500">{new Date(r.createdAt).toLocaleDateString()}</span>
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${r.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'}`}>
+                                        <span className={`text - [10px] font - bold px - 2 py - 0.5 rounded - full ${r.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'} `}>
                                             {r.status}
                                         </span>
                                     </div>
@@ -1035,10 +1056,10 @@ const CareerDataFetcher = () => {
                                     {/* Simulation Engine Toggle */}
                                     <button
                                         onClick={() => setShowSimPanel(prev => !prev)}
-                                        className={`p-2 rounded-lg border transition-all shadow-sm active:scale-95 flex items-center gap-1.5 text-xs font-bold ${showSimPanel
-                                                ? 'bg-violet-600 border-violet-600 text-white shadow-violet-500/30'
-                                                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-violet-500 hover:border-violet-300 dark:hover:border-violet-500/30'
-                                            }`}
+                                        className={`p - 2 rounded - lg border transition - all shadow - sm active: scale - 95 flex items - center gap - 1.5 text - xs font - bold ${showSimPanel
+                                            ? 'bg-violet-600 border-violet-600 text-white shadow-violet-500/30'
+                                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-violet-500 hover:border-violet-300 dark:hover:border-violet-500/30'
+                                            } `}
                                         title="Career Simulation Engine"
                                     >
                                         <Cpu size={16} />
@@ -1105,20 +1126,20 @@ const CareerDataFetcher = () => {
                                                 <div key={step.id} className="flex items-center">
                                                     <button
                                                         onClick={() => i <= currentStep && setCurrentStep(i)}
-                                                        className={`relative flex flex-col items-center gap-2 transition-all duration-300 ${i <= currentStep ? 'cursor-pointer' : 'cursor-default'}`}
+                                                        className={`relative flex flex - col items - center gap - 2 transition - all duration - 300 ${i <= currentStep ? 'cursor-pointer' : 'cursor-default'} `}
                                                     >
-                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 scale-110'
+                                                        <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center transition - all duration - 300 ${isActive ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 scale-110'
                                                             : isCompleted ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                                                                 : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
-                                                            }`}>
+                                                            } `}>
                                                             {isCompleted ? <CheckCircle2 size={20} /> : <StepIcon size={20} />}
                                                         </div>
-                                                        <span className={`text-[10px] font-bold uppercase tracking-wider hidden md:block ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`}>
+                                                        <span className={`text - [10px] font - bold uppercase tracking - wider hidden md:block ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} `}>
                                                             {step.title}
                                                         </span>
                                                     </button>
                                                     {i < FORM_STEPS.length - 1 && (
-                                                        <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors ${i < currentStep ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                                                        <div className={`w - 12 lg: w - 20 h - 0.5 mx - 2 rounded - full transition - colors ${i < currentStep ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'} `} />
                                                     )}
                                                 </div>
                                             );
@@ -1143,8 +1164,8 @@ const CareerDataFetcher = () => {
                                     <button
                                         onClick={() => currentStep > 0 && setCurrentStep(currentStep - 1)}
                                         disabled={currentStep === 0}
-                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${currentStep === 0 ? 'opacity-40 cursor-not-allowed text-slate-400' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
-                                            }`}
+                                        className={`flex items - center gap - 2 px - 5 py - 2.5 rounded - xl font - semibold text - sm transition - all ${currentStep === 0 ? 'opacity-40 cursor-not-allowed text-slate-400' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                            } `}
                                     >
                                         <ArrowLeft size={16} /> Back
                                     </button>
@@ -1159,10 +1180,10 @@ const CareerDataFetcher = () => {
                                         <button
                                             onClick={() => validateStep() && setCurrentStep(currentStep + 1)}
                                             disabled={!validateStep()}
-                                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${validateStep()
+                                            className={`flex items - center gap - 2 px - 6 py - 2.5 rounded - xl font - semibold text - sm transition - all ${validateStep()
                                                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:scale-[1.02]'
                                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
-                                                }`}
+                                                } `}
                                         >
                                             Next <ArrowRight size={16} />
                                         </button>
@@ -1170,10 +1191,10 @@ const CareerDataFetcher = () => {
                                         <button
                                             onClick={handleSubmit}
                                             disabled={!validateStep() || isGenerating}
-                                            className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm transition-all ${validateStep() && !isGenerating
+                                            className={`flex items - center gap - 2 px - 8 py - 3 rounded - xl font - bold text - sm transition - all ${validateStep() && !isGenerating
                                                 ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 hover:shadow-xl hover:scale-[1.02]'
                                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
-                                                }`}
+                                                } `}
                                         >
                                             {isGenerating ? <><Loader2 size={16} className="animate-spin" /> Generating...</> : <><Brain size={16} /> Generate Career Intelligence</>}
                                         </button>
@@ -1233,7 +1254,7 @@ const CareerDataFetcher = () => {
                                                 { label: 'Bulk MongoDB Insert', icon: '💾', color: 'bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/20' },
                                                 { label: 'ML-Ready Dataset', icon: '🤖', color: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/20' },
                                             ].map((b, i) => (
-                                                <span key={i} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border ${b.color}`}>
+                                                <span key={i} className={`inline - flex items - center gap - 1.5 px - 3 py - 1.5 rounded - lg text - xs font - bold border ${b.color} `}>
                                                     {b.icon} {b.label}
                                                 </span>
                                             ))}
@@ -1267,10 +1288,10 @@ const CareerDataFetcher = () => {
                                             <button
                                                 onClick={handleRunSimulation}
                                                 disabled={isSimulating}
-                                                className={`flex items-center gap-3 px-8 py-3.5 rounded-xl font-black text-sm transition-all whitespace-nowrap ${isSimulating
-                                                        ? 'bg-violet-300 dark:bg-violet-800 text-white cursor-not-allowed'
-                                                        : 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-xl shadow-violet-500/30 hover:shadow-2xl hover:scale-[1.03] active:scale-100'
-                                                    }`}
+                                                className={`flex items - center gap - 3 px - 8 py - 3.5 rounded - xl font - black text - sm transition - all whitespace - nowrap ${isSimulating
+                                                    ? 'bg-violet-300 dark:bg-violet-800 text-white cursor-not-allowed'
+                                                    : 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-xl shadow-violet-500/30 hover:shadow-2xl hover:scale-[1.03] active:scale-100'
+                                                    } `}
                                             >
                                                 {isSimulating
                                                     ? <><Loader2 size={18} className="animate-spin" /> Simulating...</>
@@ -1304,9 +1325,21 @@ const CareerDataFetcher = () => {
                                                     ].map((stat, i) => (
                                                         <div key={i} className="text-center p-3 rounded-xl bg-white dark:bg-slate-800/60 border border-violet-100 dark:border-violet-500/10">
                                                             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{stat.label}</p>
-                                                            <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
+                                                            <p className={`text - 2xl font - black ${stat.color} `}>{stat.value}</p>
                                                         </div>
                                                     ))}
+                                                </div>
+
+                                                {/* Bulk Export Button */}
+                                                <div className="mt-4 flex justify-end">
+                                                    <button
+                                                        onClick={() => handleExportToExcel({ batchId: simResult.batchId })}
+                                                        disabled={isExporting}
+                                                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold text-xs transition-all border border-amber-200"
+                                                    >
+                                                        {isExporting ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+                                                        Save Entire Batch to AI AGNEENT OUTPUT.xlsx
+                                                    </button>
                                                 </div>
                                                 {simResult.sampleProfile && (
                                                     <div className="mt-4 p-3 rounded-xl bg-white/60 dark:bg-slate-800/40 border border-violet-100 dark:border-violet-500/10">
