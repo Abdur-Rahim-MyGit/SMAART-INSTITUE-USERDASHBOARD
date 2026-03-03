@@ -34,8 +34,10 @@ const careerInputSchema = new mongoose.Schema({
         required: true,
     },
     preferredLocation: { type: String },
-    enum: ['0-3 LPA', '3-6 LPA', '6-10 LPA', '10-15 LPA', '15-25 LPA', '25+ LPA'],
-},
+    expectedSalaryRange: {
+        type: String,
+        enum: ['0-3 LPA', '3-6 LPA', '6-10 LPA', '10-15 LPA', '15-25 LPA', '25+ LPA'],
+    },
     // Domain-Controlled Generation
     domain: { type: String, required: true }, // Mandatory: IT Security, Data Science, Web Development, etc.
 });
