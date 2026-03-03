@@ -5,7 +5,8 @@ import {
     ArrowRight, ArrowLeft, Loader2, CheckCircle2, Sparkles, TrendingUp,
     BookOpen, Shield, Zap, Users, Award, BarChart3, Download, ChevronDown,
     ChevronUp, RefreshCw, Clock, Star, Lightbulb, Rocket, FileText, Plus,
-    Code, Cpu, Heart, Globe, Layers, PieChart, Activity, AlertTriangle, Lock, Table
+    Code, Cpu, Heart, Globe, Layers, PieChart, Activity, AlertTriangle, Lock, Table,
+    LayoutDashboard, Milestone, CircuitBoard, Gauge, Radio, Compass
 } from 'lucide-react';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import DashboardHeader from '@/components/DashboardHeader';
@@ -24,6 +25,14 @@ const DOMAINS = [
     'Mobile App Development', 'Business Analytics', 'Digital Marketing', 'Software Engineering',
     'IT Support & Networking', 'UI/UX Design', 'Blockchain Technology', 'Internet of Things (IoT)',
     'Embedded Systems', 'Product Management', 'Quality Assurance (Testing)', 'Others'
+];
+
+const REPORT_TABS = [
+    { id: 'OVERVIEW', label: 'STRATEGIC OVERVIEW', icon: LayoutDashboard, color: 'indigo', description: 'Mission profile & alignment' },
+    { id: 'SKILLS', label: 'INTELLIGENCE CORE', icon: Cpu, color: 'purple', description: 'Technical & AI capabilities' },
+    { id: 'ROADMAP', label: 'EXECUTION PATH', icon: Milestone, color: 'emerald', description: 'Phased deployment plan' },
+    { id: 'MARKET', label: 'MARKET PULSE', icon: Activity, color: 'amber', description: 'Global demand telemetry' },
+    { id: 'RESOURCES', label: 'KNOWLEDGE BASE', icon: Zap, color: 'cyan', description: 'Resource & asset mapping' },
 ];
 
 const FORM_STEPS = [
@@ -53,7 +62,7 @@ const FormInput = ({ label, name, value, onChange, placeholder, required, type =
                 onChange={onChange}
                 placeholder={placeholder}
                 required={required}
-                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 hover:border-slate-300 dark:hover:border-slate-500`}
+                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600`}
             />
         </div>
     </div>
@@ -76,7 +85,7 @@ const FormSelect = ({ label, name, value, onChange, options, required, icon: Ico
                 value={value}
                 onChange={onChange}
                 required={required}
-                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-10 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white appearance-none cursor-pointer transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 hover:border-slate-300 dark:hover:border-slate-500`}
+                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-10 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white appearance-none cursor-pointer transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600`}
             >
                 <option value="">Select...</option>
                 {options.map(opt => (
@@ -107,7 +116,7 @@ const FormTextarea = ({ label, name, value, onChange, placeholder, required, ico
                 placeholder={placeholder}
                 required={required}
                 rows={3}
-                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 hover:border-slate-300 dark:hover:border-slate-500 resize-none`}
+                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600 resize-none`}
             />
         </div>
     </div>
@@ -157,14 +166,14 @@ const ReportSection = ({ title, icon: Icon, color, children, delay = 0 }) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay }}
-            className="bg-white dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-lg shadow-slate-200/50 dark:shadow-black/20 hover:shadow-xl transition-shadow duration-300"
+            className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
         >
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="w-full px-6 py-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
             >
                 <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${color} text-white shadow-lg`}>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-700`}>
                         <Icon size={22} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
@@ -196,15 +205,15 @@ const ReportSection = ({ title, icon: Icon, color, children, delay = 0 }) => {
 // ========== SKILL TAG ==========
 const SkillTag = ({ text, variant = 'default' }) => {
     const variants = {
-        default: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/20',
-        success: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/20',
-        warning: 'bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/20',
-        purple: 'bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/20',
-        rose: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/20',
+        default: 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+        success: 'bg-slate-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border-slate-200 dark:border-slate-700',
+        warning: 'bg-slate-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400 border-slate-200 dark:border-slate-700',
+        purple: 'bg-slate-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700',
+        rose: 'bg-slate-50 dark:bg-slate-800 text-rose-600 dark:text-rose-400 border-slate-200 dark:border-slate-700',
     };
 
     return (
-        <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold border ${variants[variant]} transition-all duration-200 hover:scale-105`}>
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${variants[variant]} transition-colors hover:bg-slate-100 dark:hover:bg-slate-700`}>
             {text}
         </span>
     );
@@ -243,6 +252,7 @@ const CareerDataFetcher = () => {
     const [simResult, setSimResult] = useState(null);
     const [showSimPanel, setShowSimPanel] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+    const [activeReportTab, setActiveReportTab] = useState('OVERVIEW');
 
     const [formData, setFormData] = useState({
         shortTermGoal: '',
@@ -598,7 +608,7 @@ const CareerDataFetcher = () => {
                     <motion.div key="domain" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                             <div className="lg:col-span-2">
-                                <div className="p-8 rounded-[2rem] bg-gradient-to-br from-indigo-600 to-purple-700 text-white relative overflow-hidden h-full">
+                                <div className="p-8 rounded-[2rem] bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden h-full">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
                                     <div className="relative z-10 flex flex-col h-full">
                                         <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center mb-6">
@@ -698,22 +708,22 @@ const CareerDataFetcher = () => {
         return (
             <div ref={reportRef} className="space-y-6">
                 {/* Report Header */}
-                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-8 text-white relative overflow-hidden">
+                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 mb-6 shadow-sm relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
                     <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-4">
                             <Brain className="w-10 h-10" />
                             <div>
-                                <h2 className="text-2xl md:text-3xl font-black">Career Intelligence Report</h2>
-                                <p className="text-white/70 text-sm mt-1">Version {report.version} • Generated {new Date(report.generatedDate || report.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white">Career Intelligence Report</h2>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Version {report.version} • Generated {new Date(report.generatedDate || report.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                             </div>
                         </div>
                     </div>
                 </motion.div>
 
                 {/* Action Bar */}
-                <div className="flex flex-wrap gap-3 p-4 bg-slate-50/50 dark:bg-slate-700/30 rounded-2xl border border-slate-100 dark:border-slate-700/50 backdrop-blur-sm sticky top-4 z-40">
+                <div className="flex flex-wrap gap-3 p-4 bg-white/80 dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 backdrop-blur-md shadow-sm sticky top-4 z-40">
                     <button onClick={startNew} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl">
                         <RefreshCw size={16} /> Generate New
                     </button>
@@ -736,13 +746,13 @@ const CareerDataFetcher = () => {
 
                 {/* 0. Blueprint Dashboard Summary */}
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl flex flex-col items-center justify-center text-center">
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center">
                         <CircularProgress percentage={output.careerMatchPercentage || 85} label="Career Alignment" color="#6366f1" size={140} />
                         <p className="text-xs text-slate-400 mt-4 leading-relaxed max-w-[180px]">Based on your goals and background match to {report.careerInput?.interestedJobRole}</p>
                     </div>
 
                     <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-500/5 dark:to-slate-800 p-6 rounded-3xl border border-indigo-100 dark:border-indigo-500/20 shadow-lg group hover:scale-[1.02] transition-transform">
+                        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group transition-transform">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="p-3 rounded-2xl bg-indigo-500 text-white shadow-lg shadow-indigo-500/30">
                                     <Target size={20} />
@@ -763,7 +773,7 @@ const CareerDataFetcher = () => {
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-purple-50 to-white dark:from-purple-500/5 dark:to-slate-800 p-6 rounded-3xl border border-purple-100 dark:border-purple-500/20 shadow-lg group hover:scale-[1.02] transition-transform">
+                        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group transition-transform">
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="p-3 rounded-2xl bg-purple-500 text-white shadow-lg shadow-purple-500/30">
                                     <Zap size={20} />
@@ -778,13 +788,13 @@ const CareerDataFetcher = () => {
                             </p>
                         </div>
 
-                        <div className="sm:col-span-2 bg-gradient-to-r from-slate-900 to-indigo-900 p-6 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                        <div className="sm:col-span-2 bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-start gap-4 shadow-sm">
+                            <div className="hidden">
                                 <Brain size={120} />
                             </div>
                             <div className="relative z-10">
-                                <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2">AI Intelligence Tip</h4>
-                                <p className="text-white text-sm font-medium leading-relaxed max-w-lg">
+                                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">AI Intelligence Tip</h4>
+                                <p className="text-slate-700 dark:text-slate-300 text-sm font-medium leading-relaxed max-w-lg">
                                     Leverage tools like <span className="text-indigo-300 underline decoration-indigo-300/30 underline-offset-4">{output.aiSkills?.tools?.[0]?.name || 'Generative AI'}</span> to enhance your daily workflow in {report.careerInput?.interestedJobRole}.
                                 </p>
                             </div>
@@ -865,7 +875,7 @@ const CareerDataFetcher = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {(output.humanIntelligenceSkills || output.humanSkills)?.map((skill, i) => (
                             <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors">
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">
                                     {i + 1}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -941,7 +951,7 @@ const CareerDataFetcher = () => {
                                     transition={{ delay: 0.4 + i * 0.1 }}
                                     className="flex items-start gap-4 relative"
                                 >
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-lg shadow-indigo-500/30 z-10">
+                                    <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-white flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-lg shadow-indigo-500/30 z-10">
                                         {i + 1}
                                     </div>
                                     <div className="flex-1 bg-slate-50 dark:bg-slate-700/40 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
@@ -1130,7 +1140,7 @@ const CareerDataFetcher = () => {
 
     // ========== MAIN RENDER ==========
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950/50 transition-colors duration-300">
             <DashboardSidebar />
 
             <div className="min-h-screen transition-all duration-300">
@@ -1143,7 +1153,7 @@ const CareerDataFetcher = () => {
                         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
                             <div className="flex items-center justify-center gap-3 mb-4">
                                 <div className="relative">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-xl shadow-indigo-500/30">
+                                    <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 shadow-sm">
                                         <Database className="w-7 h-7 text-white" />
                                     </div>
                                     <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
@@ -1261,7 +1271,7 @@ const CareerDataFetcher = () => {
                         {/* Content Area */}
                         {showForm ? (
                             /* ===== FORM VIEW ===== */
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-slate-800/80 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl shadow-slate-200/50 dark:shadow-black/30 overflow-hidden">
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                                 {/* Step Indicator */}
                                 <div className="p-6 border-b border-slate-100 dark:border-slate-700">
                                     <div className="flex items-center justify-between max-w-2xl mx-auto">
@@ -1275,7 +1285,7 @@ const CareerDataFetcher = () => {
                                                         onClick={() => i <= currentStep && setCurrentStep(i)}
                                                         className={`relative flex flex-col items-center gap-2 transition-all duration-300 ${i <= currentStep ? 'cursor-pointer' : 'cursor-default'}`}
                                                     >
-                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 scale-110'
+                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-white shadow-lg shadow-indigo-500/30 scale-110'
                                                             : isCompleted ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                                                                 : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
                                                             }`}>
@@ -1328,7 +1338,7 @@ const CareerDataFetcher = () => {
                                             onClick={() => validateStep() && setCurrentStep(currentStep + 1)}
                                             disabled={!validateStep()}
                                             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${validateStep()
-                                                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:scale-[1.02]'
+                                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100'
                                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
                                                 }`}
                                         >
@@ -1339,7 +1349,7 @@ const CareerDataFetcher = () => {
                                             onClick={handleSubmit}
                                             disabled={!validateStep() || isGenerating}
                                             className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm transition-all ${validateStep() && !isGenerating
-                                                ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 hover:shadow-xl hover:scale-[1.02]'
+                                                ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100'
                                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
                                                 }`}
                                         >
@@ -1378,7 +1388,7 @@ const CareerDataFetcher = () => {
                                     className="mt-8 bg-white dark:bg-slate-800/80 rounded-3xl border border-violet-200 dark:border-violet-500/20 shadow-2xl shadow-violet-500/10 overflow-hidden"
                                 >
                                     {/* Header */}
-                                    <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 p-6 text-white relative overflow-hidden">
+                                    <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 text-slate-800 dark:text-white relative overflow-hidden">
                                         <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                                         <div className="relative z-10 flex items-center gap-4">
                                             <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center">
@@ -1386,7 +1396,7 @@ const CareerDataFetcher = () => {
                                             </div>
                                             <div>
                                                 <h2 className="text-xl font-black">Career Simulation Engine</h2>
-                                                <p className="text-white/70 text-sm mt-0.5">Auto-generate synthetic student career profiles for research & ML datasets</p>
+                                                <p className="text-slate-500 text-sm mt-0.5">Auto-generate synthetic student career profiles for research & ML datasets</p>
                                             </div>
                                         </div>
                                     </div>
@@ -1424,7 +1434,7 @@ const CareerDataFetcher = () => {
                                                             const v = Math.min(Math.max(parseInt(e.target.value) || 1, 1), 50);
                                                             setSimCount(v);
                                                         }}
-                                                        className="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-lg font-bold transition-all focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                                                        className="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-lg font-bold transition-all focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
                                                         placeholder="50"
                                                     />
                                                 </div>
@@ -1455,7 +1465,7 @@ const CareerDataFetcher = () => {
                                                 className="rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-500/10 dark:to-fuchsia-500/10 border border-violet-200 dark:border-violet-500/20 p-5"
                                             >
                                                 <div className="flex items-center gap-3 mb-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                                                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center">
                                                         <CheckCircle2 size={20} className="text-white" />
                                                     </div>
                                                     <div>
