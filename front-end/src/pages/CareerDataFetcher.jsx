@@ -19,12 +19,19 @@ const AREAS_OF_INTEREST = ['Technology', 'Business', 'Healthcare', 'Finance', 'C
 const JOB_SECTORS = ['IT', 'Core Engineering', 'Startup', 'MNC', 'Government', 'Freelance', 'Research', 'Others'];
 const COLLEGE_TYPES = ['Government', 'Private', 'Deemed', 'Autonomous', 'IIT/NIT', 'Other'];
 const SALARY_RANGES = ['0-3 LPA', '3-6 LPA', '6-10 LPA', '10-15 LPA', '15-25 LPA', '25+ LPA'];
+const DOMAINS = [
+    'Web Development', 'Data Science & AI', 'Cybersecurity', 'Cloud Computing & DevOps',
+    'Mobile App Development', 'Business Analytics', 'Digital Marketing', 'Software Engineering',
+    'IT Support & Networking', 'UI/UX Design', 'Blockchain Technology', 'Internet of Things (IoT)',
+    'Embedded Systems', 'Product Management', 'Quality Assurance (Testing)', 'Others'
+];
 
 const FORM_STEPS = [
     { id: 'goals', title: 'Career Goals', icon: Target, description: 'Define your career aspirations' },
     { id: 'education', title: 'Education', icon: GraduationCap, description: 'Your academic background' },
     { id: 'interest', title: 'Interest Area', icon: Sparkles, description: 'What excites you most' },
     { id: 'job', title: 'Job Preference', icon: Briefcase, description: 'Your ideal work environment' },
+    { id: 'domain', title: 'Gen Domain', icon: Brain, description: 'Confirm generation target' },
 ];
 
 // ========== FORM INPUT COMPONENT ==========
@@ -251,6 +258,8 @@ const CareerDataFetcher = () => {
         jobSector: '',
         preferredLocation: '',
         expectedSalaryRange: '',
+        domain: '', // Mandatory generation domain
+        domainOther: '',
     });
 
     const [excelData, setExcelData] = useState({ sectors: [], roles: [] });
@@ -339,6 +348,7 @@ const CareerDataFetcher = () => {
             case 1: return formData.degree && formData.specialization;
             case 2: return formData.areaOfInterest;
             case 3: return formData.interestedJobRole && formData.jobSector;
+            case 4: return formData.domain && (formData.domain !== 'Others' || formData.domainOther?.trim().length > 2);
             default: return true;
         }
     };
@@ -558,6 +568,53 @@ const CareerDataFetcher = () => {
                             <FormInput label="Preferred Location" name="preferredLocation" value={formData.preferredLocation} onChange={handleInputChange} placeholder="e.g., Bangalore, Remote, Hybrid" icon={MapPin} />
                         </div>
                         <FormSelect label="Expected Salary Range" name="expectedSalaryRange" value={formData.expectedSalaryRange} onChange={handleInputChange} options={SALARY_RANGES} icon={DollarSign} />
+                    </motion.div>
+                );
+            case 4:
+                return (
+                    <motion.div key="domain" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
+                        <div className="p-6 rounded-3xl bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 mb-6">
+                            <div className="flex items-center gap-3 mb-3">
+                                <AlertTriangle className="text-amber-500" />
+                                <h3 className="text-lg font-bold text-amber-900 dark:text-amber-200">Critical Confirmation</h3>
+                            </div>
+                            <p className="text-sm text-amber-800/80 dark:text-amber-200/60 leading-relaxed italic">
+                                "Which domain should the data be generated from?"
+                            </p>
+                            <p className="text-xs text-amber-700/60 dark:text-amber-200/40 mt-3">
+                                Select the specific ecosystem where you want to build your career. The engine will strictly use data from this domain only.
+                            </p>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
+                                Select Generation Domain <span className="text-red-500">*</span>
+                            </label>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {DOMAINS.map(domain => (
+                                    <button
+                                        key={domain}
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, domain: domain }))}
+                                        className={`p-4 rounded-xl border-2 text-left text-sm font-semibold transition-all duration-300 ${formData.domain === domain
+                                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-lg shadow-indigo-500/20 scale-[1.02]'
+                                            : 'border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                                            }`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span>{domain}</span>
+                                            {formData.domain === domain && <CheckCircle2 size={16} className="text-indigo-500" />}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {formData.domain === 'Others' && (
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                                <FormInput label="Specify Target Domain" name="domainOther" value={formData.domainOther} onChange={handleInputChange} placeholder="e.g., Aerospace Engineering, Quantum Computing" required icon={Lightbulb} />
+                            </motion.div>
+                        )}
                     </motion.div>
                 );
             default:
@@ -1117,7 +1174,7 @@ const CareerDataFetcher = () => {
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-slate-800/80 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl shadow-slate-200/50 dark:shadow-black/30 overflow-hidden">
                                 {/* Step Indicator */}
                                 <div className="p-6 border-b border-slate-100 dark:border-slate-700">
-                                    <div className="flex items-center justify-between max-w-lg mx-auto">
+                                    <div className="flex items-center justify-between max-w-2xl mx-auto">
                                         {FORM_STEPS.map((step, i) => {
                                             const StepIcon = step.icon;
                                             const isActive = i === currentStep;
@@ -1126,20 +1183,20 @@ const CareerDataFetcher = () => {
                                                 <div key={step.id} className="flex items-center">
                                                     <button
                                                         onClick={() => i <= currentStep && setCurrentStep(i)}
-                                                        className={`relative flex flex - col items - center gap - 2 transition - all duration - 300 ${i <= currentStep ? 'cursor-pointer' : 'cursor-default'} `}
+                                                        className={`relative flex flex-col items-center gap-2 transition-all duration-300 ${i <= currentStep ? 'cursor-pointer' : 'cursor-default'}`}
                                                     >
-                                                        <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center transition - all duration - 300 ${isActive ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 scale-110'
+                                                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 scale-110'
                                                             : isCompleted ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                                                                 : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
-                                                            } `}>
+                                                            }`}>
                                                             {isCompleted ? <CheckCircle2 size={20} /> : <StepIcon size={20} />}
                                                         </div>
-                                                        <span className={`text - [10px] font - bold uppercase tracking - wider hidden md:block ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'} `}>
+                                                        <span className={`text-[10px] font-bold uppercase tracking-wider hidden md:block ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`}>
                                                             {step.title}
                                                         </span>
                                                     </button>
                                                     {i < FORM_STEPS.length - 1 && (
-                                                        <div className={`w - 12 lg: w - 20 h - 0.5 mx - 2 rounded - full transition - colors ${i < currentStep ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'} `} />
+                                                        <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors ${i < currentStep ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
                                                     )}
                                                 </div>
                                             );
