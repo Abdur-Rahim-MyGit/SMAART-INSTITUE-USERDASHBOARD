@@ -107,7 +107,7 @@ const FormTextarea = ({ label, name, value, onChange, placeholder, required, ico
                 placeholder={placeholder}
                 required={required}
                 rows={3}
-                className={`w - full ${Icon ? 'pl-12' : 'pl-4'} pr - 4 py - 3.5 rounded - xl border - 2 border - slate - 200 dark: border - slate - 600 bg - white dark: bg - slate - 800 text - slate - 800 dark: text - white placeholder - slate - 400 transition - all duration - 300 focus: outline - none focus: border - indigo - 500 focus: ring - 4 focus: ring - indigo - 500 / 10 hover: border - slate - 300 dark: hover: border - slate - 500 resize - none`}
+                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 hover:border-slate-300 dark:hover:border-slate-500 resize-none`}
             />
         </div>
     </div>
@@ -164,7 +164,7 @@ const ReportSection = ({ title, icon: Icon, color, children, delay = 0 }) => {
                 className="w-full px-6 py-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
             >
                 <div className="flex items-center gap-4">
-                    <div className={`w - 12 h - 12 rounded - xl flex items - center justify - center bg - gradient - to - br ${color} text - white shadow - lg`}>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${color} text-white shadow-lg`}>
                         <Icon size={22} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
@@ -204,7 +204,7 @@ const SkillTag = ({ text, variant = 'default' }) => {
     };
 
     return (
-        <span className={`inline - flex items - center px - 3 py - 1.5 rounded - lg text - xs font - semibold border ${variants[variant]} transition - all duration - 200 hover: scale - 105`}>
+        <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold border ${variants[variant]} transition-all duration-200 hover:scale-105`}>
             {text}
         </span>
     );
@@ -219,7 +219,7 @@ const PriorityBadge = ({ priority }) => {
     };
 
     return (
-        <span className={`px - 2 py - 0.5 rounded - md text - [10px] font - bold uppercase tracking - wider border ${colors[priority] || colors.Medium} `}>
+        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${colors[priority] || colors.Medium}`}>
             {priority}
         </span>
     );
@@ -495,29 +495,52 @@ const CareerDataFetcher = () => {
                 );
             case 2:
                 return (
-                    <motion.div key="interest" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
+                    <motion.div key="interest" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-8">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
-                                Select Your Area of Interest <span className="text-red-500">*</span>
-                            </label>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {AREAS_OF_INTEREST.map(area => (
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2.5 rounded-xl bg-indigo-500 text-white shadow-lg shadow-indigo-500/30">
+                                    <Sparkles size={22} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-black text-slate-800 dark:text-white">Choose Your Passion</h3>
+                                    <p className="text-sm text-slate-500">Select the area that best describes your career interest</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                                {[
+                                    { name: 'Technology', icon: '💻' },
+                                    { name: 'Business', icon: '💼' },
+                                    { name: 'Healthcare', icon: '🏥' },
+                                    { name: 'Finance', icon: '📈' },
+                                    { name: 'Creative', icon: '🎨' },
+                                    { name: 'Core Engineering', icon: '⚙️' },
+                                    { name: 'Education', icon: '🎓' },
+                                    { name: 'Government', icon: '🏛️' },
+                                    { name: 'Others', icon: '✨' }
+                                ].map(item => (
                                     <button
-                                        key={area}
+                                        key={item.name}
                                         type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, areaOfInterest: area }))}
-                                        className={`p-4 rounded-xl border-2 text-sm font-semibold transition-all duration-300 ${formData.areaOfInterest === area
-                                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-lg shadow-indigo-500/20 scale-[1.02]'
-                                            : 'border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                                        onClick={() => handleSelect('areaOfInterest', item.name)}
+                                        className={`group p-6 rounded-3xl border-2 text-center transition-all duration-300 flex flex-col items-center gap-4 ${formData.areaOfInterest === item.name
+                                            ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-xl shadow-indigo-500/10 scale-105'
+                                            : 'border-slate-100 dark:border-slate-700/50 text-slate-600 dark:text-slate-400 hover:border-indigo-200 hover:bg-slate-50 dark:hover:bg-slate-800'
                                             }`}
                                     >
-                                        {area}
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl transition-transform group-hover:scale-110 ${formData.areaOfInterest === item.name ? 'bg-white dark:bg-slate-800 shadow-md' : 'bg-slate-50 dark:bg-slate-700/50'}`}>
+                                            {item.icon}
+                                        </div>
+                                        <span className="text-sm font-bold tracking-tight">{item.name}</span>
                                     </button>
                                 ))}
                             </div>
                         </div>
+
                         {formData.areaOfInterest === 'Others' && (
-                            <FormInput label="Specify Your Area" name="areaOfInterestOther" value={formData.areaOfInterestOther} onChange={handleInputChange} placeholder="e.g., Agriculture Tech, Space Engineering" icon={Lightbulb} />
+                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                                <FormInput label="Specify Your Area" name="areaOfInterestOther" value={formData.areaOfInterestOther} onChange={handleInputChange} placeholder="e.g., Agriculture Tech, Space Engineering" icon={Lightbulb} required />
+                            </motion.div>
                         )}
                     </motion.div>
                 );
@@ -573,48 +596,56 @@ const CareerDataFetcher = () => {
             case 4:
                 return (
                     <motion.div key="domain" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
-                        <div className="p-6 rounded-3xl bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 mb-6">
-                            <div className="flex items-center gap-3 mb-3">
-                                <AlertTriangle className="text-amber-500" />
-                                <h3 className="text-lg font-bold text-amber-900 dark:text-amber-200">Critical Confirmation</h3>
-                            </div>
-                            <p className="text-sm text-amber-800/80 dark:text-amber-200/60 leading-relaxed italic">
-                                "Which domain should the data be generated from?"
-                            </p>
-                            <p className="text-xs text-amber-700/60 dark:text-amber-200/40 mt-3">
-                                Select the specific ecosystem where you want to build your career. The engine will strictly use data from this domain only.
-                            </p>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
-                                Select Generation Domain <span className="text-red-500">*</span>
-                            </label>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                {DOMAINS.map(domain => (
-                                    <button
-                                        key={domain}
-                                        type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, domain: domain }))}
-                                        className={`p-4 rounded-xl border-2 text-left text-sm font-semibold transition-all duration-300 ${formData.domain === domain
-                                            ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-lg shadow-indigo-500/20 scale-[1.02]'
-                                            : 'border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                                            }`}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <span>{domain}</span>
-                                            {formData.domain === domain && <CheckCircle2 size={16} className="text-indigo-500" />}
+                        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                            <div className="lg:col-span-2">
+                                <div className="p-8 rounded-[2rem] bg-gradient-to-br from-indigo-600 to-purple-700 text-white relative overflow-hidden h-full">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+                                    <div className="relative z-10 flex flex-col h-full">
+                                        <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center mb-6">
+                                            <AlertTriangle size={24} />
                                         </div>
-                                    </button>
-                                ))}
+                                        <h3 className="text-2xl font-black mb-4">Confirm Target</h3>
+                                        <p className="text-white/80 text-sm leading-relaxed mb-8">
+                                            The system will strictly generate skills, roadmap, and market data based on the selected domain.
+                                        </p>
+                                        <div className="mt-auto p-4 rounded-2xl bg-black/20 border border-white/10">
+                                            <p className="text-[10px] uppercase font-black tracking-widest text-indigo-300 mb-1">Target Role</p>
+                                            <p className="text-lg font-bold">{formData.interestedJobRole || 'Not Selected'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="lg:col-span-3 space-y-6">
+                                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                                    Which domain should the data be generated from? <span className="text-red-500">*</span>
+                                </label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[400px] overflow-y-auto pr-2 no-scrollbar">
+                                    {DOMAINS.map(domain => (
+                                        <button
+                                            key={domain}
+                                            type="button"
+                                            onClick={() => setFormData(prev => ({ ...prev, domain: domain }))}
+                                            className={`p-4 rounded-2xl border-2 text-left transition-all duration-300 group ${formData.domain === domain
+                                                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-xl shadow-indigo-500/10'
+                                                : 'border-slate-100 dark:border-slate-700/50 text-slate-600 dark:text-slate-400 hover:border-slate-200 dark:hover:bg-slate-700/30'
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-bold group-hover:translate-x-1 transition-transform">{domain}</span>
+                                                {formData.domain === domain ? <CheckCircle2 size={18} className="text-indigo-500" /> : <div className="w-5 h-5 rounded-full border border-slate-200 dark:border-slate-600" />}
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {formData.domain === 'Others' && (
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                                        <FormInput label="Specify Custom Domain" name="domainOther" value={formData.domainOther} onChange={handleInputChange} placeholder="e.g., Quantum Computing, Neurotech" icon={Target} required />
+                                    </motion.div>
+                                )}
                             </div>
                         </div>
-
-                        {formData.domain === 'Others' && (
-                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                                <FormInput label="Specify Target Domain" name="domainOther" value={formData.domainOther} onChange={handleInputChange} placeholder="e.g., Aerospace Engineering, Quantum Computing" required icon={Lightbulb} />
-                            </motion.div>
-                        )}
                     </motion.div>
                 );
             default:
@@ -682,15 +713,16 @@ const CareerDataFetcher = () => {
                 </motion.div>
 
                 {/* Action Bar */}
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 p-4 bg-slate-50/50 dark:bg-slate-700/30 rounded-2xl border border-slate-100 dark:border-slate-700/50 backdrop-blur-sm sticky top-4 z-40">
                     <button onClick={startNew} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl">
                         <RefreshCw size={16} /> Generate New
                     </button>
-                    <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all">
+                    <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all shadow-sm">
                         <FileText size={16} /> View Form
                     </button>
+                    <div className="h-10 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block" />
                     <button onClick={handleDownloadPDF} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl ml-auto">
-                        <Download size={16} /> Download Report
+                        <Download size={16} /> PDF
                     </button>
                     <button
                         onClick={() => handleExportToExcel({ reportId: report._id || report.id })}
@@ -698,9 +730,67 @@ const CareerDataFetcher = () => {
                         className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-sm transition-all shadow-lg shadow-amber-500/30 hover:shadow-xl"
                     >
                         {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Table size={16} />}
-                        Convert into Excel
+                        Export to Excel
                     </button>
                 </div>
+
+                {/* 0. Blueprint Dashboard Summary */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl flex flex-col items-center justify-center text-center">
+                        <CircularProgress percentage={output.careerMatchPercentage || 85} label="Career Alignment" color="#6366f1" size={140} />
+                        <p className="text-xs text-slate-400 mt-4 leading-relaxed max-w-[180px]">Based on your goals and background match to {report.careerInput?.interestedJobRole}</p>
+                    </div>
+
+                    <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-500/5 dark:to-slate-800 p-6 rounded-3xl border border-indigo-100 dark:border-indigo-500/20 shadow-lg group hover:scale-[1.02] transition-transform">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="p-3 rounded-2xl bg-indigo-500 text-white shadow-lg shadow-indigo-500/30">
+                                    <Target size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-bold text-slate-400 uppercase tracking-tighter">Target Domain</h4>
+                                    <p className="text-lg font-black text-slate-800 dark:text-white leading-tight">{report.domain || report.careerInput?.domain || 'General'}</p>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-xs">
+                                    <span className="text-slate-500">Market Demand</span>
+                                    <span className="text-emerald-500 font-bold">{output.marketDemand?.demandLevel || 'High'}</span>
+                                </div>
+                                <div className="w-full h-1.5 bg-indigo-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                    <motion.div initial={{ width: 0 }} animate={{ width: '85%' }} className="h-full bg-indigo-500" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-purple-50 to-white dark:from-purple-500/5 dark:to-slate-800 p-6 rounded-3xl border border-purple-100 dark:border-purple-500/20 shadow-lg group hover:scale-[1.02] transition-transform">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="p-3 rounded-2xl bg-purple-500 text-white shadow-lg shadow-purple-500/30">
+                                    <Zap size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-bold text-slate-400 uppercase tracking-tighter">Skill Gap</h4>
+                                    <p className="text-xl font-black text-slate-800 dark:text-white">{output.skillGapPercentage || 45}%</p>
+                                </div>
+                            </div>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed italic">
+                                "Focus on AI-specific tools to bridge this gap in the next 6 months."
+                            </p>
+                        </div>
+
+                        <div className="sm:col-span-2 bg-gradient-to-r from-slate-900 to-indigo-900 p-6 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                                <Brain size={120} />
+                            </div>
+                            <div className="relative z-10">
+                                <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2">AI Intelligence Tip</h4>
+                                <p className="text-white text-sm font-medium leading-relaxed max-w-lg">
+                                    Leverage tools like <span className="text-indigo-300 underline decoration-indigo-300/30 underline-offset-4">{output.aiSkills?.tools?.[0]?.name || 'Generative AI'}</span> to enhance your daily workflow in {report.careerInput?.interestedJobRole}.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
 
                 {/* 1. Technical Skills */}
                 <ReportSection title="Technical Skills Required" icon={Code} color="from-blue-500 to-cyan-500" delay={0.1}>
@@ -1113,10 +1203,10 @@ const CareerDataFetcher = () => {
                                     {/* Simulation Engine Toggle */}
                                     <button
                                         onClick={() => setShowSimPanel(prev => !prev)}
-                                        className={`p - 2 rounded - lg border transition - all shadow - sm active: scale - 95 flex items - center gap - 1.5 text - xs font - bold ${showSimPanel
+                                        className={`p-2 rounded-lg border transition-all shadow-sm active:scale-95 flex items-center gap-1.5 text-xs font-bold ${showSimPanel
                                             ? 'bg-violet-600 border-violet-600 text-white shadow-violet-500/30'
                                             : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-violet-500 hover:border-violet-300 dark:hover:border-violet-500/30'
-                                            } `}
+                                            }`}
                                         title="Career Simulation Engine"
                                     >
                                         <Cpu size={16} />
@@ -1221,8 +1311,8 @@ const CareerDataFetcher = () => {
                                     <button
                                         onClick={() => currentStep > 0 && setCurrentStep(currentStep - 1)}
                                         disabled={currentStep === 0}
-                                        className={`flex items - center gap - 2 px - 5 py - 2.5 rounded - xl font - semibold text - sm transition - all ${currentStep === 0 ? 'opacity-40 cursor-not-allowed text-slate-400' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
-                                            } `}
+                                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${currentStep === 0 ? 'opacity-40 cursor-not-allowed text-slate-400' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                            }`}
                                     >
                                         <ArrowLeft size={16} /> Back
                                     </button>
@@ -1237,10 +1327,10 @@ const CareerDataFetcher = () => {
                                         <button
                                             onClick={() => validateStep() && setCurrentStep(currentStep + 1)}
                                             disabled={!validateStep()}
-                                            className={`flex items - center gap - 2 px - 6 py - 2.5 rounded - xl font - semibold text - sm transition - all ${validateStep()
+                                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${validateStep()
                                                 ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:scale-[1.02]'
                                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
-                                                } `}
+                                                }`}
                                         >
                                             Next <ArrowRight size={16} />
                                         </button>
@@ -1248,10 +1338,10 @@ const CareerDataFetcher = () => {
                                         <button
                                             onClick={handleSubmit}
                                             disabled={!validateStep() || isGenerating}
-                                            className={`flex items - center gap - 2 px - 8 py - 3 rounded - xl font - bold text - sm transition - all ${validateStep() && !isGenerating
+                                            className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm transition-all ${validateStep() && !isGenerating
                                                 ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 hover:shadow-xl hover:scale-[1.02]'
                                                 : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
-                                                } `}
+                                                }`}
                                         >
                                             {isGenerating ? <><Loader2 size={16} className="animate-spin" /> Generating...</> : <><Brain size={16} /> Generate Career Intelligence</>}
                                         </button>
@@ -1311,7 +1401,7 @@ const CareerDataFetcher = () => {
                                                 { label: 'Bulk MongoDB Insert', icon: '💾', color: 'bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-200 dark:border-violet-500/20' },
                                                 { label: 'ML-Ready Dataset', icon: '🤖', color: 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/20' },
                                             ].map((b, i) => (
-                                                <span key={i} className={`inline - flex items - center gap - 1.5 px - 3 py - 1.5 rounded - lg text - xs font - bold border ${b.color} `}>
+                                                <span key={i} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border ${b.color}`}>
                                                     {b.icon} {b.label}
                                                 </span>
                                             ))}
@@ -1345,10 +1435,10 @@ const CareerDataFetcher = () => {
                                             <button
                                                 onClick={handleRunSimulation}
                                                 disabled={isSimulating}
-                                                className={`flex items - center gap - 3 px - 8 py - 3.5 rounded - xl font - black text - sm transition - all whitespace - nowrap ${isSimulating
+                                                className={`flex items-center gap-3 px-8 py-3.5 rounded-xl font-black text-sm transition-all whitespace-nowrap ${isSimulating
                                                     ? 'bg-violet-300 dark:bg-violet-800 text-white cursor-not-allowed'
                                                     : 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-xl shadow-violet-500/30 hover:shadow-2xl hover:scale-[1.03] active:scale-100'
-                                                    } `}
+                                                    }`}
                                             >
                                                 {isSimulating
                                                     ? <><Loader2 size={18} className="animate-spin" /> Simulating...</>
@@ -1382,7 +1472,7 @@ const CareerDataFetcher = () => {
                                                     ].map((stat, i) => (
                                                         <div key={i} className="text-center p-3 rounded-xl bg-white dark:bg-slate-800/60 border border-violet-100 dark:border-violet-500/10">
                                                             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{stat.label}</p>
-                                                            <p className={`text - 2xl font - black ${stat.color} `}>{stat.value}</p>
+                                                            <p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
                                                         </div>
                                                     ))}
                                                 </div>
