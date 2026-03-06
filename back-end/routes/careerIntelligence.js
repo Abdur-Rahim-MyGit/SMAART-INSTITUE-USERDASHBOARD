@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const careerIntelligenceController = require('../controllers/careerIntelligenceController');
+const careerSimulationController = require('../controllers/careerSimulationController');
 
 /**
  * Career Intelligence Routes
@@ -28,5 +29,9 @@ router.delete('/reports/:id', careerIntelligenceController.deleteReport);
 
 // Admin: Force refresh Excel data cache
 router.post('/refresh-cache', careerIntelligenceController.refreshExcelCache);
+
+// ── Career Simulation Engine (isolated, no AI cost) ──
+router.post('/simulate', careerSimulationController.runSimulation);
+router.get('/simulate/batches', careerSimulationController.getSimulationBatches);
 
 module.exports = router;
