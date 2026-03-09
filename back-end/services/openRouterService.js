@@ -282,6 +282,62 @@ STRICT RULES:
 
         return this.chat(messages, systemPrompt);
     }
+
+    /**
+     * Career Guide Agent AI - Highly Structured Report
+     */
+    async generateCareerGuide(inputData, excelContext) {
+        const systemPrompt = `You are the SMAART Career Guide Agent AI. Your task is to transform student data and verified Excel context into a personalized career intelligence report.
+        
+RESPONSE FORMAT: You MUST return ONLY valid JSON matching the schema provided. No conversational text. No markdown blocks.
+
+JSON STRUCTURE:
+{
+  "learningPathOverview": "Combined learning strategy for all 3 job preferences. Identify overlapping skills.",
+  "careerZones": {
+    "primary": {
+      "zone": "Green/Amber/Red",
+      "skillCoverage": 0-100,
+      "hiringLikelihood": "Green/Amber/Red",
+      "marketIntelligence": { "demandTrends": "Description", "salaryRange": "Range" }
+    },
+    "secondary": { "zone": "Green/Amber/Red", "skillCoverage": 0-100, "hiringLikelihood": "Green/Amber/Red", "marketIntelligence": { "demandTrends": "Description", "salaryRange": "Range" } },
+    "tertiary": { "zone": "Green/Amber/Red", "skillCoverage": 0-100, "hiringLikelihood": "Green/Amber/Red", "marketIntelligence": { "demandTrends": "Description", "salaryRange": "Range" } }
+  },
+  "technicalSkills": {
+    "mustHave": ["5 essential skills"],
+    "niceToHave": ["5 competitive skills"]
+  },
+  "aiTools": {
+    "mustHave": ["5 essential AI tools"],
+    "niceToHave": ["5 competitive AI tools"]
+  },
+  "learningPathway": {
+    "certifications": ["Recommended certification programs"],
+    "courses": { "free": ["List free courses"], "paid": ["List paid courses"] },
+    "projects": ["Suggested practical projects"]
+  }
+}
+
+ZONE LOGIC:
+1. Skill Coverage: >50% = Green, 25-50% = Amber, <25% = Red (Based on degree vs role).
+2. Hiring Likelihood: How likely employers are to hire this degree for this role (Green/Amber/Red).
+3. Final Zone: Select the MORE favorable of the two.`;
+
+        const userMessage = `Generate the Career Guide Report based on this data:
+STUDENT PROFILE: ${JSON.stringify(inputData.education)}
+PREFERENCES: ${JSON.stringify(inputData.jobPreferences)}
+ASPIRATIONS: ${JSON.stringify(inputData.aspirations)}
+EXPERIENCE: ${JSON.stringify(inputData.workExperience)}
+CURRENT SKILLS: ${JSON.stringify(inputData.skillsAndCertifications)}
+
+VERIFIED DATA CONTEXT: ${JSON.stringify(excelContext)}`;
+
+        return this.chat([{ role: 'user', content: userMessage }], systemPrompt, {
+            temperature: 0.5,
+            max_tokens: 6000
+        });
+    }
 }
 
 module.exports = new OpenRouterService();

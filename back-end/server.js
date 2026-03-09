@@ -171,6 +171,10 @@ app.post('/api/career-intelligence/export-excel', authMiddleware, careerSimulati
 
 logger.info('✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)');
 
+// Career Guide Agent AI (Multifactor Analysis)
+app.use('/api/career-guide', require('./routes/careerGuide'));
+logger.info('✅ Career Guide Agent AI Routes Loaded');
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });
