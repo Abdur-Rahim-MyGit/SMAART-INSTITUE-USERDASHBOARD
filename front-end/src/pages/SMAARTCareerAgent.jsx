@@ -29,6 +29,9 @@ const ORG_TYPES = [
 const EXPERIENCE_TYPES = ['Full-Time', 'Part-Time', 'Full-Time Internship', 'Part-Time Internship', 'Freelance or Gig Work', 'Remote Work', 'Volunteering'];
 const VERIFICATION_MODES = ['URL Link', 'QR Code', 'Not Verified'];
 
+// Reusing some icons from lucide that weren't imported
+const History = Clock;
+
 const FORM_STEPS = [
     { id: 'education', title: 'Education', icon: GraduationCap, description: 'Academic foundation' },
     { id: 'preferences', title: 'Job Preferences', icon: Briefcase, description: 'Target job roles' },
@@ -36,9 +39,6 @@ const FORM_STEPS = [
     { id: 'experience', title: 'Experience', icon: History, description: 'Work history' },
     { id: 'skills', title: 'Skills & Certs', icon: Award, description: 'Verification & credentials' }
 ];
-
-// Reusing some icons from lucide that weren't imported
-const History = Clock;
 
 // ========== COMPONENTS ==========
 
