@@ -45,7 +45,7 @@ const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
 const Performance = lazy(() => import('@/pages/Performance'));
 const SMAARTWallet = lazy(() => import('@/pages/SMAARTWallet'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
-const CareerGuideAgent = lazy(() => import('@/pages/CareerGuideAgent'));
+const CareerGuideAgent = lazy(() => import('@/pages/SMAARTCareerAgent'));
 
 // AI Career Coach pages
 const AIChat = lazy(() => import('@/pages/AICareerCoach/AIChat'));

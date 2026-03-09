@@ -287,42 +287,48 @@ STRICT RULES:
      * Career Guide Agent AI - Highly Structured Report
      */
     async generateCareerGuide(inputData, excelContext) {
-        const systemPrompt = `You are the SMAART Career Guide Agent AI. Your task is to transform student data and verified Excel context into a personalized career intelligence report.
+        const systemPrompt = `You are the SMAART Career Agent AI. Your task is to transform student data and verified Excel context into a personalized career intelligence report.
         
 RESPONSE FORMAT: You MUST return ONLY valid JSON matching the schema provided. No conversational text. No markdown blocks.
 
 JSON STRUCTURE:
 {
-  "learningPathOverview": "Combined learning strategy for all 3 job preferences. Identify overlapping skills.",
+  "learningPathOverview": "A combined learning strategy for all 3 job preferences. Prioritize skills for the primary preference first, then secondary and tertiary. Identify overlapping skills.",
   "careerZones": {
     "primary": {
       "zone": "Green/Amber/Red",
       "skillCoverage": 0-100,
       "hiringLikelihood": "Green/Amber/Red",
-      "marketIntelligence": { "demandTrends": "Description", "salaryRange": "Range" }
+      "marketIntelligence": { "demandTrends": "Description of trends", "salaryRange": "Expected range" }
     },
     "secondary": { "zone": "Green/Amber/Red", "skillCoverage": 0-100, "hiringLikelihood": "Green/Amber/Red", "marketIntelligence": { "demandTrends": "Description", "salaryRange": "Range" } },
     "tertiary": { "zone": "Green/Amber/Red", "skillCoverage": 0-100, "hiringLikelihood": "Green/Amber/Red", "marketIntelligence": { "demandTrends": "Description", "salaryRange": "Range" } }
   },
   "technicalSkills": {
-    "mustHave": ["5 essential skills"],
-    "niceToHave": ["5 competitive skills"]
+    "mustHave": ["Exactly 5 essential skills"],
+    "niceToHave": ["Exactly 5 competitive enhancement skills"]
   },
   "aiTools": {
-    "mustHave": ["5 essential AI tools"],
-    "niceToHave": ["5 competitive AI tools"]
+    "mustHave": ["Exactly 5 essential AI tools/digital technologies"],
+    "niceToHave": ["Exactly 5 nice-to-have AI tools/digital technologies"]
   },
   "learningPathway": {
     "certifications": ["Recommended certification programs"],
     "courses": { "free": ["List free courses"], "paid": ["List paid courses"] },
-    "projects": ["Suggested practical projects"]
+    "projects": ["At least 3 suggested practical projects for a strong portfolio"]
   }
 }
 
 ZONE LOGIC:
-1. Skill Coverage: >50% = Green, 25-50% = Amber, <25% = Red (Based on degree vs role).
-2. Hiring Likelihood: How likely employers are to hire this degree for this role (Green/Amber/Red).
-3. Final Zone: Select the MORE favorable of the two.`;
+1. Skill Coverage (Degree Alignment): Compare user's degree to the job role requirements. 
+   - >50% coverage = Green
+   - 25-50% coverage = Amber
+   - <25% coverage = Red
+2. Employer Hiring Likelihood: 
+   - Frequent/High = Green
+   - Occasional/Moderate = Amber
+   - Rare/Low = Red
+3. Final Zone Decision: If the two results differ, choose the MORE FAVORABLE classification for the final zone to motivate the student.`;
 
         const userMessage = `Generate the Career Guide Report based on this data:
 STUDENT PROFILE: ${JSON.stringify(inputData.education)}

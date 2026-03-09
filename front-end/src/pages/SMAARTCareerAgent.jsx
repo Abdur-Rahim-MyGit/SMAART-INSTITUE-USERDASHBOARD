@@ -15,11 +15,18 @@ import excelIntelligenceApi from '@/services/careerIntelligenceApi'; // Reuse fo
 import { toast } from 'sonner';
 
 // ========== CONSTANTS ==========
-const DOMAINS = ['Engineering', 'Business & Management', 'Computer Science & IT', 'Arts & Humanities', 'Healthcare & Life Sciences', 'Law & Public Policy', 'Finance & Accounting', 'Media & Communications'];
-const DEGREE_GROUPS = ['Undergraduate Degree', 'Postgraduate Degree', 'Diploma', 'Doctorate', 'Professional Certification'];
-const JOB_TYPES = ['Full-Time', 'Part-Time', 'Freelance', 'Remote', 'Internship', 'Consultancy'];
-const SALARY_RANGES = ['3-5 LPA', '5-8 LPA', '8-12 LPA', '12-18 LPA', '18-25 LPA', '25+ LPA'];
-const ORG_TYPES = ['Startup', 'Product MNC', 'Service MNC', 'Government/Public Sector', 'NGO/Social Enterprise', 'Research Lab'];
+const DOMAINS = ['Engineering', 'Business', 'Computer Science', 'Arts', 'Healthcare', 'Management', 'Finance', 'Law', 'Life Sciences', 'Media'];
+const DEGREE_GROUPS = ['Undergraduate Degree', 'Postgraduate Degree', 'Diploma', 'Doctorate'];
+const JOB_TYPES = ['Full-Time', 'Part-Time', 'Full-Time Internship', 'Part-Time Internship', 'Freelance or Gig Work', 'Fully Remote'];
+const SALARY_RANGES = ['0–3 LPA', '3–5 LPA', '5–8 LPA', '8-12 LPA', '12-18 LPA', '18-25 LPA', '25+ LPA'];
+const ORG_TYPES = [
+    'Startup', 'High-growth scale-up', 'Small or medium enterprise',
+    'Large Indian corporate company', 'Multinational corporation',
+    'Government organization', 'Non-profit organization',
+    'Academic institution', 'Consulting firm',
+    'Family-owned business', 'Entrepreneurial venture', 'Open to any organization'
+];
+const EXPERIENCE_TYPES = ['Full-Time', 'Part-Time', 'Full-Time Internship', 'Part-Time Internship', 'Freelance or Gig Work', 'Remote Work', 'Volunteering'];
 const VERIFICATION_MODES = ['URL Link', 'QR Code', 'Not Verified'];
 
 const FORM_STEPS = [
@@ -91,7 +98,7 @@ const SelectField = ({ label, value, onChange, options, icon: Icon, required = f
 );
 
 // ========== MAIN COMPONENT ==========
-const CareerGuideAgent = () => {
+const SMAARTCareerAgent = () => {
     const [step, setStep] = useState(0);
     const [isGenerating, setIsGenerating] = useState(false);
     const [report, setReport] = useState(null);
@@ -112,6 +119,8 @@ const CareerGuideAgent = () => {
     });
 
     const [locationInput, setLocationInput] = useState('');
+
+    const showExperience = ['Undergraduate Degree', 'Postgraduate Degree'].includes(formData.education.degreeGroup);
 
     useEffect(() => {
         fetchExcelData();
@@ -240,42 +249,79 @@ const CareerGuideAgent = () => {
                     </div>
                 </FormSection>
             );
-            case 3: return (
-                <FormSection title="Work Experience" description="Tell us where you've worked before (Optional)." icon={History}>
-                    <div className="space-y-4">
-                        {formData.workExperience.map((exp, i) => (
-                            <div key={i} className="p-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 relative">
-                                <button onClick={() => setFormData({ ...formData, workExperience: formData.workExperience.filter((_, idx) => idx !== i) })} className="absolute top-4 right-4 text-slate-400 hover:text-red-500"><Trash2 size={18} /></button>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <InputField label="Organization" value={exp.organizationName} onChange={e => {
-                                        const newExp = [...formData.workExperience];
-                                        newExp[i].organizationName = e.target.value;
-                                        setFormData({ ...formData, workExperience: newExp });
-                                    }} />
-                                    <InputField label="Designation" value={exp.designation} onChange={e => {
-                                        const newExp = [...formData.workExperience];
-                                        newExp[i].designation = e.target.value;
-                                        setFormData({ ...formData, workExperience: newExp });
-                                    }} />
-                                    <InputField label="Sector" value={exp.sector} onChange={e => {
-                                        const newExp = [...formData.workExperience];
-                                        newExp[i].sector = e.target.value;
-                                        setFormData({ ...formData, workExperience: newExp });
-                                    }} />
-                                    <SelectField label="Type" options={JOB_TYPES} value={exp.experienceType} onChange={e => {
-                                        const newExp = [...formData.workExperience];
-                                        newExp[i].experienceType = e.target.value;
-                                        setFormData({ ...formData, workExperience: newExp });
-                                    }} />
-                                </div>
-                            </div>
-                        ))}
-                        <button onClick={addExperience} className="w-full p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl text-slate-500 hover:border-indigo-500 hover:text-indigo-500 transition-all flex items-center justify-center gap-2">
-                            <Plus size={20} /> Add Experience
-                        </button>
+            case 3:
+                if (!showExperience) return (
+                    <div className="p-12 text-center space-y-4">
+                        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-slate-400">
+                            <Lock size={32} />
+                        </div>
+                        <h3 className="text-xl font-bold italic">Section Locked</h3>
+                        <p className="text-slate-500 max-w-sm mx-auto font-medium">Work experience is typically analyzed for Undergraduate or Postgraduate students. Please continue to the next section.</p>
                     </div>
-                </FormSection>
-            );
+                );
+                return (
+                    <FormSection title="Work Experience" description="Tell us where you've worked before (Optional)." icon={History}>
+                        <div className="space-y-4">
+                            {formData.workExperience.map((exp, i) => (
+                                <div key={i} className="p-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 relative">
+                                    <button onClick={() => setFormData({ ...formData, workExperience: formData.workExperience.filter((_, idx) => idx !== i) })} className="absolute top-4 right-4 text-slate-400 hover:text-red-500"><Trash2 size={18} /></button>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <InputField label="Organization" value={exp.organizationName} onChange={e => {
+                                            const newExp = [...formData.workExperience];
+                                            newExp[i].organizationName = e.target.value;
+                                            setFormData({ ...formData, workExperience: newExp });
+                                        }} />
+                                        <InputField label="Designation" value={exp.designation} onChange={e => {
+                                            const newExp = [...formData.workExperience];
+                                            newExp[i].designation = e.target.value;
+                                            setFormData({ ...formData, workExperience: newExp });
+                                        }} />
+                                        <InputField label="Sector" value={exp.sector} onChange={e => {
+                                            const newExp = [...formData.workExperience];
+                                            newExp[i].sector = e.target.value;
+                                            setFormData({ ...formData, workExperience: newExp });
+                                        }} />
+                                        <SelectField label="Type" options={EXPERIENCE_TYPES} value={exp.experienceType} onChange={e => {
+                                            const newExp = [...formData.workExperience];
+                                            newExp[i].experienceType = e.target.value;
+                                            setFormData({ ...formData, workExperience: newExp });
+                                        }} />
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-semibold">Start Date</label>
+                                            <input type="date" value={exp.startDate} onChange={e => {
+                                                const newExp = [...formData.workExperience];
+                                                newExp[i].startDate = e.target.value;
+                                                setFormData({ ...formData, workExperience: newExp });
+                                            }} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none" />
+                                        </div>
+                                        {!exp.currentlyWorking && (
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-semibold">End Date</label>
+                                                <input type="date" value={exp.endDate} onChange={e => {
+                                                    const newExp = [...formData.workExperience];
+                                                    newExp[i].endDate = e.target.value;
+                                                    setFormData({ ...formData, workExperience: newExp });
+                                                }} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 outline-none" />
+                                            </div>
+                                        )}
+                                        <div className="flex items-center gap-2 pt-2">
+                                            <input type="checkbox" checked={exp.currentlyWorking} onChange={e => {
+                                                const newExp = [...formData.workExperience];
+                                                newExp[i].currentlyWorking = e.target.checked;
+                                                if (e.target.checked) newExp[i].endDate = '';
+                                                setFormData({ ...formData, workExperience: newExp });
+                                            }} id={`current-${i}`} className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                                            <label htmlFor={`current-${i}`} className="text-sm font-medium text-slate-700 dark:text-slate-300">Currently working here</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                            <button onClick={addExperience} className="w-full p-4 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl text-slate-500 hover:border-indigo-500 hover:text-indigo-500 transition-all flex items-center justify-center gap-2">
+                                <Plus size={20} /> Add Experience
+                            </button>
+                        </div>
+                    </FormSection>
+                );
             case 4: return (
                 <FormSection title="Skills & Certifications" description="Showcase your verified credentials for industry trust." icon={Award}>
                     <div className="space-y-4">
@@ -291,6 +337,11 @@ const CareerGuideAgent = () => {
                                     <InputField label="Certificate Name" value={cert.certificateName} onChange={e => {
                                         const newCerts = [...formData.skillsAndCertifications];
                                         newCerts[i].certificateName = e.target.value;
+                                        setFormData({ ...formData, skillsAndCertifications: newCerts });
+                                    }} />
+                                    <SelectField label="Year of Completion" options={Array.from({ length: 31 }, (_, i) => 2010 + i).map(String)} value={cert.yearOfCompletion} onChange={e => {
+                                        const newCerts = [...formData.skillsAndCertifications];
+                                        newCerts[i].yearOfCompletion = e.target.value;
                                         setFormData({ ...formData, skillsAndCertifications: newCerts });
                                     }} />
                                     <SelectField label="Verification Mode" options={VERIFICATION_MODES} value={cert.verificationMode} onChange={e => {
@@ -536,7 +587,7 @@ const CareerGuideAgent = () => {
                                     <div className="p-3 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
                                         <Brain size={28} />
                                     </div>
-                                    <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-800 dark:text-white">Career Guide Agent AI</h1>
+                                    <h1 className="text-3xl md:text-4xl font-black tracking-tight text-slate-800 dark:text-white">SMAART Career Agent AI</h1>
                                 </div>
                                 <p className="text-slate-500 dark:text-slate-400 font-medium">Multifactor Career Intelligence • Zone-Based Strategic Analysis</p>
                             </motion.div>
@@ -609,4 +660,4 @@ const CareerGuideAgent = () => {
     );
 };
 
-export default CareerGuideAgent;
+export default SMAARTCareerAgent;

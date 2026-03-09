@@ -29,7 +29,7 @@ const toolkitSections = [
   },
   {
     id: 10,
-    title: "Career Guide Agent AI",
+    title: "SMAART Career Agent AI",
     description: "Multifactor Career Intelligence System — professional zone-based analysis (Green/Amber/Rec) covering 3 job preferences, deep skill gaps, and learning pathways.",
     icon: Brain,
     path: "/dashboard/career-guide",
