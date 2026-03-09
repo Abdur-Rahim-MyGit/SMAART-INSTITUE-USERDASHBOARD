@@ -28,6 +28,17 @@ const toolkitSections = [
     badgeColor: "from-indigo-600 to-pink-600"
   },
   {
+    id: 10,
+    title: "Career Guide Agent AI",
+    description: "Multifactor Career Intelligence System — professional zone-based analysis (Green/Amber/Rec) covering 3 job preferences, deep skill gaps, and learning pathways.",
+    icon: Brain,
+    path: "/dashboard/career-guide",
+    color: "from-emerald-500 to-blue-600",
+    iconColor: "text-emerald-500",
+    badge: "Multifactor",
+    badgeColor: "from-emerald-600 to-blue-600"
+  },
+  {
     id: 1,
     title: "AI Career Chat",
     description: "Engage with your intelligent career strategist. Receive real-time, personalized guidance and industry insights 24/7 to accelerate your professional trajectory.",

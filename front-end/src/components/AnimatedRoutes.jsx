@@ -45,6 +45,7 @@ const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
 const Performance = lazy(() => import('@/pages/Performance'));
 const SMAARTWallet = lazy(() => import('@/pages/SMAARTWallet'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
+const CareerGuideAgent = lazy(() => import('@/pages/CareerGuideAgent'));
 
 // AI Career Coach pages
 const AIChat = lazy(() => import('@/pages/AICareerCoach/AIChat'));
@@ -145,6 +146,7 @@ const AnimatedRoutes = () => {
 
                     {/* Career Data Fetcher */}
                     <Route path="/dashboard/career-data-fetcher" element={<AssessmentFlowGuard><CareerDataFetcher /></AssessmentFlowGuard>} />
+                    <Route path="/dashboard/career-guide" element={<AssessmentFlowGuard><CareerGuideAgent /></AssessmentFlowGuard>} />
 
 
 
