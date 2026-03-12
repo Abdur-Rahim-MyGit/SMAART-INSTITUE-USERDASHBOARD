@@ -223,14 +223,30 @@ const buildCareerIntelligencePrompt = (input, excelContext) => {
 
   // Role metadata
   const roleMeta = roleData.roleMeta;
+  const targetDomain = input.domain === 'Others' ? input.domainOther : input.domain;
 
   return `You are the SMAART Career Intelligence Engine — an enterprise-grade career advisor powered by verified career databases and AI intelligence.
 
-A student has submitted their career profile. Using the VERIFIED STRUCTURED DATA below AND your knowledge, generate a comprehensive Career Intelligence Report.
+CRITICAL INSTRUCTION: GENERATION DOMAIN CONTROL
+===============================================
+The user has confirmed the following Generation Domain: "${targetDomain}".
+You MUST generate a structured career intelligence report based ONLY on this selected Generation Domain.
+
+Fetch and generate ONLY domain-specific data including:
+1. Technical skills related to the selected domain: ${targetDomain}
+2. Certifications relevant to the selected domain: ${targetDomain}
+3. Tools and technologies used in the selected domain: ${targetDomain}
+4. AI tools specific to the selected domain: ${targetDomain}
+5. Career roadmap within the selected domain: ${targetDomain}
+6. Market demand data within the selected domain: ${targetDomain}
+7. Future scope and automation analysis within the selected domain: ${targetDomain}
+
+STRICT RULE: Do not include any skills, certifications, tools, or data from other domains. Ensure all generated content strictly aligns with the selected domain ("${targetDomain}") and the user’s chosen job role ("${input.interestedJobRole}"). Maintain logical consistency and domain accuracy throughout the output. No unrelated domain data should appear.
 
 ═══════════════════════════════════════════════════════
 STUDENT CAREER PROFILE
 ═══════════════════════════════════════════════════════
+• Generation Domain: ${targetDomain}
 • Short-Term Goal (1-2 years): ${input.shortTermGoal}
 • Long-Term Goal (5+ years): ${input.longTermGoal}
 • Degree: ${input.degree}
@@ -407,7 +423,7 @@ const generateCareerReport = async (req, res) => {
     const careerInput = req.body;
 
     // Validate required fields
-    const required = ['shortTermGoal', 'longTermGoal', 'degree', 'specialization', 'areaOfInterest', 'interestedJobRole', 'jobSector'];
+    const required = ['shortTermGoal', 'longTermGoal', 'degree', 'specialization', 'areaOfInterest', 'interestedJobRole', 'jobSector', 'domain'];
     const missing = required.filter(field => !careerInput[field]);
     if (missing.length > 0) {
       return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}` });
@@ -436,6 +452,7 @@ const generateCareerReport = async (req, res) => {
       careerInput,
       status: 'processing',
       version: existingCount + 1,
+      domain: careerInput.domain === 'Others' ? careerInput.domainOther : careerInput.domain,
     });
     await careerRecord.save();
 

@@ -1,326 +1,404 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Lock,
-  ChevronLeft,
-  ChevronRight,
-  PlayCircle
-} from "lucide-react";
-import { coursesAPI } from "@/services/api";
+import { Lock, ChevronRight } from "lucide-react";
+
+const STEPS = [
+  {
+    id: 1,
+    label: "STEP 01",
+    title: "Capacity",
+    subtitle: "Level 1: Foundations",
+    description: "Build the foundational skills and resources to perform at your best in any environment.",
+    active: true,
+  },
+  {
+    id: 2,
+    label: "STEP 02",
+    title: "Capability",
+    subtitle: "Level 2: Intermediate",
+    description: "Develop core competencies and technical expertise to excel in your chosen field.",
+    active: false,
+  },
+  {
+    id: 3,
+    label: "STEP 03",
+    title: "Leadership",
+    subtitle: "Level 3: Advanced",
+    description: "Cultivate the mindset and vision to lead teams and drive meaningful change.",
+    active: false,
+  },
+];
 
 const CoursePathway = ({ onCourseClick }) => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const scrollContainerRef = useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
-  // --- Configuration ---
-  const CARD_WIDTH = isMobile ? 280 : 320;
-  const GAP_X = isMobile ? 120 : 280; 
-  const NODE_X_SPACING = CARD_WIDTH + GAP_X; 
-  const ROAD_Y = isMobile ? 240 : 280; 
-
-  const STEPS_CONFIG = [
-    { color: "#3B82F6", label: "01" },
-    { color: "#06B6D4", label: "02" },
-    { color: "#14B8A6", label: "03" },
-    { color: "#8B5CF6", label: "04" },
-    { color: "#F59E0B", label: "05" },
-    { color: "#EC4899", label: "06" },
-    { color: "#10B981", label: "07" },
-  ];
-
-  const getStepConfig = (index) => STEPS_CONFIG[index % STEPS_CONFIG.length];
-
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setLoading(true);
-        const demoData = [
-          { id: 1, title: "Introduction to User Experience", description: "Learn the fundamentals of UX design and user-centric thinking." },
-          { id: 2, title: "Wireframing & Prototyping", description: "Master the art of creating low and high-fidelity prototypes." },
-          { id: 3, title: "Visual Design Principles", description: "Explore color theory, typography, and layout hierarchies." },
-          { id: 4, title: "Design Systems & Components", description: "Build scalable and consistent design systems for large teams." },
-          { id: 5, title: "Usability Testing Methods", description: "Validate your decisions with real user testing sessions." },
-          { id: 6, title: "Accessibility & Inclusion", description: "Ensure your designs are usable by everyone, everywhere." },
-          { id: 7, title: "Final Capstone Project", description: "Apply all your skills in a comprehensive final portfolio project." },
-        ];
-
-        const response = await coursesAPI.getAll();
-        const coursesData = response.data || response;
-        const finalData = (Array.isArray(coursesData) && coursesData.length > 0) ? coursesData : demoData;
-        setCourses(finalData);
-      } catch (err) {
-        console.error('Error fetching courses:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourses();
-
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const checkScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-    }
-  };
+  return (
+    <div className="w-full select-none">
+      {/* ── MY COURSES Header ── */}
+      <div style={{
+        background: '#1a3884',
+        padding: '18px 0 14px',
+        textAlign: 'center',
+        position: 'relative',
+        marginBottom: '0',
+      }}>
 
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener('scroll', checkScroll, { passive: true });
-      checkScroll();
-    }
-    return () => container?.removeEventListener('scroll', checkScroll);
-  }, [courses]);
+        <h2 style={{
+          color: '#ffffff',
+          fontFamily: "'Playfair Display', 'Georgia', serif",
+          fontSize: '28px',
+          fontWeight: '700',
+          letterSpacing: '6px',
+          textTransform: 'uppercase',
+          margin: 0,
+        }}>
+          My Courses
+        </h2>
+      </div>
 
-  const scroll = (direction) => {
-    if (scrollContainerRef.current) {
-      const { current } = scrollContainerRef;
-      const scrollAmount = NODE_X_SPACING; 
-      if (direction === 'left') {
-        current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      } else {
-        current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    }
-  };
+      {/* Thin gold/cream line below header */}
+      <div style={{ height: '3px', background: 'linear-gradient(90deg, #c9a84c, #daa520, #c9a84c)' }} />
 
-  const getPosition = (index) => ({
-    x: (isMobile ? 180 : 400) + index * NODE_X_SPACING, 
-    y: ROAD_Y
-  });
-
-  const generateRoadPath = () => {
-    if (courses.length === 0) return "";
-    const startX = getPosition(0).x - (isMobile ? 150 : 300);
-    const endX = getPosition(courses.length - 1).x + (isMobile ? 250 : 500);
-    return `M ${startX} ${ROAD_Y} L ${endX} ${ROAD_Y}`;
-  };
-
-  if (loading) return (
-    <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-      <p className="text-slate-400 font-medium animate-pulse">Mapping your journey...</p>
+      {/* ── Cards Container ── */}
+      <div style={{
+        background: '#f5f0e8',
+        padding: isMobile ? '24px 16px 32px' : '60px 24px 60px',
+        minHeight: 'calc(100vh - 120px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: isMobile ? '24px' : '28px',
+          justifyContent: 'center',
+          alignItems: isMobile ? 'center' : 'stretch',
+          maxWidth: '960px',
+          margin: '0 auto',
+        }}>
+          {STEPS.map((step, i) => (
+            <motion.div
+              key={step.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.15 }}
+              style={{
+                flex: isMobile ? 'none' : '1',
+                maxWidth: isMobile ? '280px' : '300px',
+                width: isMobile ? '100%' : 'auto',
+              }}
+            >
+              <BookCard step={step} index={i} onCourseClick={onCourseClick} />
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </div>
   );
+};
+
+/* ── Book-Style Card Component ── */
+import { coursesAPI } from "@/services/api";
+
+const BookCard = ({ step, index, onCourseClick }) => {
+  const [hovered, setHovered] = useState(false);
+  const [courseList, setCourseList] = useState([]);
+
+  useEffect(() => {
+    // Fetch real courses to get their actual Object IDs
+    const fetchCourses = async () => {
+      try {
+        const response = await coursesAPI.getAll();
+        const courses = response.data || [];
+        setCourseList(courses);
+      } catch (e) {
+        console.error("Failed to fetch courses setup", e);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  const navyBlue = '#1a3884';
+  const gold = '#c9a84c';
+  const cream = '#faf7f0';
+  const creamDark = '#f0ebe0';
+
+  const navigateToCourse = () => {
+    if (!step.active) return;
+    
+    // We try to grab the actual Mongo ID if the courses have loaded
+    let courseId = step.id; // Fallback to 1, 2, 3
+    if (courseList.length >= step.id) {
+       courseId = courseList[step.id - 1]._id || courseList[step.id - 1].id; 
+    }
+    
+    // If there's an injected onCourseClick, use it
+    if (onCourseClick) {
+        onCourseClick(courseId);
+    } else {
+        // Fallback explicit navigation
+        window.location.href = `/dashboard/courses/${courseId}/modules`;
+    }
+  };
 
   return (
-    <div className="w-full relative select-none">
-      {/* Header Section - Moved up with reduced margins */}
-      <div className="w-full text-center mb-6 px-4 relative z-10">
-        <div className="inline-block p-1.5 px-5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold tracking-wide uppercase mb-2 text-center">
-          Career Roadmap
+    <motion.div
+      whileHover={{ y: step.active ? -6 : 0, scale: step.active ? 1.02 : 1 }}
+      transition={{ duration: 0.3 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={step.active ? "cursor-pointer" : "cursor-not-allowed"}
+      onClick={navigateToCourse}
+      style={{ perspective: '1000px' }}
+    >
+      {/* Outer book container */}
+      <div style={{
+        display: 'flex',
+        borderRadius: '4px',
+        overflow: 'hidden',
+        boxShadow: hovered && step.active
+          ? '0 12px 40px rgba(26, 56, 132, 0.35), 0 4px 12px rgba(0,0,0,0.15)'
+          : '0 6px 20px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.1)',
+        transition: 'box-shadow 0.3s ease',
+      }}>
+        {/* Book Spine */}
+        <div style={{
+          width: '32px',
+          minHeight: '100%',
+          background: `linear-gradient(180deg, ${navyBlue}, #0f2460)`,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '18px',
+          padding: '20px 0',
+          flexShrink: 0,
+          position: 'relative',
+        }}>
+          {/* Spine decorative lines */}
+          <div style={{ width: '14px', height: '2px', background: gold, opacity: 0.7, borderRadius: '1px' }} />
+          <div style={{ width: '14px', height: '2px', background: gold, opacity: 0.7, borderRadius: '1px' }} />
+          <div style={{ width: '14px', height: '2px', background: gold, opacity: 0.5, borderRadius: '1px' }} />
+          <div style={{ width: '14px', height: '2px', background: gold, opacity: 0.7, borderRadius: '1px' }} />
+          <div style={{ width: '14px', height: '2px', background: gold, opacity: 0.7, borderRadius: '1px' }} />
         </div>
-        <h2 className="text-3xl md:text-5xl font-black text-slate-800 dark:text-white tracking-tight leading-tight mb-3 text-center">
-          Your Learning <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Journey</span>
-        </h2>
-        <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-base leading-relaxed text-center">
-          Follow this curated path to master your skills. Complete each module to unlock the next step in your career.
-        </p>
-      </div>
 
-      {/* Navigation Buttons - Adjusted to match new vertical position */}
-      {!isMobile && (
-        <>
-          <button
-            onClick={() => scroll('left')}
-            disabled={!canScrollLeft}
-            className={`fixed left-8 top-[55%] z-50 w-16 h-16 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 shadow-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300 ${!canScrollLeft ? 'opacity-0 scale-90 cursor-default' : 'hover:scale-110 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700'}`}
-          >
-            <ChevronLeft className="w-8 h-8" />
-          </button>
-          <button
-            onClick={() => scroll('right')}
-            disabled={!canScrollRight}
-            className={`fixed right-8 top-[55%] z-50 w-16 h-16 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 shadow-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300 ${!canScrollRight ? 'opacity-0 scale-90 cursor-default' : 'hover:scale-110 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-700'}`}
-          >
-            <ChevronRight className="w-8 h-8" />
-          </button>
-        </>
-      )}
+        {/* Book Page Area */}
+        <div style={{
+          flex: 1,
+          background: cream,
+          padding: '4px',
+          border: `3px solid ${navyBlue}`,
+          borderLeft: 'none',
+          position: 'relative',
+        }}>
+          {/* Inner page with ornate border */}
+          <div style={{
+            border: `1.5px solid ${gold}55`,
+            padding: '28px 20px 24px',
+            position: 'relative',
+            minHeight: '340px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: `linear-gradient(135deg, ${cream} 0%, #ffffff 50%, ${cream} 100%)`,
+          }}>
+            {/* Corner Ornaments - Top Left */}
+            <OrnateCorner position="top-left" color={gold} />
+            <OrnateCorner position="top-right" color={gold} />
+            <OrnateCorner position="bottom-left" color={gold} />
+            <OrnateCorner position="bottom-right" color={gold} />
 
-      {/* Mobile Navigation Buttons */}
-      {isMobile && (
-        <div className="fixed bottom-6 left-0 right-0 z-40 flex justify-center gap-6 px-4">
-          <button
-            onClick={() => scroll('left')}
-            disabled={!canScrollLeft}
-            className={`w-14 h-14 rounded-2xl flex items-center justify-center bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-slate-200 dark:border-slate-700 transition-all active:scale-95 ${!canScrollLeft ? 'opacity-30' : 'text-blue-600 dark:text-blue-400'}`}
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          {canScrollRight && (
-            <button
-              onClick={() => scroll('right')}
-              className="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/90 dark:bg-slate-800/90 backdrop-blur-md shadow-xl border border-slate-200 dark:border-slate-700 transition-all active:scale-95 text-blue-600 dark:text-blue-400"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          )}
-        </div>
-      )}
+            {/* Course Title */}
+            <h3 style={{
+              fontFamily: "'Playfair Display', 'Georgia', serif",
+              fontSize: '28px',
+              fontWeight: '700',
+              color: navyBlue,
+              margin: '0 0 8px 0',
+              textAlign: 'center',
+              lineHeight: 1.2,
+            }}>
+              {step.title}
+            </h3>
 
-      {/* Scrollable Container - Reduced height and padding */}
-      <div
-        ref={scrollContainerRef}
-        className={`w-full ${isMobile ? 'h-[480px]' : 'h-[550px]'} overflow-x-auto overflow-y-hidden py-4 relative scrollbar-hide snap-x snap-mandatory perspective-1000`}
-      >
-        <div
-          className="relative h-full"
-          style={{ width: `${getPosition(courses.length - 1).x + 800}px` }}
-        >
-          {/* THE ROAD SVG */}
-          <svg className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
-            <defs>
-              <linearGradient id="roadGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#94a3b8" />
-                <stop offset="100%" stopColor="#475569" />
-              </linearGradient>
-            </defs>
+            {/* Subtitle */}
+            <p style={{
+              fontFamily: "'Playfair Display', 'Georgia', serif",
+              fontSize: '13px',
+              fontWeight: '500',
+              color: '#555',
+              margin: '0 0 4px 0',
+              textAlign: 'center',
+              fontStyle: 'italic',
+            }}>
+              {step.subtitle}
+            </p>
 
-            {/* Main Road Surface */}
-            <path
-              d={generateRoadPath()}
-              fill="none"
-              stroke="#e2e8f0"
-              strokeWidth="48"
-              strokeLinecap="round"
-              className="dark:stroke-slate-700 opacity-60"
-            />
-            
-            {/* Center Dashed Line */}
-            <path
-              d={generateRoadPath()}
-              fill="none"
-              stroke="#3b82f6"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray="20 30"
-              className="opacity-40"
-            />
-          </svg>
+            {/* Description */}
+            <p style={{
+              fontSize: '11px',
+              fontWeight: '400',
+              color: '#666',
+              margin: '0 0 20px 0',
+              textAlign: 'center',
+              lineHeight: 1.5,
+              maxWidth: '180px',
+            }}>
+              {step.description}
+            </p>
 
-          {/* Goal Marker */}
-          <div
-            className="absolute z-10 font-bold text-slate-700 dark:text-white flex flex-col items-center text-center pointer-events-none"
-            style={{
-              left: `${getPosition(courses.length - 1).x + (isMobile ? 180 : 350)}px`,
-              top: `${ROAD_Y}px`,
-              transform: 'translateY(-50%)',
-              width: isMobile ? '140px' : '200px'
-            }}
-          >
-            <div className="bg-gradient-to-r from-emerald-400 to-green-600 text-white text-[11px] font-bold px-5 py-2 rounded-full mb-3 shadow-lg animate-pulse tracking-widest ring-4 ring-white/50 uppercase">GOAL REACHED</div>
-            <h3 className="text-base font-black leading-tight drop-shadow-sm bg-white/80 dark:bg-black/60 backdrop-blur-md px-4 py-3 rounded-2xl text-center border border-white/20">Ready to<br />Explore Jobs!</h3>
-          </div>
-
-          {/* CARDS */}
-          {courses.map((course, index) => {
-            const pos = getPosition(index);
-            const config = getStepConfig(index);
-            const isActive = index === 0;
-
-            return (
-              <div key={course.id || index} className="snap-center">
-                {/* Visual Connector Dot on the Road */}
-                <div 
-                  className="absolute w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-4 z-20 shadow-2xl flex items-center justify-center"
-                  style={{ 
-                    left: `${pos.x}px`, 
-                    top: `${pos.y}px`, 
-                    transform: 'translate(-50%, -50%)',
-                    borderColor: config.color 
-                  }}
-                >
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: config.color }} />
+            {/* Lock icon and message for locked courses */}
+            {!step.active && (
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '40px',
+                  height: '40px',
+                  marginBottom: '8px',
+                }}>
+                  <svg viewBox="0 0 40 40" width="40" height="40">
+                    {/* Lock body */}
+                    <rect x="8" y="18" width="24" height="18" rx="2" fill={gold} opacity="0.85" />
+                    {/* Lock shackle */}
+                    <path d="M13 18 V13 C13 8 17 5 20 5 C23 5 27 8 27 13 V18" fill="none" stroke={gold} strokeWidth="3" opacity="0.85" />
+                    {/* Keyhole */}
+                    <circle cx="20" cy="27" r="3" fill={cream} />
+                    <rect x="19" y="28" width="2" height="4" fill={cream} />
+                  </svg>
                 </div>
-
-                {/* Card */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="absolute"
-                  style={{
-                    left: `${pos.x - (CARD_WIDTH / 2)}px`,
-                    top: `${pos.y - 240}px`, // Shifted higher to clear the dot
-                    width: CARD_WIDTH,
-                    zIndex: 30 // Lowered slightly so it stays below overlay menus
-                  }}
-                >
-                    <div
-                      onClick={() => {
-                        if (isActive) {
-                          onCourseClick(course._id || course.id);
-                        }
-                      }}
-                      className={`relative group ${isActive ? 'cursor-pointer' : 'cursor-not-allowed opacity-75'}`}
-                    >
-                      <div className={`relative overflow-hidden rounded-[2rem] bg-white dark:bg-slate-800 border-2 ${isActive ? 'border-slate-100 dark:border-slate-700 hover:border-blue-500/40' : 'border-slate-200 dark:border-slate-800'} shadow-2xl shadow-slate-200/50 dark:shadow-none transition-all duration-500 ${isActive ? 'group-hover:-translate-y-4' : ''}`}>
-                        
-                        {/* Header Color Strip */}
-                        <div className="h-20 bg-gradient-to-br"
-                          style={{
-                            backgroundImage: isActive 
-                              ? `linear-gradient(135deg, ${config.color} 0%, ${config.color}dd 100%)`
-                              : 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)'
-                          }}
-                        >
-                          <div className="p-5 flex justify-between items-start">
-                            <div className="bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg text-white text-[10px] font-bold uppercase tracking-widest opacity-90">
-                              Module {config.label}
-                            </div>
-                            <div className="bg-white/95 p-2 rounded-full text-slate-700 shadow-md">
-                              {isActive ? (
-                                <PlayCircle size={16} className="text-blue-600" fill="currentColor" fillOpacity={0.2} />
-                              ) : (
-                                <Lock size={16} className="text-slate-400" />
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                      {/* Content */}
-                      <div className="p-6">
-                        {/* Number Badge */}
-                        <div className="absolute top-12 right-6 w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 shadow-lg flex items-center justify-center border border-slate-50 dark:border-slate-800 transition-transform duration-500 group-hover:rotate-12">
-                          <div className="font-black text-lg" style={{ color: config.color }}>
-                            {index + 1}
-                          </div>
-                        </div>
-
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white leading-tight mb-2 pr-14 line-clamp-2 min-h-[3rem]">
-                          {course.title}
-                        </h3>
-
-                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-6 line-clamp-2 h-10">
-                          {course.description}
-                        </p>
-
-                        <button className="w-full py-3 rounded-2xl bg-slate-50 dark:bg-slate-700/50 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-[0.2em] border border-blue-50/50 dark:border-blue-900/30 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-all duration-300 flex items-center justify-center gap-2 shadow-sm">
-                          {isActive ? 'Start Course' : 'Locked'} <ChevronRight size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+                <p style={{
+                  fontFamily: "'Playfair Display', 'Georgia', serif",
+                  fontSize: '12px',
+                  color: '#777',
+                  fontStyle: 'italic',
+                  margin: 0,
+                  lineHeight: 1.4,
+                }}>
+                  Complete previous<br />to unlock
+                </p>
               </div>
-            );
-          })}
+            )}
+
+            {/* Start Course button for active course */}
+            {step.active && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent the parent div's onClick from firing twice
+                  navigateToCourse();
+                }}
+                style={{
+                  marginTop: '4px',
+                  padding: '8px 24px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  letterSpacing: '2px',
+                  textTransform: 'uppercase',
+                  color: hovered ? '#fff' : navyBlue,
+                  background: hovered ? navyBlue : 'transparent',
+                  border: `1.5px solid ${navyBlue}`,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                Start Course
+                <ChevronRight size={12} />
+              </button>
+            )}
+
+            {/* Unlocked corner ribbon for active course */}
+            {step.active && (
+              <div style={{
+                position: 'absolute',
+                bottom: '0',
+                right: '0',
+                width: '80px',
+                height: '80px',
+                overflow: 'hidden',
+              }}>
+                {/* Gold triangle */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  right: '0',
+                  width: '0',
+                  height: '0',
+                  borderStyle: 'solid',
+                  borderWidth: '0 0 80px 80px',
+                  borderColor: `transparent transparent ${gold} transparent`,
+                  opacity: 0.9,
+                }} />
+                {/* Unlocked text */}
+                <span style={{
+                  position: 'absolute',
+                  bottom: '16px',
+                  right: '-8px',
+                  width: '90px',
+                  textAlign: 'center',
+                  transform: 'rotate(-45deg)',
+                  transformOrigin: 'center center',
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  fontStyle: 'italic',
+                  fontFamily: "'Playfair Display', 'Georgia', serif",
+                  letterSpacing: '0.5px',
+                }}>
+                  Unlocked
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
+    </motion.div>
+  );
+};
+
+/* ── Ornate Corner Decoration ── */
+const OrnateCorner = ({ position, color }) => {
+  const size = 28;
+  const styles = {
+    position: 'absolute',
+    width: `${size}px`,
+    height: `${size}px`,
+    opacity: 0.45,
+  };
+
+  const posMap = {
+    'top-left': { top: '4px', left: '4px' },
+    'top-right': { top: '4px', right: '4px', transform: 'scaleX(-1)' },
+    'bottom-left': { bottom: '4px', left: '4px', transform: 'scaleY(-1)' },
+    'bottom-right': { bottom: '4px', right: '4px', transform: 'scale(-1, -1)' },
+  };
+
+  return (
+    <div style={{ ...styles, ...posMap[position] }}>
+      <svg viewBox="0 0 30 30" width={size} height={size}>
+        {/* Corner flourish */}
+        <path d="M2 2 L2 14 C2 8 8 2 14 2 L2 2Z" fill="none" stroke={color} strokeWidth="1.5" />
+        <path d="M2 2 Q8 2 8 8" fill="none" stroke={color} strokeWidth="1.2" />
+        <path d="M4 2 Q10 2 10 4" fill="none" stroke={color} strokeWidth="0.8" />
+        <circle cx="4" cy="4" r="1.2" fill={color} />
+        {/* Curly element */}
+        <path d="M2 10 C5 10 7 8 8 5" fill="none" stroke={color} strokeWidth="0.8" />
+        <path d="M10 2 C10 5 8 7 5 8" fill="none" stroke={color} strokeWidth="0.8" />
+      </svg>
     </div>
   );
 };

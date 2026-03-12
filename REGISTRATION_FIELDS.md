@@ -75,7 +75,7 @@ This document contains a 100% complete, non-abbreviated listing of every field, 
     *   Type: Text Input (Visible only if 'Other' is selected above).
 *   **Department**:
     *   Type: Text Input.
-    *   Example: `Computer Science Engineering`, `Business Administration`.
+    *   Example: `Computer Science Engi neering`, `Business Administration`.
 
 ### Step 3: Secondary Schooling (Grade 10)
 *   **School Name**:

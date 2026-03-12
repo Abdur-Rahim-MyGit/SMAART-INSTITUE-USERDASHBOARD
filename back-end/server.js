@@ -162,7 +162,14 @@ app.get('/api/career-intelligence/excel-data', authMiddleware, careerIntelligenc
 app.get('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.getReportById);
 app.delete('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.deleteReport);
 app.post('/api/career-intelligence/refresh-cache', authMiddleware, careerIntelligenceController.refreshExcelCache);
-logger.info('✅ Career Intelligence Routes Loaded (Excel + AI Engine)');
+
+// Career Simulation Engine Routes (isolated, no AI cost)
+const careerSimulationController = require('./controllers/careerSimulationController');
+app.post('/api/career-intelligence/simulate', authMiddleware, careerSimulationController.runSimulation);
+app.get('/api/career-intelligence/simulate/batches', authMiddleware, careerSimulationController.getSimulationBatches);
+app.post('/api/career-intelligence/export-excel', authMiddleware, careerSimulationController.exportToExcel);
+
+logger.info('✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)');
 
 // Health check
 app.get('/api/health', (req, res) => {
