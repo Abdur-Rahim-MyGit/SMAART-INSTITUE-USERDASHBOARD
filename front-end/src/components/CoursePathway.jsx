@@ -107,13 +107,48 @@ const CoursePathway = ({ onCourseClick }) => {
 };
 
 /* ── Book-Style Card Component ── */
+import { coursesAPI } from "@/services/api";
+
 const BookCard = ({ step, index, onCourseClick }) => {
   const [hovered, setHovered] = useState(false);
+  const [courseList, setCourseList] = useState([]);
+
+  useEffect(() => {
+    // Fetch real courses to get their actual Object IDs
+    const fetchCourses = async () => {
+      try {
+        const response = await coursesAPI.getAll();
+        const courses = response.data || [];
+        setCourseList(courses);
+      } catch (e) {
+        console.error("Failed to fetch courses setup", e);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   const navyBlue = '#1a3884';
   const gold = '#c9a84c';
   const cream = '#faf7f0';
   const creamDark = '#f0ebe0';
+
+  const navigateToCourse = () => {
+    if (!step.active) return;
+    
+    // We try to grab the actual Mongo ID if the courses have loaded
+    let courseId = step.id; // Fallback to 1, 2, 3
+    if (courseList.length >= step.id) {
+       courseId = courseList[step.id - 1]._id || courseList[step.id - 1].id; 
+    }
+    
+    // If there's an injected onCourseClick, use it
+    if (onCourseClick) {
+        onCourseClick(courseId);
+    } else {
+        // Fallback explicit navigation
+        window.location.href = `/dashboard/courses/${courseId}/modules`;
+    }
+  };
 
   return (
     <motion.div
@@ -122,7 +157,7 @@ const BookCard = ({ step, index, onCourseClick }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       className={step.active ? "cursor-pointer" : "cursor-not-allowed"}
-      onClick={() => step.active && onCourseClick?.(step.id)}
+      onClick={navigateToCourse}
       style={{ perspective: '1000px' }}
     >
       {/* Outer book container */}
@@ -260,6 +295,10 @@ const BookCard = ({ step, index, onCourseClick }) => {
             {/* Start Course button for active course */}
             {step.active && (
               <button
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent the parent div's onClick from firing twice
+                  navigateToCourse();
+                }}
                 style={{
                   marginTop: '4px',
                   padding: '8px 24px',
