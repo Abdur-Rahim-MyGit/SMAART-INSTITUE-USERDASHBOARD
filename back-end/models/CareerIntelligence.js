@@ -38,6 +38,8 @@ const careerInputSchema = new mongoose.Schema({
         type: String,
         enum: ['0-3 LPA', '3-6 LPA', '6-10 LPA', '10-15 LPA', '15-25 LPA', '25+ LPA'],
     },
+    // Domain-Controlled Generation
+    domain: { type: String, required: true }, // Mandatory: IT Security, Data Science, Web Development, etc.
 });
 
 const careerOutputSchema = new mongoose.Schema({
@@ -143,6 +145,11 @@ const careerIntelligenceSchema = new mongoose.Schema({
     // Version tracking
     version: { type: Number, default: 1 },
     generatedDate: { type: Date },
+
+    // ── Simulation Engine Fields ──
+    isSimulated: { type: Boolean, default: false, index: true },
+    simulationBatchId: { type: String, index: true }, // e.g. SIM_2026_03_02_1709389500000
+    domain: { type: String }, // e.g. "Web Development", "Data Science & AI"
 
 }, {
     timestamps: true,
