@@ -3,26 +3,14 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import LoginCard from "@/components/LoginCard";
-import { Play, ArrowLeft } from "lucide-react";
+import { Play } from "lucide-react";
 
-import videoplayback from "@/assets/videoplayback.mp4";
-
-// Mock video URLs - replaced with local video
-const institutionVideos = {
-  "1": videoplayback,
-  "2": videoplayback,
-  "3": videoplayback,
-  "4": videoplayback,
-};
+const videoUrl = "https://player.cloudinary.com/embed/?cloud_name=dlpmrdcqp&public_id=videoplayback_xt7in8";
 
 const Institution = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  // Use the imported video for all IDs for now, or fallback to the specific one if we had distinct videos
-  // const videoUrl = videoplayback;
-  const videoUrl = "https://player.cloudinary.com/embed/?cloud_name=dlpmrdcqp&public_id=videoplayback_xt7in8";
 
-  // Redirect logged-in users to dashboard
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
     if (userData) {
@@ -31,101 +19,130 @@ const Institution = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#002147] relative overflow-x-hidden transition-colors duration-300">
+    <div
+      className="min-h-screen relative overflow-x-hidden transition-colors duration-300"
+      style={{ background: "linear-gradient(135deg, #f0f4ff 0%, #eef1f8 40%, #f7f8fa 100%)" }}
+    >
       <Navbar showLinks={false} />
 
-      {/* Background Elements */}
+      {/* Subtle background crest watermark */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-[#1a3884]/5 blur-[120px]" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gray-100 dark:bg-white/5 blur-[100px]" />
-        <div className="absolute top-[20%] left-[10%] w-2 h-2 bg-[#daa520]/30 rounded-full animate-pulse" />
-        <div className="absolute bottom-[30%] right-[20%] w-3 h-3 bg-[#1a3884]/20 rounded-full animate-pulse delay-700" />
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] dark:opacity-[0.05]" />
-
-        {/* New Dynamic Blobs */}
-        <motion.div
-          animate={{ x: [0, 50, 0], y: [0, 30, 0], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#1a3884]/5 rounded-full blur-[80px]"
+        <div
+          className="absolute right-[-5%] top-[8%] w-[520px] h-[520px] opacity-[0.045]"
+          style={{
+            backgroundImage: "url('/smaart-crest.png')",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center",
+            filter: "grayscale(1)",
+          }}
         />
-        <motion.div
-          animate={{ x: [0, -30, 0], y: [0, 50, 0], opacity: [0.2, 0.5, 0.2] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute bottom-1/4 right-1/3 w-64 h-64 bg-[#daa520]/5 rounded-full blur-[60px]"
-        />
+        {/* Soft radial glows */}
+        <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100 opacity-40 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-50 opacity-50 blur-[100px]" />
       </div>
 
-      <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-8 pt-20 sm:pt-24 pb-8 sm:pb-12 relative z-10">
+      <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-10 relative z-10">
         <div className="w-full max-w-6xl mx-auto">
-          {/* Back to Home Link */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
-            <button
-              onClick={() => navigate("/")}
-              className="group flex items-center gap-2 text-gray-400 hover:text-[#1a3884] transition-colors text-xs sm:text-sm font-bold uppercase tracking-widest min-h-[44px] py-2"
-            >
-              <ArrowLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5 group-hover:-translate-x-1 transition-transform" />
-              <span className="hidden xs:inline">Back to Marketplace</span>
-              <span className="xs:hidden">Back</span>
-            </button>
-          </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center w-full max-w-full overflow-hidden">
+          {/* Two-column grid */}
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 lg:gap-14 items-center">
 
-            {/* Welcome Section (Video) */}
+            {/* LEFT: Video + Welcome Section */}
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
-              className="relative group w-full max-w-full overflow-hidden box-border"
+              transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
+              className="flex flex-col gap-0"
             >
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#daa520] rounded-xl sm:rounded-2xl md:rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-              <div className="relative bg-white dark:bg-[#00152e] backdrop-blur-xl rounded-xl sm:rounded-2xl md:rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl">
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                  <iframe
-                    src={videoUrl}
-                    className="absolute inset-0 w-full h-full border-0"
-                    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                    allowFullScreen
-                    title="Institution Login Video"
-                  />
+              {/* Outer Card — sharp corners, white bg, strong shadow */}
+              <div
+                style={{
+                  background: "#ffffff",
+                  border: "1.5px solid rgba(26,56,132,0.14)",
+                  boxShadow: "0 24px 64px rgba(26,56,132,0.13), 0 4px 20px rgba(0,0,0,0.07)",
+                }}
+              >
+                {/* Navy blue border-frame around the video */}
+                <div
+                  className="relative"
+                  style={{
+                    background: "#0d2257",
+                    padding: "10px",
+                  }}
+                >
+                  {/* Founder's Message Badge */}
+                  <div
+                    className="absolute top-3 left-3 z-20 flex items-center gap-2 px-3.5 py-1.5"
+                    style={{
+                      background: "rgba(0, 21, 46, 0.88)",
+                      backdropFilter: "blur(8px)",
+                      border: "1px solid rgba(218,165,32,0.35)",
+                    }}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-[#daa520] animate-pulse shadow-[0_0_8px_rgba(218,165,32,0.7)]" />
+                    <span className="text-[10px] sm:text-[11px] font-bold text-white tracking-widest uppercase">
+                      Founder's Message
+                    </span>
+                  </div>
 
-                  {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#00152e]/90 via-transparent to-transparent pointer-events-none" />
-
-                  {/* Badge */}
-                  <div className="absolute top-3 left-3 sm:top-6 sm:left-6 px-2.5 py-1 sm:px-4 sm:py-1.5 bg-[#002147]/80 backdrop-blur-md border border-[#white]/20 rounded-full flex items-center gap-1.5 sm:gap-2 shadow-lg z-20">
-                    <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#daa520] animate-pulse shadow-[0_0_10px_rgba(218,165,32,0.5)]" />
-                    <span className="text-[10px] sm:text-xs font-bold text-white tracking-wider uppercase">Founder's Message</span>
+                  {/* Video embed — inset inside the navy frame */}
+                  <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                    <iframe
+                      src={videoUrl}
+                      className="absolute inset-0 w-full h-full border-0"
+                      allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                      title="Founder's Message"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#00152e]/60 via-transparent to-transparent pointer-events-none" />
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-6 md:p-8 relative">
-                  <div className="flex items-start justify-between gap-3 sm:gap-4">
-                    <div>
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 font-heading tracking-tight">
-                        Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#002147] dark:to-[#4dbdc9]">Excellence</span>
-                      </h2>
-                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-xs sm:text-sm md:text-base font-light">
-                        Discover a world of opportunities and unlock your true potential with our comprehensive learning ecosystem.
-                      </p>
-                    </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-[#1a3884]/10 dark:bg-[#1a3884]/20 flex items-center justify-center border border-[#1a3884]/20 shrink-0 group-hover:scale-110 transition-transform duration-300">
-                      <Play className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[#1a3884] fill-[#1a3884]" />
-                    </div>
+                {/* Welcome text below */}
+                <div
+                  className="px-6 py-5 sm:px-8 sm:py-6 flex items-center justify-between gap-4"
+                  style={{ background: "#ffffff", borderTop: "2px solid #0d2257" }}
+                >
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 tracking-tight leading-snug">
+                      Welcome to{" "}
+                      <span
+                        className="font-extrabold"
+                        style={{
+                          background: "linear-gradient(90deg, #1a3884 0%, #2a5ad4 100%)",
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                        }}
+                      >
+                        Excellence
+                      </span>
+                    </h2>
+                    <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+                      Discover a world of opportunities and unlock your true
+                      potential with our comprehensive learning ecosystem.
+                    </p>
+                  </div>
+                  {/* Play button */}
+                  <div
+                    className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center shrink-0 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                    style={{
+                      background: "linear-gradient(135deg, #e8eef8 0%, #d4ddf5 100%)",
+                      border: "1.5px solid rgba(26,56,132,0.20)",
+                      boxShadow: "0 2px 12px rgba(26,56,132,0.12)",
+                    }}
+                  >
+                    <Play className="w-4 h-4 text-[#1a3884] fill-[#1a3884] ml-0.5" />
                   </div>
                 </div>
               </div>
             </motion.div>
 
-            {/* Login Section */}
+            {/* RIGHT: Login Card */}
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.3, duration: 0.6, ease: "easeOut" }}
             >
               <LoginCard />
             </motion.div>
@@ -137,4 +154,3 @@ const Institution = () => {
 };
 
 export default Institution;
-
