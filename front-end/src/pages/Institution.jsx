@@ -23,8 +23,6 @@ const Institution = () => {
       className="min-h-screen relative overflow-x-hidden transition-colors duration-300"
       style={{ background: "linear-gradient(135deg, #f0f4ff 0%, #eef1f8 40%, #f7f8fa 100%)" }}
     >
-      <Navbar showLinks={false} />
-
       {/* Subtle background crest watermark */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
@@ -42,7 +40,7 @@ const Institution = () => {
         <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-50 opacity-50 blur-[100px]" />
       </div>
 
-      <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-10 relative z-10">
+      <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-10 pb-10 relative z-10">
         <div className="w-full max-w-6xl mx-auto">
 
           {/* Two-column grid */}

@@ -26,7 +26,7 @@ import SectionReveal from "@/components/ui/SectionReveal";
 import CookieConsent from "@/components/CookieConsent";
 
 
-const LandingPage = () => {
+const HomeRootPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showSplash, setShowSplash] = useState(true);
@@ -116,7 +116,7 @@ const LandingPage = () => {
       </Helmet>
 
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-
+      
       <Navbar onLoginClick={openLogin} onSignupClick={openSignup} />
 
       <HeroSection onSignupClick={openSignup} onLoginClick={openLogin} />
@@ -186,5 +186,5 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default HomeRootPage;
 
