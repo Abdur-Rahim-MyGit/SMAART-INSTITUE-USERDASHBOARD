@@ -16,6 +16,7 @@ import ReflectionTask from "@/components/ReflectionTask";
 import FlashcardTask from "@/components/FlashcardTask";
 import ModulePathway from "@/components/ModulePathway";
 import FloatingDictionary from "@/components/FloatingDictionary";
+import FiveModuleRoadmap from "@/components/FiveModuleRoadmap";
 
 const IntroScreen = ({ lines, onFinish }) => {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
@@ -211,10 +212,8 @@ const ModuleViewPage = () => {
           setModules(fetchedModules);
 
           if (fetchedModules.length > 0) {
-            if (!selectedModule) setSelectedModule(fetchedModules[0].id);
-            if (!selectedDay && fetchedModules[0].days?.length > 0) {
-              setSelectedDay(fetchedModules[0].days[0].id);
-            }
+            // Keep selectedModule/Day null if not in URL to show Roadmap
+            // Only auto-select if we specifically want to skip roadmap (not the case here)
           }
 
           // Fetch Enrollment Progress if user is logged in
@@ -462,6 +461,12 @@ const ModuleViewPage = () => {
     navigate(`/dashboard/courses/${courseId}/modules/${moduleId}/days/${dayId}`);
   };
 
+  const handleBackToRoadmap = () => {
+    setSelectedModule(null);
+    setSelectedDay(null);
+    navigate(`/dashboard/courses/${courseId}/modules`);
+  };
+
   const handleMoveToNext = () => {
     const currentModule = modules.find(m => m.id === selectedModule);
     const currentDay = currentModule?.days?.find(d => d.id === selectedDay);
@@ -651,6 +656,15 @@ const ModuleViewPage = () => {
   }
 
   // --- NEW VINTAGE LAYOUT RENDER ---
+  if (!selectedModule) {
+    return (
+      <FiveModuleRoadmap 
+        courseData={courseData} 
+        onModuleSelect={(mod) => navigateToDay(mod.id, 1)} 
+      />
+    );
+  }
+
   // If loading or course not found, we handle above.
   // We'll flatten the days/steps into "Tasks" for the sidebar as requested.
   const flatTasks = modules.length > 0 ? modules[0].days || [] : [];
@@ -680,7 +694,7 @@ const ModuleViewPage = () => {
       }}>
         <div style={{ padding: '0 30px', marginBottom: '40px' }}>
           <button 
-            onClick={() => navigate('/dashboard/courses')}
+            onClick={handleBackToRoadmap}
             style={{
               background: 'transparent',
               border: 'none',
