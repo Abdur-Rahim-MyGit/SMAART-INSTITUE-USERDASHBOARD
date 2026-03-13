@@ -18,9 +18,9 @@ export default {
           dark: '#00152e', // Darker for footer/contrast
         },
         teal: {
-          DEFAULT: '#30919D',
-          hover: '#267d87',
-          light: '#40B5C4', // For highlights only
+          DEFAULT: '#0EA5E9', // Sky 500
+          hover: '#0284C7',   // Sky 600
+          light: '#38BDF8',   // Sky 400
         },
         gold: {
           DEFAULT: '#daa520',
