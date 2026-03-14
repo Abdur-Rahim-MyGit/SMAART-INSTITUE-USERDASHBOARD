@@ -43,6 +43,25 @@ const careerIntelligenceApi = {
         apiCall('/career-intelligence/refresh-cache', {
             method: 'POST',
         }),
+
+    // Career Simulation Engine — auto-generates synthetic dataset (no AI)
+    runSimulation: (count = 50) =>
+        apiCall('/career-intelligence/simulate', {
+            method: 'POST',
+            body: JSON.stringify({ count }),
+            timeout: 120000, // up to 2 min for 50 profiles
+        }),
+
+    // Get all simulation batches
+    getSimulationBatches: () =>
+        apiCall('/career-intelligence/simulate/batches'),
+
+    // Export to Excel (singular report or batch ID)
+    exportToExcel: (params) =>
+        apiCall('/career-intelligence/export-excel', {
+            method: 'POST',
+            body: JSON.stringify(params),
+        }),
 };
 
 export default careerIntelligenceApi;
