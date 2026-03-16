@@ -127,6 +127,8 @@ app.use('/api/chatbot', require('./routes/chatbot')); // AI Chatbot Support
 // Community Routes
 app.use('/api/community', require('./routes/community'));
 app.use('/api/groups', require('./routes/groups'));
+app.use('/api/moderation', require('./routes/moderationQueue'));
+app.use('/api/moderation', require('./routes/moderation'));
 
 // Avatar System Routes (3D Level-Based Unlock System)
 app.use('/api/avatar', require('./routes/avatar'));

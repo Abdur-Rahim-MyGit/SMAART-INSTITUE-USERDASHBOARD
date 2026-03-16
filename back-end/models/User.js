@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'consultant', 'college_admin', 'coach', 'student', 'teacher'],
+    enum: ['admin', 'moderator', 'consultant', 'college_admin', 'coach', 'student', 'teacher'],
     default: 'student'
   },
   qualification: String,
@@ -65,6 +65,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'active', 'inactive', 'suspended'],
     default: 'pending'
+  },
+  suspendedUntil: {
+    type: Date,
+    default: null
   },
   profileImage: String,
   // Active vision board for dashboard display

@@ -40,6 +40,11 @@ const communityPostSchema = new mongoose.Schema({
     required: [true, 'Please provide content'],
     maxlength: 5000
   },
+  channelType: {
+    type: String,
+    enum: ['support', 'discussion'],
+    default: 'discussion'
+  },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -62,6 +67,18 @@ const communityPostSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  peerVotes: [{
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    vote: {
+      type: String,
+      enum: ['up', 'down'],
+      required: true
+    }
+  }],
   reactions: [{
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -80,6 +97,10 @@ const communityPostSchema = new mongoose.Schema({
   }],
   replies: [replySchema],
   views: {
+    type: Number,
+    default: 0
+  },
+  qualityScore: {
     type: Number,
     default: 0
   },
@@ -116,7 +137,36 @@ const communityPostSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
+  // Moderation lifecycle fields
+  flagReason: {
+    type: String,
+    trim: true
+  },
+  flaggedAt: {
+    type: Date
+  },
+  moderatorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  resolution: {
+    status: {
+      type: String,
+      enum: ['pending', 'reviewed', 'actioned'],
+      default: 'pending'
+    },
+    notes: {
+      type: String,
+      trim: true,
+      maxlength: 2000
+    },
+    resolvedAt: Date
+  },
   bestAnswer: {
+    type: Boolean,
+    default: false
+  },
+  bestAnswerReply: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Reply' // This refers to a subdocument ID within the replies array
   },
@@ -137,5 +187,7 @@ communityPostSchema.index({ title: 'text', content: 'text', tags: 'text' });
 communityPostSchema.index({ author: 1 });
 communityPostSchema.index({ createdAt: -1 });
 communityPostSchema.index({ category: 1 });
+communityPostSchema.index({ channelType: 1, createdAt: -1 });
+communityPostSchema.index({ flaggedAt: -1 });
 
 module.exports = mongoose.model('CommunityPost', communityPostSchema);

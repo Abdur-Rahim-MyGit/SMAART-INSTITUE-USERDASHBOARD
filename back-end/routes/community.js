@@ -8,8 +8,11 @@ const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
 const Registration = require('../models/Registration');
 const { protect } = require('../middleware/auth');
-const { uploadCommunity } = require('../middleware/upload');
+const { uploadCommunity, cloudinary } = require('../middleware/upload');
 const { notifyCommunityReply } = require('../services/notificationService');
+const { classifyDistress } = require('../helpers/distressClassifier');
+const CoachAlert = require('../models/CoachAlert');
+const { scanImage } = require('../helpers/nsfwModeration');
 
 // Apply protection to all community routes
 router.use(protect);
@@ -103,10 +106,25 @@ router.get('/stats', async (req, res) => {
 // Get all discussions with pagination
 router.get('/discussions', async (req, res) => {
   try {
-    const { page = 1, limit = 10, category, search, sortBy = 'createdAt' } = req.query;
+    console.log('[GET discussions] query params:', req.query);
+    const { page = 1, limit = 10, category, search, sortBy = 'createdAt', channelType } = req.query;
     const collegeId = getCollegeFilter(req.query.collegeId);
 
     const query = { status: 'active' };
+
+    // Default to discussion channel unless explicitly requesting support
+    if (channelType === 'support') {
+      // STRICT: only support posts (case-insensitive)
+      query.channelType = { $regex: /^support$/i };
+    } else {
+      // Discussion: include legacy posts lacking channelType, but explicitly exclude support
+      query.channelType = { $ne: 'support' };
+      query.$or = [
+        { channelType: 'discussion' },
+        { channelType: { $exists: false } },
+        { channelType: null }
+      ];
+    }
 
     if (collegeId) {
       query.college = collegeId;
@@ -264,6 +282,12 @@ router.get('/discussions/:id', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Discussion not found' });
     }
 
+    // Block suspended users from replying
+    const now = new Date();
+    if (author?.status === 'suspended' || (author?.suspendedUntil && new Date(author.suspendedUntil) > now)) {
+      return res.status(403).json({ success: false, error: 'Your account is suspended and cannot reply.' });
+    }
+
     // Increment views
     discussion.views += 1;
     await discussion.save();
@@ -281,9 +305,10 @@ router.get('/discussions/:id', async (req, res) => {
 // Create a new discussion
 router.post('/discussions', uploadCommunity.single('image'), async (req, res) => {
   try {
-    const { title, content, category, tags, authorId, authorEmail } = req.body;
-
+    console.log('[POST] new post received', req.body);
+    const { title, content, category, tags, authorId, authorEmail, channelType } = req.body;
     console.log('[Community] Create Discussion Request Body:', JSON.stringify(req.body, null, 2));
+    console.log('[Community] channelType received:', channelType);
 
     let author = null;
     let resolvedAuthorId = authorId;
@@ -352,6 +377,12 @@ router.post('/discussions', uploadCommunity.single('image'), async (req, res) =>
       return res.status(400).json({ success: false, error: 'Author not found. Please log out and log in again.' });
     }
 
+    // Block suspended users from posting
+    const now = new Date();
+    if (author.status === 'suspended' || (author.suspendedUntil && new Date(author.suspendedUntil) > now)) {
+      return res.status(403).json({ success: false, error: 'Your account is suspended and cannot create posts.' });
+    }
+
     if (!title || !content) {
       return res.status(400).json({ success: false, error: 'Title and content are required' });
     }
@@ -377,20 +408,79 @@ router.post('/discussions', uploadCommunity.single('image'), async (req, res) =>
       });
     }
 
+    // Run NSFW scan on uploaded images before persisting
+    let mediaPayload;
+    if (req.file) {
+      const resourceType = req.file.mimetype.startsWith('video/') ? 'video' : 'image';
+
+      if (resourceType === 'image') {
+        const nsfwResult = await scanImage(req.file.path || req.file.originalname);
+
+        if (!nsfwResult.safe) {
+          try {
+            if (req.file.filename) {
+              await cloudinary.uploader.destroy(req.file.filename, { resource_type: 'image' });
+            }
+          } catch (cleanupError) {
+            console.warn('[Community] Failed to cleanup rejected image:', cleanupError.message);
+          }
+
+          return res.status(400).json({
+            success: false,
+            error: 'The uploaded image failed our safety checks.',
+            score: nsfwResult.score,
+            categories: nsfwResult.categories,
+          });
+        }
+      }
+
+      mediaPayload = {
+        url: req.file.path,
+        publicId: req.file.filename,
+        resourceType
+      };
+    }
+
     const discussion = new CommunityPost({
       title,
       content,
+      channelType: channelType === 'support' ? 'support' : 'discussion',
       author: resolvedAuthorId,
       college: author.college || null,
       category: category || 'general',
       tags: tags || [],
-      media: req.file ? {
-        url: req.file.path,
-        publicId: req.file.filename,
-        resourceType: req.file.mimetype.startsWith('video/') ? 'video' : 'image'
-      } : undefined,
+      media: mediaPayload,
       poll: req.body.poll ? (typeof req.body.poll === 'string' ? JSON.parse(req.body.poll) : req.body.poll) : undefined
     });
+
+    // Distress monitoring for support channel
+    if (discussion.channelType === 'support') {
+      const { riskLevel } = classifyDistress(`${title}\n${content}`);
+      console.log('[Distress] riskLevel', riskLevel, 'for post', discussion._id?.toString());
+      if (riskLevel === 'medium' || riskLevel === 'high') {
+        discussion.flaggedAt = discussion.flaggedAt || new Date();
+        discussion.flagReason = `distress:${riskLevel}`;
+        discussion.resolution = discussion.resolution || { status: 'pending' };
+        discussion.resolution.status = 'pending';
+
+        const savedAlert = await CoachAlert.create({
+          studentId: resolvedAuthorId,
+          postId: discussion._id,
+          riskLevel,
+          timestamp: new Date(),
+          resolved: false
+        });
+
+        console.log('[CoachAlert] created', {
+          _id: savedAlert?._id?.toString?.(),
+          studentId: savedAlert?.studentId?.toString?.(),
+          postId: savedAlert?.postId?.toString?.(),
+          riskLevel: savedAlert?.riskLevel,
+          timestamp: savedAlert?.timestamp,
+          resolved: savedAlert?.resolved
+        });
+      }
+    }
 
     await discussion.save();
 
@@ -415,26 +505,30 @@ router.post('/discussions/:id/best-answer', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Discussion not found' });
     }
 
-    // Only the post author can mark a best answer
-    if (discussion.author.toString() !== authorId) {
-      return res.status(403).json({ success: false, error: 'Only the post author can mark a best answer' });
+    const requesterId = (req.user?._id || req.user?.id || authorId || '').toString();
+    const requesterRole = (req.user?.role || req.user?.userType || '').toLowerCase();
+    const isAuthor = discussion.author?.toString() === requesterId;
+    const isModerator = ['admin', 'moderator', 'staff', 'superadmin'].includes(requesterRole);
+
+    if (!isAuthor && !isModerator) {
+      return res.status(403).json({ success: false, error: 'Only the author or a moderator can mark a best answer' });
     }
 
-    // Toggle best answer: if already marked, unmark. If different or none, set new.
-    if (discussion.bestAnswer && discussion.bestAnswer.toString() === replyId) {
-      discussion.bestAnswer = undefined;
+    const replyDoc = discussion.replies.id(replyId);
+    if (!replyDoc) {
+      return res.status(404).json({ success: false, error: 'Reply not found' });
+    }
+
+    if (discussion.bestAnswer && discussion.bestAnswerReply?.toString() === replyId) {
+      discussion.bestAnswer = false;
+      discussion.bestAnswerReply = undefined;
     } else {
-      // Verify reply exists
-      const replyExists = discussion.replies.id(replyId);
-      if (!replyExists) {
-        return res.status(404).json({ success: false, error: 'Reply not found' });
-      }
-      discussion.bestAnswer = replyId;
+      discussion.bestAnswer = true;
+      discussion.bestAnswerReply = replyId;
     }
 
     await discussion.save();
 
-    // Return populated discussion
     const populated = await CommunityPost.findById(req.params.id).lean();
     await hydrateAuthors(populated);
 
@@ -442,6 +536,49 @@ router.post('/discussions/:id/best-answer', async (req, res) => {
   } catch (error) {
     console.error('Error marking best answer:', error);
     res.status(500).json({ success: false, error: 'Failed to mark best answer' });
+  }
+});
+
+// Peer vote on a discussion (quality score)
+router.post('/discussions/:id/vote', async (req, res) => {
+  try {
+    const { userId, vote } = req.body;
+    const normalizedVote = vote === 'up' || vote === 'down' ? vote : null;
+    if (!normalizedVote) {
+      return res.status(400).json({ success: false, error: 'vote must be "up" or "down"' });
+    }
+
+    const voterId = (req.user?._id || req.user?.id || userId || '').toString();
+    if (!voterId) {
+      return res.status(400).json({ success: false, error: 'userId is required to vote' });
+    }
+
+    const discussion = await CommunityPost.findById(req.params.id);
+    if (!discussion) {
+      return res.status(404).json({ success: false, error: 'Discussion not found' });
+    }
+
+    const existingIndex = discussion.peerVotes.findIndex(v => v.userId.toString() === voterId);
+    if (existingIndex >= 0) {
+      discussion.peerVotes[existingIndex].vote = normalizedVote;
+    } else {
+      discussion.peerVotes.push({ userId: voterId, vote: normalizedVote });
+    }
+
+    const upVotes = discussion.peerVotes.filter(v => v.vote === 'up').length;
+    const downVotes = discussion.peerVotes.filter(v => v.vote === 'down').length;
+    const totalVotes = upVotes + downVotes;
+    discussion.qualityScore = totalVotes === 0 ? 0 : (upVotes - downVotes) / totalVotes;
+
+    await discussion.save();
+
+    const populated = await CommunityPost.findById(req.params.id).lean();
+    await hydrateAuthors(populated);
+
+    res.json({ success: true, data: populated });
+  } catch (error) {
+    console.error('Error recording peer vote:', error);
+    res.status(500).json({ success: false, error: 'Failed to record vote' });
   }
 });
 
@@ -466,10 +603,12 @@ router.post('/discussions/:id/report', async (req, res) => {
       reason: reason || 'Inappropriate content'
     });
 
-    // If report count is high, we could auto-hide, but for now just save
-    if (discussion.reports.length >= 5) {
-      discussion.status = 'hidden';
-    }
+    // Flag the post for moderator review
+    discussion.flaggedAt = discussion.flaggedAt || new Date();
+    discussion.flagReason = discussion.flagReason || reason || 'Inappropriate content';
+    discussion.resolution = discussion.resolution || { status: 'pending' };
+    discussion.resolution.status = 'pending';
+    discussion.status = 'active'; // keep visible until a moderator acts
 
     await discussion.save();
     res.json({ success: true, message: 'Discussion reported successfully' });

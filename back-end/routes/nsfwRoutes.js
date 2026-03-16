@@ -7,7 +7,7 @@
 
 const express = require('express');
 const router = express.Router();
-const { checkNSFWWithAPI } = require('../helpers/nsfwModeration');
+const { scanImage } = require('../helpers/nsfwModeration');
 
 /**
  * POST /api/nsfw/check
@@ -32,7 +32,7 @@ router.post('/check', async (req, res) => {
       });
     }
     
-    const result = await checkNSFWWithAPI(imageData);
+    const result = await scanImage(imageData);
     
     return res.json({
       success: true,

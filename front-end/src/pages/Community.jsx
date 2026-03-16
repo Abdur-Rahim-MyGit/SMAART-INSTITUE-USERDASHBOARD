@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HelpCircle, Bell, Users, MessageCircle, Heart, Share2, Search, TrendingUp, Star, BookOpen, Award, ChevronRight, ChevronLeft, Plus, Loader2, Bookmark, Send, MoreVertical, Image as ImageIcon, X, CheckCircle, Play, Video, Trophy, ThumbsUp, Lightbulb, Handshake } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
+import EmotionChatbot from "@/components/community/EmotionChatbot";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { communityAPI } from "@/services/communityApi";
@@ -62,6 +63,7 @@ const Community = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [stats, setStats] = useState({ totalMembers: 0, totalDiscussions: 0, totalGroups: 0, activeToday: 0 });
   const [discussions, setDiscussions] = useState([]);
+  const [channelType, setChannelType] = useState("discussion");
   const [featuredGroups, setFeaturedGroups] = useState([]);
   const [topContributors, setTopContributors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +77,7 @@ const Community = () => {
   const [reportingId, setReportingId] = useState(null);
   const [reportReason, setReportReason] = useState("");
   const [reportSubmitting, setReportSubmitting] = useState(false);
-  const [newPost, setNewPost] = useState({ title: "", content: "", category: "general" });
+  const [newPost, setNewPost] = useState({ title: "", content: "", category: "general", channelType: "discussion" });
   const [submitting, setSubmitting] = useState(false);
   const [replyingId, setReplyingId] = useState(null);
   const [replyText, setReplyText] = useState("");
@@ -102,8 +104,14 @@ const Community = () => {
   const [selectedGroups, setSelectedGroups] = useState([]);
   const [sharingToGroups, setSharingToGroups] = useState(false);
 
+  const isSupportChannel = channelType === "support";
+
+  const resolveChannel = (post) => post?.channelType || "discussion";
+  const matchesChannel = (post) => isSupportChannel ? resolveChannel(post) === "support" : resolveChannel(post) !== "support";
+  const visibleDiscussions = discussions.filter(matchesChannel);
+
   // Image Viewer Navigation
-  const feedImages = discussions
+  const feedImages = visibleDiscussions
     .map(d => d.media?.url)
     .filter(url => url && !url.match(/\.(mp4|mov|webm)$|video\/upload/i));
 
@@ -231,7 +239,7 @@ const Community = () => {
   }, [currentUser]);
 
   // Unified discussion fetcher
-  const fetchDiscussions = async (pageNum = 1, append = false) => {
+  const fetchDiscussions = async (pageNum = 1, append = false, overrideChannel) => {
     // Ensure we have user data. If not in state, try to get from storage one last time.
     let userId = currentUserId;
     if (!userId) {
@@ -258,9 +266,11 @@ const Community = () => {
         page: pageNum,
         limit: 10,
         sortBy,
+        channelType: overrideChannel || channelType,
         collegeId: userCollegeId || undefined,
         search: searchQuery || undefined
       };
+      console.log('[FETCH] fetching with channelType:', params.channelType);
 
       switch (activeTab) {
         case "my posts":
@@ -270,7 +280,7 @@ const Community = () => {
           result = await communityAPI.getBookmarkedDiscussions(userId, params);
           break;
         default:
-          result = await communityAPI.getDiscussions(params);
+            result = await communityAPI.getDiscussions(params);
       }
 
       if (result.success) {
@@ -301,8 +311,8 @@ const Community = () => {
   // Unified fetch effect - triggers on tab, sort, search, or user change
   useEffect(() => {
     setPage(1);
-    fetchDiscussions(1, false);
-  }, [activeTab, sortBy, debouncedSearch, currentUser]);
+    fetchDiscussions(1, false, channelType);
+  }, [activeTab, sortBy, debouncedSearch, currentUser, channelType]);
 
   const handleLoadMore = () => {
     if (loadingMore || !hasMore) return;
@@ -314,6 +324,14 @@ const Community = () => {
   // Handle search
   const handleSearch = () => {
     setDebouncedSearch(searchQuery);
+  };
+
+  const handleChannelSwitch = (type) => {
+    console.log('[TAB SWITCH] active channel:', type);
+    setChannelType(type);
+    setNewPost((prev) => ({ ...prev, channelType: type }));
+    setPage(1);
+    fetchDiscussions(1, false, type);
   };
 
   // Handle reaction
@@ -462,6 +480,7 @@ const Community = () => {
 
   // Handle create post
   const handleCreatePost = async () => {
+    console.log('[SUBMIT] handler start', newPost);
     if (!newPost.title.trim() || !newPost.content.trim()) {
       alert('Please enter a title and content for your post.');
       return;
@@ -519,9 +538,11 @@ const Community = () => {
       setSubmitting(true);
 
       const formData = new FormData();
+      console.log('[SUBMIT] posting', formData);
       formData.append('title', newPost.title);
       formData.append('content', newPost.content);
       formData.append('category', newPost.category);
+      formData.append('channelType', newPost.channelType || channelType);
       if (authorId) formData.append('authorId', authorId);
       if (authorEmail) formData.append('authorEmail', authorEmail);
       if (selectedMedia) formData.append('image', selectedMedia); // Field name remains 'image' for backend compat, but can be video
@@ -535,11 +556,12 @@ const Community = () => {
         formData.append('poll', JSON.stringify(formattedPoll));
       }
 
+      console.log('[API CALL] sending', formData);
       const result = await communityAPI.createDiscussion(formData);
 
       if (result.success) {
         setDiscussions(prev => [result.data, ...prev]);
-        setNewPost({ title: "", content: "", category: "general" });
+        setNewPost({ title: "", content: "", category: "general", channelType });
         setSelectedMedia(null);
         setMediaPreview(null);
         setMediaType(null);
@@ -708,6 +730,29 @@ const Community = () => {
               </div>
             </div>
 
+            {/* Channel Switcher */}
+            <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex gap-2 bg-white/70 backdrop-blur-sm p-1 rounded-2xl shadow-sm border border-white/60">
+                {[{ key: "discussion", label: "Discussion", hint: "General" }, { key: "support", label: "Support", hint: "Emotion Coach" }].map((chan) => (
+                  <button
+                    key={chan.key}
+                    onClick={() => handleChannelSwitch(chan.key)}
+                    className={`px-4 py-3 rounded-xl text-sm font-bold flex flex-col leading-tight transition-all ${
+                      channelType === chan.key
+                        ? "bg-[#002147] text-white shadow-lg shadow-blue-900/15"
+                        : "text-gray-600 hover:bg-white"
+                    }`}
+                  >
+                    <span>{chan.label}</span>
+                    <span className="text-[10px] uppercase tracking-widest font-black opacity-70">{chan.hint}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-600 max-w-md font-semibold">
+                Support channel runs Emotion Coach, safer responses, and pings staff for distressed posts.
+              </p>
+            </div>
+
             {/* Stats Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12">
               {[
@@ -745,7 +790,11 @@ const Community = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setShowNewPostModal(true)}
+                  onClick={() => {
+                    setNewPost((prev) => ({ ...prev, channelType }));
+                    console.log('[MODAL] channelType set to:', channelType);
+                    setShowNewPostModal(true);
+                  }}
                   className="w-full py-4 bg-gradient-to-r from-[#002147] to-[#002147]/90 text-white font-semibold rounded-2xl shadow-lg shadow-[#002147]/20 transition-all flex items-center justify-center gap-2 mb-2"
                 >
                   <Plus className="w-5 h-5" />
@@ -790,7 +839,7 @@ const Community = () => {
                   <div className="flex items-center justify-center py-12">
                     <Loader2 className="w-8 h-8 text-[#002147] animate-spin" />
                   </div>
-                ) : discussions.length === 0 ? (
+                ) : visibleDiscussions.length === 0 ? (
                   <div className="text-center py-12 bg-white border border-gray-100 rounded-xl shadow-sm">
                     <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-600 dark:text-gray-300 mb-1 font-bold">
@@ -1286,7 +1335,7 @@ const Community = () => {
                 )}
 
                 {/* Load More */}
-                {hasMore && discussions.length >= 10 && (
+                {hasMore && visibleDiscussions.length >= 10 && (
                   <div className="flex justify-center mt-8">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -1313,6 +1362,10 @@ const Community = () => {
 
               {/* Right Column - Sidebar */}
               <div className="space-y-8">
+                {isSupportChannel && (
+                  <EmotionChatbot studentName={currentUser?.fullName || currentUser?.name} />
+                )}
+
                 {/* Featured Groups */}
                 <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 hover:bg-white/80 transition-all duration-300">
                   <h3 className="text-[#002147] font-bold mb-6 flex items-center gap-3 text-lg">
@@ -1325,7 +1378,7 @@ const Community = () => {
                     <p className="text-gray-500 text-sm text-center py-4">No groups available</p>
                   ) : (
                     <div className="space-y-4">
-                      {featuredGroups.map((group) => {
+                      {visibleDiscussions.map((discussion) => {
                         const IconComponent = iconMap[group.icon] || Users;
                         return (
                           <div
@@ -1482,6 +1535,34 @@ const Community = () => {
                             <option value="other">✨ Other</option>
                           </select>
                           <ChevronRight className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none rotate-90" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Channel</label>
+                          {isSupportChannel ? (
+                            <div className="px-4 py-3 rounded-xl bg-blue-50 text-[#002147] font-bold border border-blue-100">
+                              Support (locked)
+                            </div>
+                          ) : (
+                            <div className="flex gap-2 bg-gray-50 border border-gray-100 rounded-2xl p-1">
+                              {[{ key: "discussion", label: "Discussion" }, { key: "support", label: "Support" }].map((chan) => (
+                                <button
+                                  key={chan.key}
+                                  onClick={() => setNewPost(prev => ({ ...prev, channelType: chan.key }))}
+                                  className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                                    newPost.channelType === chan.key
+                                      ? "bg-[#002147] text-white shadow"
+                                      : "text-gray-600 hover:bg-white"
+                                  }`}
+                                >
+                                  {chan.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                          <p className="text-[11px] text-gray-500 font-semibold mt-2">Support channel enables Emotion Coach and quicker triage.</p>
                         </div>
                       </div>
                     </div>
