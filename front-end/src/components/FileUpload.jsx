@@ -97,10 +97,10 @@ const FileUpload = ({
 
             <div
                 className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${isDragging
-                    ? "border-teal-500 bg-teal-50 dark:bg-teal-500/10"
+                    ? "border-[#1a3884] bg-blue-50 dark:bg-blue-900/10"
                     : value
-                        ? "border-emerald-500/50 bg-emerald-50/50 dark:bg-emerald-500/5"
-                        : "border-slate-300 dark:border-white/10 hover:border-teal-400 dark:hover:border-teal-400/50"
+                        ? "border-green-500/50 bg-green-50/50 dark:bg-green-500/5"
+                        : "border-slate-300 dark:border-white/10 hover:border-[#1a3884] dark:hover:border-blue-400/50"
                     }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -127,8 +127,8 @@ const FileUpload = ({
                                 exit={{ opacity: 0, scale: 0.8 }}
                                 className="flex flex-col items-center"
                             >
-                                <Loader2 className="w-10 h-10 text-teal-500 animate-spin mb-2" />
-                                <p className="text-sm text-teal-600 font-medium">Adding to your Skills Passport...</p>
+                                <Loader2 className="w-10 h-10 text-[#1a3884] animate-spin mb-2" />
+                                <p className="text-sm text-[#1a3884] font-medium">Adding to your Skills Passport...</p>
                             </motion.div>
                         ) : value ? (
                             <motion.div
@@ -137,14 +137,14 @@ const FileUpload = ({
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="flex items-center gap-4 w-full"
                             >
-                                <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center">
-                                    <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                                <div className="flex-shrink-0 w-12 h-12 bg-green-100 dark:bg-green-500/20 rounded-full flex items-center justify-center">
+                                    <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                                         File Uploaded Successfully
                                     </p>
-                                    <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                                    <p className="text-xs text-green-600 dark:text-green-400">
                                         Ready to submit
                                     </p>
                                 </div>
@@ -162,11 +162,11 @@ const FileUpload = ({
                                 animate={{ opacity: 1 }}
                                 className="flex flex-col items-center text-center cursor-pointer"
                             >
-                                <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-3 group-hover:bg-teal-50 dark:group-hover:bg-teal-500/10 transition-colors">
-                                    <Upload className="w-6 h-6 text-slate-400 group-hover:text-teal-500" />
+                                <div className="w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-3 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/10 transition-colors">
+                                    <Upload className="w-6 h-6 text-slate-400 group-hover:text-[#1a3884]" />
                                 </div>
                                 <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                                    <span className="text-teal-600 dark:text-teal-400">Click to upload</span> or drag and drop
+                                    <span className="text-[#1a3884] dark:text-blue-400">Click to upload</span> or drag and drop
                                 </p>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                     {helperText} (Max {maxSizeMB}MB)

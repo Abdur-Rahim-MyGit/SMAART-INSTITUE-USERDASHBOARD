@@ -230,18 +230,24 @@ const DashboardSidebar = () => {
             {[
               { label: 'Home', path: '/dashboard' },
               { label: 'Courses', path: '/dashboard/courses' },
+              { label: 'Chat', path: '/dashboard/ai-career-coach/chat' },
               { label: 'Assessments', path: '/dashboard/assessment-centre' },
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
-              { label: 'Wallet', path: '/dashboard/smaart-wallet' }
+              { label: 'Wallet', path: '/dashboard/smaart-wallet' },
+              { label: 'Help', path: null, isHelp: true }
             ].map(item => {
               const isActive = location.pathname === item.path ||
                 (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
 
               return (
-                <Link
-                  key={item.path}
-                  to={item.path}
+                <button
+                  key={item.label}
+                  id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  onClick={() => {
+                    if (item.isHelp) setIsChatbotOpen(true);
+                    else if (item.path) navigate(item.path);
+                  }}
                   className={`text-sm font-bold transition-all duration-200 relative group py-1 ${isActive
                     ? 'text-[#1a3884]'
                     : 'text-slate-600 dark:text-slate-300 hover:text-[#1a3884] dark:hover:text-[#1a3884]'
@@ -255,7 +261,7 @@ const DashboardSidebar = () => {
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
-                </Link>
+                </button>
               );
             })}
           </div>
@@ -390,7 +396,9 @@ const DashboardSidebar = () => {
             </div>
 
             {/* Profile */}
-            <ProfileDropdown />
+            <div id="nav-profile">
+              <ProfileDropdown />
+            </div>
           </div>
         </div>
       </header>

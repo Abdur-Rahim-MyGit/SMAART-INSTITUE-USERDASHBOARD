@@ -67,7 +67,7 @@ const Analysis = () => {
                                         initial={{ width: 0 }}
                                         animate={{ width: "92%" }}
                                         transition={{ duration: 1, delay: 0.5 }}
-                                        className="h-full bg-teal shadow-[0_0_10px_rgba(20,184,166,0.5)]"
+                                        className="h-full bg-teal shadow-[0_0_10px_rgba(26, 56, 132, 0.5)]"
                                     />
                                 </div>
                             </div>
@@ -82,7 +82,7 @@ const Analysis = () => {
                                         initial={{ width: 0 }}
                                         animate={{ width: "85%" }}
                                         transition={{ duration: 1, delay: 0.7 }}
-                                        className="h-full bg-teal shadow-[0_0_10px_rgba(20,184,166,0.5)]"
+                                        className="h-full bg-teal shadow-[0_0_10px_rgba(26, 56, 132, 0.5)]"
                                     />
                                 </div>
                             </div>
@@ -97,7 +97,7 @@ const Analysis = () => {
                                         initial={{ width: 0 }}
                                         animate={{ width: "78%" }}
                                         transition={{ duration: 1, delay: 0.9 }}
-                                        className="h-full bg-teal shadow-[0_0_10px_rgba(20,184,166,0.5)]"
+                                        className="h-full bg-teal shadow-[0_0_10px_rgba(26, 56, 132, 0.5)]"
                                     />
                                 </div>
                             </div>

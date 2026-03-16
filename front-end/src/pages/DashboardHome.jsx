@@ -9,6 +9,7 @@ import {
   BookOpen, Award, CheckCircle2, Circle, Clock, Briefcase, MapPin, DollarSign, Globe, Zap, Shield, Check
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
+import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 
 const DashboardHome = () => {
   const navigate = useNavigate();
@@ -44,6 +45,10 @@ const DashboardHome = () => {
     <>
       {showVisionSplash && (
         <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
+      )}
+      
+      {!showVisionSplash && user && (
+        <StudentOnboarding user={user} />
       )}
 
       <div className={`min-h-screen ${bgMain} font-sans transition-colors duration-300 text-slate-800`}>
