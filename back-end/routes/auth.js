@@ -1046,11 +1046,10 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
       // If not found in this college, DO NOT fall back to other collections
       // This prevents cross-college password resets
       if (!user) {
-        console.log(`[Forgot Password] Email ${normalizedEmail} not found in college ${collegeCode} - silently rejecting`);
-        return res.json({
-          message: 'If an account exists with this email at this institution, you will receive a password reset code.',
-          success: true,
-          wrongCollege: true // Flag for frontend to show helpful message
+        console.log(`[Forgot Password] Email ${normalizedEmail} not found in college ${collegeCode}`);
+        return res.status(404).json({
+          error: 'Email not found at this institution.',
+          wrongCollege: true 
         });
       }
     } else {
@@ -1065,10 +1064,10 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
     }
 
     // Don't reveal if user exists or not for security
+    // STRICT: Return error if user doesn't exist
     if (!user) {
-      return res.json({
-        message: 'If an account exists with this email, you will receive a password reset code.',
-        success: true
+      return res.status(404).json({
+        error: 'No account found with this email address.'
       });
     }
 

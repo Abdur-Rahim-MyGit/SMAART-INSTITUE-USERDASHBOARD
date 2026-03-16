@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, Mail, ArrowRight, KeyRound, CheckCircle, Eye, EyeOff, Info, CheckCircle2 } from "lucide-react";
+import { X, Loader2, Mail, ArrowRight, KeyRound, CheckCircle, Eye, EyeOff, Info, CheckCircle2, Building2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { API_BASE_URL, apiCall } from "@/services/api";
 import logoWhite from "@/assets/white.png";
@@ -16,6 +17,11 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [collegeSearch, setCollegeSearch] = useState("");
+    const [colleges, setColleges] = useState([]);
+    const [selectedCollege, setSelectedCollege] = useState(null);
+    const [isSearchingColleges, setIsSearchingColleges] = useState(false);
+    const [showCollegeDropdown, setShowCollegeDropdown] = useState(false);
     const inputRefs = useRef([]);
 
     useEffect(() => {
@@ -26,8 +32,42 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
             setOtp(["", "", "", "", "", ""]);
             setNewPassword("");
             setConfirmPassword("");
+            
+            // Try to pre-fill from session if available
+            const stored = sessionStorage.getItem("selectedInstitution");
+            if (stored) {
+                try {
+                    const inst = JSON.parse(stored);
+                    setSelectedCollege(inst);
+                    setCollegeSearch(inst.name);
+                } catch (e) {}
+            }
         }
     }, [isOpen]);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (collegeSearch.trim() && (!selectedCollege || collegeSearch !== selectedCollege.name)) {
+                fetchColleges(collegeSearch);
+            }
+        }, 300);
+        return () => clearTimeout(timeoutId);
+    }, [collegeSearch]);
+
+    const fetchColleges = async (search) => {
+        setIsSearchingColleges(true);
+        try {
+            const data = await apiCall(`/colleges?search=${encodeURIComponent(search)}&limit=5`);
+            if (data.success) {
+                setColleges(data.data || []);
+                setShowCollegeDropdown(true);
+            }
+        } catch (error) {
+            console.error("Colleges fetch error:", error);
+        } finally {
+            setIsSearchingColleges(false);
+        }
+    };
 
     useEffect(() => {
         if (step === 2 && inputRefs.current[0]) {
@@ -74,22 +114,18 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
             return;
         }
 
+        if (!selectedCollege) {
+            toast.error("Please select your institution");
+            return;
+        }
+
         setIsLoading(true);
         try {
-            const storedInstitution = sessionStorage.getItem("selectedInstitution");
-            let collegeCode = null;
-            if (storedInstitution) {
-                try {
-                    const institution = JSON.parse(storedInstitution);
-                    collegeCode = institution.code || institution.name;
-                } catch (e) {}
-            }
-
             const data = await apiCall('/auth/forgot-password', {
                 method: "POST",
                 body: JSON.stringify({
                     email: email.trim(),
-                    collegeCode: collegeCode
+                    collegeCode: selectedCollege.code || selectedCollege.name
                 }),
             });
 
@@ -193,9 +229,9 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                         {/* Close Button */}
                         <button
                             onClick={onClose}
-                            className="absolute -top-2 -right-2 text-gray-400 hover:text-[#BC9B6A] transition-colors z-20"
+                            className="absolute top-5 right-5 text-white/70 hover:text-white transition-colors z-30"
                         >
-                            <X className="w-6 h-6" />
+                            <X className="w-5 h-5" />
                         </button>
 
                         {/* Header */}
@@ -225,21 +261,78 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                         </p>
                                     </div>
 
-                                    <div className="space-y-1.5 mt-4">
-                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Account Email</label>
-                                        <Input
-                                            type="email"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            placeholder="your@email.com"
-                                            className="bg-white border-gray-300 h-11 rounded-none text-sm px-4 focus:border-[#BC9B6A] shadow-sm"
-                                        />
+                                    <div className="space-y-4">
+                                        {/* College Selection */}
+                                        <div className="space-y-1.5 relative">
+                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Your Institution</label>
+                                            <div className="relative">
+                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                                    <Building2 className="w-4 h-4" />
+                                                </div>
+                                                <Input
+                                                    type="text"
+                                                    value={collegeSearch}
+                                                    onChange={(e) => {
+                                                        setCollegeSearch(e.target.value);
+                                                        if (selectedCollege && e.target.value !== selectedCollege.name) {
+                                                            setSelectedCollege(null);
+                                                        }
+                                                    }}
+                                                    placeholder="Search University/College..."
+                                                    className="bg-white border-gray-300 h-11 rounded-none text-sm pl-10 pr-4 focus:border-[#BC9B6A] shadow-sm"
+                                                />
+                                                {isSearchingColleges && (
+                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                        <Loader2 className="w-4 h-4 animate-spin text-[#BC9B6A]" />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Dropdown for colleges */}
+                                            {showCollegeDropdown && colleges.length > 0 && !selectedCollege && (
+                                                <div className="absolute top-full left-0 right-0 z-[100] bg-white border border-gray-200 shadow-xl max-h-48 overflow-y-auto mt-1 custom-scrollbar">
+                                                    {colleges.map((college, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            onClick={() => {
+                                                                setSelectedCollege({
+                                                                    name: college.collegeName,
+                                                                    code: college.collegeCode
+                                                                });
+                                                                setCollegeSearch(college.collegeName);
+                                                                setShowCollegeDropdown(false);
+                                                            }}
+                                                            className="p-3 text-sm hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0 flex items-center gap-2"
+                                                        >
+                                                            <Building2 className="w-3.5 h-3.5 text-[#002B5B]" />
+                                                            <span className="truncate">{college.collegeName}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-1.5 mt-2">
+                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Account Email</label>
+                                            <div className="relative">
+                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                                    <Mail className="w-4 h-4" />
+                                                </div>
+                                                <Input
+                                                    type="email"
+                                                    value={email}
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    placeholder="your@email.com"
+                                                    className="bg-white border-gray-300 h-11 rounded-none text-sm pl-10 pr-4 focus:border-[#BC9B6A] shadow-sm"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <Button
                                         onClick={handleRequestReset}
-                                        disabled={isLoading || !email}
-                                        className="w-full bg-[#004D40] hover:bg-[#00332D] text-white h-12 rounded-none text-sm font-bold transition-all shadow-xl mt-6"
+                                        disabled={isLoading || !email || !selectedCollege}
+                                        className="w-full bg-[#004D40] hover:bg-[#00332D] text-white h-12 rounded-none text-sm font-bold transition-all shadow-xl mt-6 disabled:opacity-50"
                                     >
                                         {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Reset Code"}
                                     </Button>
