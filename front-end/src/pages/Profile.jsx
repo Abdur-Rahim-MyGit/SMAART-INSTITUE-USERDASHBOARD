@@ -381,12 +381,12 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  {/* Edit Button */}
+                  {/* Add Details Button */}
                   <button
-                    onClick={() => navigate('/dashboard/settings')}
+                    onClick={() => navigate('/add-details')}
                     className="w-full py-2 mt-4 rounded-md border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-gray-300 text-xs font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                   >
-                    Edit Profile
+                    Add Details
                   </button>
                 </motion.div>
 
