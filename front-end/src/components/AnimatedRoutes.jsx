@@ -15,6 +15,7 @@ const MyNotes = lazy(() => import('@/pages/MyNotes'));
 const MyAssessments = lazy(() => import('@/pages/MyAssessments'));
 const SkillsPassport = lazy(() => import('@/pages/SkillsPassport'));
 const Profile = lazy(() => import('@/pages/Profile'));
+const AddDetails = lazy(() => import('@/pages/AddDetails'));
 const ModuleViewPage = lazy(() => import('@/pages/ModuleViewPage'));
 const QuotientsGrid = lazy(() => import('@/pages/QuotientsGrid'));
 const VisionBoardGalleryPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardGalleryPro'));
@@ -104,6 +105,8 @@ const AnimatedRoutes = () => {
                     <Route path="/skills-passport" element={<AssessmentFlowGuard><SkillsPassport /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/skills-passport" element={<AssessmentFlowGuard><SkillsPassport /></AssessmentFlowGuard>} />
                     <Route path="/profile" element={<AssessmentFlowGuard><Profile /></AssessmentFlowGuard>} />
+                    <Route path="/add-details" element={<AssessmentFlowGuard><AddDetails /></AssessmentFlowGuard>} />
+                    <Route path="/dashboard/add-details" element={<AssessmentFlowGuard><AddDetails /></AssessmentFlowGuard>} />
                     <Route path="/module/:courseId/:moduleId" element={<AssessmentFlowGuard><ModuleViewPage /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/courses/:courseId/modules" element={<AssessmentFlowGuard><ModuleViewPage /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/courses/:courseId/modules/:moduleId/days/:dayId" element={<AssessmentFlowGuard><ModuleViewPage /></AssessmentFlowGuard>} />
