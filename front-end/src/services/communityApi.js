@@ -44,6 +44,7 @@ export const communityAPI = {
   // Create discussion
   createDiscussion: async (data) => {
     const isFormData = data instanceof FormData;
+    console.log('[API CALL] sending', data);
     return apiCall('/community/discussions', {
       method: 'POST',
       body: isFormData ? data : JSON.stringify(data),
