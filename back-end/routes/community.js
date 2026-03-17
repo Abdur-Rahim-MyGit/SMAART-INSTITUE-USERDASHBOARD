@@ -125,6 +125,17 @@ router.get('/coachalerts', requireRole('moderator', 'admin'), async (req, res) =
   }
 });
 
+// Maintenance: remove replies with null author to prevent validation errors
+router.get('/fix-corrupt-replies', requireRole('admin', 'moderator', 'staff', 'superadmin'), async (req, res) => {
+  try {
+    const result = await CommunityPost.updateMany({}, { $pull: { replies: { author: null } } });
+    res.json({ success: true, modifiedCount: result.modifiedCount });
+  } catch (error) {
+    console.error('Error fixing corrupt replies:', error);
+    res.status(500).json({ success: false, error: 'Failed to fix corrupt replies' });
+  }
+});
+
 // Get all discussions with pagination
 router.get('/discussions', async (req, res) => {
   try {
@@ -298,10 +309,11 @@ router.get('/discussions/bookmarks/:userId', async (req, res) => {
   }
 });
 
-// Create a discussion (multipart supported)
-router.post('/discussions', uploadCommunity.single('media'), async (req, res) => {
+// Create a discussion (multipart supported, accept any common file field name)
+router.post('/discussions', uploadCommunity.any(), async (req, res) => {
   try {
     const { title, content, authorId, authorEmail, channelType, tags, category, isMentorInteraction } = req.body;
+    const file = (req.files && req.files[0]) || req.file;
 
     const normalizedChannel = (channelType || '').toString().toLowerCase();
     const resolvedChannelType = ['support', 'discussion', 'mentor', 'coach'].includes(normalizedChannel)
@@ -378,16 +390,16 @@ router.post('/discussions', uploadCommunity.single('media'), async (req, res) =>
 
     // Run NSFW scan on uploaded images before persisting
     let mediaPayload;
-    if (req.file) {
-      const resourceType = req.file.mimetype?.startsWith('video/') ? 'video' : 'image';
+    if (file) {
+      const resourceType = file.mimetype?.startsWith('video/') ? 'video' : 'image';
 
       if (resourceType === 'image') {
-        const nsfwResult = await scanImage(req.file.path || req.file.originalname);
+        const nsfwResult = await scanImage(file.path || file.originalname);
 
         if (!nsfwResult.safe) {
           try {
-            if (req.file.filename) {
-              await cloudinary.uploader.destroy(req.file.filename, { resource_type: 'image' });
+            if (file.filename) {
+              await cloudinary.uploader.destroy(file.filename, { resource_type: 'image' });
             }
           } catch (cleanupError) {
             console.warn('[Community] Failed to cleanup rejected image:', cleanupError.message);
@@ -403,8 +415,8 @@ router.post('/discussions', uploadCommunity.single('media'), async (req, res) =>
       }
 
       mediaPayload = {
-        url: req.file.path,
-        publicId: req.file.filename,
+        url: file.path,
+        publicId: file.filename,
         resourceType
       };
     }
@@ -630,7 +642,7 @@ const likeHandler = async (req, res) => {
     } else {
       discussion.likes.splice(likeIndex, 1);
     }
-
+    discussion.replies = (discussion.replies || []).filter(r => r && r.author != null);
     await discussion.save();
     res.json({ success: true, data: { likes: discussion.likes.length, isLiked: likeIndex === -1 } });
   } catch (error) {
@@ -695,6 +707,9 @@ router.post('/discussions/:id/react', async (req, res) => {
       support: (discussion.reactions || []).filter(r => r.type === 'support').length
     };
 
+    discussion.replies = (discussion.replies || []).filter(r => r && r.author != null);
+    await discussion.save();
+
     res.json({
       success: true,
       data: {
@@ -726,7 +741,7 @@ router.post('/discussions/:id/bookmark', async (req, res) => {
     } else {
       discussion.isBookmarkedBy.splice(bookmarkIndex, 1);
     }
-
+    discussion.replies = (discussion.replies || []).filter(r => r && r.author != null);
     await discussion.save();
     res.json({ success: true, data: { isBookmarked: bookmarkIndex === -1 } });
   } catch (error) {
@@ -780,7 +795,7 @@ router.post('/discussions/:id/vote', async (req, res) => {
       // New vote
       discussion.poll.options[optionIndex].voters.push(userId);
     }
-
+    discussion.replies = (discussion.replies || []).filter(r => r && r.author != null);
     await discussion.save();
 
     const populated = await CommunityPost.findById(req.params.id).lean();
@@ -828,7 +843,7 @@ router.post('/discussions/:id/reply', async (req, res) => {
       author: authorId,
       content
     });
-
+    discussion.replies = (discussion.replies || []).filter(r => r && r.author != null);
     await discussion.save();
 
     // Log mentor/coach interactions for mentorship tracking
@@ -917,6 +932,7 @@ router.put('/discussions/:id/reply/:replyId', async (req, res) => {
     }
 
     reply.content = content;
+    discussion.replies = (discussion.replies || []).filter(r => r && r.author != null);
     await discussion.save();
 
     const populated = await CommunityPost.findById(id).lean();
@@ -951,6 +967,7 @@ router.delete('/discussions/:id/reply/:replyId', async (req, res) => {
     }
 
     reply.remove();
+    discussion.replies = (discussion.replies || []).filter(r => r && r.author != null);
     await discussion.save();
 
     const populated = await CommunityPost.findById(id).lean();

@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const path = require('path');
 require('dotenv').config();
+const { startCronJobs } = require('./utils/cronJobs');
 
 // Import logger
 const logger = require('./utils/logger');
@@ -137,6 +138,7 @@ app.use('/api/community', require('./routes/community'));
 app.use('/api/groups', require('./routes/groups'));
 app.use('/api/moderation', require('./routes/moderationQueue'));
 app.use('/api/moderation/actions', require('./routes/moderation'));
+app.use('/api/ppi', require('./routes/ppiRoutes'));
 
 // Avatar System Routes (3D Level-Based Unlock System)
 app.use('/api/avatar', require('./routes/avatar'));
@@ -233,4 +235,5 @@ const startServer = (port) => {
 };
 
 startServer(PORT);
+startCronJobs();
 
