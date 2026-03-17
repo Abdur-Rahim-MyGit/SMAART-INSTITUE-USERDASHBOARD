@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Heart, BookOpen, Users, Target, Briefcase, Monitor, Leaf, Download, Shield, Share2, BarChart2, MapPin, Calendar, CheckCircle, ArrowLeft, X } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
+import DashboardHeader from "@/components/DashboardHeader";
 import { assessmentApi } from "@/services/assessmentApi";
 import SkillsPassportSkeleton from "@/components/skeletons/SkillsPassportSkeleton";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
@@ -414,20 +415,16 @@ const SkillsPassport = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-900 font-sans transition-colors duration-300">
+        <div className="h-screen flex flex-col bg-slate-50 dark:bg-slate-900 font-sans transition-colors duration-300 overflow-hidden">
             <DashboardSidebar />
 
-            <div className="relative">
+            <div className="flex-1 overflow-y-auto transition-all duration-300">
+                <DashboardHeader />
                 <main className="w-full py-8 px-4 md:px-8">
                     {isLoading ? (
                         <SkillsPassportSkeleton />
                     ) : (
                         <div className="max-w-5xl mx-auto">
-                            <header className="mb-8">
-                                <h1 className="text-3xl font-bold text-[#002147] dark:text-white">Skills Passport</h1>
-                                <p className="text-slate-500 dark:text-slate-400 mt-1.5">Track your competency growth across assessments.</p>
-                            </header>
-
                             {/* Tabs + Skills Passport button */}
                             <div className="flex items-center gap-3 mb-8 flex-wrap">
                                 <div className="flex flex-wrap gap-2 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors">

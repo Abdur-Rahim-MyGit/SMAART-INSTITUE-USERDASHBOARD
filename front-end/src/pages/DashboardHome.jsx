@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import DashboardSidebar from "@/components/DashboardSidebar";
+import DashboardHeader from "@/components/DashboardHeader";
 import PageTransition from "@/components/PageTransition";
 import VisionBoardSplash from "@/components/VisionBoardSplash";
 import {
@@ -51,11 +52,14 @@ const DashboardHome = () => {
         <StudentOnboarding user={user} />
       )}
 
-      <div className={`min-h-screen ${bgMain} font-sans transition-colors duration-300 text-slate-800`}>
+      <div className={`h-screen flex flex-col ${bgMain} font-sans transition-colors duration-300 text-slate-800 overflow-hidden`}>
         <DashboardSidebar />
 
-        <div className="min-h-screen p-3 md:p-5 lg:p-6 pb-20 lg:pb-6">
-          <PageTransition>
+        <div className="flex-1 overflow-y-auto transition-all duration-300">
+          <DashboardHeader />
+
+          <main className="p-3 md:p-5 lg:p-6 pb-20 lg:pb-6">
+            <PageTransition>
             <div className="max-w-[1600px] mx-auto space-y-4">
 
 
@@ -458,8 +462,9 @@ const DashboardHome = () => {
                  </div>
               </div>
 
-            </div>
-          </PageTransition>
+              </div>
+            </PageTransition>
+          </main>
         </div>
       </div>
     </>
