@@ -42,8 +42,12 @@ const communityPostSchema = new mongoose.Schema({
   },
   channelType: {
     type: String,
-    enum: ['support', 'discussion'],
+    enum: ['support', 'discussion', 'mentor', 'coach'],
     default: 'discussion'
+  },
+  isMentorInteraction: {
+    type: Boolean,
+    default: false
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,

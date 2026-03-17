@@ -23,6 +23,11 @@ const communityGroupSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
+  memberRole: {
+    type: String,
+    enum: ['student', 'mentor', 'coach'],
+    default: 'student'
+  },
   admins: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

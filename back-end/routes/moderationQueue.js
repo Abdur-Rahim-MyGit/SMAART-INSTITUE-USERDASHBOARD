@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const CommunityPost = require('../models/CommunityPost');
+const ModerationLog = require('../models/ModerationLog');
 const { protect } = require('../middleware/auth');
 const { requireRole } = require('../middleware/roleMiddleware');
 
@@ -44,8 +46,9 @@ router.get('/queue', async (req, res) => {
       }
     });
   } catch (error) {
+    console.log('[MODERATION ERROR]', error);
     console.error('Error fetching moderation queue:', error);
-    res.status(500).json({ success: false, error: 'Failed to load moderation queue' });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -91,8 +94,48 @@ router.patch('/queue/:id/resolution', async (req, res) => {
 
     res.json({ success: true, data: post });
   } catch (error) {
+    console.log('[MODERATION ERROR]', error);
     console.error('Error updating moderation resolution:', error);
-    res.status(500).json({ success: false, error: 'Failed to update moderation resolution' });
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /moderation/queue/:postId/dismiss
+router.post('/queue/:postId/dismiss', async (req, res) => {
+  try {
+    const { postId } = req.params;
+    let postObjectId;
+    try {
+      postObjectId = new mongoose.Types.ObjectId(postId);
+    } catch (castError) {
+      return res.status(400).json({ success: false, error: 'Invalid postId' });
+    }
+
+    const post = await CommunityPost.findById(postObjectId);
+    if (!post || !post.flaggedAt) {
+      return res.status(404).json({ success: false, error: 'Flagged post not found' });
+    }
+
+    post.resolution = post.resolution || {};
+    post.resolution.status = 'actioned';
+    post.resolution.resolvedAt = new Date();
+    post.moderatorId = req.user._id;
+
+    await post.save();
+
+    await ModerationLog.create({
+      action: 'dismissed',
+      actorId: req.user?._id || req.user?.id || new mongoose.Types.ObjectId(),
+      targetId: post.author,
+      postId: postObjectId,
+      reason: 'Post dismissed from moderation queue'
+    });
+
+    res.json({ success: true, data: post });
+  } catch (error) {
+    console.log('[MODERATION ERROR]', error);
+    console.error('Error dismissing flagged post:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
