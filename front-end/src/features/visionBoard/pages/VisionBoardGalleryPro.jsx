@@ -61,19 +61,19 @@ const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeac
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className={`group relative bg-white dark:bg-[#1e293b] rounded-2xl shadow-sm border overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isCurrentVision ? 'border-blue-500 ring-2 ring-blue-500/20 shadow-blue-500/10' : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700'
+      className={`group relative bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${isCurrentVision ? 'border-[#1a3884] ring-2 ring-[#1a3884]/20 shadow-[#1a3884]/10' : 'border-slate-200 dark:border-slate-700 hover:border-[#1a3884]/50 dark:hover:border-[#1a3884]/50'
         }`}
     >
       {/* Active Vision Badge */}
       {isCurrentVision && (
-        <div className="absolute top-0 left-0 right-0 bg-blue-600 text-white text-[10px] font-bold py-1.5 px-2 text-center z-10 shadow-md tracking-widest uppercase">
-          <Star className="w-3 h-3 inline mr-1 mb-0.5 fill-white" />
+        <div className="absolute top-0 left-0 right-0 bg-[#1a3884] text-white text-[9px] font-bold py-1 px-2 text-center z-10 shadow-sm tracking-widest uppercase">
+          <Star className="w-2.5 h-2.5 inline mr-1 mb-0.5 fill-white" />
           Active Vision
         </div>
       )}
 
       {/* Collage Image */}
-      <div className={`relative aspect-square bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden ${isCurrentVision ? 'mt-7 border-t border-slate-100 dark:border-slate-700' : ''}`}>
+      <div className={`relative aspect-square bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden ${isCurrentVision ? 'mt-5 border-t border-slate-100 dark:border-slate-700' : ''}`}>
         {board.collageImage ? (
           <img
             src={board.collageImage}
@@ -153,13 +153,13 @@ const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeac
       </div>
 
       {/* Footer Info */}
-      <div className="p-5 relative">
-        <div className="mb-4">
-          <h3 className="font-bold text-slate-800 dark:text-white truncate text-base mb-1" title={board.title}>
+      <div className="p-3.5 relative">
+        <div className="mb-3">
+          <h3 className="font-bold text-slate-800 dark:text-white truncate text-sm mb-0.5" title={board.title}>
             {board.title}
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
-            <Calendar className="w-3.5 h-3.5" />
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
+            <Calendar className="w-3 h-3" />
             {formatDate(board.createdAt)}
           </p>
         </div>
@@ -177,9 +177,9 @@ const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeac
             setIsSettingActive(false);
           }}
           disabled={isSettingActive}
-          className={`w-full text-xs font-bold h-10 shadow-sm relative overflow-hidden transition-all duration-300 rounded-lg group/btn ${isCurrentVision
+          className={`w-full text-[10px] font-bold h-8 shadow-sm relative overflow-hidden transition-all duration-300 rounded-lg group/btn ${isCurrentVision
             ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-500 text-green-700 dark:text-green-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 hover:text-red-600'
-            : 'bg-blue-600 hover:bg-blue-700 text-white border-0 hover:shadow-lg hover:-translate-y-0.5'
+            : 'bg-[#1a3884] hover:bg-[#132c6b] text-white border-0 hover:shadow-md hover:-translate-y-0.5'
             }`}
         >
           {isSettingActive ? (
@@ -190,11 +190,11 @@ const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeac
           ) : isCurrentVision ? (
             <>
               <span className="flex items-center group-hover/btn:hidden">
-                <CheckCircle2 className="w-3.5 h-3.5 mr-2" />
+                <CheckCircle2 className="w-3 h-3 mr-1.5" />
                 Active Vision
               </span>
               <span className="hidden group-hover/btn:flex items-center">
-                <EyeOff className="w-3.5 h-3.5 mr-2" />
+                <EyeOff className="w-3 h-3 mr-1.5" />
                 Deactivate
               </span>
             </>
@@ -688,41 +688,38 @@ const VisionBoardGalleryPro = () => {
 
 
   return (
-    <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 overflow-hidden">
       <DashboardSidebar />
 
-      <div className="min-h-screen transition-all duration-300">
+      <div className="flex-1 overflow-y-auto transition-all duration-300">
         <DashboardHeader />
 
-        <main className="w-full relative py-8 px-4 md:px-0">
-          <div className="max-w-7xl mx-auto pb-12">
+        <main className="w-full relative py-4 px-4 md:px-8">
+          <div className="max-w-[1600px] mx-auto pb-6">
 
-            {/* Header Section */}
-            <div className="w-full text-center mb-12 px-4 relative z-10">
-              <div className="inline-block p-2 px-6 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm font-bold tracking-wide uppercase mb-3">
-                Dream & Manifest
+            {/* Header Section - Compact */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
+              <div className="flex-1 text-center md:text-left">
+                <p className="text-[#1a3884] dark:text-[#BC9B6A] text-3xl md:text-4xl font-['Dancing_Script'] mb-1">
+                  Visualize your goals and manifest your future...
+                </p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium max-w-xl">
+                  Create, view, and set your active vision board here.
+                </p>
               </div>
-              <h2 className="text-3xl md:text-5xl font-black text-slate-800 dark:text-white tracking-tight leading-tight mb-4">
-                My Vision <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Boards</span>
-              </h2>
-              <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                Visualize your goals and manifest your future. Create, view, and set your active vision board here.
-              </p>
-            </div>
 
-            {/* Actions Toolbar */}
-            <div className="flex flex-col md:flex-row justify-end items-center gap-4 mb-8">
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="hidden md:flex items-center text-xs font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-[#1e293b] px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-                  {boards.length} / {maxAllowed} Boards Used
+              <div className="flex items-center gap-4 shrink-0">
+                <div className="flex items-center text-xs font-bold text-[#1a3884]/70 dark:text-[#BC9B6A]/70 bg-white/50 dark:bg-[#1e293b]/50 px-4 py-2 rounded-xl border border-[#1a3884]/10 dark:border-[#BC9B6A]/10 shadow-sm">
+                  <Grid3X3 className="w-3.5 h-3.5 mr-2 opacity-50" />
+                  {boards.length} / {maxAllowed} BOARDS
                 </div>
 
                 <Button
                   onClick={handleCreateNew}
                   disabled={!canCreateMore}
-                  className={`h-12 px-6 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all ${canCreateMore
-                    ? "bg-blue-600 hover:bg-blue-700 text-white hover:-translate-y-1"
-                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                  className={`h-11 px-6 rounded-xl font-bold shadow-lg transition-all ${canCreateMore
+                    ? "bg-[#1a3884] hover:bg-[#132c6b] text-white hover:-translate-y-0.5"
+                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed border-0"
                     }`}
                 >
                   <Plus className="w-5 h-5 mr-2" />
@@ -731,27 +728,30 @@ const VisionBoardGalleryPro = () => {
               </div>
             </div>
 
+            {/* Content Container */}
+            <div className="relative">
+
             {/* Content */}
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-32 space-y-4">
-                <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+                <Loader2 className="w-12 h-12 text-[#1a3884] animate-spin" />
                 <p className="text-slate-400 animate-pulse">Loading your visions...</p>
               </div>
             ) : boards.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-24 text-center bg-white dark:bg-[#1e293b] rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm border-dashed">
-                <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mb-6">
-                  <Images className="w-8 h-8 text-blue-500" />
+                <div className="w-20 h-20 bg-[#1a3884]/10 rounded-full flex items-center justify-center mb-6">
+                  <Images className="w-8 h-8 text-[#1a3884]" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">No vision boards found</h3>
                 <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-8">
                   Start your journey by creating your first vision board today.
                 </p>
-                <Button onClick={handleCreateNew} className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-8 h-12 font-bold shadow-lg hover:shadow-blue-500/25">
+                <Button onClick={handleCreateNew} className="bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl px-8 h-12 font-bold shadow-lg hover:shadow-[#1a3884]/25">
                   <Plus className="w-5 h-5 mr-2" /> Create Board
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 <AnimatePresence>
                   {boards.map(board => (
                     <BoardCard
@@ -783,7 +783,8 @@ const VisionBoardGalleryPro = () => {
                   ))}
                 </AnimatePresence>
               </div>
-            )}
+                )}
+            </div>
           </div>
         </main>
 

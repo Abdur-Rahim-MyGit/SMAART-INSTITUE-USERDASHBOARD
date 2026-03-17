@@ -298,16 +298,18 @@ const Profile = () => {
   // Profile.jsx
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-950 transition-colors duration-300 overflow-hidden">
       <DashboardSidebar />
 
-      <div className="min-h-screen transition-all duration-300">
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
         <DashboardHeader />
 
         {loading ? (
-          <ProfileSkeleton />
+          <div className="flex-1 overflow-y-auto">
+            <ProfileSkeleton />
+          </div>
         ) : (
-          <main className="container mx-auto px-3 py-4 max-w-6xl">
+          <main className="flex-1 overflow-y-auto container mx-auto px-3 py-4 max-w-6xl">
             {/* Main Grid Layout - Compact */}
             <div className="grid lg:grid-cols-[260px_1fr] gap-4">
 

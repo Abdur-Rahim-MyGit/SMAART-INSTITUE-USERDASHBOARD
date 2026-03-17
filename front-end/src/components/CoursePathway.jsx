@@ -41,32 +41,7 @@ const CoursePathway = ({ onCourseClick }) => {
 
   return (
     <div className="w-full select-none">
-      {/* ── MY COURSES Header ── */}
-      <div style={{
-        background: '#1a3884',
-        padding: '18px 0 14px',
-        textAlign: 'center',
-        position: 'relative',
-        marginBottom: '0',
-      }}>
-
-        <h2 style={{
-          color: '#ffffff',
-          fontFamily: "'Playfair Display', 'Georgia', serif",
-          fontSize: '28px',
-          fontWeight: '700',
-          letterSpacing: '6px',
-          textTransform: 'uppercase',
-          margin: 0,
-        }}>
-          My Courses
-        </h2>
-      </div>
-
-      {/* Thin gold/cream line below header */}
-      <div style={{ height: '3px', background: 'linear-gradient(90deg, #c9a84c, #daa520, #c9a84c)' }} />
-
-      {/* ── Cards Container ── */}
+      {/* Cards Container */}
       <div style={{
         background: '#f5f0e8',
         padding: isMobile ? '24px 16px 32px' : '60px 24px 60px',

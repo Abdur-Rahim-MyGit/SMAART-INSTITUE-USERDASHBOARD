@@ -77,9 +77,9 @@ const AssessmentsDashboard = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#001229] transition-colors duration-300 font-sans">
+        <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#001229] transition-colors duration-300 font-sans overflow-hidden">
             <DashboardSidebar />
-            <div className="min-h-screen transition-all duration-300">
+            <div className="flex-1 overflow-y-auto transition-all duration-300">
                 <DashboardHeader />
 
                 <main className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
@@ -89,36 +89,20 @@ const AssessmentsDashboard = () => {
                         transition={{ duration: 0.45 }}
                         className="max-w-6xl mx-auto space-y-8"
                     >
-                        {/* ── Header ── */}
-                        <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] flex items-center justify-center shadow-lg shadow-blue-600/20 dark:shadow-blue-900/40">
-                                    <Brain className="w-6 h-6 text-white" />
-                                </div>
-                                <div>
-                                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white tracking-tight">
-                                        Assessment Centre
-                                    </h1>
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                                        Complete all four stages to build your competency profile
-                                    </p>
-                                </div>
+                        {/* Summary Stats */}
+                        <div className="flex justify-end items-center gap-2.5">
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 shadow-sm text-xs">
+                                <Award className="w-3.5 h-3.5 text-slate-400" />
+                                <span className="font-bold text-slate-700 dark:text-slate-200">{completedCount}</span>
+                                <span className="text-slate-400 dark:text-slate-500">/4 done</span>
                             </div>
-
-                            <div className="flex items-center gap-2.5">
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 shadow-sm text-xs">
-                                    <Award className="w-3.5 h-3.5 text-slate-400" />
-                                    <span className="font-bold text-slate-700 dark:text-slate-200">{completedCount}</span>
-                                    <span className="text-slate-400 dark:text-slate-500">/4 done</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 shadow-sm text-xs">
-                                    <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
-                                    <span className="font-bold text-slate-700 dark:text-slate-200">{pct}%</span>
-                                </div>
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 shadow-sm text-xs">
+                                <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
+                                <span className="font-bold text-slate-700 dark:text-slate-200">{pct}%</span>
                             </div>
-                        </header>
+                        </div>
 
-                        {/* ── Progress Track ── */}
+                        {/* Progress Track */}
                         <div className="relative bg-white dark:bg-slate-800/50 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-700/40 shadow-sm">
                             <div className="flex items-center justify-between mb-4">
                                 {STAGES.map((s, i) => {
