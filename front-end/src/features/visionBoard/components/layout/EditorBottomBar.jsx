@@ -4,7 +4,7 @@ import { Slider } from "@/components/ui/slider";
 
 const EditorBottomBar = ({ zoomLevel, setZoomLevel, onFitToScreen }) => {
   return (
-    <div className="hidden lg:flex h-10 bg-white dark:bg-[#001a38] border-t border-slate-200 dark:border-white/10 items-center justify-between px-4 fixed bottom-0 left-0 right-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+    <div className="hidden lg:flex h-10 bg-white dark:bg-[#1a3884] border-t border-slate-200 dark:border-white/10 items-center justify-between px-4 fixed bottom-0 left-0 right-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
         {/* Left: Spacer */}
         <div className="flex items-center gap-4">
         </div>

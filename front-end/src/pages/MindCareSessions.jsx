@@ -209,10 +209,11 @@ const MindCareSessions = () => {
   };
 
   return (
-    <div className="min-h-screen lms-dashboard-bg text-[#1A1A1A] font-sans">
+    <div className="h-screen flex flex-col lms-dashboard-bg text-[#1A1A1A] font-sans overflow-hidden">
       <DashboardSidebar />
 
-      <div className="min-h-screen">
+      <div className="flex-1 overflow-y-auto transition-all duration-300">
+        <DashboardHeader />
         <PageTransition>
           <main className="p-4 sm:p-6 lg:p-8">
             <motion.div
@@ -220,17 +221,6 @@ const MindCareSessions = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Page Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-xl bg-[#1a3884]/20">
-                    <Heart className="w-6 h-6 text-[#1a3884]" />
-                  </div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-[#002147]">Mind Care Sessions</h1>
-                </div>
-                <p className="text-gray-500">Request coaching sessions and track your appointments</p>
-              </div>
-
               {/* Tab Navigation */}
               <div className="flex flex-wrap gap-2 mb-6">
                 {tabs.map((tab) => {

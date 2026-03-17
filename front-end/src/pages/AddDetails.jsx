@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { API_BASE_URL, apiCall } from "@/services/api";
 import FileUpload from "@/components/FileUpload";
 import logoWhite from "@/assets/white.png";
+import DashboardSidebar from "@/components/DashboardSidebar";
+import DashboardHeader from "@/components/DashboardHeader";
 
 const AddDetails = () => {
     const navigate = useNavigate();
@@ -224,22 +226,11 @@ const AddDetails = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#BC9B6A]/30 pb-12">
-            <header className="bg-[#002147] text-white py-2 px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-3 sticky top-0 z-[100] shadow-md border-b-2 border-[#BC9B6A]">
-                <div className="flex items-center gap-3">
-                    <img src={logoWhite} alt="SMAART INSTITUTE" className="h-8 w-auto" />
-                    <div className="h-8 w-[1px] bg-white/20 hidden md:block mx-2" />
-                    <h1 className="text-xl md:text-2xl font-serif text-white/90">
-                        {steps[currentStep].title}
-                        <div className="h-[2px] w-1/2 bg-[#BC9B6A] mt-1 mx-auto md:mx-0" />
-                    </h1>
-                </div>
-                <div className="hidden sm:block">
-                    <p className="text-sm font-serif italic text-white/80 tracking-wide">"Enhance Your Profile, Unlock Opportunities!"</p>
-                </div>
-            </header>
-
-            <div className="max-w-4xl mx-auto py-10 px-4 relative">
+        <div className="h-screen flex flex-col bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#BC9B6A]/30 overflow-hidden">
+            <DashboardSidebar />
+            <div className="flex-1 overflow-y-auto transition-all duration-300">
+                <DashboardHeader />
+                <div className="max-w-4xl mx-auto py-10 px-4 relative">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-8 md:p-10 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.1)] border-2 border-[#BC9B6A] relative flex flex-col min-h-[600px]">
                     
                     <div className="mb-8 flex items-center justify-between">
@@ -480,6 +471,7 @@ const AddDetails = () => {
                             <span className={`text-[8px] font-bold uppercase tracking-widest ${idx === currentStep ? 'text-[#BC9B6A]' : 'text-slate-300'}`}>{step.title}</span>
                         </div>
                     ))}
+                </div>
                 </div>
             </div>
         </div>

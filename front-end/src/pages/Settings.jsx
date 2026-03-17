@@ -218,10 +218,10 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#001229]">
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-[#001229] overflow-hidden">
       <DashboardSidebar />
 
-      <div className="min-h-screen transition-all duration-300">
+      <div className="flex-1 overflow-y-auto transition-all duration-300">
         <DashboardHeader />
 
         <main className="p-4 sm:p-6 lg:p-8">
@@ -230,17 +230,6 @@ const Settings = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            {/* Page Header */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 rounded-xl bg-[#1a3884]/20">
-                  <SettingsIcon className="w-6 h-6 text-[#1a3884]" />
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
-              </div>
-              <p className="text-gray-500 dark:text-gray-400">Manage your account settings and preferences</p>
-            </div>
-
             {/* Settings Layout */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Sidebar Navigation */}

@@ -17,10 +17,10 @@ const MyCourses = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300 overflow-hidden">
       <DashboardSidebar />
 
-      <div className="min-h-screen transition-all duration-300">
+      <div className="flex-1 overflow-y-auto transition-all duration-300">
         <DashboardHeader />
 
         <main className="w-full relative px-0 md:px-0">
