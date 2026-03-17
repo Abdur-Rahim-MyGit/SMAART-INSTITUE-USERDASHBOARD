@@ -3,11 +3,13 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const CommunityPost = require('../models/CommunityPost');
 const CommunityGroup = require('../models/CommunityGroup');
+const MentorshipLog = require('../models/MentorshipLog');
 const User = require('../models/User');
 const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
 const Registration = require('../models/Registration');
 const { protect } = require('../middleware/auth');
+const { requireRole } = require('../middleware/roleMiddleware');
 const { uploadCommunity, cloudinary } = require('../middleware/upload');
 const { notifyCommunityReply } = require('../services/notificationService');
 const { classifyDistress } = require('../helpers/distressClassifier');
@@ -103,6 +105,26 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// Get coach alerts (moderator/admin only)
+router.get('/coachalerts', requireRole('moderator', 'admin'), async (req, res) => {
+  try {
+    const { resolved } = req.query;
+
+    const query = {};
+    if (resolved === 'true') query.resolved = true;
+    if (resolved === 'false') query.resolved = false;
+
+    const alerts = await CoachAlert.find(query)
+      .sort({ timestamp: -1 })
+      .lean();
+
+    res.json({ success: true, data: alerts });
+  } catch (error) {
+    console.error('Error fetching coach alerts:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch coach alerts' });
+  }
+});
+
 // Get all discussions with pagination
 router.get('/discussions', async (req, res) => {
   try {
@@ -110,17 +132,23 @@ router.get('/discussions', async (req, res) => {
     const { page = 1, limit = 10, category, search, sortBy = 'createdAt', channelType } = req.query;
     const collegeId = getCollegeFilter(req.query.collegeId);
 
+    const allowedChannels = ['support', 'discussion', 'mentor', 'coach'];
+    const normalizedChannel = (channelType || '').toString().toLowerCase();
+    const channelFilter = allowedChannels.includes(normalizedChannel) ? normalizedChannel : null;
     const query = { status: 'active' };
 
-    // Default to discussion channel unless explicitly requesting support
-    if (channelType === 'support') {
+    // Default to discussion-like channels unless explicitly filtered
+    if (channelFilter === 'support') {
       // STRICT: only support posts (case-insensitive)
       query.channelType = { $regex: /^support$/i };
+    } else if (channelFilter) {
+      query.channelType = channelFilter;
     } else {
-      // Discussion: include legacy posts lacking channelType, but explicitly exclude support
-      query.channelType = { $ne: 'support' };
+      // Include discussion/mentor/coach + legacy posts; exclude support by omission
       query.$or = [
         { channelType: 'discussion' },
+        { channelType: 'mentor' },
+        { channelType: 'coach' },
         { channelType: { $exists: false } },
         { channelType: null }
       ];
@@ -270,110 +298,50 @@ router.get('/discussions/bookmarks/:userId', async (req, res) => {
   }
 });
 
-// Get single discussion
-router.get('/discussions/:id', async (req, res) => {
+// Create a discussion (multipart supported)
+router.post('/discussions', uploadCommunity.single('media'), async (req, res) => {
   try {
-    const discussion = await CommunityPost.findById(req.params.id);
+    const { title, content, authorId, authorEmail, channelType, tags, category, isMentorInteraction } = req.body;
 
-    // Don't hydrate here immediately because we need to save() first. 
-    // We will convert to object and hydrate after save.
+    const normalizedChannel = (channelType || '').toString().toLowerCase();
+    const resolvedChannelType = ['support', 'discussion', 'mentor', 'coach'].includes(normalizedChannel)
+      ? normalizedChannel
+      : 'discussion';
 
-    if (!discussion) {
-      return res.status(404).json({ success: false, error: 'Discussion not found' });
-    }
-
-    // Block suspended users from replying
-    const now = new Date();
-    if (author?.status === 'suspended' || (author?.suspendedUntil && new Date(author.suspendedUntil) > now)) {
-      return res.status(403).json({ success: false, error: 'Your account is suspended and cannot reply.' });
-    }
-
-    // Increment views
-    discussion.views += 1;
-    await discussion.save();
-
-    const discussionObj = discussion.toObject();
-    await hydrateAuthors(discussionObj);
-
-    res.json({ success: true, data: discussionObj });
-  } catch (error) {
-    console.error('Error fetching discussion:', error);
-    res.status(500).json({ success: false, error: 'Failed to fetch discussion' });
-  }
-});
-
-// Create a new discussion
-router.post('/discussions', uploadCommunity.single('image'), async (req, res) => {
-  try {
-    console.log('[POST] new post received', req.body);
-    const { title, content, category, tags, authorId, authorEmail, channelType } = req.body;
-    console.log('[Community] Create Discussion Request Body:', JSON.stringify(req.body, null, 2));
-    console.log('[Community] channelType received:', channelType);
-
-    let author = null;
     let resolvedAuthorId = authorId;
+    let author = null;
 
-    // If authorId is provided, look up by ID first
     if (authorId) {
-      console.log('[Community] Looking up author with ID:', authorId);
-
-      author = await User.findById(authorId).select('college fullName email');
-      console.log('[Community] Checked User:', author ? 'Found' : 'Not Found');
-
-      if (!author) {
-        author = await Student.findById(authorId).select('college fullName email');
-        console.log('[Community] Checked Student:', author ? 'Found' : 'Not Found');
-      }
-
-      if (!author) {
-        author = await Teacher.findById(authorId).select('college fullName email');
-        console.log('[Community] Checked Teacher:', author ? 'Found' : 'Not Found');
-      }
-
-      if (!author) {
-        author = await Registration.findById(authorId).select('institution fullName email');
-        console.log('[Community] Checked Registration:', author ? 'Found' : 'Not Found');
-      }
+      author = await User.findById(authorId).select('college fullName email status suspendedUntil');
+      if (!author) author = await Student.findById(authorId).select('college fullName email status suspendedUntil');
+      if (!author) author = await Teacher.findById(authorId).select('college fullName email status suspendedUntil');
+      if (!author) author = await Registration.findById(authorId).select('institution fullName email status suspendedUntil');
     }
 
     // If no author found by ID and email is provided, look up by email
     if (!author && authorEmail) {
-      console.log('[Community] Looking up author by email:', authorEmail);
       const normalizedEmail = authorEmail.toLowerCase().trim();
 
-      author = await Student.findOne({ email: normalizedEmail }).select('college fullName email');
-      if (author) {
-        console.log('[Community] Found Student by email');
-        resolvedAuthorId = author._id;
+      author = await Student.findOne({ email: normalizedEmail }).select('college fullName email status suspendedUntil');
+      if (author) resolvedAuthorId = author._id;
+
+      if (!author) {
+        author = await User.findOne({ email: normalizedEmail }).select('college fullName email status suspendedUntil');
+        if (author) resolvedAuthorId = author._id;
       }
 
       if (!author) {
-        author = await User.findOne({ email: normalizedEmail }).select('college fullName email');
-        if (author) {
-          console.log('[Community] Found User by email');
-          resolvedAuthorId = author._id;
-        }
+        author = await Teacher.findOne({ email: normalizedEmail }).select('college fullName email status suspendedUntil');
+        if (author) resolvedAuthorId = author._id;
       }
 
       if (!author) {
-        author = await Teacher.findOne({ email: normalizedEmail }).select('college fullName email');
-        if (author) {
-          console.log('[Community] Found Teacher by email');
-          resolvedAuthorId = author._id;
-        }
-      }
-
-      if (!author) {
-        author = await Registration.findOne({ email: normalizedEmail }).select('institution fullName email');
-        if (author) {
-          console.log('[Community] Found Registration by email');
-          resolvedAuthorId = author._id;
-        }
+        author = await Registration.findOne({ email: normalizedEmail }).select('institution fullName email status suspendedUntil');
+        if (author) resolvedAuthorId = author._id;
       }
     }
 
     if (!author) {
-      console.error('[Community] Author lookup failed for ID:', authorId, 'and email:', authorEmail);
       return res.status(400).json({ success: false, error: 'Author not found. Please log out and log in again.' });
     }
 
@@ -411,7 +379,7 @@ router.post('/discussions', uploadCommunity.single('image'), async (req, res) =>
     // Run NSFW scan on uploaded images before persisting
     let mediaPayload;
     if (req.file) {
-      const resourceType = req.file.mimetype.startsWith('video/') ? 'video' : 'image';
+      const resourceType = req.file.mimetype?.startsWith('video/') ? 'video' : 'image';
 
       if (resourceType === 'image') {
         const nsfwResult = await scanImage(req.file.path || req.file.originalname);
@@ -444,7 +412,8 @@ router.post('/discussions', uploadCommunity.single('image'), async (req, res) =>
     const discussion = new CommunityPost({
       title,
       content,
-      channelType: channelType === 'support' ? 'support' : 'discussion',
+      channelType: resolvedChannelType,
+      isMentorInteraction,
       author: resolvedAuthorId,
       college: author.college || null,
       category: category || 'general',
@@ -456,28 +425,18 @@ router.post('/discussions', uploadCommunity.single('image'), async (req, res) =>
     // Distress monitoring for support channel
     if (discussion.channelType === 'support') {
       const { riskLevel } = classifyDistress(`${title}\n${content}`);
-      console.log('[Distress] riskLevel', riskLevel, 'for post', discussion._id?.toString());
       if (riskLevel === 'medium' || riskLevel === 'high') {
         discussion.flaggedAt = discussion.flaggedAt || new Date();
         discussion.flagReason = `distress:${riskLevel}`;
         discussion.resolution = discussion.resolution || { status: 'pending' };
         discussion.resolution.status = 'pending';
 
-        const savedAlert = await CoachAlert.create({
+        await CoachAlert.create({
           studentId: resolvedAuthorId,
           postId: discussion._id,
           riskLevel,
           timestamp: new Date(),
           resolved: false
-        });
-
-        console.log('[CoachAlert] created', {
-          _id: savedAlert?._id?.toString?.(),
-          studentId: savedAlert?.studentId?.toString?.(),
-          postId: savedAlert?.postId?.toString?.(),
-          riskLevel: savedAlert?.riskLevel,
-          timestamp: savedAlert?.timestamp,
-          resolved: savedAlert?.resolved
         });
       }
     }
@@ -492,6 +451,28 @@ router.post('/discussions', uploadCommunity.single('image'), async (req, res) =>
   } catch (error) {
     console.error('Error creating discussion:', error);
     res.status(500).json({ success: false, error: 'Failed to create discussion' });
+  }
+});
+
+// Get single discussion
+router.get('/discussions/:id', async (req, res) => {
+  try {
+    const discussion = await CommunityPost.findById(req.params.id);
+
+    if (!discussion) {
+      return res.status(404).json({ success: false, error: 'Discussion not found' });
+    }
+
+    discussion.views = (discussion.views || 0) + 1;
+    await discussion.save();
+
+    const populatedDiscussion = await CommunityPost.findById(req.params.id).lean();
+    await hydrateAuthors(populatedDiscussion);
+
+    res.json({ success: true, data: populatedDiscussion });
+  } catch (error) {
+    console.error('Error fetching discussion:', error);
+    res.status(500).json({ success: false, error: 'Failed to fetch discussion' });
   }
 });
 
@@ -558,6 +539,11 @@ router.post('/discussions/:id/vote', async (req, res) => {
       return res.status(404).json({ success: false, error: 'Discussion not found' });
     }
 
+    const actorRole = (req.user?.role || req.user?.userType || '').toString().toLowerCase();
+    if (actorRole === 'student' && discussion.author?.toString() === voterId) {
+      return res.status(403).json({ success: false, error: 'You cannot vote on your own post' });
+    }
+
     const existingIndex = discussion.peerVotes.findIndex(v => v.userId.toString() === voterId);
     if (existingIndex >= 0) {
       discussion.peerVotes[existingIndex].vote = normalizedVote;
@@ -618,20 +604,29 @@ router.post('/discussions/:id/report', async (req, res) => {
   }
 });
 
-// Like/Unlike a discussion
-router.post('/discussions/:id/like', async (req, res) => {
+// Like/Unlike a discussion (primary route)
+const likeHandler = async (req, res) => {
   try {
     const { userId } = req.body;
-    const discussion = await CommunityPost.findById(req.params.id);
+    const actorId = (req.user?._id || req.user?.id || userId || '').toString();
+    if (!actorId) {
+      return res.status(400).json({ success: false, error: 'userId is required to like' });
+    }
 
+    const discussion = await CommunityPost.findById(req.params.id);
     if (!discussion) {
       return res.status(404).json({ success: false, error: 'Discussion not found' });
     }
 
-    const likeIndex = discussion.likes.indexOf(userId);
+    const actorRole = (req.user?.role || req.user?.userType || '').toString().toLowerCase();
+    if (actorRole === 'student' && discussion.author?.toString() === actorId) {
+      return res.status(403).json({ success: false, error: 'You cannot react to your own post' });
+    }
+
+    const likeIndex = discussion.likes.findIndex(l => l.toString() === actorId);
 
     if (likeIndex === -1) {
-      discussion.likes.push(userId);
+      discussion.likes.push(actorId);
     } else {
       discussion.likes.splice(likeIndex, 1);
     }
@@ -642,16 +637,30 @@ router.post('/discussions/:id/like', async (req, res) => {
     console.error('Error liking discussion:', error);
     res.status(500).json({ success: false, error: 'Failed to like discussion' });
   }
-});
+};
+
+router.post('/discussions/:id/like', likeHandler);
+// Alias to support clients calling /api/community/:id/like
+router.post('/:id/like', likeHandler);
 
 // React to a discussion
 router.post('/discussions/:id/react', async (req, res) => {
   try {
     const { userId, type } = req.body;
+    const actorId = (req.user?._id || req.user?.id || userId || '').toString();
+    if (!actorId) {
+      return res.status(400).json({ success: false, error: 'userId is required to react' });
+    }
+
     const discussion = await CommunityPost.findById(req.params.id);
 
     if (!discussion) {
       return res.status(404).json({ success: false, error: 'Discussion not found' });
+    }
+
+    const actorRole = (req.user?.role || req.user?.userType || '').toString().toLowerCase();
+    if (actorRole === 'student' && discussion.author?.toString() === actorId) {
+      return res.status(403).json({ success: false, error: 'You cannot react to your own post' });
     }
 
     if (!['like', 'heart', 'insightful', 'support'].includes(type)) {
@@ -659,12 +668,12 @@ router.post('/discussions/:id/react', async (req, res) => {
     }
 
     // Find if user already reacted
-    const reactionIndex = (discussion.reactions || []).findIndex(r => r.user.toString() === userId);
+    const reactionIndex = (discussion.reactions || []).findIndex(r => r.user.toString() === actorId);
 
     if (reactionIndex === -1) {
       // New reaction
       if (!discussion.reactions) discussion.reactions = [];
-      discussion.reactions.push({ user: userId, type });
+      discussion.reactions.push({ user: actorId, type });
     } else {
       // User already reacted
       if (discussion.reactions[reactionIndex].type === type) {
@@ -789,9 +798,9 @@ router.post('/discussions/:id/reply', async (req, res) => {
   try {
     const { content, authorId } = req.body;
     const discussion = await CommunityPost.findById(req.params.id);
-    let author = await User.findById(authorId).select('college');
-    if (!author) author = await Student.findById(authorId).select('college');
-    if (!author) author = await Teacher.findById(authorId).select('college');
+    let author = await User.findById(authorId).select('college role');
+    if (!author) author = await Student.findById(authorId).select('college role');
+    if (!author) author = await Teacher.findById(authorId).select('college role');
     if (!author) author = await Registration.findById(authorId).select('institution');
 
     if (!discussion) {
@@ -821,6 +830,29 @@ router.post('/discussions/:id/reply', async (req, res) => {
     });
 
     await discussion.save();
+
+    // Log mentor/coach interactions for mentorship tracking
+    try {
+      const role = (author?.role || '').toString().toLowerCase();
+      const isMentorOrCoach = role === 'mentor' || role === 'coach';
+      const isMentorChannel = discussion.isMentorInteraction || discussion.channelType === 'mentor' || discussion.channelType === 'coach';
+
+      if (isMentorOrCoach && isMentorChannel) {
+        const replyDoc = discussion.replies[discussion.replies.length - 1];
+        const replyTimestamp = replyDoc?.createdAt ? new Date(replyDoc.createdAt) : new Date();
+        const responseTimeMinutes = Math.max(0, Math.round((replyTimestamp - new Date(discussion.createdAt)) / 60000));
+
+        await MentorshipLog.create({
+          mentorId: authorId,
+          studentId: discussion.author,
+          postId: discussion._id,
+          timestamp: replyTimestamp,
+          responseTime: responseTimeMinutes
+        });
+      }
+    } catch (logError) {
+      console.error('Error logging mentorship interaction:', logError);
+    }
 
     // Send notification to post author about the reply (don't notify if replying to own post)
     if (discussion.author.toString() !== authorId) {

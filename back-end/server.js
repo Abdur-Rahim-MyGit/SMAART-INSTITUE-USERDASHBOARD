@@ -21,6 +21,14 @@ if (missingEnv.length > 0) {
 
 const app = express();
 
+// Trace moderation requests early to confirm routing path
+app.use((req, res, next) => {
+  if (req.path.includes('moderation')) {
+    console.log('[SERVER] moderation request:', req.method, req.originalUrl);
+  }
+  next();
+});
+
 // Security: Set standard HTTP headers
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow resource loading (e.g., images) across origins if needed
@@ -128,7 +136,7 @@ app.use('/api/chatbot', require('./routes/chatbot')); // AI Chatbot Support
 app.use('/api/community', require('./routes/community'));
 app.use('/api/groups', require('./routes/groups'));
 app.use('/api/moderation', require('./routes/moderationQueue'));
-app.use('/api/moderation', require('./routes/moderation'));
+app.use('/api/moderation/actions', require('./routes/moderation'));
 
 // Avatar System Routes (3D Level-Based Unlock System)
 app.use('/api/avatar', require('./routes/avatar'));

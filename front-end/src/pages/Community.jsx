@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { HelpCircle, Bell, Users, MessageCircle, Heart, Share2, Search, TrendingUp, Star, BookOpen, Award, ChevronRight, ChevronLeft, Plus, Loader2, Bookmark, Send, MoreVertical, Image as ImageIcon, X, CheckCircle, Play, Video, Trophy, ThumbsUp, Lightbulb, Handshake } from "lucide-react";
+import { HelpCircle, Bell, Users, MessageCircle, Heart, Share2, Search, TrendingUp, Star, BookOpen, Award, ChevronRight, ChevronLeft, Plus, Loader2, Bookmark, Send, MoreVertical, Image as ImageIcon, X, CheckCircle, Play, Video, Trophy, ThumbsUp, ThumbsDown, Lightbulb, Handshake } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import EmotionChatbot from "@/components/community/EmotionChatbot";
@@ -95,6 +95,7 @@ const Community = () => {
   const [showPollEditor, setShowPollEditor] = useState(false);
   const [pollData, setPollData] = useState({ options: ["", ""] });
   const [votingId, setVotingId] = useState(null);
+  const [qualityVotingId, setQualityVotingId] = useState(null);
   const [viewerImage, setViewerImage] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -321,6 +322,22 @@ const Community = () => {
     fetchDiscussions(nextPage, true);
   };
 
+  // Peer quality vote
+  const handleQualityVote = async (discussionId, vote) => {
+    if (!currentUser || !currentUserId || qualityVotingId === discussionId) return;
+    try {
+      setQualityVotingId(discussionId);
+      const result = await communityAPI.voteOnPost(discussionId, vote);
+      if (result.success) {
+        setDiscussions(prev => prev.map(d => d._id === discussionId ? result.data : d));
+      }
+    } catch (error) {
+      console.error('Error submitting peer vote:', error);
+    } finally {
+      setQualityVotingId(null);
+    }
+  };
+
   // Handle search
   const handleSearch = () => {
     setDebouncedSearch(searchQuery);
@@ -365,6 +382,8 @@ const Community = () => {
             ? { ...d, likes: result.data.isLiked ? [...d.likes, currentUserId] : d.likes.filter(id => id !== currentUserId) }
             : d
         ));
+      } else if (result?.error) {
+        alert(result.error);
       }
     } catch (error) {
       console.error('Error liking:', error);
@@ -890,6 +909,10 @@ const Community = () => {
                       const isLikedByMe = discussion.likes?.includes(currentUser?._id || currentUser?.id || currentUserId);
                       const isBookmarkedByMe = discussion.isBookmarkedBy?.includes(currentUser?._id || currentUser?.id || currentUserId);
                       const isAuthor = currentUserId && getAuthorId(discussion.author) === currentUserId;
+                      const upVotes = (discussion.peerVotes || []).filter(v => v.vote === 'up').length;
+                      const downVotes = (discussion.peerVotes || []).filter(v => v.vote === 'down').length;
+                      const myPeerVote = (discussion.peerVotes || []).find(v => String(v.userId) === currentUserId)?.vote;
+                      const qualityScore = typeof discussion.qualityScore === 'number' ? discussion.qualityScore : 0;
 
                       return (
                         <motion.div
@@ -913,6 +936,9 @@ const Community = () => {
                                   </span>
                                 )}
                                 {discussion.author?.role === 'admin' && <AdminBadge />}
+                                <span className="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-black rounded-full border border-blue-100">
+                                  QS {qualityScore.toFixed(2)}
+                                </span>
                               </div>
                               <h3 className="text-[#002147] text-lg font-bold mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
                                 {discussion.title}
@@ -1067,6 +1093,32 @@ const Community = () => {
                           )}
 
                           <div className="flex items-center gap-3 mt-6 pt-4 border-t border-gray-100/50">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleQualityVote(discussion._id, 'up'); }}
+                              disabled={qualityVotingId === discussion._id}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${myPeerVote === 'up'
+                                ? 'bg-green-50 text-green-700 border-green-200 shadow-sm'
+                                : 'bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100'}
+                              `}
+                              title="Upvote"
+                            >
+                              <ThumbsUp className={`w-4 h-4 ${myPeerVote === 'up' ? 'fill-current' : ''}`} />
+                              <span>{upVotes}</span>
+                            </button>
+
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleQualityVote(discussion._id, 'down'); }}
+                              disabled={qualityVotingId === discussion._id}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${myPeerVote === 'down'
+                                ? 'bg-red-50 text-red-700 border-red-200 shadow-sm'
+                                : 'bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100'}
+                              `}
+                              title="Downvote"
+                            >
+                              <ThumbsDown className={`w-4 h-4 ${myPeerVote === 'down' ? 'fill-current' : ''}`} />
+                              <span>{downVotes}</span>
+                            </button>
+
                             <div className="relative">
                               <button
                                 onMouseEnter={() => setActiveReactionPickerId(discussion._id)}

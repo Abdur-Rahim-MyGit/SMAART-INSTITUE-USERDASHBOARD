@@ -85,6 +85,14 @@ export const communityAPI = {
     });
   },
 
+  // Peer quality vote
+  voteOnPost: async (discussionId, vote) => {
+    return apiCall(`/community/discussions/${discussionId}/vote`, {
+      method: 'POST',
+      body: JSON.stringify({ vote })
+    });
+  },
+
   // Add reply to discussion
   addReply: async (discussionId, content, authorId) => {
     return apiCall(`/community/discussions/${discussionId}/reply`, {
