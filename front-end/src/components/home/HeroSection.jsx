@@ -112,7 +112,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
       {/* Radiant Gradient Glows - Adjusted for Theme Visibility */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-[#1a3884] rounded-full blur-[120px] opacity-10 dark:opacity-25 animate-pulse-slow"></div>
-        <div className="absolute top-[30%] -right-[10%] w-[40%] h-[60%] bg-[#daa520] rounded-full blur-[130px] opacity-5 dark:opacity-15"></div>
+        <div className="absolute top-[30%] -right-[10%] w-[40%] h-[60%] bg-[#C0C0C0] rounded-full blur-[130px] opacity-5 dark:opacity-15"></div>
         <div className="absolute -bottom-[10%] left-[20%] w-[60%] h-[40%] bg-gray-200 dark:bg-[#1a3884] rounded-full blur-[100px] opacity-50 dark:opacity-80"></div>
       </div>
 
@@ -148,7 +148,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-8 font-heading leading-tight text-[#1a3884] dark:text-white"
             >
               An Integrated <br className="hidden sm:block" />
-              <span className="text-3xl sm:text-4xl md:text-5xl block mt-2 mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#daa520] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300 drop-shadow-sm">
+              <span className="text-3xl sm:text-4xl md:text-5xl block mt-2 mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#C0C0C0] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300 drop-shadow-sm">
                 Employability & Impact Ecosystem
               </span>
               <span className="text-xl sm:text-3xl text-gray-600 dark:text-gray-300 font-bold block mt-2">
@@ -182,7 +182,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
                     element.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="group relative px-8 py-4 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white rounded-xl font-bold text-base transition-all duration-300 shadow-[0_0_20px_rgba(26,56,132,0.3)] hover:shadow-[0_0_30px_rgba(26,56,132,0.5)] hover:-translate-y-1 w-full sm:w-auto overflow-hidden border border-[#daa520]/50"
+                className="group relative px-8 py-4 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white rounded-xl font-bold text-base transition-all duration-300 shadow-[0_0_20px_rgba(26,56,132,0.3)] hover:shadow-[0_0_30px_rgba(26,56,132,0.5)] hover:-translate-y-1 w-full sm:w-auto overflow-hidden border border-[#C0C0C0]/50"
               >
                 <div className="absolute inset-0 overflow-hidden rounded-xl">
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -210,11 +210,11 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               className="flex flex-wrap items-center justify-center lg:justify-start gap-x-8 gap-y-3 text-sm text-gray-600 dark:text-gray-400 font-medium"
             >
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-[#daa520]" />
+                <CheckCircle className="w-4 h-4 text-[#C0C0C0]" />
                 <span>Holistic Skill Profiling</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-[#daa520]" />
+                <CheckCircle className="w-4 h-4 text-[#C0C0C0]" />
                 <span>AI-Driven Career Pathways</span>
               </div>
             </motion.div>
@@ -228,7 +228,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
             className="flex-1 w-full max-w-[650px] relative z-20"
           >
             {/* Abstract Glow behind image */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-[#1a3884] to-[#daa520] opacity-30 dark:opacity-20 blur-xl rounded-2xl -z-10 animate-pulse-slow" />
+            <div className="absolute -inset-4 bg-gradient-to-r from-[#1a3884] to-[#C0C0C0] opacity-30 dark:opacity-20 blur-xl rounded-2xl -z-10 animate-pulse-slow" />
 
             <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#002147]/5 backdrop-blur-sm dark:bg-[#002147]/40">
               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none z-10" />
@@ -262,7 +262,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               className="absolute -top-6 -right-6 bg-[#ffff]/90 dark:bg-[#00152e]/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#daa520]/20 flex items-center justify-center text-[#daa520]">
+                <div className="w-10 h-10 rounded-full bg-[#C0C0C0]/20 flex items-center justify-center text-[#C0C0C0]">
                   <span className="font-bold">AI</span>
                 </div>
                 <div>
@@ -280,4 +280,5 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
 };
 
 export default HeroSection;
+
 

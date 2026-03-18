@@ -119,7 +119,7 @@ const Library = () => {
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl font-display font-bold text-slate-800 dark:text-white mb-2"
+              className="text-4xl font-sans font-bold text-slate-800 dark:text-white mb-2"
             >
               Knowledge Library
             </motion.h1>
@@ -229,3 +229,4 @@ const Library = () => {
 };
 
 export default Library;
+

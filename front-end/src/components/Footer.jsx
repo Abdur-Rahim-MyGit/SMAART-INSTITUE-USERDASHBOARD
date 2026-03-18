@@ -15,7 +15,7 @@ const Footer = () => {
 
     // Icon styles
     const iconClass = theme === 'dark'
-        ? 'bg-white/5 text-gray-400 hover:bg-[#daa520] hover:text-[#000F24]'
+        ? 'bg-white/5 text-gray-400 hover:bg-[#C0C0C0] hover:text-[#000F24]'
         : 'bg-[#1a3884]/5 text-[#1a3884] hover:bg-[#1a3884] hover:text-white';
 
     // Logo Box styles
@@ -26,7 +26,7 @@ const Footer = () => {
     return (
         <footer className={`border-t pt-20 pb-10 transition-colors duration-500 relative ${footerBg} ${borderColor} ${footerText}`}>
             {/* Decorative Top Border */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#daa520]/50 to-transparent" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#C0C0C0]/50 to-transparent" />
 
             <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
@@ -38,7 +38,7 @@ const Footer = () => {
                             </div>
                             <div className="flex flex-col">
                                 <span className={`text-xl font-bold tracking-tight leading-none transition-colors ${theme === 'dark' ? 'text-white' : 'text-[#1a3884]'}`}>
-                                    SMAART<span className="text-[#daa520]"> Institute</span>
+                                    SMAART<span className="text-[#C0C0C0]"> Institute</span>
                                 </span>
                                 <span className={`text-[10px] uppercase tracking-widest leading-none mt-1.5 font-semibold ${subTextColor}`}>
                                     Employability & Impact
@@ -85,9 +85,9 @@ const Footer = () => {
                                             const element = document.getElementById(item.id);
                                             if (element) element.scrollIntoView({ behavior: 'smooth' });
                                         }}
-                                        className={`text-sm transition-colors flex items-center gap-3 group font-medium hover:text-[#daa520]`}
+                                        className={`text-sm transition-colors flex items-center gap-3 group font-medium hover:text-[#C0C0C0]`}
                                     >
-                                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-[#daa520]/50 group-hover:bg-[#daa520]' : 'bg-[#1a3884]/30 group-hover:bg-[#daa520]'}`} />
+                                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-[#C0C0C0]/50 group-hover:bg-[#C0C0C0]' : 'bg-[#1a3884]/30 group-hover:bg-[#C0C0C0]'}`} />
                                         {item.name}
                                     </button>
                                 </li>
@@ -103,9 +103,9 @@ const Footer = () => {
                                 <li key={item}>
                                     <Link
                                         to="#"
-                                        className={`text-sm transition-colors flex items-center gap-3 group font-medium hover:text-[#daa520]`}
+                                        className={`text-sm transition-colors flex items-center gap-3 group font-medium hover:text-[#C0C0C0]`}
                                     >
-                                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-[#daa520]/50 group-hover:bg-[#daa520]' : 'bg-[#1a3884]/30 group-hover:bg-[#daa520]'}`} />
+                                        <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-[#C0C0C0]/50 group-hover:bg-[#C0C0C0]' : 'bg-[#1a3884]/30 group-hover:bg-[#C0C0C0]'}`} />
                                         {item}
                                     </Link>
                                 </li>
@@ -118,16 +118,16 @@ const Footer = () => {
                         <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>Contact Us</h3>
                         <ul className="space-y-6">
                             <li className="flex items-start gap-4">
-                                <MapPin className="w-5 h-5 text-[#daa520] shrink-0 mt-0.5" />
+                                <MapPin className="w-5 h-5 text-[#C0C0C0] shrink-0 mt-0.5" />
                                 <span className="text-sm leading-relaxed">Nungambakkam, Chennai<br />600034, India</span>
                             </li>
                             <li className="flex items-center gap-4">
-                                <Mail className="w-5 h-5 text-[#daa520] shrink-0" />
-                                <a href="mailto:hello@smaartinstitute.org" className="text-sm hover:text-[#daa520] transition-colors">hello@smaartinstitute.org</a>
+                                <Mail className="w-5 h-5 text-[#C0C0C0] shrink-0" />
+                                <a href="mailto:hello@smaartinstitute.org" className="text-sm hover:text-[#C0C0C0] transition-colors">hello@smaartinstitute.org</a>
                             </li>
                             <li className="flex items-center gap-4">
-                                <Phone className="w-5 h-5 text-[#daa520] shrink-0" />
-                                <a href="tel:+916383930215" className="text-sm hover:text-[#daa520] transition-colors">+91-6383930215</a>
+                                <Phone className="w-5 h-5 text-[#C0C0C0] shrink-0" />
+                                <a href="tel:+916383930215" className="text-sm hover:text-[#C0C0C0] transition-colors">+91-6383930215</a>
                             </li>
                         </ul>
                     </div>
@@ -140,7 +140,7 @@ const Footer = () => {
                     </p>
                     <button
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className={`text-xs font-semibold flex items-center gap-2 transition-colors ${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-[#1a3884] hover:text-[#daa520]'}`}
+                        className={`text-xs font-semibold flex items-center gap-2 transition-colors ${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-[#1a3884] hover:text-[#C0C0C0]'}`}
                     >
                         Back to Top <ArrowUp className="w-3 h-3" />
                     </button>
@@ -151,3 +151,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

@@ -50,7 +50,7 @@ const AssessmentBanner = ({ title = "ONBOARDING" }) => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-4xl md:text-5xl font-display font-bold text-[#002147] drop-shadow-sm"
+          className="text-4xl md:text-5xl font-sans font-bold text-[#002147] drop-shadow-sm"
         >
           {title}
         </motion.h1>
@@ -61,4 +61,5 @@ const AssessmentBanner = ({ title = "ONBOARDING" }) => {
 };
 
 export default AssessmentBanner;
+
 

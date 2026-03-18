@@ -183,12 +183,12 @@ const SecurityGuard = () => {
         cursor: "pointer",
       }}
     >
-      <ShieldAlert className="w-16 h-16 mb-4 text-[#daa520]" />
-      <h2 className="text-2xl font-bold mb-2 text-[#daa520]">Security Protected</h2>
+      <ShieldAlert className="w-16 h-16 mb-4 text-[#C0C0C0]" />
+      <h2 className="text-2xl font-bold mb-2 text-[#C0C0C0]">Security Protected</h2>
       <p className="text-gray-300 mb-2">
         Content is hidden because the application lost focus or the mouse left the window.
       </p>
-      <p className="text-[#daa520] font-semibold animate-pulse">
+      <p className="text-[#C0C0C0] font-semibold animate-pulse">
         Click anywhere to return
       </p>
     </div>
@@ -196,3 +196,4 @@ const SecurityGuard = () => {
 };
 
 export default SecurityGuard;
+

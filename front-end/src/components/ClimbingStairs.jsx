@@ -62,8 +62,8 @@ const ClimbingStairs = ({ modules = [] }) => {
             <defs>
               <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="#1a3884" />
-                <stop offset="50%" stopColor="#daa520" />
-                <stop offset="100%" stopColor="#daa520" />
+                <stop offset="50%" stopColor="#C0C0C0" />
+                <stop offset="100%" stopColor="#C0C0C0" />
               </linearGradient>
             </defs>
 
@@ -86,7 +86,7 @@ const ClimbingStairs = ({ modules = [] }) => {
                     cy={pos.y}
                     r="8"
                     fill={isCompleted ? "#1a3884" : "rgba(26, 56, 132, 0.1)"}
-                    stroke={isCompleted ? "#daa520" : "rgba(255, 255, 255, 0.1)"}
+                    stroke={isCompleted ? "#C0C0C0" : "rgba(255, 255, 255, 0.1)"}
                     strokeWidth="2"
                     className={isCompleted ? "drop-shadow-[0_0_15px_rgba(26,56,132,0.8)]" : ""}
                   />
@@ -118,9 +118,9 @@ const ClimbingStairs = ({ modules = [] }) => {
                 y1="0"
                 x2="1100"
                 y2="-120"
-                stroke="#daa520"
+                stroke="#C0C0C0"
                 strokeWidth="4"
-                className="drop-shadow-[0_0_15px_rgba(218,165,32,0.8)]"
+                className="drop-shadow-[0_0_15px_rgba(192, 192, 192,0.8)]"
               />
 
               {/* Large Glowing White Flag */}
@@ -128,7 +128,7 @@ const ClimbingStairs = ({ modules = [] }) => {
                 <path
                   d="M 1100 -120 L 1190 -120 L 1190 -180 L 1100 -180 Z"
                   fill="#1a3884"
-                  stroke="#daa520"
+                  stroke="#C0C0C0"
                   strokeWidth="2"
                 />
                 {/* Goal text on big flag */}
@@ -160,10 +160,10 @@ const ClimbingStairs = ({ modules = [] }) => {
                 cx="1100"
                 cy="0"
                 r="10"
-                fill={completedCount === totalSteps ? "#daa520" : "rgba(218, 165, 32, 0.1)"}
-                stroke={completedCount === totalSteps ? "#daa520" : "rgba(255, 255, 255, 0.1)"}
+                fill={completedCount === totalSteps ? "#C0C0C0" : "rgba(192, 192, 192, 0.1)"}
+                stroke={completedCount === totalSteps ? "#C0C0C0" : "rgba(255, 255, 255, 0.1)"}
                 strokeWidth="2"
-                className={completedCount === totalSteps ? "drop-shadow-[0_0_20px_rgba(218,165,32,0.9)]" : ""}
+                className={completedCount === totalSteps ? "drop-shadow-[0_0_20px_rgba(192, 192, 192,0.9)]" : ""}
               />
               {/* Goal label */}
               <text
@@ -205,8 +205,8 @@ const ClimbingStairs = ({ modules = [] }) => {
               {/* Ball with gradient and glow */}
               <defs>
                 <radialGradient id="ballGradient">
-                  <stop offset="0%" stopColor="#daa520" />
-                  <stop offset="50%" stopColor="#daa520" />
+                  <stop offset="0%" stopColor="#C0C0C0" />
+                  <stop offset="50%" stopColor="#C0C0C0" />
                   <stop offset="100%" stopColor="#f5d78e" />
                 </radialGradient>
                 <filter id="ballGlow">
@@ -223,7 +223,7 @@ const ClimbingStairs = ({ modules = [] }) => {
                 cx="0"
                 cy="0"
                 r="16"
-                fill="rgba(218, 165, 32, 0.3)"
+                fill="rgba(192, 192, 192, 0.3)"
                 filter="url(#ballGlow)"
               />
 
@@ -233,7 +233,7 @@ const ClimbingStairs = ({ modules = [] }) => {
                 cy="0"
                 r="12"
                 fill="url(#ballGradient)"
-                stroke="#daa520"
+                stroke="#C0C0C0"
                 strokeWidth="2"
               />
 
@@ -257,5 +257,6 @@ const ClimbingStairs = ({ modules = [] }) => {
 };
 
 export default ClimbingStairs;
+
 
 

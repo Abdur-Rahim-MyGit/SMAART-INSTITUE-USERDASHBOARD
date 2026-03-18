@@ -66,7 +66,7 @@ const LearningPathway = ({ modules = [] }) => {
         transition={{ duration: 0.6 }}
         className="space-y-2"
       >
-        <h2 className="text-2xl font-display font-bold text-white">
+        <h2 className="text-2xl font-sans font-bold text-white">
           Your Learning Pathway is about to start
         </h2>
         <p className="text-gray-700">
@@ -237,3 +237,4 @@ const LearningPathway = ({ modules = [] }) => {
 };
 
 export default LearningPathway;
+

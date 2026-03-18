@@ -4,11 +4,11 @@ import { LineChart, BrainCircuit, Trophy, Target } from "lucide-react";
 // FeaturePoint Component with enhanced styling
 const FeaturePoint = ({ icon: Icon, title, desc }) => (
     <div className="flex gap-4 group">
-        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#1a3884]/10 dark:bg-white/5 flex items-center justify-center border border-[#1a3884]/20 dark:border-white/10 group-hover:bg-[#1a3884] dark:group-hover:bg-[#daa520] transition-colors duration-300">
-            <Icon className="w-6 h-6 text-[#1a3884] dark:text-[#daa520] group-hover:text-white dark:group-hover:text-[#002147] transition-colors duration-300" />
+        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-[#1a3884]/10 dark:bg-white/5 flex items-center justify-center border border-[#1a3884]/20 dark:border-white/10 group-hover:bg-[#1a3884] dark:group-hover:bg-[#C0C0C0] transition-colors duration-300">
+            <Icon className="w-6 h-6 text-[#1a3884] dark:text-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-colors duration-300" />
         </div>
         <div>
-            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#1a3884] dark:group-hover:text-[#daa520] transition-colors">{title}</h4>
+            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#1a3884] dark:group-hover:text-[#C0C0C0] transition-colors">{title}</h4>
             <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{desc}</p>
         </div>
     </div>
@@ -32,7 +32,7 @@ const FeatureDeepDive = () => {
                             {/* Visual Placeholder */}
                             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#001226]/50 backdrop-blur-sm">
                                 <div className="text-center p-6 border border-gray-200 dark:border-white/10 rounded-xl bg-white/50 dark:bg-white/5">
-                                    <BrainCircuit className="w-12 h-12 text-[#1a3884] dark:text-[#daa520] mx-auto mb-3 opacity-50" />
+                                    <BrainCircuit className="w-12 h-12 text-[#1a3884] dark:text-[#C0C0C0] mx-auto mb-3 opacity-50" />
                                     <span className="text-gray-500 dark:text-gray-400 font-mono text-xs uppercase tracking-widest">
                                         Professional & Technical<br />Capability View
                                     </span>
@@ -46,7 +46,7 @@ const FeatureDeepDive = () => {
                                 <span className="text-xs font-bold text-gray-900 dark:text-white">Live AI Analysis</span>
                             </div>
                             <div className="h-1.5 w-32 bg-gray-200 dark:bg-gray-700/50 rounded-full overflow-hidden">
-                                <div className="h-full w-[75%] bg-[#1a3884] dark:bg-[#daa520]" />
+                                <div className="h-full w-[75%] bg-[#1a3884] dark:bg-[#C0C0C0]" />
                             </div>
                         </div>
                     </motion.div>
@@ -58,7 +58,7 @@ const FeatureDeepDive = () => {
                         className="space-y-8"
                     >
                         <div>
-                            <span className="text-[#1a3884] dark:text-[#daa520] font-bold tracking-wider text-sm uppercase">Professional & Technical Capability™</span>
+                            <span className="text-[#1a3884] dark:text-[#C0C0C0] font-bold tracking-wider text-sm uppercase">Professional & Technical Capability™</span>
                             <h3 className="text-3xl md:text-4xl font-bold text-[#1a3884] dark:text-white mt-2 mb-4">Campus to Career™</h3>
                             <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-light">
                                 Preparing learners for entry into the workforce and aligning their capability with professional practice. We bridge the gap between academic theory and workplace reality.
@@ -89,7 +89,7 @@ const FeatureDeepDive = () => {
                         className="order-2 lg:order-1 space-y-8"
                     >
                         <div>
-                            <span className="text-[#daa520] font-bold tracking-wider text-sm uppercase">Innovation & Impact Capability™</span>
+                            <span className="text-[#C0C0C0] font-bold tracking-wider text-sm uppercase">Innovation & Impact Capability™</span>
                             <h3 className="text-3xl md:text-4xl font-bold text-[#1a3884] dark:text-white mt-2 mb-4">Career to Life™</h3>
                             <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-light">
                                 Supporting long-term progression, leadership transition, and the ability to create value through innovation. For those ready to shape the future.
@@ -116,11 +116,11 @@ const FeatureDeepDive = () => {
                         viewport={{ once: true }}
                         className="order-1 lg:order-2 relative"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-tl from-[#daa520]/20 to-transparent blur-3xl rounded-full" />
+                        <div className="absolute inset-0 bg-gradient-to-tl from-[#C0C0C0]/20 to-transparent blur-3xl rounded-full" />
                         <div className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl bg-white dark:bg-[#001835]/80 aspect-video group">
                             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#001226]/50 backdrop-blur-sm">
                                 <div className="text-center p-6 border border-gray-200 dark:border-white/10 rounded-xl bg-white/50 dark:bg-white/5">
-                                    <Trophy className="w-12 h-12 text-[#daa520] mx-auto mb-3 opacity-50" />
+                                    <Trophy className="w-12 h-12 text-[#C0C0C0] mx-auto mb-3 opacity-50" />
                                     <span className="text-gray-500 dark:text-gray-400 font-mono text-xs uppercase tracking-widest">
                                         Leadership & Innovation<br />Analytics
                                     </span>
@@ -136,3 +136,4 @@ const FeatureDeepDive = () => {
 };
 
 export default FeatureDeepDive;
+

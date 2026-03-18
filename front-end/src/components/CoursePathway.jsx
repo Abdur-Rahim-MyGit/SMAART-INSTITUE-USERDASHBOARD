@@ -196,7 +196,7 @@ const BookCard = ({ step, index, onCourseClick }) => {
 
             {/* Course Title */}
             <h3 style={{
-              fontFamily: "'Playfair Display', 'Georgia', serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: '28px',
               fontWeight: '700',
               color: navyBlue,
@@ -209,7 +209,7 @@ const BookCard = ({ step, index, onCourseClick }) => {
 
             {/* Subtitle */}
             <p style={{
-              fontFamily: "'Playfair Display', 'Georgia', serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: '13px',
               fontWeight: '500',
               color: '#555',
@@ -255,7 +255,7 @@ const BookCard = ({ step, index, onCourseClick }) => {
                   </svg>
                 </div>
                 <p style={{
-                  fontFamily: "'Playfair Display', 'Georgia', serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: '12px',
                   color: '#777',
                   fontStyle: 'italic',
@@ -331,7 +331,7 @@ const BookCard = ({ step, index, onCourseClick }) => {
                   fontSize: '11px',
                   fontWeight: '700',
                   fontStyle: 'italic',
-                  fontFamily: "'Playfair Display', 'Georgia', serif",
+                  fontFamily: "'Inter', sans-serif",
                   letterSpacing: '0.5px',
                 }}>
                   Unlocked
@@ -379,3 +379,4 @@ const OrnateCorner = ({ position, color }) => {
 };
 
 export default CoursePathway;
+

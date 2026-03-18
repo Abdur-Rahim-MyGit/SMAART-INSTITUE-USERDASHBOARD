@@ -223,11 +223,11 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border-2 border-[#BC9B6A] rounded-none shadow-2xl overflow-hidden z-10 flex flex-col max-h-[calc(100vh-2rem)]"
+            className="relative w-full max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border-2 border-[#C0C0C0] rounded-none shadow-2xl overflow-hidden z-10 flex flex-col max-h-[calc(100vh-2rem)]"
           >
             {/* Decorative Elements */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#1a3884]/5 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#daa520]/5 rounded-full blur-[50px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#C0C0C0]/5 rounded-full blur-[50px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
             {/* Content Switcher: Normal OTP or Force Logout Confirmation */}
             {!showForceLogout ? (
@@ -244,7 +244,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                   <div className="w-12 h-12 bg-gradient-to-br from-[#1a3884]/20 to-[#1a3884]/5 rounded-none border border-[#1a3884]/20 flex items-center justify-center mx-auto mb-3 shadow-md">
                     <Mail className="w-6 h-6 text-[#1a3884]" />
                   </div>
-                  <h2 className="text-lg sm:text-xl font-display font-bold text-[#002147] mb-1">
+                  <h2 className="text-lg sm:text-xl font-sans font-bold text-[#002147] mb-1">
                     Verify Your Email
                   </h2>
                   <p className="text-gray-500">
@@ -288,7 +288,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                             aria-label={`Digit ${index + 1} of 6`}
                             aria-describedby="otp-helper"
                             autoComplete="one-time-code"
-                            className="w-9 h-11 text-center text-lg font-bold bg-gray-50 border border-gray-200 rounded-none text-[#002147] focus:border-[#BC9B6A] focus:ring-1 focus:ring-[#BC9B6A]/30 transition-all duration-300 outline-none"
+                            className="w-9 h-11 text-center text-lg font-bold bg-gray-50 border border-gray-200 rounded-none text-[#002147] focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0]/30 transition-all duration-300 outline-none"
                           />
                         ))}
                       </div>
@@ -390,5 +390,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 };
 
 export default LoginOtpModal;
+
+
 
 

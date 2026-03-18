@@ -27,7 +27,7 @@ const Newsletter = () => {
 
                     {/* Decorative blobs */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-[#1a3884]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#daa520]/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C0C0C0]/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2" />
 
                     <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
                         <div className="flex-1 text-center md:text-left">
@@ -46,7 +46,7 @@ const Newsletter = () => {
                                     <Input
                                         type="email"
                                         placeholder="Enter your email"
-                                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#daa520]/50 focus:ring-[#daa520]/20 transition-all"
+                                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#C0C0C0]/50 focus:ring-[#C0C0C0]/20 transition-all"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -55,7 +55,7 @@ const Newsletter = () => {
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full bg-[#daa520] hover:bg-[#b8860b] text-[#1a3884] font-bold"
+                                    className="w-full bg-[#C0C0C0] hover:bg-[#A8A8A8] text-[#1a3884] font-bold"
                                 >
                                     {isLoading ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -79,3 +79,4 @@ const Newsletter = () => {
 };
 
 export default Newsletter;
+

@@ -84,19 +84,19 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative w-full max-w-[420px] bg-[#FDFBF7] border-2 border-[#BC9B6A] rounded-none shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
+          className="relative w-full max-w-[420px] bg-[#FDFBF7] border-2 border-[#C0C0C0] rounded-none shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
         >
           {/* Vintage Decorative Border */}
-          <div className="absolute inset-2 border border-[#BC9B6A]/20 pointer-events-none rounded-none" />
-          <div className="absolute top-4 left-4 w-8 h-8 border-t border-l border-[#BC9B6A]/40 pointer-events-none" />
-          <div className="absolute top-4 right-4 w-8 h-8 border-t border-r border-[#BC9B6A]/40 pointer-events-none" />
-          <div className="absolute bottom-4 left-4 w-8 h-8 border-b border-l border-[#BC9B6A]/40 pointer-events-none" />
-          <div className="absolute bottom-4 right-4 w-8 h-8 border-b border-r border-[#BC9B6A]/40 pointer-events-none" />
+          <div className="absolute inset-2 border border-[#C0C0C0]/20 pointer-events-none rounded-none" />
+          <div className="absolute top-4 left-4 w-8 h-8 border-t border-l border-[#C0C0C0]/40 pointer-events-none" />
+          <div className="absolute top-4 right-4 w-8 h-8 border-t border-r border-[#C0C0C0]/40 pointer-events-none" />
+          <div className="absolute bottom-4 left-4 w-8 h-8 border-b border-l border-[#C0C0C0]/40 pointer-events-none" />
+          <div className="absolute bottom-4 right-4 w-8 h-8 border-b border-r border-[#C0C0C0]/40 pointer-events-none" />
 
 
           <div className="relative z-10 flex flex-col h-full">
             {/* Header / Brand */}
-            <div className="bg-[#002B5B] p-8 shadow-xl flex flex-col items-center justify-center rounded-none border-b-2 border-[#BC9B6A]">
+            <div className="bg-[#002B5B] p-8 shadow-xl flex flex-col items-center justify-center rounded-none border-b-2 border-[#C0C0C0]">
               <div className="relative mb-3">
                 <img src={logoWhite} alt="Smaart Institute" className="h-14 w-auto drop-shadow-md" />
               </div>
@@ -147,13 +147,13 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
                       placeholder="Create complex password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="bg-white border-gray-300 text-gray-900 h-11 rounded-none px-4 text-sm focus:border-[#BC9B6A] focus-visible:ring-[#BC9B6A]/10 transition-all shadow-sm"
+                      className="bg-white border-gray-300 text-gray-900 h-11 rounded-none px-4 text-sm focus:border-[#C0C0C0] focus-visible:ring-[#C0C0C0]/10 transition-all shadow-sm"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#BC9B6A] hover:text-[#9A7B4F] transition-colors"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C0C0C0] hover:text-[#9A7B4F] transition-colors"
                     >
                       {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -169,13 +169,13 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Repeat new password"
-                      className="bg-white border-gray-300 text-gray-900 h-11 rounded-none px-4 text-sm focus:border-[#BC9B6A] transition-all shadow-sm"
+                      className="bg-white border-gray-300 text-gray-900 h-11 rounded-none px-4 text-sm focus:border-[#C0C0C0] transition-all shadow-sm"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#BC9B6A]"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C0C0C0]"
                     >
                       {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -228,3 +228,4 @@ const RequirementItem = ({ label, met }) => (
 );
 
 export default FirstLoginPasswordModal;
+

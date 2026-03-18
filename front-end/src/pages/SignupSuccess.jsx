@@ -35,7 +35,7 @@ const SignupSuccess = () => {
           transition={{ delay: 0.4 }}
           className="space-y-3 sm:space-y-4 mb-6 sm:mb-8"
         >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-gray-900">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold text-gray-900">
             Registration Successful!
           </h1>
           <p className="text-gray-700 text-base sm:text-lg leading-relaxed">
@@ -64,4 +64,5 @@ const SignupSuccess = () => {
 };
 
 export default SignupSuccess;
+
 

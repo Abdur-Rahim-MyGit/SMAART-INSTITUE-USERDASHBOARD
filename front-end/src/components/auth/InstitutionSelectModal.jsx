@@ -26,7 +26,7 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
           >
             {/* Ambient Background Glows */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#1a3884]/10 rounded-full blur-[80px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#daa520]/10 rounded-full blur-[80px] pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C0C0C0]/10 rounded-full blur-[80px] pointer-events-none" />
 
             {/* Header */}
             <div className="relative p-6 sm:p-8 text-center border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 backdrop-blur-sm">
@@ -43,7 +43,7 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
                 </svg>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-sans font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
                 Select Your Institution
               </h2>
               <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
@@ -63,4 +63,6 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
 };
 
 export default InstitutionSelectModal;
+
+
 

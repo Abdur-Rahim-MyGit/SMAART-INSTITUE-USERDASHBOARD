@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Lock, Check, Star, ChevronRight, BookOpen, PenTool, HelpCircle, Play } from "lucide-react";
 
-// Color scheme: Navy #002147, Teal #1a3884, Gold #FFD700/#daa520, White
+// Color scheme: Navy #002147, Teal #1a3884, Gold #FFD700/#C0C0C0, White
 const CoursePath = ({ completedCourses, onCourseClick }) => {
   const safeCompleted = Number.isFinite(completedCourses) ? completedCourses : 0;
 
@@ -40,7 +40,7 @@ const CoursePath = ({ completedCourses, onCourseClick }) => {
   const getCategoryColor = (category) => {
     switch(category) {
       case 'Expression': return 'text-[#1a3884]';
-      case 'Vocabulary': return 'text-[#daa520]';
+      case 'Vocabulary': return 'text-[#C0C0C0]';
       case 'Grammar': return 'text-purple-500';
       case 'Practice': return 'text-orange-500';
       case 'Quiz': return 'text-blue-500';
@@ -70,7 +70,7 @@ const CoursePath = ({ completedCourses, onCourseClick }) => {
                   <div className="flex flex-col items-center mr-4 flex-shrink-0">
                     {/* Day Badge */}
                     <div className={`w-8 text-center text-[10px] font-medium mb-1 ${
-                      isCompleted ? 'text-[#1a3884]' : isInProgress ? 'text-[#daa520]' : 'text-gray-400'
+                      isCompleted ? 'text-[#1a3884]' : isInProgress ? 'text-[#C0C0C0]' : 'text-gray-400'
                     }`}>
                       {lesson.category === 'Practice' || lesson.category === 'Quiz' ? '' : `Day`}
                       <br />
@@ -86,7 +86,7 @@ const CoursePath = ({ completedCourses, onCourseClick }) => {
                         isCompleted 
                           ? 'bg-[#1a3884] text-white' 
                           : isInProgress 
-                          ? 'bg-[#daa520] text-white shadow-lg shadow-[#daa520]/30' 
+                          ? 'bg-[#C0C0C0] text-white shadow-lg shadow-[#C0C0C0]/30' 
                           : 'bg-gray-200 text-gray-400'
                       }`}
                     >
@@ -117,7 +117,7 @@ const CoursePath = ({ completedCourses, onCourseClick }) => {
                       isCompleted 
                         ? 'bg-white border-gray-100 hover:border-[#1a3884]/30 hover:shadow-md' 
                         : isInProgress 
-                        ? 'bg-white border-[#daa520]/30 shadow-md hover:shadow-lg' 
+                        ? 'bg-white border-[#C0C0C0]/30 shadow-md hover:shadow-lg' 
                         : 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
                     }`}
                   >
@@ -127,10 +127,10 @@ const CoursePath = ({ completedCourses, onCourseClick }) => {
                         isCompleted 
                           ? 'bg-[#1a3884]/10' 
                           : isInProgress 
-                          ? 'bg-[#daa520]/10' 
+                          ? 'bg-[#C0C0C0]/10' 
                           : 'bg-gray-100'
                       }`}>
-                        <span className={isCompleted ? 'text-[#1a3884]' : isInProgress ? 'text-[#daa520]' : 'text-gray-400'}>
+                        <span className={isCompleted ? 'text-[#1a3884]' : isInProgress ? 'text-[#C0C0C0]' : 'text-gray-400'}>
                           {getCategoryIcon(lesson.category)}
                         </span>
                       </div>
@@ -158,7 +158,7 @@ const CoursePath = ({ completedCourses, onCourseClick }) => {
                       {/* Arrow */}
                       {isActive && (
                         <ChevronRight className={`w-5 h-5 flex-shrink-0 ${
-                          isInProgress ? 'text-[#daa520]' : 'text-gray-300'
+                          isInProgress ? 'text-[#C0C0C0]' : 'text-gray-300'
                         }`} />
                       )}
                     </div>
@@ -174,4 +174,5 @@ const CoursePath = ({ completedCourses, onCourseClick }) => {
 };
 
 export default CoursePath;
+
 

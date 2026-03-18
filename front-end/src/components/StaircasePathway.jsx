@@ -66,7 +66,7 @@ const StaircasePathway = ({ modules = [] }) => {
         transition={{ duration: 0.6 }}
         className="space-y-2"
       >
-        <h2 className="text-2xl font-display font-bold text-white">
+        <h2 className="text-2xl font-sans font-bold text-white">
           Your Learning Staircase
         </h2>
         <p className="text-gray-700">
@@ -255,3 +255,4 @@ const StaircasePathway = ({ modules = [] }) => {
 };
 
 export default StaircasePathway;
+

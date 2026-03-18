@@ -29,7 +29,7 @@ const ComingSoon = ({ title = "Coming Soon", subtitle = "Under Development" }) =
           transition={{ delay: 0.4 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-display font-bold text-gray-800 mb-4">
+          <h1 className="text-4xl font-sans font-bold text-gray-800 mb-4">
             {title}
           </h1>
           <h2 className="text-xl font-semibold text-accent mb-6">
@@ -66,3 +66,4 @@ const ComingSoon = ({ title = "Coming Soon", subtitle = "Under Development" }) =
 };
 
 export default ComingSoon;
+

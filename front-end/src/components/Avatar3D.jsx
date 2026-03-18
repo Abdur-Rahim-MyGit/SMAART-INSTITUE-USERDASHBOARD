@@ -228,7 +228,7 @@ const LevelIndicator = ({ level, xp, xpToNext }) => {
           </div>
           <div className="mt-1 w-20 h-1.5 bg-white/20 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-[#daa520] transition-all duration-500"
+              className="h-full bg-[#C0C0C0] transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -253,7 +253,7 @@ const CelebrationParticles = ({ active }) => {
           (Math.random() - 0.5) * 3
         ],
         speed: 0.5 + Math.random() * 1.5,
-        color: ['#1a3884', '#daa520', '#ff6b6b', '#4ecdc4'][Math.floor(Math.random() * 4)]
+        color: ['#1a3884', '#C0C0C0', '#ff6b6b', '#4ecdc4'][Math.floor(Math.random() * 4)]
       });
     }
     return temp;
@@ -444,5 +444,6 @@ export const preloadAvatar = (url) => {
 };
 
 export default Avatar3D;
+
 
 

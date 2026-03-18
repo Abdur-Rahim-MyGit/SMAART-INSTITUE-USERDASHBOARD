@@ -426,9 +426,9 @@ const ComprehensiveSignup = () => {
     } catch (error) { console.error("Submission error:", error); toast.error(error.message || "Failed to submit"); setIsLoading(false); }
   };
 
-  const inputClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#BC9B6A] focus:ring-0 px-0 py-2 text-base transition-all duration-300 placeholder:text-gray-400";
-  const selectClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#BC9B6A] focus:ring-0 px-0 py-2 text-base transition-all duration-300 appearance-none";
-  const textareaClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#BC9B6A] focus:ring-0 px-0 py-2 text-base transition-all duration-300 resize-none placeholder:text-gray-400";
+  const inputClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 placeholder:text-gray-400";
+  const selectClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 appearance-none";
+  const textareaClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 resize-none placeholder:text-gray-400";
   const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
   const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25-35 LPA", "35-50 LPA", "50+ LPA", "Negotiable"];
   // Use Excel data sectors if available, otherwise fallback to defaults
@@ -454,20 +454,20 @@ const ComprehensiveSignup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#BC9B6A]/30">
+    <div className="min-h-screen bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#C0C0C0]/30">
       {/* Deep Blue Header */}
-      <header className="bg-[#002147] text-white py-2 px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-3 sticky top-0 z-[100] shadow-md border-b-2 border-[#BC9B6A]">
+      <header className="bg-[#002147] text-white py-2 px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-3 sticky top-0 z-[100] shadow-md border-b-2 border-[#C0C0C0] shadow-[0_0_15px_rgba(192,192,192,0.3)]">
         <div className="flex items-center gap-3">
           <img src={logoWhite} alt="SMAART INSTITUTE" className="h-8 w-auto" />
           <div className="h-8 w-[1px] bg-white/20 hidden md:block mx-2" />
-          <h1 className="text-xl md:text-2xl font-serif text-white/90">
+          <h1 className="text-xl md:text-2xl font-sans text-white/90">
             {steps[currentStep].title}
-            <div className="h-[2px] w-1/2 bg-[#BC9B6A] mt-1 mx-auto md:mx-0" />
+            <div className="h-[2px] w-1/2 bg-[#C0C0C0] mt-1 mx-auto md:mx-0" />
           </h1>
         </div>
         
         <div className="text-center md:text-right hidden sm:block">
-          <p className="text-sm font-serif italic text-white/80 tracking-wide">
+          <p className="text-sm font-sans italic text-white/80 tracking-wide">
             "Empower Your Future, Enroll Today!"
           </p>
         </div>
@@ -481,7 +481,7 @@ const ComprehensiveSignup = () => {
           className="relative"
         >
           {/* Torn Paper Container */}
-          <div className="bg-white p-4 md:p-6 shadow-[0_15px_60px_-15px_rgba(0,0,0,0.15)] border-2 border-[#BC9B6A] rounded-none relative">
+          <div className="bg-white p-4 md:p-6 shadow-[0_15px_60px_-15px_rgba(0,0,0,0.15),0_0_20px_rgba(192,192,192,0.4)] border-2 border-[#C0C0C0] rounded-none relative">
             
             <AnimatePresence mode="wait">
             {/* Step 0: Profile Photo */}
@@ -1048,7 +1048,7 @@ const ComprehensiveSignup = () => {
                 {currentStep > 0 && (
                   <button 
                     onClick={handlePrevStep}
-                    className="text-lg font-serif text-gray-500 hover:text-gray-800 transition-colors"
+                    className="text-lg font-sans text-gray-500 hover:text-gray-800 transition-colors"
                   >
                     Previous
                   </button>
@@ -1056,7 +1056,7 @@ const ComprehensiveSignup = () => {
                 {currentStep < steps.length - 1 ? (
                   <button 
                     onClick={handleNextStep}
-                    className="text-lg font-serif text-[#1a3884] font-bold hover:opacity-80 transition-opacity"
+                    className="text-lg font-sans text-[#1a3884] font-bold hover:opacity-80 transition-opacity"
                   >
                     Next
                   </button>
@@ -1064,7 +1064,7 @@ const ComprehensiveSignup = () => {
                   <button 
                     onClick={handleSubmit}
                     disabled={isLoading}
-                    className="text-lg font-serif text-[#BC9B6A] font-bold hover:opacity-80 transition-opacity flex items-center gap-2"
+                    className="text-lg font-sans text-[#C0C0C0] font-bold hover:opacity-80 transition-opacity flex items-center gap-2"
                   >
                     {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Complete"}
                   </button>
@@ -1078,3 +1078,5 @@ const ComprehensiveSignup = () => {
 };
 
 export default ComprehensiveSignup;
+
+

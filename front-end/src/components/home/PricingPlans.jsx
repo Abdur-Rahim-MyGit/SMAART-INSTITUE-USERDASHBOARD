@@ -53,18 +53,18 @@ const PricingPlans = () => {
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
                             className={`relative rounded-2xl p-8 border ${plan.highlight
-                                ? "bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border-[#1a3884] dark:border-[#daa520] shadow-[0_0_40px_rgba(26,56,132,0.15)]"
-                                : "bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-[#daa520] dark:hover:border-white/20"
+                                ? "bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border-[#1a3884] dark:border-[#C0C0C0] shadow-[0_0_40px_rgba(26,56,132,0.15)]"
+                                : "bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-[#C0C0C0] dark:hover:border-white/20"
                                 } backdrop-blur-sm transition-all duration-300`}
                         >
                             {plan.highlight && (
-                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#1a3884] dark:bg-[#daa520] text-white dark:text-[#002147] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border border-[#daa520] dark:border-white">
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#1a3884] dark:bg-[#C0C0C0] text-white dark:text-[#002147] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border border-[#C0C0C0] dark:border-white">
                                     Most Popular
                                 </div>
                             )}
 
                             <div className="flex items-center gap-3 mb-6">
-                                <div className={`p-2 rounded-lg ${plan.highlight ? "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#daa520]" : "bg-gray-200 dark:bg-white/15 text-gray-700 dark:text-blue-300"} border border-transparent ${plan.highlight ? "border-[#1a3884]/20 dark:border-[#daa520]/30" : ""}`}>
+                                <div className={`p-2 rounded-lg ${plan.highlight ? "bg-[#1a3884]/10 text-[#1a3884] dark:text-[#C0C0C0]" : "bg-gray-200 dark:bg-white/15 text-gray-700 dark:text-blue-300"} border border-transparent ${plan.highlight ? "border-[#1a3884]/20 dark:border-[#C0C0C0]/30" : ""}`}>
                                     {plan.icon}
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white">{plan.name}</h3>
@@ -80,7 +80,7 @@ const PricingPlans = () => {
                             <div className="space-y-4 mb-8">
                                 {plan.features.map((feature) => (
                                     <div key={feature} className="flex items-start gap-3 text-sm text-gray-600 dark:text-white">
-                                        <Check className={`w-4 h-4 mt-0.5 ${plan.highlight ? "text-[#daa520]" : "text-blue-400 dark:text-blue-300"}`} />
+                                        <Check className={`w-4 h-4 mt-0.5 ${plan.highlight ? "text-[#C0C0C0]" : "text-blue-400 dark:text-blue-300"}`} />
                                         <span>{feature}</span>
                                     </div>
                                 ))}
@@ -89,8 +89,8 @@ const PricingPlans = () => {
                             <Button
                                 variant="default"
                                 className={`w-full h-12 rounded-xl text-base font-semibold transition-all duration-300 ${plan.highlight
-                                    ? "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#daa520] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#daa520]"
-                                    : "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#daa520] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#daa520]"
+                                    ? "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#C0C0C0] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#C0C0C0]"
+                                    : "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#C0C0C0] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#C0C0C0]"
                                     }`}
                             >
                                 {plan.cta}
@@ -104,3 +104,4 @@ const PricingPlans = () => {
 };
 
 export default PricingPlans;
+

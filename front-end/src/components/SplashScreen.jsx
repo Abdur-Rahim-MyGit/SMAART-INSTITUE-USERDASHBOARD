@@ -83,8 +83,8 @@ const SplashScreen = ({ onComplete }) => {
                                 </feMerge>
                             </filter>
                             <linearGradient id="pathGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-                                <stop offset="0%" stopColor="#daa520" stopOpacity="0" />
-                                <stop offset="50%" stopColor="#daa520" stopOpacity="1" />
+                                <stop offset="0%" stopColor="#C0C0C0" stopOpacity="0" />
+                                <stop offset="50%" stopColor="#C0C0C0" stopOpacity="1" />
                                 <stop offset="100%" stopColor="#fff" stopOpacity="1" />
                             </linearGradient>
                         </defs>
@@ -114,7 +114,7 @@ const SplashScreen = ({ onComplete }) => {
                         {/* "The Right Path" - Gold Particle Traveling Up */}
                         <motion.circle
                             r="2"
-                            fill="#daa520"
+                            fill="#C0C0C0"
                             filter="url(#glow)"
                             initial={{ cx: 50, cy: 150, opacity: 0 }}
                             animate={{
@@ -180,7 +180,7 @@ const SplashScreen = ({ onComplete }) => {
                     transition={{ delay: 1.5, duration: 1 }}
                     className="text-center relative"
                 >
-                    <h1 className="text-4xl md:text-6xl font-display font-bold text-white mb-3 tracking-tight">
+                    <h1 className="text-4xl md:text-6xl font-sans font-bold text-white mb-3 tracking-tight">
                         <motion.span
                             initial={{ opacity: 0, filter: "blur(10px)" }}
                             animate={{ opacity: 1, filter: "blur(0px)" }}
@@ -220,4 +220,6 @@ const SplashScreen = ({ onComplete }) => {
 };
 
 export default SplashScreen;
+
+
 

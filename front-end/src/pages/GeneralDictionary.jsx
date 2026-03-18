@@ -76,7 +76,7 @@ const GeneralDictionary = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h1 className="text-4xl font-display font-bold text-slate-800 dark:text-white mb-2">
+            <h1 className="text-4xl font-sans font-bold text-slate-800 dark:text-white mb-2">
               General Dictionary
             </h1>
             <p className="text-slate-600 dark:text-slate-400">Master professional terminology with our interactive reference tool.</p>
@@ -226,7 +226,7 @@ const GeneralDictionary = () => {
                   </div>
 
                   <h3 className="text-3xl font-bold mb-2 capitalize">{wordOfDay.word}</h3>
-                  <p className="text-purple-100 mb-6 italic font-serif">
+                  <p className="text-purple-100 mb-6 italic font-sans">
                     {wordOfDay.phonetic}
                   </p>
 
@@ -279,3 +279,5 @@ const GeneralDictionary = () => {
 };
 
 export default GeneralDictionary;
+
+

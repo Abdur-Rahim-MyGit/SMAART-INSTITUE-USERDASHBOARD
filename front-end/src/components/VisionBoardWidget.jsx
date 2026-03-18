@@ -133,7 +133,7 @@ const VisionBoardWidget = () => {
           
           {/* Badge */}
           <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10">
-            <Sparkles className="w-3 h-3 text-yellow-400" />
+            <Sparkles className="w-3 h-3 text-[#C0C0C0]" />
             <span className="text-[10px] font-bold text-white tracking-wider uppercase">Daily Inspiration</span>
           </div>
 
@@ -152,7 +152,7 @@ const VisionBoardWidget = () => {
             className="group relative overflow-hidden rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.2)]"
           >
             <span className="relative z-10 flex items-center gap-2 px-4 py-1">
-              <Star className="w-4 h-4 text-yellow-400 group-hover:rotate-180 transition-transform duration-500" />
+              <Star className="w-4 h-4 text-[#C0C0C0] group-hover:rotate-180 transition-transform duration-500" />
               Set Your Personal Vision
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
@@ -168,10 +168,10 @@ const VisionBoardWidget = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative glass-effect rounded-xl overflow-hidden border-2 border-[#daa520]/30 shadow-[0_0_30px_rgba(218,165,32,0.2)]"
+        className="relative glass-effect rounded-xl overflow-hidden border-2 border-[#C0C0C0]/30 shadow-[0_0_30px_rgba(192, 192, 192,0.2)]"
       >
         {/* Active Vision Badge */}
-        <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-[#daa520] to-[#FFD700] text-[#002147] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
+        <div className="absolute top-4 left-4 z-20 bg-gradient-to-r from-[#C0C0C0] to-[#E5E4E2] text-[#002147] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
           <Star className="w-3 h-3" />
           Active Vision
         </div>
@@ -223,7 +223,7 @@ const VisionBoardWidget = () => {
               <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
                 {visionData.title}
               </h3>
-              <p className="text-[#daa520] text-sm sm:text-base font-medium drop-shadow-md">
+              <p className="text-[#C0C0C0] text-sm sm:text-base font-medium drop-shadow-md">
                 {visionData.quote || "Chase your dreams"}
               </p>
               <p className="text-white/60 text-xs mt-2">
@@ -290,4 +290,5 @@ const VisionBoardWidget = () => {
 };
 
 export default VisionBoardWidget;
+
 

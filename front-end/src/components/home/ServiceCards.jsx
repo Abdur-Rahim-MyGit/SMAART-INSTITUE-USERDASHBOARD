@@ -21,7 +21,7 @@ const ServiceCard = ({ service, index }) => {
       onMouseMove={handleMouseMove}
       className="group relative rounded-2xl p-8 overflow-hidden flex flex-col transition-all duration-300
                  bg-white/80 dark:bg-[#002147]/30 backdrop-blur-md border border-gray-100 dark:border-white/5 
-                 hover:border-[#daa520]/50 dark:hover:border-[#daa520]/50 hover:shadow-2xl hover:-translate-y-2
+                 hover:border-[#C0C0C0]/50 dark:hover:border-[#C0C0C0]/50 hover:shadow-2xl hover:-translate-y-2
                  hover:bg-white dark:hover:bg-[#002147]/60"
     >
       {/* Spotlight Effect */}
@@ -31,7 +31,7 @@ const ServiceCard = ({ service, index }) => {
           background: useMotionTemplate`
             radial-gradient(
               650px circle at ${mouseX}px ${mouseY}px,
-              rgba(218, 165, 32, 0.1),
+              rgba(192, 192, 192, 0.1),
               transparent 80%
             )
           `,
@@ -40,11 +40,11 @@ const ServiceCard = ({ service, index }) => {
 
       <div className="relative z-10 flex flex-col h-full">
         {/* Icon with refined gradient */}
-        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#0d2150] flex items-center justify-center mb-8 shadow-lg shadow-[#1a3884]/20 group-hover:scale-110 transition-transform duration-300 text-white border border-[#daa520]/30`}>
+        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#0d2150] flex items-center justify-center mb-8 shadow-lg shadow-[#1a3884]/20 group-hover:scale-110 transition-transform duration-300 text-white border border-[#C0C0C0]/30`}>
           {service.icon}
         </div>
 
-        <h3 className="text-2xl font-bold mb-4 text-[#1a3884] dark:text-white group-hover:text-[#daa520] transition-colors">
+        <h3 className="text-2xl font-bold mb-4 text-[#1a3884] dark:text-white group-hover:text-[#C0C0C0] transition-colors">
           {service.title}
         </h3>
 
@@ -55,7 +55,7 @@ const ServiceCard = ({ service, index }) => {
         <ul className="space-y-4 mb-8 border-t border-gray-100 dark:border-white/10 pt-6">
           {service.features.map((feature) => (
             <li key={feature} className="flex items-center text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#daa520] mr-3 shadow-[0_0_8px_#daa520]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0] mr-3 shadow-[0_0_8px_#C0C0C0]" />
               {feature}
             </li>
           ))}
@@ -119,7 +119,7 @@ const ServiceCards = () => {
             viewport={{ once: true }}
             className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1a3884] dark:text-white tracking-tight font-heading leading-tight mb-6"
           >
-            Building Capability for the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#daa520] dark:from-blue-300 dark:via-white dark:to-yellow-300">Changing World of Work</span>
+            Building Capability for the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#C0C0C0] dark:from-blue-300 dark:via-white dark:to-yellow-300">Changing World of Work</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -143,3 +143,4 @@ const ServiceCards = () => {
 };
 
 export default ServiceCards;
+

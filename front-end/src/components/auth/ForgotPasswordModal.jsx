@@ -215,14 +215,14 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                    className="relative w-full max-w-[420px] bg-[#FDFBF7] border-2 border-[#BC9B6A] rounded-none shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
+                    className="relative w-full max-w-[420px] bg-[#FDFBF7] border-2 border-[#C0C0C0] rounded-none shadow-[0_30px_60px_rgba(0,0,0,0.4)] overflow-hidden"
                 >
                     {/* Vintage Decorative Border */}
-                    <div className="absolute inset-2 border border-[#BC9B6A]/20 pointer-events-none rounded-none" />
-                    <div className="absolute top-4 left-4 w-8 h-8 border-t border-l border-[#BC9B6A]/40 pointer-events-none" />
-                    <div className="absolute top-4 right-4 w-8 h-8 border-t border-r border-[#BC9B6A]/40 pointer-events-none" />
-                    <div className="absolute bottom-4 left-4 w-8 h-8 border-b border-l border-[#BC9B6A]/40 pointer-events-none" />
-                    <div className="absolute bottom-4 right-4 w-8 h-8 border-b border-r border-[#BC9B6A]/40 pointer-events-none" />
+                    <div className="absolute inset-2 border border-[#C0C0C0]/20 pointer-events-none rounded-none" />
+                    <div className="absolute top-4 left-4 w-8 h-8 border-t border-l border-[#C0C0C0]/40 pointer-events-none" />
+                    <div className="absolute top-4 right-4 w-8 h-8 border-t border-r border-[#C0C0C0]/40 pointer-events-none" />
+                    <div className="absolute bottom-4 left-4 w-8 h-8 border-b border-l border-[#C0C0C0]/40 pointer-events-none" />
+                    <div className="absolute bottom-4 right-4 w-8 h-8 border-b border-r border-[#C0C0C0]/40 pointer-events-none" />
 
 
                     <div className="relative z-10 flex flex-col h-full">
@@ -235,7 +235,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                         </button>
 
                         {/* Header */}
-                        <div className="bg-[#002B5B] p-8 shadow-xl flex flex-col items-center justify-center rounded-none border-b-2 border-[#BC9B6A]">
+                        <div className="bg-[#002B5B] p-8 shadow-xl flex flex-col items-center justify-center rounded-none border-b-2 border-[#C0C0C0]">
                             <div className="relative mb-3">
                                 <img src={logoWhite} alt="Smaart Institute" className="h-14 w-auto drop-shadow-md" />
                             </div>
@@ -279,11 +279,11 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                         }
                                                     }}
                                                     placeholder="Search University/College..."
-                                                    className="bg-white border-gray-300 h-11 rounded-none text-sm pl-10 pr-4 focus:border-[#BC9B6A] shadow-sm"
+                                                    className="bg-white border-gray-300 h-11 rounded-none text-sm pl-10 pr-4 focus:border-[#C0C0C0] shadow-sm"
                                                 />
                                                 {isSearchingColleges && (
                                                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                        <Loader2 className="w-4 h-4 animate-spin text-[#BC9B6A]" />
+                                                        <Loader2 className="w-4 h-4 animate-spin text-[#C0C0C0]" />
                                                     </div>
                                                 )}
                                             </div>
@@ -323,7 +323,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder="your@email.com"
-                                                    className="bg-white border-gray-300 h-11 rounded-none text-sm pl-10 pr-4 focus:border-[#BC9B6A] shadow-sm"
+                                                    className="bg-white border-gray-300 h-11 rounded-none text-sm pl-10 pr-4 focus:border-[#C0C0C0] shadow-sm"
                                                 />
                                             </div>
                                         </div>
@@ -360,7 +360,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                     value={digit}
                                                     onChange={(e) => handleOtpChange(index, e.target.value)}
                                                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                                                    className="w-10 h-14 text-center text-xl font-bold bg-white border-2 border-gray-200 rounded-none focus:border-[#BC9B6A] focus:ring-1 focus:ring-[#BC9B6A]/20 outline-none transition-all shadow-sm"
+                                                    className="w-10 h-14 text-center text-xl font-bold bg-white border-2 border-gray-200 rounded-none focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0]/20 outline-none transition-all shadow-sm"
                                                 />
                                             ))}
                                         </div>
@@ -390,10 +390,10 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                     type={showPassword ? "text" : "password"}
                                                     value={newPassword}
                                                     onChange={(e) => setNewPassword(e.target.value)}
-                                                    className="bg-white border-gray-300 h-11 rounded-none px-4 text-sm focus:border-[#BC9B6A] shadow-sm"
+                                                    className="bg-white border-gray-300 h-11 rounded-none px-4 text-sm focus:border-[#C0C0C0] shadow-sm"
                                                     placeholder="Enter new password"
                                                 />
-                                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#BC9B6A]">
+                                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C0C0C0]">
                                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                                 </button>
                                             </div>
@@ -405,10 +405,10 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                     type={showConfirmPassword ? "text" : "password"}
                                                     value={confirmPassword}
                                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                                    className="bg-white border-gray-300 h-11 rounded-none px-4 text-sm focus:border-[#BC9B6A] shadow-sm"
+                                                    className="bg-white border-gray-300 h-11 rounded-none px-4 text-sm focus:border-[#C0C0C0] shadow-sm"
                                                     placeholder="Confirm new password"
                                                 />
-                                                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#BC9B6A]">
+                                                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C0C0C0]">
                                                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                                 </button>
                                             </div>
@@ -469,3 +469,4 @@ const RequirementItem = ({ label, met }) => (
   );
 
 export default ForgotPasswordModal;
+

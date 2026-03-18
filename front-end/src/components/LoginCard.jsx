@@ -235,8 +235,8 @@ const LoginCard = () => {
         className="flex items-center justify-between gap-3 px-4 py-2"
         style={{
           background: "#ffffff",
-          border: "2px solid #BC9B6A",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          border: "2px solid #C0C0C0",
+          boxShadow: "0 4px 20px rgba(192, 192, 192, 0.3)",
           borderRadius: "0px",
         }}
       >
@@ -245,7 +245,7 @@ const LoginCard = () => {
             className="w-10 h-10 sm:w-11 sm:h-11 rounded-none flex items-center justify-center shrink-0"
             style={{
               background: "linear-gradient(135deg, #f8f9fc 0%, #eef2fb 100%)",
-              border: "1px solid rgba(188,155,106,0.3)",
+              border: "1px solid rgba(192, 192, 192, 0.4)",
             }}
           >
             <Building2 className="w-5 h-5 text-[#1a3884]" />
@@ -280,8 +280,8 @@ const LoginCard = () => {
         className="overflow-hidden"
         style={{
           background: "#ffffff",
-          border: "2px solid #BC9B6A",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.06)",
+          border: "2px solid #C0C0C0",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.1), 0 0 15px rgba(192, 192, 192, 0.4)",
           borderRadius: "0px",
         }}
       >

@@ -117,10 +117,10 @@ const Institution = () => {
                     style={{
                       background: "rgba(0, 21, 46, 0.88)",
                       backdropFilter: "blur(8px)",
-                      border: "1px solid rgba(218,165,32,0.35)",
+                      border: "1px solid rgba(192,192,192,0.35)",
                     }}
                   >
-                    <span className="w-2 h-2 rounded-full bg-[#daa520] animate-pulse shadow-[0_0_8px_rgba(218,165,32,0.7)]" />
+                    <span className="w-2 h-2 rounded-full bg-[#C0C0C0] animate-pulse shadow-[0_0_8px_rgba(192,192,192,0.7)]" />
                     <span className="text-[10px] sm:text-[11px] font-bold text-white tracking-widest uppercase">
                       Founder's Message
                     </span>

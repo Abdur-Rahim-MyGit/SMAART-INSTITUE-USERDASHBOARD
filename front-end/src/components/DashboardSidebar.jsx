@@ -494,7 +494,7 @@ const DashboardSidebar = () => {
                 onClick={() => setIsMobileOpen(false)}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
                 style={{
-                  background: 'linear-gradient(135deg, #daa520 0%, #b8860b 50%, #daa520 100%)',
+                  background: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 50%, #C0C0C0 100%)',
                 }}
               >
                 <Award className="w-5 h-5 text-slate-900" />
@@ -558,4 +558,5 @@ const DashboardSidebar = () => {
 };
 
 export default DashboardSidebar;
+
 
