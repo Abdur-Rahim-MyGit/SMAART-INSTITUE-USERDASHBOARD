@@ -229,7 +229,6 @@ const DashboardSidebar = () => {
             {[
               { label: 'Home', path: '/dashboard' },
               { label: 'Courses', path: '/dashboard/courses' },
-              { label: 'Chat', path: '/dashboard/ai-career-coach/chat' },
               { label: 'Assessments', path: '/dashboard/assessment-centre' },
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },

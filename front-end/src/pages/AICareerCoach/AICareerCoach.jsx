@@ -20,19 +20,6 @@ import { toast } from 'sonner';
 
 const features = [
     {
-        id: 'chat',
-        title: 'AI Career Chat',
-        description: 'Have a conversation with your AI career coach. Get personalized advice, ask questions, and receive guidance 24/7.',
-        icon: MessageSquare,
-        path: '/dashboard/ai-career-coach/chat',
-        state: null,
-        color: 'from-purple-500 to-indigo-600',
-        iconBg: 'bg-purple-100 dark:bg-purple-900/30',
-        iconColor: 'text-purple-600 dark:text-purple-400',
-        badge: 'Interactive',
-        badgeColor: 'bg-purple-500'
-    },
-    {
         id: 'profile',
         title: 'Profile Analysis',
         description: 'Get AI-powered insights into your strengths, weaknesses, and career potential based on your skills and experience.',
@@ -174,7 +161,7 @@ const AICareerCoach = () => {
             navigate('/dashboard/ai-career-coach/profile');
             toast.info('Complete your profile to get started!');
         } else {
-            navigate('/dashboard/ai-career-coach/chat');
+            navigate('/dashboard/profile-analysis');
         }
     };
 
