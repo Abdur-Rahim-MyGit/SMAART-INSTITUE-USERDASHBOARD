@@ -76,7 +76,9 @@ const collegeSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  logo: String
+  logo: String,
+  chairmanVideo: String,
+  principalVideo: String
 }, {
   timestamps: true
 });
