@@ -196,9 +196,9 @@ const AddDetails = () => {
         }
     };
 
-    const inputClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#BC9B6A] focus:ring-0 px-0 py-2 text-base transition-all duration-300 placeholder:text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed";
-    const selectClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#BC9B6A] focus:ring-0 px-0 py-2 text-base transition-all duration-300 appearance-none disabled:opacity-60 disabled:cursor-not-allowed";
-    const textareaClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#BC9B6A] focus:ring-0 px-0 py-2 text-base transition-all duration-300 resize-none placeholder:text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed";
+    const inputClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 placeholder:text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed";
+    const selectClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 appearance-none disabled:opacity-60 disabled:cursor-not-allowed";
+    const textareaClass = "w-full bg-transparent border-0 border-b border-gray-300 focus:border-[#C0C0C0] focus:ring-0 px-0 py-2 text-base transition-all duration-300 resize-none placeholder:text-gray-400 disabled:opacity-60 disabled:cursor-not-allowed";
     const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
 
     if (isInitialLoading) {
@@ -206,7 +206,7 @@ const AddDetails = () => {
             <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="w-12 h-12 animate-spin text-[#1a3884]" />
-                    <p className="font-serif italic text-slate-500">Loading your profile data...</p>
+                    <p className="font-sans italic text-slate-500">Loading your profile data...</p>
                 </div>
             </div>
         );
@@ -226,12 +226,12 @@ const AddDetails = () => {
     }
 
     return (
-        <div className="h-screen flex flex-col bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#BC9B6A]/30 overflow-hidden">
+        <div className="h-screen flex flex-col bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#C0C0C0]/30 overflow-hidden">
             <DashboardSidebar />
             <div className="flex-1 overflow-y-auto transition-all duration-300">
                 <DashboardHeader />
                 <div className="max-w-4xl mx-auto py-10 px-4 relative">
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-8 md:p-10 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.1)] border-2 border-[#BC9B6A] relative flex flex-col min-h-[600px]">
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-8 md:p-10 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.1),0_0_20px_rgba(192,192,192,0.4)] border-2 border-[#C0C0C0] relative flex flex-col min-h-[600px]">
                     
                     <div className="mb-8 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -337,7 +337,7 @@ const AddDetails = () => {
                             <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6 flex-1">
                                 <div className="flex justify-between items-center mb-4">
                                     <p className="text-sm text-slate-500">Add multiple degrees or diplomas you have completed or are pursuing.</p>
-                                    <Button onClick={() => setHigherEducation([...higherEducation, { id: Date.now(), qualificationLevel: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }])} variant="outline" size="sm" className="gap-2 border-[#BC9B6A] text-[#BC9B6A] hover:bg-[#BC9B6A]/10 rounded-full px-4">
+                                    <Button onClick={() => setHigherEducation([...higherEducation, { id: Date.now(), qualificationLevel: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }])} variant="outline" size="sm" className="gap-2 border-[#C0C0C0] text-[#C0C0C0] hover:bg-[#C0C0C0]/10 rounded-full px-4">
                                         <Plus size={16} /> Add New Degree
                                     </Button>
                                 </div>
@@ -345,10 +345,10 @@ const AddDetails = () => {
                                 {higherEducation.map((item, index) => {
                                     const isExisting = index < (existingData?.higherEducation?.length || 0);
                                     return (
-                                        <div key={item.id} className={`p-8 border-2 ${isExisting ? 'border-slate-100 bg-slate-50/30' : 'border-[#BC9B6A]/30 bg-[#BC9B6A]/5 shadow-sm'} relative transition-all duration-300`}>
+                                        <div key={item.id} className={`p-8 border-2 ${isExisting ? 'border-slate-100 bg-slate-50/30' : 'border-[#C0C0C0]/30 bg-[#C0C0C0]/5 shadow-sm'} relative transition-all duration-300`}>
                                             {!isExisting && <button onClick={() => setHigherEducation(higherEducation.filter(h => h.id !== item.id))} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-2"><Trash2 size={20} /></button>}
                                             <div className="flex items-center gap-2 mb-6">
-                                                <GraduationCap className={`w-5 h-5 ${isExisting ? 'text-slate-400' : 'text-[#BC9B6A]'}`} />
+                                                <GraduationCap className={`w-5 h-5 ${isExisting ? 'text-slate-400' : 'text-[#C0C0C0]'}`} />
                                                 <h3 className="font-bold text-slate-800 tracking-tight">Academic Record #{index + 1} {isExisting && <span className="ml-3 text-[9px] font-black bg-slate-200 text-slate-500 px-2 py-0.5 rounded uppercase tracking-widest">Saved</span>}</h3>
                                             </div>
                                             <div className="grid md:grid-cols-2 gap-x-10 gap-y-6">
@@ -375,7 +375,7 @@ const AddDetails = () => {
                             <motion.div key="step11" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6 flex-1">
                                 <div className="flex justify-between items-center mb-4">
                                     <p className="text-sm text-slate-500">Add professional certifications, courses, or training rewards.</p>
-                                    <Button onClick={() => setCertificates({...certificates, items: [...certificates.items, { id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }]})} variant="outline" size="sm" className="gap-2 border-[#BC9B6A] text-[#BC9B6A] hover:bg-[#BC9B6A]/10 rounded-full px-4">
+                                    <Button onClick={() => setCertificates({...certificates, items: [...certificates.items, { id: Date.now(), title: "", issuingOrg: "", certificateFile: null, yearOfCompletion: "", verificationType: "", verificationUrl: "" }]})} variant="outline" size="sm" className="gap-2 border-[#C0C0C0] text-[#C0C0C0] hover:bg-[#C0C0C0]/10 rounded-full px-4">
                                         <Plus size={16} /> Add New Certificate
                                     </Button>
                                 </div>
@@ -383,10 +383,10 @@ const AddDetails = () => {
                                 {certificates.items.map((item, index) => {
                                     const isExisting = index < (existingData?.certificates?.length || 0);
                                     return (
-                                        <div key={item.id} className={`p-8 border-2 ${isExisting ? 'border-slate-100 bg-slate-50/30' : 'border-[#BC9B6A]/30 bg-[#BC9B6A]/5 shadow-sm'} relative transition-all duration-300`}>
+                                        <div key={item.id} className={`p-8 border-2 ${isExisting ? 'border-slate-100 bg-slate-50/30' : 'border-[#C0C0C0]/30 bg-[#C0C0C0]/5 shadow-sm'} relative transition-all duration-300`}>
                                             {!isExisting && <button onClick={() => setCertificates({...certificates, items: certificates.items.filter(c => c.id !== item.id)})} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-2"><Trash2 size={20} /></button>}
                                             <div className="flex items-center gap-2 mb-6">
-                                                <Award className={`w-5 h-5 ${isExisting ? 'text-slate-400' : 'text-[#BC9B6A]'}`} />
+                                                <Award className={`w-5 h-5 ${isExisting ? 'text-slate-400' : 'text-[#C0C0C0]'}`} />
                                                 <h3 className="font-bold text-slate-800 tracking-tight">Professional Certificate #{index + 1}</h3>
                                             </div>
                                             <div className="grid md:grid-cols-2 gap-x-10 gap-y-6">
@@ -429,7 +429,7 @@ const AddDetails = () => {
                             variant="ghost"
                             onClick={handlePrevStep}
                             disabled={currentStep === 0}
-                            className="text-slate-400 hover:text-slate-700 font-serif disabled:opacity-0"
+                            className="text-slate-400 hover:text-slate-700 font-sans disabled:opacity-0"
                         >
                             Previous
                         </Button>
@@ -438,7 +438,7 @@ const AddDetails = () => {
                             {currentStep < steps.length - 1 ? (
                                 <Button
                                     onClick={handleNextStep}
-                                    className="bg-[#1a3884] hover:bg-[#002147] text-white px-10 py-6 rounded-none font-bold font-serif text-lg transition-all group"
+                                    className="bg-[#1a3884] hover:bg-[#002147] text-white px-10 py-6 rounded-none font-bold font-sans text-lg transition-all group"
                                 >
                                     Next Section
                                     <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -447,7 +447,7 @@ const AddDetails = () => {
                                 <Button
                                     onClick={handleSubmit}
                                     disabled={isLoading}
-                                    className="bg-[#BC9B6A] hover:bg-[#a68a5c] text-white px-12 py-6 rounded-none font-bold font-serif text-lg shadow-xl shadow-[#BC9B6A]/20 disabled:opacity-70"
+                                    className="bg-[#C0C0C0] hover:bg-[#A8A8A8] text-white px-12 py-6 rounded-none font-bold font-sans text-lg shadow-xl shadow-[#C0C0C0]/20 disabled:opacity-70"
                                 >
                                     {isLoading ? (
                                         <div className="flex items-center gap-3">
@@ -467,8 +467,8 @@ const AddDetails = () => {
                 <div className="mt-8 flex justify-between items-center px-4">
                     {steps.map((step, idx) => (
                         <div key={idx} className="flex flex-col items-center gap-2">
-                            <div className={`w-3 h-3 rounded-full border-2 transition-all duration-500 ${idx <= currentStep ? 'bg-[#BC9B6A] border-[#BC9B6A] scale-125' : 'bg-white border-slate-200'}`} />
-                            <span className={`text-[8px] font-bold uppercase tracking-widest ${idx === currentStep ? 'text-[#BC9B6A]' : 'text-slate-300'}`}>{step.title}</span>
+                            <div className={`w-3 h-3 rounded-full border-2 transition-all duration-500 ${idx <= currentStep ? 'bg-[#C0C0C0] border-[#C0C0C0] scale-125' : 'bg-white border-slate-200'}`} />
+                            <span className={`text-[8px] font-bold uppercase tracking-widest ${idx === currentStep ? 'text-[#C0C0C0]' : 'text-slate-300'}`}>{step.title}</span>
                         </div>
                     ))}
                 </div>
@@ -479,3 +479,5 @@ const AddDetails = () => {
 };
 
 export default AddDetails;
+
+

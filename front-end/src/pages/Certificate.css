@@ -129,7 +129,7 @@
     font-weight: 700;
     letter-spacing: 0.5em;
     /* Premium spacing */
-    color: #b8860b;
+    color: #A8A8A8;
     text-transform: uppercase;
     margin-top: 8px;
     opacity: 0.9;
@@ -278,7 +278,7 @@
 }
 
 .band {
-    color: #b8860b;
+    color: #A8A8A8;
 }
 
 /* ── Footer ── */
@@ -473,7 +473,7 @@
 .combined-content {
     background: #ffffff;
     /* Explicit Gold Border */
-    border: 1.5mm solid #b8860b;
+    border: 1.5mm solid #A8A8A8;
     /* Create an even white frame between the outer Navy and inner Gold borders */
     margin: 4mm;
     /* Reduced from 6mm */
@@ -509,7 +509,7 @@
     /* Shrink to fit name */
 
     /* Use border-bottom with generous padding for robust PDF generation */
-    border-bottom: 2px solid #b8860b !important;
+    border-bottom: 2px solid #A8A8A8 !important;
     padding-bottom: 4mm !important;
     /* Reduced from 8mm */
     /* Visual gap between text and line */
@@ -579,12 +579,13 @@
 }
 
 .included-cert-item.gold-theme .cert-bullet {
-    background-color: #b8860b;
+    background-color: #A8A8A8;
     /* Gold bullet for the Gold cert */
 }
 
 .combined-watermark {
-    color: #b8860b;
+    color: #A8A8A8;
     opacity: 0.05 !important;
 }
+
 

@@ -60,7 +60,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
     if (loading) {
         return (
             <div className="fixed inset-0 z-[9999] bg-[#002147] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-t-[#1a3884] border-r-transparent border-b-[#daa520] border-l-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-4 border-t-[#1a3884] border-r-transparent border-b-[#C0C0C0] border-l-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -80,7 +80,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
 
                 {/* Decorative elements */}
                 <div className="absolute top-10 left-10 text-[#1a3884]/20 text-6xl font-black tracking-wider">VISION</div>
-                <div className="absolute bottom-10 right-10 text-[#daa520]/20 text-6xl font-black tracking-wider">MANIFEST</div>
+                <div className="absolute bottom-10 right-10 text-[#C0C0C0]/20 text-6xl font-black tracking-wider">MANIFEST</div>
 
                 {/* Main Vision Board Container */}
                 <motion.div
@@ -137,7 +137,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1 }}
                     onClick={() => onComplete?.()}
-                    className="absolute bottom-12 left-1/2 -translate-x-1/2 px-8 py-3 bg-gradient-to-r from-[#daa520] to-[#f0c040] hover:from-[#c4941a] hover:to-[#daa520] text-[#002147] text-base font-bold rounded-full transition-all shadow-lg border-2 border-white/30"
+                    className="absolute bottom-12 left-1/2 -translate-x-1/2 px-8 py-3 bg-gradient-to-r from-[#C0C0C0] to-[#E5E4E2] hover:from-[#E5E4E2] hover:to-[#C0C0C0] text-[#002147] text-base font-bold rounded-full transition-all shadow-lg border-2 border-white/30"
                 >
                     A'int giving up on my dream! ✨
                 </motion.button>
@@ -148,7 +148,7 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
                         initial={{ width: "100%" }}
                         animate={{ width: "0%" }}
                         transition={{ duration: duration / 1000, ease: "linear" }}
-                        className="h-full bg-gradient-to-r from-[#1a3884] to-[#daa520]"
+                        className="h-full bg-gradient-to-r from-[#1a3884] to-[#C0C0C0]"
                     />
                 </div>
             </motion.div>
@@ -157,4 +157,5 @@ const VisionBoardSplash = ({ onComplete, duration = 3000 }) => {
 };
 
 export default VisionBoardSplash;
+
 

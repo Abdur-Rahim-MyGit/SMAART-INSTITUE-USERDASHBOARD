@@ -36,7 +36,7 @@ const UNLOCK_CONFIG = {
     icon: Shirt,
     name: 'Cool Jacket',
     description: 'Looking sharp with this trendy jacket!',
-    color: '#daa520',
+    color: '#C0C0C0',
     level: 3
   },
   glasses: {
@@ -94,7 +94,7 @@ const LevelUpCelebration = ({
               recycle={false}
               numberOfPieces={300}
               gravity={0.2}
-              colors={['#1a3884', '#daa520', '#ff6b6b', '#4ecdc4', '#fff']}
+              colors={['#1a3884', '#C0C0C0', '#ff6b6b', '#4ecdc4', '#fff']}
             />
           )}
 
@@ -145,7 +145,7 @@ const LevelUpCelebration = ({
                     rotate: { duration: 15, repeat: Infinity, ease: 'linear' },
                     scale: { duration: 3, repeat: Infinity }
                   }}
-                  className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full bg-[#daa520]/10 blur-3xl"
+                  className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full bg-[#C0C0C0]/10 blur-3xl"
                 />
               </div>
 
@@ -156,7 +156,7 @@ const LevelUpCelebration = ({
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', delay: 0.2 }}
-                  className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#daa520] to-[#b8860b] shadow-lg shadow-[#daa520]/30 mb-6"
+                  className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-[#C0C0C0] to-[#A8A8A8] shadow-lg shadow-[#C0C0C0]/30 mb-6"
                 >
                   <div className="flex flex-col items-center">
                     <Trophy className="w-8 h-8 text-white mb-1" />
@@ -191,8 +191,8 @@ const LevelUpCelebration = ({
                     transition={{ delay: 0.5 }}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#1a3884]/20 rounded-full mb-6"
                   >
-                    <Sparkles className="w-4 h-4 text-[#daa520]" />
-                    <span className="text-[#daa520] font-bold">+{xpGained} XP</span>
+                    <Sparkles className="w-4 h-4 text-[#C0C0C0]" />
+                    <span className="text-[#C0C0C0] font-bold">+{xpGained} XP</span>
                   </motion.div>
                 )}
 
@@ -255,5 +255,6 @@ const LevelUpCelebration = ({
 };
 
 export default LevelUpCelebration;
+
 
 

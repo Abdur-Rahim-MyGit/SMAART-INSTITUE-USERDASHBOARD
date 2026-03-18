@@ -54,8 +54,8 @@ const DashboardHeader = () => {
 
   return (
     <div className="w-full relative z-30">
-      {/* Top Gold Line */}
-      <div style={{ height: '3px', background: 'linear-gradient(90deg, #c9a84c, #daa520, #c9a84c)' }} />
+      {/* Top Silver Line */}
+      <div style={{ height: '3px', background: 'linear-gradient(90deg, #C0C0C0, #FFFFFF, #C0C0C0)' }} />
 
       {/* Blue Header Bar */}
       <div style={{
@@ -68,10 +68,10 @@ const DashboardHeader = () => {
         <motion.h1 
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-2xl md:text-3xl lg:text-4xl"
+          className="text-2xl md:text-3xl lg:text-4xl font-sans"
           style={{
             color: '#ffffff',
-            fontFamily: "'Playfair Display', 'Georgia', serif",
+            fontFamily: "'Inter', sans-serif",
             fontWeight: '700',
             letterSpacing: 'min(8px, 2vw)',
             textTransform: 'uppercase',
@@ -87,10 +87,11 @@ const DashboardHeader = () => {
         </motion.h1>
       </div>
 
-      {/* Bottom Gold Line */}
-      <div style={{ height: '3px', background: 'linear-gradient(90deg, #c9a84c, #daa520, #c9a84c)' }} />
+      {/* Bottom Silver Line */}
+      <div style={{ height: '3px', background: 'linear-gradient(90deg, #C0C0C0, #FFFFFF, #C0C0C0)' }} />
     </div>
   );
 };
 
 export default DashboardHeader;
+

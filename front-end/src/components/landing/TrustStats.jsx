@@ -53,7 +53,7 @@ const TrustStats = () => {
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   className="text-center group pt-8 md:pt-0 first:pt-0 border-gray-200 dark:border-white/10"
                 >
-                  <div className="text-4xl md:text-5xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-[#daa520] transition-colors duration-300 font-heading">
+                  <div className="text-4xl md:text-5xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-[#C0C0C0] transition-colors duration-300 font-heading">
                     <Counter value={stat.value} />
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider group-hover:text-[#002147] dark:group-hover:text-white transition-colors">
@@ -70,3 +70,4 @@ const TrustStats = () => {
 };
 
 export default TrustStats;
+

@@ -700,7 +700,7 @@ const VisionBoardGalleryPro = () => {
             {/* Header Section - Compact */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
               <div className="flex-1 text-center md:text-left">
-                <p className="text-[#1a3884] dark:text-[#BC9B6A] text-3xl md:text-4xl font-['Dancing_Script'] mb-1">
+                <p className="text-[#1a3884] dark:text-[#C0C0C0] text-3xl md:text-4xl font-['Dancing_Script'] mb-1">
                   Visualize your goals and manifest your future...
                 </p>
                 <p className="text-slate-500 dark:text-slate-400 text-sm font-medium max-w-xl">
@@ -709,7 +709,7 @@ const VisionBoardGalleryPro = () => {
               </div>
 
               <div className="flex items-center gap-4 shrink-0">
-                <div className="flex items-center text-xs font-bold text-[#1a3884]/70 dark:text-[#BC9B6A]/70 bg-white/50 dark:bg-[#1e293b]/50 px-4 py-2 rounded-xl border border-[#1a3884]/10 dark:border-[#BC9B6A]/10 shadow-sm">
+                <div className="flex items-center text-xs font-bold text-[#1a3884]/70 dark:text-[#C0C0C0]/70 bg-white/50 dark:bg-[#1e293b]/50 px-4 py-2 rounded-xl border border-[#1a3884]/10 dark:border-[#C0C0C0]/10 shadow-sm">
                   <Grid3X3 className="w-3.5 h-3.5 mr-2 opacity-50" />
                   {boards.length} / {maxAllowed} BOARDS
                 </div>
@@ -893,5 +893,6 @@ const VisionBoardGalleryPro = () => {
 };
 
 export default VisionBoardGalleryPro;
+
 
 

@@ -88,7 +88,7 @@ const ModuleCard = ({ module, index }) => {
                 <BookOpen className="w-6 h-6 text-accent" />
               </div>
               <div>
-                <h3 className="text-2xl font-display font-bold text-background">
+                <h3 className="text-2xl font-sans font-bold text-background">
                   {module.title}
                 </h3>
                 <p className="text-accent font-semibold">{moduleInfo.day}</p>
@@ -156,7 +156,7 @@ const ModuleCard = ({ module, index }) => {
             <BookOpen className="w-6 h-6 text-accent" />
           </div>
           <div>
-            <h3 className="text-2xl font-display font-bold text-background">
+            <h3 className="text-2xl font-sans font-bold text-background">
               {module.title}
             </h3>
             <p className="text-accent font-semibold">{moduleInfo.day}</p>
@@ -225,3 +225,4 @@ const ModuleCard = ({ module, index }) => {
 };
 
 export default ModuleCard;
+

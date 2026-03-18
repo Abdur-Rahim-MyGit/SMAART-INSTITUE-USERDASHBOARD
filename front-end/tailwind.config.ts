@@ -27,6 +27,12 @@ export default {
           hover: '#b8860b',
           light: '#f4c430',
         },
+        silver: {
+          DEFAULT: '#C0C0C0',
+          hover: '#A8A8A8',
+          light: '#E5E4E2',
+          glow: 'rgba(192, 192, 192, 0.5)',
+        },
         white: {
           DEFAULT: '#ffffff',
           muted: '#e2e8f0', // Slate-200 for body text
@@ -77,6 +83,10 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)'
+      },
+      boxShadow: {
+        'silver-glow': '0 0 15px rgba(192, 192, 192, 0.5)',
+        'premium-silver': '0 20px 60px rgba(0,0,0,0.1), 0 0 15px rgba(192, 192, 192, 0.3)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const IntegrationMarquee = () => {
     const partners = [
-        { name: "ICAS", color: "#daa520" },
+        { name: "ICAS", color: "#C0C0C0" },
         { name: "University of Oxford", color: "#ffffff" },
         { name: "Cambridge Assessment", color: "#ffffff" },
         { name: "Pearson", color: "#ffffff" },
@@ -36,7 +36,7 @@ const IntegrationMarquee = () => {
                     {[...partners, ...partners].map((partner, index) => (
                         <div
                             key={index}
-                            className="text-2xl font-bold opacity-100 hover:opacity-100 transition-opacity duration-300 font-serif"
+                            className="text-2xl font-bold opacity-100 hover:opacity-100 transition-opacity duration-300 font-sans"
                             style={{ color: partner.color === '#ffffff' ? '#ffffff' : partner.color }}
                         >
                             {partner.name}
@@ -49,3 +49,5 @@ const IntegrationMarquee = () => {
 };
 
 export default IntegrationMarquee;
+
+

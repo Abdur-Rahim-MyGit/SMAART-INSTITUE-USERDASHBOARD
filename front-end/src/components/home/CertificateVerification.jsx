@@ -133,7 +133,7 @@ const CertificateVerification = () => {
         <section id="verify-certificate" className="py-24 bg-gray-50 dark:bg-[#000F24] relative overflow-hidden transition-colors duration-500">
             {/* Background decoration */}
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#daa520]/5 dark:bg-[#daa520]/10 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#C0C0C0]/5 dark:bg-[#C0C0C0]/10 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
             <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
                 <div className="max-w-7xl mx-auto">
@@ -147,12 +147,12 @@ const CertificateVerification = () => {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.8 }}
                             >
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/10 dark:bg-[#daa520]/10 border border-[#1a3884]/20 dark:border-[#daa520]/20 text-[#1a3884] dark:text-[#daa520] text-xs font-bold uppercase tracking-widest mb-8">
+                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/10 dark:bg-[#C0C0C0]/10 border border-[#1a3884]/20 dark:border-[#C0C0C0]/20 text-[#1a3884] dark:text-[#C0C0C0] text-xs font-bold uppercase tracking-widest mb-8">
                                     Official Records
                                 </div>
                                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading leading-tight tracking-tight">
                                     Certificate <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#daa520] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300">
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#C0C0C0] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300">
                                         Verification
                                     </span>
                                 </h2>
@@ -172,10 +172,10 @@ const CertificateVerification = () => {
                                             whileInView={{ opacity: 1, x: 0 }}
                                             viewport={{ once: true }}
                                             transition={{ delay: 0.2 + idx * 0.1 }}
-                                            className="flex items-center gap-5 p-4 rounded-2xl bg-white dark:bg-[#001835]/80 border border-gray-100 dark:border-white/10 hover:border-[#daa520]/50 dark:hover:border-[#daa520]/50 shadow-sm transition-all duration-300 group backdrop-blur-sm"
+                                            className="flex items-center gap-5 p-4 rounded-2xl bg-white dark:bg-[#001835]/80 border border-gray-100 dark:border-white/10 hover:border-[#C0C0C0]/50 dark:hover:border-[#C0C0C0]/50 shadow-sm transition-all duration-300 group backdrop-blur-sm"
                                         >
-                                            <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center group-hover:bg-[#1a3884] dark:group-hover:bg-[#daa520] group-hover:text-white dark:group-hover:text-[#002147] transition-all duration-300 shadow-inner">
-                                                <item.icon className="w-5 h-5 text-[#1a3884] dark:text-[#daa520] group-hover:text-white dark:group-hover:text-[#002147] transition-colors" />
+                                            <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center group-hover:bg-[#1a3884] dark:group-hover:bg-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-all duration-300 shadow-inner">
+                                                <item.icon className="w-5 h-5 text-[#1a3884] dark:text-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-colors" />
                                             </div>
                                             <div>
                                                 <h4 className="text-gray-400 dark:text-gray-500 font-bold text-[9px] uppercase tracking-widest mb-0.5">{item.title}</h4>
@@ -204,14 +204,14 @@ const CertificateVerification = () => {
 
                                         {/* Top Decoration */}
                                         <div className="h-32 bg-gradient-to-r from-[#1a3884] to-[#0d1f4d] relative overflow-hidden flex-shrink-0">
-                                            <div className="absolute inset-0 bg-[#daa520]/10 pattern-dots" />
-                                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#daa520]/20 rounded-full blur-3xl" />
+                                            <div className="absolute inset-0 bg-[#C0C0C0]/10 pattern-dots" />
+                                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#C0C0C0]/20 rounded-full blur-3xl" />
                                             <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl" />
 
                                             <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white dark:from-[#001835] to-transparent opacity-20" />
 
                                             <div className="absolute inset-0 flex flex-col items-center justify-center text-white pb-4">
-                                                <ShieldCheck className="w-10 h-10 mb-2 text-[#daa520]" />
+                                                <ShieldCheck className="w-10 h-10 mb-2 text-[#C0C0C0]" />
                                                 <h3 className="text-xl font-bold font-heading tracking-wide">Credential Check</h3>
                                             </div>
                                         </div>
@@ -231,7 +231,7 @@ const CertificateVerification = () => {
                                                 <button
                                                     onClick={() => { setActiveTab('scan'); setVerificationResult(null); setError(null); }}
                                                     className={`flex-1 py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'scan'
-                                                        ? 'bg-[#daa520] text-[#002147] shadow-md'
+                                                        ? 'bg-[#C0C0C0] text-[#002147] shadow-md'
                                                         : 'text-gray-500 hover:text-[#1a3884] dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'}`}
                                                 >
                                                     <QrCode className="w-3.5 h-3.5" />
@@ -250,7 +250,7 @@ const CertificateVerification = () => {
                                                             className="w-full relative py-4"
                                                         >
                                                             <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">Point your camera at the certificate QR code</p>
-                                                            <div className="rounded-2xl overflow-hidden border-2 border-[#daa520] bg-black relative aspect-square max-w-[300px] mx-auto shadow-2xl">
+                                                            <div className="rounded-2xl overflow-hidden border-2 border-[#C0C0C0] bg-black relative aspect-square max-w-[300px] mx-auto shadow-2xl">
                                                                 <div id="reader-landing" className="w-full h-full" />
                                                             </div>
                                                         </motion.div>
@@ -272,7 +272,7 @@ const CertificateVerification = () => {
                                                                     value={certificateId}
                                                                     onChange={(e) => setCertificateId(e.target.value)}
                                                                     placeholder="e.g. SMAART-202X-XXXX"
-                                                                    className="w-full h-14 px-4 text-center text-lg font-mono font-bold bg-gray-50 dark:bg-[#000F24] border-2 border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#daa520] focus:ring-0 transition-colors text-[#1a3884] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-700"
+                                                                    className="w-full h-14 px-4 text-center text-lg font-mono font-bold bg-gray-50 dark:bg-[#000F24] border-2 border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#C0C0C0] focus:ring-0 transition-colors text-[#1a3884] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-700"
                                                                 />
                                                             </div>
 
@@ -282,7 +282,7 @@ const CertificateVerification = () => {
                                                                 className="w-full bg-[#1a3884] hover:bg-[#0d1f4d] text-white h-14 rounded-2xl font-bold shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-wide text-sm"
                                                             >
                                                                 {isVerifying ? (
-                                                                    <Loader2 className="w-5 h-5 animate-spin text-[#daa520]" />
+                                                                    <Loader2 className="w-5 h-5 animate-spin text-[#C0C0C0]" />
                                                                 ) : (
                                                                     <>
                                                                         Verify Now
@@ -343,7 +343,7 @@ const CertificateVerification = () => {
                                                                             <div className="bg-gray-50 dark:bg-[#000F24] p-6 rounded-2xl border border-gray-100 dark:border-white/5 text-left space-y-4 shadow-inner">
                                                                                 <div>
                                                                                     <label className="text-xs text-gray-400 uppercase tracking-wider font-bold">Recipient</label>
-                                                                                    <p className="text-lg font-bold text-[#1a3884] dark:text-[#daa520]">{verificationResult.certificate.fullName}</p>
+                                                                                    <p className="text-lg font-bold text-[#1a3884] dark:text-[#C0C0C0]">{verificationResult.certificate.fullName}</p>
                                                                                 </div>
                                                                                 <div className="h-px bg-gray-200 dark:bg-white/10" />
                                                                                 <div>
@@ -382,3 +382,4 @@ const CertificateVerification = () => {
 };
 
 export default CertificateVerification;
+

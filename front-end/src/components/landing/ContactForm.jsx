@@ -68,7 +68,7 @@ const ContactForm = () => {
     <section id="contact" className="py-16 sm:py-24 bg-gray-50/50 dark:bg-[#000F24] relative overflow-hidden scroll-mt-24 transition-colors duration-500">
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#daa520]/5 dark:bg-[#daa520]/10 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#C0C0C0]/5 dark:bg-[#C0C0C0]/10 rounded-full blur-[100px] -translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
       <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
         <div className="max-w-7xl mx-auto">
@@ -82,12 +82,12 @@ const ContactForm = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/10 dark:bg-[#daa520]/10 border border-[#1a3884]/20 dark:border-[#daa520]/20 text-[#1a3884] dark:text-[#daa520] text-xs font-bold uppercase tracking-widest mb-8">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/10 dark:bg-[#C0C0C0]/10 border border-[#1a3884]/20 dark:border-[#C0C0C0]/20 text-[#1a3884] dark:text-[#C0C0C0] text-xs font-bold uppercase tracking-widest mb-8">
                   Get In Touch
                 </div>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading leading-tight tracking-tight">
                   Engage with <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#daa520] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#C0C0C0] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300">
                     SMAART Institute
                   </span>
                 </h2>
@@ -107,10 +107,10 @@ const ContactForm = () => {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.2 + idx * 0.1 }}
-                      className="flex items-center gap-5 p-4 rounded-2xl bg-white dark:bg-[#001835]/80 border border-gray-100 dark:border-white/10 hover:border-[#daa520]/50 dark:hover:border-[#daa520]/50 shadow-sm transition-all duration-300 group backdrop-blur-sm"
+                      className="flex items-center gap-5 p-4 rounded-2xl bg-white dark:bg-[#001835]/80 border border-gray-100 dark:border-white/10 hover:border-[#C0C0C0]/50 dark:hover:border-[#C0C0C0]/50 shadow-sm transition-all duration-300 group backdrop-blur-sm"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center group-hover:bg-[#1a3884] dark:group-hover:bg-[#daa520] group-hover:text-white dark:group-hover:text-[#002147] transition-all duration-300 shadow-inner">
-                        <item.icon className="w-5 h-5 text-[#1a3884] dark:text-[#daa520] group-hover:text-white dark:group-hover:text-[#002147] transition-colors" />
+                      <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center group-hover:bg-[#1a3884] dark:group-hover:bg-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-all duration-300 shadow-inner">
+                        <item.icon className="w-5 h-5 text-[#1a3884] dark:text-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-colors" />
                       </div>
                       <div>
                         <h4 className="text-gray-400 dark:text-gray-500 font-bold text-[9px] uppercase tracking-widest mb-0.5">{item.title}</h4>
@@ -135,7 +135,7 @@ const ContactForm = () => {
                 <div className="bg-white dark:bg-[#001835]/90 border border-gray-100 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative overflow-hidden h-full flex flex-col backdrop-blur-xl">
                   {/* Decorative Elements */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#1a3884]/10 to-transparent pointer-events-none" />
-                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#daa520]/10 to-transparent pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-[#C0C0C0]/10 to-transparent pointer-events-none" />
 
                   {isSuccess ? (
                     <motion.div
@@ -144,7 +144,7 @@ const ContactForm = () => {
                       className="flex flex-col items-center justify-center py-12 text-center flex-grow"
                     >
                       <div className="w-24 h-24 bg-[#1a3884]/20 rounded-full flex items-center justify-center mb-8 border border-[#1a3884]/30 shadow-lg shadow-[#1a3884]/20">
-                        <CheckCircle className="w-12 h-12 text-[#1a3884] dark:text-[#daa520]" />
+                        <CheckCircle className="w-12 h-12 text-[#1a3884] dark:text-[#C0C0C0]" />
                       </div>
                       <h3 className="text-3xl font-bold text-[#002147] dark:text-white mb-4 tracking-tight">Message Received!</h3>
                       <p className="text-gray-600 dark:text-gray-300 mb-10 max-w-sm mx-auto text-lg leading-relaxed font-light">Thank you for reaching out. A specialist from our team will contact you within one business day.</p>
@@ -170,7 +170,7 @@ const ContactForm = () => {
                               onChange={handleChange}
                               placeholder="John Smith"
                               required
-                              className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#daa520] focus:ring-1 focus:ring-[#daa520] transition-all duration-300 h-14 rounded-2xl px-6"
+                              className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 h-14 rounded-2xl px-6"
                             />
                           </div>
                           <div className="space-y-3">
@@ -181,7 +181,7 @@ const ContactForm = () => {
                               value={formData.institution}
                               onChange={handleChange}
                               placeholder="University of Excellence"
-                              className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#daa520] focus:ring-1 focus:ring-[#daa520] transition-all duration-300 h-14 rounded-2xl px-6"
+                              className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 h-14 rounded-2xl px-6"
                             />
                           </div>
                         </div>
@@ -197,7 +197,7 @@ const ContactForm = () => {
                               onChange={handleChange}
                               placeholder="john.smith@edu.com"
                               required
-                              className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#daa520] focus:ring-1 focus:ring-[#daa520] transition-all duration-300 h-14 rounded-2xl px-6"
+                              className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 h-14 rounded-2xl px-6"
                             />
                           </div>
                           <div className="space-y-3">
@@ -209,7 +209,7 @@ const ContactForm = () => {
                               value={formData.phone}
                               onChange={handleChange}
                               placeholder="+91-0000000000"
-                              className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#daa520] focus:ring-1 focus:ring-[#daa520] transition-all duration-300 h-14 rounded-2xl px-6"
+                              className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 h-14 rounded-2xl px-6"
                             />
                           </div>
                         </div>
@@ -223,13 +223,13 @@ const ContactForm = () => {
                             onChange={handleChange}
                             placeholder="I'm interested in implementing SMAART Institute for our students..."
                             required
-                            className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#daa520] focus:ring-1 focus:ring-[#daa520] transition-all duration-300 min-h-[120px] rounded-xl px-4 py-3 resize-none"
+                            className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 min-h-[120px] rounded-xl px-4 py-3 resize-none"
                           />
                         </div>
 
                         <Button
                           type="submit"
-                          className="w-full bg-gradient-to-r from-[#1a3884] to-[#2a4d9e] hover:from-[#2a4d9e] hover:to-[#1a3884] text-white font-bold py-5 text-lg rounded-xl shadow-xl shadow-[#1a3884]/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group border border-[#daa520] relative overflow-hidden"
+                          className="w-full bg-gradient-to-r from-[#1a3884] to-[#2a4d9e] hover:from-[#2a4d9e] hover:to-[#1a3884] text-white font-bold py-5 text-lg rounded-xl shadow-xl shadow-[#1a3884]/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center group border border-[#C0C0C0] relative overflow-hidden"
                           disabled={isSubmitting}
                         >
                           <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -261,4 +261,5 @@ const ContactForm = () => {
 };
 
 export default ContactForm;
+
 

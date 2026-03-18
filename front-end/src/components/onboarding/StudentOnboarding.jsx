@@ -181,7 +181,7 @@ const StudentOnboarding = ({ user }) => {
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative w-full max-w-lg bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3),0_0_20px_rgba(212,175,55,0.2)] overflow-hidden border-4 border-[#d4af37] ring-1 ring-[#d4af37]/50"
+          className="relative w-full max-w-lg bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3),0_0_20px_rgba(192,192,192,0.4)] overflow-hidden border-4 border-[#C0C0C0] ring-1 ring-[#C0C0C0]/50"
         >
           {/* Top Progress Bar */}
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-100 flex">
@@ -222,7 +222,7 @@ const StudentOnboarding = ({ user }) => {
               <span className="inline-block px-3 py-1 bg-blue-50 text-[#1a3884] text-[10px] font-bold uppercase tracking-widest rounded-full mb-3">
                 Step {currentStep} of {totalSteps}
               </span>
-              <h2 className="text-2xl font-serif font-extrabold text-[#1a3884] mb-3">
+              <h2 className="text-2xl font-sans font-extrabold text-[#1a3884] mb-3">
                 {currentData.title}
               </h2>
               <p className="text-slate-600 leading-relaxed text-sm">
@@ -293,3 +293,4 @@ const StudentOnboarding = ({ user }) => {
 };
 
 export default StudentOnboarding;
+

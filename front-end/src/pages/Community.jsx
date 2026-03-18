@@ -706,7 +706,7 @@ const Community = () => {
                 <span className="absolute top-1/2 left-1/4 text-[9px] text-white/30 hidden sm:block">IDEA</span>
                 <span className="absolute top-6 right-1/4 text-[10px] text-white/40">TECHNOLOGY</span>
                 <span className="absolute bottom-8 right-20 text-[9px] text-white/50">MOTIVATION</span>
-                <span className="absolute top-6 right-10 text-[10px] font-bold text-[#daa520] tracking-widest">MISSION</span>
+                <span className="absolute top-6 right-10 text-[10px] font-bold text-[#C0C0C0] tracking-widest">MISSION</span>
                 <span className="absolute top-16 right-4 text-[9px] text-white/50">GLOBAL</span>
                 <span className="absolute bottom-6 right-8 text-[9px] text-white/50 border border-white/20 px-1">SUCCESS</span>
                 <div className="absolute top-[-50%] left-[30%] w-56 h-56 bg-[#002147]/20 blur-[60px] rounded-full mix-blend-overlay"></div>
@@ -776,7 +776,7 @@ const Community = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12">
               {[
                 { label: "Members", value: stats.totalMembers?.toLocaleString() || "0", icon: Users, color: "text-[#002147]", bg: "bg-[#002147]/10" },
-                { label: "Discussions", value: stats.totalDiscussions?.toLocaleString() || "0", icon: MessageCircle, color: "text-[#daa520]", bg: "bg-[#daa520]/10" },
+                { label: "Discussions", value: stats.totalDiscussions?.toLocaleString() || "0", icon: MessageCircle, color: "text-[#C0C0C0]", bg: "bg-[#C0C0C0]/10" },
                 { label: "Groups", value: stats.totalGroups?.toLocaleString() || "0", icon: Star, color: "text-purple-500", bg: "bg-purple-500/10" },
                 { label: "Active Today", value: stats.activeToday?.toLocaleString() || "0", icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" },
               ].map((stat, index) => (
@@ -2028,3 +2028,4 @@ const Community = () => {
 };
 
 export default Community;
+

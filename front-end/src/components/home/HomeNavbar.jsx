@@ -50,8 +50,8 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
             <img src={whiteLogo} alt="SMAART Institute" className="h-full w-auto object-contain" />
           </div>
           <div className="flex flex-col">
-            <span className="text-white font-display font-bold text-xl leading-none tracking-tight drop-shadow-md">
-              SMAART <span style={{ color: '#daa520' }}>Institute</span>
+            <span className="text-white font-sans font-bold text-xl leading-none tracking-tight drop-shadow-md">
+              SMAART <span style={{ color: '#C0C0C0' }}>Institute</span>
             </span>
             <span className="text-[10px] font-medium tracking-wider uppercase opacity-80" style={{ color: '#F0F0F2' }}>
               Unlock Potential
@@ -74,7 +74,7 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
             ))}
           </div>
 
-          <div className="h-6 w-px" style={{ backgroundColor: 'rgba(218, 165, 32, 0.5)' }} />
+          <div className="h-6 w-px" style={{ backgroundColor: 'rgba(192, 192, 192, 0.5)' }} />
 
           <div className="flex items-center gap-4">
             <Button
@@ -88,7 +88,7 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
             </Button>
             <Button
               className="text-white font-semibold shadow-lg"
-              style={{ backgroundColor: '#1a3884', boxShadow: '0 10px 15px -3px rgba(26, 56, 132, 0.4)', border: '1px solid #daa520' }}
+              style={{ backgroundColor: '#1a3884', boxShadow: '0 10px 15px -3px rgba(26, 56, 132, 0.4)', border: '1px solid #C0C0C0' }}
               onClick={onSignupClick}
             >
               <UserPlus className="w-4 h-4 mr-2" />
@@ -114,7 +114,7 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden overflow-hidden"
-            style={{ backgroundColor: '#002147', borderTop: '1px solid #daa520' }}
+            style={{ backgroundColor: '#002147', borderTop: '1px solid #C0C0C0' }}
           >
             <div className="container mx-auto px-6 py-6 flex flex-col gap-4">
               {navLinks.map((link) => (
@@ -127,7 +127,7 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
                   {link.name}
                 </button>
               ))}
-              <hr style={{ borderColor: '#daa520' }} className="my-2" />
+              <hr style={{ borderColor: '#C0C0C0' }} className="my-2" />
               <Button
                 variant="ghost"
                 className="justify-start hover:bg-white/10"
@@ -142,7 +142,7 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
               </Button>
               <Button
                 className="text-white justify-start"
-                style={{ backgroundColor: '#1a3884', border: '1px solid #daa520' }}
+                style={{ backgroundColor: '#1a3884', border: '1px solid #C0C0C0' }}
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onSignupClick();
@@ -160,3 +160,5 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
 };
 
 export default LandingNavbar;
+
+

@@ -85,7 +85,7 @@ const ModuleTasks = () => {
             <Link to="/dashboard">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="text-accent text-2xl font-display font-bold lg:hidden"
+                className="text-accent text-2xl font-sans font-bold lg:hidden"
               >
                 SMAART Institute
               </motion.div>
@@ -119,12 +119,12 @@ const ModuleTasks = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/dashboard/courses')}
                 className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors"
-                style={{ border: '2px solid #daa520', boxShadow: '0 0 8px rgba(218, 165, 32, 0.2)' }}
+                style={{ border: '2px solid #C0C0C0', boxShadow: '0 0 8px rgba(192, 192, 192, 0.2)' }}
               >
                 <ArrowLeft className="w-6 h-6" style={{ color: '#002147' }} />
               </motion.button>
               <div>
-                <h1 className="text-4xl font-display font-bold" style={{ color: '#002147' }}>
+                <h1 className="text-4xl font-sans font-bold" style={{ color: '#002147' }}>
                   {module.title}
                 </h1>
                 <p className="text-lg font-semibold" style={{ color: '#1a3884' }}>{moduleInfo.day} • {moduleInfo.title}</p>
@@ -137,15 +137,15 @@ const ModuleTasks = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="bg-white rounded-xl p-8"
-              style={{ border: '2px solid #daa520', boxShadow: '0 0 15px rgba(218, 165, 32, 0.3)' }}
+              style={{ border: '2px solid #C0C0C0', boxShadow: '0 0 15px rgba(192, 192, 192, 0.3)' }}
             >
               <div className="flex items-start gap-6">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(218, 165, 32, 0.15)' }}>
-                  <BookOpen className="w-8 h-8" style={{ color: '#daa520' }} />
+                <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(192, 192, 192, 0.15)' }}>
+                  <BookOpen className="w-8 h-8" style={{ color: '#C0C0C0' }} />
                 </div>
 
                 <div className="flex-1">
-                  <h2 className="text-2xl font-display font-bold mb-3" style={{ color: '#002147' }}>
+                  <h2 className="text-2xl font-sans font-bold mb-3" style={{ color: '#002147' }}>
                     {moduleInfo.title}
                   </h2>
                   <p className="leading-relaxed mb-6" style={{ color: '#1a3884' }}>
@@ -154,7 +154,7 @@ const ModuleTasks = () => {
 
                   <div className="flex items-center gap-8">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5" style={{ color: '#daa520' }} />
+                      <Clock className="w-5 h-5" style={{ color: '#C0C0C0' }} />
                       <span style={{ color: '#002147' }}>Duration: {moduleInfo.duration}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -172,7 +172,7 @@ const ModuleTasks = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="bg-white rounded-xl p-6"
-              style={{ border: '2px solid #daa520', boxShadow: '0 0 15px rgba(218, 165, 32, 0.3)' }}
+              style={{ border: '2px solid #C0C0C0', boxShadow: '0 0 15px rgba(192, 192, 192, 0.3)' }}
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-semibold" style={{ color: '#002147' }}>Progress Overview</h3>
@@ -181,13 +181,13 @@ const ModuleTasks = () => {
                 </span>
               </div>
 
-              <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(218, 165, 32, 0.2)' }}>
+              <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(192, 192, 192, 0.2)' }}>
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
                   transition={{ duration: 1.5, delay: 0.5 }}
                   className="h-full"
-                  style={{ background: 'linear-gradient(to right, #daa520, #FFD700)' }}
+                  style={{ background: 'linear-gradient(to right, #C0C0C0, #E5E4E2)' }}
                 />
               </div>
 
@@ -202,9 +202,9 @@ const ModuleTasks = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="bg-white rounded-xl p-8"
-              style={{ border: '2px solid #daa520', boxShadow: '0 0 15px rgba(218, 165, 32, 0.3)' }}
+              style={{ border: '2px solid #C0C0C0', boxShadow: '0 0 15px rgba(192, 192, 192, 0.3)' }}
             >
-              <h3 className="text-2xl font-display font-bold mb-6" style={{ color: '#002147' }}>
+              <h3 className="text-2xl font-sans font-bold mb-6" style={{ color: '#002147' }}>
                 Module Tasks
               </h3>
 
@@ -216,20 +216,20 @@ const ModuleTasks = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 + index * 0.05 }}
                     className="flex items-center gap-4 p-4 rounded-lg transition-colors group cursor-pointer hover:bg-gray-50"
-                    style={{ border: '1px solid rgba(218, 165, 32, 0.3)' }}
+                    style={{ border: '1px solid rgba(192, 192, 192, 0.3)' }}
                     onClick={() => handleTaskToggle(task.id)}
                   >
                     <Checkbox
                       checked={task.completed}
                       className="w-5 h-5"
-                      style={{ borderColor: '#daa520' }}
+                      style={{ borderColor: '#C0C0C0' }}
                     />
 
                     <div className="flex items-center gap-3 flex-1">
                       {task.completed ? (
                         <CheckCircle2 className="w-5 h-5" style={{ color: '#1a3884' }} />
                       ) : (
-                        <Circle className="w-5 h-5" style={{ color: '#daa520' }} />
+                        <Circle className="w-5 h-5" style={{ color: '#C0C0C0' }} />
                       )}
 
                       <span className={`font-medium transition-colors ${task.completed
@@ -267,7 +267,7 @@ const ModuleTasks = () => {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate('/dashboard/courses')}
                 className="px-8 py-3 bg-white font-semibold rounded-lg transition-colors"
-                style={{ color: '#002147', border: '2px solid #daa520' }}
+                style={{ color: '#002147', border: '2px solid #C0C0C0' }}
               >
                 Back to Modules
               </motion.button>
@@ -277,7 +277,7 @@ const ModuleTasks = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="px-8 py-3 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
-                  style={{ background: 'linear-gradient(to right, #daa520, #FFD700)' }}
+                  style={{ background: 'linear-gradient(to right, #C0C0C0, #E5E4E2)' }}
                 >
                   Next Module
                 </motion.button>
@@ -291,5 +291,7 @@ const ModuleTasks = () => {
 };
 
 export default ModuleTasks;
+
+
 
 

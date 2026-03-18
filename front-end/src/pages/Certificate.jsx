@@ -228,7 +228,7 @@ const Certificate = () => {
                     <main className="w-full relative py-12 px-4 md:px-6">
                         {/* Header */}
                         <div className="text-center mb-8">
-                            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#daa520] to-[#b8860b] flex items-center justify-center shadow-lg shadow-amber-500/20">
+                            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#C0C0C0] to-[#A8A8A8] flex items-center justify-center shadow-lg shadow-amber-500/20">
                                 <ShieldCheck className="w-10 h-10 text-[#002147]" />
                             </div>
                             <h1 className="text-3xl font-bold text-[#002147] dark:text-white mb-3 tracking-tight">Credentials & Achievements</h1>
@@ -493,4 +493,5 @@ const Certificate = () => {
 };
 
 export default Certificate;
+
 

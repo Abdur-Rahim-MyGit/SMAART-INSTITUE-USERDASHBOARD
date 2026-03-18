@@ -127,11 +127,11 @@ const InstitutionSelector = ({ onSelect }) => {
       <div className="relative">
 
         {/* Ambient background glow for the selector area */}
-        <div className="absolute -inset-2 bg-[#BC9B6A]/5 dark:bg-[#BC9B6A]/10 rounded-none blur-xl pointer-events-none -z-10" />
+        <div className="absolute -inset-2 bg-[#C0C0C0]/5 dark:bg-[#C0C0C0]/10 rounded-none blur-xl pointer-events-none -z-10" />
 
         {/* Input Wrapper */}
         <div className="relative group z-20">
-          <div className="absolute inset-0 bg-[#BC9B6A] rounded-none opacity-0 group-focus-within:opacity-10 blur-lg transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-[#C0C0C0] rounded-none opacity-0 group-focus-within:opacity-10 blur-lg transition-opacity duration-500" />
 
           <div className="relative flex items-center">
             <div className="absolute left-4 z-20 pointer-events-none">
@@ -146,7 +146,7 @@ const InstitutionSelector = ({ onSelect }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 200)}
-              className="w-full h-11 pl-11 pr-11 text-sm bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-[#BC9B6A] rounded-none font-semibold shadow-md group-hover:shadow-lg transition-all duration-300"
+              className="w-full h-11 pl-11 pr-11 text-sm bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-[#C0C0C0] rounded-none font-semibold shadow-md group-hover:shadow-lg transition-all duration-300"
             />
 
             {loading && (
@@ -199,7 +199,7 @@ const InstitutionSelector = ({ onSelect }) => {
                           }}
                           whileHover={{ x: 4 }}
                           className={`flex items-center gap-2.5 p-2 cursor-pointer rounded-none transition-all duration-200 group border ${index === focusedIndex
-                            ? "bg-[#BC9B6A]/10 border-[#BC9B6A]/20 shadow-sm"
+                            ? "bg-[#C0C0C0]/10 border-[#C0C0C0]/20 shadow-sm"
                             : "border-transparent hover:bg-gray-50 dark:hover:bg-white/5 hover:border-gray-200 dark:hover:border-white/10"
                             }`}
                         >
@@ -262,4 +262,5 @@ const InstitutionSelector = ({ onSelect }) => {
 };
 
 export default InstitutionSelector;
+
 

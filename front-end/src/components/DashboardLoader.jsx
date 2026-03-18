@@ -44,8 +44,8 @@ const DashboardLoader = ({ onComplete }) => {
                                 </feMerge>
                             </filter>
                             <linearGradient id="pathGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-                                <stop offset="0%" stopColor="#daa520" stopOpacity="0" />
-                                <stop offset="50%" stopColor="#daa520" stopOpacity="1" />
+                                <stop offset="0%" stopColor="#C0C0C0" stopOpacity="0" />
+                                <stop offset="50%" stopColor="#C0C0C0" stopOpacity="1" />
                                 <stop offset="100%" stopColor="#fff" stopOpacity="1" />
                             </linearGradient>
                         </defs>
@@ -75,7 +75,7 @@ const DashboardLoader = ({ onComplete }) => {
                         {/* "The Right Path" - Gold Particle Traveling Up */}
                         <motion.circle
                             r="2.5"
-                            fill="#daa520"
+                            fill="#C0C0C0"
                             filter="url(#glow)"
                             initial={{ cx: 50, cy: 150, opacity: 0 }}
                             animate={{
@@ -176,4 +176,5 @@ const DashboardLoader = ({ onComplete }) => {
 };
 
 export default DashboardLoader;
+
 

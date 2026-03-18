@@ -373,7 +373,7 @@ const ModuleView = ({ courseId, onBack }) => {
         </motion.button>
 
         <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-800">
+          <h1 className="text-2xl sm:text-3xl font-sans font-bold text-gray-800">
             {module.title} - {day.title}
           </h1>
           <p className="text-sm sm:text-base text-gray-600">{day.description}</p>
@@ -617,7 +617,7 @@ const ModuleView = ({ courseId, onBack }) => {
         </motion.button>
 
         <div className="space-y-2">
-          <h1 className="text-4xl font-display font-bold text-gray-800">
+          <h1 className="text-4xl font-sans font-bold text-gray-800">
             {module.title}
           </h1>
           <p className="text-gray-800/70 text-lg">Select a day to start learning</p>
@@ -756,7 +756,7 @@ const ModuleView = ({ courseId, onBack }) => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center space-y-2 mb-8"
       >
-        <h1 className="text-3xl font-display font-bold text-gray-800">
+        <h1 className="text-3xl font-sans font-bold text-gray-800">
           {courseData?.title || `Course ${courseId}`}
         </h1>
         <p className="text-gray-600">Select a module and day to start learning</p>
@@ -869,3 +869,4 @@ const ModuleView = ({ courseId, onBack }) => {
 };
 
 export default ModuleView;
+

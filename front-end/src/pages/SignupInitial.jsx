@@ -81,7 +81,7 @@ const SignupInitial = () => {
           <div className="flex justify-center mb-6">
             <img src={whiteLogo} alt="SMAART Institute" className="h-20 w-auto object-contain" />
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-background mb-1 sm:mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold text-background mb-1 sm:mb-2">
             Create Account
           </h1>
           <p className="text-background/70 text-sm sm:text-base">Join SMAART Institute today</p>
@@ -174,3 +174,4 @@ const SignupInitial = () => {
 };
 
 export default SignupInitial;
+

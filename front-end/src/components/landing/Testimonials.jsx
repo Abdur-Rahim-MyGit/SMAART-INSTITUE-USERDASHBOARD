@@ -45,7 +45,7 @@ const Testimonials = () => {
   return (
     <section id="testimonials" className="py-20 bg-gray-50 dark:bg-[#000F24] relative overflow-hidden scroll-mt-24 sm:scroll-mt-28 transition-colors duration-500">
       {/* Background Elements */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1a3884]/5 dark:bg-[#daa520]/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1a3884]/5 dark:bg-[#C0C0C0]/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10 w-full">
         <div className="text-center mb-10">
@@ -55,7 +55,7 @@ const Testimonials = () => {
             viewport={{ once: true }}
             className="text-3xl font-bold mb-3 text-gray-900 dark:text-white tracking-tight font-heading"
           >
-            Impact & <span className="text-[#daa520]">Values</span>
+            Impact & <span className="text-[#C0C0C0]">Values</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -102,7 +102,7 @@ const Testimonials = () => {
                   <div className="text-center md:text-left flex-1">
                     <div className="flex justify-center md:justify-start gap-1 mb-2">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <Star key={star} className="w-3.5 h-3.5 text-[#daa520] fill-[#daa520]" />
+                        <Star key={star} className="w-3.5 h-3.5 text-[#C0C0C0] fill-[#C0C0C0]" />
                       ))}
                     </div>
 
@@ -114,7 +114,7 @@ const Testimonials = () => {
                       <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">
                         {testimonials[currentIndex].author}
                       </h4>
-                      <p className="text-[#daa520] font-medium text-xs uppercase tracking-wide">
+                      <p className="text-[#C0C0C0] font-medium text-xs uppercase tracking-wide">
                         {testimonials[currentIndex].role}
                       </p>
                     </div>
@@ -150,7 +150,7 @@ const Testimonials = () => {
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`h-1 rounded-full transition-all duration-300 ${index === currentIndex ? "w-8 bg-[#daa520]" : "w-2 bg-gray-300 dark:bg-white/10 hover:bg-gray-400 dark:hover:bg-white/30"
+                className={`h-1 rounded-full transition-all duration-300 ${index === currentIndex ? "w-8 bg-[#C0C0C0]" : "w-2 bg-gray-300 dark:bg-white/10 hover:bg-gray-400 dark:hover:bg-white/30"
                   }`}
               />
             ))}
@@ -162,3 +162,4 @@ const Testimonials = () => {
 };
 
 export default Testimonials;
+

@@ -22,7 +22,7 @@ const PassportPreview = () => {
     <section className="py-16 sm:py-24 bg-white dark:bg-[#002147] transition-colors duration-300 relative overflow-hidden">
       {/* Background Orbs */}
       <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#daa520]/5 dark:bg-[#daa520]/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#C0C0C0]/5 dark:bg-[#C0C0C0]/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
@@ -59,10 +59,10 @@ const PassportPreview = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-[#1a3884] dark:text-white text-xl tracking-tight">SMAART Passport</h3>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-[#daa520] font-black">Capability & Skills Record</p>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-[#C0C0C0] font-black">Capability & Skills Record</p>
                     </div>
                   </div>
-                  <div className="px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest bg-[#daa520]/10 border border-[#daa520]/30 text-[#b8860b] dark:text-[#daa520] flex items-center gap-2">
+                  <div className="px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest bg-[#C0C0C0]/10 border border-[#C0C0C0]/30 text-[#A8A8A8] dark:text-[#C0C0C0] flex items-center gap-2">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     VERIFIED
                   </div>
@@ -90,13 +90,13 @@ const PassportPreview = () => {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.5 + i * 0.2 }}
-                        className="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 hover:border-[#daa520]/30 transition-colors"
+                        className="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-white/5 rounded-xl border border-gray-100 dark:border-white/10 hover:border-[#C0C0C0]/30 transition-colors"
                       >
                         <div className="flex items-center gap-3">
                           <CheckCircle className="w-4 h-4 text-[#1a3884]" />
                           <div className="h-3 w-40 bg-gray-200 dark:bg-white/10 rounded-full" />
                         </div>
-                        <div className="h-2.5 w-10 rounded-full bg-[#daa520]/30" />
+                        <div className="h-2.5 w-10 rounded-full bg-[#C0C0C0]/30" />
                       </motion.div>
                     ))}
                   </div>
@@ -108,7 +108,7 @@ const PassportPreview = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1 font-bold">Issued By</p>
-                      <p className="font-bold text-[#daa520] text-xl font-heading tracking-tight">SMAART Institute</p>
+                      <p className="font-bold text-[#C0C0C0] text-xl font-heading tracking-tight">SMAART Institute</p>
                     </div>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ const PassportPreview = () => {
                   transition={{ delay: 0.4 + index * 0.1 }}
                   className="flex items-center gap-5 text-gray-700 dark:text-gray-300"
                 >
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[#daa520]/20 text-[#daa520] shrink-0">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[#C0C0C0]/20 text-[#C0C0C0] shrink-0">
                     <CheckCircle className="w-5 h-5" />
                   </div>
                   <span className="text-base font-medium">{item}</span>
@@ -171,7 +171,7 @@ const PassportPreview = () => {
                   const element = document.getElementById('contact');
                   if (element) element.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="bg-gradient-to-r from-[#1a3884] to-[#daa520] hover:from-[#daa520] hover:to-[#1a3884] text-white font-bold px-8 py-5 rounded-2xl shadow-xl shadow-[#1a3884]/20 text-lg transition-all duration-300 group"
+                className="bg-gradient-to-r from-[#1a3884] to-[#C0C0C0] hover:from-[#C0C0C0] hover:to-[#1a3884] text-white font-bold px-8 py-5 rounded-2xl shadow-xl shadow-[#1a3884]/20 text-lg transition-all duration-300 group"
               >
                 <Download className="mr-3 w-5 h-5 group-hover:-translate-y-1 transition-transform" />
                 Get Your Skills Passport
@@ -186,4 +186,5 @@ const PassportPreview = () => {
 };
 
 export default PassportPreview;
+
 

@@ -41,7 +41,7 @@ const FAQAccordion = () => {
             viewport={{ once: true }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading tracking-tight"
           >
-            Insights & <span className="text-[#daa520]">Frameworks</span>
+            Insights & <span className="text-[#C0C0C0]">Frameworks</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -63,21 +63,21 @@ const FAQAccordion = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               className={`rounded-xl border transition-all duration-300 overflow-hidden ${activeIndex === index
-                ? "bg-white dark:bg-[#1a3884]/20 border-[#daa520]/50 shadow-lg shadow-[#1a3884]/10 backdrop-blur-md"
-                : "bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-[#daa520]/30 hover:bg-white dark:hover:bg-white/10"
+                ? "bg-white dark:bg-[#1a3884]/20 border-[#C0C0C0]/50 shadow-lg shadow-[#1a3884]/10 backdrop-blur-md"
+                : "bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-[#C0C0C0]/30 hover:bg-white dark:hover:bg-white/10"
                 }`}
             >
               <button
                 onClick={() => toggle(index)}
                 className="w-full flex items-center justify-between p-6 text-left focus:outline-none group"
               >
-                <span className={`text-lg font-semibold pr-8 transition-colors duration-300 ${activeIndex === index ? "text-[#1a3884] dark:text-[#daa520]" : "text-[#002147] dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-[#daa520]"
+                <span className={`text-lg font-semibold pr-8 transition-colors duration-300 ${activeIndex === index ? "text-[#1a3884] dark:text-[#C0C0C0]" : "text-[#002147] dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-[#C0C0C0]"
                   }`}>
                   {faq.question}
                 </span>
                 <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 border ${activeIndex === index
                   ? 'bg-[#1a3884] text-white border-[#1a3884] rotate-180'
-                  : 'bg-white dark:bg-white/10 text-gray-400 dark:text-gray-300 border-gray-200 dark:border-white/20 group-hover:border-[#daa520] group-hover:text-[#daa520]'
+                  : 'bg-white dark:bg-white/10 text-gray-400 dark:text-gray-300 border-gray-200 dark:border-white/20 group-hover:border-[#C0C0C0] group-hover:text-[#C0C0C0]'
                   }`}>
                   {activeIndex === index ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 </div>
@@ -106,3 +106,4 @@ const FAQAccordion = () => {
 };
 
 export default FAQAccordion;
+

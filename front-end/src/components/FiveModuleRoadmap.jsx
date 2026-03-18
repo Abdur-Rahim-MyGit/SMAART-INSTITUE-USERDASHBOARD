@@ -17,7 +17,7 @@ const StarIcon = ({ color }) => (
 
 const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
   const navyBlue = '#1a3884'; 
-  const gold = '#C9A45B'; 
+  const gold = '#C0C0C0'; 
   const cream = '#F5F2ED'; 
   const white = '#FFFFFF';
   const tan = '#A68B5C';
@@ -142,7 +142,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
           color: navyBlue, 
           fontSize: '38px', 
           fontWeight: '900', 
-          fontFamily: "'Playfair Display', serif", 
+          fontFamily: "'Inter', sans-serif", 
           margin: 0,
           textShadow: '0 4px 15px rgba(0,0,0,0.05)'
         }}>
@@ -289,7 +289,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                       </div>
 
                       <div>
-                        <h3 style={{ fontSize: '18px', fontWeight: '800', margin: '8px 0 2px', color: isLocked ? 'rgba(201, 164, 91, 0.5)' : gold }}>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', margin: '8px 0 2px', color: isLocked ? 'rgba(192, 192, 192, 0.5)' : gold }}>
                           Module {module.level}
                         </h3>
                         <p style={{ fontSize: '11px', opacity: isLocked ? 0.4 : 0.8, margin: 0, fontWeight: '500', minHeight: '32px', lineHeight: '1.3' }}>
@@ -381,7 +381,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                     color: navyBlue, 
                     fontWeight: '900', 
                     margin: 0,
-                    fontFamily: "'Playfair Display', serif",
+                    fontFamily: "'Inter', sans-serif",
                     whiteSpace: 'nowrap'
                   }}>
                     Now Learning Module {selectedModule.level}:
@@ -483,3 +483,4 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
 };
 
 export default FiveModuleRoadmap;
+

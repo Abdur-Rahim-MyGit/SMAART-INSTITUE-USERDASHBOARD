@@ -75,10 +75,10 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 <button
                   key={item}
                   onClick={() => handleNavItemClick(item)}
-                  className={`text-sm font-semibold transition-all duration-300 relative group ${scrolled ? 'text-[#1a3884] dark:text-gray-300 hover:text-[#daa520] dark:hover:text-[#daa520]' : 'text-[#1a3884] dark:text-gray-200 hover:text-[#daa520] dark:hover:text-[#daa520]'}`}
+                  className={`text-sm font-semibold transition-all duration-300 relative group ${scrolled ? 'text-[#1a3884] dark:text-gray-300 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0]' : 'text-[#1a3884] dark:text-gray-200 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0]'}`}
                 >
                   {item}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#daa520] transition-all duration-300 group-hover:w-full rounded-full" />
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#C0C0C0] transition-all duration-300 group-hover:w-full rounded-full" />
                 </button>
               ))}
               <div className="flex items-center gap-4 pl-6 border-l border-gray-200 dark:border-white/10">
@@ -103,7 +103,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 </button>
                 <button
                   onClick={() => onSignupClick ? onSignupClick() : navigate('/?modal=true')}
-                  className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 border border-[#daa520]/30"
+                  className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 border border-[#C0C0C0]/30"
                 >
                   Get Started
                 </button>
@@ -151,7 +151,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
               <button
                 key={item}
                 onClick={() => handleNavItemClick(item)}
-                className="text-left text-gray-600 dark:text-gray-300 hover:text-[#daa520] dark:hover:text-[#daa520] font-medium py-2 border-b border-gray-50 dark:border-white/5"
+                className="text-left text-gray-600 dark:text-gray-300 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0] font-medium py-2 border-b border-gray-50 dark:border-white/5"
               >
                 {item}
               </button>
@@ -178,3 +178,4 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
 };
 
 export default Navbar;
+

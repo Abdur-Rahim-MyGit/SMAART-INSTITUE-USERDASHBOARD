@@ -158,7 +158,7 @@ const VerifyOTP = () => {
           transition={{ delay: 0.2 }}
           className="text-center mb-6 sm:mb-8"
         >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-background mb-1 sm:mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold text-background mb-1 sm:mb-2">
             Verify OTP
           </h1>
           <p className="text-background/70 text-xs sm:text-sm">
@@ -256,3 +256,4 @@ const VerifyOTP = () => {
 };
 
 export default VerifyOTP;
+

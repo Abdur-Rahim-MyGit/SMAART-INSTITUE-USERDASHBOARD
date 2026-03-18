@@ -20,9 +20,9 @@
     /* Blue #1a3884 */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 43 74% 49%;
-    /* Gold #daa520 */
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 75%;
+    /* Silver #C0C0C0 */
+    --secondary-foreground: 212 100% 14%;
 
     --muted: 212 30% 25%;
     --muted-foreground: 215 20% 65%;
@@ -68,8 +68,8 @@
   .lms-dashboard-bg {
     @apply bg-[#F8FAFC] dark:bg-[#00152E];
     background-image:
-      radial-gradient(at 0% 0%, hsla(184, 53%, 40%, 0.03) 0, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(43, 74%, 49%, 0.03) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(184, 53%, 40%, 0.03) 0, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(0, 0%, 75%, 0.03) 0, transparent 50%);
   }
 
   .premium-gradient-bg {
@@ -161,7 +161,15 @@
   }
 
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-gold to-gold-light;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-silver to-silver-light shadow-[0_0_10px_rgba(192,192,192,0.3)];
+  }
+
+  .text-gradient-silver {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-silver to-silver-light shadow-[0_0_10px_rgba(192,192,192,0.3)];
+  }
+
+  .silver-glow-border {
+    @apply border-2 border-[#C0C0C0] shadow-[0_0_15px_rgba(192,192,192,0.4)] transition-all duration-300;
   }
 
   .glass-card {
@@ -183,7 +191,7 @@
 
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: rgba(218, 165, 32, 0.3) transparent;
+    scrollbar-color: rgba(192, 192, 192, 0.3) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -195,7 +203,7 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: rgba(218, 165, 32, 0.3);
+    background-color: rgba(192, 192, 192, 0.3);
     border-radius: 20px;
   }
 
@@ -293,3 +301,4 @@
   mask-image: linear-gradient(to right, black 85%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
 }
+

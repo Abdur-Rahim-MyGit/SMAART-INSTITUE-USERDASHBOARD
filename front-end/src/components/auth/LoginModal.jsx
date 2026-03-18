@@ -174,7 +174,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
                 <div className="w-16 h-16 bg-gradient-to-br from-teal/20 to-teal/5 rounded-2xl border border-teal/20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal/10">
                   <Lock className="w-8 h-8 text-teal" />
                 </div>
-                <h2 className="text-3xl font-display font-bold text-white mb-2">Welcome Back</h2>
+                <h2 className="text-3xl font-sans font-bold text-white mb-2">Welcome Back</h2>
                 <p className="text-white/50">Enter your credentials to access your account</p>
               </div>
 
@@ -288,3 +288,4 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
 };
 
 export default LoginModal;
+

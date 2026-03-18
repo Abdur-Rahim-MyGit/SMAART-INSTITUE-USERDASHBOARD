@@ -112,7 +112,7 @@ const VerifyCertificate = () => {
             <div className="fixed inset-0 pointer-events-none z-0">
                 <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid-pattern.svg')] opacity-[0.03] dark:opacity-[0.05]"></div>
                 <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#1a3884]/10 rounded-full blur-[100px] animate-pulse"></div>
-                <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#daa520]/5 rounded-full blur-[100px] animate-pulse delay-700"></div>
+                <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#C0C0C0]/5 rounded-full blur-[100px] animate-pulse delay-700"></div>
             </div>
 
             <main className={`relative z-10 container mx-auto px-4 py-8 max-w-5xl ${isLoggedIn ? 'pt-8' : 'pt-28'}`}>
@@ -127,7 +127,7 @@ const VerifyCertificate = () => {
                         <ShieldCheck className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight font-heading">
-                        Certificate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#2a4d9e] dark:from-[#daa520] dark:to-[#f0e68c]">Verification</span>
+                        Certificate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#2a4d9e] dark:from-[#C0C0C0] dark:to-[#A8A8A8]">Verification</span>
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
                         Verify the authenticity of SMAART Institute credentials securely via our blockchain-enabled checkpoint system.
@@ -143,7 +143,7 @@ const VerifyCertificate = () => {
                         transition={{ delay: 0.1 }}
                         className="lg:col-span-5 space-y-6"
                     >
-                        <div className="bg-white dark:bg-[#001835]/80 backdrop-blur-xl rounded-3xl p-6 border border-gray-200 dark:border-white/10 shadow-2xl ring-1 ring-black/5 dark:ring-white/5">
+                        <div className="bg-white dark:bg-[#001835]/80 backdrop-blur-xl rounded-3xl p-6 border border-[#C0C0C0] shadow-2xl shadow-[#C0C0C0]/10 ring-1 ring-black/5 dark:ring-white/5">
 
                             {/* Toggle Switch */}
                             <div className="flex bg-gray-100 dark:bg-[#000F24] p-1.5 rounded-xl mb-8 border border-gray-200 dark:border-white/5">
@@ -190,10 +190,10 @@ const VerifyCertificate = () => {
                                         <div id="qr-file-reader" className="hidden"></div>
 
                                         <div className="flex flex-col items-center gap-4 py-4">
-                                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#1a3884]/10 to-[#daa520]/10 border-2 border-dashed border-[#daa520]/40 flex items-center justify-center">
+                                            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#1a3884]/10 to-[#C0C0C0]/10 border-2 border-dashed border-[#C0C0C0]/40 flex items-center justify-center">
                                                 {isQrScanning
-                                                    ? <Loader2 className="w-8 h-8 text-[#1a3884] dark:text-[#daa520] animate-spin" />
-                                                    : <ImageIcon className="w-8 h-8 text-[#1a3884] dark:text-[#daa520]" />
+                                                    ? <Loader2 className="w-8 h-8 text-[#1a3884] dark:text-[#C0C0C0] animate-spin" />
+                                                    : <ImageIcon className="w-8 h-8 text-[#1a3884] dark:text-[#C0C0C0]" />
                                                 }
                                             </div>
 
@@ -238,13 +238,13 @@ const VerifyCertificate = () => {
                                                 Certificate Identifier
                                             </label>
                                             <div className="relative group">
-                                                <div className="absolute inset-0 bg-gradient-to-r from-[#daa520]/20 to-[#1a3884]/20 rounded-xl blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                                                <div className="absolute inset-0 bg-gradient-to-r from-[#C0C0C0]/20 to-[#1a3884]/20 rounded-xl blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                                 <input
                                                     type="text"
                                                     value={certificateId}
                                                     onChange={(e) => setCertificateId(e.target.value)}
                                                     placeholder="e.g. SMAART-CAP-2025-ABC12"
-                                                    className="relative w-full px-5 py-4 pl-12 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-black/20 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-[#daa520] focus:border-transparent transition-all font-mono shadow-inner"
+                                                    className="relative w-full px-5 py-4 pl-12 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-black/20 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-[#C0C0C0] focus:border-transparent transition-all font-mono shadow-inner"
                                                 />
                                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                                             </div>
@@ -257,12 +257,12 @@ const VerifyCertificate = () => {
                                         >
                                             {isVerifying ? (
                                                 <>
-                                                    <Loader2 className="w-5 h-5 animate-spin text-[#daa520]" />
+                                                    <Loader2 className="w-5 h-5 animate-spin text-[#C0C0C0]" />
                                                     Verifying...
                                                 </>
                                             ) : (
                                                 <>
-                                                    <ShieldCheck className="w-5 h-5 text-[#daa520] group-hover:scale-110 transition-transform" />
+                                                    <ShieldCheck className="w-5 h-5 text-[#C0C0C0] group-hover:scale-110 transition-transform" />
                                                     Authenticate Now
                                                 </>
                                             )}
@@ -313,12 +313,12 @@ const VerifyCertificate = () => {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     className={`relative rounded-3xl overflow-hidden border shadow-2xl transition-all duration-500 ${verificationResult.verified
-                                        ? 'bg-white dark:bg-[#001835]/90 border-[#daa520]/30 shadow-[#daa520]/10'
+                                        ? 'bg-white dark:bg-[#001835]/90 border-[#C0C0C0]/30 shadow-[#C0C0C0]/10'
                                         : 'bg-white dark:bg-[#001835]/90 border-yellow-500/30'
                                         }`}
                                 >
                                     {/* Ornamental Header */}
-                                    <div className={`h-2 w-full ${verificationResult.verified ? 'bg-gradient-to-r from-[#1a3884] via-[#daa520] to-[#1a3884]' : 'bg-gradient-to-r from-yellow-600 via-orange-500 to-yellow-600'}`} />
+                                    <div className={`h-2 w-full ${verificationResult.verified ? 'bg-gradient-to-r from-[#1a3884] via-[#C0C0C0] to-[#1a3884]' : 'bg-gradient-to-r from-yellow-600 via-orange-500 to-yellow-600'}`} />
 
                                     <div className="p-8 md:p-10">
 
@@ -350,7 +350,7 @@ const VerifyCertificate = () => {
                                                 <div className="grid md:grid-cols-2 gap-8">
                                                     <div>
                                                         <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest font-semibold">Awarded To</label>
-                                                        <p className="text-2xl font-bold text-[#1a3884] dark:text-[#daa520] mt-1 font-heading">
+                                                        <p className="text-2xl font-bold text-[#1a3884] dark:text-[#C0C0C0] mt-1 font-heading">
                                                             {verificationResult.certificate.fullName}
                                                         </p>
                                                         <p className="text-sm text-gray-400 dark:text-gray-500 mt-1 font-mono">
@@ -482,3 +482,4 @@ const VerifyCertificate = () => {
 };
 
 export default VerifyCertificate;
+

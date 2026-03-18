@@ -73,7 +73,7 @@ const DashboardHome = () => {
                      </div>
                      <div>
                         <h3 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Continue learning</h3>
-                        <h2 className="text-base font-bold font-serif leading-tight text-[#1a3884] dark:text-white">Level 3: Management Basics</h2>
+                        <h2 className="text-base font-bold font-sans leading-tight text-[#1a3884] dark:text-white">Level 3: Management Basics</h2>
                      </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -95,11 +95,11 @@ const DashboardHome = () => {
                 {/* Career Direction Hero (Span 8) */}
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                  className="lg:col-span-8 bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col"
+                  className="lg:col-span-8 bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-2xl p-4 shadow-[0_4px_20px_rgba(192,192,192,0.2)] flex flex-col"
                 >
                   <div className="flex justify-between items-start mb-2">
-                     <h2 className="text-xl font-serif font-bold text-[#1a3884] dark:text-white">Career Direction</h2>
-                     <button className="text-xs font-semibold text-[#1a3884] dark:text-blue-400 hover:text-[#C9A45B] transition">View Evidence</button>
+                     <h2 className="text-xl font-sans font-bold text-[#1a3884] dark:text-white">Career Direction</h2>
+                     <button className="text-xs font-semibold text-[#1a3884] dark:text-blue-400 hover:text-[#C0C0C0] transition">View Evidence</button>
                   </div>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
@@ -167,9 +167,9 @@ const DashboardHome = () => {
                 {/* Skills by Tier (Span 4) */}
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                  className="lg:col-span-4 bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col"
+                  className="lg:col-span-4 bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-2xl p-4 shadow-[0_4px_20px_rgba(192,192,192,0.2)] flex flex-col"
                 >
-                  <h2 className="text-base font-serif font-bold text-[#1a3884] dark:text-white mb-2">Skills by Tier</h2>
+                  <h2 className="text-base font-sans font-bold text-[#1a3884] dark:text-white mb-2">Skills by Tier</h2>
                   
                   <div className="flex-1 space-y-3">
                      <div>
@@ -234,14 +234,14 @@ const DashboardHome = () => {
                       <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
                       <div className="z-10 flex flex-col items-start text-left">
                          <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center mb-3">
-                            <Zap className="w-4 h-4 text-[#DEBA6F]" fill="none" strokeWidth={2} />
+                            <Zap className="w-4 h-4 text-[#C0C0C0]" fill="none" strokeWidth={2} />
                          </div>
                          <h3 className="font-bold text-[9px] text-white uppercase tracking-[0.2em] mb-1.5">Next Best Skill</h3>
-                         <h2 className="text-xl font-extrabold font-serif mb-2 leading-none tracking-tight text-white">Python Programming</h2>
+                         <h2 className="text-xl font-extrabold font-sans mb-2 leading-none tracking-tight text-white">Python Programming</h2>
                          <p className="text-[13px] text-white/90 leading-relaxed max-w-[95%] mb-4">
                             Completing this makes you eligible for 1 more role. (Coursera, ~40 hrs)
                          </p>
-                         <button className="bg-[#C5A059] text-white px-6 py-2 rounded-full text-xs font-bold hover:bg-[#b08f4c] transition shadow-md">
+                         <button className="bg-[#C0C0C0] text-white px-6 py-2 rounded-full text-xs font-bold hover:bg-[#A8A8A8] transition shadow-md">
                             Start Learning
                          </button>
                       </div>
@@ -249,10 +249,10 @@ const DashboardHome = () => {
 
                    <motion.div 
                      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                     className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex-1"
+                     className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex-1"
                    >
                       <div className="flex justify-between items-center mb-3">
-                         <h3 className="font-bold text-base font-serif text-[#1a3884] dark:text-white">Apply Your Skills</h3>
+                         <h3 className="font-bold text-base font-sans text-[#1a3884] dark:text-white">Apply Your Skills</h3>
                          <ArrowUp className="w-4 h-4 rotate-45 text-slate-400" />
                       </div>
                       <div className="space-y-3">
@@ -280,9 +280,9 @@ const DashboardHome = () => {
                 {/* Col 5-9: Learning Path */}
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-                  className="lg:col-span-5 bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col h-full"
+                  className="lg:col-span-5 bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col h-full"
                 >
-                   <h2 className="text-base font-serif font-bold text-[#1a3884] dark:text-white mb-2">Learning Path</h2>
+                   <h2 className="text-base font-sans font-bold text-[#1a3884] dark:text-white mb-2">Learning Path</h2>
                    
                    <div className="flex-1 space-y-3">
                       {/* 5a Your Skill Dev Path */}
@@ -334,7 +334,7 @@ const DashboardHome = () => {
                                   <span className="font-bold text-sm text-slate-800 dark:text-slate-200 block">AWS Solutions Architect</span>
                                   <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Issued By Amazon</span>
                                </div>
-                               <span className="text-[9px] font-bold bg-[#C9A45B]/10 text-[#C9A45B] px-2 py-0.5 rounded-full border border-[#C9A45B]/20">Essential</span>
+                               <span className="text-[9px] font-bold bg-[#C0C0C0]/10 text-[#C0C0C0] px-2 py-0.5 rounded-full border border-[#C0C0C0]/20">Essential</span>
                             </div>
                             
                             <div className="grid grid-cols-2 gap-2 mb-3 mt-2">
@@ -349,9 +349,9 @@ const DashboardHome = () => {
                             </div>
 
                             <ul className="text-sm text-slate-600 dark:text-slate-300 font-medium space-y-2.5">
-                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C9A45B]"></div> Industry recognized credential</li>
-                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C9A45B]"></div> High ROI for Cloud roles</li>
-                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C9A45B]"></div> Boosts resume visibility significantly</li>
+                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]"></div> Industry recognized credential</li>
+                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]"></div> High ROI for Cloud roles</li>
+                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]"></div> Boosts resume visibility significantly</li>
                             </ul>
                          </div>
                       </div>
@@ -361,9 +361,9 @@ const DashboardHome = () => {
                 <div className="lg:col-span-3 flex flex-col gap-4">
                    <motion.div 
                      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                     className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm"
+                     className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-2xl p-4 shadow-sm"
                    >
-                      <h3 className="font-bold text-sm font-serif mb-2 text-[#1a3884] dark:text-white">Events & Community</h3>
+                      <h3 className="font-bold text-sm font-sans mb-2 text-[#1a3884] dark:text-white">Events & Community</h3>
                       <div className="flex flex-col gap-2">
                          <button onClick={() => navigate('/community')} className="w-full flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-xl border border-slate-100 dark:border-slate-700 group">
                             <div className="w-8 h-8 rounded-full bg-[#1a3884]/5 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-[#1a3884]/10 dark:group-hover:bg-blue-900/50 transition whitespace-nowrap overflow-visible">
@@ -373,8 +373,8 @@ const DashboardHome = () => {
                          </button>
                          
                          <button onClick={() => navigate('/my-courses')} className="w-full flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-xl border border-slate-100 dark:border-slate-700 group">
-                            <div className="w-8 h-8 rounded-full bg-[#C9A45B]/10 flex items-center justify-center transition">
-                               <BookOpen className="w-4 h-4 text-[#C9A45B]" />
+                            <div className="w-8 h-8 rounded-full bg-[#C0C0C0]/10 flex items-center justify-center transition">
+                               <BookOpen className="w-4 h-4 text-[#C0C0C0]" />
                             </div>
                             <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex-1 text-left">Concept Checks</span>
                          </button>
@@ -393,7 +393,7 @@ const DashboardHome = () => {
                      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
                      className="grid grid-cols-1 gap-3"
                    >
-                      <div className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3 hover:shadow-md transition cursor-pointer group">
+                      <div className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3 hover:shadow-md transition cursor-pointer group">
                          <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center shrink-0 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition">
                             <MapPin className="w-5 h-5 text-amber-600 dark:text-amber-500" />
                          </div>
@@ -403,7 +403,7 @@ const DashboardHome = () => {
                          </div>
                       </div>
                       
-                      <div className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer group">
+                      <div className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer group">
                          <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40 transition">
                             <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
                          </div>
@@ -413,7 +413,7 @@ const DashboardHome = () => {
                          </div>
                       </div>
                       
-                      <div className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer group">
+                      <div className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer group">
                          <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition">
                             <Globe className="w-5 h-5 text-blue-600 dark:text-blue-500" />
                          </div>
@@ -433,13 +433,13 @@ const DashboardHome = () => {
                  <motion.button 
                    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.8 }}
                    onClick={() => navigate('/smaart-wallet')}
-                   className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-full px-6 py-3 shadow-sm hover:shadow-md transition"
+                   className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-full px-6 py-3 shadow-sm hover:shadow-md transition"
                  >
                     <span className="font-bold text-sm text-[#1a3884] dark:text-white">Wallet & Badges</span>
                     <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-700 pl-3">
-                       <Award className="w-4 h-4 text-[#C9A45B]" />
-                       <Shield className="w-4 h-4 text-[#C9A45B]" />
-                       <Sparkles className="w-4 h-4 text-[#C9A45B]" />
+                       <Award className="w-4 h-4 text-[#C0C0C0]" />
+                       <Shield className="w-4 h-4 text-[#C0C0C0]" />
+                       <Sparkles className="w-4 h-4 text-[#C0C0C0]" />
                     </div>
                  </motion.button>
 
@@ -447,7 +447,7 @@ const DashboardHome = () => {
                     <motion.button 
                       initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.9 }}
                       onClick={() => navigate('/smaart-toolkit')}
-                      className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-full px-6 py-3 font-bold text-sm text-[#1a3884] dark:text-white shadow-sm hover:shadow-md transition"
+                      className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-full px-6 py-3 font-bold text-sm text-[#1a3884] dark:text-white shadow-sm hover:shadow-md transition"
                     >
                        Quick Access Toolkit
                     </motion.button>
@@ -472,3 +472,5 @@ const DashboardHome = () => {
 };
 
 export default DashboardHome;
+
+
