@@ -17,7 +17,7 @@ const StarIcon = ({ color }) => (
 
 const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
   const navyBlue = '#1a3884'; 
-  const gold = '#C0C0C0'; 
+  const silver = '#C0C0C0'; 
   const cream = '#F5F2ED'; 
   const white = '#FFFFFF';
   const tan = '#A68B5C';
@@ -80,7 +80,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       // 2. Smoothly scroll to the newly unlocked module after a brief pause
       const scrollTimer = setTimeout(() => {
         ele.scrollTo({
-          left: Math.max(0, (actualActiveLevel - 1) * 350 - 200),
+          left: Math.max(0, (250 + (actualActiveLevel - 1) * 350) - (window.innerWidth / 2)),
           behavior: 'smooth'
         });
       }, 600);
@@ -94,7 +94,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       return () => { clearTimeout(scrollTimer); clearTimeout(unlockTimer); };
     } else {
       // Normal map load, just center on current
-      ele.scrollLeft = Math.max(0, (actualActiveLevel - 1) * 350 - 200);
+      ele.scrollLeft = Math.max(0, (250 + (actualActiveLevel - 1) * 350) - (window.innerWidth / 2));
       setVisualActiveLevel(actualActiveLevel);
       localStorage.setItem('smaart_last_active', actualActiveLevel.toString());
     }
@@ -222,7 +222,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                   {/* Wire connecting card to path */}
                   <motion.line 
                     x1={p.x} y1={p.y} x2={p.x} y2={p.y + 60} 
-                    animate={{ stroke: isLocked ? "#9CA3AF" : gold }} 
+                    animate={{ stroke: isLocked ? "#9CA3AF" : silver }} 
                     strokeWidth="1.5" 
                     transition={{ duration: 0.6 }}
                   />
@@ -230,17 +230,25 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                   {/* Path Node */}
                   <motion.circle 
                     cx={p.x} cy={p.y} r="8" 
-                    animate={{ fill: isCurrent || isCompleted ? gold : "#D1D5DB" }} 
+                    animate={{ fill: isCurrent || isCompleted ? silver : "#D1D5DB" }} 
                     transition={{ duration: 0.6 }}
                   />
                   {isCurrent && (
-                    <motion.circle 
-                      cx={p.x} cy={p.y} r="15" 
-                      fill="none" stroke={gold} strokeWidth="2" 
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1.2, opacity: 1 }}
-                      transition={{ repeat: Infinity, duration: 1.5 }}
-                    />
+                    <>
+                      <motion.circle 
+                        cx={p.x} cy={p.y} r="15" 
+                        fill="none" stroke={silver} strokeWidth="2" 
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: [0.8, 1.4], opacity: [0.5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeOut" }}
+                      />
+                      <motion.circle 
+                        cx={p.x} cy={p.y} r="8" 
+                        fill={silver}
+                        animate={{ opacity: [1, 0.4, 1] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                      />
+                    </>
                   )}
 
                   {/* The Hanging Card */}
@@ -252,13 +260,16 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                   >
                     <motion.div
                       animate={{ 
-                        borderColor: isSelected && !isLocked ? gold : 'transparent',
+                        borderColor: isSelected && !isLocked ? silver : 'transparent',
                         backgroundColor: isCurrent ? navyBlue : cardNavy,
-                        boxShadow: isCurrent ? `0 15px 35px rgba(0,0,0,0.4), 0 0 15px ${gold}33` : (isSelected ? '0 10px 25px rgba(0,0,0,0.4)' : '0 10px 25px rgba(0,0,0,0.3)'),
+                        boxShadow: isCurrent 
+                          ? `0 0 20px ${silver}, 0 0 40px ${silver}44, inset 0 0 10px ${silver}33` 
+                          : (isSelected ? `0 0 15px ${silver}66` : '0 10px 25px rgba(0,0,0,0.3)'),
+                        borderColor: isCurrent || isSelected ? silver : 'transparent',
                       }}
                       transition={{ duration: 0.6 }}
                       style={{
-                        borderRadius: '16px',
+                        borderRadius: '0px',
                         padding: '16px 14px', // Reduced padding
                         height: '100%',
                         display: 'flex',
@@ -278,18 +289,32 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                             </motion.div>
                           ) : isCompleted ? (
                             <motion.div key="check" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }}>
-                              <CheckCircle2 size={20} color={gold} />
+                              <CheckCircle2 size={20} color={silver} />
                             </motion.div>
                           ) : (
-                            <motion.div key="star" initial={{ opacity: 0, scale: 0, rotate: -180 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} exit={{ opacity: 0, scale: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 10 }}>
-                              <StarIcon color={gold} />
+                            <motion.div 
+                              key="star" 
+                              initial={{ opacity: 0, scale: 0, rotate: -180 }} 
+                              animate={{ 
+                                opacity: [1, 0.4, 1], 
+                                scale: [1, 1.2, 1], 
+                                rotate: 0 
+                              }} 
+                              exit={{ opacity: 0, scale: 0 }} 
+                              transition={{ 
+                                opacity: { repeat: Infinity, duration: 1.5 },
+                                scale: { repeat: Infinity, duration: 1.5 },
+                                default: { type: 'spring', stiffness: 200, damping: 10 }
+                              }}
+                            >
+                              <StarIcon color={silver} />
                             </motion.div>
                           )}
                         </AnimatePresence>
                       </div>
 
                       <div>
-                        <h3 style={{ fontSize: '18px', fontWeight: '800', margin: '8px 0 2px', color: isLocked ? 'rgba(192, 192, 192, 0.5)' : gold }}>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', margin: '8px 0 2px', color: isLocked ? 'rgba(192, 192, 192, 0.5)' : silver }}>
                           Module {module.level}
                         </h3>
                         <p style={{ fontSize: '11px', opacity: isLocked ? 0.4 : 0.8, margin: 0, fontWeight: '500', minHeight: '32px', lineHeight: '1.3' }}>
@@ -309,11 +334,11 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                           <div style={{ 
                             width: `${module.progress}%`, 
                             height: '100%', 
-                            backgroundColor: gold, 
+                            backgroundColor: silver, 
                             borderRadius: '3px' 
                           }} />
                         </div>
-                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: gold }}>
+                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: silver }}>
                           {module.progress}%
                         </span>
                       </div>
@@ -326,11 +351,11 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                           if (!isLocked) handleModuleClick(module);
                         }}
                         style={{
-                          backgroundColor: isLocked ? 'rgba(255,255,255,0.1)' : gold,
+                          backgroundColor: isLocked ? 'rgba(255,255,255,0.1)' : silver,
                           color: isLocked ? 'rgba(255,255,255,0.4)' : (isCompleted ? navyBlue : cardNavy),
                           border: 'none',
                           padding: '10px 0',
-                          borderRadius: '8px',
+                          borderRadius: '0px',
                           fontSize: '12px',
                           fontWeight: '800',
                           cursor: isLocked ? 'not-allowed' : 'pointer',

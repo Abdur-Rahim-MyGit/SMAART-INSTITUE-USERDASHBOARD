@@ -48,7 +48,6 @@ const SMAARTWallet = lazy(() => import('@/pages/SMAARTWallet'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
 
 // AI Career Coach pages
-const AIChat = lazy(() => import('@/pages/AICareerCoach/AIChat'));
 const ProfileAnalysis = lazy(() => import('@/pages/AICareerCoach/ProfileAnalysis'));
 const ResumeBuilder = lazy(() => import('@/pages/AICareerCoach/ResumeBuilder'));
 
@@ -142,7 +141,6 @@ const AnimatedRoutes = () => {
                     <Route path="/dashboard/performance" element={<AssessmentFlowGuard><Performance /></AssessmentFlowGuard>} />
 
                     {/* AI Career Coach Routes */}
-                    <Route path="/dashboard/ai-career-coach/chat" element={<AssessmentFlowGuard><AIChat /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/profile-analysis" element={<AssessmentFlowGuard><ProfileAnalysis /></AssessmentFlowGuard>} />
                     <Route path="/dashboard/resume-builder" element={<AssessmentFlowGuard><ResumeBuilder /></AssessmentFlowGuard>} />
 

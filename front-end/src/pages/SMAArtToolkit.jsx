@@ -24,15 +24,6 @@ const toolkitSections = [
     badge: "AI + Data"
   },
   {
-    id: 1,
-    title: "AI Career Chat",
-    description: "Engage with your intelligent career strategist. Receive real-time, personalized guidance and industry insights 24/7 to accelerate your professional trajectory.",
-    icon: MessageSquare,
-    path: "/dashboard/ai-career-coach/chat",
-    color: "#1a3884",
-    badge: "AI Powered"
-  },
-  {
     id: 3,
     title: "SMAART AI Resume Builder",
     description: "Craft ATS-optimized resumes that stand out. Leverage AI to generate impactful summaries and role-specific content that maximizes your interview chances.",

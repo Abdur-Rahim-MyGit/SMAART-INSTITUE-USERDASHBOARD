@@ -111,6 +111,13 @@ const ModuleViewPage = () => {
   const [earnedBadge, setEarnedBadge] = useState(null);
   const [finishedIntros, setFinishedIntros] = useState({}); // Track which video intros have been seen
   const [activeTaskIndex, setActiveTaskIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Reset selected step when session changes
   useEffect(() => {
@@ -683,12 +690,14 @@ const ModuleViewPage = () => {
       color: navyBlue,
       fontFamily: "'Inter', sans-serif",
       display: 'flex',
+      flexDirection: isMobile ? 'column' : 'row',
     }}>
       {/* LEFT SIDEBAR (Table of Contents) */}
       <div style={{
-        width: '280px',
-        borderRight: `1.5px solid ${gold}44`,
-        padding: '40px 0',
+        width: isMobile ? '100%' : '280px',
+        borderRight: isMobile ? 'none' : `1.5px solid ${gold}44`,
+        borderBottom: isMobile ? `1.5px solid ${gold}44` : 'none',
+        padding: isMobile ? '20px' : '40px 0',
         display: 'flex',
         flexDirection: 'column',
       }}>
@@ -713,9 +722,9 @@ const ModuleViewPage = () => {
             ← Back to Roadmap
           </button>
           <h2 style={{
-            fontSize: '24px',
+            fontSize: isMobile ? '20px' : '24px',
             fontWeight: '700',
-            margin: '0 0 30px 0',
+            margin: isMobile ? '0 0 15px 0' : '0 0 30px 0',
             color: navyBlue,
             letterSpacing: '0.5px'
           }}>
@@ -770,19 +779,20 @@ const ModuleViewPage = () => {
       {/* RIGHT MAIN AREA (Video & Content) */}
       <div style={{
         flex: 1,
-        padding: '40px 60px',
+        padding: isMobile ? '20px' : '40px 60px',
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
-        overflowY: 'auto',
+        height: isMobile ? 'auto' : '100vh',
+        overflowY: isMobile ? 'visible' : 'auto',
       }}>
         {/* Top Header - Progress */}
         <div style={{
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: isMobile ? 'center' : 'flex-end',
           alignItems: 'center',
           gap: '20px',
-          marginBottom: '30px'
+          marginBottom: isMobile ? '20px' : '30px',
+          order: isMobile ? -1 : 0
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
              <span style={{ fontSize: '18px', fontWeight: '600' }}>Course Progress</span>
@@ -815,7 +825,7 @@ const ModuleViewPage = () => {
            }}>
              {/* Header above video */}
              <div style={{ marginBottom: '20px' }}>
-               <h1 style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>
+               <h1 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '700', marginBottom: '8px' }}>
                  {activeTask.title || `Task ${activeTaskIndex + 1}`}
                </h1>
                <p style={{ fontSize: '14px', color: '#555', fontStyle: 'italic' }}>
@@ -849,7 +859,7 @@ const ModuleViewPage = () => {
              {/* Content Below Video */}
              <div style={{ 
                display: 'grid', 
-               gridTemplateColumns: '1fr 1fr', 
+               gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
                gap: '40px',
                borderTop: `1px solid ${gold}44`,
                paddingTop: '30px'
