@@ -127,11 +127,11 @@ const InstitutionSelector = ({ onSelect }) => {
       <div className="relative">
 
         {/* Ambient background glow for the selector area */}
-        <div className="absolute -inset-4 bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-[2rem] blur-2xl pointer-events-none -z-10" />
+        <div className="absolute -inset-2 bg-[#BC9B6A]/5 dark:bg-[#BC9B6A]/10 rounded-none blur-xl pointer-events-none -z-10" />
 
         {/* Input Wrapper */}
         <div className="relative group z-20">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1a3884] to-[#daa520] rounded-2xl opacity-0 group-focus-within:opacity-20 blur-xl transition-opacity duration-500" />
+          <div className="absolute inset-0 bg-[#BC9B6A] rounded-none opacity-0 group-focus-within:opacity-10 blur-lg transition-opacity duration-500" />
 
           <div className="relative flex items-center">
             <div className="absolute left-4 z-20 pointer-events-none">
@@ -146,7 +146,7 @@ const InstitutionSelector = ({ onSelect }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 200)}
-              className="w-full h-12 sm:h-14 pl-11 pr-11 text-sm sm:text-base bg-white dark:bg-[#002147] border border-gray-100 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-2 focus-visible:ring-[#1a3884] rounded-xl sm:rounded-2xl font-semibold shadow-lg group-hover:shadow-xl transition-all duration-300"
+              className="w-full h-11 pl-11 pr-11 text-sm bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-[#BC9B6A] rounded-none font-semibold shadow-md group-hover:shadow-lg transition-all duration-300"
             />
 
             {loading && (
@@ -177,7 +177,7 @@ const InstitutionSelector = ({ onSelect }) => {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute top-0 left-0 right-0 z-[100] bg-white dark:bg-[#001c3d] border border-gray-200 dark:border-white/10 rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-72 overflow-y-auto custom-scrollbar"
+                className="absolute top-0 left-0 right-0 z-[100] bg-white dark:bg-[#001c3d] border border-gray-200 dark:border-white/10 rounded-none shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
               >
                 {colleges.length > 0 ? (
                   <div className="p-1.5 sm:p-2">
@@ -198,8 +198,8 @@ const InstitutionSelector = ({ onSelect }) => {
                             });
                           }}
                           whileHover={{ x: 4 }}
-                          className={`flex items-center gap-3 sm:gap-4 p-2.5 sm:p-3 cursor-pointer rounded-lg sm:rounded-xl transition-all duration-200 group border ${index === focusedIndex
-                            ? "bg-[#1a3884]/10 border-[#1a3884]/20 shadow-sm"
+                          className={`flex items-center gap-2.5 p-2 cursor-pointer rounded-none transition-all duration-200 group border ${index === focusedIndex
+                            ? "bg-[#BC9B6A]/10 border-[#BC9B6A]/20 shadow-sm"
                             : "border-transparent hover:bg-gray-50 dark:hover:bg-white/5 hover:border-gray-200 dark:hover:border-white/10"
                             }`}
                         >

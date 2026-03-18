@@ -4,12 +4,38 @@
  */
 
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const User = require('../models/User');
 
 /**
  * Protect middleware - verifies JWT and attaches user to request
  */
 const protect = async (req, res, next) => {
+  // DEBUG - remove after fixing
+  console.log('[AUTH] headers:', {
+    bypass: req.headers['x-admin-bypass'],
+    secret: req.headers['x-admin-secret'],
+    secretMatch: req.headers['x-admin-secret'] === process.env.ADMIN_SYSTEM_SECRET
+  });
+
+  // ADMIN BYPASS - must be first
+  if (
+    req.headers['x-admin-bypass'] === 'true' &&
+    req.headers['x-admin-secret'] === process.env.ADMIN_SYSTEM_SECRET
+  ) {
+    req.user = {
+      role: 'admin',
+      _id: new mongoose.Types.ObjectId(),
+      id: 'admin-bypass'
+    };
+    return next();
+  }
+
+  // Honor pre-populated admin bypass user (e.g., set by upstream middleware)
+  if (req.user && req.user.id === 'admin-bypass') {
+    return next();
+  }
+
   let token;
 
   // Check for token in Cookie (Preferred) or Authorization header

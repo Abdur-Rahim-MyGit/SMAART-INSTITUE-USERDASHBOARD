@@ -36,7 +36,7 @@ const Motivational = () => {
                     transition={{ duration: 0.5 }}
                     className="text-center mb-12"
                 >
-                    <div className="inline-block p-4 rounded-full bg-teal/10 mb-6 border border-teal/20 shadow-[0_0_30px_rgba(20,184,166,0.3)] animate-pulse-slow">
+                    <div className="inline-block p-4 rounded-full bg-teal/10 mb-6 border border-teal/20 shadow-[0_0_30px_rgba(26, 56, 132, 0.3)] animate-pulse-slow">
                         <Rocket className="w-12 h-12 text-teal" />
                     </div>
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
@@ -75,7 +75,7 @@ const Motivational = () => {
                 >
                     <Button
                         onClick={() => navigate("/dashboard")}
-                        className="h-14 px-10 text-lg bg-teal hover:bg-teal-600 text-white shadow-[0_0_30px_rgba(20,184,166,0.4)] hover:shadow-[0_0_50px_rgba(20,184,166,0.6)] hover:scale-105 transition-all duration-300 rounded-xl font-bold group"
+                        className="h-14 px-10 text-lg bg-teal hover:bg-teal-600 text-white shadow-[0_0_30px_rgba(26, 56, 132, 0.4)] hover:shadow-[0_0_50px_rgba(26, 56, 132, 0.6)] hover:scale-105 transition-all duration-300 rounded-xl font-bold group"
                     >
                         <Star className="w-6 h-6 mr-2 fill-current group-hover:rotate-180 transition-transform duration-500" />
                         Start Your Journey Here!

@@ -205,7 +205,7 @@ const DashboardSidebar = () => {
 
 
           {/* Left: Logo */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -218,31 +218,36 @@ const DashboardSidebar = () => {
                 <img
                   src={theme === 'dark' ? whiteLogo : blueLogo}
                   alt="SMAART Institute"
-                  className="h-10 w-auto object-contain"
+                  className="h-8 lg:h-10 w-auto object-contain"
                 />
               </div>
-
             </Link>
           </div>
 
-          {/* Center: Desktop Navigation Menu */}
-          <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+          {/* Center: Desktop Navigation Menu - Responsive Gap and Flex */}
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-2 xl:gap-6 px-4">
             {[
               { label: 'Home', path: '/dashboard' },
               { label: 'Courses', path: '/dashboard/courses' },
+              { label: 'Chat', path: '/dashboard/ai-career-coach/chat' },
               { label: 'Assessments', path: '/dashboard/assessment-centre' },
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
-              { label: 'Wallet', path: '/dashboard/smaart-wallet' }
+              { label: 'Wallet', path: '/dashboard/smaart-wallet' },
+              { label: 'Help', path: null, isHelp: true }
             ].map(item => {
               const isActive = location.pathname === item.path ||
                 (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
 
               return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`text-sm font-bold transition-all duration-200 relative group py-1 ${isActive
+                <button
+                  key={item.label}
+                  id={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  onClick={() => {
+                    if (item.isHelp) setIsChatbotOpen(true);
+                    else if (item.path) navigate(item.path);
+                  }}
+                  className={`text-[11px] xl:text-sm font-bold transition-all duration-200 relative group py-1 whitespace-nowrap ${isActive
                     ? 'text-[#1a3884]'
                     : 'text-slate-600 dark:text-slate-300 hover:text-[#1a3884] dark:hover:text-[#1a3884]'
                     }`}
@@ -255,18 +260,18 @@ const DashboardSidebar = () => {
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
-                </Link>
+                </button>
               );
             })}
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 xl:gap-3 shrink-0">
 
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full text-slate-500 hover:text-blue-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-blue-400 dark:hover:bg-slate-800 transition-all"
+              className="p-2 rounded-full text-slate-500 hover:text-[#1a3884] hover:bg-slate-100 dark:text-slate-400 dark:hover:text-[#1a3884] dark:hover:bg-slate-800 transition-all"
               aria-label="Toggle Theme"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -276,7 +281,7 @@ const DashboardSidebar = () => {
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setNotificationOpen(!notificationOpen)}
-                className="p-2 mr-1 rounded-full text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all relative group/nav"
+                className="p-2 mr-1 rounded-full text-slate-400 hover:text-[#1a3884] hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all relative group/nav"
               >
                 <Bell className="w-5 h-5 group-hover/nav:animate-bounce" />
                 {unreadCount > 0 ? (
@@ -326,7 +331,7 @@ const DashboardSidebar = () => {
                     <div className="max-h-[350px] overflow-y-auto bg-white dark:bg-slate-900">
                       {notifLoading ? (
                         <div className="flex justify-center py-10">
-                          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                          <div className="w-8 h-8 border-2 border-[#1a3884] border-t-transparent rounded-full animate-spin" />
                         </div>
                       ) : notifications.length === 0 ? (
                         <div className="flex flex-col items-center py-10 text-center px-4">
@@ -336,7 +341,7 @@ const DashboardSidebar = () => {
                           <p className="text-slate-500 dark:text-slate-400 font-medium">No notifications yet</p>
                           <button
                             onClick={generateTestNotification}
-                            className="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                            className="mt-4 px-4 py-2 bg-[#1a3884] text-white text-sm font-medium rounded-lg hover:bg-[#112558] transition-colors"
                           >
                             Generate Test Notification
                           </button>
@@ -365,7 +370,7 @@ const DashboardSidebar = () => {
                                 </div>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">{n.message}</p>
                               </div>
-                              {!n.isRead && <div className="w-2 h-2 bg-blue-600 rounded-full mt-2" />}
+                              {!n.isRead && <div className="w-2 h-2 bg-[#1a3884] rounded-full mt-2" />}
                             </div>
                           ))}
                         </div>
@@ -379,7 +384,7 @@ const DashboardSidebar = () => {
                           navigate('/notifications');
                           setNotificationOpen(false);
                         }}
-                        className="w-full text-center text-sm font-medium text-blue-600 hover:text-blue-700"
+                        className="w-full text-center text-sm font-medium text-[#1a3884] hover:text-[#112558]"
                       >
                         View all notifications
                       </button>
@@ -390,7 +395,9 @@ const DashboardSidebar = () => {
             </div>
 
             {/* Profile */}
-            <ProfileDropdown />
+            <div id="nav-profile">
+              <ProfileDropdown />
+            </div>
           </div>
         </div>
       </header>
@@ -427,7 +434,7 @@ const DashboardSidebar = () => {
                   className="h-9 w-auto object-contain"
                 />
                 <span className="font-bold text-lg text-slate-900 dark:text-white">
-                  SMAART<span className="text-blue-600"> Institute</span>
+                  SMAART<span className="text-[#1a3884]"> Institute</span>
                 </span>
               </Link>
               <button
@@ -456,11 +463,11 @@ const DashboardSidebar = () => {
                         to={item.path}
                         onClick={() => setIsMobileOpen(false)}
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                          ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/30'
                           : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                       >
-                        <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-blue-600'}`} />
+                        <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-[#1a3884]'}`} />
                         <span className="font-medium">{item.label}</span>
                       </Link>
                     </motion.div>
@@ -475,7 +482,7 @@ const DashboardSidebar = () => {
                 onClick={toggleTheme}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
-                {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-blue-600" />}
+                {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-[#1a3884]" />}
                 <span className="font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
               </button>
             </div>

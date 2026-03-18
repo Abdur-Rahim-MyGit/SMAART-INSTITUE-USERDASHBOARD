@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const path = require('path');
 require('dotenv').config();
+const { startCronJobs } = require('./utils/cronJobs');
 
 // Import logger
 const logger = require('./utils/logger');
@@ -20,6 +21,14 @@ if (missingEnv.length > 0) {
 }
 
 const app = express();
+
+// Trace moderation requests early to confirm routing path
+app.use((req, res, next) => {
+  if (req.path.includes('moderation')) {
+    console.log('[SERVER] moderation request:', req.method, req.originalUrl);
+  }
+  next();
+});
 
 // Security: Set standard HTTP headers
 app.use(helmet({
@@ -127,6 +136,9 @@ app.use('/api/chatbot', require('./routes/chatbot')); // AI Chatbot Support
 // Community Routes
 app.use('/api/community', require('./routes/community'));
 app.use('/api/groups', require('./routes/groups'));
+app.use('/api/moderation', require('./routes/moderationQueue'));
+app.use('/api/moderation/actions', require('./routes/moderation'));
+app.use('/api/ppi', require('./routes/ppiRoutes'));
 
 // Avatar System Routes (3D Level-Based Unlock System)
 app.use('/api/avatar', require('./routes/avatar'));
@@ -223,4 +235,5 @@ const startServer = (port) => {
 };
 
 startServer(PORT);
+startCronJobs();
 

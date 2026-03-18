@@ -32,7 +32,7 @@ const EditorTopBar = ({
   handleInstantCheck
 }) => {
   return (
-    <div className="h-14 bg-gradient-to-r from-[#005c97] to-[#363795] flex items-center justify-between px-3 text-white flex-shrink-0 z-50 shadow-md">
+    <div className="h-14 bg-[#1a3884] flex items-center justify-between px-3 text-white flex-shrink-0 z-50 shadow-md">
       {/* Left: Home & File Menu */}
       <div className="flex items-center gap-4">
         <Link
@@ -124,7 +124,7 @@ const EditorTopBar = ({
         </Button>
 
         <Button 
-            className="bg-white text-[#363795] hover:bg-slate-100 h-9 px-4 font-semibold gap-2"
+            className="bg-white text-[#1a3884] hover:bg-slate-100 h-9 px-4 font-semibold gap-2"
             onClick={onPreview}
         >
             <Eye className="w-4 h-4" />

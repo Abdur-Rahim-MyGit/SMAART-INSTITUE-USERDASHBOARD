@@ -423,8 +423,8 @@ router.post('/:id/messages', async (req, res) => {
         if (image) {
             try {
                 // Check image for NSFW content
-                const { checkNSFWWithAPI } = require('../helpers/nsfwModeration');
-                const nsfwCheck = await checkNSFWWithAPI(image);
+                const { scanImage } = require('../helpers/nsfwModeration');
+                const nsfwCheck = await scanImage(image);
 
                 if (!nsfwCheck.isSafe) {
                     return res.status(400).json({

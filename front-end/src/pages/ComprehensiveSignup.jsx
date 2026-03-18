@@ -439,7 +439,7 @@ const ComprehensiveSignup = () => {
   if (isSuccess) {
     return (
       <div className="fixed inset-0 z-50 bg-white dark:bg-[#001229] flex items-center justify-center flex-col">
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 10 }} className="w-24 h-24 bg-teal-500 rounded-full flex items-center justify-center shadow-2xl">
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 10 }} className="w-24 h-24 bg-[#1a3884] rounded-full flex items-center justify-center shadow-2xl">
           <CheckCircle2 className="w-12 h-12 text-white" />
         </motion.div>
         <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-3xl font-bold text-slate-900 dark:text-white mt-8">
@@ -450,16 +450,17 @@ const ComprehensiveSignup = () => {
         </motion.p>
       </div>
     );
+
   }
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#BC9B6A]/30">
       {/* Deep Blue Header */}
-      <header className="bg-[#002147] text-white py-6 px-4 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4 sticky top-0 z-[100] shadow-xl">
-        <div className="flex items-center gap-4">
-          <img src={logoWhite} alt="SMAART INSTITUTE" className="h-14 w-auto" />
-          <div className="h-10 w-[1px] bg-white/20 hidden md:block mx-2" />
-          <h1 className="text-2xl md:text-4xl font-serif text-white/90">
+      <header className="bg-[#002147] text-white py-2 px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-3 sticky top-0 z-[100] shadow-md border-b-2 border-[#BC9B6A]">
+        <div className="flex items-center gap-3">
+          <img src={logoWhite} alt="SMAART INSTITUTE" className="h-8 w-auto" />
+          <div className="h-8 w-[1px] bg-white/20 hidden md:block mx-2" />
+          <h1 className="text-xl md:text-2xl font-serif text-white/90">
             {steps[currentStep].title}
             <div className="h-[2px] w-1/2 bg-[#BC9B6A] mt-1 mx-auto md:mx-0" />
           </h1>
@@ -472,7 +473,7 @@ const ComprehensiveSignup = () => {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto py-12 px-4 relative z-10">
+      <div className="max-w-4xl mx-auto py-4 px-4 relative z-10">
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
@@ -480,7 +481,7 @@ const ComprehensiveSignup = () => {
           className="relative"
         >
           {/* Torn Paper Container */}
-          <div className="bg-white p-8 md:p-16 shadow-[0_15px_60px_-15px_rgba(0,0,0,0.15)] relative before:content-[''] before:absolute before:inset-x-0 before:-top-4 before:h-8 before:bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] before:bg-white before:[clip-path:polygon(0%_100%,_5%_80%,_10%_100%,_15%_85%,_20%_100%,_25%_80%,_30%_100%,_35%_85%,_40%_100%,_45%_82%,_50%_100%,_55%_88%,_60%_100%,_65%_80%,_70%_100%,_75%_85%,_80%_100%,_85%_78%,_90%_100%,_95%_85%,_100%_100%)] after:content-[''] after:absolute after:inset-x-0 after:-bottom-4 after:h-8 after:bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] after:bg-white after:[clip-path:polygon(0%_0%,_5%_25%,_10%_0%,_15%_20%,_20%_0%,_25%_25%,_30%_0%,_35%_15%,_40%_0%,_45%_22%,_50%_0%,_55%_12%,_60%_0%,_65%_20%,_70%_0%,_75%_15%,_80%_0%,_85%_28%,_90%_0%,_95%_15%,_100%_0%)]">
+          <div className="bg-white p-4 md:p-6 shadow-[0_15px_60px_-15px_rgba(0,0,0,0.15)] border-2 border-[#BC9B6A] rounded-none relative">
             
             <AnimatePresence mode="wait">
             {/* Step 0: Profile Photo */}
@@ -495,8 +496,8 @@ const ComprehensiveSignup = () => {
 
             {/* Step 1: Personal Details */}
             {currentStep === 1 && (
-              <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-12">
-                <div className="grid md:grid-cols-2 gap-x-16 gap-y-10">
+              <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
                   <div className="space-y-1">
                     <Label className="text-sm text-gray-500 font-medium">Full Name</Label>
                     <div className="relative group">
@@ -628,7 +629,7 @@ const ComprehensiveSignup = () => {
                   <Button onClick={addHigherEd} variant="outline" size="sm" className="gap-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Degree</Button>
                 </div>
                 {higherEducation.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {higherEducation.length > 1 && <button onClick={() => removeHigherEd(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Degree #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -658,7 +659,7 @@ const ComprehensiveSignup = () => {
                   </div>
                 </div>
                 {extracurricular.isApplicable ? extracurricular.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {extracurricular.items.length > 1 && <button onClick={() => removeExtracurricular(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Activity #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -683,7 +684,7 @@ const ComprehensiveSignup = () => {
                   <Button onClick={addJobPref} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>
                 </div>
                 {jobPreferences.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {jobPreferences.items.length > 1 && <button onClick={() => removeJobPref(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Pref #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -713,7 +714,7 @@ const ComprehensiveSignup = () => {
                           placeholder="Search or enter your preferred role"
                         />
                         {activeSearchIndex === index && roleSuggestions.length > 0 && (
-                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto no-scrollbar ring-1 ring-black/5">
+                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-none shadow-2xl max-h-60 overflow-y-auto no-scrollbar ring-1 ring-black/5">
                             <div className="p-2 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-3">
                               SMAART Role Suggestions
                             </div>
@@ -784,7 +785,7 @@ const ComprehensiveSignup = () => {
                             setSectorPreferences({ ...sectorPreferences, preferredSectors: [...sectorPreferences.preferredSectors, s] });
                           }
                         }}
-                        className={`px-4 py-2 rounded-full border transition-colors ${sectorPreferences.preferredSectors.includes(s) ? "bg-teal-500 text-white border-teal-500" : "bg-white dark:bg-transparent border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-teal-500"}`}>
+                        className={`px-4 py-2 rounded-full border transition-colors ${sectorPreferences.preferredSectors.includes(s) ? "bg-[#1a3884] text-white border-[#1a3884]" : "bg-white dark:bg-transparent border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-[#1a3884]"}`}>
                         {s}
                       </button>
                     ))}
@@ -865,7 +866,7 @@ const ComprehensiveSignup = () => {
                   </div>
                 </div>
                 {workExperience.isApplicable ? workExperience.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {workExperience.items.length > 1 && <button onClick={() => removeWorkExperience(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Exp #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -880,7 +881,7 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2"><Label>Significant Accomplishments *</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder="Highlight major achievements, contributions, or impacts you made during your tenure." /></div>
                       <div className="md:col-span-2 space-y-4">
                         <Label>Document Type (Select all that apply) *</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-none border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
                           {[
                             { id: "offerLetter", label: "Offer Letter" },
                             { id: "appointmentLetter", label: "Appointment Letter" },
@@ -901,9 +902,9 @@ const ComprehensiveSignup = () => {
                                   }
                                   setWorkExperience(n);
                                 }}
-                                className="w-4 h-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+                                className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]"
                               />
-                              <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-teal-600 transition-colors">{doc.label}</span>
+                              <span className="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-[#1a3884] transition-colors">{doc.label}</span>
                             </label>
                           ))}
                         </div>
@@ -911,8 +912,8 @@ const ComprehensiveSignup = () => {
                         {item.selectedDocs.length > 0 && (
                           <div className="grid md:grid-cols-2 gap-6 pt-2">
                             {item.selectedDocs.map(docId => (
-                              <div key={docId} className="space-y-2 p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
-                                <Label className="text-teal-600 dark:text-teal-400 font-semibold">
+                              <div key={docId} className="space-y-2 p-4 rounded-none border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
+                                <Label className="text-[#1a3884] dark:text-blue-400 font-semibold">
                                   Upload {docId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} *
                                 </Label>
                                 <FileUpload
@@ -945,7 +946,7 @@ const ComprehensiveSignup = () => {
                   </div>
                 </div>
                 {projects.isApplicable ? projects.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {projects.items.length > 1 && <button onClick={() => removeProject(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Project #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -986,7 +987,7 @@ const ComprehensiveSignup = () => {
                   </div>
                 </div>
                 {certificates.isApplicable ? certificates.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {certificates.items.length > 1 && (
                       <button onClick={() => removeCertificate(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2">
                         <Trash2 size={18} />
@@ -994,7 +995,7 @@ const ComprehensiveSignup = () => {
                     )}
                     <h3 className="font-semibold mb-4 text-[#002147]">Cert #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div className="md:col-span-2 p-4 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
+                      <div className="md:col-span-2 p-4 rounded-none border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
                         <div className="grid md:grid-cols-2 gap-6 items-center">
                           <div>
                             <Label>Certificate Name / Title *</Label>
@@ -1043,17 +1044,6 @@ const ComprehensiveSignup = () => {
           </AnimatePresence>
 
           {/* Redesigned Footer - Inside the torn paper card */}
-          <div className="mt-16 space-y-6">
-            <div className="relative h-[6px] w-full bg-gray-200 rounded-full overflow-hidden">
-              <motion.div 
-                initial={{ width: 0 }}
-                animate={{ width: `${((currentStep) / (steps.length - 1)) * 100}%` }}
-                className="absolute inset-y-0 left-0 bg-[#0EA5E9] transition-all duration-500"
-              />
-            </div>
-            
-            <div className="flex flex-col items-center gap-4">
-              <span className="text-sm font-serif text-gray-400 italic">Page {currentStep + 1} of {steps.length}</span>
               <div className="w-full flex justify-end items-center gap-8">
                 {currentStep > 0 && (
                   <button 
@@ -1066,7 +1056,7 @@ const ComprehensiveSignup = () => {
                 {currentStep < steps.length - 1 ? (
                   <button 
                     onClick={handleNextStep}
-                    className="text-lg font-serif text-[#0EA5E9] font-bold hover:opacity-80 transition-opacity"
+                    className="text-lg font-serif text-[#1a3884] font-bold hover:opacity-80 transition-opacity"
                   >
                     Next
                   </button>
@@ -1081,12 +1071,10 @@ const ComprehensiveSignup = () => {
                 )}
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </motion.div>
-    </div>
-  </div>
-);
+      </div>
+    );
 };
 
 export default ComprehensiveSignup;

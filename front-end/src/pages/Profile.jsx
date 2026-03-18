@@ -298,16 +298,18 @@ const Profile = () => {
   // Profile.jsx
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-950 transition-colors duration-300 overflow-hidden">
       <DashboardSidebar />
 
-      <div className="min-h-screen transition-all duration-300">
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
         <DashboardHeader />
 
         {loading ? (
-          <ProfileSkeleton />
+          <div className="flex-1 overflow-y-auto">
+            <ProfileSkeleton />
+          </div>
         ) : (
-          <main className="container mx-auto px-3 py-4 max-w-6xl">
+          <main className="flex-1 overflow-y-auto container mx-auto px-3 py-4 max-w-6xl">
             {/* Main Grid Layout - Compact */}
             <div className="grid lg:grid-cols-[260px_1fr] gap-4">
 
@@ -381,12 +383,12 @@ const Profile = () => {
                     </div>
                   </div>
 
-                  {/* Edit Button */}
+                  {/* Add Details Button */}
                   <button
-                    onClick={() => navigate('/dashboard/settings')}
+                    onClick={() => navigate('/add-details')}
                     className="w-full py-2 mt-4 rounded-md border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-gray-300 text-xs font-medium hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                   >
-                    Edit Profile
+                    Add Details
                   </button>
                 </motion.div>
 

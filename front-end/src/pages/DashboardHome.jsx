@@ -1,1040 +1,470 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DashboardSidebar from "@/components/DashboardSidebar";
+import DashboardHeader from "@/components/DashboardHeader";
 import PageTransition from "@/components/PageTransition";
 import VisionBoardSplash from "@/components/VisionBoardSplash";
 import {
-  TrendingUp,
-  Zap,
-  Calendar as CalendarIcon,
-  CheckCircle2,
-  Clock,
-  MessageSquare,
-  ChevronRight,
-  ClipboardCheck,
-  Play,
-  ChevronLeft,
-  BookOpen,
-  Award,
-  HelpCircle,
-  Sparkles,
-  Target,
-  ArrowRight,
-  MoreHorizontal,
-  Bell,
-  Search,
-  Users,
-  Trash2
+  Users, HeartPulse, Sparkles, ArrowUp,
+  BookOpen, Award, CheckCircle2, Circle, Clock, Briefcase, MapPin, DollarSign, Globe, Zap, Shield, Check
 } from "lucide-react";
-import { getTasks, createTask, deleteTask } from "@/services/taskService";
-import useAvatar from '@/hooks/useAvatar';
-import ContinueLearning from '@/components/ContinueLearning';
-import CourseCardSkeleton from '@/components/skeletons/CourseCardSkeleton';
-import StatsCardSkeleton from '@/components/skeletons/StatsCardSkeleton';
-import apiCall, { API_BASE_URL } from '@/services/api';
 import useUser from "@/hooks/useUser";
-
-/* Helper function for calendar logic */
-const getDaysInMonth = (date) => {
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDayIndex = new Date(year, month, 1).getDay();
-  const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  return { daysArray, firstDayIndex };
-};
+import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 
 const DashboardHome = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { user, loading: userLoading } = useUser();
-  const [currentDate, setCurrentDate] = useState(new Date());
   const [showVisionSplash, setShowVisionSplash] = useState(false);
-  const [showStreakModal, setShowStreakModal] = useState(false);
-
-  // Real data states
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
-  const [stats, setStats] = useState({
-    totalCourses: 0,
-    completedModules: 0,
-    baselineScore: 0,
-    dayStreak: 0,
-    currentModuleName: "No Active Module",
-    currentModuleProgress: 0
-  });
   const [dashboardLoading, setDashboardLoading] = useState(true);
-  const [moduleProgress, setModuleProgress] = useState(0);
-
-  // Animation Variants - Smoother, more professional
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.08 }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 15, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "tween", ease: "easeOut", duration: 0.4 }
-    }
-  };
 
   useEffect(() => {
     const hasSeenSplash = sessionStorage.getItem('visionSplashShown');
-    if (!hasSeenSplash) {
-      setShowVisionSplash(true);
-    }
+    if (!hasSeenSplash) setShowVisionSplash(true);
   }, []);
 
   useEffect(() => {
-    const clockInterval = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 1000);
-    return () => clearInterval(clockInterval);
-  }, [location.key]);
+    if (user && !userLoading) setDashboardLoading(false);
+  }, [user, userLoading]);
 
   const handleVisionSplashComplete = () => {
     setShowVisionSplash(false);
     sessionStorage.setItem('visionSplashShown', 'true');
   };
 
-  // Calendar Note State
-  const [showNoteModal, setShowNoteModal] = useState(false);
-  const [selectedNoteDate, setSelectedNoteDate] = useState(null);
-  const [newNote, setNewNote] = useState("");
-  const [selectedNoteTime, setSelectedNoteTime] = useState("12:00");
-  const [calendarNotes, setCalendarNotes] = useState({});
-
-  const handleDayDoubleClick = (date) => {
-    setSelectedNoteDate(date);
-    // Default to current time or next hour
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    setSelectedNoteTime(`${hours}:${minutes}`);
-    setShowNoteModal(true);
-  };
-
-  const saveNote = async () => {
-    if (!newNote.trim() || !selectedNoteDate) return;
-
-    try {
-      // Save to Backend
-      const taskData = {
-        title: newNote,
-        date: selectedNoteDate,
-        time: selectedNoteTime,
-        type: 'personal',
-        status: 'Pending'
-      };
-
-      const savedTask = await createTask(taskData);
-
-      // Update Local State
-      const dateKey = selectedNoteDate.toDateString();
-      setCalendarNotes(prev => ({
-        ...prev,
-        [dateKey]: [...(prev[dateKey] || []), {
-          id: savedTask._id,
-          text: savedTask.title,
-          time: savedTask.time
-        }]
-      }));
-
-      setNewNote("");
-      setShowNoteModal(false);
-    } catch (error) {
-      console.error("Failed to save note:", error);
-    }
-  };
-
-  const handleDeleteNote = async (noteId) => {
-    try {
-      await deleteTask(noteId);
-
-      // Update local state
-      setCalendarNotes(prev => {
-        const updated = { ...prev };
-        Object.keys(updated).forEach(dateKey => {
-          updated[dateKey] = updated[dateKey].filter(note => note.id !== noteId);
-          if (updated[dateKey].length === 0) {
-            delete updated[dateKey];
-          }
-        });
-        return updated;
-      });
-    } catch (error) {
-      console.error("Failed to delete note:", error);
-    }
-  };
-
-  // Fetch Dashboard Data (Real Data Integration)
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!user || (!user.id && !user._id)) {
-        setDashboardLoading(false);
-        return;
-      }
-
-      try {
-        setDashboardLoading(true);
-        const userId = user.id || user._id;
-        const token = sessionStorage.getItem('token');
-
-        if (!userId || !token) {
-          setDashboardLoading(false);
-          return;
-        }
-
-        // Fetch enrolled courses
-        const coursesResponse = await fetch(
-          `${API_BASE_URL.replace('/api', '')}/api/courseEnrollments/student/${userId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-
-        let courses = [];
-        if (coursesResponse.ok) {
-          const coursesData = await coursesResponse.json();
-          courses = Array.isArray(coursesData.data) ? coursesData.data : (Array.isArray(coursesData) ? coursesData : []);
-          setEnrolledCourses(courses);
-        }
-
-        // Fetch Tasks (Calendar Notes)
-        try {
-          const tasks = await getTasks();
-          const notesMap = {};
-          tasks.forEach(task => {
-            if (task.date) {
-              const d = new Date(task.date);
-              if (!isNaN(d.getTime())) {
-                const key = d.toDateString();
-                if (!notesMap[key]) notesMap[key] = [];
-                notesMap[key].push({
-                  id: task._id,
-                  text: task.title,
-                  time: task.time || 'All Day'
-                });
-              }
-            }
-          });
-          setCalendarNotes(notesMap);
-        } catch (err) {
-          console.error("Failed to fetch tasks", err);
-        }
-
-        // Fetch baseline results
-        const baselineResponse = await fetch(
-          `${API_BASE_URL.replace('/api', '')}/api/baselineresults/user/${userId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-
-        let baseline = null;
-        if (baselineResponse.ok) {
-          baseline = await baselineResponse.json();
-        }
-
-        // Calculate stats and resume point
-        let completedModulesCount = 0;
-        let totalProgressSum = 0;
-        let resumeUrl = '/dashboard/courses';
-        let currentModuleTitle = 'Start Learning';
-        let lastAccessedTime = 'Never';
-
-        // Pre-process all courses for stats
-        courses.forEach(enrollment => {
-          const course = enrollment.course;
-          if (!course || !course.modules || course.modules.length === 0) {
-            enrollment.calculatedProgress = enrollment.progress || 0;
-            totalProgressSum += enrollment.calculatedProgress;
-            return;
-          }
-
-          let totalExpectedDays = 0;
-          let completedDaysCount = 0;
-
-          course.modules.forEach(mod => {
-            const modExpected = mod.days ? mod.days.length : 0;
-            totalExpectedDays += modExpected;
-
-            const mProg = (enrollment.moduleProgress || []).find(mp =>
-              (mp.module === mod._id || mp.module?._id === mod._id)
-            );
-
-            if (mProg) {
-              const completedInMod = new Set();
-              if (mProg.videoProgress) {
-                mProg.videoProgress.forEach(vp => {
-                  if (vp.isCompleted) completedInMod.add(vp.dayId);
-                });
-              }
-              if (mProg.completedTasks) {
-                mProg.completedTasks.forEach(ct => {
-                  completedInMod.add(ct.dayId);
-                });
-              }
-              completedDaysCount += completedInMod.size;
-            }
-          });
-
-          const granularProgress = totalExpectedDays > 0
-            ? Math.round((completedDaysCount / totalExpectedDays) * 100)
-            : 0;
-
-          enrollment.calculatedProgress = granularProgress;
-          totalProgressSum += granularProgress;
-
-          if (enrollment.moduleProgress && Array.isArray(enrollment.moduleProgress)) {
-            enrollment.moduleProgress.forEach(module => {
-              if (module.status === 'completed') {
-                completedModulesCount++;
-              }
-            });
-          }
-
-          // NEW: Check for any activity at all (even if 0% progress)
-          let hasActivity = false;
-          if (enrollment.moduleProgress && enrollment.moduleProgress.length > 0) {
-            hasActivity = enrollment.moduleProgress.some(m => {
-              const hasVideo = m.videoProgress && m.videoProgress.some(vp => vp.maxWatchedTime > 0);
-              const hasTasks = m.completedTasks && m.completedTasks.length > 0;
-              const hasQuizzes = m.quizzesTaken && m.quizzesTaken.length > 0;
-              return hasVideo || hasTasks || hasQuizzes;
-            });
-          }
-          enrollment.hasAnyActivity = hasActivity;
-        });
-
-        // A course is "Active" if it's in_progress OR has any activity, and not finished
-        const activeCoursesCount = courses.filter(c =>
-          (c.status === 'in_progress' || c.status === 'in-progress' || c.status === 'enrolled' || c.hasAnyActivity || c.calculatedProgress > 0) &&
-          c.calculatedProgress < 100
-        ).length;
-
-        // Find the "Active" course for hero section
-        const activeCourseEnrollment = [...courses]
-          .filter(e =>
-            (e.status === 'in_progress' || e.status === 'in-progress' || e.status === 'enrolled' || e.hasAnyActivity || e.calculatedProgress > 0) &&
-            e.calculatedProgress < 100
-          )
-          .sort((a, b) =>
-            new Date(b.lastAccessedAt || 0) - new Date(a.lastAccessedAt || 0)
-          )[0];
-
-        if (activeCourseEnrollment) {
-          const course = activeCourseEnrollment.course;
-          const enrollment = activeCourseEnrollment;
-          let resumeModuleId = 1;
-          let resumeDayId = 1;
-
-          // Format Last Accessed Time
-          if (activeCourseEnrollment.lastAccessedAt) {
-            const diff = Date.now() - new Date(activeCourseEnrollment.lastAccessedAt).getTime();
-            const minutes = Math.floor(diff / 60000);
-            if (minutes < 1) lastAccessedTime = 'Just now';
-            else if (minutes < 60) lastAccessedTime = `${minutes}m ago`;
-            else if (minutes < 1440) lastAccessedTime = `${Math.floor(minutes / 60)}h ago`;
-            else lastAccessedTime = `${Math.floor(minutes / 1440)}d ago`;
-          }
-
-          if (course && Array.isArray(course.modules)) {
-            let found = false;
-            for (let mIdx = 0; mIdx < course.modules.length; mIdx++) {
-              const moduleDoc = course.modules[mIdx];
-              const modProgress = (enrollment.moduleProgress || []).find(
-                mp => mp.module === moduleDoc._id || mp.module?._id === moduleDoc._id
-              );
-
-              if (!modProgress || modProgress.status !== 'completed') {
-                resumeModuleId = mIdx + 1;
-                currentModuleTitle = moduleDoc.title || `Module ${mIdx + 1}`;
-
-                const videoProgress = modProgress?.videoProgress || [];
-                const completedTasks = modProgress?.completedTasks || [];
-                const daysCount = moduleDoc.days?.length || 0;
-
-                for (let d = 1; d <= daysCount; d++) {
-                  const isVidDone = videoProgress.some(vp => vp.dayId === d && vp.isCompleted);
-                  const dayDoc = moduleDoc.days?.find(day => day.dayNumber === d || day.id === d);
-                  const hasTasks = dayDoc?.tasks?.length > 0;
-                  const isTaskDone = completedTasks.some(ct => ct.dayId === d);
-                  const taskCondition = hasTasks ? isTaskDone : true;
-
-                  if (!isVidDone || !taskCondition) {
-                    resumeDayId = d;
-                    found = true;
-                    break;
-                  }
-                }
-              }
-              if (found) break;
-            }
-          }
-
-          if (course?._id) {
-            resumeUrl = `/dashboard/courses/${course._id}/modules/${resumeModuleId}/days/${resumeDayId}`;
-          }
-        }
-
-        const overallProgress = courses.length > 0
-          ? Math.round(totalProgressSum / courses.length)
-          : 0;
-
-        // Calculate current module progress specifically
-        let currentModuleProgressVal = 0;
-        let currentModuleName = "Start Learning";
-
-        if (activeCourseEnrollment) {
-          const course = activeCourseEnrollment.course;
-          const enrollment = activeCourseEnrollment;
-
-          // Find the first incomplete module
-          const currentMod = course.modules.find((m, idx) => {
-            const mIdx = idx + 1;
-            const modProg = (enrollment.moduleProgress || []).find(
-              mp => mp.module === m._id || mp.module?._id === m._id
-            );
-            return !modProg || modProg.status !== 'completed';
-          }) || course.modules[0];
-
-          if (currentMod) {
-            currentModuleName = currentMod.title || "Current Module";
-            const modProg = (enrollment.moduleProgress || []).find(
-              mp => mp.module === currentMod._id || mp.module?._id === currentMod._id
-            );
-
-            if (modProg) {
-              const completedInMod = new Set();
-              if (modProg.videoProgress) {
-                modProg.videoProgress.forEach(vp => {
-                  if (vp.isCompleted) completedInMod.add(vp.dayId);
-                });
-              }
-              if (modProg.completedTasks) {
-                modProg.completedTasks.forEach(ct => {
-                  completedInMod.add(ct.dayId);
-                });
-              }
-
-              const totalDays = currentMod.days?.length || 1;
-              currentModuleProgressVal = Math.round((completedInMod.size / totalDays) * 100);
-            }
-          }
-        }
-
-        // Fetch Streak
-        let currentStreak = 0;
-        try {
-          const streakRes = await apiCall('/avatar/streak-status');
-          if (streakRes.success) {
-            currentStreak = streakRes.data?.totalStreakDays || streakRes.data?.streak || 0;
-          }
-        } catch (e) {
-          console.error("Failed to fetch streak", e);
-        }
-
-        setStats({
-          totalCourses: activeCoursesCount,
-          completedModules: completedModulesCount,
-          baselineScore: baseline?.baselineScore || 0,
-          dayStreak: currentStreak,
-          resumeUrl,
-          currentModuleTitle,
-          lastAccessedTime,
-          activeEnrollment: activeCourseEnrollment,
-          currentModuleName,
-          currentModuleProgress: currentModuleProgressVal
-        });
-
-        setModuleProgress(currentModuleProgressVal);
-
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
-      } finally {
-        setDashboardLoading(false);
-      }
-    };
-
-    if (user && (user.id || user._id)) {
-      fetchDashboardData();
-
-      // Refresh data on window focus to handle updates from other tabs
-      const onFocus = () => fetchDashboardData();
-      window.addEventListener('focus', onFocus);
-      return () => window.removeEventListener('focus', onFocus);
-    }
-  }, [user]);
-
-  // --- Calendar Logic ---
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [calendarMonth, setCalendarMonth] = useState(new Date());
-
-  const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const days = new Date(year, month + 1, 0).getDate();
-    const firstDayIndex = new Date(year, month, 1).getDay();
-    return {
-      daysArray: Array.from({ length: days }, (_, i) => i + 1),
-      firstDayIndex
-    };
-  };
-
-  const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-
-  const handlePrevMonth = () => {
-    setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
-  };
-
-  const handleNextMonth = () => {
-    setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
-  };
-
-  if (userLoading || !user) {
+  if (userLoading || dashboardLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <p className="text-slate-500 text-sm font-medium animate-pulse">Loading Workspace...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#F5F2ED] dark:bg-slate-950">
+        <div className="w-12 h-12 border-4 border-slate-200 border-t-[#1a3884] rounded-full animate-spin"></div>
       </div>
     );
   }
+
+  const bgMain = "bg-[#F5F2ED] dark:bg-[#0B1120]";
 
   return (
     <>
       {showVisionSplash && (
         <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
       )}
-
-      {/* Streak Details Modal */}
-      {showStreakModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowStreakModal(false)}>
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-transparent w-full max-w-2xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <ContinueLearning />
-            <div className="mt-4 flex justify-center">
-              <button
-                onClick={() => setShowStreakModal(false)}
-                className="px-6 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full font-bold text-sm shadow-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </motion.div>
-        </div>
+      
+      {!showVisionSplash && user && (
+        <StudentOnboarding user={user} />
       )}
 
-      <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] text-slate-900 font-sans transition-colors duration-300">
+      <div className={`h-screen flex flex-col ${bgMain} font-sans transition-colors duration-300 text-slate-800 overflow-hidden`}>
         <DashboardSidebar />
 
-        <div className="min-h-screen pb-20 lg:pb-0">
-          <PageTransition>
-            <motion.main
-              className="max-w-[1600px] mx-auto p-4 md:p-8 lg:p-10"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
+        <div className="flex-1 overflow-y-auto transition-all duration-300">
+          <DashboardHeader />
 
-              {/* Enhanced Header - Professional & Clean */}
-              <motion.div className="mb-6 md:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 flex-wrap" variants={itemVariants}>
-                <div className="flex-1 min-w-[200px]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2.5 py-0.5 rounded-md bg-white border border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 shadow-sm">
-                      {currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                    </span>
-                    {/* <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> */}
+          <main className="p-3 md:p-5 lg:p-6 pb-20 lg:pb-6">
+            <PageTransition>
+            <div className="max-w-[1600px] mx-auto space-y-4">
+
+
+              <motion.div 
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                  className="bg-white dark:bg-slate-900 border border-blue-100 dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center justify-between"
+              >
+                  <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
+                        <BookOpen className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
+                     </div>
+                     <div>
+                        <h3 className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Continue learning</h3>
+                        <h2 className="text-base font-bold font-serif leading-tight text-[#1a3884] dark:text-white">Level 3: Management Basics</h2>
+                     </div>
                   </div>
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-                    Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">{user?.fullName?.split(' ')[0] || 'Student'}</span>
-                  </h1>
-                  <p className="text-slate-500 dark:text-slate-400 mt-1.5 text-sm md:text-base font-medium">
-                    Your learning overview for today.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  {/* Streak Badge - Click to open details */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowStreakModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer group"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center">
-                      <TrendingUp className="w-5 h-5 text-orange-500 fill-orange-500" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 leading-none">Streak</p>
-                      <p className="text-sm font-bold text-slate-900 dark:text-white leading-none mt-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        Day {stats.dayStreak}
-                      </p>
-                    </div>
-                  </motion.button>
-                </div>
+                  <div className="flex items-center gap-4">
+                     <div className="hidden sm:flex items-center gap-2">
+                        <div className="w-24 lg:w-32 h-1 bg-blue-50 dark:bg-slate-800 rounded-full overflow-hidden border border-blue-100 dark:border-slate-700">
+                           <div className="w-[75%] h-full bg-[#1a3884] dark:bg-blue-500 rounded-full"></div>
+                        </div>
+                        <span className="text-[10px] font-bold text-[#1a3884] dark:text-blue-300">75%</span>
+                     </div>
+                     <button onClick={() => navigate('/dashboard/courses')} className="bg-[#1a3884] dark:bg-blue-600 hover:bg-[#112558] dark:hover:bg-blue-700 text-white px-5 py-2 rounded-full text-xs font-bold transition shadow-sm">
+                        Resume
+                     </button>
+                  </div>
               </motion.div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
-
-                {/* Left Column - Main Content */}
-                <div className="lg:col-span-8 space-y-6 md:space-y-8">
-
-                  {/* Professional Hero Section */}
-                  <motion.section
-                    variants={itemVariants}
-                    className="relative overflow-hidden rounded-[20px] md:rounded-[24px] bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 md:p-10 shadow-xl shadow-slate-200 dark:shadow-none text-slate-900 dark:text-white z-0 ring-1 ring-slate-200 dark:ring-white/5"
-                  >
-                    {/* Subtle Grid Pattern */}
-                    <div className="absolute inset-0 opacity-20"
-                      style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }}
-                    />
-
-                    {/* Abstract Geometric Accents */}
-                    <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-br from-blue-600/20 to-indigo-600/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
-
-                    <div className="relative z-10">
-                      <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-                        <div className="md:w-3/4">
-                          <div className="flex items-center gap-2 mb-4">
-                            <span className="w-8 h-1 bg-blue-500 rounded-full"></span>
-                            <p className="text-blue-600 dark:text-blue-200 text-xs font-bold uppercase tracking-widest">Module Progress</p>
-                          </div>
-
-                          <h2 className="text-2xl md:text-3xl font-bold mb-4 leading-tight text-slate-900 dark:text-white">
-                            You're performing exceptionally well.
-                            <br className="hidden md:block" />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Keep up the momentum.</span>
-                          </h2>
-
-                          <p className="text-slate-600 dark:text-slate-300 mb-8 max-w-lg leading-relaxed text-sm">
-                            {enrolledCourses.length > 0
-                              ? `You are currently working on "${stats.currentModuleName}". Resume your session to continue your progress.`
-                              : "Start your professional journey today by exploring our industry-standard courses."}
-                          </p>
-
-                          <div className="flex flex-wrap gap-4">
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => navigate(stats.resumeUrl || '/dashboard/courses')}
-                              className="px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-bold text-sm shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors flex items-center gap-2"
-                            >
-                              <Play className="w-4 h-4 fill-white dark:fill-slate-900" />
-                              {enrolledCourses.length > 0 ? "Resume Learning" : "Browse Library"}
-                            </motion.button>
-                          </div>
-                        </div>
-
-                        {/* Circular Progress (Professional Style) */}
-                        <div className="relative w-32 h-32 flex-shrink-0 flex items-center justify-center">
-                          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                            <circle cx="50" cy="50" r="45" fill="none" className="stroke-slate-100 dark:stroke-white/10" strokeWidth="6" />
-                            <circle
-                              cx="50" cy="50" r="45"
-                              fill="none"
-                              stroke="#3b82f6"
-                              strokeWidth="6"
-                              strokeLinecap="round"
-                              strokeDasharray={`${2 * Math.PI * 45}`}
-                              strokeDashoffset={`${2 * Math.PI * 45 * (1 - moduleProgress / 100)}`}
-                              className="transition-all duration-1000 ease-out"
-                            />
-                          </svg>
-                          <div className="absolute text-center">
-                            <span className="text-2xl font-bold block text-slate-900 dark:text-white">{moduleProgress}%</span>
-                            <span className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-semibold">Done</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.section>
-
-                  {/* KPI Stats Grid - Minimalist & Clean */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                    {[
-                      { label: 'Active Courses', value: stats.totalCourses, icon: BookOpen, color: 'text-blue-600', trend: '+1', trendColor: 'text-emerald-500' },
-                      { label: 'Modules Done', value: stats.completedModules, icon: CheckCircle2, color: 'text-emerald-600', trend: '+3', trendColor: 'text-emerald-500' },
-                      { label: 'Baseline Score', value: `${stats.baselineScore}%`, icon: Target, color: 'text-violet-600', trend: 'High', trendColor: 'text-blue-500' },
-                      { label: 'Learning Hours', value: '24h', icon: Clock, color: 'text-amber-600', trend: '+2h', trendColor: 'text-emerald-500' }
-                    ].map((stat, i) => (
-                      <motion.div
-                        key={i}
-                        variants={itemVariants}
-                        whileHover={{ y: -2 }}
-                        className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-slate-100 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600 transition-all group"
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <div className={`p-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 ${stat.color}`}>
-                            <stat.icon className="w-5 h-5" />
-                          </div>
-                          {stat.trend && (
-                            <span className={`text-xs font-bold ${stat.trendColor} bg-emerald-50 dark:bg-emerald-900/20 px-1.5 py-0.5 rounded`}>
-                              {stat.trend}
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-0.5">{stat.value}</h3>
-                        <p className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">{stat.label}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  {/* 7-Day Streak Tracker - REMOVED from here, now in Modal */}
-
-                  {/* Current Course - Horizontal Professional Card */}
-                  <motion.section variants={itemVariants}>
-                    <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                        Ongoing Learning
-                      </h3>
-                      <button
-                        onClick={() => navigate('/dashboard/courses')}
-                        className="text-sm font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
-                      >
-                        View Library <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    {dashboardLoading ? (
-                      <CourseCardSkeleton />
-                    ) : stats.activeEnrollment ? (
-                      <motion.div
-                        whileHover={{ scale: 1.005 }}
-                        className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-100 dark:border-slate-700 overflow-hidden flex flex-col md:flex-row"
-                      >
-                        {/* Image Section */}
-                        <div className="md:w-1/3 relative h-48 md:h-auto group cursor-pointer" onClick={() => navigate(stats.resumeUrl)}>
-                          <img
-                            src={stats.activeEnrollment.course?.thumbnail || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=800"}
-                            alt="Course"
-                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-slate-900/40 group-hover:bg-slate-900/20 transition-colors flex items-center justify-center">
-                            <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg transform scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-300">
-                              <Play className="w-5 h-5 text-slate-900 fill-current ml-1" />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Content Section */}
-                        <div className="md:w-2/3 p-6 md:p-8 flex flex-col justify-center">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className="bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold px-2.5 py-1 rounded uppercase tracking-wider dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300 truncate max-w-[200px]">
-                              {stats.currentModuleTitle || 'Core Module'}
-                            </span>
-                            <span className="text-slate-400 text-xs font-medium">Last accessed {stats.lastAccessedTime || 'recently'}</span>
-                          </div>
-
-                          <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2 line-clamp-1">
-                            {stats.activeEnrollment.course?.title || 'Advanced Leadership & Management'}
-                          </h4>
-
-                          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6 line-clamp-2 leading-relaxed">
-                            {stats.activeEnrollment.course?.description || 'Learn to lead effective teams and manage complex projects with confidence.'}
-                          </p>
-
-                          <div className="flex items-center gap-4">
-                            <div className="flex-1">
-                              <div className="flex justify-between text-xs font-semibold text-slate-500 mb-1.5">
-                                <span>Progress</span>
-                                <span className="text-slate-900 dark:text-white">{stats.activeEnrollment.calculatedProgress || 0}%</span>
-                              </div>
-                              <div className="w-full bg-slate-100 dark:bg-slate-700/50 rounded-full h-2">
-                                <div
-                                  className="bg-blue-600 h-2 rounded-full transition-all duration-1000"
-                                  style={{ width: `${stats.activeEnrollment.calculatedProgress || 0}%` }}
-                                />
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => navigate(stats.resumeUrl)}
-                              className="px-5 py-2.5 bg-slate-900 dark:bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 dark:hover:bg-blue-700 transition-colors shadow-sm"
-                            >
-                              Continue
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ) : (
-                      <div className="bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-center shadow-sm">
-                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
-                          <BookOpen className="w-8 h-8 text-slate-300" />
-                        </div>
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">No Active Courses</h3>
-                        <p className="text-slate-500 text-sm mb-5 max-w-sm">
-                          You haven't enrolled in any courses yet. Select a course from the library to begin.
-                        </p>
-                        <button
-                          onClick={() => navigate('/dashboard/courses')}
-                          className="px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                          Browse Library
-                        </button>
-                      </div>
-                    )}
-                  </motion.section>
-                </div>
-
-                {/* Right Column - Sidebar Widgets */}
-                <motion.div
-                  variants={itemVariants}
-                  className="lg:col-span-4 space-y-6"
+              {/* TOP ROW: Career Direction & Skills by Tier */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                
+                {/* Career Direction Hero (Span 8) */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                  className="lg:col-span-8 bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col"
                 >
-
-                  {/* Calendar Widget - Professional Agenda Style */}
-                  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                        {calendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                      </h3>
-                      <div className="flex gap-1 bg-slate-50 dark:bg-slate-700 rounded-lg p-0.5">
-                        <button onClick={handlePrevMonth} className="p-1.5 hover:bg-white dark:hover:bg-slate-600 rounded-md shadow-sm transition-all"><ChevronLeft className="w-4 h-4 text-slate-500" /></button>
-                        <button onClick={handleNextMonth} className="p-1.5 hover:bg-white dark:hover:bg-slate-600 rounded-md shadow-sm transition-all"><ChevronRight className="w-4 h-4 text-slate-500" /></button>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                      {dayNames.map((d, i) => <div key={i}>{d}</div>)}
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-1">
-                      {/* Padding for empty days */}
-                      {(() => {
-                        const { daysArray, firstDayIndex } = getDaysInMonth(calendarMonth);
-
-                        return (
-                          <>
-                            {Array.from({ length: firstDayIndex }).map((_, i) => (
-                              <div key={`empty-${i}`} />
-                            ))}
-
-                            {daysArray.map(day => {
-                              const date = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth(), day);
-                              const isToday = date.toDateString() === new Date().toDateString();
-                              const isSelected = date.toDateString() === selectedDate.toDateString();
-                              const hasNotes = calendarNotes[date.toDateString()]?.length > 0;
-
-                              return (
-                                <div
-                                  key={day}
-                                  onClick={() => setSelectedDate(date)}
-                                  onDoubleClick={() => handleDayDoubleClick(date)}
-                                  className={`h-9 flex flex-col items-center justify-center rounded-md text-xs font-semibold cursor-pointer transition-all border border-transparent relative ${isSelected
-                                    ? 'bg-blue-600 text-white shadow-md'
-                                    : isToday
-                                      ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
-                                      : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700'
-                                    }`}
-                                  title="Double click to add a note"
-                                >
-                                  <span>{day}</span>
-                                  {hasNotes && !isSelected && (
-                                    <span className="w-1 h-1 rounded-full bg-blue-500 absolute bottom-1.5" />
-                                  )}
-                                  {hasNotes && isSelected && (
-                                    <span className="w-1 h-1 rounded-full bg-white absolute bottom-1.5" />
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </>
-                        );
-                      })()}
-                    </div>
-
-                    {/* Agenda List */}
-                    <div className="mt-6 space-y-3">
-
-                      {/* Dynamic Notes for Selected Date */}
-                      {calendarNotes[selectedDate.toDateString()]?.length > 0 && (
-                        <div className="mb-4 space-y-2">
-                          <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-2">
-                            Notes for {selectedDate.getDate()} {selectedDate.toLocaleDateString('en-US', { month: 'short' })}
-                          </p>
-                          {calendarNotes[selectedDate.toDateString()].map(note => (
-                            <div key={note.id} className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 group">
-                              <div className="w-1 h-auto self-stretch rounded-full bg-blue-500 flex-shrink-0" />
-                              <div className="flex-1">
-                                <p className="text-sm font-medium text-slate-900 dark:text-white leading-tight break-words">{note.text}</p>
-                                <p className="text-[10px] text-blue-500 mt-1 font-bold opacity-80">{note.time}</p>
-                              </div>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteNote(note.id);
-                                }}
-                                className="p-1.5 rounded-md hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors flex-shrink-0"
-                                title="Delete note"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Dynamic Upcoming Deadlines */}
-                      {(() => {
-                        const allUpcoming = [];
-                        const now = new Date();
-                        now.setHours(0, 0, 0, 0);
-
-                        Object.entries(calendarNotes).forEach(([dateStr, notes]) => {
-                          const date = new Date(dateStr);
-                          const isSelectedDate = date.toDateString() === selectedDate.toDateString();
-
-                          if (date >= now && !isSelectedDate) {
-                            notes.forEach(note => {
-                              allUpcoming.push({ ...note, date });
-                            });
-                          }
-                        });
-
-                        // Sort by date then time
-                        allUpcoming.sort((a, b) => a.date.getTime() - b.date.getTime() || (a.time || '').localeCompare(b.time || ''));
-
-                        const nextThree = allUpcoming.slice(0, 3);
-
-                        if (nextThree.length === 0) return null;
-
-                        return (
-                          <div className="mt-8">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Upcoming Deadlines</p>
-                            <div className="space-y-3">
-                              {nextThree.map((deadline) => (
-                                <div
-                                  key={deadline.id}
-                                  onClick={() => {
-                                    setCalendarMonth(new Date(deadline.date));
-                                    setSelectedDate(new Date(deadline.date));
-                                  }}
-                                  className="flex items-start gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-700/50 transition-colors cursor-pointer group shadow-sm bg-white dark:bg-slate-800"
-                                >
-                                  <div className={`w-1 h-8 rounded-full bg-blue-500 flex-shrink-0`} />
-                                  <div className="flex-1 overflow-hidden">
-                                    <p className="text-sm font-semibold text-slate-900 dark:text-white leading-tight truncate">{deadline.text}</p>
-                                    <p className="text-xs text-slate-500 mt-0.5">
-                                      {deadline.date.toDateString() === new Date().toDateString()
-                                        ? 'Today'
-                                        : deadline.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {deadline.time || 'All Day'}
-                                    </p>
-                                  </div>
-                                  <ChevronRight size={14} className="text-slate-300 group-hover:text-blue-500 self-center" />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })()}
-
-                    </div>
+                  <div className="flex justify-between items-start mb-2">
+                     <h2 className="text-xl font-serif font-bold text-[#1a3884] dark:text-white">Career Direction</h2>
+                     <button className="text-xs font-semibold text-[#1a3884] dark:text-blue-400 hover:text-[#C9A45B] transition">View Evidence</button>
                   </div>
-
-                  {/* Quick Shortcuts - Clean List */}
-                  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-                    <h3 className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 font-bold text-slate-900 dark:text-white text-sm">
-                      Quick Access
-                    </h3>
-                    <div className="divide-y divide-slate-100 dark:divide-slate-700">
-                      {[
-                        { label: 'My Notes', icon: ClipboardCheck, path: '/dashboard/notes', desc: 'Review your study notes' },
-                        { label: 'Community', icon: Users, path: '/dashboard/community', desc: 'Connect with peers' },
-                        { label: 'Certificates', icon: Award, path: '/dashboard/certificate', desc: 'View earned credentials' },
-                        { label: 'Support', icon: HelpCircle, path: '/dashboard/support', desc: 'Get assistance' }
-                      ].map((item, i) => (
-                        <div
-                          key={i}
-                          onClick={() => navigate(item.path)}
-                          className="flex items-center gap-4 p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors group"
-                        >
-                          <div className="p-2 rounded-lg bg-slate-50 text-slate-500 group-hover:text-blue-600 group-hover:bg-blue-50 transition-colors dark:bg-slate-700 dark:text-slate-400 dark:group-hover:bg-blue-900/20 dark:group-hover:text-blue-400">
-                            <item.icon className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-semibold text-slate-900 dark:text-white">{item.label}</p>
-                            <p className="text-xs text-slate-500">{item.desc}</p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
-                        </div>
-                      ))}
-                    </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                     <div>
+                       <div className="text-2xl font-bold text-slate-800 dark:text-white">12</div>
+                       <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Cluster Roles</div>
+                     </div>
+                     <div>
+                       <div className="text-2xl font-bold text-slate-800 dark:text-white">45</div>
+                       <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Unique Skills</div>
+                     </div>
+                     <div>
+                       <div className="text-2xl font-bold text-slate-800 dark:text-white">120</div>
+                       <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Days on Platform</div>
+                     </div>
                   </div>
-
+                  
+                  <div className="mb-4">
+                     <div className="flex justify-between text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                       <span>14 of 45 skills developed (8 verified, 6 self-declared)</span>
+                     </div>
+                     <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex shadow-inner">
+                        <div className="h-full bg-green-600 dark:bg-green-500" style={{ width: '25%' }} title="Verified"></div>
+                        <div className="h-full bg-green-300 dark:bg-green-400" style={{ width: '20%' }} title="Self-Declared"></div>
+                     </div>
+                     <button className="text-[9px] font-bold text-[#1a3884] dark:text-blue-400 opacity-80 hover:opacity-100 transition mt-1.5">
+                        Add evidence to strengthen your profile
+                     </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-auto">
+                     {/* Role Eligibility Cards */}
+                     {[
+                       { role: 'Software Engineer', salary: '$80k-$100k', ai: 'High', away: '2 skills away' },
+                       { role: 'Data Analyst', salary: '$70k-$90k', ai: 'Med', away: 'Eligible' },
+                       { role: 'UX Designer', salary: '$75k-$95k', ai: 'Low', away: '1 skill away' },
+                       { role: 'Product Manager', salary: '$90k-$120k', ai: 'High', away: '3 skills away' }
+                     ].map((role, idx) => (
+                       <div key={idx} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl flex flex-col gap-2 hover:shadow-md transition cursor-pointer">
+                          <div className="flex items-center gap-2">
+                             <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                                <Briefcase className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
+                             </div>
+                             <div>
+                               <div className="font-bold text-xs leading-tight text-slate-800 dark:text-slate-200">{role.role}</div>
+                               <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{role.salary}</div>
+                             </div>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex">
+                              <div className="h-full bg-green-500" style={{ width: role.away === 'Eligible' ? '100%' : '60%' }}></div>
+                              {role.away !== 'Eligible' && <div className="h-full bg-green-300" style={{ width: '20%' }}></div>}
+                          </div>
+                          <div className="flex items-center justify-between text-[11px] font-bold">
+                             <span className="px-2 py-1 bg-[#1a3884]/10 dark:bg-blue-900/40 text-[#1a3884] dark:text-blue-300 rounded-md">AI: {role.ai}</span>
+                             <span className={`${role.away === 'Eligible' ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                                {role.away === 'Eligible' && <CheckCircle2 className="w-3 h-3 inline mr-1" />}
+                                {role.away}
+                             </span>
+                          </div>
+                       </div>
+                     ))}
+                  </div>
                 </motion.div>
 
-              </div>
-            </motion.main>
-          </PageTransition>
+                {/* Skills by Tier (Span 4) */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                  className="lg:col-span-4 bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col"
+                >
+                  <h2 className="text-base font-serif font-bold text-[#1a3884] dark:text-white mb-2">Skills by Tier</h2>
+                  
+                  <div className="flex-1 space-y-3">
+                     <div>
+                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+                           <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                           Tier 1: Foundational
+                        </div>
+                        <div className="flex items-center justify-between p-2 rounded-xl border border-green-200 dark:border-green-900/50 bg-green-50/50 dark:bg-green-900/20 hover:bg-green-50 dark:hover:bg-green-900/40 transition cursor-pointer">
+                           <div className="flex items-center gap-3">
+                              <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-500" />
+                              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Basic Excel</span>
+                           </div>
+                           <span className="text-[11px] font-bold px-2 py-1 bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-300 rounded-md">4 roles</span>
+                        </div>
+                     </div>
 
-          {/* Note Modal */}
-          {showNoteModal && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowNoteModal(false)}>
-              <div
-                className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-md shadow-2xl transform transition-all border border-slate-200 dark:border-slate-800"
-                onClick={e => e.stopPropagation()}
-              >
-                <h3 className="font-bold text-lg mb-4 text-slate-900 dark:text-white flex items-center gap-2">
-                  <div className="w-1 h-6 bg-blue-600 rounded-full" />
-                  Add Note for {selectedNoteDate?.toLocaleDateString()}
-                </h3>
-                <textarea
-                  autoFocus
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  placeholder="Type your note here..."
-                  className="w-full h-24 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none mb-4 text-sm placeholder:text-slate-400 font-medium"
-                />
+                     <div>
+                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+                           <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                           Tier 2: Intermediate
+                        </div>
+                        <div className="flex items-center justify-between p-2 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-900/20 hover:bg-amber-50 dark:hover:bg-amber-900/40 transition cursor-pointer">
+                           <div className="flex items-center gap-3">
+                              <Clock className="w-5 h-5 text-amber-600 dark:text-amber-500" />
+                              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">SQL Basics</span>
+                           </div>
+                           <span className="text-[11px] font-bold px-2 py-1 bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-300 rounded-md">2 roles</span>
+                        </div>
+                     </div>
 
-                <div className="mb-6">
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">
-                    Set Time / Deadline
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="time"
-                      value={selectedNoteTime}
-                      onChange={(e) => setSelectedNoteTime(e.target.value)}
-                      className="w-full p-3 pl-10 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm font-semibold"
-                    />
-                    <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                     <div>
+                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+                           <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                           Tier 3: Advanced
+                        </div>
+                        <div className="flex items-center justify-between p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
+                           <div className="flex items-center gap-3">
+                              <Circle className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Advanced Python</span>
+                           </div>
+                           <span className="text-[11px] font-bold px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">1 role</span>
+                        </div>
+                     </div>
                   </div>
-                </div>
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={() => setShowNoteModal(false)}
-                    className="px-5 py-2.5 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={saveNote}
-                    className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:scale-105 active:scale-95"
-                  >
-                    Save Note
-                  </button>
+                  
+                  <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                     <button className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#1a3884] dark:text-blue-400 py-1.5 rounded-lg text-[10px] font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm">Job Application</button>
+                     <button className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#1a3884] dark:text-blue-400 py-1.5 rounded-lg text-[10px] font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm">Interview Prep</button>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* MIDDLE ROW: Next Best Skill, Learning Path, Apply & Tracking */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                
+                {/* Col 1-4: Next Best Skill & Apply Your Skills */}
+                <div className="lg:col-span-4 flex flex-col gap-4">
+                    <motion.div 
+                     initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
+                     className="bg-[#12265A] text-white rounded-2xl p-4 shadow-lg relative overflow-hidden flex flex-col"
+                   >
+                      <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+                      <div className="z-10 flex flex-col items-start text-left">
+                         <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center mb-3">
+                            <Zap className="w-4 h-4 text-[#DEBA6F]" fill="none" strokeWidth={2} />
+                         </div>
+                         <h3 className="font-bold text-[9px] text-white uppercase tracking-[0.2em] mb-1.5">Next Best Skill</h3>
+                         <h2 className="text-xl font-extrabold font-serif mb-2 leading-none tracking-tight text-white">Python Programming</h2>
+                         <p className="text-[13px] text-white/90 leading-relaxed max-w-[95%] mb-4">
+                            Completing this makes you eligible for 1 more role. (Coursera, ~40 hrs)
+                         </p>
+                         <button className="bg-[#C5A059] text-white px-6 py-2 rounded-full text-xs font-bold hover:bg-[#b08f4c] transition shadow-md">
+                            Start Learning
+                         </button>
+                      </div>
+                   </motion.div>
+
+                   <motion.div 
+                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                     className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex-1"
+                   >
+                      <div className="flex justify-between items-center mb-3">
+                         <h3 className="font-bold text-base font-serif text-[#1a3884] dark:text-white">Apply Your Skills</h3>
+                         <ArrowUp className="w-4 h-4 rotate-45 text-slate-400" />
+                      </div>
+                      <div className="space-y-3">
+                         <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:shadow-md transition cursor-pointer group">
+                            <div className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition">Frontend Internship</div>
+                            <div className="flex gap-1.5 mb-1.5">
+                               <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                               <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                               <Circle className="w-3.5 h-3.5 text-amber-500" />
+                            </div>
+                            <div className="text-[10px] text-slate-500 font-semibold bg-white dark:bg-slate-800 px-2 py-1 rounded-lg inline-block border border-slate-100 dark:border-slate-700">Timing: Ready in 2w</div>
+                         </div>
+                         <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl hover:shadow-md transition cursor-pointer group">
+                            <div className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition">Open Source Project</div>
+                            <div className="flex gap-1.5 mb-1.5">
+                               <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                               <Circle className="w-3.5 h-3.5 text-amber-500" />
+                            </div>
+                            <div className="text-[10px] text-slate-500 font-semibold bg-white dark:bg-slate-800 px-2 py-1 rounded-lg inline-block border border-slate-100 dark:border-slate-700">Timing: Now</div>
+                         </div>
+                      </div>
+                   </motion.div>
+                 </div>
+
+                {/* Col 5-9: Learning Path */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+                  className="lg:col-span-5 bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col h-full"
+                >
+                   <h2 className="text-base font-serif font-bold text-[#1a3884] dark:text-white mb-2">Learning Path</h2>
+                   
+                   <div className="flex-1 space-y-3">
+                      {/* 5a Your Skill Dev Path */}
+                      <div>
+                         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">1. Your Skill Development Path</h3>
+                         <div className="bg-[#F8F9FA] dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-xl p-3 hover:border-[#1a3884]/30 dark:hover:border-blue-500/50 transition">
+                            <div className="flex justify-between items-start mb-2">
+                               <div>
+                                  <div className="flex items-center gap-3 mb-2">
+                                     <span className="w-5 h-5 bg-[#1a3884] text-white text-[10px] font-bold rounded-full flex items-center justify-center">1</span>
+                                     <span className="font-bold text-sm text-slate-800 dark:text-slate-200">Python Programming</span>
+                                  </div>
+                                  <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Unlocks <span className="text-[#1a3884] dark:text-blue-400 font-bold">2 roles</span> • High priority</div>
+                               </div>
+                               <button className="text-xs font-bold bg-[#1a3884] text-white px-4 py-2 rounded-xl hover:bg-[#112558] transition shadow-sm">Mark Complete</button>
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-3 py-2 rounded-lg border border-slate-100 dark:border-slate-700 inline-flex items-center gap-2">
+                               <BookOpen className="w-3.5 h-3.5 text-slate-400" /> Free course: Codecademy (20h)
+                            </div>
+                         </div>
+                      </div>
+
+                      {/* 5b Free Company Training */}
+                      <div>
+                         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">2. Free Company Training</h3>
+                         <div className="bg-[#F8F9FA] dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-xl p-3 hover:border-[#1a3884]/30 dark:hover:border-blue-500/50 transition">
+                            <div className="flex justify-between items-start mb-2">
+                               <div>
+                                  <span className="font-bold text-base text-slate-800 dark:text-slate-200 block mb-1">TechCorp Cloud Bootcamp</span>
+                                  <div className="text-xs text-slate-500 flex items-center gap-2 mt-2">
+                                     <Clock className="w-3.5 h-3.5" /> Duration: 4 Weeks
+                                  </div>
+                               </div>
+                               <span className="text-[10px] font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-800/50">Hiring Pipeline</span>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-300 font-medium mt-3 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
+                               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> AWS</span>
+                               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Docker</span>
+                            </div>
+                         </div>
+                      </div>
+
+                      {/* 5c Certifications */}
+                      <div>
+                         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">3. Certifications for Advantage</h3>
+                         <div className="bg-[#F8F9FA] dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-xl p-3 hover:border-[#1a3884]/30 dark:hover:border-blue-500/50 transition">
+                            <div className="flex justify-between items-start mb-2">
+                               <div>
+                                  <span className="font-bold text-sm text-slate-800 dark:text-slate-200 block">AWS Solutions Architect</span>
+                                  <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Issued By Amazon</span>
+                               </div>
+                               <span className="text-[9px] font-bold bg-[#C9A45B]/10 text-[#C9A45B] px-2 py-0.5 rounded-full border border-[#C9A45B]/20">Essential</span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-2 mb-3 mt-2">
+                               <div className="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700 flex flex-col justify-center">
+                                  <span className="text-[9px] text-slate-400 font-semibold uppercase">Cost</span>
+                                  <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">$150</span>
+                               </div>
+                               <div className="bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700 flex flex-col justify-center">
+                                  <span className="text-[9px] text-slate-400 font-semibold uppercase">Prep Time</span>
+                                  <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">40 hours</span>
+                               </div>
+                            </div>
+
+                            <ul className="text-sm text-slate-600 dark:text-slate-300 font-medium space-y-2.5">
+                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C9A45B]"></div> Industry recognized credential</li>
+                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C9A45B]"></div> High ROI for Cloud roles</li>
+                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-full bg-[#C9A45B]"></div> Boosts resume visibility significantly</li>
+                            </ul>
+                         </div>
+                      </div>
+                   </div>
+                </motion.div>
+
+                <div className="lg:col-span-3 flex flex-col gap-4">
+                   <motion.div 
+                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                     className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm"
+                   >
+                      <h3 className="font-bold text-sm font-serif mb-2 text-[#1a3884] dark:text-white">Events & Community</h3>
+                      <div className="flex flex-col gap-2">
+                         <button onClick={() => navigate('/community')} className="w-full flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-xl border border-slate-100 dark:border-slate-700 group">
+                            <div className="w-8 h-8 rounded-full bg-[#1a3884]/5 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-[#1a3884]/10 dark:group-hover:bg-blue-900/50 transition whitespace-nowrap overflow-visible">
+                               <Users className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
+                            </div>
+                            <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex-1 text-left">Community Feed</span>
+                         </button>
+                         
+                         <button onClick={() => navigate('/my-courses')} className="w-full flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-xl border border-slate-100 dark:border-slate-700 group">
+                            <div className="w-8 h-8 rounded-full bg-[#C9A45B]/10 flex items-center justify-center transition">
+                               <BookOpen className="w-4 h-4 text-[#C9A45B]" />
+                            </div>
+                            <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex-1 text-left">Concept Checks</span>
+                         </button>
+
+                         <button onClick={() => navigate('/mind-care')} className="w-full flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-xl border border-slate-100 dark:border-slate-700 group">
+                            <div className="w-8 h-8 rounded-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center group-hover:bg-rose-100 dark:group-hover:bg-rose-900/40 transition">
+                               <HeartPulse className="w-4 h-4 text-rose-500 dark:text-rose-400" />
+                            </div>
+                            <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex-1 text-left">Mind Care</span>
+                         </button>
+                      </div>
+                   </motion.div>
+
+                   {/* Optional Info Cards */}
+                   <motion.div 
+                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+                     className="grid grid-cols-1 gap-3"
+                   >
+                      <div className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-xl p-3 shadow-sm flex items-center gap-3 hover:shadow-md transition cursor-pointer group">
+                         <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center shrink-0 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition">
+                            <MapPin className="w-5 h-5 text-amber-600 dark:text-amber-500" />
+                         </div>
+                         <div>
+                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Location Intelligence</div>
+                            <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Tech hubs matching your skills</div>
+                         </div>
+                      </div>
+                      
+                      <div className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer group">
+                         <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40 transition">
+                            <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+                         </div>
+                         <div>
+                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Salary Intelligence</div>
+                            <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Market value projection</div>
+                         </div>
+                      </div>
+                      
+                      <div className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-2xl p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer group">
+                         <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition">
+                            <Globe className="w-5 h-5 text-blue-600 dark:text-blue-500" />
+                         </div>
+                         <div>
+                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200">English Level</div>
+                            <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Professional Working</div>
+                         </div>
+                      </div>
+                   </motion.div>
                 </div>
               </div>
-            </div>
-          )}
+
+
+
+              {/* BOTTOM STRIP: Tools & Utilities (Kept from old design to maintain functionality) */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                 <motion.button 
+                   initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.8 }}
+                   onClick={() => navigate('/smaart-wallet')}
+                   className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-full px-6 py-3 shadow-sm hover:shadow-md transition"
+                 >
+                    <span className="font-bold text-sm text-[#1a3884] dark:text-white">Wallet & Badges</span>
+                    <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-700 pl-3">
+                       <Award className="w-4 h-4 text-[#C9A45B]" />
+                       <Shield className="w-4 h-4 text-[#C9A45B]" />
+                       <Sparkles className="w-4 h-4 text-[#C9A45B]" />
+                    </div>
+                 </motion.button>
+
+                 <div className="flex items-center gap-4">
+                    <motion.button 
+                      initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.9 }}
+                      onClick={() => navigate('/smaart-toolkit')}
+                      className="bg-white dark:bg-slate-900 border border-[#E8E4D9] dark:border-slate-800 rounded-full px-6 py-3 font-bold text-sm text-[#1a3884] dark:text-white shadow-sm hover:shadow-md transition"
+                    >
+                       Quick Access Toolkit
+                    </motion.button>
+                    
+                    <motion.button 
+                      initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1.0 }}
+                      className="w-12 h-12 bg-[#1a3884] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#112558] transition"
+                      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    >
+                       <ArrowUp className="w-5 h-5" />
+                    </motion.button>
+                 </div>
+              </div>
+
+              </div>
+            </PageTransition>
+          </main>
         </div>
       </div>
     </>

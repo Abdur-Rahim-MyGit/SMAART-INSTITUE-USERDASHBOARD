@@ -232,19 +232,20 @@ const LoginCard = () => {
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex items-center justify-between gap-3 px-4 py-3"
+        className="flex items-center justify-between gap-3 px-4 py-2"
         style={{
           background: "#ffffff",
-          border: "1.5px solid #1a3884",
-          boxShadow: "0 4px 20px rgba(26,56,132,0.07)",
+          border: "2px solid #BC9B6A",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          borderRadius: "0px",
         }}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <div
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center shrink-0"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-none flex items-center justify-center shrink-0"
             style={{
-              background: "linear-gradient(135deg, #eef2fb 0%, #dce5f5 100%)",
-              border: "1px solid rgba(26,56,132,0.15)",
+              background: "linear-gradient(135deg, #f8f9fc 0%, #eef2fb 100%)",
+              border: "1px solid rgba(188,155,106,0.3)",
             }}
           >
             <Building2 className="w-5 h-5 text-[#1a3884]" />
@@ -279,16 +280,17 @@ const LoginCard = () => {
         className="overflow-hidden"
         style={{
           background: "#ffffff",
-          border: "1.5px solid #1a3884",
-          boxShadow: "0 20px 60px rgba(26,56,132,0.13), 0 4px 20px rgba(0,0,0,0.06)",
+          border: "2px solid #BC9B6A",
+          boxShadow: "0 20px 60px rgba(0,0,0,0.1), 0 4px 20px rgba(0,0,0,0.06)",
+          borderRadius: "0px",
         }}
       >
-        <div className="px-6 pt-8 pb-7 sm:px-8 sm:pt-9 sm:pb-8">
+        <div className="px-5 pt-6 pb-5 sm:px-6 sm:pt-7 sm:pb-6">
 
           {/* Header */}
-          <div className="flex flex-col items-center text-center mb-7 sm:mb-8">
+          <div className="flex flex-col items-center text-center mb-5 sm:mb-6">
             <div
-              className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
+              className="w-12 h-12 flex items-center justify-center mb-3 shadow-md rounded-none"
               style={{
                 background: "linear-gradient(135deg, #1a3884 0%, #102567 100%)",
                 boxShadow: "0 8px 24px rgba(26,56,132,0.30)",
@@ -299,12 +301,12 @@ const LoginCard = () => {
               <Lock className="w-6 h-6 text-white" />
             </div>
             <h2
-              className="text-xl sm:text-2xl font-extrabold tracking-tight mb-1"
-              style={{ color: "#0d1f4e", letterSpacing: "-0.02em" }}
+              className="text-lg sm:text-xl font-extrabold tracking-tight mb-0.5"
+              style={{ color: "#0d1f4e", letterSpacing: "-0.01em" }}
             >
               Welcome Back
             </h2>
-            <p className="text-gray-400 text-xs sm:text-[13px] font-normal">
+            <p className="text-gray-400 text-[11px] sm:text-[12px] font-normal">
               Enter your credentials to access the portal
             </p>
           </div>
@@ -329,10 +331,10 @@ const LoginCard = () => {
                 Email or Student ID
               </label>
               <div
-                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 sm:h-12 transition-all group"
+                className="flex items-center gap-2.5 px-3.5 rounded-none h-10 transition-all group"
                 style={{
-                  background: "#f5f7fc",
-                  border: "1.5px solid #e3e8f4",
+                  background: "#f8f9fc",
+                  border: "1.2px solid #e3e8f4",
                 }}
                 onFocusCapture={(e) => {
                   e.currentTarget.style.border = "1.5px solid #1a3884";
@@ -381,10 +383,10 @@ const LoginCard = () => {
                 </button>
               </div>
               <div
-                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 sm:h-12 transition-all"
+                className="flex items-center gap-2.5 px-3.5 rounded-none h-10 transition-all"
                 style={{
-                  background: "#f5f7fc",
-                  border: "1.5px solid #e3e8f4",
+                  background: "#f8f9fc",
+                  border: "1.2px solid #e3e8f4",
                 }}
                 onFocusCapture={(e) => {
                   e.currentTarget.style.border = "1.5px solid #1a3884";
@@ -430,10 +432,10 @@ const LoginCard = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="relative w-full h-11 sm:h-12 flex items-center justify-center gap-2 font-bold text-sm sm:text-[15px] text-white transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 mt-1 disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden"
+              className="relative w-full h-10 flex items-center justify-center gap-2 font-bold text-sm text-white transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 mt-0.5 disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden rounded-none"
               style={{
                 background: "linear-gradient(90deg, #1a3884 0%, #1e47ad 100%)",
-                boxShadow: "0 6px 24px rgba(26,56,132,0.32)",
+                boxShadow: "0 6px 20px rgba(26,56,132,0.25)",
               }}
               onMouseEnter={(e) => {
                 if (!isLoading) e.currentTarget.style.boxShadow = "0 10px 32px rgba(26,56,132,0.42)";
