@@ -163,4 +163,32 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Get college by name
+router.get('/name/:name', async (req, res) => {
+  try {
+    const name = decodeURIComponent(req.params.name);
+    const college = await College.findOne({
+      collegeName: { $regex: new RegExp(`^${name}$`, 'i') }
+    });
+
+    if (!college) {
+      return res.status(404).json({
+        success: false,
+        error: 'College not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: college
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch college',
+      message: err.message
+    });
+  }
+});
+
 module.exports = router;

@@ -1,15 +1,19 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import LoginCard from "@/components/LoginCard";
-import { Play } from "lucide-react";
+import { Play, Loader2, AlertCircle } from "lucide-react";
+import { apiCall } from "@/services/api";
 
-const videoUrl = "https://player.cloudinary.com/embed/?cloud_name=dlpmrdcqp&public_id=videoplayback_xt7in8";
+const videoUrlFallback = "https://player.cloudinary.com/embed/?cloud_name=dlpmrdcqp&public_id=videoplayback_xt7in8";
 
 const Institution = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [collegeData, setCollegeData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
@@ -17,6 +21,36 @@ const Institution = () => {
       navigate("/dashboard", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchCollegeData = async () => {
+      try {
+        setLoading(true);
+        console.log(`🔍 Fetching data for institution: ${id}`);
+        const response = await apiCall(`/colleges/name/${encodeURIComponent(id)}`);
+        
+        if (response && response.success) {
+          console.log("✅ Institution data fetched:", response.data);
+          setCollegeData(response.data);
+        } else {
+          console.warn("⚠️ Institution fetch returned success:false", response);
+          setError("Institution details not found");
+        }
+      } catch (err) {
+        console.error("❌ Error fetching college data:", err);
+        setError(`Failed to load: ${err.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchCollegeData();
+    }
+  }, [id]);
+
+  const currentVideoUrl = (collegeData && collegeData.chairmanVideo) ? collegeData.chairmanVideo : videoUrlFallback;
+  console.log("📺 Rendering video URL:", currentVideoUrl);
 
   return (
     <div
@@ -42,6 +76,14 @@ const Institution = () => {
 
       <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-10 pb-10 relative z-10">
         <div className="w-full max-w-6xl mx-auto">
+
+          {/* ERROR ALERT */}
+          {error && (
+            <div className="lg:col-span-2 mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <p className="text-sm font-medium">{error}</p>
+            </div>
+          )}
 
           {/* Two-column grid */}
           <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-8 lg:gap-14 items-center">
@@ -86,13 +128,19 @@ const Institution = () => {
 
                   {/* Video embed — inset inside the navy frame */}
                   <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                    <iframe
-                      src={videoUrl}
-                      className="absolute inset-0 w-full h-full border-0"
-                      allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                      allowFullScreen
-                      title="Founder's Message"
-                    />
+                    {loading ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50">
+                        <Loader2 className="w-8 h-8 text-white animate-spin" />
+                      </div>
+                    ) : (
+                      <iframe
+                        src={currentVideoUrl}
+                        className="absolute inset-0 w-full h-full border-0"
+                        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                        allowFullScreen
+                        title="Founder's Message"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#00152e]/60 via-transparent to-transparent pointer-events-none" />
                   </div>
                 </div>

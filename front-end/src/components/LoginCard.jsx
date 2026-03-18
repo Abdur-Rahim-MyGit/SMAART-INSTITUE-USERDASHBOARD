@@ -138,15 +138,23 @@ const LoginCard = () => {
     }
   };
 
-  const handleInstitutionSelected = () => {
-    const storedInstitution = sessionStorage.getItem("selectedInstitution");
-    if (storedInstitution) {
-      try {
-        const institution = JSON.parse(storedInstitution);
-        setSelectedInstitution(institution);
-        setShowInstitutionSelector(false);
-      } catch (error) {
-        console.error("Error parsing stored institution:", error);
+  const handleInstitutionSelected = (institution) => {
+    // If institution is passed (from InstitutionSelector), use it. 
+    // Otherwise fallback to sessionStorage (legacy/initial load)
+    const targetInstitution = institution || (
+      sessionStorage.getItem("selectedInstitution") ? 
+      JSON.parse(sessionStorage.getItem("selectedInstitution")) : 
+      null
+    );
+
+    if (targetInstitution) {
+      setSelectedInstitution(targetInstitution);
+      setShowInstitutionSelector(false);
+
+      // CRITICAL FIX: If we are on an institution-specific page, 
+      // sync the URL so the parent component (like Institution.jsx) updates its video/data
+      if (window.location.pathname.includes('/institution/')) {
+        navigate(`/institution/${encodeURIComponent(targetInstitution.name)}`, { replace: true });
       }
     }
   };
