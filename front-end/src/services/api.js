@@ -204,12 +204,20 @@ export const apiCall = async (endpoint, options = {}) => {
 
     // FIX #14: Only probe fallback ports in development mode
     const isDev = import.meta.env.DEV;
-    if (isNetworkError && !workingBaseUrl && isDev) {
-      console.warn("⚠️ API connection failed, searching for backend fallbacks (dev mode)...");
+    const is404InDev = isDev && error.status === 404;
+    const isErrorThatTriggersFallback = isNetworkError || is404InDev;
+
+    // If it's a 404 in dev, or a general network error when we don't have a confirmed port
+    if (isErrorThatTriggersFallback && isDev) {
+      // If we already had a confirmed port but now it's giving 404, we might need to search again 
+      // (e.g. backend restarted on a different port)
+      if (workingBaseUrl && !is404InDev) throw error; 
+
+      console.warn("⚠️ API connection failed or route not found, searching for backend fallbacks (dev mode)...");
 
       const fallbacks = [
         API_BASE_URL.replace(":5000", ":5001"),
-        API_BASE_URL.replace(":5000", ":50001")
+        API_BASE_URL.replace(":5000", ":5002")
       ];
 
       for (const fallbackUrl of fallbacks) {

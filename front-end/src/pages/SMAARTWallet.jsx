@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Award, Trophy, BookOpen, Layers, ChevronRight, Download,
-    Shield, Star, CheckCircle2, Clock, FileText, Zap, Brain
+    Shield, Star, CheckCircle2, Clock, FileText, Zap, Brain,
+    Upload, Link as LinkIcon, QrCode, Calendar, X
 } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
@@ -12,6 +13,9 @@ import apiCall, { coursesAPI } from "@/services/api";
 import { assessmentApi } from "@/services/assessmentApi";
 import BadgeGallery from "@/components/badges/BadgeGallery";
 import CertificateVerification from "@/components/landing/CertificateVerification";
+import UserCertificateUploadModal from "@/components/wallet/UserCertificateUploadModal";
+import { userCertificateApi } from "@/services/userCertificateApi";
+import { toast } from "sonner";
 
 /* ══════════════════════════════════════
    SMAART Wallet – Your Professional Vault
@@ -31,17 +35,23 @@ const SMAARTWallet = () => {
     const [activeTab, setActiveTab] = useState("overview");
     const [courses, setCourses] = useState([]);
     const [stageStatus, setStageStatus] = useState({});
+    const [userCertificates, setUserCertificates] = useState([]);
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [loading, setLoading] = useState(true);
 
     /* ── Data fetch ── */
     useEffect(() => {
         const fetchAll = async () => {
             try {
-                const [courseRes] = await Promise.allSettled([
+                const [courseRes, userCertRes] = await Promise.allSettled([
                     coursesAPI.getAll(),
+                    userCertificateApi.getAll()
                 ]);
                 if (courseRes.status === "fulfilled" && courseRes.value?.courses) {
                     setCourses(courseRes.value.courses);
+                }
+                if (userCertRes.status === "fulfilled" && userCertRes.value?.success) {
+                    setUserCertificates(userCertRes.value.data);
                 }
 
                 // Assessment status
@@ -62,6 +72,18 @@ const SMAARTWallet = () => {
         };
         fetchAll();
     }, []);
+
+    const handleDeleteUserCert = async (id) => {
+        try {
+            const res = await userCertificateApi.delete(id);
+            if (res.success) {
+                setUserCertificates(prev => prev.filter(c => c._id !== id));
+                toast.success("Certificate removed from vault");
+            }
+        } catch (err) {
+            toast.error("Failed to delete certificate");
+        }
+    };
 
     /* ── Derived stats ── */
     const badges = user?.badges || [];
@@ -256,6 +278,102 @@ const SMAARTWallet = () => {
                                             </div>
                                         </div>
 
+                                        {/* User Uploaded Certificates */}
+                                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                                            <div className="flex items-center justify-between mb-6">
+                                                <div className="flex items-center gap-3">
+                                                    <Shield className="w-6 h-6 text-blue-600" />
+                                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Your Uploaded Credentials</h3>
+                                                </div>
+                                                <button
+                                                    onClick={() => setIsUploadModalOpen(true)}
+                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+                                                >
+                                                    <Upload className="w-4 h-4" /> Upload Certificate
+                                                </button>
+                                            </div>
+
+                                            {userCertificates.length > 0 ? (
+                                                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                    {userCertificates.map((cert, i) => (
+                                                        <motion.div
+                                                            key={cert._id}
+                                                            initial={{ opacity: 0, scale: 0.95 }}
+                                                            animate={{ opacity: 1, scale: 1 }}
+                                                            transition={{ delay: i * 0.05 }}
+                                                            className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 relative group"
+                                                        >
+                                                            <div className="flex items-start gap-4 mb-4">
+                                                                <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                                                                    <FileText className="w-6 h-6" />
+                                                                </div>
+                                                                <div className="min-w-0 flex-1">
+                                                                    <h4 className="text-sm font-bold text-slate-800 dark:text-white leading-tight mb-1 truncate">
+                                                                        {cert.title}
+                                                                    </h4>
+                                                                    <p className="text-[11px] text-slate-400 font-medium truncate">{cert.issuer}</p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="space-y-2 mb-4">
+                                                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                                                    <Calendar className="w-3 h-3 text-slate-400" />
+                                                                    Issued: {new Date(cert.issueDate).toLocaleDateString()}
+                                                                </div>
+                                                                {cert.verificationUrl && (
+                                                                    <a 
+                                                                        href={cert.verificationUrl} 
+                                                                        target="_blank" 
+                                                                        rel="noopener noreferrer"
+                                                                        className="flex items-center gap-2 text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wider"
+                                                                    >
+                                                                        <LinkIcon className="w-3 h-3" />
+                                                                        Verify Credential
+                                                                    </a>
+                                                                )}
+                                                                {cert.qrCodeIdentifier && (
+                                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                                                        <QrCode className="w-3 h-3" />
+                                                                        ID: {cert.qrCodeIdentifier}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="flex items-center gap-2">
+                                                                <a 
+                                                                    href={cert.certificateUrl} 
+                                                                    target="_blank" 
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+                                                                >
+                                                                    <Download className="w-3.5 h-3.5" /> View File
+                                                                </a>
+                                                                <button 
+                                                                    onClick={() => handleDeleteUserCert(cert._id)}
+                                                                    className="p-2 rounded-lg border border-red-100 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
+                                                                >
+                                                                    <X className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        </motion.div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="text-center py-10 border-2 border-dashed border-slate-100 dark:border-slate-700/50 rounded-2xl">
+                                                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3">
+                                                        <Award className="w-6 h-6 text-slate-300 dark:text-slate-600" />
+                                                    </div>
+                                                    <p className="text-sm font-medium text-slate-400">No external certificates uploaded yet.</p>
+                                                    <button
+                                                        onClick={() => setIsUploadModalOpen(true)}
+                                                        className="mt-4 text-xs font-bold text-blue-600 hover:underline"
+                                                    >
+                                                        Add your first credential
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+
                                         {/* Verification Section */}
                                         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
                                             <div className="p-6 border-b border-slate-100 dark:border-slate-700">
@@ -393,6 +511,12 @@ const SMAARTWallet = () => {
                     </div>
                 </main>
             </div>
+
+            <UserCertificateUploadModal 
+                isOpen={isUploadModalOpen} 
+                onClose={() => setIsUploadModalOpen(false)}
+                onUploadSuccess={(newCert) => setUserCertificates(prev => [newCert, ...prev])}
+            />
         </div>
     );
 };

@@ -139,6 +139,7 @@ app.use('/api/groups', require('./routes/groups'));
 app.use('/api/moderation', require('./routes/moderationQueue'));
 app.use('/api/moderation/actions', require('./routes/moderation'));
 app.use('/api/ppi', require('./routes/ppiRoutes'));
+app.use('/api/user-certificates', require('./routes/userCertificates'));
 
 // Avatar System Routes (3D Level-Based Unlock System)
 app.use('/api/avatar', require('./routes/avatar'));
