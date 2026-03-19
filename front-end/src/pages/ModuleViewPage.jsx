@@ -702,25 +702,45 @@ const ModuleViewPage = () => {
         flexDirection: 'column',
       }}>
         <div style={{ padding: '0 30px', marginBottom: '40px' }}>
-          <button 
-            onClick={handleBackToRoadmap}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              fontFamily: "'Inter', sans-serif",
-              fontSize: '12px',
-              fontStyle: 'italic',
-              color: '#666',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: 0,
-              marginBottom: '20px'
-            }}
-          >
-            ← Back to Roadmap
-          </button>
+            <button 
+              onClick={navigateToCourses}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                fontFamily: "'Inter', sans-serif",
+                fontSize: '12px',
+                fontWeight: '600',
+                color: navyBlue,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: 0,
+                marginBottom: '8px',
+                opacity: 0.8
+              }}
+            >
+              <ArrowLeft size={14} /> Back to My Courses
+            </button>
+            <button 
+              onClick={handleBackToRoadmap}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                fontFamily: "'Inter', sans-serif",
+                fontSize: '11px',
+                fontStyle: 'italic',
+                color: '#666',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: 0,
+                marginBottom: '20px'
+              }}
+            >
+              ← Back to Roadmap
+            </button>
           <h2 style={{
             fontSize: isMobile ? '20px' : '24px',
             fontWeight: '700',

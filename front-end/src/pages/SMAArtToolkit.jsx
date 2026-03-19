@@ -126,10 +126,10 @@ const SMAArtToolkit = () => {
     <div className="h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 overflow-hidden">
       <DashboardSidebar />
 
-      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 transition-all duration-300">
         <DashboardHeader />
 
-        <main className="flex-1 overflow-y-auto px-4 py-8 md:px-8">
+        <main className="flex-1 overflow-y-auto min-h-0 px-4 py-8 md:px-8">
           <div className="max-w-7xl mx-auto pb-12">
             
             {/* Toolbar - Compact description only */}
