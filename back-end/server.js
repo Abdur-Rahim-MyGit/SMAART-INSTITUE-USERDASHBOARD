@@ -32,11 +32,12 @@ app.use((req, res, next) => {
 
 // Security: Set standard HTTP headers
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow resource loading (e.g., images) across origins if needed
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false, // ✅ disable CSP for dev/ngrok
 }));
 
-app.use(cookieParser()); // Parse cookies
-app.use(require('./middleware/deviceFingerprint')); // Capture device info
+app.use(cookieParser());
+app.use(require('./middleware/deviceFingerprint'));
 
 // HTTP Request Logging
 if (process.env.NODE_ENV === 'development') {
@@ -48,10 +49,10 @@ if (process.env.NODE_ENV === 'development') {
 // Trust proxy for rate limiting (needed for IPv6/proxy setups)
 app.set('trust proxy', 1);
 
-// Middleware - Allow CORS from any origin for development (mobile access)
+// Middleware - CORS
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, etc)
+    // Allow requests with no origin (mobile apps, curl, etc)
     if (!origin) return callback(null, true);
 
     const isProduction = process.env.NODE_ENV === 'production';
@@ -65,25 +66,26 @@ app.use(cors({
       return callback(new Error('Not allowed by CORS'));
     }
 
-    // Development: Allow Localhost & Local Network IPs (Mobile Testing)
+    // Development: Allow Localhost, Local Network IPs & ngrok
     const allowedDevPatterns = [
       /^http:\/\/localhost(:\d+)?$/,
       /^http:\/\/127\.0\.0\.1(:\d+)?$/,
-      /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/,  // Local network IPs
-      /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/,   // Private network IPs
+      /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/,   // Local network IPs
+      /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/,    // Private network IPs
       /^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d+\.\d+(:\d+)?$/, // Private network IPs
+      /^https:\/\/.*\.ngrok-free\.app$/,          // ✅ ngrok free tier
+      /^https:\/\/.*\.ngrok\.io$/,                // ✅ ngrok legacy
     ];
 
     if (allowedDevPatterns.some(pattern => pattern.test(origin))) {
       return callback(null, true);
     }
 
-    // Block unknown origins in Dev too (to be cleaner, or allow all?)
-    // User complaint was "server talks to any IP". So we restrict to local networks.
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
+
 // Increase payload size limit for base64 images (50MB)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -102,7 +104,9 @@ mongoose.connect(mongoURI, {
     process.exit(1);
   });
 
-// Existing Routes
+// ─── Routes ───────────────────────────────────────────────────────────────────
+
+// Auth & Users
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/colleges', require('./routes/colleges'));
@@ -118,9 +122,8 @@ app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/courseEnrollments', require('./routes/courseEnrollments'));
 app.use('/api/questionBanks', require('./routes/questionBanks'));
 
-
 // People Management Routes
-app.use('/api/certificates', require('./routes/certificates')); // Certificate verification system
+app.use('/api/certificates', require('./routes/certificates'));
 app.use('/api/students', require('./routes/students'));
 app.use('/api/teachers', require('./routes/teachers'));
 
@@ -130,8 +133,8 @@ app.use('/api/coachSessions', require('./routes/coachSessions'));
 
 // Support Routes
 app.use('/api/escalations', require('./routes/escalations'));
-app.use('/api/tickets', require('./routes/tickets')); // Support Ticketing System
-app.use('/api/chatbot', require('./routes/chatbot')); // AI Chatbot Support
+app.use('/api/tickets', require('./routes/tickets'));
+app.use('/api/chatbot', require('./routes/chatbot'));
 
 // Community Routes
 app.use('/api/community', require('./routes/community'));
@@ -140,32 +143,27 @@ app.use('/api/moderation', require('./routes/moderationQueue'));
 app.use('/api/moderation/actions', require('./routes/moderation'));
 app.use('/api/ppi', require('./routes/ppiRoutes'));
 
-// Avatar System Routes (3D Level-Based Unlock System)
+// Avatar System Routes
 app.use('/api/avatar', require('./routes/avatar'));
 
-// AI Career Coach Routes - Inline to avoid module loading issues
+// AI Career Coach Routes
 const aiCareerCoachController = require('./controllers/aiCareerCoachController');
 const { protect: authMiddleware } = require('./middleware/auth');
 
-// Profile Management
 app.get('/api/ai-career-coach/profile', authMiddleware, aiCareerCoachController.getProfile);
 app.put('/api/ai-career-coach/profile', authMiddleware, aiCareerCoachController.updateProfile);
 app.post('/api/ai-career-coach/profile/analyze', authMiddleware, aiCareerCoachController.analyzeProfile);
-
-// Career Features
 app.get('/api/ai-career-coach/recommendations', authMiddleware, aiCareerCoachController.getCareerRecommendations);
 app.post('/api/ai-career-coach/skill-gap', authMiddleware, aiCareerCoachController.analyzeSkillGap);
 app.post('/api/ai-career-coach/learning-plan', authMiddleware, aiCareerCoachController.generateLearningPlan);
 app.post('/api/ai-career-coach/resume', authMiddleware, aiCareerCoachController.generateResume);
-
-// Chat Features
 app.post('/api/ai-career-coach/chat', authMiddleware, aiCareerCoachController.chat);
 app.get('/api/ai-career-coach/chat/sessions', authMiddleware, aiCareerCoachController.getChatSessions);
 app.get('/api/ai-career-coach/chat/:sessionId', authMiddleware, aiCareerCoachController.getChatHistory);
 
 logger.info('✅ AI Career Coach Routes Loaded (Inline)');
 
-// Career Intelligence Routes (Career Data Fetcher)
+// Career Intelligence Routes
 const careerIntelligenceController = require('./controllers/careerIntelligenceController');
 app.post('/api/career-intelligence/generate', authMiddleware, careerIntelligenceController.generateCareerReport);
 app.get('/api/career-intelligence/reports', authMiddleware, careerIntelligenceController.getReports);
@@ -175,7 +173,7 @@ app.get('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligen
 app.delete('/api/career-intelligence/reports/:id', authMiddleware, careerIntelligenceController.deleteReport);
 app.post('/api/career-intelligence/refresh-cache', authMiddleware, careerIntelligenceController.refreshExcelCache);
 
-// Career Simulation Engine Routes (isolated, no AI cost)
+// Career Simulation Engine Routes
 const careerSimulationController = require('./controllers/careerSimulationController');
 app.post('/api/career-intelligence/simulate', authMiddleware, careerSimulationController.runSimulation);
 app.get('/api/career-intelligence/simulate/batches', authMiddleware, careerSimulationController.getSimulationBatches);
@@ -190,38 +188,44 @@ app.get('/api/health', (req, res) => {
 
 // Vision Boards Routes
 app.use('/api/visionBoards', require('./routes/visionBoards'));
-app.use('/api/vision-boards', require('./routes/visionBoards')); // Alternative route with hyphen
-app.use('/api/vision-board', require('./routes/visionBoardRoutes')); // Basic vision board routes
-app.use('/api/vision-board-pro', require('./routes/visionBoardProRoutes')); // Pro vision board routes
-app.use('/api/user-vision-boards', require('./routes/userVisionBoardRoutes')); // User vision board routes
+app.use('/api/vision-boards', require('./routes/visionBoards'));
+app.use('/api/vision-board', require('./routes/visionBoardRoutes'));
+app.use('/api/vision-board-pro', require('./routes/visionBoardProRoutes'));
+app.use('/api/user-vision-boards', require('./routes/userVisionBoardRoutes'));
 
 // Content Moderation Routes
-app.use('/api/nsfw', require('./routes/nsfwRoutes')); // NSFW image moderation (placeholder for API)
-app.use('/api/ocr', require('./routes/ocrRoutes')); // OCR text extraction using OCR.space
+app.use('/api/nsfw', require('./routes/nsfwRoutes'));
+app.use('/api/ocr', require('./routes/ocrRoutes'));
 
-// Contact Form Route
+// Misc Routes
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/tasks', require('./routes/tasks'));
-app.use('/api/upload', require('./routes/uploadRoutes')); // New upload route
-app.use('/api/badges', require('./routes/badges')); // Badges & Achievement System
-app.use('/api/notifications', require('./routes/notifications')); // Notification System
+app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/badges', require('./routes/badges'));
+app.use('/api/notifications', require('./routes/notifications'));
 
+// ─── Serve Frontend (Vite build) ──────────────────────────────────────────────
+// ✅ Place this AFTER all API routes
+// ✅ Correct
+app.use(express.static(path.join(__dirname, '../front-end/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../front-end/dist', 'index.html'));
+});
 
-
-// Error Handling Middleware
+// ─── Error Handling ───────────────────────────────────────────────────────────
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
-app.use(notFound); // 404 handler
-app.use(errorHandler); // Global error handler
+app.use(notFound);
+app.use(errorHandler);
 
+// ─── Start Server ─────────────────────────────────────────────────────────────
 const PORT = parseInt(process.env.PORT, 10) || 5000;
 const FALLBACK_PORT = parseInt(process.env.FALLBACK_PORT, 10) || (PORT + 1);
-const HOST = '0.0.0.0'; // Listen on all network interfaces for mobile access
+const HOST = '0.0.0.0';
 
 const startServer = (port) => {
   const server = app.listen(port, HOST, () => {
     console.log('\x1b[36m%s\x1b[0m', `\n🚀 Server running: http://localhost:${port}`);
     console.log('\x1b[32m%s\x1b[0m', `   Mode: ${process.env.NODE_ENV || 'development'}\n`);
-    // logger.info not used here to avoid double formatting if possible, or just use logger.info with new clean format
   });
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
@@ -236,4 +240,3 @@ const startServer = (port) => {
 
 startServer(PORT);
 startCronJobs();
-

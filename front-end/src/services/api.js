@@ -2,13 +2,13 @@
 // Dynamically detect API URL based on current hostname (for mobile/network access)
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
-  // If accessing from localhost, use localhost
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return import.meta.env.VITE_API_URL || "http://localhost:5000/api";
   }
-  // If accessing from network IP, use the same IP for backend
-  return `http://${hostname}:5000/api`;
+  // For ngrok or any external host — use same protocol, no port
+  return `${window.location.protocol}//${hostname}/api`;
 };
+
 
 let API_BASE_URL = getApiBaseUrl();
 let workingBaseUrl = sessionStorage.getItem("workingApiPort"); // Cache for the discovered working port
@@ -19,7 +19,7 @@ export const getBackendUrl = () => {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return "http://localhost:5000";
   }
-  return `http://${hostname}:5000`;
+  return `${window.location.protocol}//${hostname}`;
 };
 
 export { API_BASE_URL };

@@ -311,3 +311,32 @@
 {"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-18 11:37:42"}
 {"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-18 11:37:43"}
 {"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-18 11:37:44"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-18 23:42:23"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-18 23:42:24"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-18 23:42:24"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 11:33:07"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 11:33:07"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 11:33:07"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 11:34:45"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 11:34:45"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 11:34:45"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 17:45:29"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 17:45:30"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 17:45:31"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 17:54:42"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 17:54:42"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 17:54:44"}
+{"level":"warn","message":"ENOENT: no such file or directory, stat 'C:\\Users\\naifb\\OneDrive\\Desktop\\SMAART INSTITUTE\\16-03-2026\\SMAART-INSTITUE-USERDASHBOARD\\frontend\\dist\\index.html'","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-03-19 17:55:24","url":"/"}
+{"level":"warn","message":"ENOENT: no such file or directory, stat 'C:\\Users\\naifb\\OneDrive\\Desktop\\SMAART INSTITUTE\\16-03-2026\\SMAART-INSTITUE-USERDASHBOARD\\frontend\\dist\\index.html'","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-03-19 17:55:25","url":"/favicon.ico"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 17:59:46"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 17:59:47"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 17:59:49"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 18:00:00"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 18:00:00"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 18:00:08"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 18:06:50"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 18:06:50"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 18:06:53"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 18:21:47"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 18:21:47"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 18:21:49"}
