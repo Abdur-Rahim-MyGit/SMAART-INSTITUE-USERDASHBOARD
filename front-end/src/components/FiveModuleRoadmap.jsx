@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { ClipboardList, Lock, CheckCircle2 } from "lucide-react";
+import { ClipboardList, Lock, CheckCircle2, ArrowLeft } from "lucide-react";
 import FloatingDictionary from "@/components/FloatingDictionary";
 import blueLogo from "@/assets/blue.png";
 import { Link } from "react-router-dom";
@@ -135,9 +135,28 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       overflow: 'hidden'
     }}>
       <div style={{ position: 'absolute', top: '40px', left: '60px', zIndex: 200, pointerEvents: 'none' }}>
-        <Link to="/" style={{ pointerEvents: 'auto', display: 'inline-block' }}>
-          <img src={blueLogo} alt="SMAART Institute Logo" style={{ height: '55px', marginBottom: '8px' }} />
-        </Link>
+        <div className="flex flex-col gap-4 mb-4">
+          <Link 
+            to="/dashboard/courses" 
+            style={{ 
+              pointerEvents: 'auto', 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px',
+              color: navyBlue,
+              fontSize: '14px',
+              fontWeight: '600',
+              textDecoration: 'none',
+              opacity: 0.8,
+              transition: 'opacity 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
+          >
+            <ArrowLeft size={16} />
+            Back to My Courses
+          </Link>
+        </div>
         <h1 style={{ 
           color: navyBlue, 
           fontSize: '38px', 
