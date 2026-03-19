@@ -353,3 +353,6 @@
 {"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-18 14:54:28"}
 {"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-03-18 14:54:28"}
 {"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-18 14:54:29"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-03-19 13:52:53"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-03-19 13:52:53"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-03-19 13:52:53"}
