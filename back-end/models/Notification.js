@@ -19,6 +19,8 @@ const notificationSchema = new mongoose.Schema({
       'support',         // Ticket response
       'task',            // Task due/overdue
       'certificate',     // Certificate issued
+      'warning',         // Moderator warning
+      'suspension',      // Account suspension
       'system'           // System announcements, maintenance
     ],
     required: true,

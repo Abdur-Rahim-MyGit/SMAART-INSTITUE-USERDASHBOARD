@@ -35,6 +35,32 @@ router.get('/queue', async (req, res) => {
       CommunityPost.countDocuments(query)
     ]);
 
+    // Hydrate author info (name + suspension status)
+    const User = require('../models/User');
+    const Student = require('../models/Student');
+    const Teacher = require('../models/Teacher');
+    const Registration = require('../models/Registration');
+
+    const authorIds = [...new Set(items.map(i => i.author?.toString()).filter(Boolean))];
+    const authorMap = new Map();
+
+    if (authorIds.length > 0) {
+      const [users, students, teachers, regs] = await Promise.all([
+        User.find({ _id: { $in: authorIds } }).select('fullName email status suspendedUntil').lean(),
+        Student.find({ _id: { $in: authorIds } }).select('fullName email status suspendedUntil').lean(),
+        Teacher.find({ _id: { $in: authorIds } }).select('fullName email status suspendedUntil').lean(),
+        Registration.find({ _id: { $in: authorIds } }).select('fullName email status suspendedUntil').lean(),
+      ]);
+      [...users, ...students, ...teachers, ...regs].forEach(a => authorMap.set(a._id.toString(), a));
+    }
+
+    items.forEach(item => {
+      const id = item.author?.toString();
+      if (id && authorMap.has(id)) {
+        item.author = authorMap.get(id);
+      }
+    });
+
     res.json({
       success: true,
       data: items,
