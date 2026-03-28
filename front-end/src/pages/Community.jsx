@@ -1403,7 +1403,7 @@ const Community = () => {
                     <p className="text-gray-500 text-sm text-center py-4">No groups available</p>
                   ) : (
                     <div className="space-y-4">
-                      {visibleDiscussions.map((discussion) => {
+                      {featuredGroups.map((group) => {
                         const IconComponent = iconMap[group.icon] || Users;
                         return (
                           <div

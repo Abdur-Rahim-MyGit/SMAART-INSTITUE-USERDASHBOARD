@@ -11,6 +11,8 @@ const NOTIFICATION_CONFIG = {
   support: { icon: 'headphones', color: '#6366F1' },
   task: { icon: 'check-circle', color: '#EF4444' },
   certificate: { icon: 'award', color: '#8B5CF6' },
+  warning: { icon: 'alert-triangle', color: '#F97316' },
+  suspension: { icon: 'shield-off', color: '#DC2626' },
   system: { icon: 'bell', color: '#64748B' }
 };
 
@@ -384,6 +386,45 @@ const notifyNewCourse = async (userIds, course) => {
   return Notification.insertMany(notifications);
 };
 
+/**
+ * Notify user about a moderator warning
+ */
+const notifyModerationWarning = async (userId, reason) => {
+  return createNotification({
+    userId,
+    type: 'warning',
+    title: '⚠️ Community Warning',
+    message: `A moderator has issued a warning on your account. Reason: ${reason || 'Policy violation'}`,
+    link: '/community',
+    icon: 'alert-triangle',
+    color: '#F97316',
+    metadata: {
+      action: 'warn',
+      reason
+    }
+  });
+};
+
+/**
+ * Notify user about account suspension
+ */
+const notifyModerationSuspension = async (userId, reason, durationDays) => {
+  return createNotification({
+    userId,
+    type: 'suspension',
+    title: '🚫 Account Posting Suspended',
+    message: `Your posting privileges have been suspended. Reason: ${reason || 'Policy violation'}. Duration: ${durationDays} days.`,
+    link: '/community',
+    icon: 'shield-off',
+    color: '#DC2626',
+    metadata: {
+      action: 'suspend',
+      reason,
+      durationDays
+    }
+  });
+};
+
 module.exports = {
   createNotification,
   notifyBadgeEarned,
@@ -402,5 +443,7 @@ module.exports = {
   notifyTaskDue,
   notifySystemAnnouncement,
   notifyWelcome,
-  notifyNewCourse
+  notifyNewCourse,
+  notifyModerationWarning,
+  notifyModerationSuspension
 };

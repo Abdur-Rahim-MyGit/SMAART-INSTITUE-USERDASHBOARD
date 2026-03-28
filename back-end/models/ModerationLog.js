@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const moderationLogSchema = new mongoose.Schema({
   action: {
     type: String,
-    enum: ['warn', 'suspend', 'delete_post', 'escalate', 'dismissed'],
+    enum: ['warn', 'suspend', 'unsuspend', 'delete_post', 'escalate', 'dismissed'],
     required: true
   },
   actorId: {
