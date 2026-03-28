@@ -33,9 +33,23 @@ const LEET_REPLACEMENTS = {
 };
 
 /**
- * Normalize text by removing leet speak and special characters
+ * Normalize text by replacing leet speak, but keep spaces for word boundary checks
  */
-const normalizeText = (text) => {
+const normalizeTextWithSpaces = (text) => {
+  if (!text) return "";
+  let normalized = text.toLowerCase();
+  for (const [leet, normal] of Object.entries(LEET_REPLACEMENTS)) {
+    normalized = normalized.split(leet).join(normal);
+  }
+  // Remove special characters but KEEP spaces
+  normalized = normalized.replace(/[^\w\s]/g, "");
+  return normalized;
+};
+
+/**
+ * Aggressive normalization for substring checks (squashes everything)
+ */
+const normalizeTextAggressive = (text) => {
   if (!text) return "";
   let normalized = text.toLowerCase();
   for (const [leet, normal] of Object.entries(LEET_REPLACEMENTS)) {
@@ -57,7 +71,8 @@ export const moderateText = (text, exactMatch = true) => {
     return { isClean: true, flaggedWords: [] };
   }
 
-  const normalizedText = normalizeText(text);
+  const normalizedWithSpaces = normalizeTextWithSpaces(text);
+  const normalizedAggressive = normalizeTextAggressive(text);
   const originalLower = text.toLowerCase();
   const flaggedWords = [];
 
@@ -65,19 +80,13 @@ export const moderateText = (text, exactMatch = true) => {
     if (exactMatch) {
       // Use regex with word boundaries to avoid false positives (like "ass" in "assessment")
       const regex = new RegExp(`\\b${bannedWord}\\b`, "i");
-      if (regex.test(text) || regex.test(originalLower)) {
-        flaggedWords.push(bannedWord);
-        continue;
-      }
-
-      // Also check normalized without special chars, but this is trickier for word boundaries
-      // so we just do a simple check for common short ones or use the same regex on normalized
-      if (regex.test(normalizedText)) {
+      
+      if (regex.test(text) || regex.test(originalLower) || regex.test(normalizedWithSpaces)) {
         flaggedWords.push(bannedWord);
       }
     } else {
-      // Check normalized text (catches leet speak and substrings)
-      if (normalizedText.includes(bannedWord)) {
+      // Check aggressive normalized text (catches leet speak and substrings, useful for OCR)
+      if (normalizedAggressive.includes(bannedWord)) {
         flaggedWords.push(bannedWord);
         continue;
       }
@@ -205,12 +214,14 @@ export const moderateTextOverlaysAsync = async (textOverlays) => {
 export const censorText = (text) => {
   if (!text || typeof text !== "string") return text;
   let censoredText = text;
-  const lowerText = text.toLowerCase();
+  
   for (const bannedWord of BANNED_WORDS) {
-    const index = lowerText.indexOf(bannedWord);
-    if (index !== -1) {
+    // Only censor exact word matches to avoid the "Scunthorpe problem"
+    const regex = new RegExp(`\\b${bannedWord}\\b`, "gi");
+    if (regex.test(censoredText)) {
       const asterisks = "*".repeat(bannedWord.length);
-      const regex = new RegExp(bannedWord, "gi");
+      // Reset lastIndex because test() modifies it for global regexes
+      regex.lastIndex = 0; 
       censoredText = censoredText.replace(regex, asterisks);
     }
   }

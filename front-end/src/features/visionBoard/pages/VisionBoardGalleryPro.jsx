@@ -100,10 +100,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeac
           </div>
         </div>
 
-        {/* Template Badge */}
-        <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md border border-white/20 px-2.5 py-1 rounded-lg text-[10px] font-medium text-white shadow-sm">
-          {template.name}
-        </div>
+
 
         {/* Menu Button */}
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
@@ -125,16 +122,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeac
                   onClick={() => setShowMenu(false)}
                 />
                 <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-1 z-30 overflow-hidden">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDuplicate(board);
-                      setShowMenu(false);
-                    }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-700"
-                  >
-                    <Copy className="w-3.5 h-3.5" /> Duplicate
-                  </button>
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -349,13 +337,20 @@ const ViewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange }) 
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-[#002147] truncate pr-4">
-              {board.title}
-            </h2>
+          <div className="flex items-start justify-between px-4 py-3 border-b border-gray-200">
+            <div className="flex flex-col pr-4">
+              <h2 className="text-lg font-semibold text-[#002147] break-words">
+                {board.title}
+              </h2>
+              {board.description && (
+                <p className="text-sm text-gray-500 mt-1 max-w-xl break-words">
+                  {board.description}
+                </p>
+              )}
+            </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>

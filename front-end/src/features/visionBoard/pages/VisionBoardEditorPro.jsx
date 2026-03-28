@@ -127,8 +127,8 @@ const VisionBoardEditorPro = () => {
 
           if (!nsfwResult.isSafe) {
             toast({
-              title: "Background Image Blocked",
-              description: nsfwResult.reason || "This image contains inappropriate content.",
+              title: "Explicit Content",
+              description: nsfwResult.reason || "Explicit content detected.",
               variant: "destructive",
             });
             return;
@@ -193,14 +193,14 @@ const VisionBoardEditorPro = () => {
 
       if (!nsfwResult.isSafe) {
         toast({
-          title: "Image Blocked",
-          description: nsfwResult.reason || "This image contains inappropriate content.",
+          title: "Explicit Content",
+          description: nsfwResult.reason || "Explicit content detected.",
           variant: "destructive",
         });
         return;
       }
 
-      // Image is safe, add it to the slot
+      // Add image to the slot
       setImages((prev) => ({
         ...prev,
         [slotId]: {
@@ -264,8 +264,8 @@ const VisionBoardEditorPro = () => {
             const nsfwResult = await checkBase64ImageNSFW(imageData);
             if (!nsfwResult.isSafe) {
                  toast({
-                    title: "Image Blocked",
-                    description: nsfwResult.reason,
+                    title: "Explicit Content",
+                    description: nsfwResult.reason || "Explicit content detected.",
                     variant: "destructive",
                 });
                 return;

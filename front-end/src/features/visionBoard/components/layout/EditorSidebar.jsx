@@ -12,7 +12,7 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
     { id: "templates", icon: LayoutTemplate, label: "Design" },
     { id: "text", icon: Type, label: "Text" },
     { id: "style", icon: Palette, label: "Style" },
-    { id: "settings", icon: Settings2, label: "Settings" },
+    { id: "settings", icon: Settings2, label: "Canva Size" },
   ];
 
   return (
@@ -23,20 +23,19 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
           <button
             key={tab.id}
             onClick={() => setActivePanel(activePanel === tab.id ? null : tab.id)}
-            className={`flex flex-col items-center justify-center flex-1 h-full gap-0.5 group relative lg:w-full lg:flex-none lg:h-auto lg:gap-1 lg:py-2 ${
-              isActive ? "text-white" : "text-gray-400 hover:text-white"
-            }`}
+            className={`flex flex-col items-center justify-center flex-1 h-full gap-0.5 group relative lg:w-full lg:flex-none lg:h-auto lg:gap-1 lg:py-2 ${isActive ? "text-white" : "text-gray-400 hover:text-white"
+              }`}
           >
             {/* Active Indication Bar - Top on mobile, Left on desktop */}
             {isActive && (
-                <>
+              <>
                 <div className="absolute top-0 left-2 right-2 h-0.5 bg-teal-400 rounded-b lg:hidden"></div>
                 <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-1 bg-teal-400 rounded-r"></div>
-                </>
+              </>
             )}
-            
+
             <div className={`p-1.5 rounded-lg transition-all ${isActive ? "bg-white/10" : "lg:group-hover:bg-white/5"}`}>
-                <tab.icon className="w-5 h-5 lg:w-6 lg:h-6" strokeWidth={1.5} />
+              <tab.icon className="w-5 h-5 lg:w-6 lg:h-6" strokeWidth={1.5} />
             </div>
             <span className="text-[9px] lg:text-[10px] font-medium tracking-wide">{tab.label}</span>
           </button>
