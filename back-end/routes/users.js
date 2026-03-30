@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
 const Student = require('../models/Student');
+const College = require('../models/College');
 const upload = require('../middleware/upload');
 
 const router = express.Router();
@@ -600,16 +601,21 @@ router.get('/register-details/:email', async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
 
     // First try to find in User collection
-    let user = await User.findOne({ email: normalizedEmail });
+    let user = await User.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName');
     let userSource = 'User';
+    let fallbackCollege = null;
 
-    // If not found in User, try Student collection
-    if (!user) {
-      const student = await Student.findOne({ email: normalizedEmail });
+    // Even if User is found, if college is missing, check Student collection
+    if (!user || !user.college) {
+      const student = await Student.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName');
       if (student) {
-        user = student;
-        userSource = 'Student';
-        console.log(`[register-details] Found student: ${student.fullName}`);
+        if (user) {
+          fallbackCollege = student.college;
+        } else {
+          user = student;
+          userSource = 'Student';
+          console.log(`[register-details] Found student: ${student.fullName}`);
+        }
       }
     }
 
@@ -676,13 +682,17 @@ router.get('/register-details/:email', async (req, res) => {
         ...registration.toObject(),
         fullName: registration.fullName || user.fullName,
         gender: registration.gender || user.gender,
-        badges: aggregatedBadges
+        badges: aggregatedBadges,
+        college: user?.college || fallbackCollege || null
       });
     }
 
     // Return user data without registration — include all available fields
     console.log(`[register-details] Returning ${userSource} data for ${normalizedEmail}: ${user.fullName}`);
     const userObj = user.toObject ? user.toObject() : user;
+    if (fallbackCollege && !userObj.college) {
+      userObj.college = fallbackCollege;
+    }
     res.json({
       ...userObj,
       badges: aggregatedBadges,
