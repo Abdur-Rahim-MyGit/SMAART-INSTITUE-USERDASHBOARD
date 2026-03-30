@@ -443,16 +443,36 @@ const DashboardSidebar = () => {
           >
             {/* Mobile Header */}
             <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
-              <Link to="/" className="flex items-center gap-2" onClick={() => setIsMobileOpen(false)}>
-                <img
-                  src={theme === 'dark' ? whiteLogo : blueLogo}
-                  alt="SMAART Institute"
-                  className="h-9 w-auto object-contain"
-                />
-                <span className="font-bold text-lg text-slate-900 dark:text-white">
-                  SMAART<span className="text-[#1a3884]"> Institute</span>
-                </span>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link to="/" className="flex items-center group" onClick={() => setIsMobileOpen(false)}>
+                  <div className="h-8 w-auto flex items-center justify-center transition-all duration-300">
+                    <img
+                      src={theme === 'dark' ? whiteLogo : blueLogo}
+                      alt="SMAART Institute"
+                      className="h-7 w-auto object-contain"
+                    />
+                  </div>
+                </Link>
+
+                {user?.college?.logo && (
+                  <div className="flex items-center gap-2 ml-1">
+                    <div className="h-5 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1" />
+                    <div className="h-8 w-auto flex items-center justify-center transition-all duration-300">
+                      <img
+                        src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
+                        alt={user.college.collegeName || "College Logo"}
+                        className="h-7 w-auto object-contain"
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                {!user?.college?.logo && (
+                  <span className="font-bold text-base text-slate-900 dark:text-white ml-1">
+                    SMAART<span className="text-[#1a3884]"> Institute</span>
+                  </span>
+                )}
+              </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
                 className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
