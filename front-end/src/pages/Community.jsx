@@ -281,7 +281,7 @@ const Community = () => {
           result = await communityAPI.getBookmarkedDiscussions(userId, params);
           break;
         default:
-            result = await communityAPI.getDiscussions(params);
+          result = await communityAPI.getDiscussions(params);
       }
 
       if (result.success) {
@@ -697,7 +697,6 @@ const Community = () => {
 
           <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
 
-
             {/* Search Bar */}
             <div className="mb-8">
               <div className="relative max-w-2xl mx-auto">
@@ -731,11 +730,10 @@ const Community = () => {
                   <button
                     key={chan.key}
                     onClick={() => handleChannelSwitch(chan.key)}
-                    className={`px-4 py-3 rounded-xl text-sm font-bold flex flex-col leading-tight transition-all ${
-                      channelType === chan.key
-                        ? "bg-[#002147] text-white shadow-lg shadow-blue-900/15"
-                        : "text-gray-600 hover:bg-white"
-                    }`}
+                    className={`px-4 py-3 rounded-xl text-sm font-bold flex flex-col leading-tight transition-all ${channelType === chan.key
+                      ? "bg-[#002147] text-white shadow-lg shadow-blue-900/15"
+                      : "text-gray-600 hover:bg-white"
+                      }`}
                   >
                     <span>{chan.label}</span>
                     <span className="text-[10px] uppercase tracking-widest font-black opacity-70">{chan.hint}</span>
@@ -1405,7 +1403,7 @@ const Community = () => {
                     <p className="text-gray-500 text-sm text-center py-4">No groups available</p>
                   ) : (
                     <div className="space-y-4">
-                      {visibleDiscussions.map((discussion) => {
+                      {featuredGroups.map((group) => {
                         const IconComponent = iconMap[group.icon] || Users;
                         return (
                           <div
@@ -1578,11 +1576,10 @@ const Community = () => {
                                 <button
                                   key={chan.key}
                                   onClick={() => setNewPost(prev => ({ ...prev, channelType: chan.key }))}
-                                  className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
-                                    newPost.channelType === chan.key
-                                      ? "bg-[#002147] text-white shadow"
-                                      : "text-gray-600 hover:bg-white"
-                                  }`}
+                                  className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all ${newPost.channelType === chan.key
+                                    ? "bg-[#002147] text-white shadow"
+                                    : "text-gray-600 hover:bg-white"
+                                    }`}
                                 >
                                   {chan.label}
                                 </button>

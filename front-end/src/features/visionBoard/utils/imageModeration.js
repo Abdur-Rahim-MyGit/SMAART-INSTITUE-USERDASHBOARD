@@ -66,7 +66,7 @@ const checkNSFW = async (imageElement) => {
       if (predictionMap[category] && predictionMap[category] > threshold) {
         return {
           flagged: true,
-          reason: `Contains inappropriate content (${category.toLowerCase()})`,
+          reason: `Explicit content`,
           type: 'nsfw',
           category,
           probability: predictionMap[category],

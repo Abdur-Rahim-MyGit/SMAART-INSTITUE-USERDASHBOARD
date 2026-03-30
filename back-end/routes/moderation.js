@@ -8,6 +8,7 @@ const Teacher = require('../models/Teacher');
 const Registration = require('../models/Registration');
 const CommunityPost = require('../models/CommunityPost');
 const ModerationLog = require('../models/ModerationLog');
+const { notifyModerationWarning, notifyModerationSuspension } = require('../services/notificationService');
 
 // Trace incoming requests to verify router reachability
 router.use((req, res, next) => {
@@ -57,6 +58,15 @@ router.post('/warn/:userId', async (req, res) => {
       reason
     });
 
+    // Send notification to warned student
+    try {
+      console.log('[WARN] sending notification to:', target._id.toString());
+      const notifResult = await notifyModerationWarning(target._id, reason);
+      console.log('[WARN] notification result:', notifResult?._id || notifResult);
+    } catch (notifErr) {
+      console.warn('[WARN] Failed to send notification:', notifErr.message);
+    }
+
     res.json({ success: true, message: 'Warning issued', userId: target._id });
   } catch (error) {
     console.log('[MODERATION ERROR]', error);
@@ -90,6 +100,7 @@ router.post('/suspend/:userId', async (req, res) => {
 
     target.suspendedUntil = untilDate;
     target.status = 'suspended';
+    target.currentSessionId = null; // Invalidate session → forces immediate logout
     await target.save();
 
     await logAction({
@@ -99,10 +110,74 @@ router.post('/suspend/:userId', async (req, res) => {
       reason: `${reason} (until ${untilDate.toISOString()})`
     });
 
+    // Send notification to suspended student
+    const effectiveDays = Math.ceil((untilDate - Date.now()) / (24 * 60 * 60 * 1000));
+    try {
+      await notifyModerationSuspension(target._id, reason, effectiveDays);
+    } catch (notifErr) {
+      console.warn('[SUSPEND] Failed to send notification:', notifErr.message);
+    }
+
     res.json({ success: true, message: 'User suspended', userId: target._id, suspendedUntil: untilDate });
   } catch (error) {
     console.log('[MODERATION ERROR]', error);
     console.error('Error suspending user:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// POST /moderation/unsuspend/:userId
+router.post('/unsuspend/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { reason = 'Suspension lifted by moderator' } = req.body;
+
+    console.log('[UNSUSPEND] looking up user:', userId);
+
+    let target = await User.findById(userId);
+    if (!target) target = await Student.findById(userId);
+    if (!target) target = await Teacher.findById(userId);
+    if (!target) target = await Registration.findById(userId);
+
+    console.log('[UNSUSPEND] user found:', target ? target.fullName : 'NOT FOUND');
+    if (!target) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    target.suspendedUntil = null;
+    if (target.status === 'suspended') {
+      target.status = 'active';
+    }
+    target.currentSessionId = null; // They need to log in fresh
+    await target.save();
+
+    await logAction({
+      action: 'unsuspend',
+      actorId: req.user?._id || req.user?.id || new mongoose.Types.ObjectId(),
+      targetId: target._id,
+      reason
+    });
+
+    // Send reinstatement notification
+    try {
+      const { createNotification } = require('../services/notificationService');
+      await createNotification({
+        userId: target._id,
+        type: 'system',
+        title: '✅ Account Reinstated',
+        message: 'Your posting privileges have been restored. You can now post in the community.',
+        link: '/community',
+        icon: 'check-circle',
+        color: '#10B981'
+      });
+    } catch (notifErr) {
+      console.warn('[UNSUSPEND] Failed to send notification:', notifErr.message);
+    }
+
+    res.json({ success: true, message: 'User unsuspended', userId: target._id });
+  } catch (error) {
+    console.log('[MODERATION ERROR]', error);
+    console.error('Error unsuspending user:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

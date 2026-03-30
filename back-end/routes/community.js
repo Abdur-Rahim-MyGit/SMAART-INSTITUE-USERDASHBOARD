@@ -125,6 +125,24 @@ router.get('/coachalerts', requireRole('moderator', 'admin'), async (req, res) =
   }
 });
 
+// Resolve a coach alert (moderator/admin only)
+router.patch('/coachalerts/:id/resolve', requireRole('moderator', 'admin'), async (req, res) => {
+  try {
+    const alert = await CoachAlert.findByIdAndUpdate(
+      req.params.id,
+      { resolved: true },
+      { new: true }
+    );
+    if (!alert) {
+      return res.status(404).json({ success: false, error: 'Alert not found' });
+    }
+    res.json({ success: true, data: alert });
+  } catch (error) {
+    console.error('Error resolving coach alert:', error);
+    res.status(500).json({ success: false, error: 'Failed to resolve coach alert' });
+  }
+});
+
 // Maintenance: remove replies with null author to prevent validation errors
 router.get('/fix-corrupt-replies', requireRole('admin', 'moderator', 'staff', 'superadmin'), async (req, res) => {
   try {
@@ -488,6 +506,24 @@ router.get('/discussions/:id', async (req, res) => {
   }
 });
 
+// Toggle pin status on a discussion (moderator/admin only)
+router.patch('/discussions/:id/pin', requireRole('moderator', 'admin'), async (req, res) => {
+  try {
+    const discussion = await CommunityPost.findById(req.params.id);
+    if (!discussion) {
+      return res.status(404).json({ success: false, error: 'Discussion not found' });
+    }
+
+    discussion.isPinned = !discussion.isPinned;
+    await discussion.save();
+
+    res.json({ success: true, data: { isPinned: discussion.isPinned } });
+  } catch (error) {
+    console.error('Error toggling pin:', error);
+    res.status(500).json({ success: false, error: 'Failed to toggle pin' });
+  }
+});
+
 // Mark/Unmark a reply as Best Answer
 router.post('/discussions/:id/best-answer', async (req, res) => {
   try {
@@ -613,6 +649,22 @@ router.post('/discussions/:id/report', async (req, res) => {
   } catch (error) {
     console.error('Error reporting discussion:', error);
     res.status(500).json({ success: false, error: 'Failed to report discussion' });
+  }
+});
+
+// Pin/Unpin a discussion (moderator/admin only)
+router.patch('/discussions/:id/pin', requireRole('moderator', 'admin'), async (req, res) => {
+  try {
+    const discussion = await CommunityPost.findById(req.params.id);
+    if (!discussion) {
+      return res.status(404).json({ success: false, error: 'Discussion not found' });
+    }
+    discussion.isPinned = !discussion.isPinned;
+    await discussion.save();
+    res.json({ success: true, data: discussion });
+  } catch (error) {
+    console.error('Error toggling pin:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

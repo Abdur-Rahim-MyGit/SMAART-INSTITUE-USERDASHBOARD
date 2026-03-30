@@ -28,15 +28,40 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
     if (!canvasRef.current) return;
 
     try {
-      // Scale up for better preview quality (at least 2x or more for high-res)
-      const minScale = Math.max(2, 1080 / canvasRef.current.offsetWidth);
-      const canvas = await html2canvas(canvasRef.current, {
+      const originalCanvas = canvasRef.current;
+      const width = originalCanvas.offsetWidth;
+      const height = originalCanvas.offsetHeight;
+
+      const clone = originalCanvas.cloneNode(true);
+      clone.style.transform = "none";
+      clone.style.width = `${width}px`;
+      clone.style.height = `${height}px`;
+      clone.style.position = "fixed";
+      clone.style.top = "0";
+      clone.style.left = "0";
+      clone.style.zIndex = "-9999";
+      clone.style.margin = "0";
+
+      if (!clone.style.backgroundColor || clone.style.backgroundColor === 'transparent') {
+          clone.style.backgroundColor = '#ffffff'; 
+      }
+
+      document.body.appendChild(clone);
+
+      const minScale = Math.max(2, 1080 / width);
+      const canvas = await html2canvas(clone, {
         scale: minScale,
         useCORS: true,
         allowTaint: true,
         logging: false,
         backgroundColor: null,
+        width: width,
+        height: height,
+        windowWidth: width,
+        windowHeight: height
       });
+
+      document.body.removeChild(clone);
       setPreviewImage(canvas.toDataURL("image/png", 1.0));
     } catch (error) {
       console.error("Preview generation error:", error);
@@ -49,13 +74,41 @@ const PreviewModal = ({ isOpen, onClose, canvasRef, title }) => {
     setIsExporting(true);
     try {
       const resolution = EXPORT_RESOLUTIONS[selectedResolution];
-      const canvas = await html2canvas(canvasRef.current, {
-        scale: resolution.width / canvasRef.current.offsetWidth,
+      const originalCanvas = canvasRef.current;
+      const baseWidth = originalCanvas.offsetWidth;
+      const baseHeight = originalCanvas.offsetHeight;
+
+      const clone = originalCanvas.cloneNode(true);
+      clone.style.transform = "none";
+      clone.style.width = `${baseWidth}px`;
+      clone.style.height = `${baseHeight}px`;
+      clone.style.position = "fixed";
+      clone.style.top = "0";
+      clone.style.left = "0";
+      clone.style.zIndex = "-9999";
+      clone.style.margin = "0";
+
+      if (!clone.style.backgroundColor || clone.style.backgroundColor === 'transparent') {
+          clone.style.backgroundColor = '#ffffff'; 
+      }
+
+      document.body.appendChild(clone);
+
+      const targetScale = resolution.width / baseWidth;
+
+      const canvas = await html2canvas(clone, {
+        scale: targetScale,
         useCORS: true,
         allowTaint: true,
         logging: false,
         backgroundColor: null,
+        width: baseWidth,
+        height: baseHeight,
+        windowWidth: baseWidth,
+        windowHeight: baseHeight
       });
+
+      document.body.removeChild(clone);
 
       const link = document.createElement("a");
       link.download = `${title || "vision-board"}-${resolution.width}x${resolution.height

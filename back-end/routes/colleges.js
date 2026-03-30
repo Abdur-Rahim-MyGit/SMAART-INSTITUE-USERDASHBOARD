@@ -1,5 +1,6 @@
 const express = require('express');
 const College = require('../models/College');
+const CollegeBanner = require('../models/CollegeBanner');
 const { searchLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
@@ -68,6 +69,27 @@ router.get('/', searchLimiter, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch colleges',
+      message: err.message
+    });
+  }
+});
+
+// Get college banners by college ID
+router.get('/:id/banners', async (req, res) => {
+  try {
+    const banners = await CollegeBanner.find({
+      collegeId: req.params.id,
+      isActive: true
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: banners
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch college banners',
       message: err.message
     });
   }

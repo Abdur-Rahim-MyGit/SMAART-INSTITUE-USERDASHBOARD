@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
+import CollegeBanners from "@/components/CollegeBanners";
 
 const DashboardHome = () => {
   const navigate = useNavigate();
@@ -62,6 +63,10 @@ const DashboardHome = () => {
             <PageTransition>
             <div className="max-w-[1600px] mx-auto space-y-4">
 
+              {/* College Banners Section */}
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+                 <CollegeBanners />
+              </motion.div>
 
               <motion.div 
                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
