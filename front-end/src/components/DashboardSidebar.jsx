@@ -24,6 +24,7 @@ import {
 import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
 import ChatbotModal from "@/components/ChatbotModal";
+import useUser from "@/hooks/useUser";
 import { useTheme } from "@/contexts/ThemeContext";
 import blueLogo from "@/assets/blue.png";
 import whiteLogo from "@/assets/white.png";
@@ -49,6 +50,7 @@ const bottomMenuItems = [
 const DashboardSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useUser();
   const { theme, setTheme } = useTheme();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -204,7 +206,7 @@ const DashboardSidebar = () => {
         <div className="flex items-center justify-between px-6 lg:px-10 h-16">
 
 
-          {/* Left: Logo */}
+          {/* Left: Logo Section */}
           <div className="flex items-center gap-2 shrink-0">
             <button
               className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -213,15 +215,30 @@ const DashboardSidebar = () => {
               {isMobileOpen ? <X className="w-5 h-5 text-slate-600 dark:text-slate-300" /> : <Menu className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
             </button>
 
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="h-10 w-auto flex items-center justify-center transition-all duration-300">
-                <img
-                  src={theme === 'dark' ? whiteLogo : blueLogo}
-                  alt="SMAART Institute"
-                  className="h-8 lg:h-10 w-auto object-contain"
-                />
-              </div>
-            </Link>
+            <div className="flex items-center gap-2 lg:gap-4">
+              <Link to="/" className="flex items-center group">
+                <div className="h-10 w-auto flex items-center justify-center transition-all duration-300">
+                  <img
+                    src={theme === 'dark' ? whiteLogo : blueLogo}
+                    alt="SMAART Institute"
+                    className="h-8 lg:h-10 w-auto object-contain"
+                  />
+                </div>
+              </Link>
+
+              {user?.college?.logo && (
+                <div className="flex items-center gap-2 lg:gap-4">
+                  <div className="h-6 w-[1.5px] bg-slate-300 dark:bg-slate-700 mx-0.5 lg:mx-1" />
+                  <div className="h-10 w-auto flex items-center justify-center transition-all duration-300">
+                    <img
+                      src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
+                      alt={user.college.collegeName || "College Logo"}
+                      className="h-8 lg:h-10 w-auto object-contain"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Center: Desktop Navigation Menu - Responsive Gap and Flex */}
