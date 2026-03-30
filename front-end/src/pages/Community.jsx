@@ -696,32 +696,7 @@ const Community = () => {
           <DashboardHeader />
 
           <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-            {/* Page Banner */}
-            <div className="mb-6 relative overflow-hidden rounded-3xl bg-[#002147] py-8 px-6 shadow-lg">
-              {/* Background Decorative Elements */}
-              <div className="absolute inset-0 opacity-10 pointer-events-none select-none overflow-hidden">
-                <span className="absolute top-4 left-4 text-[10px] tracking-widest text-[#002147] font-bold border border-[#002147] rounded-full px-2 py-0.5">STARTUP</span>
-                <span className="absolute top-12 left-20 text-[9px] text-white/50">GROWTH</span>
-                <span className="absolute bottom-4 left-10 text-[9px] text-white/50">PROMOTION</span>
-                <span className="absolute top-1/2 left-1/4 text-[9px] text-white/30 hidden sm:block">IDEA</span>
-                <span className="absolute top-6 right-1/4 text-[10px] text-white/40">TECHNOLOGY</span>
-                <span className="absolute bottom-8 right-20 text-[9px] text-white/50">MOTIVATION</span>
-                <span className="absolute top-6 right-10 text-[10px] font-bold text-[#C0C0C0] tracking-widest">MISSION</span>
-                <span className="absolute top-16 right-4 text-[9px] text-white/50">GLOBAL</span>
-                <span className="absolute bottom-6 right-8 text-[9px] text-white/50 border border-white/20 px-1">SUCCESS</span>
-                <div className="absolute top-[-50%] left-[30%] w-56 h-56 bg-[#002147]/20 blur-[60px] rounded-full mix-blend-overlay"></div>
-              </div>
 
-              <div className="relative z-10 flex flex-col items-center justify-center text-center">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight mb-2">
-                  <span className="text-[#FFA500]">SMAART</span> <span className="text-white">Community</span>
-                </h1>
-                <div className="h-0.5 w-16 bg-gradient-to-r from-transparent via-[#FFA500] to-transparent mb-3 opacity-50"></div>
-                <p className="text-blue-100/80 text-xs sm:text-sm max-w-lg font-light tracking-wide">
-                  Connect, learn, and grow together in our global startup ecosystem
-                </p>
-              </div>
-            </div>
 
             {/* Search Bar */}
             <div className="mb-8">
