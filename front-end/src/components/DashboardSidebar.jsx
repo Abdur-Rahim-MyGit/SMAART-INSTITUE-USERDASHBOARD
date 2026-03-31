@@ -207,9 +207,9 @@ const DashboardSidebar = () => {
 
 
           {/* Left: Logo Section */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
-              className="lg:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="lg:hidden p-1.5 rounded-none hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
             >
               {isMobileOpen ? <X className="w-5 h-5 text-slate-600 dark:text-slate-300" /> : <Menu className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
@@ -272,7 +272,7 @@ const DashboardSidebar = () => {
                   {isActive && (
                     <motion.span
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1a3884] rounded-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1a3884] rounded-none"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -287,7 +287,7 @@ const DashboardSidebar = () => {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full text-slate-500 hover:text-[#1a3884] hover:bg-slate-100 dark:text-slate-400 dark:hover:text-[#1a3884] dark:hover:bg-slate-800 transition-all"
+              className="p-2 rounded-none text-slate-500 hover:text-[#1a3884] hover:bg-slate-100 dark:text-slate-400 dark:hover:text-[#1a3884] dark:hover:bg-slate-800 transition-all"
               aria-label="Toggle Theme"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -297,15 +297,15 @@ const DashboardSidebar = () => {
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setNotificationOpen(!notificationOpen)}
-                className="p-2 mr-1 rounded-full text-slate-400 hover:text-[#1a3884] hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all relative group/nav"
+                className="p-2 mr-1 rounded-none text-slate-400 hover:text-[#1a3884] hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all relative group/nav"
               >
                 <Bell className="w-5 h-5 group-hover/nav:animate-bounce" />
                 {unreadCount > 0 ? (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-white dark:border-slate-900">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-none border-2 border-white dark:border-slate-900">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 ) : (
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900 shadow-sm" />
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-none border-2 border-white dark:border-slate-900 shadow-sm" />
                 )}
               </button>
 
@@ -317,7 +317,7 @@ const DashboardSidebar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute -right-12 sm:right-0 mt-2 w-[300px] sm:w-96 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                    className="absolute -right-12 sm:right-0 mt-2 w-[300px] sm:w-96 bg-white dark:bg-slate-900 rounded-none shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                     style={{ zIndex: 9999 }}
                   >
                     {/* Header */}
@@ -326,7 +326,7 @@ const DashboardSidebar = () => {
                         <Bell className="w-5 h-5 text-white" />
                         <h3 className="font-semibold text-white">Notifications</h3>
                         {unreadCount > 0 && (
-                          <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-full">
+                          <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-none">
                             {unreadCount} new
                           </span>
                         )}
@@ -351,7 +351,7 @@ const DashboardSidebar = () => {
                         </div>
                       ) : notifications.length === 0 ? (
                         <div className="flex flex-col items-center py-10 text-center px-4">
-                          <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-3">
+                          <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-none flex items-center justify-center mb-3">
                             <Bell className="w-7 h-7 text-slate-400" />
                           </div>
                           <p className="text-slate-500 dark:text-slate-400 font-medium">No notifications yet</p>
@@ -374,7 +374,7 @@ const DashboardSidebar = () => {
                               className={`px-4 py-3 flex items-start gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${!n.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
                             >
                               <div
-                                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                                className="w-10 h-10 rounded-none flex items-center justify-center flex-shrink-0"
                                 style={{ backgroundColor: `${n.color || '#2563EB'}20` }}
                               >
                                 <Bell className="w-5 h-5" style={{ color: n.color || '#2563EB' }} />
@@ -386,7 +386,7 @@ const DashboardSidebar = () => {
                                 </div>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">{n.message}</p>
                               </div>
-                              {!n.isRead && <div className="w-2 h-2 bg-[#1a3884] rounded-full mt-2" />}
+                              {!n.isRead && <div className="w-2 h-2 bg-[#1a3884] rounded-none mt-2" />}
                             </div>
                           ))}
                         </div>

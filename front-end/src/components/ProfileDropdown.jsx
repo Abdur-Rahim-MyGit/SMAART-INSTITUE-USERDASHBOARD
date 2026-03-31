@@ -97,7 +97,7 @@ const ProfileDropdown = () => {
       <div
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 cursor-pointer"
+        className="flex items-center gap-3 px-3 py-2 rounded-none transition-all duration-200 cursor-pointer"
       >
         {/* Name Only */}
         <div className="text-right hidden sm:block">
@@ -105,12 +105,12 @@ const ProfileDropdown = () => {
         </div>
 
         {/* Profile Avatar */}
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#002147] overflow-hidden">
+        <div className="w-10 h-10 rounded-none flex items-center justify-center bg-[#002147] overflow-hidden">
           {avatarUrl ? (
             <img
               src={avatarUrl}
               alt={displayName}
-              className="w-10 h-10 rounded-xl object-cover"
+              className="w-10 h-10 rounded-none object-cover"
             />
           ) : (
             <span className="text-base font-bold text-white">

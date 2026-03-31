@@ -115,7 +115,6 @@ const StudentGroups = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-8 space-y-8">
-        <DashboardHeader />
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/20 dark:border-white/5">
