@@ -60,7 +60,7 @@ const CollegeBanners = () => {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.9 }}
           transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 25 }}
-          className="fixed bottom-6 right-6 z-[100] w-72 sm:w-80 shadow-2xl rounded-2xl overflow-hidden bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
+          className="fixed bottom-6 right-6 z-[100] w-72 sm:w-80 shadow-2xl rounded-none overflow-hidden bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
         >
           <div 
             className="relative aspect-[21/9] w-full bg-slate-100 dark:bg-slate-800 group cursor-pointer" 
@@ -100,11 +100,11 @@ const CollegeBanners = () => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.3 }}
-        className="relative w-full overflow-hidden rounded-2xl mb-4 shadow-sm group bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
+        className="relative w-full overflow-hidden rounded-none mb-4 shadow-sm group bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
       >
         <button 
            onClick={() => setIsMinimized(true)}
-           className="absolute top-3 right-3 z-[60] w-9 h-9 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-105"
+           className="absolute top-3 right-3 z-[60] w-9 h-9 rounded-none bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-105"
            title="Minimize to Corner"
         >
            <Minimize2 className="w-4.5 h-4.5" />
@@ -142,13 +142,13 @@ const CollegeBanners = () => {
             <>
               <button
                 onClick={prevBanner}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-none bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={nextBanner}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-none bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -158,7 +158,7 @@ const CollegeBanners = () => {
                   <button
                     key={idx}
                     onClick={() => setCurrentIndex(idx)}
-                    className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+                    className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-none transition-all duration-300 ${
                       idx === currentIndex ? 'bg-white w-4 sm:w-6' : 'bg-white/50 hover:bg-white/80'
                     }`}
                   />

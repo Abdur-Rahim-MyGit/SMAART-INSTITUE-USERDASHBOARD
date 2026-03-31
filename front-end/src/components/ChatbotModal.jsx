@@ -107,12 +107,12 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="w-full max-w-2xl h-[600px] bg-gradient-to-br from-[#001a38] to-[#002447] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-[#1a3884]/30"
+          className="w-full max-w-2xl h-[600px] bg-gradient-to-br from-[#001a38] to-[#002447] rounded-none shadow-2xl flex flex-col overflow-hidden border border-[#1a3884]/30"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-[#1a3884]/30 bg-[#001a38]/50">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-none bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -138,7 +138,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-3 ${message.role === 'user'
+                  className={`max-w-[80%] rounded-none px-4 py-3 ${message.role === 'user'
                       ? 'bg-gradient-to-br from-[#1a3884] to-[#132c6b] text-white'
                       : message.isError
                         ? 'bg-red-500/20 text-red-200 border border-red-500/30'
@@ -160,7 +160,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
                 animate={{ opacity: 1 }}
                 className="flex justify-start"
               >
-                <div className="bg-white/10 rounded-2xl px-4 py-3 border border-white/10">
+                <div className="bg-white/10 rounded-none px-4 py-3 border border-white/10">
                   <div className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-[#1a3884]" />
                     <span className="text-sm text-gray-300">Thinking...</span>
@@ -177,7 +177,7 @@ const ChatbotModal = ({ isOpen, onClose, onEscalateToTicket }) => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mx-4 mb-2 p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg"
+              className="mx-4 mb-2 p-3 bg-amber-500/20 border border-amber-500/30 rounded-none"
             >
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />

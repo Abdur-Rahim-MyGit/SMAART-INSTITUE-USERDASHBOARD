@@ -108,7 +108,7 @@ const SMAARTWallet = () => {
     if (userLoading) {
         return (
             <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] flex items-center justify-center">
-                <div className="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-full animate-spin" />
+                <div className="w-10 h-10 border-4 border-slate-200 border-t-blue-600 rounded-none animate-spin" />
             </div>
         );
     }
@@ -129,12 +129,6 @@ const SMAARTWallet = () => {
                             transition={{ duration: 0.5 }}
                             className="text-center"
                         >
-                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] shadow-lg shadow-blue-600/20 mb-5">
-                                <Shield className="w-8 h-8 text-white" />
-                            </div>
-                            <h1 className="text-3xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight mb-2">
-                                SMAART Wallet
-                            </h1>
                             <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
                                 Your professional vault — view and manage your certificates, badges, course progress, and key learning flashcards all in one place.
                             </p>
@@ -142,14 +136,14 @@ const SMAARTWallet = () => {
 
                         {/* ── Tab Navigation ── */}
                         <div className="flex justify-center">
-                            <div className="inline-flex bg-white dark:bg-slate-800 rounded-2xl p-1.5 shadow-sm border border-slate-200 dark:border-slate-700 overflow-x-auto max-w-full">
+                            <div className="inline-flex bg-white dark:bg-slate-800 rounded-none p-1.5 shadow-sm border border-slate-200 dark:border-slate-700 overflow-x-auto max-w-full">
                                 {TABS.map((tab) => {
                                     const Icon = tab.icon;
                                     return (
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
-                                            className={`flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
+                                            className={`flex items-center gap-1.5 px-4 sm:px-5 py-2.5 rounded-none font-semibold text-xs sm:text-sm transition-all duration-300 whitespace-nowrap ${activeTab === tab.id
                                                     ? "bg-[#1a3884] text-white shadow-md"
                                                     : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700"
                                                 }`}
@@ -188,9 +182,9 @@ const SMAARTWallet = () => {
                                                     initial={{ opacity: 0, y: 16 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: i * 0.08 }}
-                                                    className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow"
+                                                    className="bg-white dark:bg-slate-800 rounded-none p-5 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow"
                                                 >
-                                                    <div className={`w-10 h-10 rounded-lg ${stat.bg} ${stat.color} flex items-center justify-center mb-3`}>
+                                                    <div className={`w-10 h-10 rounded-none ${stat.bg} ${stat.color} flex items-center justify-center mb-3`}>
                                                         <stat.icon className="w-5 h-5" />
                                                     </div>
                                                     <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{stat.value}</h3>
@@ -200,7 +194,7 @@ const SMAARTWallet = () => {
                                         </div>
 
                                         {/* What's in your wallet */}
-                                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                                        <div className="bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
                                             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">What's in your SMAART Wallet?</h3>
                                             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
                                                 Your SMAART Wallet is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources. Here's what you'll find:
@@ -212,8 +206,8 @@ const SMAARTWallet = () => {
                                                     { icon: BookOpen, title: "Course Overview", desc: "A dashboard view of all your enrolled courses, modules completed, and overall progress across the SMAART curriculum." },
                                                     { icon: Zap, title: "Flashcards & Key Terms", desc: "Quick-reference cards for the six core quotients and other essential professional terminology from your learning journey." },
                                                 ].map((item, i) => (
-                                                    <div key={i} className="flex gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-700/30 border border-slate-100 dark:border-slate-700/50">
-                                                        <div className="w-10 h-10 rounded-lg bg-[#1a3884]/10 dark:bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                                                    <div key={i} className="flex gap-4 p-4 rounded-none bg-slate-50 dark:bg-slate-700/30 border border-slate-100 dark:border-slate-700/50">
+                                                        <div className="w-10 h-10 rounded-none bg-[#1a3884]/10 dark:bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                                                             <item.icon className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                                                         </div>
                                                         <div>
@@ -230,7 +224,7 @@ const SMAARTWallet = () => {
                                 {/* ════════ CERTIFICATES TAB ════════ */}
                                 {activeTab === "certificates" && (
                                     <div className="space-y-8">
-                                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                                        <div className="bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
                                             <div className="flex items-center justify-between mb-6">
                                                 <div className="flex items-center gap-3">
                                                     <Award className="w-6 h-6 text-amber-600" />
@@ -238,7 +232,7 @@ const SMAARTWallet = () => {
                                                 </div>
                                                 <button
                                                     onClick={() => navigate("/dashboard/certificate")}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-[#2d5dc7] transition-colors"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-[#1a3884] text-white text-sm font-bold hover:bg-[#2d5dc7] transition-colors"
                                                 >
                                                     <Download className="w-4 h-4" /> Download Centre
                                                 </button>
@@ -252,10 +246,10 @@ const SMAARTWallet = () => {
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ delay: i * 0.08 }}
                                                         onClick={() => navigate("/dashboard/certificate")}
-                                                        className="bg-slate-50 dark:bg-slate-700/30 rounded-xl border border-slate-100 dark:border-slate-700 p-5 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-md transition-all group"
+                                                        className="bg-slate-50 dark:bg-slate-700/30 rounded-none border border-slate-100 dark:border-slate-700 p-5 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-md transition-all group"
                                                     >
                                                         <div className="flex items-start gap-4">
-                                                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                            <div className="w-12 h-12 rounded-none bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-sm">
                                                                 <Award className="w-6 h-6 text-white" />
                                                             </div>
                                                             <div className="flex-1 min-w-0">
@@ -263,10 +257,10 @@ const SMAARTWallet = () => {
                                                                     {cert.title}
                                                                 </h4>
                                                                 <div className="flex items-center gap-2 mt-2">
-                                                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                                                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400">
                                                                         {cert.code}
                                                                     </span>
-                                                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400">
+                                                                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400">
                                                                         {cert.level}
                                                                     </span>
                                                                 </div>
@@ -279,7 +273,7 @@ const SMAARTWallet = () => {
                                         </div>
 
                                         {/* User Uploaded Certificates */}
-                                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                                        <div className="bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
                                             <div className="flex items-center justify-between mb-6">
                                                 <div className="flex items-center gap-3">
                                                     <Shield className="w-6 h-6 text-blue-600" />
@@ -287,7 +281,7 @@ const SMAARTWallet = () => {
                                                 </div>
                                                 <button
                                                     onClick={() => setIsUploadModalOpen(true)}
-                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+                                                    className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
                                                 >
                                                     <Upload className="w-4 h-4" /> Upload Certificate
                                                 </button>
@@ -301,10 +295,10 @@ const SMAARTWallet = () => {
                                                             initial={{ opacity: 0, scale: 0.95 }}
                                                             animate={{ opacity: 1, scale: 1 }}
                                                             transition={{ delay: i * 0.05 }}
-                                                            className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 relative group"
+                                                            className="bg-slate-50 dark:bg-slate-900/50 rounded-none border border-slate-100 dark:border-slate-700 p-5 relative group"
                                                         >
                                                             <div className="flex items-start gap-4 mb-4">
-                                                                <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                                                                <div className="w-12 h-12 rounded-none bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                                                                     <FileText className="w-6 h-6" />
                                                                 </div>
                                                                 <div className="min-w-0 flex-1">
@@ -344,13 +338,13 @@ const SMAARTWallet = () => {
                                                                     href={cert.certificateUrl} 
                                                                     target="_blank" 
                                                                     rel="noopener noreferrer"
-                                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+                                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-none bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
                                                                 >
                                                                     <Download className="w-3.5 h-3.5" /> View File
                                                                 </a>
                                                                 <button 
                                                                     onClick={() => handleDeleteUserCert(cert._id)}
-                                                                    className="p-2 rounded-lg border border-red-100 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
+                                                                    className="p-2 rounded-none border border-red-100 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
                                                                 >
                                                                     <X className="w-4 h-4" />
                                                                 </button>
@@ -359,8 +353,8 @@ const SMAARTWallet = () => {
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <div className="text-center py-10 border-2 border-dashed border-slate-100 dark:border-slate-700/50 rounded-2xl">
-                                                    <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3">
+                                                <div className="text-center py-10 border-2 border-dashed border-slate-100 dark:border-slate-700/50 rounded-none">
+                                                    <div className="w-12 h-12 rounded-none bg-slate-50 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3">
                                                         <Award className="w-6 h-6 text-slate-300 dark:text-slate-600" />
                                                     </div>
                                                     <p className="text-sm font-medium text-slate-400">No external certificates uploaded yet.</p>
@@ -375,7 +369,7 @@ const SMAARTWallet = () => {
                                         </div>
 
                                         {/* Verification Section */}
-                                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
+                                        <div className="bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm">
                                             <div className="p-6 border-b border-slate-100 dark:border-slate-700">
                                                 <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                                     <Shield className="w-5 h-5 text-emerald-600" />
@@ -392,7 +386,7 @@ const SMAARTWallet = () => {
 
                                 {/* ════════ BADGES TAB ════════ */}
                                 {activeTab === "badges" && (
-                                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                                    <div className="bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
                                         <BadgeGallery badges={badges} userName={user?.fullName || "Student"} />
                                     </div>
                                 )}
@@ -419,7 +413,7 @@ const SMAARTWallet = () => {
                                                         animate={{ opacity: 1, y: 0 }}
                                                         transition={{ delay: i * 0.08 }}
                                                         onClick={() => navigate(`/dashboard/courses/${course._id}/modules`)}
-                                                        className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all group"
+                                                        className="bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all group"
                                                     >
                                                         {/* Thumbnail */}
                                                         <div className="h-32 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] relative overflow-hidden">
@@ -428,7 +422,7 @@ const SMAARTWallet = () => {
                                                             )}
                                                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                                                             <div className="absolute bottom-3 left-3 right-3">
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white/20 backdrop-blur-sm text-white">
+                                                                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none bg-white/20 backdrop-blur-sm text-white">
                                                                     {course.courseCode || "Course"}
                                                                 </span>
                                                             </div>
@@ -456,8 +450,8 @@ const SMAARTWallet = () => {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-10 text-center">
-                                                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-50 dark:bg-slate-700 flex items-center justify-center">
+                                            <div className="bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 p-10 text-center">
+                                                <div className="w-16 h-16 mx-auto mb-4 rounded-none bg-slate-50 dark:bg-slate-700 flex items-center justify-center">
                                                     <BookOpen className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                                 </div>
                                                 <h4 className="text-base font-bold text-slate-800 dark:text-white mb-1">No Courses Yet</h4>
@@ -466,7 +460,7 @@ const SMAARTWallet = () => {
                                                 </p>
                                                 <button
                                                     onClick={() => navigate("/dashboard/courses")}
-                                                    className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#1a3884] text-white text-sm font-bold hover:bg-[#2d5dc7] transition-colors"
+                                                    className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-none bg-[#1a3884] text-white text-sm font-bold hover:bg-[#2d5dc7] transition-colors"
                                                 >
                                                     Browse Courses
                                                 </button>
@@ -491,13 +485,13 @@ const SMAARTWallet = () => {
                                             ))}
                                         </div>
 
-                                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-5 text-center">
+                                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-none border border-slate-200 dark:border-slate-700 p-5 text-center">
                                             <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
                                                 More flashcards are available within each course module
                                             </p>
                                             <button
                                                 onClick={() => navigate("/dashboard/courses")}
-                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border-2 border-[#1a3884] dark:border-blue-500 text-[#1a3884] dark:text-blue-400 text-sm font-bold hover:bg-[#1a3884]/5 dark:hover:bg-blue-500/10 transition-colors"
+                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-none border-2 border-[#1a3884] dark:border-blue-500 text-[#1a3884] dark:text-blue-400 text-sm font-bold hover:bg-[#1a3884]/5 dark:hover:bg-blue-500/10 transition-colors"
                                             >
                                                 <BookOpen className="w-4 h-4" /> Explore Course Flashcards
                                             </button>
@@ -540,11 +534,11 @@ const FlashcardItem = ({ card, index }) => {
             >
                 {/* Front */}
                 <div
-                    className="absolute inset-0 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 flex flex-col justify-between backface-hidden hover:shadow-md hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all"
+                    className="absolute inset-0 bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 p-5 flex flex-col justify-between backface-hidden hover:shadow-md hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all"
                     style={{ backfaceVisibility: "hidden" }}
                 >
                     <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-none bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400">
                             {card.category}
                         </span>
                     </div>
@@ -558,7 +552,7 @@ const FlashcardItem = ({ card, index }) => {
 
                 {/* Back */}
                 <div
-                    className="absolute inset-0 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] rounded-xl p-5 flex flex-col justify-center text-white"
+                    className="absolute inset-0 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] rounded-none p-5 flex flex-col justify-center text-white"
                     style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
                 >
                     <p className="text-sm leading-relaxed text-center text-white/90">
