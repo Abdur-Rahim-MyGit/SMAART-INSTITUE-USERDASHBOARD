@@ -64,6 +64,51 @@ const ComprehensiveSignup = () => {
   const [roleSuggestions, setRoleSuggestions] = useState([]);
   const [activeSearchIndex, setActiveSearchIndex] = useState(null);
 
+  // Degree Options State
+  const [degreeOptions, setDegreeOptions] = useState({
+    levels: [],
+    domains: {}, // mapped by index: [options]
+    fullNames: {}, // mapped by index: [options]
+    specializations: {} // mapped by index: [options]
+  });
+
+  // Fetch Degree Levels on Mount
+  useEffect(() => {
+    const fetchLevels = async () => {
+      try {
+        const response = await apiCall('/degrees/levels');
+        if (response?.success) {
+          setDegreeOptions(prev => ({ ...prev, levels: response.data }));
+        }
+      } catch (error) {
+        console.error("Error fetching degree levels:", error);
+      }
+    };
+    fetchLevels();
+  }, []);
+
+  // Generic Degree Option Fetcher
+  const fetchDegreeSubOptions = async (type, params, index) => {
+    try {
+      let endpoint = '';
+      if (type === 'domains') endpoint = '/degrees/domains';
+      else if (type === 'fullNames') endpoint = '/degrees/fullNames';
+      else if (type === 'specializations') endpoint = '/degrees/specializations';
+
+      const queryString = new URLSearchParams(params).toString();
+      const response = await apiCall(`${endpoint}?${queryString}`);
+      
+      if (response?.success) {
+        setDegreeOptions(prev => ({
+          ...prev,
+          [type]: { ...prev[type], [index]: response.data }
+        }));
+      }
+    } catch (error) {
+      console.error(`Error fetching degree ${type}:`, error);
+    }
+  };
+
   useEffect(() => {
     const fetchExcelData = async () => {
       try {
@@ -84,7 +129,7 @@ const ComprehensiveSignup = () => {
   const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null });
   const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
   const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", marksheet: null });
-  const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
+  const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
   const [extracurricular, setExtracurricular] = useState({ isApplicable: true, items: [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] });
   const [jobPreferences, setJobPreferences] = useState({ items: [{ id: Date.now(), preferredRole: "", jobType: "", preferredLocation1: "", preferredLocation2: "", preferredLocation3: "", willingToRelocate: "", expectedSalary: "" }] });
   const [sectorPreferences, setSectorPreferences] = useState({ preferredSectors: [], secondarySectors: [], otherSector: "" }); // added otherSector
@@ -165,8 +210,10 @@ const ComprehensiveSignup = () => {
   const validateHigherEducation = () => {
     for (let i = 0; i < higherEducation.length; i++) {
       const h = higherEducation[i];
-      if (!h.qualificationLevel) { toast.error(`Higher Ed ${i + 1}: Qualification Level is required`); return false; }
-      if (!h.degree?.trim()) { toast.error(`Higher Ed ${i + 1}: Degree is required`); return false; }
+      if (!h.qualificationLevel) { toast.error(`Higher Ed ${i + 1}: Degree Level is required`); return false; }
+      if (!h.degree) { toast.error(`Higher Ed ${i + 1}: Domain Field is required`); return false; }
+      if (!h.degreeFullName) { toast.error(`Higher Ed ${i + 1}: Degree Full Name is required`); return false; }
+      if (!h.specialization) { toast.error(`Higher Ed ${i + 1}: Specialization is required`); return false; }
       if (!h.institutionName?.trim()) { toast.error(`Higher Ed ${i + 1}: Institution Name is required`); return false; }
       if (!h.university?.trim()) { toast.error(`Higher Ed ${i + 1}: University is required`); return false; }
       if (!h.yearOfPassing) { toast.error(`Higher Ed ${i + 1}: Year of Passing is required`); return false; }
@@ -349,7 +396,7 @@ const ComprehensiveSignup = () => {
   };
   const handlePrevStep = () => { if (currentStep > 0) { setCurrentStep(currentStep - 1); window.scrollTo(0, 0); } };
 
-  const addHigherEd = () => setHigherEducation([...higherEducation, { id: Date.now(), qualificationLevel: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
+  const addHigherEd = () => setHigherEducation([...higherEducation, { id: Date.now(), qualificationLevel: "", degreeFullName: "", degree: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
   const removeHigherEd = (id) => { if (higherEducation.length > 1) setHigherEducation(higherEducation.filter(h => h.id !== id)); };
   const addExtracurricular = () => setExtracurricular(prev => ({ ...prev, items: [...prev.items, { id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] }));
   const removeExtracurricular = (id) => setExtracurricular(prev => ({ ...prev, items: prev.items.filter(e => e.id !== id) }));
@@ -633,9 +680,90 @@ const ComprehensiveSignup = () => {
                     {higherEducation.length > 1 && <button onClick={() => removeHigherEd(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Degree #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Qualification Level *</Label><select value={item.qualificationLevel} onChange={(e) => { const n = [...higherEducation]; n[index].qualificationLevel = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select</option><option value="UG Diploma">Undergraduate Diploma (UG Diploma)</option><option value="PG Diploma">Postgraduate Diploma (PG Diploma)</option><option value="UG">Undergraduate Degree (UG)</option><option value="PG">Postgraduate Degree (PG)</option><option value="MPhil">MPhil (Master of Philosophy)</option><option value="PhD">Doctoral Degree (PhD / Doctorate)</option><option value="Post-Doctoral">Post-Doctoral Level</option></select></div>
-                      <div><Label>Academic Qualification Name *</Label><Input value={item.degree} onChange={(e) => { const n = [...higherEducation]; n[index].degree = e.target.value; setHigherEducation(n); }} className={inputClass} placeholder="e.g. B.E, B.Sc, BBA,  BA, BCA, B.Com" /></div>
-                      <div><Label>Specialization</Label><Input value={item.specialization} onChange={(e) => { const n = [...higherEducation]; n[index].specialization = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
+                      {/* Degree Level */}
+                      <div>
+                        <Label>Degree Level *</Label>
+                        <select 
+                          value={item.qualificationLevel} 
+                          onChange={(e) => { 
+                            const val = e.target.value;
+                            const n = [...higherEducation]; 
+                            n[index].qualificationLevel = val;
+                            n[index].degree = "";
+                            n[index].degreeFullName = "";
+                            n[index].specialization = "";
+                            setHigherEducation(n); 
+                            if (val) fetchDegreeSubOptions('domains', { level: val }, index);
+                          }} 
+                          className={selectClass}
+                        >
+                          <option value="">Select Level</option>
+                          {degreeOptions.levels.map(l => <option key={l} value={l}>{l}</option>)}
+                        </select>
+                      </div>
+
+                      {/* Degree (Domain) */}
+                      <div>
+                        <Label>Domain Field *</Label>
+                        <select 
+                          value={item.degree} 
+                          disabled={!item.qualificationLevel}
+                          onChange={(e) => { 
+                            const val = e.target.value;
+                            const n = [...higherEducation]; 
+                            n[index].degree = val;
+                            n[index].degreeFullName = "";
+                            n[index].specialization = "";
+                            setHigherEducation(n); 
+                            if (val) fetchDegreeSubOptions('fullNames', { level: item.qualificationLevel, domain: val }, index);
+                          }} 
+                          className={selectClass}
+                        >
+                          <option value="">Select Degree</option>
+                          {(degreeOptions.domains[index] || []).map(d => <option key={d} value={d}>{d}</option>)}
+                        </select>
+                      </div>
+
+                      {/* Degree Full Name */}
+                      <div>
+                        <Label>Degree Full Name *</Label>
+                        <select 
+                          value={item.degreeFullName} 
+                          disabled={!item.degree}
+                          onChange={(e) => { 
+                            const val = e.target.value;
+                            const n = [...higherEducation]; 
+                            n[index].degreeFullName = val;
+                            n[index].specialization = "";
+                            setHigherEducation(n); 
+                            if (val) fetchDegreeSubOptions('specializations', { level: item.qualificationLevel, domain: item.degree, fullName: val }, index);
+                          }} 
+                          className={selectClass}
+                        >
+                          <option value="">Select Full Name</option>
+                          {(degreeOptions.fullNames[index] || []).map(f => <option key={f} value={f}>{f}</option>)}
+                        </select>
+                      </div>
+
+                      {/* Specialization */}
+                      <div>
+                        <Label>Specialization *</Label>
+                        <select 
+                          value={item.specialization} 
+                          disabled={!item.degreeFullName}
+                          onChange={(e) => { 
+                            const val = e.target.value;
+                            const n = [...higherEducation]; 
+                            n[index].specialization = val;
+                            setHigherEducation(n); 
+                          }} 
+                          className={selectClass}
+                        >
+                          <option value="">Select Specialization</option>
+                          {(degreeOptions.specializations[index] || []).map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </div>
+
                       <div><Label>Institution *</Label><Input value={item.institutionName} onChange={(e) => { const n = [...higherEducation]; n[index].institutionName = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
                       <div><Label>University *</Label><Input value={item.university} onChange={(e) => { const n = [...higherEducation]; n[index].university = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
                       <div><Label>Year of Passing (Expected) *</Label><select value={item.yearOfPassing} onChange={(e) => { const n = [...higherEducation]; n[index].yearOfPassing = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>

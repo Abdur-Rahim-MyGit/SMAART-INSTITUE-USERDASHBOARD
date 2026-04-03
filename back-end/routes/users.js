@@ -128,6 +128,7 @@ router.post('/register-details', upload.fields([
         id: he.id,
         qualificationLevel: he.qualificationLevel || '',
         degree: he.degree || '',
+        degreeFullName: he.degreeFullName || '',
         specialization: he.specialization || '',
         institutionName: he.institutionName || '',
         university: he.university || '',
