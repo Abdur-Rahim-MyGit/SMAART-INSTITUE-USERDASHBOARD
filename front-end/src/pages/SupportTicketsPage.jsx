@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, LifeBuoy, MessageSquare, History, Plus, Loader2, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import TicketForm from '@/components/tickets/TicketForm';
+import TicketDetail from '@/components/tickets/TicketDetail';
 // import { ticketApi } from '@/services/ticketApi'; // Removed unused invalid import
 
 const SupportTicketsPage = () => {
@@ -58,7 +59,11 @@ const SupportTicketsPage = () => {
     }
   };
 
+  const [successTicket, setSuccessTicket] = useState(null);
+  const [selectedTicket, setSelectedTicket] = useState(null);
+
   const handleSuccess = (ticket) => {
+    setSuccessTicket(ticket);
     setActiveTab('history');
     fetchTickets(); // Refresh list
   };
@@ -133,6 +138,23 @@ const SupportTicketsPage = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
               >
+                {/* ITSM Success Banner */}
+                {successTicket?.itsmTicketNumber && (
+                  <div className="mb-6 p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 shadow-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-indigo-400" />
+                      <span className="text-sm font-semibold text-indigo-400">
+                        Ticket submitted successfully
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
+                      Your ITSM reference number is{' '}
+                      <span className="font-mono text-indigo-400 font-bold">{successTicket.itsmTicketNumber}</span>
+                      . Use this to track your issue status.
+                    </p>
+                  </div>
+                )}
+
                 {/* Chat Conversation Preview */}
                 {conversationData?.messages && (
                   <div className="mb-6 p-4 rounded-xl bg-[#1a3884]/5 dark:bg-[#1a3884]/10 border border-[#1a3884]/20 dark:border-[#1a3884]/30 shadow-sm">
@@ -180,10 +202,18 @@ const SupportTicketsPage = () => {
                   </div>
                 ) : (
                   tickets.map((ticket) => (
-                    <div key={ticket._id} className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-[#1a3884]/50 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all group">
+                    <div key={ticket._id} onClick={() => setSelectedTicket(ticket)} className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-[#1a3884]/50 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all group cursor-pointer">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <span className="text-xs font-mono text-slate-400 uppercase tracking-widest mb-1 block">#{ticket.ticketId || ticket._id.slice(-6)}</span>
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">#{ticket.ticketId || ticket._id.slice(-6)}</span>
+                            {ticket.itsmTicketNumber && (
+                              <span className="px-2 py-0.5 text-xs rounded-full border bg-indigo-500/20 text-indigo-400 border-indigo-500/30 font-mono flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block" />
+                                {ticket.itsmTicketNumber}
+                              </span>
+                            )}
+                          </div>
                           <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#1a3884] transition-colors">{ticket.title}</h3>
                         </div>
                         <span className={`px-3 py-1 rounded-full text-xs font-bold border ${statusColor(ticket.status)} capitalize shadow-sm`}>
@@ -216,6 +246,23 @@ const SupportTicketsPage = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Ticket Detail Modal */}
+      <AnimatePresence>
+        {selectedTicket && (
+          <TicketDetail
+            ticket={selectedTicket}
+            onClose={() => setSelectedTicket(null)}
+            onUpdate={(updatedTicket) => {
+              setTickets(prev => prev.map(t => 
+                t._id === updatedTicket._id ? updatedTicket : t
+              ));
+              setSelectedTicket(updatedTicket);
+            }}
+            isAdmin={false}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

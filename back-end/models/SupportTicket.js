@@ -14,7 +14,8 @@ const responseSchema = new mongoose.Schema({
   respondedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false,
+    default: null
   },
   respondedAt: {
     type: Date,
@@ -62,6 +63,14 @@ const supportTicketSchema = new mongoose.Schema({
       message: 'Invalid priority. Must be one of: low, medium, high'
     },
     default: 'medium'
+  },
+  itsmTicketId: {
+    type: String,
+    default: null
+  },
+  itsmTicketNumber: {
+    type: String,
+    default: null
   },
   status: {
     type: String,
