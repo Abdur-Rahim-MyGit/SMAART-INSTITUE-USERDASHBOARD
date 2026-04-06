@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const SupportTicket = require('../models/SupportTicket');
 const { protect, authorize } = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const itsmClient = require('../services/itsmClient');
 
 const router = express.Router();
 
@@ -78,6 +79,11 @@ router.post('/',
     try {
       const { title, description, category, priority } = req.body;
 
+      // Verify user is authenticated
+      if (!req.user || !req.user._id) {
+        return res.status(401).json({ success: false, error: 'User not authenticated' });
+      }
+
       // Process uploaded files
       const attachments = req.files ? req.files.map(file => ({
         filename: file.filename,
@@ -97,6 +103,26 @@ router.post('/',
       });
 
       await ticket.save();
+
+      // Bridge to ITSM Platform (non-blocking — ticket still saves if ITSM is down)
+      try {
+        const itsmTicket = await itsmClient.createTicket({
+          title: ticket.title,
+          description: ticket.description,
+          category: ticket.category === 'technical' ? 'hardware' : 'software',
+          priority: ticket.priority === 'high' ? 'P1' : ticket.priority === 'medium' ? 'P2' : 'P3',
+          externalRef: ticket.ticketId
+        });
+
+        if (itsmTicket.success) {
+          ticket.itsmTicketId = itsmTicket.ticketId;
+          ticket.itsmTicketNumber = itsmTicket.ticketNumber;
+          await ticket.save();
+        }
+      } catch (itsmError) {
+        // Log but don't fail — dashboard ticket already saved
+        console.warn('[ITSM Bridge] Failed to create ITSM ticket:', itsmError.message);
+      }
 
       // Populate user info for response
       await ticket.populate('userId', 'fullName email userId');
@@ -307,6 +333,92 @@ router.get('/:id',
 );
 
 /**
+ * @route   POST /api/tickets/:id/user-response
+ * @desc    Add a response to own ticket (Ticket owner only)
+ * @access  Private (Authenticated - ticket owner)
+ */
+router.post('/:id/user-response',
+  protect,
+  async (req, res) => {
+    try {
+      const { message } = req.body;
+
+      if (!message || message.trim().length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Message is required'
+        });
+      }
+
+      const ticket = await SupportTicket.findById(req.params.id);
+
+      if (!ticket) {
+        return res.status(404).json({
+          success: false,
+          error: 'Ticket not found'
+        });
+      }
+
+      // Check if user owns this ticket
+      const ticketOwnerId = ticket.userId?._id 
+        ? ticket.userId._id.toString() 
+        : ticket.userId.toString();
+
+      if (ticketOwnerId !== req.user._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          error: 'Not authorized to respond to this ticket'
+        });
+      }
+
+      // Don't allow responses on closed/resolved tickets
+      if (ticket.status === 'closed' || ticket.status === 'resolved') {
+        return res.status(400).json({
+          success: false,
+          error: 'Cannot add response to a closed or resolved ticket'
+        });
+      }
+
+      ticket.responses.push({
+        message: message.trim(),
+        respondedBy: req.user._id,
+        respondedAt: new Date()
+      });
+
+      await ticket.save();
+
+      // Forward student reply to ITSM as a worknote (non-blocking)
+      if (ticket.itsmTicketId) {
+        itsmClient.addWorknote(
+          ticket.itsmTicketId,
+          `[Student Reply] ${message.trim()}`,
+          'user-dashboard'
+        ).catch(err => console.warn('[ITSM Sync] Student worknote failed:', err.message));
+      }
+
+      // Populate for response
+      await ticket.populate([
+        { path: 'userId', select: 'fullName email userId profileImage' },
+        { path: 'responses.respondedBy', select: 'fullName email role' }
+      ]);
+
+      res.json({
+        success: true,
+        message: 'Response added successfully',
+        data: ticket
+      });
+    } catch (error) {
+      console.error('Error adding user response:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to add response',
+        message: error.message
+      });
+    }
+  }
+);
+
+/**
  * @route   PUT /api/tickets/:id
  * @desc    Update ticket status or add response (Admin only)
  * @access  Private (Admin)
@@ -334,11 +446,13 @@ router.put('/:id',
 
       // Add response if provided
       if (response && response.trim().length > 0) {
-        ticket.responses.push({
-          message: response.trim(),
-          respondedBy: req.user._id,
-          respondedAt: new Date()
-        });
+      const responderId = req.user._id || req.user.id;
+
+      ticket.responses.push({
+        message: response.trim(),
+        respondedBy: responderId,
+        respondedAt: new Date()
+      });
 
         // Auto-update status to in-progress if still open
         if (ticket.status === 'open') {
@@ -347,6 +461,20 @@ router.put('/:id',
       }
 
       await ticket.save();
+
+      // Sync status back to ITSM
+      if (ticket.itsmTicketId) {
+        try {
+          const itsmStatus = 
+            ticket.status === 'resolved' ? 'resolved' :
+            ticket.status === 'closed' ? 'closed' :
+            ticket.status === 'in-progress' ? 'diagnosed' : 'logged';
+
+          await itsmClient.syncStatus(ticket.itsmTicketId, itsmStatus);
+        } catch (syncErr) {
+          console.warn('[ITSM Sync] Status sync failed:', syncErr.message);
+        }
+      }
 
       // Populate for response
       await ticket.populate([
@@ -521,5 +649,41 @@ router.get('/stats/summary',
     }
   }
 );
+
+// Sync worknote endpoint for ITSM → UserDashboard
+// Token-protected: ITSM posts here whenever an agent adds a worknote on a linked incident
+router.post('/sync-worknote', async (req, res) => {
+  try {
+    const { externalRef, message, agentName, syncToken } = req.body;
+
+    if (syncToken !== process.env.USERDASHBOARD_SYNC_TOKEN) {
+      return res.status(401).json({ error: 'Invalid sync token' });
+    }
+
+    const SupportTicket = require('../models/SupportTicket');
+    const ticket = await SupportTicket.findOneAndUpdate(
+      { ticketId: externalRef },
+      {
+        $push: {
+          responses: {
+            message: `[ITSM Agent - ${agentName}] ${message}`,
+            respondedBy: null,
+            respondedAt: new Date()
+          }
+        }
+      },
+      { runValidators: false, new: true }
+    );
+
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found for ref: ' + externalRef });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('[sync-worknote] error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

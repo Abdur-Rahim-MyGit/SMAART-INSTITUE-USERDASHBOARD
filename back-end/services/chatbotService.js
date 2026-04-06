@@ -10,9 +10,12 @@ const GOOGLE_AI_KEY = process.env.GOOGLE_AI_API_KEY;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 // Google AI Gemini API endpoint
-const GOOGLE_AI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const MODEL = 'google/gemini-1.5-flash';
+const GOOGLE_AI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const OPENROUTER_API_URL = process.env.OPENROUTER_BASE_URL
+  ? `${process.env.OPENROUTER_BASE_URL}/chat/completions`
+  : 'https://openrouter.ai/api/v1/chat/completions';
+// Use env-configured model or fall back to a reliable free model
+const MODEL = process.env.AI_MODEL || 'google/gemini-2.0-flash:free';
 
 // System prompt with knowledge about SMAART Minds platform
 const SYSTEM_PROMPT = `You are a helpful support assistant for SMAART Minds, an educational platform. Your role is to help users with common questions and guide them through the platform.

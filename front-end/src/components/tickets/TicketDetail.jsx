@@ -13,7 +13,7 @@ import {
   Loader2,
   CheckCircle
 } from "lucide-react";
-import { updateTicket } from "@/services/ticketApi";
+import { updateTicket, addUserResponse } from "@/services/ticketApi";
 
 const STATUS_CONFIG = {
   'open': {
@@ -49,7 +49,7 @@ const CATEGORY_CONFIG = {
   'other': { label: 'Other' }
 };
 
-const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
+const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser = null }) => {
   const [replyMessage, setReplyMessage] = useState('');
   const [selectedStatus, setSelectedStatus] = useState(ticket.status);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,27 +70,72 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
     });
   };
 
+  // Resolve display name for a response
+  const getSenderName = (response) => {
+    // ITSM-synced messages: extract name from prefix [ITSM Agent - Name]
+    if (!response.respondedBy && response.message?.startsWith('[ITSM Agent -')) {
+      const match = response.message.match(/^\[ITSM Agent - ([^\]]+)\]/);
+      return match ? match[1] : 'Support Team';
+    }
+    // Populated respondedBy with fullName
+    if (response.respondedBy?.fullName) return response.respondedBy.fullName;
+    // Current user's own message (by userId match)
+    const responderId = response.respondedBy?._id || response.respondedBy;
+    const userId = currentUser?._id || currentUser?.id || ticket.userId?._id || ticket.userId;
+    if (responderId && userId && responderId.toString() === userId.toString()) return 'You';
+    // Ticket owner's name from ticket.userId
+    if (responderId && ticket.userId?._id?.toString() === responderId.toString()) {
+      return ticket.userId?.fullName || 'You';
+    }
+    // null respondedBy — could be ticket owner (student reply via older code)
+    if (!response.respondedBy) return 'Support Team';
+    return 'Support';
+  };
+
+  const getSenderInitial = (response) => {
+    const name = getSenderName(response);
+    return name.charAt(0).toUpperCase();
+  };
+
+  const isOwnMessage = (response) => {
+    const responderId = response.respondedBy?._id || response.respondedBy;
+    const userId = currentUser?._id || currentUser?.id || ticket.userId?._id || ticket.userId;
+    return responderId && userId && responderId.toString() === userId.toString();
+  };
+
+  const isItsmMessage = (response) => {
+    return !response.respondedBy && response.message?.startsWith('[ITSM Agent -');
+  };
+
   const handleSubmitReply = async () => {
     if (!replyMessage.trim() && selectedStatus === ticket.status) return;
 
     setIsSubmitting(true);
     try {
-      const updates = {};
-      if (replyMessage.trim()) {
-        updates.response = replyMessage.trim();
-      }
-      if (selectedStatus !== ticket.status) {
-        updates.status = selectedStatus;
+      let result;
+
+      if (isAdmin) {
+        // Admin can update status and add response
+        const updates = {};
+        if (replyMessage.trim()) {
+          updates.response = replyMessage.trim();
+        }
+        if (selectedStatus !== ticket.status) {
+          updates.status = selectedStatus;
+        }
+        result = await updateTicket(ticket._id, updates);
+      } else {
+        // User can only add response to their own ticket
+        result = await addUserResponse(ticket._id, replyMessage.trim());
       }
 
-      const result = await updateTicket(ticket._id, updates);
       setSubmitSuccess(true);
       setReplyMessage('');
 
       setTimeout(() => {
         setSubmitSuccess(false);
         if (onUpdate) onUpdate(result.data);
-      }, 1000);
+      }, 1500);
     } catch (error) {
       console.error('Error updating ticket:', error);
     } finally {
@@ -226,29 +271,83 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false }) => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-4 rounded-xl bg-[#1a3884]/10 border border-[#1a3884]/20"
+                    className={`p-4 rounded-xl border ${
+                      isItsmMessage(response)
+                        ? 'bg-indigo-500/10 border-indigo-500/20'
+                        : isOwnMessage(response)
+                          ? 'bg-[#1a3884]/20 border-[#1a3884]/40'
+                          : 'bg-[#1a3884]/10 border-[#1a3884]/20'
+                    }`}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-6 h-6 rounded-full bg-[#1a3884]/30 flex items-center justify-center">
-                        <span className="text-[10px] text-[#1a3884] font-medium">
-                          {response.respondedBy?.fullName?.charAt(0)?.toUpperCase() || 'A'}
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                        isItsmMessage(response) ? 'bg-indigo-500/30' : 'bg-[#1a3884]/30'
+                      }`}>
+                        <span className={`text-[10px] font-medium ${
+                          isItsmMessage(response) ? 'text-indigo-400' : 'text-[#6b8de8]'
+                        }`}>
+                          {getSenderInitial(response)}
                         </span>
                       </div>
-                      <span className="text-sm text-white font-medium">
-                        {response.respondedBy?.fullName || 'Support Team'}
+                      <span className={`text-sm font-medium ${
+                        isItsmMessage(response) ? 'text-indigo-300' : 'text-white'
+                      }`}>
+                        {getSenderName(response)}
                       </span>
+                      {isItsmMessage(response) && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-mono">ITSM</span>
+                      )}
                       <span className="text-xs text-gray-500">
                         {formatDate(response.respondedAt)}
                       </span>
                     </div>
                     <p className="text-gray-300 text-sm whitespace-pre-wrap pl-8">
-                      {response.message}
+                      {/* Strip [ITSM Agent - Name] prefix for cleaner display */}
+                      {isItsmMessage(response)
+                        ? response.message.replace(/^\[ITSM Agent - [^\]]+\]\s*/, '')
+                        : response.message
+                      }
                     </p>
                   </motion.div>
                 ))
               )}
             </div>
           </div>
+
+          {/* User Reply Section */}
+          {!isAdmin && ticket.status !== 'closed' && ticket.status !== 'resolved' && (
+            <div className="pt-4 border-t border-[#1a3884]/20">
+              <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Add a message
+              </h3>
+              <div className="relative">
+                <textarea
+                  value={replyMessage}
+                  onChange={(e) => setReplyMessage(e.target.value)}
+                  placeholder="Add more details or reply to support..."
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-xl bg-[#002147] border border-[#1a3884]/30 text-white placeholder-gray-500 focus:border-[#1a3884] focus:outline-none transition-colors resize-none pr-14"
+                />
+                <button
+                  onClick={handleSubmitReply}
+                  disabled={isSubmitting || !replyMessage.trim()}
+                  className="absolute bottom-3 right-3 p-2 rounded-lg bg-[#1a3884] text-white hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : submitSuccess ? (
+                    <CheckCircle className="w-4 h-4" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Your message will be sent to the support team.
+              </p>
+            </div>
+          )}
 
           {/* Admin Reply Section */}
           {isAdmin && (

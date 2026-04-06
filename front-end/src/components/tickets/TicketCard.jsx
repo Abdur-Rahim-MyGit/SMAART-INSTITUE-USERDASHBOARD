@@ -83,6 +83,12 @@ const TicketCard = ({ ticket, onClick, showUser = false }) => {
             <span className={`px-2 py-0.5 text-xs rounded-full ${categoryConfig.color}`}>
               {categoryConfig.label}
             </span>
+            {ticket.itsmTicketNumber && (
+              <span className="px-2 py-0.5 text-xs rounded-full border bg-indigo-500/20 text-indigo-400 border-indigo-500/30 font-mono flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                {ticket.itsmTicketNumber}
+              </span>
+            )}
           </div>
 
           {/* Title */}
