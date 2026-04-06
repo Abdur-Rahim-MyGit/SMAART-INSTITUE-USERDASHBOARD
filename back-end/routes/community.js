@@ -157,35 +157,37 @@ router.get(
   requireRole("moderator", "admin"),
   async (req, res) => {
     try {
-      const [postStats, replyStats, students, studentUsers] = await Promise.all([
-        CommunityPost.aggregate([
-          { $match: { status: "active", author: { $ne: null } } },
-          {
-            $group: {
-              _id: "$author",
-              postCount: { $sum: 1 },
-              lastPostAt: { $max: "$createdAt" },
-              qualityAvg: { $avg: { $ifNull: ["$qualityScore", 0] } },
+      const [postStats, replyStats, students, studentUsers] = await Promise.all(
+        [
+          CommunityPost.aggregate([
+            { $match: { status: "active", author: { $ne: null } } },
+            {
+              $group: {
+                _id: "$author",
+                postCount: { $sum: 1 },
+                lastPostAt: { $max: "$createdAt" },
+                qualityAvg: { $avg: { $ifNull: ["$qualityScore", 0] } },
+              },
             },
-          },
-        ]),
-        CommunityPost.aggregate([
-          { $match: { status: "active" } },
-          { $unwind: "$replies" },
-          { $match: { "replies.author": { $ne: null } } },
-          {
-            $group: {
-              _id: "$replies.author",
-              replyCount: { $sum: 1 },
-              lastReplyAt: { $max: "$replies.createdAt" },
+          ]),
+          CommunityPost.aggregate([
+            { $match: { status: "active" } },
+            { $unwind: "$replies" },
+            { $match: { "replies.author": { $ne: null } } },
+            {
+              $group: {
+                _id: "$replies.author",
+                replyCount: { $sum: 1 },
+                lastReplyAt: { $max: "$replies.createdAt" },
+              },
             },
-          },
-        ]),
-        Student.find({}).select("fullName email department college").lean(),
-        User.find({ role: "student" })
-          .select("fullName email department college")
-          .lean(),
-      ]);
+          ]),
+          Student.find({}).select("fullName email department college").lean(),
+          User.find({ role: "student" })
+            .select("fullName email department college")
+            .lean(),
+        ],
+      );
 
       const allStudents = [...students, ...studentUsers];
       const studentIds = allStudents.map((record) => record._id);
@@ -215,7 +217,10 @@ router.get(
 
       const profileMap = new Map();
       engagementProfiles.forEach((profile) => {
-        profileMap.set(profile.studentId.toString(), profile.communityScore || 0);
+        profileMap.set(
+          profile.studentId.toString(),
+          profile.communityScore || 0,
+        );
       });
 
       const isolationCutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
@@ -231,8 +236,12 @@ router.get(
         const postData = postMap.get(studentId) || {};
         const replyData = replyMap.get(studentId) || {};
 
-        const lastPostAt = postData.lastPostAt ? new Date(postData.lastPostAt) : null;
-        const lastReplyAt = replyData.lastReplyAt ? new Date(replyData.lastReplyAt) : null;
+        const lastPostAt = postData.lastPostAt
+          ? new Date(postData.lastPostAt)
+          : null;
+        const lastReplyAt = replyData.lastReplyAt
+          ? new Date(replyData.lastReplyAt)
+          : null;
         const lastActive = new Date(
           Math.max(toTimestamp(lastPostAt), toTimestamp(lastReplyAt)),
         );
@@ -253,7 +262,9 @@ router.get(
         };
       });
 
-      engagementData.sort((a, b) => toTimestamp(b.lastActive) - toTimestamp(a.lastActive));
+      engagementData.sort(
+        (a, b) => toTimestamp(b.lastActive) - toTimestamp(a.lastActive),
+      );
 
       return res.json({
         success: true,
@@ -263,7 +274,10 @@ router.get(
       console.error("Error fetching student engagement breakdown:", error);
       return res
         .status(500)
-        .json({ success: false, error: "Failed to fetch student engagement breakdown" });
+        .json({
+          success: false,
+          error: "Failed to fetch student engagement breakdown",
+        });
     }
   },
 );
@@ -329,24 +343,32 @@ router.get(
       const page = Math.max(1, parseInt(req.query.page, 10) || 1);
       const limit = Math.max(1, parseInt(req.query.limit, 10) || 50);
       const typeFilter = (req.query.type || "").toString().toLowerCase().trim();
-      const allowedTypes = new Set(["moderation", "mentorship", "post", "alert"]);
+      const allowedTypes = new Set([
+        "moderation",
+        "mentorship",
+        "post",
+        "alert",
+      ]);
 
       if (typeFilter && !allowedTypes.has(typeFilter)) {
         return res.status(400).json({
           success: false,
-          error: "Invalid type. Allowed values: moderation, mentorship, post, alert",
+          error:
+            "Invalid type. Allowed values: moderation, mentorship, post, alert",
         });
       }
 
-      const [moderationLogs, mentorshipLogs, posts, alerts] = await Promise.all([
-        ModerationLog.find({}).sort({ timestamp: -1 }).limit(50).lean(),
-        MentorshipLog.find({}).sort({ timestamp: -1 }).limit(50).lean(),
-        CommunityPost.find({ status: "active" })
-          .sort({ createdAt: -1 })
-          .limit(50)
-          .lean(),
-        CoachAlert.find({}).sort({ timestamp: -1 }).limit(50).lean(),
-      ]);
+      const [moderationLogs, mentorshipLogs, posts, alerts] = await Promise.all(
+        [
+          ModerationLog.find({}).sort({ timestamp: -1 }).limit(50).lean(),
+          MentorshipLog.find({}).sort({ timestamp: -1 }).limit(50).lean(),
+          CommunityPost.find({ status: "active" })
+            .sort({ createdAt: -1 })
+            .limit(50)
+            .lean(),
+          CoachAlert.find({}).sort({ timestamp: -1 }).limit(50).lean(),
+        ],
+      );
 
       const moderationActivities = moderationLogs.map((entry) => ({
         type: "moderation",
@@ -397,12 +419,14 @@ router.get(
 
       const personIds = new Set();
       merged.forEach((entry) => {
-        ["actorId", "targetId", "mentorId", "studentId", "author"].forEach((field) => {
-          const id = getEntityId(entry[field]);
-          if (id && mongoose.Types.ObjectId.isValid(id)) {
-            personIds.add(id);
-          }
-        });
+        ["actorId", "targetId", "mentorId", "studentId", "author"].forEach(
+          (field) => {
+            const id = getEntityId(entry[field]);
+            if (id && mongoose.Types.ObjectId.isValid(id)) {
+              personIds.add(id);
+            }
+          },
+        );
       });
 
       const entityLookup = await buildEntityLookup([...personIds]);
@@ -410,11 +434,16 @@ router.get(
       const withNames = merged.map((entry) => {
         const mapped = { ...entry };
 
-        if (entry.actorId) mapped.actorName = entityLookup.get(entry.actorId)?.name || null;
-        if (entry.targetId) mapped.targetName = entityLookup.get(entry.targetId)?.name || null;
-        if (entry.mentorId) mapped.mentorName = entityLookup.get(entry.mentorId)?.name || null;
-        if (entry.studentId) mapped.studentName = entityLookup.get(entry.studentId)?.name || null;
-        if (entry.author) mapped.authorName = entityLookup.get(entry.author)?.name || null;
+        if (entry.actorId)
+          mapped.actorName = entityLookup.get(entry.actorId)?.name || null;
+        if (entry.targetId)
+          mapped.targetName = entityLookup.get(entry.targetId)?.name || null;
+        if (entry.mentorId)
+          mapped.mentorName = entityLookup.get(entry.mentorId)?.name || null;
+        if (entry.studentId)
+          mapped.studentName = entityLookup.get(entry.studentId)?.name || null;
+        if (entry.author)
+          mapped.authorName = entityLookup.get(entry.author)?.name || null;
 
         return mapped;
       });
@@ -649,12 +678,10 @@ router.get("/discussions/bookmarks/:userId", async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching bookmarked discussions:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        error: "Failed to fetch bookmarked discussions",
-      });
+    res.status(500).json({
+      success: false,
+      error: "Failed to fetch bookmarked discussions",
+    });
   }
 });
 
@@ -738,12 +765,10 @@ router.post("/discussions", uploadCommunity.any(), async (req, res) => {
     }
 
     if (!author) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Author not found. Please log out and log in again.",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Author not found. Please log out and log in again.",
+      });
     }
 
     // Block suspended users from posting
@@ -752,12 +777,10 @@ router.post("/discussions", uploadCommunity.any(), async (req, res) => {
       author.status === "suspended" ||
       (author.suspendedUntil && new Date(author.suspendedUntil) > now)
     ) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          error: "Your account is suspended and cannot create posts.",
-        });
+      return res.status(403).json({
+        success: false,
+        error: "Your account is suspended and cannot create posts.",
+      });
     }
 
     if (!title || !content) {
@@ -974,12 +997,10 @@ router.post("/discussions/:id/best-answer", async (req, res) => {
     );
 
     if (!isAuthor && !isModerator) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          error: "Only the author or a moderator can mark a best answer",
-        });
+      return res.status(403).json({
+        success: false,
+        error: "Only the author or a moderator can mark a best answer",
+      });
     }
 
     const replyDoc = discussion.replies.id(replyId);
@@ -1092,12 +1113,10 @@ router.post("/discussions/:id/report", async (req, res) => {
       (r) => r.user.toString() === userId,
     );
     if (alreadyReported) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "You have already reported this discussion",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "You have already reported this discussion",
+      });
     }
 
     discussion.reports.push({
@@ -1424,12 +1443,10 @@ router.post("/discussions/:id/reply", async (req, res) => {
       author.college &&
       discussion.college.toString() !== author.college.toString()
     ) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          error: "Replies are restricted to your institution.",
-        });
+      return res.status(403).json({
+        success: false,
+        error: "Replies are restricted to your institution.",
+      });
     }
 
     // Moderate reply content
