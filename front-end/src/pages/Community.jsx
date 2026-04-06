@@ -1,5 +1,35 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { HelpCircle, Bell, Users, MessageCircle, Heart, Share2, Search, TrendingUp, Star, BookOpen, Award, ChevronRight, ChevronLeft, Plus, Loader2, Bookmark, Send, MoreVertical, Image as ImageIcon, X, CheckCircle, Play, Video, Trophy, ThumbsUp, ThumbsDown, Lightbulb, Handshake } from "lucide-react";
+import {
+  HelpCircle,
+  Bell,
+  Users,
+  MessageCircle,
+  Heart,
+  Share2,
+  Search,
+  TrendingUp,
+  Star,
+  BookOpen,
+  Award,
+  ChevronRight,
+  ChevronLeft,
+  Plus,
+  Loader2,
+  Bookmark,
+  Send,
+  MoreVertical,
+  Image as ImageIcon,
+  X,
+  CheckCircle,
+  Play,
+  Video,
+  Trophy,
+  ThumbsUp,
+  ThumbsDown,
+  Lightbulb,
+  Handshake,
+  GraduationCap,
+} from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import EmotionChatbot from "@/components/community/EmotionChatbot";
@@ -17,14 +47,38 @@ const iconMap = {
   Users,
   Star,
   Target: TrendingUp,
-  Wrench: Award
+  Wrench: Award,
 };
 
 const REACTION_TYPES = [
-  { type: 'like', emoji: '👍', label: 'Like', color: 'text-blue-500', icon: ThumbsUp },
-  { type: 'heart', emoji: '❤️', label: 'Love', color: 'text-red-500', icon: Heart },
-  { type: 'insightful', emoji: '💡', label: 'Insightful', color: 'text-yellow-500', icon: Lightbulb },
-  { type: 'support', emoji: '🤝', label: 'Support', color: 'text-green-500', icon: Handshake }
+  {
+    type: "like",
+    emoji: "👍",
+    label: "Like",
+    color: "text-blue-500",
+    icon: ThumbsUp,
+  },
+  {
+    type: "heart",
+    emoji: "❤️",
+    label: "Love",
+    color: "text-red-500",
+    icon: Heart,
+  },
+  {
+    type: "insightful",
+    emoji: "💡",
+    label: "Insightful",
+    color: "text-yellow-500",
+    icon: Lightbulb,
+  },
+  {
+    type: "support",
+    emoji: "🤝",
+    label: "Support",
+    color: "text-green-500",
+    icon: Handshake,
+  },
 ];
 
 const BestAnswerBadge = () => (
@@ -50,7 +104,7 @@ const formatTimeAgo = (dateString) => {
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return 'Just now';
+  if (diffMins < 1) return "Just now";
   if (diffMins < 60) return `${diffMins}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 7) return `${diffDays}d ago`;
@@ -61,7 +115,12 @@ const Community = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("discussions");
   const [currentUser, setCurrentUser] = useState(null);
-  const [stats, setStats] = useState({ totalMembers: 0, totalDiscussions: 0, totalGroups: 0, activeToday: 0 });
+  const [stats, setStats] = useState({
+    totalMembers: 0,
+    totalDiscussions: 0,
+    totalGroups: 0,
+    activeToday: 0,
+  });
   const [discussions, setDiscussions] = useState([]);
   const [channelType, setChannelType] = useState("discussion");
   const [featuredGroups, setFeaturedGroups] = useState([]);
@@ -77,7 +136,12 @@ const Community = () => {
   const [reportingId, setReportingId] = useState(null);
   const [reportReason, setReportReason] = useState("");
   const [reportSubmitting, setReportSubmitting] = useState(false);
-  const [newPost, setNewPost] = useState({ title: "", content: "", category: "general", channelType: "discussion" });
+  const [newPost, setNewPost] = useState({
+    title: "",
+    content: "",
+    category: "general",
+    channelType: "discussion",
+  });
   const [submitting, setSubmitting] = useState(false);
   const [replyingId, setReplyingId] = useState(null);
   const [replyText, setReplyText] = useState("");
@@ -106,15 +170,16 @@ const Community = () => {
   const [sharingToGroups, setSharingToGroups] = useState(false);
 
   const isSupportChannel = channelType === "support";
+  const isMentorChannel = channelType === "mentor";
 
   const resolveChannel = (post) => post?.channelType || "discussion";
-  const matchesChannel = (post) => isSupportChannel ? resolveChannel(post) === "support" : resolveChannel(post) !== "support";
+  const matchesChannel = (post) => resolveChannel(post) === channelType;
   const visibleDiscussions = discussions.filter(matchesChannel);
 
   // Image Viewer Navigation
   const feedImages = visibleDiscussions
-    .map(d => d.media?.url)
-    .filter(url => url && !url.match(/\.(mp4|mov|webm)$|video\/upload/i));
+    .map((d) => d.media?.url)
+    .filter((url) => url && !url.match(/\.(mp4|mov|webm)$|video\/upload/i));
 
   const handlePrevImage = (e) => {
     e?.stopPropagation();
@@ -135,12 +200,12 @@ const Community = () => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!viewerImage) return;
-      if (e.key === 'ArrowLeft') handlePrevImage();
-      if (e.key === 'ArrowRight') handleNextImage();
-      if (e.key === 'Escape') setViewerImage(null);
+      if (e.key === "ArrowLeft") handlePrevImage();
+      if (e.key === "ArrowRight") handleNextImage();
+      if (e.key === "Escape") setViewerImage(null);
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [viewerImage, feedImages]);
 
   const handleMediaChange = (e) => {
@@ -151,7 +216,7 @@ const Community = () => {
         return;
       }
       setSelectedMedia(file);
-      setMediaType(file.type.startsWith('video/') ? 'video' : 'image');
+      setMediaType(file.type.startsWith("video/") ? "video" : "image");
       const reader = new FileReader();
       reader.onloadend = () => {
         setMediaPreview(reader.result);
@@ -175,7 +240,7 @@ const Community = () => {
         return;
       }
       setSelectedMedia(file);
-      setMediaType(file.type.startsWith('video/') ? 'video' : 'image');
+      setMediaType(file.type.startsWith("video/") ? "video" : "image");
       const reader = new FileReader();
       reader.onloadend = () => {
         setMediaPreview(reader.result);
@@ -184,12 +249,15 @@ const Community = () => {
     }
   };
 
-  const userCollegeId = currentUser?.college?._id || currentUser?.college || null;
-  const currentUserId = currentUser ? String(currentUser._id || currentUser.id || currentUser.userId || "") : "";
+  const userCollegeId =
+    currentUser?.college?._id || currentUser?.college || null;
+  const currentUserId = currentUser
+    ? String(currentUser._id || currentUser.id || currentUser.userId || "")
+    : "";
 
   const getAuthorName = (author) => {
-    if (!author) return 'Anonymous';
-    return author.fullName || author.name || author.email || 'Anonymous';
+    if (!author) return "Anonymous";
+    return author.fullName || author.name || author.email || "Anonymous";
   };
 
   const getAuthorId = (author) => {
@@ -203,18 +271,18 @@ const Community = () => {
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
-        console.log('Community - Loaded user from session:', {
+        console.log("Community - Loaded user from session:", {
           id: parsedUser.id,
           _id: parsedUser._id,
           userId: parsedUser.userId,
-          email: parsedUser.email
+          email: parsedUser.email,
         });
         setCurrentUser(parsedUser);
       } catch (e) {
-        console.error('Community - Failed to parse user data:', e);
+        console.error("Community - Failed to parse user data:", e);
       }
     } else {
-      console.warn('Community - No user data found in sessionStorage');
+      console.warn("Community - No user data found in sessionStorage");
     }
   }, []);
 
@@ -226,21 +294,25 @@ const Community = () => {
         const [statsRes, groupsRes, contributorsRes] = await Promise.all([
           communityAPI.getStats().catch(() => ({ success: false })),
           groupsAPI.getMyGroups().catch(() => ({ success: false })),
-          communityAPI.getTopContributors(4).catch(() => ({ success: false }))
+          communityAPI.getTopContributors(4).catch(() => ({ success: false })),
         ]);
 
         if (statsRes.success) setStats(statsRes.data);
         if (groupsRes.success) setFeaturedGroups(groupsRes.data);
         if (contributorsRes.success) setTopContributors(contributorsRes.data);
       } catch (error) {
-        console.error('Error fetching community meta data:', error);
+        console.error("Error fetching community meta data:", error);
       }
     };
     fetchData();
   }, [currentUser]);
 
   // Unified discussion fetcher
-  const fetchDiscussions = async (pageNum = 1, append = false, overrideChannel) => {
+  const fetchDiscussions = async (
+    pageNum = 1,
+    append = false,
+    overrideChannel,
+  ) => {
     // Ensure we have user data. If not in state, try to get from storage one last time.
     let userId = currentUserId;
     if (!userId) {
@@ -248,10 +320,12 @@ const Community = () => {
         const stored = JSON.parse(sessionStorage.getItem("user") || "{}");
         userId = stored._id || stored.id || stored.userId;
         if (userId && !currentUser) setCurrentUser(stored);
-      } catch (e) { /* ignore */ }
+      } catch (e) {
+        /* ignore */
+      }
     }
 
-    if (!userId && activeTab !== 'discussions') {
+    if (!userId && activeTab !== "discussions") {
       console.warn("No user ID found, cannot fetch private discussions");
       setLoading(false);
       setLoadingMore(false);
@@ -269,9 +343,9 @@ const Community = () => {
         sortBy,
         channelType: overrideChannel || channelType,
         collegeId: userCollegeId || undefined,
-        search: searchQuery || undefined
+        search: searchQuery || undefined,
       };
-      console.log('[FETCH] fetching with channelType:', params.channelType);
+      console.log("[FETCH] fetching with channelType:", params.channelType);
 
       switch (activeTab) {
         case "my posts":
@@ -286,7 +360,7 @@ const Community = () => {
 
       if (result.success) {
         if (append) {
-          setDiscussions(prev => [...prev, ...result.data]);
+          setDiscussions((prev) => [...prev, ...result.data]);
         } else {
           setDiscussions(result.data);
         }
@@ -294,7 +368,7 @@ const Community = () => {
         setHasMore(result.data.length === 10);
       }
     } catch (error) {
-      console.error('Error fetching discussions:', error);
+      console.error("Error fetching discussions:", error);
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -324,15 +398,18 @@ const Community = () => {
 
   // Peer quality vote
   const handleQualityVote = async (discussionId, vote) => {
-    if (!currentUser || !currentUserId || qualityVotingId === discussionId) return;
+    if (!currentUser || !currentUserId || qualityVotingId === discussionId)
+      return;
     try {
       setQualityVotingId(discussionId);
       const result = await communityAPI.voteOnPost(discussionId, vote);
       if (result.success) {
-        setDiscussions(prev => prev.map(d => d._id === discussionId ? result.data : d));
+        setDiscussions((prev) =>
+          prev.map((d) => (d._id === discussionId ? result.data : d)),
+        );
       }
     } catch (error) {
-      console.error('Error submitting peer vote:', error);
+      console.error("Error submitting peer vote:", error);
     } finally {
       setQualityVotingId(null);
     }
@@ -344,7 +421,7 @@ const Community = () => {
   };
 
   const handleChannelSwitch = (type) => {
-    console.log('[TAB SWITCH] active channel:', type);
+    console.log("[TAB SWITCH] active channel:", type);
     setChannelType(type);
     setNewPost((prev) => ({ ...prev, channelType: type }));
     setPage(1);
@@ -356,17 +433,23 @@ const Community = () => {
     if (!currentUser || !currentUserId) return;
 
     try {
-      const result = await communityAPI.reactToDiscussion(discussionId, currentUserId, type);
+      const result = await communityAPI.reactToDiscussion(
+        discussionId,
+        currentUserId,
+        type,
+      );
       if (result.success) {
-        setDiscussions(prev => prev.map(d =>
-          d._id === discussionId
-            ? { ...d, reactions: result.data.reactions }
-            : d
-        ));
+        setDiscussions((prev) =>
+          prev.map((d) =>
+            d._id === discussionId
+              ? { ...d, reactions: result.data.reactions }
+              : d,
+          ),
+        );
         setActiveReactionPickerId(null);
       }
     } catch (error) {
-      console.error('Error reacting:', error);
+      console.error("Error reacting:", error);
     }
   };
 
@@ -377,16 +460,23 @@ const Community = () => {
     try {
       const result = await communityAPI.toggleLike(discussionId, currentUserId);
       if (result.success) {
-        setDiscussions(prev => prev.map(d =>
-          d._id === discussionId
-            ? { ...d, likes: result.data.isLiked ? [...d.likes, currentUserId] : d.likes.filter(id => id !== currentUserId) }
-            : d
-        ));
+        setDiscussions((prev) =>
+          prev.map((d) =>
+            d._id === discussionId
+              ? {
+                  ...d,
+                  likes: result.data.isLiked
+                    ? [...d.likes, currentUserId]
+                    : d.likes.filter((id) => id !== currentUserId),
+                }
+              : d,
+          ),
+        );
       } else if (result?.error) {
         alert(result.error);
       }
     } catch (error) {
-      console.error('Error liking:', error);
+      console.error("Error liking:", error);
     }
   };
 
@@ -395,16 +485,28 @@ const Community = () => {
     if (!currentUser || !currentUserId) return;
 
     try {
-      const result = await communityAPI.toggleBookmark(discussionId, currentUserId);
+      const result = await communityAPI.toggleBookmark(
+        discussionId,
+        currentUserId,
+      );
       if (result.success) {
-        setDiscussions(prev => prev.map(d =>
-          d._id === discussionId
-            ? { ...d, isBookmarkedBy: result.data.isBookmarked ? [...(d.isBookmarkedBy || []), currentUserId] : (d.isBookmarkedBy || []).filter(id => id !== currentUserId) }
-            : d
-        ));
+        setDiscussions((prev) =>
+          prev.map((d) =>
+            d._id === discussionId
+              ? {
+                  ...d,
+                  isBookmarkedBy: result.data.isBookmarked
+                    ? [...(d.isBookmarkedBy || []), currentUserId]
+                    : (d.isBookmarkedBy || []).filter(
+                        (id) => id !== currentUserId,
+                      ),
+                }
+              : d,
+          ),
+        );
       }
     } catch (error) {
-      console.error('Error bookmarking:', error);
+      console.error("Error bookmarking:", error);
     }
   };
 
@@ -414,16 +516,20 @@ const Community = () => {
 
     try {
       setVotingId(discussionId);
-      const result = await communityAPI.voteInPoll(discussionId, currentUserId, optionIndex);
+      const result = await communityAPI.voteInPoll(
+        discussionId,
+        currentUserId,
+        optionIndex,
+      );
       if (result.success) {
-        setDiscussions(prev => prev.map(d =>
-          d._id === discussionId ? result.data : d
-        ));
+        setDiscussions((prev) =>
+          prev.map((d) => (d._id === discussionId ? result.data : d)),
+        );
       } else {
         alert(result.error || "Failed to vote");
       }
     } catch (error) {
-      console.error('Error voting:', error);
+      console.error("Error voting:", error);
       alert("An error occurred while voting");
     } finally {
       setVotingId(null);
@@ -434,22 +540,32 @@ const Community = () => {
   const handleReplySubmit = async (discussion) => {
     if (!currentUser || !replyText.trim()) return;
 
-    if (userCollegeId && discussion.college && discussion.college !== userCollegeId) {
-      console.warn('Replies restricted to your institution');
+    if (
+      userCollegeId &&
+      discussion.college &&
+      discussion.college !== userCollegeId
+    ) {
+      console.warn("Replies restricted to your institution");
       return;
     }
 
     try {
       setReplySubmitting(true);
-      const result = await communityAPI.addReply(discussion._id, replyText.trim(), currentUserId);
+      const result = await communityAPI.addReply(
+        discussion._id,
+        replyText.trim(),
+        currentUserId,
+      );
       if (result.success) {
         const updated = result.data;
-        setDiscussions((prev) => prev.map((d) => (d._id === updated._id ? updated : d)));
+        setDiscussions((prev) =>
+          prev.map((d) => (d._id === updated._id ? updated : d)),
+        );
         setReplyText("");
         setReplyingId(null);
       }
     } catch (error) {
-      console.error('Error adding reply:', error);
+      console.error("Error adding reply:", error);
     } finally {
       setReplySubmitting(false);
     }
@@ -459,15 +575,22 @@ const Community = () => {
     if (!currentUser || !editText.trim()) return;
     try {
       setEditSubmitting(true);
-      const result = await communityAPI.editReply(discussionId, reply._id, editText.trim(), currentUserId);
+      const result = await communityAPI.editReply(
+        discussionId,
+        reply._id,
+        editText.trim(),
+        currentUserId,
+      );
       if (result.success) {
         const updated = result.data;
-        setDiscussions((prev) => prev.map((d) => (d._id === updated._id ? updated : d)));
+        setDiscussions((prev) =>
+          prev.map((d) => (d._id === updated._id ? updated : d)),
+        );
         setEditingReplyId(null);
         setEditText("");
       }
     } catch (error) {
-      console.error('Error editing reply:', error);
+      console.error("Error editing reply:", error);
     } finally {
       setEditSubmitting(false);
     }
@@ -476,32 +599,44 @@ const Community = () => {
   const handleReplyDelete = async (discussionId, replyId) => {
     if (!currentUser) return;
     try {
-      const result = await communityAPI.deleteReply(discussionId, replyId, currentUserId);
+      const result = await communityAPI.deleteReply(
+        discussionId,
+        replyId,
+        currentUserId,
+      );
       if (result.success) {
-        setDiscussions((prev) => prev.map((d) => (d._id === result.data._id ? result.data : d)));
+        setDiscussions((prev) =>
+          prev.map((d) => (d._id === result.data._id ? result.data : d)),
+        );
       }
     } catch (error) {
-      console.error('Error deleting reply:', error);
+      console.error("Error deleting reply:", error);
     }
   };
 
   const handleMarkBestAnswer = async (discussionId, replyId) => {
     if (!currentUser) return;
     try {
-      const result = await communityAPI.markBestAnswer(discussionId, replyId, currentUserId);
+      const result = await communityAPI.markBestAnswer(
+        discussionId,
+        replyId,
+        currentUserId,
+      );
       if (result.success) {
-        setDiscussions((prev) => prev.map((d) => (d._id === discussionId ? result.data : d)));
+        setDiscussions((prev) =>
+          prev.map((d) => (d._id === discussionId ? result.data : d)),
+        );
       }
     } catch (error) {
-      console.error('Error marking best answer:', error);
+      console.error("Error marking best answer:", error);
     }
   };
 
   // Handle create post
   const handleCreatePost = async () => {
-    console.log('[SUBMIT] handler start', newPost);
+    console.log("[SUBMIT] handler start", newPost);
     if (!newPost.title.trim() || !newPost.content.trim()) {
-      alert('Please enter a title and content for your post.');
+      alert("Please enter a title and content for your post.");
       return;
     }
 
@@ -510,46 +645,59 @@ const Community = () => {
     const contentCheck = moderateText(newPost.content);
 
     if (!titleCheck.isClean) {
-      setModerationWarning('Your title contains inappropriate language. Please revise before posting.');
+      setModerationWarning(
+        "Your title contains inappropriate language. Please revise before posting.",
+      );
       return;
     }
 
     if (!contentCheck.isClean) {
-      setModerationWarning('Your content contains inappropriate language. Please revise before posting.');
+      setModerationWarning(
+        "Your content contains inappropriate language. Please revise before posting.",
+      );
       return;
     }
 
-    setModerationWarning('');
+    setModerationWarning("");
 
     // Try multiple sources for the author ID
     // 1. From currentUser state (already parsed from storage on mount)
     // 2. Re-read from storage for latest data
     let storedUser = {};
     try {
-      const userStr = sessionStorage.getItem('user');
+      const userStr = sessionStorage.getItem("user");
       if (userStr) {
         storedUser = JSON.parse(userStr);
       }
     } catch (e) {
-      console.error('Failed to parse stored user:', e);
+      console.error("Failed to parse stored user:", e);
     }
 
     // Try all possible ID fields from both sources
-    const authorId = currentUser?._id || currentUser?.id || currentUser?.userId ||
-      storedUser?._id || storedUser?.id || storedUser?.userId ||
-      currentUser?.user?._id || currentUser?.user?.id ||
-      storedUser?.user?._id || storedUser?.user?.id ||
+    const authorId =
+      currentUser?._id ||
+      currentUser?.id ||
+      currentUser?.userId ||
+      storedUser?._id ||
+      storedUser?.id ||
+      storedUser?.userId ||
+      currentUser?.user?._id ||
+      currentUser?.user?.id ||
+      storedUser?.user?._id ||
+      storedUser?.user?.id ||
       currentUserId;
 
     // Get email as fallback for author lookup
     const authorEmail = currentUser?.email || storedUser?.email;
 
-    console.log('Creating post - Author ID:', authorId);
-    console.log('Creating post - Author Email:', authorEmail);
+    console.log("Creating post - Author ID:", authorId);
+    console.log("Creating post - Author Email:", authorEmail);
 
     if (!authorId && !authorEmail) {
-      console.error('Missing Author ID and Email. Session might be invalid.');
-      alert('Your session seems to be invalid. Please log out and log in again.');
+      console.error("Missing Author ID and Email. Session might be invalid.");
+      alert(
+        "Your session seems to be invalid. Please log out and log in again.",
+      );
       return;
     }
 
@@ -557,30 +705,41 @@ const Community = () => {
       setSubmitting(true);
 
       const formData = new FormData();
-      console.log('[SUBMIT] posting', formData);
-      formData.append('title', newPost.title);
-      formData.append('content', newPost.content);
-      formData.append('category', newPost.category);
-      formData.append('channelType', newPost.channelType || channelType);
-      if (authorId) formData.append('authorId', authorId);
-      if (authorEmail) formData.append('authorEmail', authorEmail);
-      if (selectedMedia) formData.append('image', selectedMedia); // Field name remains 'image' for backend compat, but can be video
+      console.log("[SUBMIT] posting", formData);
+      formData.append("title", newPost.title);
+      formData.append("content", newPost.content);
+      formData.append("category", newPost.category);
+      formData.append("channelType", newPost.channelType || channelType);
+      if (authorId) formData.append("authorId", authorId);
+      if (authorEmail) formData.append("authorEmail", authorEmail);
+      if (selectedMedia) formData.append("image", selectedMedia); // Field name remains 'image' for backend compat, but can be video
 
-      if (showPollEditor && pollData.question?.trim() && pollData.options.filter(o => o.trim()).length >= 2) {
+      if (
+        showPollEditor &&
+        pollData.question?.trim() &&
+        pollData.options.filter((o) => o.trim()).length >= 2
+      ) {
         const formattedPoll = {
           question: pollData.question,
-          options: pollData.options.filter(o => o.trim()).map(o => ({ text: o, voters: [] })),
-          expiresAt: pollData.expiresAt
+          options: pollData.options
+            .filter((o) => o.trim())
+            .map((o) => ({ text: o, voters: [] })),
+          expiresAt: pollData.expiresAt,
         };
-        formData.append('poll', JSON.stringify(formattedPoll));
+        formData.append("poll", JSON.stringify(formattedPoll));
       }
 
-      console.log('[API CALL] sending', formData);
+      console.log("[API CALL] sending", formData);
       const result = await communityAPI.createDiscussion(formData);
 
       if (result.success) {
-        setDiscussions(prev => [result.data, ...prev]);
-        setNewPost({ title: "", content: "", category: "general", channelType });
+        setDiscussions((prev) => [result.data, ...prev]);
+        setNewPost({
+          title: "",
+          content: "",
+          category: "general",
+          channelType,
+        });
         setSelectedMedia(null);
         setMediaPreview(null);
         setMediaType(null);
@@ -588,12 +747,12 @@ const Community = () => {
         setPollData({ options: ["", ""] });
         setShowNewPostModal(false);
       } else {
-        console.error('Failed to create post:', result.error);
-        alert(result.error || 'Failed to create post. Please try again.');
+        console.error("Failed to create post:", result.error);
+        alert(result.error || "Failed to create post. Please try again.");
       }
     } catch (error) {
-      console.error('Error creating post:', error);
-      alert('An error occurred while creating your post. Please try again.');
+      console.error("Error creating post:", error);
+      alert("An error occurred while creating your post. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -604,9 +763,15 @@ const Community = () => {
 
     try {
       setReportSubmitting(true);
-      const result = await communityAPI.reportDiscussion(discussionId, currentUserId, reportReason);
+      const result = await communityAPI.reportDiscussion(
+        discussionId,
+        currentUserId,
+        reportReason,
+      );
       if (result.success) {
-        alert("Thank you for your report. Our moderator team will review this content.");
+        alert(
+          "Thank you for your report. Our moderator team will review this content.",
+        );
         setReportingId(null);
         setReportReason("");
       } else {
@@ -622,9 +787,10 @@ const Community = () => {
 
   // Handle share to groups
   const handleShareToGroups = async () => {
-    if (!currentUser || !sharingDiscussionId || selectedGroups.length === 0) return;
+    if (!currentUser || !sharingDiscussionId || selectedGroups.length === 0)
+      return;
 
-    const discussion = discussions.find(d => d._id === sharingDiscussionId);
+    const discussion = discussions.find((d) => d._id === sharingDiscussionId);
     if (!discussion) return;
 
     try {
@@ -637,35 +803,45 @@ const Community = () => {
         content: discussion.content,
         author: {
           name: getAuthorName(discussion.author),
-          id: getAuthorId(discussion.author)
+          id: getAuthorId(discussion.author),
         },
         category: discussion.category,
-        media: discussion.media ? {
-          url: discussion.media.url,
-          type: discussion.media.resourceType || (discussion.media.url.match(/\.(mp4|mov|webm)$|video\/upload/i) ? 'video' : 'image')
-        } : null,
-        poll: discussion.poll ? {
-          question: discussion.poll.question,
-          options: discussion.poll.options,
-          expiresAt: discussion.poll.expiresAt
-        } : null,
-        createdAt: discussion.createdAt
+        media: discussion.media
+          ? {
+              url: discussion.media.url,
+              type:
+                discussion.media.resourceType ||
+                (discussion.media.url.match(/\.(mp4|mov|webm)$|video\/upload/i)
+                  ? "video"
+                  : "image"),
+            }
+          : null,
+        poll: discussion.poll
+          ? {
+              question: discussion.poll.question,
+              options: discussion.poll.options,
+              expiresAt: discussion.poll.expiresAt,
+            }
+          : null,
+        createdAt: discussion.createdAt,
       };
 
       // Share to all selected groups
-      const sharePromises = selectedGroups.map(groupId =>
-        groupsAPI.sharePostToGroup(groupId, postData)
+      const sharePromises = selectedGroups.map((groupId) =>
+        groupsAPI.sharePostToGroup(groupId, postData),
       );
 
       const results = await Promise.all(sharePromises);
 
-      const successCount = results.filter(r => r.success).length;
+      const successCount = results.filter((r) => r.success).length;
       const failCount = results.length - successCount;
 
       if (successCount > 0) {
-        alert(`Successfully shared to ${successCount} group${successCount > 1 ? 's' : ''}!${failCount > 0 ? ` (${failCount} failed)` : ''}`);
+        alert(
+          `Successfully shared to ${successCount} group${successCount > 1 ? "s" : ""}!${failCount > 0 ? ` (${failCount} failed)` : ""}`,
+        );
       } else {
-        const firstError = results.find(r => !r.success)?.error;
+        const firstError = results.find((r) => !r.success)?.error;
         alert(`Failed to share: ${firstError || "Unknown error"}`);
       }
 
@@ -696,7 +872,6 @@ const Community = () => {
           <DashboardHeader />
 
           <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-
             {/* Search Bar */}
             <div className="mb-8">
               <div className="relative max-w-2xl mx-auto">
@@ -708,7 +883,7 @@ const Community = () => {
                     placeholder="Search discussions, categories, or content..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     className="w-full pl-12 pr-12 py-4 bg-white dark:bg-[#1E293B] border-0 ring-1 ring-gray-100 dark:ring-gray-700 rounded-full text-[#002147] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#002147]/20 dark:focus:ring-blue-500/40 shadow-lg shadow-gray-200/50 dark:shadow-none transition-all hover:shadow-xl hover:shadow-gray-200/50"
                   />
                   {searchQuery && (
@@ -724,50 +899,117 @@ const Community = () => {
             </div>
 
             {/* Channel Switcher */}
-            <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+            <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
               <div className="flex gap-2 bg-white/70 backdrop-blur-sm p-1 rounded-2xl shadow-sm border border-white/60">
-                {[{ key: "discussion", label: "Discussion", hint: "General" }, { key: "support", label: "Support", hint: "Emotion Coach" }].map((chan) => (
+                {[
+                  {
+                    key: "discussion",
+                    label: "Discussion",
+                    hint: "General",
+                    icon: MessageCircle,
+                  },
+                  {
+                    key: "support",
+                    label: "Support",
+                    hint: "Emotion Coach",
+                    icon: Handshake,
+                  },
+                  {
+                    key: "mentor",
+                    label: "Mentor",
+                    hint: "Mentors & Coaches",
+                    icon: GraduationCap,
+                  },
+                ].map((chan) => (
                   <button
                     key={chan.key}
                     onClick={() => handleChannelSwitch(chan.key)}
-                    className={`px-4 py-3 rounded-xl text-sm font-bold flex flex-col leading-tight transition-all ${channelType === chan.key
-                      ? "bg-[#002147] text-white shadow-lg shadow-blue-900/15"
-                      : "text-gray-600 hover:bg-white"
-                      }`}
+                    className={`px-4 py-3 rounded-xl text-sm font-bold flex flex-col leading-tight transition-all ${
+                      channelType === chan.key
+                        ? "bg-[#002147] text-white shadow-lg shadow-blue-900/15"
+                        : "text-gray-600 hover:bg-white"
+                    }`}
                   >
-                    <span>{chan.label}</span>
-                    <span className="text-[10px] uppercase tracking-widest font-black opacity-70">{chan.hint}</span>
+                    <span className="flex items-center gap-2">
+                      <chan.icon className="w-4 h-4" />
+                      {chan.label}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-widest font-black opacity-70">
+                      {chan.hint}
+                    </span>
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-gray-600 max-w-md font-semibold">
-                Support channel runs Emotion Coach, safer responses, and pings staff for distressed posts.
-              </p>
+              {isMentorChannel ? (
+                <div className="max-w-md rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs font-semibold px-4 py-3">
+                  Ask your mentors and coaches directly. Posts here are visible
+                  to all mentors assigned to your college.
+                </div>
+              ) : (
+                <p className="text-xs text-gray-600 max-w-md font-semibold">
+                  {isSupportChannel
+                    ? "Support channel runs Emotion Coach, safer responses, and pings staff for distressed posts."
+                    : "Discussion channel is for general community conversations and peer help."}
+                </p>
+              )}
             </div>
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12">
               {[
-                { label: "Members", value: stats.totalMembers?.toLocaleString() || "0", icon: Users, color: "text-[#002147]", bg: "bg-[#002147]/10" },
-                { label: "Discussions", value: stats.totalDiscussions?.toLocaleString() || "0", icon: MessageCircle, color: "text-[#C0C0C0]", bg: "bg-[#C0C0C0]/10" },
-                { label: "Groups", value: stats.totalGroups?.toLocaleString() || "0", icon: Star, color: "text-purple-500", bg: "bg-purple-500/10" },
-                { label: "Active Today", value: stats.activeToday?.toLocaleString() || "0", icon: TrendingUp, color: "text-green-500", bg: "bg-green-500/10" },
+                {
+                  label: "Members",
+                  value: stats.totalMembers?.toLocaleString() || "0",
+                  icon: Users,
+                  color: "text-[#002147]",
+                  bg: "bg-[#002147]/10",
+                },
+                {
+                  label: "Discussions",
+                  value: stats.totalDiscussions?.toLocaleString() || "0",
+                  icon: MessageCircle,
+                  color: "text-[#C0C0C0]",
+                  bg: "bg-[#C0C0C0]/10",
+                },
+                {
+                  label: "Groups",
+                  value: stats.totalGroups?.toLocaleString() || "0",
+                  icon: Star,
+                  color: "text-purple-500",
+                  bg: "bg-purple-500/10",
+                },
+                {
+                  label: "Active Today",
+                  value: stats.activeToday?.toLocaleString() || "0",
+                  icon: TrendingUp,
+                  color: "text-green-500",
+                  bg: "bg-green-500/10",
+                },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -2, boxShadow: "0 10px 20px -5px rgba(0,0,0,0.05)" }}
+                  whileHover={{
+                    y: -2,
+                    boxShadow: "0 10px 20px -5px rgba(0,0,0,0.05)",
+                  }}
                   className="bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl rounded-xl p-3 shadow-sm border border-white/40 dark:border-white/10 transition-all duration-300"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 ${stat.bg} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <div
+                      className={`w-8 h-8 ${stat.bg} rounded-lg flex items-center justify-center flex-shrink-0`}
+                    >
                       <stat.icon className={`w-4 h-4 ${stat.color}`} />
                     </div>
                     <div>
-                      <p className="text-xl font-bold text-[#002147] dark:text-white leading-none mb-0.5 tracking-tight">{stat.value}</p>
-                      <p className="text-[11px] text-gray-500 font-medium leading-none">{stat.label}</p>
+                      <p className="text-xl font-bold text-[#002147] dark:text-white leading-none mb-0.5 tracking-tight">
+                        {stat.value}
+                      </p>
+                      <p className="text-[11px] text-gray-500 font-medium leading-none">
+                        {stat.label}
+                      </p>
                     </div>
                   </div>
                 </motion.div>
@@ -784,7 +1026,7 @@ const Community = () => {
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     setNewPost((prev) => ({ ...prev, channelType }));
-                    console.log('[MODAL] channelType set to:', channelType);
+                    console.log("[MODAL] channelType set to:", channelType);
                     setShowNewPostModal(true);
                   }}
                   className="w-full py-4 bg-gradient-to-r from-[#002147] to-[#002147]/90 text-white font-semibold rounded-2xl shadow-lg shadow-[#002147]/20 transition-all flex items-center justify-center gap-2 mb-2"
@@ -800,10 +1042,11 @@ const Community = () => {
                       <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`px-5 py-2.5 rounded-lg text-sm font-medium capitalize transition-all duration-300 ${activeTab === tab
-                          ? "bg-white dark:bg-[#1E293B] text-[#002147] dark:text-white shadow-sm ring-1 ring-gray-100 dark:ring-gray-700"
-                          : "text-gray-500 dark:text-gray-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/10"
-                          }`}
+                        className={`px-5 py-2.5 rounded-lg text-sm font-medium capitalize transition-all duration-300 ${
+                          activeTab === tab
+                            ? "bg-white dark:bg-[#1E293B] text-[#002147] dark:text-white shadow-sm ring-1 ring-gray-100 dark:ring-gray-700"
+                            : "text-gray-500 dark:text-gray-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/10"
+                        }`}
                       >
                         {tab}
                       </button>
@@ -812,14 +1055,14 @@ const Community = () => {
 
                   <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm p-1 rounded-xl border border-white/40">
                     <button
-                      onClick={() => setSortBy('createdAt')}
-                      className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${sortBy === 'createdAt' ? 'bg-[#002147] text-white shadow-md' : 'text-gray-500 hover:bg-white/50'}`}
+                      onClick={() => setSortBy("createdAt")}
+                      className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${sortBy === "createdAt" ? "bg-[#002147] text-white shadow-md" : "text-gray-500 hover:bg-white/50"}`}
                     >
                       NEWEST
                     </button>
                     <button
-                      onClick={() => setSortBy('popularity')}
-                      className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${sortBy === 'popularity' ? 'bg-[#002147] text-white shadow-md' : 'text-gray-500 hover:bg-white/50'}`}
+                      onClick={() => setSortBy("popularity")}
+                      className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${sortBy === "popularity" ? "bg-[#002147] text-white shadow-md" : "text-gray-500 hover:bg-white/50"}`}
                     >
                       POPULAR
                     </button>
@@ -835,10 +1078,14 @@ const Community = () => {
                   <div className="text-center py-12 bg-white border border-gray-100 rounded-xl shadow-sm">
                     <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-600 dark:text-gray-300 mb-1 font-bold">
-                      {debouncedSearch ? `No results for "${debouncedSearch}"` : "No discussions yet"}
+                      {debouncedSearch
+                        ? `No results for "${debouncedSearch}"`
+                        : "No discussions yet"}
                     </p>
                     <p className="text-gray-400 text-sm">
-                      {debouncedSearch ? "Try adjusting your search or category filters" : "Be the first to start a conversation!"}
+                      {debouncedSearch
+                        ? "Try adjusting your search or category filters"
+                        : "Be the first to start a conversation!"}
                     </p>
                     {debouncedSearch && (
                       <button
@@ -856,14 +1103,19 @@ const Community = () => {
                             setLoading(true);
                             const result = await communityAPI.seedData();
                             if (result.success) {
-                              alert('Data seeded successfully! Refreshing...');
+                              alert("Data seeded successfully! Refreshing...");
                               window.location.reload();
                             } else {
-                              alert('Failed to seed data: ' + (result.error || 'Unknown error'));
+                              alert(
+                                "Failed to seed data: " +
+                                  (result.error || "Unknown error"),
+                              );
                             }
                           } catch (err) {
                             console.error(err);
-                            alert('Error seeding data. Make sure backend is running.');
+                            alert(
+                              "Error seeding data. Make sure backend is running.",
+                            );
                           } finally {
                             setLoading(false);
                           }
@@ -877,15 +1129,32 @@ const Community = () => {
                 ) : (
                   /* Discussions List */
                   <div className="space-y-4">
-                    {discussions.map((discussion, index) => {
-                      const isExpanded = expandedDiscussionId === discussion._id;
-                      const isLikedByMe = discussion.likes?.includes(currentUser?._id || currentUser?.id || currentUserId);
-                      const isBookmarkedByMe = discussion.isBookmarkedBy?.includes(currentUser?._id || currentUser?.id || currentUserId);
-                      const isAuthor = currentUserId && getAuthorId(discussion.author) === currentUserId;
-                      const upVotes = (discussion.peerVotes || []).filter(v => v.vote === 'up').length;
-                      const downVotes = (discussion.peerVotes || []).filter(v => v.vote === 'down').length;
-                      const myPeerVote = (discussion.peerVotes || []).find(v => String(v.userId) === currentUserId)?.vote;
-                      const qualityScore = typeof discussion.qualityScore === 'number' ? discussion.qualityScore : 0;
+                    {visibleDiscussions.map((discussion, index) => {
+                      const isExpanded =
+                        expandedDiscussionId === discussion._id;
+                      const isLikedByMe = discussion.likes?.includes(
+                        currentUser?._id || currentUser?.id || currentUserId,
+                      );
+                      const isBookmarkedByMe =
+                        discussion.isBookmarkedBy?.includes(
+                          currentUser?._id || currentUser?.id || currentUserId,
+                        );
+                      const isAuthor =
+                        currentUserId &&
+                        getAuthorId(discussion.author) === currentUserId;
+                      const upVotes = (discussion.peerVotes || []).filter(
+                        (v) => v.vote === "up",
+                      ).length;
+                      const downVotes = (discussion.peerVotes || []).filter(
+                        (v) => v.vote === "down",
+                      ).length;
+                      const myPeerVote = (discussion.peerVotes || []).find(
+                        (v) => String(v.userId) === currentUserId,
+                      )?.vote;
+                      const qualityScore =
+                        typeof discussion.qualityScore === "number"
+                          ? discussion.qualityScore
+                          : 0;
 
                       return (
                         <motion.div
@@ -908,7 +1177,9 @@ const Community = () => {
                                     PINNED
                                   </span>
                                 )}
-                                {discussion.author?.role === 'admin' && <AdminBadge />}
+                                {discussion.author?.role === "admin" && (
+                                  <AdminBadge />
+                                )}
                                 <span className="px-2 py-1 bg-blue-50 text-blue-700 text-[10px] font-black rounded-full border border-blue-100">
                                   QS {qualityScore.toFixed(2)}
                                 </span>
@@ -919,20 +1190,34 @@ const Community = () => {
                               <div className="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
                                 <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[#002147] font-bold uppercase overflow-hidden border border-white">
                                   {discussion.author?.profileImage ? (
-                                    <img src={discussion.author.profileImage} alt="" className="w-full h-full object-cover" />
-                                  ) : getAuthorName(discussion.author).charAt(0)}
+                                    <img
+                                      src={discussion.author.profileImage}
+                                      alt=""
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    getAuthorName(discussion.author).charAt(0)
+                                  )}
                                 </div>
                                 <span>{getAuthorName(discussion.author)}</span>
                                 <span>•</span>
-                                <span>{formatTimeAgo(discussion.createdAt)}</span>
+                                <span>
+                                  {formatTimeAgo(discussion.createdAt)}
+                                </span>
                               </div>
                             </div>
                             <div className="flex flex-col gap-2">
                               <button
-                                onClick={() => setExpandedDiscussionId(isExpanded ? null : discussion._id)}
-                                className={`p-2 rounded-xl transition-all ${isExpanded ? 'bg-[#002147] text-white shadow-lg' : 'bg-gray-50 text-gray-400 hover:bg-gray-100 group-hover:text-[#002147]'}`}
+                                onClick={() =>
+                                  setExpandedDiscussionId(
+                                    isExpanded ? null : discussion._id,
+                                  )
+                                }
+                                className={`p-2 rounded-xl transition-all ${isExpanded ? "bg-[#002147] text-white shadow-lg" : "bg-gray-50 text-gray-400 hover:bg-gray-100 group-hover:text-[#002147]"}`}
                               >
-                                <ChevronRight className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                                <ChevronRight
+                                  className={`w-5 h-5 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                                />
                               </button>
                             </div>
                           </div>
@@ -949,7 +1234,7 @@ const Community = () => {
                             {isExpanded && (
                               <motion.div
                                 initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
+                                animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 className="overflow-hidden"
                               >
@@ -960,90 +1245,157 @@ const Community = () => {
                             )}
                           </AnimatePresence>
 
-                          {discussion.poll && discussion.poll.options && discussion.poll.options.length > 0 && (
-                            <div className="mt-6 p-6 bg-gradient-to-br from-blue-50/50 to-white rounded-3xl border border-blue-100/50 shadow-sm">
-                              <div className="flex items-center gap-2 mb-4">
-                                <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
-                                  <TrendingUp className="w-4 h-4 text-white" />
+                          {discussion.poll &&
+                            discussion.poll.options &&
+                            discussion.poll.options.length > 0 && (
+                              <div className="mt-6 p-6 bg-gradient-to-br from-blue-50/50 to-white rounded-3xl border border-blue-100/50 shadow-sm">
+                                <div className="flex items-center gap-2 mb-4">
+                                  <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center">
+                                    <TrendingUp className="w-4 h-4 text-white" />
+                                  </div>
+                                  <h4 className="text-sm font-black text-[#002147] uppercase tracking-wider">
+                                    {discussion.poll.question || "Poll"}
+                                  </h4>
                                 </div>
-                                <h4 className="text-sm font-black text-[#002147] uppercase tracking-wider">
-                                  {discussion.poll.question || "Poll"}
-                                </h4>
-                              </div>
 
-                              <div className="space-y-3">
-                                {discussion.poll.options.map((option, idx) => {
-                                  const totalVotes = discussion.poll.options.reduce((acc, opt) => acc + (opt.voters?.length || 0), 0);
-                                  const optionVotes = option.voters?.length || 0;
-                                  const percentage = totalVotes > 0 ? Math.round((optionVotes / totalVotes) * 100) : 0;
-                                  const hasVoted = discussion.poll.options.some(opt => opt.voters?.some(vId => String(vId) === currentUserId));
-                                  const myVote = option.voters?.some(vId => String(vId) === currentUserId);
-                                  const isExpired = discussion.poll.expiresAt && new Date() > new Date(discussion.poll.expiresAt);
+                                <div className="space-y-3">
+                                  {discussion.poll.options.map(
+                                    (option, idx) => {
+                                      const totalVotes =
+                                        discussion.poll.options.reduce(
+                                          (acc, opt) =>
+                                            acc + (opt.voters?.length || 0),
+                                          0,
+                                        );
+                                      const optionVotes =
+                                        option.voters?.length || 0;
+                                      const percentage =
+                                        totalVotes > 0
+                                          ? Math.round(
+                                              (optionVotes / totalVotes) * 100,
+                                            )
+                                          : 0;
+                                      const hasVoted =
+                                        discussion.poll.options.some((opt) =>
+                                          opt.voters?.some(
+                                            (vId) =>
+                                              String(vId) === currentUserId,
+                                          ),
+                                        );
+                                      const myVote = option.voters?.some(
+                                        (vId) => String(vId) === currentUserId,
+                                      );
+                                      const isExpired =
+                                        discussion.poll.expiresAt &&
+                                        new Date() >
+                                          new Date(discussion.poll.expiresAt);
 
-                                  return (
-                                    <div key={idx} className="relative">
-                                      <button
-                                        disabled={isExpired || votingId === discussion._id}
-                                        onClick={(e) => { e.stopPropagation(); handleVote(discussion._id, idx); }}
-                                        className={`w-full text-left p-4 rounded-2xl border-2 transition-all relative overflow-hidden group/opt ${myVote
-                                          ? 'border-blue-500 bg-blue-50/30'
-                                          : hasVoted || isExpired
-                                            ? 'border-gray-100 bg-gray-50/50 cursor-default'
-                                            : 'border-gray-100 bg-white hover:border-blue-200 hover:bg-blue-50/20'
-                                          }`}
-                                      >
-                                        {/* Progress Bar Background */}
-                                        {(hasVoted || isExpired) && (
-                                          <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${percentage}%` }}
-                                            className={`absolute inset-0 opacity-10 ${myVote ? 'bg-blue-500' : 'bg-[#002147]'}`}
-                                          />
-                                        )}
+                                      return (
+                                        <div key={idx} className="relative">
+                                          <button
+                                            disabled={
+                                              isExpired ||
+                                              votingId === discussion._id
+                                            }
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleVote(discussion._id, idx);
+                                            }}
+                                            className={`w-full text-left p-4 rounded-2xl border-2 transition-all relative overflow-hidden group/opt ${
+                                              myVote
+                                                ? "border-blue-500 bg-blue-50/30"
+                                                : hasVoted || isExpired
+                                                  ? "border-gray-100 bg-gray-50/50 cursor-default"
+                                                  : "border-gray-100 bg-white hover:border-blue-200 hover:bg-blue-50/20"
+                                            }`}
+                                          >
+                                            {/* Progress Bar Background */}
+                                            {(hasVoted || isExpired) && (
+                                              <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{
+                                                  width: `${percentage}%`,
+                                                }}
+                                                className={`absolute inset-0 opacity-10 ${myVote ? "bg-blue-500" : "bg-[#002147]"}`}
+                                              />
+                                            )}
 
-                                        <div className="relative z-10 flex items-center justify-between gap-4">
-                                          <div className="flex items-center gap-3">
-                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${myVote ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
-                                              }`}>
-                                              {myVote && <div className="w-2 h-2 bg-white rounded-full" />}
+                                            <div className="relative z-10 flex items-center justify-between gap-4">
+                                              <div className="flex items-center gap-3">
+                                                <div
+                                                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                                                    myVote
+                                                      ? "border-blue-500 bg-blue-500"
+                                                      : "border-gray-300"
+                                                  }`}
+                                                >
+                                                  {myVote && (
+                                                    <div className="w-2 h-2 bg-white rounded-full" />
+                                                  )}
+                                                </div>
+                                                <span
+                                                  className={`text-sm font-bold ${myVote ? "text-blue-700" : "text-[#002147]"}`}
+                                                >
+                                                  {option.text}
+                                                </span>
+                                              </div>
+                                              {(hasVoted || isExpired) && (
+                                                <span className="text-xs font-black text-[#002147] opacity-60">
+                                                  {percentage}%
+                                                </span>
+                                              )}
                                             </div>
-                                            <span className={`text-sm font-bold ${myVote ? 'text-blue-700' : 'text-[#002147]'}`}>
-                                              {option.text}
-                                            </span>
-                                          </div>
-                                          {(hasVoted || isExpired) && (
-                                            <span className="text-xs font-black text-[#002147] opacity-60">
-                                              {percentage}%
-                                            </span>
-                                          )}
+                                          </button>
                                         </div>
-                                      </button>
-                                    </div>
-                                  );
-                                })}
-                              </div>
+                                      );
+                                    },
+                                  )}
+                                </div>
 
-                              <div className="mt-4 flex items-center justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
-                                <span>{discussion.poll.options.reduce((acc, opt) => acc + (opt.voters?.length || 0), 0)} TOTAL VOTES</span>
-                                {discussion.poll.expiresAt && (
-                                  <span className={new Date() > new Date(discussion.poll.expiresAt) ? 'text-red-500' : ''}>
-                                    {new Date() > new Date(discussion.poll.expiresAt) ? 'POLL CLOSED' : `ENDS ${new Date(discussion.poll.expiresAt).toLocaleDateString()}`}
+                                <div className="mt-4 flex items-center justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">
+                                  <span>
+                                    {discussion.poll.options.reduce(
+                                      (acc, opt) =>
+                                        acc + (opt.voters?.length || 0),
+                                      0,
+                                    )}{" "}
+                                    TOTAL VOTES
                                   </span>
-                                )}
+                                  {discussion.poll.expiresAt && (
+                                    <span
+                                      className={
+                                        new Date() >
+                                        new Date(discussion.poll.expiresAt)
+                                          ? "text-red-500"
+                                          : ""
+                                      }
+                                    >
+                                      {new Date() >
+                                      new Date(discussion.poll.expiresAt)
+                                        ? "POLL CLOSED"
+                                        : `ENDS ${new Date(discussion.poll.expiresAt).toLocaleDateString()}`}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
 
                           {/* Media Display */}
                           {discussion.media?.url && (
                             <div className="mt-4 rounded-2xl overflow-hidden border border-white/40 shadow-xl group/media relative">
-                              {discussion.media.resourceType === 'video' || (discussion.media.url.match(/\.(mp4|mov|webm)$|video\/upload/i)) ? (
+                              {discussion.media.resourceType === "video" ||
+                              discussion.media.url.match(
+                                /\.(mp4|mov|webm)$|video\/upload/i,
+                              ) ? (
                                 <div className="relative aspect-video bg-black flex items-center justify-center">
                                   <video
                                     src={discussion.media.url}
                                     controls
                                     className="w-full h-full object-contain"
-                                    poster={discussion.media.url.replace(/\.[^.]+$/, '.jpg')}
+                                    poster={discussion.media.url.replace(
+                                      /\.[^.]+$/,
+                                      ".jpg",
+                                    )}
                                   />
                                   <div className="absolute top-4 right-4 p-2 bg-black/40 backdrop-blur-md rounded-lg border border-white/20">
                                     <Video className="w-4 h-4 text-white" />
@@ -1052,7 +1404,10 @@ const Community = () => {
                               ) : (
                                 <div
                                   className="cursor-pointer overflow-hidden"
-                                  onClick={(e) => { e.stopPropagation(); setViewerImage(discussion.media.url); }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setViewerImage(discussion.media.url);
+                                  }}
                                 >
                                   <img
                                     src={discussion.media.url}
@@ -1067,42 +1422,66 @@ const Community = () => {
 
                           <div className="flex items-center gap-3 mt-6 pt-4 border-t border-gray-100/50">
                             <button
-                              onClick={(e) => { e.stopPropagation(); handleQualityVote(discussion._id, 'up'); }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQualityVote(discussion._id, "up");
+                              }}
                               disabled={qualityVotingId === discussion._id}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${myPeerVote === 'up'
-                                ? 'bg-green-50 text-green-700 border-green-200 shadow-sm'
-                                : 'bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100'}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                                myPeerVote === "up"
+                                  ? "bg-green-50 text-green-700 border-green-200 shadow-sm"
+                                  : "bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100"
+                              }
                               `}
                               title="Upvote"
                             >
-                              <ThumbsUp className={`w-4 h-4 ${myPeerVote === 'up' ? 'fill-current' : ''}`} />
+                              <ThumbsUp
+                                className={`w-4 h-4 ${myPeerVote === "up" ? "fill-current" : ""}`}
+                              />
                               <span>{upVotes}</span>
                             </button>
 
                             <button
-                              onClick={(e) => { e.stopPropagation(); handleQualityVote(discussion._id, 'down'); }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleQualityVote(discussion._id, "down");
+                              }}
                               disabled={qualityVotingId === discussion._id}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${myPeerVote === 'down'
-                                ? 'bg-red-50 text-red-700 border-red-200 shadow-sm'
-                                : 'bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100'}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                                myPeerVote === "down"
+                                  ? "bg-red-50 text-red-700 border-red-200 shadow-sm"
+                                  : "bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100"
+                              }
                               `}
                               title="Downvote"
                             >
-                              <ThumbsDown className={`w-4 h-4 ${myPeerVote === 'down' ? 'fill-current' : ''}`} />
+                              <ThumbsDown
+                                className={`w-4 h-4 ${myPeerVote === "down" ? "fill-current" : ""}`}
+                              />
                               <span>{downVotes}</span>
                             </button>
 
                             <div className="relative">
                               <button
-                                onMouseEnter={() => setActiveReactionPickerId(discussion._id)}
-                                onClick={(e) => { e.stopPropagation(); handleLike(discussion._id); }}
-                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all ${isLikedByMe
-                                  ? 'bg-red-50 text-red-500 shadow-sm border border-red-100'
-                                  : 'bg-gray-50 text-gray-500 hover:bg-gray-100 border border-transparent'
-                                  }`}
+                                onMouseEnter={() =>
+                                  setActiveReactionPickerId(discussion._id)
+                                }
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleLike(discussion._id);
+                                }}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl transition-all ${
+                                  isLikedByMe
+                                    ? "bg-red-50 text-red-500 shadow-sm border border-red-100"
+                                    : "bg-gray-50 text-gray-500 hover:bg-gray-100 border border-transparent"
+                                }`}
                               >
-                                <Heart className={`w-4 h-4 ${isLikedByMe ? 'fill-current' : ''}`} />
-                                <span className="font-bold text-xs">{discussion.likes?.length || 0}</span>
+                                <Heart
+                                  className={`w-4 h-4 ${isLikedByMe ? "fill-current" : ""}`}
+                                />
+                                <span className="font-bold text-xs">
+                                  {discussion.likes?.length || 0}
+                                </span>
                               </button>
 
                               {/* Reaction Picker Redesigned */}
@@ -1110,7 +1489,9 @@ const Community = () => {
                                 <motion.div
                                   initial={{ opacity: 0, y: 10, scale: 0.9 }}
                                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                                  onMouseLeave={() => setActiveReactionPickerId(null)}
+                                  onMouseLeave={() =>
+                                    setActiveReactionPickerId(null)
+                                  }
                                   className="absolute bottom-full left-0 mb-3 px-2 py-1.5 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 flex items-center gap-1 z-50"
                                 >
                                   {REACTION_TYPES.map((react) => (
@@ -1132,13 +1513,19 @@ const Community = () => {
                             </div>
 
                             {/* Display reaction counts if any */}
-                            {(discussion.reactions?.length > 0) && (
+                            {discussion.reactions?.length > 0 && (
                               <div className="flex items-center -space-x-1">
-                                {REACTION_TYPES.map(rt => {
-                                  const reactionsOfType = (discussion.reactions || []).filter(r => r.type === rt.type);
+                                {REACTION_TYPES.map((rt) => {
+                                  const reactionsOfType = (
+                                    discussion.reactions || []
+                                  ).filter((r) => r.type === rt.type);
                                   if (reactionsOfType.length === 0) return null;
                                   return (
-                                    <div key={rt.type} className="w-6 h-6 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-xs z-10" title={`${rt.label}: ${reactionsOfType.length}`}>
+                                    <div
+                                      key={rt.type}
+                                      className="w-6 h-6 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-xs z-10"
+                                      title={`${rt.label}: ${reactionsOfType.length}`}
+                                    >
                                       {rt.emoji}
                                     </div>
                                   );
@@ -1160,21 +1547,28 @@ const Community = () => {
                               className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-[#002147] rounded-xl transition-all border border-transparent"
                             >
                               <MessageCircle className="w-4 h-4" />
-                              <span className="font-bold text-xs">{discussion.replies?.length || 0}</span>
+                              <span className="font-bold text-xs">
+                                {discussion.replies?.length || 0}
+                              </span>
                             </button>
 
                             <div className="flex-1" />
 
                             <button
-                              onClick={(e) => { e.stopPropagation(); handleBookmark(discussion._id); }}
-                              className={`p-1.5 rounded-lg transition-all ${isBookmarkedByMe
-                                ? 'bg-yellow-50 text-yellow-600'
-                                : 'text-gray-400 hover:text-yellow-600 hover:bg-yellow-50'
-                                }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBookmark(discussion._id);
+                              }}
+                              className={`p-1.5 rounded-lg transition-all ${
+                                isBookmarkedByMe
+                                  ? "bg-yellow-50 text-yellow-600"
+                                  : "text-gray-400 hover:text-yellow-600 hover:bg-yellow-50"
+                              }`}
                             >
-                              <Bookmark className={`w-4 h-4 ${isBookmarkedByMe ? 'fill-current' : ''}`} />
+                              <Bookmark
+                                className={`w-4 h-4 ${isBookmarkedByMe ? "fill-current" : ""}`}
+                              />
                             </button>
-
 
                             <button
                               onClick={(e) => {
@@ -1189,7 +1583,10 @@ const Community = () => {
                             </button>
 
                             <button
-                              onClick={(e) => { e.stopPropagation(); setReportingId(discussion._id); }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setReportingId(discussion._id);
+                              }}
                               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                               title="Report Discussion"
                             >
@@ -1202,7 +1599,7 @@ const Community = () => {
                             {isExpanded && (
                               <motion.div
                                 initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
+                                animate={{ opacity: 1, height: "auto" }}
                                 exit={{ opacity: 0, height: 0 }}
                                 className="mt-6 space-y-4 border-t border-gray-100 pt-6"
                               >
@@ -1212,17 +1609,25 @@ const Community = () => {
                                 </h4>
 
                                 {discussion.replies?.map((reply) => {
-                                  const isOwner = currentUserId && getAuthorId(reply.author) === currentUserId;
-                                  const isBest = discussion.bestAnswer === reply._id;
-                                  const isEditable = isOwner && (Date.now() - new Date(reply.createdAt).getTime() < 15 * 60 * 1000);
+                                  const isOwner =
+                                    currentUserId &&
+                                    getAuthorId(reply.author) === currentUserId;
+                                  const isBest =
+                                    discussion.bestAnswer === reply._id;
+                                  const isEditable =
+                                    isOwner &&
+                                    Date.now() -
+                                      new Date(reply.createdAt).getTime() <
+                                      15 * 60 * 1000;
 
                                   return (
                                     <div
                                       key={reply._id || reply.createdAt}
-                                      className={`group/reply relative rounded-2xl p-4 transition-all ${isBest
-                                        ? 'bg-green-50/50 border-2 border-green-200'
-                                        : 'bg-gray-50/50 border border-gray-100'
-                                        }`}
+                                      className={`group/reply relative rounded-2xl p-4 transition-all ${
+                                        isBest
+                                          ? "bg-green-50/50 border-2 border-green-200"
+                                          : "bg-gray-50/50 border border-gray-100"
+                                      }`}
                                     >
                                       {isBest && (
                                         <div className="absolute -top-3 left-4">
@@ -1233,23 +1638,39 @@ const Community = () => {
                                       <div className="flex items-start justify-between mb-2">
                                         <div className="flex items-center gap-2">
                                           <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-[10px] font-bold text-[#002147] border border-white">
-                                            {getAuthorName(reply.author).charAt(0)}
+                                            {getAuthorName(reply.author).charAt(
+                                              0,
+                                            )}
                                           </div>
                                           <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-[#002147]">{getAuthorName(reply.author)}</span>
-                                            <span className="text-[10px] text-gray-400">{formatTimeAgo(reply.createdAt)}</span>
+                                            <span className="text-xs font-bold text-[#002147]">
+                                              {getAuthorName(reply.author)}
+                                            </span>
+                                            <span className="text-[10px] text-gray-400">
+                                              {formatTimeAgo(reply.createdAt)}
+                                            </span>
                                           </div>
                                         </div>
 
                                         <div className="flex items-center gap-1">
                                           {isAuthor && (
                                             <button
-                                              onClick={() => handleMarkBestAnswer(discussion._id, reply._id)}
-                                              className={`p-1.5 rounded-lg transition-all ${isBest
-                                                ? 'text-green-600 bg-green-100'
-                                                : 'text-gray-300 hover:text-green-600 hover:bg-green-50'
-                                                }`}
-                                              title={isBest ? "Unmark as Best Answer" : "Mark as Best Answer"}
+                                              onClick={() =>
+                                                handleMarkBestAnswer(
+                                                  discussion._id,
+                                                  reply._id,
+                                                )
+                                              }
+                                              className={`p-1.5 rounded-lg transition-all ${
+                                                isBest
+                                                  ? "text-green-600 bg-green-100"
+                                                  : "text-gray-300 hover:text-green-600 hover:bg-green-50"
+                                              }`}
+                                              title={
+                                                isBest
+                                                  ? "Unmark as Best Answer"
+                                                  : "Mark as Best Answer"
+                                              }
                                             >
                                               <CheckCircle className="w-4 h-4" />
                                             </button>
@@ -1260,21 +1681,33 @@ const Community = () => {
                                               <button
                                                 onClick={(e) => {
                                                   e.stopPropagation();
-                                                  setReplyMenuOpenId(replyMenuOpenId === reply._id ? null : reply._id);
+                                                  setReplyMenuOpenId(
+                                                    replyMenuOpenId ===
+                                                      reply._id
+                                                      ? null
+                                                      : reply._id,
+                                                  );
                                                 }}
                                                 className="p-1.5 rounded-lg text-gray-400 hover:text-[#002147] hover:bg-white transition-all"
                                               >
                                                 <MoreVertical className="w-4 h-4" />
                                               </button>
-                                              {replyMenuOpenId === reply._id && (
+                                              {replyMenuOpenId ===
+                                                reply._id && (
                                                 <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-100 rounded-xl shadow-xl z-10 overflow-hidden">
                                                   {isEditable && (
                                                     <button
                                                       className="w-full text-left px-4 py-2 text-xs text-[#002147] hover:bg-gray-50 transition-colors"
                                                       onClick={() => {
-                                                        setEditingReplyId(reply._id);
-                                                        setEditText(reply.content);
-                                                        setReplyMenuOpenId(null);
+                                                        setEditingReplyId(
+                                                          reply._id,
+                                                        );
+                                                        setEditText(
+                                                          reply.content,
+                                                        );
+                                                        setReplyMenuOpenId(
+                                                          null,
+                                                        );
                                                       }}
                                                     >
                                                       Edit
@@ -1283,7 +1716,10 @@ const Community = () => {
                                                   <button
                                                     className="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 transition-colors"
                                                     onClick={() => {
-                                                      handleReplyDelete(discussion._id, reply._id);
+                                                      handleReplyDelete(
+                                                        discussion._id,
+                                                        reply._id,
+                                                      );
                                                       setReplyMenuOpenId(null);
                                                     }}
                                                   >
@@ -1300,28 +1736,47 @@ const Community = () => {
                                         <div className="space-y-3">
                                           <textarea
                                             value={editText}
-                                            onChange={(e) => setEditText(e.target.value)}
+                                            onChange={(e) =>
+                                              setEditText(e.target.value)
+                                            }
                                             rows={3}
                                             className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none"
                                           />
                                           <div className="flex gap-2 justify-end">
                                             <button
-                                              onClick={() => { setEditingReplyId(null); setEditText(""); }}
+                                              onClick={() => {
+                                                setEditingReplyId(null);
+                                                setEditText("");
+                                              }}
                                               className="px-3 py-1.5 text-xs font-bold text-gray-500 hover:text-gray-700"
                                             >
                                               Cancel
                                             </button>
                                             <button
-                                              onClick={() => handleReplyEdit(discussion._id, reply)}
-                                              disabled={editSubmitting || !editText.trim()}
+                                              onClick={() =>
+                                                handleReplyEdit(
+                                                  discussion._id,
+                                                  reply,
+                                                )
+                                              }
+                                              disabled={
+                                                editSubmitting ||
+                                                !editText.trim()
+                                              }
                                               className="px-4 py-1.5 bg-[#002147] text-white text-xs font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50"
                                             >
-                                              {editSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Save'}
+                                              {editSubmitting ? (
+                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                              ) : (
+                                                "Save"
+                                              )}
                                             </button>
                                           </div>
                                         </div>
                                       ) : (
-                                        <p className="text-gray-700 text-sm leading-relaxed">{reply.content}</p>
+                                        <p className="text-gray-700 text-sm leading-relaxed">
+                                          {reply.content}
+                                        </p>
                                       )}
                                     </div>
                                   );
@@ -1330,22 +1785,32 @@ const Community = () => {
                                 {/* Reply Input */}
                                 <div className="mt-4 flex gap-3">
                                   <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
-                                    {currentUser?.fullName?.charAt(0) || 'U'}
+                                    {currentUser?.fullName?.charAt(0) || "U"}
                                   </div>
                                   <div className="flex-1 relative">
                                     <textarea
                                       value={replyText}
-                                      onChange={(e) => setReplyText(e.target.value)}
+                                      onChange={(e) =>
+                                        setReplyText(e.target.value)
+                                      }
                                       placeholder="Add a constructive comment..."
                                       className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all resize-none min-h-[100px]"
                                     />
                                     <div className="absolute bottom-3 right-3 flex items-center gap-2">
                                       <button
-                                        onClick={() => handleReplySubmit(discussion)}
-                                        disabled={replySubmitting || !replyText.trim()}
+                                        onClick={() =>
+                                          handleReplySubmit(discussion)
+                                        }
+                                        disabled={
+                                          replySubmitting || !replyText.trim()
+                                        }
                                         className="p-2 bg-[#002147] text-white rounded-xl shadow-lg shadow-blue-900/20 hover:scale-105 transition-all disabled:opacity-50 disabled:scale-100"
                                       >
-                                        {replySubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                        {replySubmitting ? (
+                                          <Loader2 className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                          <Send className="w-4 h-4" />
+                                        )}
                                       </button>
                                     </div>
                                   </div>
@@ -1388,7 +1853,9 @@ const Community = () => {
               {/* Right Column - Sidebar */}
               <div className="space-y-8">
                 {isSupportChannel && (
-                  <EmotionChatbot studentName={currentUser?.fullName || currentUser?.name} />
+                  <EmotionChatbot
+                    studentName={currentUser?.fullName || currentUser?.name}
+                  />
                 )}
 
                 {/* Featured Groups */}
@@ -1400,7 +1867,9 @@ const Community = () => {
                     My Groups
                   </h3>
                   {featuredGroups.length === 0 ? (
-                    <p className="text-gray-500 text-sm text-center py-4">No groups available</p>
+                    <p className="text-gray-500 text-sm text-center py-4">
+                      No groups available
+                    </p>
                   ) : (
                     <div className="space-y-4">
                       {featuredGroups.map((group) => {
@@ -1410,14 +1879,19 @@ const Community = () => {
                             key={group._id}
                             className="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/60 hover:shadow-sm transition-all cursor-pointer group/item"
                           >
-                            <div className={`w-12 h-12 ${group.color || 'bg-[#002147]'} rounded-2xl flex items-center justify-center shadow-sm group-hover/item:scale-105 transition-transform duration-300`}>
+                            <div
+                              className={`w-12 h-12 ${group.color || "bg-[#002147]"} rounded-2xl flex items-center justify-center shadow-sm group-hover/item:scale-105 transition-transform duration-300`}
+                            >
                               <IconComponent className="w-6 h-6 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-[#002147] text-sm font-bold truncate mb-0.5">{group.name}</p>
+                              <p className="text-[#002147] text-sm font-bold truncate mb-0.5">
+                                {group.name}
+                              </p>
                               <p className="text-gray-500 text-xs flex items-center gap-1">
                                 <Users className="w-3 h-3" />
-                                {(group.memberCount || 0).toLocaleString()} members
+                                {(group.memberCount || 0).toLocaleString()}{" "}
+                                members
                               </p>
                             </div>
                           </div>
@@ -1427,13 +1901,17 @@ const Community = () => {
                   )}
                   <div className="flex gap-3 mt-6">
                     <button
-                      onClick={() => navigate('/dashboard/groups')}
+                      onClick={() => navigate("/dashboard/groups")}
                       className="flex-1 py-3 text-sm font-semibold text-[#002147] bg-[#002147]/5 hover:bg-[#002147]/10 rounded-2xl transition-all"
                     >
                       View My Groups
                     </button>
                     <button
-                      onClick={() => navigate('/dashboard/groups', { state: { create: true } })}
+                      onClick={() =>
+                        navigate("/dashboard/groups", {
+                          state: { create: true },
+                        })
+                      }
                       className="flex-1 py-3 text-sm font-semibold text-white bg-[#002147] hover:bg-[#002147]/90 rounded-2xl transition-all shadow-lg shadow-blue-900/20"
                     >
                       Create Group
@@ -1450,7 +1928,9 @@ const Community = () => {
                     Top Contributors
                   </h3>
                   {topContributors.length === 0 ? (
-                    <p className="text-gray-500 text-sm text-center py-4">No contributors yet</p>
+                    <p className="text-gray-500 text-sm text-center py-4">
+                      No contributors yet
+                    </p>
                   ) : (
                     <div className="space-y-4">
                       {topContributors.map((user, index) => (
@@ -1464,24 +1944,55 @@ const Community = () => {
                           <div className="relative">
                             <div className="w-12 h-12 bg-gradient-to-br from-[#002147] to-blue-900 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md border-2 border-white overflow-hidden">
                               {user.author?.profileImage ? (
-                                <img src={user.author.profileImage} alt="" className="w-full h-full object-cover" />
-                              ) : (user.author?.fullName || user.author?.name || 'A').charAt(0).toUpperCase()}
+                                <img
+                                  src={user.author.profileImage}
+                                  alt=""
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                (
+                                  user.author?.fullName ||
+                                  user.author?.name ||
+                                  "A"
+                                )
+                                  .charAt(0)
+                                  .toUpperCase()
+                              )}
                             </div>
-                            <div className={`absolute -top-1 -left-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-sm border border-white ${index === 0 ? "bg-yellow-400 text-yellow-900" :
-                              index === 1 ? "bg-slate-300 text-slate-700" :
-                                index === 2 ? "bg-orange-400 text-orange-900" :
-                                  "bg-blue-100 text-blue-700"
-                              }`}>
+                            <div
+                              className={`absolute -top-1 -left-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-sm border border-white ${
+                                index === 0
+                                  ? "bg-yellow-400 text-yellow-900"
+                                  : index === 1
+                                    ? "bg-slate-300 text-slate-700"
+                                    : index === 2
+                                      ? "bg-orange-400 text-orange-900"
+                                      : "bg-blue-100 text-blue-700"
+                              }`}
+                            >
                               {index + 1}
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[#002147] text-sm font-bold truncate">{user.author?.fullName || user.author?.name || 'Anonymous'}</p>
-                            <p className="text-gray-500 text-[10px] font-medium uppercase tracking-wider">{user.postCount} posts • {user.replyCount} replies</p>
+                            <p className="text-[#002147] text-sm font-bold truncate">
+                              {user.author?.fullName ||
+                                user.author?.name ||
+                                "Anonymous"}
+                            </p>
+                            <p className="text-gray-500 text-[10px] font-medium uppercase tracking-wider">
+                              {user.postCount} posts • {user.replyCount} replies
+                            </p>
                           </div>
                           <div className="text-right">
-                            <div className="text-[#002147] text-xs font-black">{(user.points || ((user.postCount * 10) + (user.replyCount * 5))).toLocaleString()}</div>
-                            <div className="text-[8px] text-gray-400 font-bold uppercase">Points</div>
+                            <div className="text-[#002147] text-xs font-black">
+                              {(
+                                user.points ||
+                                user.postCount * 10 + user.replyCount * 5
+                              ).toLocaleString()}
+                            </div>
+                            <div className="text-[8px] text-gray-400 font-bold uppercase">
+                              Points
+                            </div>
                           </div>
                         </motion.div>
                       ))}
@@ -1497,13 +2008,13 @@ const Community = () => {
                     <span className="text-2xl">💡</span> Community Tip
                   </h3>
                   <p className="text-gray-700 text-sm leading-7 relative z-10 font-medium">
-                    Engage with discussions and help others to earn points and badges. Top contributors get featured on the leaderboard!
+                    Engage with discussions and help others to earn points and
+                    badges. Top contributors get featured on the leaderboard!
                   </p>
                 </div>
               </div>
             </div>
-
-          </main >
+          </main>
 
           {/* New Post Modal */}
           {showNewPostModal && (
@@ -1533,25 +2044,41 @@ const Community = () => {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Post Title</label>
+                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
+                          Post Title
+                        </label>
                         <input
                           type="text"
                           value={newPost.title}
-                          onChange={(e) => setNewPost(prev => ({ ...prev, title: e.target.value }))}
+                          onChange={(e) =>
+                            setNewPost((prev) => ({
+                              ...prev,
+                              title: e.target.value,
+                            }))
+                          }
                           placeholder="What's on your mind?"
                           className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[#002147] font-bold placeholder:text-gray-300 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Category</label>
+                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
+                          Category
+                        </label>
                         <div className="relative">
                           <select
                             value={newPost.category}
-                            onChange={(e) => setNewPost(prev => ({ ...prev, category: e.target.value }))}
+                            onChange={(e) =>
+                              setNewPost((prev) => ({
+                                ...prev,
+                                category: e.target.value,
+                              }))
+                            }
                             className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[#002147] font-bold appearance-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
                           >
-                            <option value="general">🌍 General Discussion</option>
+                            <option value="general">
+                              🌍 General Discussion
+                            </option>
                             <option value="career">💼 Career Growth</option>
                             <option value="study">📚 Study Resources</option>
                             <option value="exams">🎯 Exam Prep</option>
@@ -1565,45 +2092,74 @@ const Community = () => {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Channel</label>
-                          {isSupportChannel ? (
+                          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
+                            Channel
+                          </label>
+                          {isMentorChannel ? (
+                            <div className="px-4 py-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                              Mentor (locked)
+                            </div>
+                          ) : isSupportChannel ? (
                             <div className="px-4 py-3 rounded-xl bg-blue-50 text-[#002147] font-bold border border-blue-100">
                               Support (locked)
                             </div>
                           ) : (
                             <div className="flex gap-2 bg-gray-50 border border-gray-100 rounded-2xl p-1">
-                              {[{ key: "discussion", label: "Discussion" }, { key: "support", label: "Support" }].map((chan) => (
+                              {[
+                                { key: "discussion", label: "Discussion" },
+                                { key: "support", label: "Support" },
+                                { key: "mentor", label: "Mentor" },
+                              ].map((chan) => (
                                 <button
                                   key={chan.key}
-                                  onClick={() => setNewPost(prev => ({ ...prev, channelType: chan.key }))}
-                                  className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all ${newPost.channelType === chan.key
-                                    ? "bg-[#002147] text-white shadow"
-                                    : "text-gray-600 hover:bg-white"
-                                    }`}
+                                  onClick={() =>
+                                    setNewPost((prev) => ({
+                                      ...prev,
+                                      channelType: chan.key,
+                                    }))
+                                  }
+                                  className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                                    newPost.channelType === chan.key
+                                      ? "bg-[#002147] text-white shadow"
+                                      : "text-gray-600 hover:bg-white"
+                                  }`}
                                 >
                                   {chan.label}
                                 </button>
                               ))}
                             </div>
                           )}
-                          <p className="text-[11px] text-gray-500 font-semibold mt-2">Support channel enables Emotion Coach and quicker triage.</p>
+                          <p className="text-[11px] text-gray-500 font-semibold mt-2">
+                            {isMentorChannel
+                              ? "Mentor Channel — Your question will be visible to all mentors and coaches"
+                              : isSupportChannel
+                                ? "Support channel enables Emotion Coach and quicker triage."
+                                : "Discussion channel is public to your college community."}
+                          </p>
                         </div>
                       </div>
                     </div>
 
                     <div>
                       <div className="flex items-center justify-between mb-2 px-1">
-                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest">Rich Content</label>
+                        <label className="block text-xs font-black text-gray-400 uppercase tracking-widest">
+                          Rich Content
+                        </label>
                         <button
                           onClick={() => setShowPollEditor(!showPollEditor)}
-                          className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all ${showPollEditor ? 'bg-[#002147] text-white' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                          className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all ${showPollEditor ? "bg-[#002147] text-white" : "bg-blue-50 text-blue-600 hover:bg-blue-100"}`}
                         >
-                          {showPollEditor ? 'Remove Poll' : 'Add Poll'}
+                          {showPollEditor ? "Remove Poll" : "Add Poll"}
                         </button>
                       </div>
                       <textarea
                         value={newPost.content}
-                        onChange={(e) => setNewPost(prev => ({ ...prev, content: e.target.value }))}
+                        onChange={(e) =>
+                          setNewPost((prev) => ({
+                            ...prev,
+                            content: e.target.value,
+                          }))
+                        }
                         placeholder="Go ahead, share your story or ask a question..."
                         rows={showPollEditor ? 3 : 6}
                         className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[#002147] font-medium leading-relaxed placeholder:text-gray-300 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all resize-none"
@@ -1613,14 +2169,16 @@ const Community = () => {
                     {showPollEditor && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
+                        animate={{ opacity: 1, height: "auto" }}
                         className="space-y-4 p-6 bg-blue-50/50 rounded-3xl border border-blue-100/50"
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
                             <TrendingUp className="w-4 h-4 text-blue-600" />
                           </div>
-                          <h4 className="text-sm font-black text-[#002147] uppercase tracking-wider">Create a Poll</h4>
+                          <h4 className="text-sm font-black text-[#002147] uppercase tracking-wider">
+                            Create a Poll
+                          </h4>
                         </div>
 
                         <div className="space-y-3">
@@ -1628,7 +2186,12 @@ const Community = () => {
                             type="text"
                             placeholder="Poll Question (e.g., Which framework do you prefer?)"
                             value={pollData.question || ""}
-                            onChange={(e) => setPollData(prev => ({ ...prev, question: e.target.value }))}
+                            onChange={(e) =>
+                              setPollData((prev) => ({
+                                ...prev,
+                                question: e.target.value,
+                              }))
+                            }
                             className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                           />
 
@@ -1642,13 +2205,23 @@ const Community = () => {
                                   onChange={(e) => {
                                     const newOptions = [...pollData.options];
                                     newOptions[idx] = e.target.value;
-                                    setPollData(prev => ({ ...prev, options: newOptions }));
+                                    setPollData((prev) => ({
+                                      ...prev,
+                                      options: newOptions,
+                                    }));
                                   }}
                                   className="flex-1 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                                 />
                                 {pollData.options.length > 2 && (
                                   <button
-                                    onClick={() => setPollData(prev => ({ ...prev, options: prev.options.filter((_, i) => i !== idx) }))}
+                                    onClick={() =>
+                                      setPollData((prev) => ({
+                                        ...prev,
+                                        options: prev.options.filter(
+                                          (_, i) => i !== idx,
+                                        ),
+                                      }))
+                                    }
                                     className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                                   >
                                     <X className="w-4 h-4" />
@@ -1659,7 +2232,12 @@ const Community = () => {
 
                             {pollData.options.length < 5 && (
                               <button
-                                onClick={() => setPollData(prev => ({ ...prev, options: [...prev.options, ""] }))}
+                                onClick={() =>
+                                  setPollData((prev) => ({
+                                    ...prev,
+                                    options: [...prev.options, ""],
+                                  }))
+                                }
                                 className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1.5 px-2 py-1 transition-colors"
                               >
                                 <Plus className="w-3 h-3" />
@@ -1669,11 +2247,18 @@ const Community = () => {
                           </div>
 
                           <div className="pt-2">
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Ending Date (Optional)</label>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">
+                              Ending Date (Optional)
+                            </label>
                             <input
                               type="datetime-local"
                               value={pollData.expiresAt || ""}
-                              onChange={(e) => setPollData(prev => ({ ...prev, expiresAt: e.target.value }))}
+                              onChange={(e) =>
+                                setPollData((prev) => ({
+                                  ...prev,
+                                  expiresAt: e.target.value,
+                                }))
+                              }
                               className="w-full px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-xs font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                             />
                           </div>
@@ -1682,19 +2267,29 @@ const Community = () => {
                     )}
 
                     <div>
-                      <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Media Attachment</label>
+                      <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
+                        Media Attachment
+                      </label>
                       <div
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
-                        className={`relative group/upload flex flex-col items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] transition-all cursor-pointer ${mediaPreview ? 'border-blue-500 bg-blue-50/10' : 'hover:border-blue-400 hover:bg-gray-100'}`}
+                        className={`relative group/upload flex flex-col items-center justify-center p-8 bg-gray-50 border-2 border-dashed border-gray-200 rounded-[2rem] transition-all cursor-pointer ${mediaPreview ? "border-blue-500 bg-blue-50/10" : "hover:border-blue-400 hover:bg-gray-100"}`}
                         onClick={() => fileInputRef.current?.click()}
                       >
                         {mediaPreview ? (
                           <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg">
-                            {mediaType === 'video' ? (
-                              <video src={mediaPreview} className="w-full h-full object-cover" controls />
+                            {mediaType === "video" ? (
+                              <video
+                                src={mediaPreview}
+                                className="w-full h-full object-cover"
+                                controls
+                              />
                             ) : (
-                              <img src={mediaPreview} alt="Preview" className="w-full h-full object-cover" />
+                              <img
+                                src={mediaPreview}
+                                alt="Preview"
+                                className="w-full h-full object-cover"
+                              />
                             )}
                             <button
                               onClick={(e) => {
@@ -1717,8 +2312,12 @@ const Community = () => {
                             <div className="w-16 h-16 bg-white rounded-3xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-gray-100 group-hover:shadow-md transition-shadow">
                               <ImageIcon className="w-8 h-8 text-blue-500" />
                             </div>
-                            <p className="text-[#002147] font-black text-sm mb-1 uppercase tracking-wider">Drag & Drop Media</p>
-                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Support Images & Videos up to 5MB</p>
+                            <p className="text-[#002147] font-black text-sm mb-1 uppercase tracking-wider">
+                              Drag & Drop Media
+                            </p>
+                            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+                              Support Images & Videos up to 5MB
+                            </p>
                           </div>
                         )}
                         <input
@@ -1741,7 +2340,9 @@ const Community = () => {
                       <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center shrink-0">
                         <X className="w-4 h-4 text-red-600" />
                       </div>
-                      <p className="text-xs text-red-800 font-bold leading-relaxed">{moderationWarning}</p>
+                      <p className="text-xs text-red-800 font-bold leading-relaxed">
+                        {moderationWarning}
+                      </p>
                     </motion.div>
                   )}
                 </div>
@@ -1755,7 +2356,11 @@ const Community = () => {
                   </button>
                   <button
                     onClick={handleCreatePost}
-                    disabled={submitting || !newPost.title.trim() || !newPost.content.trim()}
+                    disabled={
+                      submitting ||
+                      !newPost.title.trim() ||
+                      !newPost.content.trim()
+                    }
                     className="flex-[2] py-4 bg-[#002147] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-900/20 hover:shadow-2xl hover:shadow-blue-900/40 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none flex items-center justify-center gap-3"
                   >
                     {submitting ? (
@@ -1786,13 +2391,17 @@ const Community = () => {
                       <Bell className="w-5 h-5 text-red-500" />
                       Report Content
                     </h3>
-                    <button onClick={() => setReportingId(null)} className="text-gray-400 hover:text-gray-600">
+                    <button
+                      onClick={() => setReportingId(null)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
                       <X className="w-5 h-5" />
                     </button>
                   </div>
                   <div className="p-6 space-y-4">
                     <p className="text-sm text-gray-500">
-                      Please provide a reason for reporting this discussion. Our moderators will review it shortly.
+                      Please provide a reason for reporting this discussion. Our
+                      moderators will review it shortly.
                     </p>
                     <select
                       value={reportReason}
@@ -1800,13 +2409,21 @@ const Community = () => {
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:ring-2 focus:ring-red-500/20 outline-none hover:bg-white transition-all shadow-sm"
                     >
                       <option value="">Select a reason...</option>
-                      <option value="Inappropriate language">Inappropriate language</option>
-                      <option value="Hate speech or harassment">Hate speech or harassment</option>
-                      <option value="Spam or misleading">Spam or misleading</option>
-                      <option value="Inappropriate media">Inappropriate media</option>
+                      <option value="Inappropriate language">
+                        Inappropriate language
+                      </option>
+                      <option value="Hate speech or harassment">
+                        Hate speech or harassment
+                      </option>
+                      <option value="Spam or misleading">
+                        Spam or misleading
+                      </option>
+                      <option value="Inappropriate media">
+                        Inappropriate media
+                      </option>
                       <option value="Other">Other</option>
                     </select>
-                    {reportReason === 'Other' && (
+                    {reportReason === "Other" && (
                       <textarea
                         placeholder="Describe the issue..."
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm h-24 resize-none focus:ring-2 focus:ring-red-500/20 outline-none hover:bg-white transition-all shadow-sm"
@@ -1816,7 +2433,10 @@ const Community = () => {
                   </div>
                   <div className="p-6 bg-gray-50/50 flex gap-3">
                     <button
-                      onClick={() => { setReportingId(null); setReportReason(""); }}
+                      onClick={() => {
+                        setReportingId(null);
+                        setReportReason("");
+                      }}
                       className="flex-1 py-3 text-sm font-bold text-gray-500 hover:text-gray-700"
                     >
                       Cancel
@@ -1826,7 +2446,11 @@ const Community = () => {
                       disabled={reportSubmitting || !reportReason.trim()}
                       className="flex-1 py-3 bg-red-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-red-600/20 hover:bg-red-700 transition-all disabled:opacity-50"
                     >
-                      {reportSubmitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Submit Report"}
+                      {reportSubmitting ? (
+                        <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+                      ) : (
+                        "Submit Report"
+                      )}
                     </button>
                   </div>
                 </motion.div>
@@ -1846,7 +2470,9 @@ const Community = () => {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-[#002147]">Share to Groups</h3>
+                    <h3 className="text-xl font-bold text-[#002147]">
+                      Share to Groups
+                    </h3>
                     <button
                       onClick={() => {
                         setShowShareModal(false);
@@ -1863,8 +2489,12 @@ const Community = () => {
                     {featuredGroups.length === 0 ? (
                       <div className="text-center py-12">
                         <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-600 font-medium mb-1">No groups yet</p>
-                        <p className="text-gray-400 text-sm">Join or create a group to share posts</p>
+                        <p className="text-gray-600 font-medium mb-1">
+                          No groups yet
+                        </p>
+                        <p className="text-gray-400 text-sm">
+                          Join or create a group to share posts
+                        </p>
                       </div>
                     ) : (
                       <div className="space-y-3">
@@ -1878,19 +2508,32 @@ const Community = () => {
                               checked={selectedGroups.includes(group._id)}
                               onChange={(e) => {
                                 if (e.target.checked) {
-                                  setSelectedGroups([...selectedGroups, group._id]);
+                                  setSelectedGroups([
+                                    ...selectedGroups,
+                                    group._id,
+                                  ]);
                                 } else {
-                                  setSelectedGroups(selectedGroups.filter(id => id !== group._id));
+                                  setSelectedGroups(
+                                    selectedGroups.filter(
+                                      (id) => id !== group._id,
+                                    ),
+                                  );
                                 }
                               }}
                               className="w-5 h-5 rounded-lg border-2 border-gray-300 text-[#002147] focus:ring-2 focus:ring-[#002147]/20"
                             />
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white ${group.type === 'student' ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-blue-500 to-blue-700'}`}>
+                            <div
+                              className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white ${group.type === "student" ? "bg-gradient-to-br from-green-400 to-green-600" : "bg-gradient-to-br from-blue-500 to-blue-700"}`}
+                            >
                               {group.name?.charAt(0)}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-bold text-[#002147] text-sm truncate">{group.name}</p>
-                              <p className="text-xs text-gray-500">{group.memberDetails?.length || 0} members</p>
+                              <p className="font-bold text-[#002147] text-sm truncate">
+                                {group.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {group.memberDetails?.length || 0} members
+                              </p>
                             </div>
                           </label>
                         ))}
@@ -1966,7 +2609,10 @@ const Community = () => {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      disabled={feedImages.indexOf(viewerImage) === feedImages.length - 1}
+                      disabled={
+                        feedImages.indexOf(viewerImage) ===
+                        feedImages.length - 1
+                      }
                       className="absolute right-6 p-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl backdrop-blur-md transition-colors disabled:opacity-20 disabled:cursor-not-allowed z-[210]"
                       onClick={handleNextImage}
                     >
@@ -1975,7 +2621,8 @@ const Community = () => {
 
                     {/* Counter */}
                     <div className="absolute bottom-10 left-1/2 -translate-x-1/2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white text-xs font-black tracking-widest uppercase">
-                      {feedImages.indexOf(viewerImage) + 1} / {feedImages.length}
+                      {feedImages.indexOf(viewerImage) + 1} /{" "}
+                      {feedImages.length}
                     </div>
                   </>
                 )}
@@ -1993,11 +2640,10 @@ const Community = () => {
               </motion.div>
             )}
           </AnimatePresence>
-        </div >
+        </div>
       </div>
     </div>
   );
 };
 
 export default Community;
-
