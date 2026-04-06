@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { HelpCircle, Bell, Users, MessageCircle, Heart, Share2, Search, TrendingUp, Star, BookOpen, Award, ChevronRight, ChevronLeft, Plus, Loader2, Bookmark, Send, MoreVertical, Image as ImageIcon, X, CheckCircle, Play, Video, Trophy, ThumbsUp, ThumbsDown, Lightbulb, Handshake } from "lucide-react";
+import { HelpCircle, Bell, Users, MessageCircle, Heart, Share2, Search, TrendingUp, Star, BookOpen, Award, ChevronRight, ChevronLeft, Plus, Loader2, Bookmark, Send, MoreVertical, Image as ImageIcon, X, CheckCircle, Play, Video, Trophy, ThumbsUp, ThumbsDown, Lightbulb, Handshake, GraduationCap } from "lucide-react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
 import EmotionChatbot from "@/components/community/EmotionChatbot";
@@ -106,9 +106,10 @@ const Community = () => {
   const [sharingToGroups, setSharingToGroups] = useState(false);
 
   const isSupportChannel = channelType === "support";
+  const isMentorChannel = channelType === "mentor";
 
   const resolveChannel = (post) => post?.channelType || "discussion";
-  const matchesChannel = (post) => isSupportChannel ? resolveChannel(post) === "support" : resolveChannel(post) !== "support";
+  const matchesChannel = (post) => resolveChannel(post) === channelType;
   const visibleDiscussions = discussions.filter(matchesChannel);
 
   // Image Viewer Navigation
@@ -724,9 +725,13 @@ const Community = () => {
             </div>
 
             {/* Channel Switcher */}
-            <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+            <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
               <div className="flex gap-2 bg-white/70 backdrop-blur-sm p-1 rounded-2xl shadow-sm border border-white/60">
-                {[{ key: "discussion", label: "Discussion", hint: "General" }, { key: "support", label: "Support", hint: "Emotion Coach" }].map((chan) => (
+                {[
+                  { key: "discussion", label: "Discussion", hint: "General", icon: MessageCircle },
+                  { key: "support", label: "Support", hint: "Emotion Coach", icon: Handshake },
+                  { key: "mentor", label: "Mentor", hint: "Mentors & Coaches", icon: GraduationCap },
+                ].map((chan) => (
                   <button
                     key={chan.key}
                     onClick={() => handleChannelSwitch(chan.key)}
@@ -735,14 +740,25 @@ const Community = () => {
                       : "text-gray-600 hover:bg-white"
                       }`}
                   >
-                    <span>{chan.label}</span>
+                    <span className="flex items-center gap-2">
+                      <chan.icon className="w-4 h-4" />
+                      {chan.label}
+                    </span>
                     <span className="text-[10px] uppercase tracking-widest font-black opacity-70">{chan.hint}</span>
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-gray-600 max-w-md font-semibold">
-                Support channel runs Emotion Coach, safer responses, and pings staff for distressed posts.
-              </p>
+              {isMentorChannel ? (
+                <div className="max-w-md rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-xs font-semibold px-4 py-3">
+                  Ask your mentors and coaches directly. Posts here are visible to all mentors assigned to your college.
+                </div>
+              ) : (
+                <p className="text-xs text-gray-600 max-w-md font-semibold">
+                  {isSupportChannel
+                    ? "Support channel runs Emotion Coach, safer responses, and pings staff for distressed posts."
+                    : "Discussion channel is for general community conversations and peer help."}
+                </p>
+              )}
             </div>
 
             {/* Stats Cards */}
@@ -877,7 +893,7 @@ const Community = () => {
                 ) : (
                   /* Discussions List */
                   <div className="space-y-4">
-                    {discussions.map((discussion, index) => {
+                    {visibleDiscussions.map((discussion, index) => {
                       const isExpanded = expandedDiscussionId === discussion._id;
                       const isLikedByMe = discussion.likes?.includes(currentUser?._id || currentUser?.id || currentUserId);
                       const isBookmarkedByMe = discussion.isBookmarkedBy?.includes(currentUser?._id || currentUser?.id || currentUserId);
@@ -1566,13 +1582,17 @@ const Community = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                           <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Channel</label>
-                          {isSupportChannel ? (
+                          {isMentorChannel ? (
+                            <div className="px-4 py-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                              Mentor (locked)
+                            </div>
+                          ) : isSupportChannel ? (
                             <div className="px-4 py-3 rounded-xl bg-blue-50 text-[#002147] font-bold border border-blue-100">
                               Support (locked)
                             </div>
                           ) : (
                             <div className="flex gap-2 bg-gray-50 border border-gray-100 rounded-2xl p-1">
-                              {[{ key: "discussion", label: "Discussion" }, { key: "support", label: "Support" }].map((chan) => (
+                              {[{ key: "discussion", label: "Discussion" }, { key: "support", label: "Support" }, { key: "mentor", label: "Mentor" }].map((chan) => (
                                 <button
                                   key={chan.key}
                                   onClick={() => setNewPost(prev => ({ ...prev, channelType: chan.key }))}
@@ -1586,7 +1606,13 @@ const Community = () => {
                               ))}
                             </div>
                           )}
-                          <p className="text-[11px] text-gray-500 font-semibold mt-2">Support channel enables Emotion Coach and quicker triage.</p>
+                          <p className="text-[11px] text-gray-500 font-semibold mt-2">
+                            {isMentorChannel
+                              ? "Mentor Channel — Your question will be visible to all mentors and coaches"
+                              : isSupportChannel
+                                ? "Support channel enables Emotion Coach and quicker triage."
+                                : "Discussion channel is public to your college community."}
+                          </p>
                         </div>
                       </div>
                     </div>
