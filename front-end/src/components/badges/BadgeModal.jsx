@@ -138,7 +138,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
 
                                     {/* Category Label */}
                                     <span className={`
-                                        px-4 py-1 rounded-full text-sm font-bold uppercase
+                                        px-4 py-1 rounded-none text-sm font-bold uppercase
                                         bg-gradient-to-r ${unifiedStyle.gradient} text-white
                                         shadow-md mb-4
                                     `}>
@@ -182,7 +182,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     </div>
 
                                     {/* QR Code */}
-                                    <div className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                                    <div className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700">
                                         <QRCodeSVG
                                             value={verificationUrl}
                                             size={80}
@@ -203,7 +203,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 rounded-b-3xl">
+                        <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 rounded-none">
                             {/* Share Buttons */}
                             <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-4 font-medium">
                                 Share your achievement
@@ -212,7 +212,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                 <button
                                     onClick={() => handleShare('linkedin')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-2 px-4 py-2 bg-[#0077b5] hover:bg-[#006699] text-white rounded-lg transition-colors font-medium text-sm"
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#0077b5] hover:bg-[#006699] text-white rounded-none transition-colors font-medium text-sm"
                                 >
                                     <FaLinkedin className="w-4 h-4" />
                                     LinkedIn
@@ -220,7 +220,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                 <button
                                     onClick={() => handleShare('facebook')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-2 px-4 py-2 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded-lg transition-colors font-medium text-sm"
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded-none transition-colors font-medium text-sm"
                                 >
                                     <FaFacebook className="w-4 h-4" />
                                     Facebook
@@ -228,7 +228,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                 <button
                                     onClick={() => handleShare('twitter')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-2 px-4 py-2 bg-[#1da1f2] hover:bg-[#1a8cd8] text-white rounded-lg transition-colors font-medium text-sm"
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#1da1f2] hover:bg-[#1a8cd8] text-white rounded-none transition-colors font-medium text-sm"
                                 >
                                     <FaTwitter className="w-4 h-4" />
                                     Twitter
@@ -239,7 +239,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                             <div className="flex justify-center gap-3">
                                 <button
                                     onClick={handleDownloadCertificate}
-                                    className="flex items-center gap-2 px-5 py-2 bg-[#002147] hover:bg-[#001a38] text-white rounded-lg transition-colors font-medium text-sm"
+                                    className="flex items-center gap-2 px-5 py-2 bg-[#002147] hover:bg-[#001a38] text-white rounded-none transition-colors font-medium text-sm"
                                 >
                                     <FaDownload className="w-4 h-4" />
                                     Download Certificate
@@ -248,7 +248,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     href={verificationUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 px-5 py-2 bg-[#1a3884] hover:bg-[#287a84] text-white rounded-lg transition-colors font-medium text-sm"
+                                    className="flex items-center gap-2 px-5 py-2 bg-[#1a3884] hover:bg-[#287a84] text-white rounded-none transition-colors font-medium text-sm"
                                 >
                                     <FaExternalLinkAlt className="w-4 h-4" />
                                     Verify Badge

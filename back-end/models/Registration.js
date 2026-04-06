@@ -52,7 +52,8 @@ const registrationSchema = new mongoose.Schema({
     _id: false,
     id: String,
     qualificationLevel: String,
-    degree: String,
+    degree: String, // Domain (e.g. Engineering)
+    degreeFullName: String, // (e.g. Bachelor of Technology)
     specialization: String,
     institutionName: String,
     university: String,

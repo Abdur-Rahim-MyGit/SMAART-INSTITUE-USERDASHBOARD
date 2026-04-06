@@ -30,7 +30,7 @@ const InteractiveMenu = () => {
             {isActive && (
               <motion.div
                 layoutId="activeTabIndicator"
-                className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#1a3884] rounded-full"
+                className="absolute bottom-0 left-0 right-0 h-[3px] bg-[#1a3884] rounded-none"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
             )}

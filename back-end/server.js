@@ -107,6 +107,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/colleges', require('./routes/colleges'));
 app.use('/api/registrations', require('./routes/registrations'));
+app.use('/api/degrees', require('./routes/degrees'));
 
 // Academic Routes
 app.use('/api/assessments', require('./routes/assessments'));
