@@ -91,6 +91,18 @@ export const addTicketResponse = async (ticketId, message) => {
 };
 
 /**
+ * Add a response to own ticket (User/ticket owner)
+ * @param {string} ticketId - Ticket ID
+ * @param {string} message - Response message
+ */
+export const addUserResponse = async (ticketId, message) => {
+  return apiCall(`/tickets/${ticketId}/user-response`, {
+    method: 'POST',
+    body: JSON.stringify({ message })
+  });
+};
+
+/**
  * Delete a ticket (Admin only)
  * @param {string} ticketId - Ticket ID
  */
@@ -114,6 +126,7 @@ export default {
   getAllTickets,
   updateTicket,
   addTicketResponse,
+  addUserResponse,
   deleteTicket,
   getTicketStats
 };
