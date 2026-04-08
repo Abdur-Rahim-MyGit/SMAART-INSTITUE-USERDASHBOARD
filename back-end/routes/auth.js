@@ -382,7 +382,7 @@ router.post('/login',
       }
 
       // Execute Student Search
-      user = await Student.findOne(studentQuery).select('+password');
+      user = await Student.findOne(studentQuery).populate('college', 'logo collegeName').select('+password');
 
       if (user) {
         userType = 'student';
@@ -394,7 +394,7 @@ router.post('/login',
         let teacherQuery = isEmail ? { email: identifier.toLowerCase() } : { teacherId: identifier };
         if (collegeId) teacherQuery.college = collegeId;
 
-        user = await Teacher.findOne(teacherQuery).select('+password');
+        user = await Teacher.findOne(teacherQuery).populate('college', 'logo collegeName').select('+password');
 
         if (user) {
           userType = 'teacher';
@@ -405,7 +405,7 @@ router.post('/login',
       // 3. If not found, try generic User (Admin, etc)
       if (!user) {
         let userQuery = isEmail ? { email: identifier.toLowerCase() } : { userId: identifier };
-        user = await User.findOne(userQuery).select('+password');
+        user = await User.findOne(userQuery).populate('college', 'logo collegeName').select('+password');
 
         if (user) {
           userType = 'user';
