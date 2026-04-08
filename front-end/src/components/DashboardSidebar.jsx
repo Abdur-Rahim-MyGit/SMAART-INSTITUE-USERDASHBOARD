@@ -228,12 +228,18 @@ const DashboardSidebar = () => {
 
               {user?.college?.logo && (
                 <div className="flex items-center gap-2 lg:gap-4">
-                  <div className="h-6 w-[1.5px] bg-slate-300 dark:bg-slate-700 mx-0.5 lg:mx-1" />
-                  <div className="h-10 w-auto flex items-center justify-center transition-all duration-300">
-                    <img
+                  <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block mx-1" />
+                  <div className="flex items-center">
+                    <img 
                       src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
-                      alt={user.college.collegeName || "College Logo"}
-                      className="h-8 lg:h-10 w-auto object-contain"
+                      alt={user.college.collegeName || "College Logo"} 
+                      className="h-8 lg:h-10 w-auto object-contain max-w-[120px]"
+                      onError={(e) => {
+                        // Hide both the separator and the image if loading fails
+                        const container = e.target.closest('.flex.items-center.gap-2');
+                        if (container) container.style.display = 'none';
+                        else e.target.style.display = 'none';
+                      }}
                     />
                   </div>
                 </div>
