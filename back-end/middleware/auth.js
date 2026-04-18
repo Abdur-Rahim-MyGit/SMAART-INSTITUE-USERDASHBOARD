@@ -63,7 +63,7 @@ const protect = async (req, res, next) => {
       }
 
       // Attach user to request (excluding password)
-      req.user = await UserModel.findById(decoded.userId || decoded.id).select('-password');
+      req.user = await UserModel.findById(decoded.userId || decoded.id).populate('college', 'logo collegeName').select('-password');
 
       if (!req.user) {
         return res.status(401).json({
@@ -135,7 +135,7 @@ const optionalAuth = async (req, res, next) => {
       else if (userType === 'teacher') UserModel = require('../models/Teacher');
       else if (userType === 'registration') UserModel = require('../models/Registration');
 
-      req.user = await UserModel.findById(decoded.userId || decoded.id).select('-password');
+      req.user = await UserModel.findById(decoded.userId || decoded.id).populate('college', 'logo collegeName').select('-password');
 
       // SECURITY: Session Check for Optional Auth
       if (req.user && decoded.sessionId) {
