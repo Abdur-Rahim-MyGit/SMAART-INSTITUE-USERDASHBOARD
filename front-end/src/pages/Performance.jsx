@@ -34,7 +34,6 @@ import {
     PolarRadiusAxis,
     Radar
 } from "recharts";
-import DashboardSidebar from "@/components/DashboardSidebar";
 import useUser from "@/hooks/useUser";
 import { apiCall } from '@/services/api';
 
@@ -200,10 +199,8 @@ const Performance = () => {
     const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
     return (
-        <div className="flex min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] font-sans transition-colors duration-300">
-            <DashboardSidebar />
-
-            <main className="flex-1 lg:ml-64 p-4 md:p-8 pt-24 lg:pt-8 overflow-y-auto">
+        <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] font-sans transition-colors duration-300">
+            <main className="p-4 md:p-8 overflow-y-auto">
                 <div className="max-w-7xl mx-auto space-y-8">
 
                     {/* Header */}

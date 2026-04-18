@@ -8,8 +8,6 @@ import {
     Code, Cpu, Heart, Globe, Layers, PieChart, Activity, AlertTriangle, Lock, Table,
     LayoutDashboard, Milestone, CircuitBoard, Gauge, Radio, Compass
 } from 'lucide-react';
-import DashboardSidebar from '@/components/DashboardSidebar';
-import DashboardHeader from '@/components/DashboardHeader';
 import careerIntelligenceApi from '@/services/careerIntelligenceApi';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -1390,12 +1388,7 @@ const renderReport = () => {
 // ========== MAIN RENDER ==========
 return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950/50 transition-colors duration-300">
-        <DashboardSidebar />
-
-        <div className="min-h-screen transition-all duration-300">
-            <DashboardHeader />
-
-            <main className="w-full relative py-8 px-4 md:px-0">
+        <main className="w-full relative py-8 px-4 md:px-0">
                 <div className="max-w-5xl mx-auto pb-12">
 
                     {/* Page Header */}
@@ -1793,7 +1786,6 @@ return (
 
                 </div>
             </main>
-        </div>
     </div>
 );
 };

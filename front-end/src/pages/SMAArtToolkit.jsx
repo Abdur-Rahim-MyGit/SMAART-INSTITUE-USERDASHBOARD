@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
 import { Heart, BookOpen, BookText, ArrowRight, MessageSquare, User, FileText, Database, Shield } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { useNavigate } from "react-router-dom";
 
 const toolkitSections = [
@@ -123,14 +121,7 @@ const ToolkitCard = ({ section, index }) => {
 
 const SMAArtToolkit = () => {
   return (
-    <div className="h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 overflow-hidden">
-      <DashboardSidebar />
-
-      <div className="flex-1 flex flex-col min-w-0 min-h-0 transition-all duration-300">
-        <DashboardHeader />
-
-        <main className="flex-1 overflow-y-auto min-h-0 px-4 py-8 md:px-8">
-          <div className="max-w-7xl mx-auto pb-12">
+    <div className="space-y-6">
             
             {/* Toolbar - Compact description only */}
             <div className="mb-8 max-w-2xl">
@@ -149,9 +140,6 @@ const SMAArtToolkit = () => {
               ))}
             </div>
 
-          </div>
-        </main>
-      </div>
     </div>
   );
 };

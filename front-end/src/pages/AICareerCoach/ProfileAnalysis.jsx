@@ -9,8 +9,6 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-import DashboardSidebar from '@/components/DashboardSidebar';
-import DashboardHeader from '@/components/DashboardHeader';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { toast } from 'sonner';
 
@@ -234,11 +232,7 @@ const ProfileAnalysis = () => {
 
     return (
         <div className="min-h-screen bg-[#eef2f5] dark:bg-[#000d1a] transition-colors duration-300">
-            <DashboardSidebar />
-            <div className="transition-all duration-300">
-                <DashboardHeader />
-
-                <main className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <main className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                     {/* Breadcrumb & Title */}
                     <div className="mb-8">
                         <button
@@ -596,7 +590,6 @@ const ProfileAnalysis = () => {
                         )}
                     </AnimatePresence>
                 </main>
-            </div>
         </div>
     );
 };

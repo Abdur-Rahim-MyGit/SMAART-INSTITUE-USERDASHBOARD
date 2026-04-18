@@ -4,8 +4,6 @@ import { Play, ChevronRight, CheckCircle2, Circle, Clock, BookOpen, FileText, Vi
 import { toast } from "sonner";
 import { coursesAPI, courseEnrollmentAPI } from "@/services/api";
 import { useParams, useNavigate } from "react-router-dom";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import TaskQuestion from "@/components/TaskQuestion";
 import useUser from "@/hooks/useUser";

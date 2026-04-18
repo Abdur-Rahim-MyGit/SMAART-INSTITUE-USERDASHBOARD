@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Bell, User, HelpCircle, Award } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import VisionBoardWidget from "@/components/VisionBoardWidget";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -56,10 +54,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors duration-300">
-      <DashboardSidebar />
-
-      <div className="min-h-screen transition-all duration-300">
-        <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
+      <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -115,7 +110,6 @@ const Dashboard = () => {
             </motion.div>
           </motion.div>
         </main>
-      </div>
     </div>
   );
 };

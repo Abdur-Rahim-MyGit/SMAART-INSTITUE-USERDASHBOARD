@@ -23,14 +23,13 @@ import {
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL, getBackendUrl } from "@/services/api";
 import useUser from "@/hooks/useUser";
 
 import ProfileSkeleton from '@/components/skeletons/ProfileSkeleton';
 import BadgeGallery from "@/components/badges/BadgeGallery";
+import PageTransition from "@/components/PageTransition";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -298,18 +297,14 @@ const Profile = () => {
   // Profile.jsx
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-slate-950 transition-colors duration-300 overflow-hidden">
-      <DashboardSidebar />
-
-      <div className="flex-1 flex flex-col min-w-0 min-h-0 transition-all duration-300">
-        <DashboardHeader />
-
-        {loading ? (
-          <div className="flex-1 overflow-y-auto min-h-0">
-            <ProfileSkeleton />
-          </div>
-        ) : (
-          <main className="flex-1 overflow-y-auto min-h-0 container mx-auto px-3 py-4 max-w-6xl">
+    <PageTransition>
+    <div className="space-y-6">
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-12 h-12 border-4 border-slate-200 border-t-[#1a3884] rounded-full animate-spin"></div>
+        </div>
+      ) : (
+        <main className="container mx-auto px-3 py-4 max-w-6xl">
             {/* Main Grid Layout - Compact */}
             <div className="grid lg:grid-cols-[260px_1fr] gap-4">
 
@@ -858,7 +853,6 @@ const Profile = () => {
             </div>
           </main>
         )}
-      </div>
 
       {/* Edit Profile Modal */}
       <AnimatePresence>
@@ -954,6 +948,7 @@ const Profile = () => {
         )}
       </AnimatePresence>
     </div>
+    </PageTransition>
   );
 };
 

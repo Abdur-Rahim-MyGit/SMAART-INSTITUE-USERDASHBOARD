@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Calendar, User, Hash, TrendingUp, ScanLine, ArrowLeft, Share2, ImageIcon } from 'lucide-react';
 import Navbar from '@/components/Navbar';
-import DashboardSidebar from '@/components/DashboardSidebar';
 import PageTransition from '@/components/PageTransition';
 import apiCall from '@/services/api';
 import { toast } from 'sonner';
@@ -458,11 +457,10 @@ const VerifyCertificate = () => {
         </>
     );
 
-    // Logged-in users get the dashboard layout (with sidebar)
+    // Logged-in users get the dashboard layout
     if (isLoggedIn) {
         return (
             <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] transition-colors duration-300 font-sans relative overflow-x-hidden">
-                <DashboardSidebar />
                 <PageTransition>
                     <div className="min-h-screen pb-20 lg:pb-0">
                         {pageContent}

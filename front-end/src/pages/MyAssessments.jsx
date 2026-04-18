@@ -4,8 +4,6 @@ import {
   Award, Target, X, CheckCircle2, Download, Shield, Share2,
   BarChart2, MapPin, Briefcase, Calendar, CheckCircle, ArrowLeft
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import AssessmentBanner from "@/components/AssessmentBanner";
 import { assessmentApi } from "@/services/assessmentApi";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
@@ -505,10 +503,7 @@ const MyAssessments = () => {
 
   return (
     <div className="min-h-screen">
-      <DashboardSidebar />
-      <div className="min-h-screen transition-all duration-300">
-        <DashboardHeader />
-        <main className="p-4 sm:p-6">
+      <main className="p-4 sm:p-6">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {isFirstLogin && (
               <motion.div initial={{ opacity: 0, y: -20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.5 }} className="mb-6 sm:mb-8">
@@ -623,7 +618,6 @@ const MyAssessments = () => {
             )}
           </AnimatePresence>
         </main>
-      </div>
     </div>
   );
 };

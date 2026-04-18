@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Loader2, ArrowLeft, Sparkles, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import DashboardSidebar from '@/components/DashboardSidebar';
-import DashboardHeader from '@/components/DashboardHeader';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { toast } from 'sonner';
 
@@ -29,10 +27,7 @@ const AICareerRecommendations = () => {
 
     return (
         <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229]">
-            <DashboardSidebar />
-            <div className="min-h-screen">
-                <DashboardHeader />
-                <main className="w-full relative py-8 px-4 md:px-0">
+            <main className="w-full relative py-8 px-4 md:px-0">
                     <div className="max-w-4xl mx-auto pb-12">
                         <div className="mb-6 px-4">
                             <button onClick={() => navigate('/dashboard/ai-career-coach')} className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-purple-600 mb-4">
@@ -65,7 +60,6 @@ const AICareerRecommendations = () => {
                         </div>
                     </div>
                 </main>
-            </div>
         </div>
     );
 };

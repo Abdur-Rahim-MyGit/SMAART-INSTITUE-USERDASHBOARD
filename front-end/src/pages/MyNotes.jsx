@@ -11,8 +11,6 @@ import {
     StickyNote,
     Clock
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -114,11 +112,7 @@ const MyNotes = () => {
 
     return (
         <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
-            <DashboardSidebar />
-            <div className="min-h-screen transition-all duration-300">
-                <DashboardHeader />
-
-                <main className="w-full relative py-8 px-4 md:px-6">
+            <main className="w-full relative py-8 px-4 md:px-6">
                     <div className="max-w-7xl mx-auto pb-12">
 
                         {/* Header */}
@@ -272,8 +266,6 @@ const MyNotes = () => {
                         </div>
                     )}
                 </AnimatePresence>
-
-            </div>
         </div>
     );
 };

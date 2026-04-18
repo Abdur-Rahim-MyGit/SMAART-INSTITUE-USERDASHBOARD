@@ -2,9 +2,6 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Download, ArrowRight, CheckCircle, BarChart2, BrainCircuit } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
-
 const Analysis = () => {
     const navigate = useNavigate();
 
@@ -20,12 +17,8 @@ const Analysis = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-navy relative overflow-hidden selection:bg-teal/30 text-white font-sans">
-            <DashboardSidebar />
-            <div className="flex-1 overflow-y-auto transition-all duration-300">
-                <DashboardHeader />
-                
-                {/* Abstract Background Elements matching HeroSection */}
+        <div className="min-h-screen bg-navy relative overflow-hidden selection:bg-teal/30 text-white font-sans">
+            {/* Abstract Background Elements matching HeroSection */}
                 <div className="fixed inset-0 z-0 pointer-events-none">
                     <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full bg-teal/5 blur-[120px]" />
                     <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-navy-light blur-[100px]" />
@@ -160,7 +153,6 @@ const Analysis = () => {
                         </Button>
                     </motion.div>
                 </div>
-            </div>
         </div>
     );
 };

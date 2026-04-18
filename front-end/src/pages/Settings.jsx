@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Settings as SettingsIcon, Bell, Lock, User, Palette, Globe, Shield, HelpCircle } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -218,76 +216,67 @@ const Settings = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 dark:bg-[#001229] overflow-hidden">
-      <DashboardSidebar />
-
-      <div className="flex-1 overflow-y-auto transition-all duration-300">
-        <DashboardHeader />
-
-        <main className="p-4 sm:p-6 lg:p-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Settings Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Sidebar Navigation */}
-              <div className="lg:col-span-1">
-                <div className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 p-4 space-y-2 shadow-sm dark:shadow-none">
-                  {settingsTabs.map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${activeTab === tab.id
-                            ? "bg-[#1a3884]/20 text-gray-900 dark:text-white border border-[#1a3884]"
-                            : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white"
-                          }`}
-                      >
-                        <Icon className="w-5 h-5 flex-shrink-0" />
-                        <span className="font-medium">{tab.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Main Content */}
-              <div className="lg:col-span-3">
-                <motion.div
-                  key={activeTab}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 p-6 shadow-sm dark:shadow-none"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      {/* Settings Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Sidebar Navigation */}
+        <div className="lg:col-span-1">
+          <div className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 p-4 space-y-2 shadow-sm dark:shadow-none">
+            {settingsTabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${activeTab === tab.id
+                      ? "bg-[#1a3884]/20 text-gray-900 dark:text-white border border-[#1a3884]"
+                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white"
+                    }`}
                 >
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                    {settingsTabs.find((t) => t.id === activeTab)?.label}
-                  </h2>
-                  <p className="text-gray-500 dark:text-gray-400 mb-6">
-                    {settingsTabs.find((t) => t.id === activeTab)?.description}
-                  </p>
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  <span className="font-medium">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                  {renderTabContent()}
+        {/* Main Content */}
+        <div className="lg:col-span-3">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 p-6 shadow-sm dark:shadow-none"
+          >
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              {settingsTabs.find((t) => t.id === activeTab)?.label}
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
+              {settingsTabs.find((t) => t.id === activeTab)?.description}
+            </p>
 
-                  {/* Save Button */}
-                  <div className="mt-8 flex justify-end gap-3">
-                    <button className="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-[#1a3884]/50 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#1a3884] transition-colors">
-                      Cancel
-                    </button>
-                    <button className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors">
-                      Save Changes
-                    </button>
-                  </div>
-                </motion.div>
-              </div>
+            {renderTabContent()}
+
+            {/* Save Button */}
+            <div className="mt-8 flex justify-end gap-3">
+              <button className="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-[#1a3884]/50 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#1a3884] transition-colors">
+                Cancel
+              </button>
+              <button className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors">
+                Save Changes
+              </button>
             </div>
           </motion.div>
-        </main>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

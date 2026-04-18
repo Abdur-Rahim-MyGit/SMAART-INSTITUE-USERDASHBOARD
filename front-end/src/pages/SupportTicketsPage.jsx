@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, LifeBuoy, MessageSquare, History, Plus, Loader2, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
-import DashboardSidebar from '@/components/DashboardSidebar';
 import TicketForm from '@/components/tickets/TicketForm';
 import TicketDetail from '@/components/tickets/TicketDetail';
 // import { ticketApi } from '@/services/ticketApi'; // Removed unused invalid import
@@ -79,9 +78,7 @@ const SupportTicketsPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#001229] transition-colors duration-300">
-      <DashboardSidebar />
-
-      <div className="lg:ml-0 pt-4">
+      <div className="pt-4">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">

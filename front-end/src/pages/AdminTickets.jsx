@@ -14,8 +14,6 @@ import {
   XCircle,
   ChevronDown
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import TicketCard from "@/components/tickets/TicketCard";
 import TicketDetail from "@/components/tickets/TicketDetail";
 import { getAllTickets } from "@/services/ticketApi";
@@ -125,12 +123,7 @@ const AdminTickets = () => {
 
   return (
     <div className="min-h-screen bg-[#001229]">
-      <DashboardSidebar />
-
-      <div className="min-h-screen transition-all duration-300">
-        <DashboardHeader />
-
-        <main className="p-4 sm:p-6 lg:p-8">
+      <main className="p-4 sm:p-6 lg:p-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -389,7 +382,6 @@ const AdminTickets = () => {
             )}
           </motion.div>
         </main>
-      </div>
 
       {/* Ticket Detail Modal */}
       <AnimatePresence>
