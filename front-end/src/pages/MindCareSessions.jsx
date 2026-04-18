@@ -21,8 +21,6 @@ import {
   BookOpen,
   Brain
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { apiCall } from "@/services/api";
 import { useUser } from "@/contexts/UserContext";
 import { toast } from "sonner";
@@ -209,13 +207,8 @@ const MindCareSessions = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col lms-dashboard-bg text-[#1A1A1A] font-sans overflow-hidden">
-      <DashboardSidebar />
-
-      <div className="flex-1 overflow-y-auto transition-all duration-300">
-        <DashboardHeader />
-        <PageTransition>
-          <main className="p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen lms-dashboard-bg text-[#1A1A1A] font-sans">
+      <main className="p-4 sm:p-6 lg:p-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -520,8 +513,6 @@ const MindCareSessions = () => {
               </AnimatePresence>
             </motion.div>
           </main>
-        </PageTransition>
-      </div>
 
       {/* Feedback Modal */}
       <AnimatePresence>

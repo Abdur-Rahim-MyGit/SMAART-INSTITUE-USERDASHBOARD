@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import DashboardSidebar from '@/components/DashboardSidebar';
-import DashboardHeader from '@/components/DashboardHeader';
 import {
   Bell,
   Check,
@@ -292,12 +290,7 @@ const Notifications = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] text-slate-900 font-sans transition-colors duration-300">
-      <DashboardSidebar />
-      
-      <div className="min-h-screen transition-all duration-300 pb-20 lg:pb-0">
-        <DashboardHeader />
-
-        <main className="container mx-auto px-3 py-4 max-w-6xl">
+      <main className="container mx-auto px-3 py-4 max-w-6xl">
           {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -583,7 +576,6 @@ const Notifications = () => {
           </div>
         )}
         </main>
-      </div>
     </div>
   );
 };

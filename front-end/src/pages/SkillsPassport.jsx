@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Heart, BookOpen, Users, Target, Briefcase, Monitor, Leaf, Download, Shield, Share2, BarChart2, MapPin, Calendar, CheckCircle, ArrowLeft, X } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { assessmentApi } from "@/services/assessmentApi";
 import SkillsPassportSkeleton from "@/components/skeletons/SkillsPassportSkeleton";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
@@ -415,12 +413,7 @@ const SkillsPassport = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-slate-50 dark:bg-slate-900 font-sans transition-colors duration-300 overflow-hidden">
-            <DashboardSidebar />
-
-            <div className="flex-1 overflow-y-auto transition-all duration-300">
-                <DashboardHeader />
-                <main className="w-full py-8 px-4 md:px-8">
+        <div className="space-y-6">
                     {isLoading ? (
                         <SkillsPassportSkeleton />
                     ) : (
@@ -587,8 +580,6 @@ const SkillsPassport = () => {
                             </motion.div>
                         </div>
                     )}
-                </main>
-            </div>
 
             {/* Digital Skills Passport modal */}
             <AnimatePresence>

@@ -15,8 +15,6 @@ import {
   RefreshCw,
   Inbox
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import TicketForm from "@/components/tickets/TicketForm";
 import TicketCard from "@/components/tickets/TicketCard";
 import TicketDetail from "@/components/tickets/TicketDetail";
@@ -104,12 +102,7 @@ const Help = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#001229]">
-      <DashboardSidebar />
-
-      <div className="min-h-screen transition-all duration-300">
-        <DashboardHeader />
-
-        <main className="p-4 sm:p-6 lg:p-8">
+      <main className="p-4 sm:p-6 lg:p-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -393,7 +386,6 @@ const Help = () => {
             </AnimatePresence>
           </motion.div>
         </main>
-      </div>
 
       {/* Ticket Detail Modal */}
       <AnimatePresence>

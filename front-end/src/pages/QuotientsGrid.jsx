@@ -13,8 +13,6 @@ import {
   BookOpen,
   ChevronRight
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { assessmentApi } from "@/services/assessmentApi";
 
 const THEME = {
@@ -105,11 +103,8 @@ const QuotientsGrid = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#001229]">
-      <DashboardSidebar />
-      <div className="min-h-screen transition-all duration-300">
-        <DashboardHeader />
-
+    <>
+      <div className="min-h-screen bg-[#001229]">
         <main className="p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             <header className="mb-8">
@@ -250,7 +245,7 @@ const QuotientsGrid = () => {
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };
 

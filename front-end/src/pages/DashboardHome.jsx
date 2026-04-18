@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import PageTransition from "@/components/PageTransition";
 import VisionBoardSplash from "@/components/VisionBoardSplash";
 import {
@@ -41,25 +39,19 @@ const DashboardHome = () => {
     );
   }
 
-  const bgMain = "bg-[#F5F2ED] dark:bg-[#0B1120]";
-
   return (
-    <>
+    <PageTransition>
+      {/* Vision Board Splash Overlay */}
       {showVisionSplash && (
         <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
       )}
       
+      {/* Student Onboarding */}
       {!showVisionSplash && user && (
         <StudentOnboarding user={user} />
       )}
 
-      <div className={`h-screen flex flex-col ${bgMain} font-sans transition-colors duration-300 text-slate-800 overflow-hidden`}>
-        <DashboardSidebar />
-
-        <div className="flex-1 overflow-y-auto transition-all duration-300">
-          <main className="p-3 md:p-5 lg:p-6 pb-20 lg:pb-6">
-            <PageTransition>
-            <div className="max-w-[1600px] mx-auto space-y-4">
+      <div className="space-y-6">
 
               {/* NEW HERO SECTION */}
               <motion.div 
@@ -556,12 +548,8 @@ const DashboardHome = () => {
                  </div>
               </div>
 
-              </div>
-            </PageTransition>
-          </main>
         </div>
-      </div>
-    </>
+    </PageTransition>
   );
 };
 

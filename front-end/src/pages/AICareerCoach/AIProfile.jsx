@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Save, Loader2, ArrowLeft, Sparkles, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import DashboardSidebar from '@/components/DashboardSidebar';
-import DashboardHeader from '@/components/DashboardHeader';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
 import { toast } from 'sonner';
 
@@ -129,12 +127,7 @@ const AIProfile = () => {
 
     return (
         <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
-            <DashboardSidebar />
-
-            <div className="min-h-screen transition-all duration-300">
-                <DashboardHeader />
-
-                <main className="w-full relative py-8 px-4 md:px-0">
+            <main className="w-full relative py-8 px-4 md:px-0">
                     <div className="max-w-4xl mx-auto pb-12">
 
                         {/* Header */}
@@ -308,7 +301,6 @@ const AIProfile = () => {
 
                     </div>
                 </main>
-            </div>
         </div>
     );
 };

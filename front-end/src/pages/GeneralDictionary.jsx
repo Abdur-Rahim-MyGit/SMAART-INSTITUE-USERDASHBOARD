@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Volume2, Book, Star, Share2, ArrowRight, Loader2, Sparkles } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { toast } from "sonner";
 
 const GeneralDictionary = () => {
@@ -65,12 +63,7 @@ const GeneralDictionary = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <DashboardSidebar />
-
-      <div className="min-h-screen transition-all duration-300">
-        <DashboardHeader />
-
-        <main className="container mx-auto px-4 md:px-6 py-8">
+      <main className="container mx-auto px-4 md:px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -273,7 +266,6 @@ const GeneralDictionary = () => {
             </div>
           </div>
         </main>
-      </div>
     </div>
   );
 };

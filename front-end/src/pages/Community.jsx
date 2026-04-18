@@ -30,8 +30,6 @@ import {
   Handshake,
   GraduationCap,
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import EmotionChatbot from "@/components/community/EmotionChatbot";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
@@ -866,11 +864,7 @@ const Community = () => {
       </div>
 
       <div className="relative z-10">
-        <DashboardSidebar />
-
         <div className="min-h-screen transition-all duration-300">
-          <DashboardHeader />
-
           <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
             {/* Search Bar */}
             <div className="mb-8">
@@ -1188,7 +1182,7 @@ const Community = () => {
                                 {discussion.title}
                               </h3>
                               <div className="flex items-center gap-2 text-[11px] text-gray-500 font-medium">
-                                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[#002147] font-bold uppercase overflow-hidden border border-white">
+                                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-[10px] font-bold text-[#002147] border border-white">
                                   {discussion.author?.profileImage ? (
                                     <img
                                       src={discussion.author.profileImage}
@@ -2057,7 +2051,7 @@ const Community = () => {
                             }))
                           }
                           placeholder="What's on your mind?"
-                          className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[#002147] font-bold placeholder:text-gray-300 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
+                          className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                         />
                       </div>
 
@@ -2074,7 +2068,7 @@ const Community = () => {
                                 category: e.target.value,
                               }))
                             }
-                            className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[#002147] font-bold appearance-none focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all"
+                            className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                           >
                             <option value="general">
                               🌍 General Discussion
@@ -2162,7 +2156,7 @@ const Community = () => {
                         }
                         placeholder="Go ahead, share your story or ask a question..."
                         rows={showPollEditor ? 3 : 6}
-                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-[#002147] font-medium leading-relaxed placeholder:text-gray-300 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all resize-none"
+                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium leading-relaxed placeholder:text-gray-300 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all resize-none"
                       />
                     </div>
 
@@ -2192,7 +2186,7 @@ const Community = () => {
                                 question: e.target.value,
                               }))
                             }
-                            className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                            className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                           />
 
                           <div className="space-y-2">
@@ -2210,7 +2204,7 @@ const Community = () => {
                                       options: newOptions,
                                     }));
                                   }}
-                                  className="flex-1 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                                  className="flex-1 px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-sm font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                                 />
                                 {pollData.options.length > 2 && (
                                   <button
@@ -2259,7 +2253,7 @@ const Community = () => {
                                   expiresAt: e.target.value,
                                 }))
                               }
-                              className="w-full px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-xs font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
+                              className="w-full px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-xs font-bold text-[#002147] focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                             />
                           </div>
                         </div>
@@ -2384,7 +2378,7 @@ const Community = () => {
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                  className="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-white/40"
+                  className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden"
                 >
                   <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                     <h3 className="text-lg font-bold text-[#002147] flex items-center gap-2">
@@ -2426,7 +2420,7 @@ const Community = () => {
                     {reportReason === "Other" && (
                       <textarea
                         placeholder="Describe the issue..."
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm h-24 resize-none focus:ring-2 focus:ring-red-500/20 outline-none hover:bg-white transition-all shadow-sm"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm h-24 resize-none focus:ring-2 focus:ring-red-500/20 outline-none transition-all"
                         onChange={(e) => setReportReason(e.target.value)}
                       />
                     )}

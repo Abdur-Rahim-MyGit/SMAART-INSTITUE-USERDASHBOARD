@@ -635,3 +635,6 @@
 {"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-08 12:15:27"}
 {"level":"warn","message":"Route /user/login not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-08 12:41:14","url":"/user/login"}
 {"level":"warn","message":"Route /favicon.ico not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-08 12:41:14","url":"/favicon.ico"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-18 13:39:17"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-18 13:39:17"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-18 13:39:18"}

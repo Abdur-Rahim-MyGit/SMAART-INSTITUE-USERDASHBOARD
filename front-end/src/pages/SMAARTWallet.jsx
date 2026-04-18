@@ -5,8 +5,6 @@ import {
     Shield, Star, CheckCircle2, Clock, FileText, Zap, Brain,
     Upload, Link as LinkIcon, QrCode, Calendar, X
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { useNavigate } from "react-router-dom";
 import useUser from "@/hooks/useUser";
 import apiCall, { coursesAPI } from "@/services/api";
@@ -115,10 +113,7 @@ const SMAARTWallet = () => {
 
     return (
         <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
-            <DashboardSidebar />
             <div className="min-h-screen transition-all duration-300">
-                <DashboardHeader />
-
                 <main className="w-full relative py-8 px-4 md:px-6 lg:px-8">
                     <div className="max-w-6xl mx-auto space-y-8">
 

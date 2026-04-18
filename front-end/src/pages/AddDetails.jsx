@@ -9,9 +9,6 @@ import { useNavigate } from "react-router-dom";
 import { API_BASE_URL, apiCall } from "@/services/api";
 import FileUpload from "@/components/FileUpload";
 import logoWhite from "@/assets/white.png";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
-
 const AddDetails = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(0);
@@ -271,11 +268,8 @@ const AddDetails = () => {
     }
 
     return (
-        <div className="h-screen flex flex-col bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#C0C0C0]/30 overflow-hidden">
-            <DashboardSidebar />
-            <div className="flex-1 overflow-y-auto transition-all duration-300">
-                <DashboardHeader />
-                <div className="max-w-4xl mx-auto py-10 px-4 relative">
+        <div className="min-h-screen bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#C0C0C0]/30">
+            <div className="max-w-4xl mx-auto py-10 px-4 relative">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-8 md:p-10 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.1),0_0_20px_rgba(192,192,192,0.4)] border-2 border-[#C0C0C0] relative flex flex-col min-h-[600px]">
                     
                     <div className="mb-8 flex items-center justify-between">
@@ -598,7 +592,6 @@ const AddDetails = () => {
                     ))}
                 </div>
                 </div>
-            </div>
         </div>
     );
 };

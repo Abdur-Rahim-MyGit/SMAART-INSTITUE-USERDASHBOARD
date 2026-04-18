@@ -5,8 +5,6 @@ import {
     Brain, CheckCircle2, ChevronRight,
     FileText, ArrowRight, Clock, Play, Eye, Info, Layers, Award, TrendingUp
 } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { assessmentApi } from "@/services/assessmentApi";
 import useUser from "@/hooks/useUser";
 
@@ -77,12 +75,8 @@ const AssessmentsDashboard = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col bg-slate-50 dark:bg-[#001229] transition-colors duration-300 font-sans overflow-hidden">
-            <DashboardSidebar />
-            <div className="flex-1 overflow-y-auto transition-all duration-300">
-                <DashboardHeader />
-
-                <main className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+        <div className="space-y-6">
+            <main className="px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
                     <motion.div
                         initial={{ opacity: 0, y: 18 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -161,8 +155,7 @@ const AssessmentsDashboard = () => {
                         {/* ── Guidelines ── */}
                         <GuidelinesCard />
                     </motion.div>
-                </main>
-            </div>
+            </main>
         </div>
     );
 };

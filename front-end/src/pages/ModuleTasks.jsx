@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { Bell, CheckCircle2, Circle, ArrowLeft, BookOpen, Clock, Calendar } from "lucide-react";
-import DashboardSidebar from "@/components/DashboardSidebar";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "react-router-dom";
@@ -77,10 +76,7 @@ const ModuleTasks = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#e8ecef' }}>
-      <DashboardSidebar />
-
-      <div className="min-h-screen transition-all duration-300">
-        <header className="sticky top-0 z-30 glass-effect border-b border-sidebar-border">
+      <header className="sticky top-0 z-30 glass-effect border-b border-sidebar-border">
           <div className="container mx-auto px-6 py-4 flex items-center justify-between">
             <Link to="/dashboard">
               <motion.div
@@ -285,7 +281,6 @@ const ModuleTasks = () => {
             </motion.div>
           </motion.div>
         </main>
-      </div>
     </div>
   );
 };

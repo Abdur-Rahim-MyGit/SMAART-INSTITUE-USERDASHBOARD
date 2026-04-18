@@ -5,8 +5,6 @@ import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 import { toast } from 'sonner';
 import apiCall from '@/services/api';
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { BadgeGallery } from "@/components/badges";
 import useUser from "@/hooks/useUser";
 import blueLogo from '@/assets/blue.png';
@@ -221,11 +219,7 @@ const Certificate = () => {
     if (!selectedType) {
         return (
             <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
-                <DashboardSidebar />
-                <div className="min-h-screen transition-all duration-300">
-                    <DashboardHeader />
-
-                    <main className="w-full relative py-12 px-4 md:px-6">
+                <main className="w-full relative py-12 px-4 md:px-6">
                         {/* Header */}
                         <div className="text-center mb-8">
                             <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#C0C0C0] to-[#A8A8A8] flex items-center justify-center shadow-lg shadow-amber-500/20">
@@ -330,8 +324,7 @@ const Certificate = () => {
                         )}
                     </main>
                 </div>
-            </div>
-        );
+            );
     }
 
     // --- RENDER CERTIFICATE VIEW ---
@@ -339,38 +332,34 @@ const Certificate = () => {
 
     return (
         <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
-            <DashboardSidebar />
-            <div className="min-h-screen transition-all duration-300">
-                <DashboardHeader />
+            <main className="w-full relative py-8 px-4 flex flex-col items-center">
 
-                <main className="w-full relative py-8 px-4 flex flex-col items-center">
+                {/* Controls */}
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-4 no-print bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur-md p-2 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg">
+                    <button
+                        onClick={() => setSelectedType(null)}
+                        className="flex items-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl transition-all font-medium text-sm"
+                    >
+                        ← Back
+                    </button>
+                    <div className="w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
+                    <button
+                        onClick={handleDownload}
+                        disabled={isGenerating}
+                        className="flex items-center gap-2 bg-[#002147] hover:bg-[#0d1b2a] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-5 py-2 rounded-xl shadow-md transition-all font-bold text-sm disabled:opacity-50"
+                    >
+                        <Download className="w-4 h-4" />
+                        {isGenerating ? 'Generating...' : 'Download PDF'}
+                    </button>
+                </div>
 
-                    {/* Controls */}
-                    <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-4 no-print bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur-md p-2 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg">
-                        <button
-                            onClick={() => setSelectedType(null)}
-                            className="flex items-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl transition-all font-medium text-sm"
-                        >
-                            ← Back
-                        </button>
-                        <div className="w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
-                        <button
-                            onClick={handleDownload}
-                            disabled={isGenerating}
-                            className="flex items-center gap-2 bg-[#002147] hover:bg-[#0d1b2a] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-5 py-2 rounded-xl shadow-md transition-all font-bold text-sm disabled:opacity-50"
-                        >
-                            <Download className="w-4 h-4" />
-                            {isGenerating ? 'Generating...' : 'Download PDF'}
-                        </button>
-                    </div>
+                {/* Certificate Paper - A4 Portrait */}
+                <div className="transform scale-[0.6] sm:scale-[0.8] lg:scale-[0.9] origin-top mt-16 shadow-2xl">
+                    <div className="certificate-paper" ref={certificateRef} id="certificate-to-print">
+                        {/* Security Watermark Backdrop */}
+                        <div className={`cert-watermark-overlay ${selectedType.id === 'combined' ? 'combined-watermark' : ''}`}>{certId}</div>
 
-                    {/* Certificate Paper - A4 Portrait */}
-                    <div className="transform scale-[0.6] sm:scale-[0.8] lg:scale-[0.9] origin-top mt-16 shadow-2xl">
-                        <div className="certificate-paper" ref={certificateRef} id="certificate-to-print">
-                            {/* Security Watermark Backdrop */}
-                            <div className={`cert-watermark-overlay ${selectedType.id === 'combined' ? 'combined-watermark' : ''}`}>{certId}</div>
-
-                            <div className={`cert-content ${selectedType.id === 'combined' ? 'combined-content' : ''}`}>
+                        <div className={`cert-content ${selectedType.id === 'combined' ? 'combined-content' : ''}`}>
                                 <header className="cert-header">
                                     <div className="cert-logo-container">
                                         <img src={blueLogo} alt="SMAART INSTITUTE Logo" className="cert-logo" />
@@ -381,7 +370,7 @@ const Certificate = () => {
                                     </div>
                                 </header>
 
-                                <main className="cert-body">
+                                <div className="cert-body">
                                     <section className="cert-main-title">
                                         <h1 style={{ whiteSpace: 'pre-line' }} className={selectedType.id === 'combined' ? 'combined-title' : ''}>
                                             {selectedType.shortTitle}
@@ -453,45 +442,42 @@ const Certificate = () => {
                                             </div>
                                         </div>
                                     </section>
-                                </main>
+                                </div>
 
-                                <footer className="cert-footer">
-                                    <div className="signature-zone">
-                                        <div className="signature-line"></div>
-                                        <div className="signature-name">Ms. Rehana Banu Ameer</div>
-                                        <div className="signature-title">Director of Academic Quality</div>
-                                        <div className="signature-org">SMAART Institute (UK)</div>
-                                        <div className="issue-date">Issued this day: {issueDate}</div>
-                                    </div>
+                            <footer className="cert-footer">
+                                <div className="signature-zone">
+                                    <div className="signature-line"></div>
+                                    <div className="signature-name">Ms. Rehana Banu Ameer</div>
+                                    <div className="signature-title">Director of Academic Quality</div>
+                                    <div className="signature-org">SMAART Institute (UK)</div>
+                                    <div className="issue-date">Issued this day: {issueDate}</div>
+                                </div>
 
-                                    <div className="verification-zone">
-                                        {qrCodeDataUrl && (
-                                            <img src={qrCodeDataUrl} alt="Verify QR Code" className="qr-code" />
-                                        )}
-                                        <div className="verify-info">
-                                            <span className="verify-label">Verify this credential at:</span>
-                                            <span className="verify-url">https://verify.smaart.in</span>
-                                            <span className="cert-id-tag">REF: {certId}</span>
-                                        </div>
+                                <div className="verification-zone">
+                                    {qrCodeDataUrl && (
+                                        <img src={qrCodeDataUrl} alt="Verify QR Code" className="qr-code" />
+                                    )}
+                                    <div className="verify-info">
+                                        <span className="verify-label">Verify this credential at:</span>
+                                        <span className="verify-url">https://verify.smaart.in</span>
+                                        <span className="cert-id-tag">REF: {certId}</span>
                                     </div>
-                                </footer>
+                                </div>
+                            </footer>
 
-                                {selectedType.id !== 'combined' && (
-                                    <div className="legal-disclaimer">
-                                        This credential is an industry-recognized professional qualification and does not confer
-                                        academic degree or government-regulated diploma equivalence within the UK education framework.
-                                        &copy; {new Date().getFullYear()} SMAART Institute London.
-                                    </div>
-                                )}
-                            </div>
+                            {selectedType.id !== 'combined' && (
+                                <div className="legal-disclaimer">
+                                    This credential is an industry-recognized professional qualification and does not confer
+                                    academic degree or government-regulated diploma equivalence within the UK education framework.
+                                    &copy; {new Date().getFullYear()} SMAART Institute London.
+                                </div>
+                            )}
                         </div>
                     </div>
+                </div>
                 </main>
-            </div>
         </div>
     );
 };
 
 export default Certificate;
-
-
