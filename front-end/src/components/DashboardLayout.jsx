@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, Bell, Settings, Search, Command } from "lucide-react";
+import { ChevronRight, Bell, Settings, Search, Command, Clock } from "lucide-react";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -79,6 +79,32 @@ const DashboardLayout = () => {
   const { isCollapsed } = useSidebar();
   const { theme } = useTheme();
   const { user } = useUser();
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format time
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
 
   // Get page title
   const getPageTitle = () => {
@@ -132,97 +158,97 @@ const DashboardLayout = () => {
         }`}
       >
         {/* Top Header Bar */}
-        <header className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
-          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
-            {/* Left: Breadcrumbs & Title */}
-            <div className="flex flex-col gap-1">
+        <header className="sticky top-0 z-40 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
+            {/* Left: Breadcrumbs & Page Title */}
+            <div className="flex flex-col">
               {/* Breadcrumbs */}
-              {breadcrumbs.length > 0 && (
-                <nav className="hidden sm:flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  {breadcrumbs.map((crumb, index) => (
-                    <div key={crumb.path} className="flex items-center gap-2">
-                      {index > 0 && <ChevronRight className="w-3 h-3" />}
-                      {crumb.isLast ? (
-                        <span className="font-medium text-slate-900 dark:text-white">
-                          {crumb.label}
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => navigate(crumb.path)}
-                          className="hover:text-[#1a3884] transition-colors"
-                        >
-                          {crumb.label}
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </nav>
-              )}
+              <nav className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="hover:text-[#1a3884] dark:hover:text-blue-400 transition-colors font-medium"
+                >
+                  Dashboard
+                </button>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                <span className="font-semibold text-slate-700 dark:text-slate-300">
+                  {pageTitle}
+                </span>
+              </nav>
 
               {/* Page Title */}
               <motion.h1
                 key={pageTitle}
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mt-0.5"
               >
                 {pageTitle}
               </motion.h1>
             </div>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Search Bar - Desktop */}
-              <button className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                <Search className="w-4 h-4" />
-                <span className="text-sm">Search...</span>
-                <div className="flex items-center gap-0.5 ml-2 px-1.5 py-0.5 bg-white dark:bg-slate-700 rounded text-[10px] font-medium">
-                  <Command className="w-3 h-3" />
-                  <span>K</span>
-                </div>
-              </button>
+            <div className="flex items-center gap-1 sm:gap-2">
+              {/* Time Display - Desktop */}
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-lg mr-2">
+                <Clock className="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  {formatTime(currentTime)}
+                </span>
+              </div>
+
+              {/* Divider */}
+              <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
 
               {/* Settings Button */}
               <button
                 onClick={() => navigate('/dashboard/settings')}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#1a3884] transition-colors"
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
                 aria-label="Settings"
               >
                 <Settings className="w-5 h-5" />
               </button>
 
-              {/* Notification Button (Mobile/Tablet only) */}
+              {/* Notification Button */}
               <button
                 onClick={() => navigate('/notifications')}
-                className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-[#1a3884] transition-colors relative"
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors relative"
                 aria-label="Notifications"
               >
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
 
-              {/* User Avatar - Quick Access */}
-              <button
-                onClick={() => navigate('/profile')}
-                className="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              >
-                {user?.profilePicture ? (
-                  <img
-                    src={user.profilePicture}
-                    alt={user.fullName || 'User'}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-[#1a3884] flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">
-                      {(user?.firstName?.[0] || user?.fullName?.[0] || 'U').toUpperCase()}
-                    </span>
-                  </div>
-                )}
-                <span className="hidden sm:block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  {user?.firstName || user?.fullName?.split(' ')[0] || 'User'}
-                </span>
-              </button>
+              {/* User Profile Section */}
+              <div className="flex items-center gap-2 ml-1 pl-3 border-l border-slate-200 dark:border-slate-700">
+                <div className="hidden sm:block text-right">
+                  <p className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                    {getGreeting()}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {user?.firstName || user?.fullName?.split(' ')[0] || 'User'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="relative"
+                  aria-label="Profile"
+                >
+                  {user?.profilePicture ? (
+                    <img
+                      src={user.profilePicture}
+                      alt={user.fullName || 'User'}
+                      className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700 hover:ring-[#1a3884] dark:hover:ring-blue-400 transition-all"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-[#1a3884] flex items-center justify-center ring-2 ring-slate-200 dark:ring-slate-700 hover:ring-[#1a3884] dark:hover:ring-blue-400 transition-all">
+                      <span className="text-white text-sm font-semibold">
+                        {(user?.firstName?.[0] || user?.fullName?.[0] || 'U').toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </header>

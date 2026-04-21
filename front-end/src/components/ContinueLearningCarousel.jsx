@@ -68,25 +68,27 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lms-card p-6 relative overflow-hidden group"
+            className="relative"
         >
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h2 className="text-xl font-bold text-[#002147] dark:text-white">
-                        Jump Back In <span className="text-[#1a3884] ml-2">Progress 🚀</span>
+                    <h2 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
+                        Continue Learning
                     </h2>
-                    <p className="text-xs text-gray-400 font-medium">Continue from where you left off</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Pick up where you left off</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     <button
                         onClick={() => scrollCarousel('left')}
-                        className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-[#1a3884] hover:text-white flex items-center justify-center transition-all duration-300"
+                        className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-200"
+                        aria-label="Previous"
                     >
                         <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                         onClick={() => scrollCarousel('right')}
-                        className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 hover:bg-[#1a3884] hover:text-white flex items-center justify-center transition-all duration-300"
+                        className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors duration-200"
+                        aria-label="Next"
                     >
                         <ChevronRight className="w-5 h-5" />
                     </button>
@@ -95,7 +97,7 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
 
             <div
                 ref={carouselRef}
-                className="flex gap-5 overflow-x-auto pb-4 pt-1 scrollbar-hide px-1"
+                className="flex gap-6 overflow-x-auto pb-4 pt-1 scrollbar-hide"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
                 {courses.slice(0, 8).map((course, index) => {
@@ -103,55 +105,44 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
                     return (
                         <motion.div
                             key={course._id || index}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: index * 0.1 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
                             onClick={() => onCourseClick && onCourseClick(course._id || course.id)}
-                            className="group relative min-w-[300px] h-[180px] rounded-3xl overflow-hidden cursor-pointer flex-shrink-0 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                            className="group relative min-w-[280px] h-[200px] rounded-2xl overflow-hidden cursor-pointer flex-shrink-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300"
                         >
-                            {/* Premium Thumbnail Background */}
-                            <div className="absolute inset-0 bg-[#002147]">
+                            {/* Image Background */}
+                            <div className="absolute inset-0">
                                 <img
                                     src={`https://images.unsplash.com/photo-${1516000000000 + index}?auto=format&fit=crop&q=80&w=800`}
                                     alt={course.title}
-                                    className="w-full h-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
                             </div>
 
-                            {/* Dynamic Overlays */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#00152E] via-black/20 to-transparent" />
-                            <div className="absolute inset-0 bg-[#1a3884]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                            {/* Bottom Info Section */}
-                            <div className="absolute inset-x-0 bottom-0 p-5 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                                <span className="inline-block px-2 py-0.5 rounded-lg bg-white/10 backdrop-blur-md text-[#1a3884] text-[9px] font-black uppercase tracking-widest mb-2 border border-white/10">
-                                    COURSE
-                                </span>
-                                <h3 className="text-white font-black text-lg mb-2 line-clamp-1 group-hover:text-[#1a3884] transition-colors">
-                                    {course.title || "Untitled Milestone"}
-                                </h3>
-
-                                <div className="flex items-center justify-between mb-3">
-                                    <p className="text-white/60 text-xs font-bold">
-                                        {course.modules?.length || 0} Modules
-                                    </p>
-                                    <span className="text-white font-black text-xs">{progress || 45}%</span>
+                            {/* Content */}
+                            <div className="absolute inset-x-0 bottom-0 p-5">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-xs font-medium text-slate-300 dark:text-slate-400">
+                                        {course.modules?.length || 0} modules
+                                    </span>
+                                    <span className="text-slate-500 dark:text-slate-600">•</span>
+                                    <span className="text-xs font-medium text-white">
+                                        {progress || 0}% complete
+                                    </span>
                                 </div>
-
-                                {/* Progress Bar */}
-                                <div className="h-2 bg-white/10 rounded-full overflow-hidden backdrop-blur-md">
+                                <h3 className="text-white font-semibold text-base mb-3 line-clamp-2 leading-snug">
+                                    {course.title || "Untitled Course"}
+                                </h3>
+                                <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
-                                        animate={{ width: `${progress || 45}%` }}
-                                        transition={{ delay: 0.5, duration: 1, ease: "circOut" }}
-                                        className="h-full rounded-full bg-gradient-to-r from-[#1a3884] to-[#2a4d9e]"
+                                        animate={{ width: `${progress || 0}%` }}
+                                        transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+                                        className="h-full bg-white"
                                     />
                                 </div>
-                            </div>
-
-                            {/* Floating Play Indicator */}
-                            <div className="absolute top-4 right-4 w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 scale-50 group-hover:scale-100">
-                                <Play className="w-5 h-5 text-white fill-white" />
                             </div>
                         </motion.div>
                     );

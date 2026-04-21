@@ -120,9 +120,21 @@ const LeftSidebar = () => {
   const { avatarData } = useAvatar();
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
+  const [showCollegeLogo, setShowCollegeLogo] = useState(false);
 
   // Mobile sidebar state
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  // Auto-toggle between profile photo and college logo
+  useEffect(() => {
+    if (!user?.college?.logo) return;
+    
+    const interval = setInterval(() => {
+      setShowCollegeLogo(prev => !prev);
+    }, 5000); // Toggle every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [user?.college?.logo]);
 
   // Fetch profile photo from Registration API
   useEffect(() => {
@@ -419,37 +431,22 @@ const LeftSidebar = () => {
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
         className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-xl`}
         onMouseEnter={() => isCollapsed && toggleSidebar()}
-        onMouseLeave={() => !isCollapsed && toggleSidebar()}
       >
         {/* Logo Section */}
-        <div className={`flex items-center gap-2 lg:gap-4 p-4 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 justify-center' : 'px-5'}`}>
-          <Link to="/dashboard" className="flex items-center gap-2 lg:gap-4 overflow-hidden">
+        <div className={`flex flex-col items-start p-5 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
+          <Link to="/dashboard" className="flex flex-col items-start overflow-hidden">
             {/* SMAART Institute Logo */}
-            <div className="h-10 w-auto flex items-center justify-center transition-all duration-300">
+            <div className="flex items-center transition-all duration-300">
               <img
                 src={theme === 'dark' ? whiteLogo : blueLogo}
                 alt="SMAART Institute"
-                className="h-8 lg:h-10 w-auto object-contain"
+                className="h-12 lg:h-14 w-auto object-contain"
               />
             </div>
-            
-            {/* College Logo - hidden when collapsed */}
-            {user?.college?.logo && !isCollapsed && (
-              <div className="flex items-center gap-2 lg:gap-4">
-                <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block mx-1" />
-                <div className="flex items-center">
-                  <img
-                    src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
-                    alt={user.college.collegeName || "College Logo"}
-                    className="h-8 lg:h-10 w-auto object-contain max-w-[120px]"
-                    onError={(e) => {
-                      const container = e.target.closest('.flex.items-center.gap-2');
-                      if (container) container.style.display = 'none';
-                      else e.target.style.display = 'none';
-                    }}
-                  />
-                </div>
-              </div>
+            {!isCollapsed && (
+              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
+                Craft Your Career
+              </span>
             )}
           </Link>
         </div>
@@ -688,7 +685,16 @@ const LeftSidebar = () => {
           >
             {/* Avatar */}
             <div className="relative flex-shrink-0">
-              {profilePhoto || user?.profilePicture ? (
+              {showCollegeLogo && user?.college?.logo ? (
+                <img
+                  src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
+                  alt={user.college.collegeName || "College Logo"}
+                  className="w-10 h-10 rounded-lg object-contain bg-white dark:bg-slate-800 border-2 border-white dark:border-slate-700 p-1"
+                  onError={(e) => {
+                    setShowCollegeLogo(false);
+                  }}
+                />
+              ) : profilePhoto || user?.profilePicture ? (
                 <img
                   src={profilePhoto || user.profilePicture}
                   alt={user.fullName || 'User'}

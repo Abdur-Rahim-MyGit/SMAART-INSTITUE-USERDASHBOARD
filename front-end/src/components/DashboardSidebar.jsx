@@ -54,6 +54,32 @@ const DashboardSidebar = () => {
   const { theme, setTheme } = useTheme();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format time
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  // Get greeting based on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
+  };
 
   // Notification state
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -202,48 +228,38 @@ const DashboardSidebar = () => {
   return (
     <>
       {/* Top Navigation Bar */}
-      <header className="fixed top-0 left-0 right-0 z-[80] bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-b border-slate-200/50 dark:border-white/10 shadow-sm transition-all duration-300">
-        <div className="flex items-center justify-between px-6 lg:px-10 h-16">
-
+      <header className="fixed top-0 left-0 right-0 z-[80] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/60 dark:border-white/10 shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between px-4 lg:px-8 h-18 py-3">
 
           {/* Left: Logo Section */}
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             <button
-              className="lg:hidden p-1.5 rounded-none hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
             >
               {isMobileOpen ? <X className="w-5 h-5 text-slate-600 dark:text-slate-300" /> : <Menu className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
             </button>
 
-            <div className="flex items-center gap-2 lg:gap-4">
-              <Link to="/" className="flex items-center group">
-                <div className="h-10 w-auto flex items-center justify-center transition-all duration-300">
+            <div className="flex items-center gap-3">
+              <Link to="/dashboard" className="flex items-center group">
+                <div className="h-11 w-auto flex items-center justify-center transition-all duration-300">
                   <img
                     src={theme === 'dark' ? whiteLogo : blueLogo}
                     alt="SMAART Institute"
-                    className="h-8 lg:h-10 w-auto object-contain"
+                    className="h-9 lg:h-11 w-auto object-contain"
                   />
                 </div>
               </Link>
 
-              {user?.college?.logo && (
-                <div className="flex items-center gap-2 lg:gap-4">
-                  <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block mx-1" />
-                  <div className="flex items-center">
-                    <img 
-                      src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
-                      alt={user.college.collegeName || "College Logo"} 
-                      className="h-8 lg:h-10 w-auto object-contain max-w-[120px]"
-                      onError={(e) => {
-                        // Hide both the separator and the image if loading fails
-                        const container = e.target.closest('.flex.items-center.gap-2');
-                        if (container) container.style.display = 'none';
-                        else e.target.style.display = 'none';
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
+              {/* Time Display */}
+              <div className="hidden md:flex flex-col ml-2">
+                <span className="text-xs font-semibold text-[#1a3884] dark:text-blue-400">
+                  {formatTime(currentTime)}
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                  {getGreeting()}, {user?.firstName || user?.fullName?.split(' ')[0] || 'User'}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -583,7 +599,7 @@ const DashboardSidebar = () => {
         )}
       </AnimatePresence>
 
-      <div className="h-16" />
+      <div className="h-[72px]" />
 
       {/* Chatbot Modal */}
       <ChatbotModal

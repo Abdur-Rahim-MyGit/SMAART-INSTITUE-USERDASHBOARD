@@ -638,3 +638,31 @@
 {"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-18 13:39:17"}
 {"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-18 13:39:17"}
 {"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-18 13:39:18"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-20 05:57:52"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-20 05:57:53"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-20 05:57:57"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-20 11:57:27"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-20 11:57:27"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-20 11:57:28"}
+{"level":"warn","message":"Route /api/education/structure not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-20 17:32:31","url":"/api/education/structure"}
+{"level":"warn","message":"Route /api/career-roles/names not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-20 17:32:31","url":"/api/career-roles/names"}
+{"level":"warn","message":"Route /api/education/structure not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-20 17:32:31","url":"/api/education/structure"}
+{"level":"warn","message":"Route /api/career-roles/names not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-20 17:32:31","url":"/api/career-roles/names"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-21 11:13:22"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-21 11:13:23"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-21 11:13:23"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-21 11:46:09"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-21 11:46:09"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-21 11:46:10"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-21 15:10:40"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-21 15:10:40"}
+{"level":"error","message":"Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/","reason":{"commonWireVersion":0,"compatible":true,"heartbeatFrequencyMS":10000,"localThresholdMS":15,"logicalSessionTimeoutMinutes":null,"maxElectionId":null,"maxSetVersion":null,"servers":{},"setName":"atlas-taxso3-shard-0","stale":false,"type":"ReplicaSetNoPrimary"},"service":"smaart-minds-api","stack":"MongooseServerSelectionError: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/\n    at _handleConnectionErrors (/home/soubanaadi/Documents/User-Dashboard/SMAART-INSTITUE-USERDASHBOARD/back-end/node_modules/mongoose/lib/connection.js:816:11)\n    at NativeConnection.openUri (/home/soubanaadi/Documents/User-Dashboard/SMAART-INSTITUE-USERDASHBOARD/back-end/node_modules/mongoose/lib/connection.js:791:11)","timestamp":"2026-04-21 15:11:10"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-21 15:20:19"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-21 15:20:19"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-21 15:20:20"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-21 15:20:50"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-21 15:20:51"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-21 15:20:52"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-21 15:23:37"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-21 15:23:38"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-21 15:23:48"}
