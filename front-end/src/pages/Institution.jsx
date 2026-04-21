@@ -79,7 +79,7 @@ const Institution = () => {
 
           {/* ERROR ALERT */}
           {error && (
-            <div className="lg:col-span-2 mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+            <div className="lg:col-span-2 mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm font-medium">{error}</p>
             </div>
@@ -95,8 +95,9 @@ const Institution = () => {
               transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
               className="flex flex-col gap-0"
             >
-              {/* Outer Card — sharp corners, white bg, strong shadow */}
+              {/* Outer Card — rounded corners, white bg, strong shadow */}
               <div
+                className="rounded-3xl overflow-hidden"
                 style={{
                   background: "#ffffff",
                   border: "1.5px solid rgba(26,56,132,0.14)",
@@ -105,15 +106,15 @@ const Institution = () => {
               >
                 {/* Navy blue border-frame around the video */}
                 <div
-                  className="relative"
+                  className="relative rounded-t-3xl"
                   style={{
-                    background: "#0d2257",
-                    padding: "10px",
+                    background: "linear-gradient(135deg, #0d2257 0%, #1a3884 100%)",
+                    padding: "12px",
                   }}
                 >
                   {/* Founder's Message Badge */}
                   <div
-                    className="absolute top-3 left-3 z-20 flex items-center gap-2 px-3.5 py-1.5"
+                    className="absolute top-4 left-4 z-20 flex items-center gap-2 px-4 py-2 rounded-full"
                     style={{
                       background: "rgba(0, 21, 46, 0.88)",
                       backdropFilter: "blur(8px)",
@@ -127,27 +128,27 @@ const Institution = () => {
                   </div>
 
                   {/* Video embed — inset inside the navy frame */}
-                  <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                  <div className="relative w-full rounded-2xl overflow-hidden" style={{ paddingBottom: "56.25%" }}>
                     {loading ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50">
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 rounded-2xl">
                         <Loader2 className="w-8 h-8 text-white animate-spin" />
                       </div>
                     ) : (
                       <iframe
                         src={currentVideoUrl}
-                        className="absolute inset-0 w-full h-full border-0"
+                        className="absolute inset-0 w-full h-full border-0 rounded-2xl"
                         allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
                         allowFullScreen
                         title="Founder's Message"
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#00152e]/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#00152e]/60 via-transparent to-transparent pointer-events-none rounded-2xl" />
                   </div>
                 </div>
 
                 {/* Welcome text below */}
                 <div
-                  className="px-6 py-5 sm:px-8 sm:py-6 flex items-center justify-between gap-4"
+                  className="px-6 py-5 sm:px-8 sm:py-6 flex items-center justify-between gap-4 rounded-b-3xl"
                   style={{ background: "#ffffff", borderTop: "2px solid #0d2257" }}
                 >
                   <div>
@@ -171,14 +172,13 @@ const Institution = () => {
                   </div>
                   {/* Play button */}
                   <div
-                    className="w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center shrink-0 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0 hover:scale-105 transition-transform duration-200 cursor-pointer rounded-full"
                     style={{
-                      background: "linear-gradient(135deg, #e8eef8 0%, #d4ddf5 100%)",
-                      border: "1.5px solid rgba(26,56,132,0.20)",
-                      boxShadow: "0 2px 12px rgba(26,56,132,0.12)",
+                      background: "linear-gradient(135deg, #1a3884 0%, #2a5ad4 100%)",
+                      boxShadow: "0 4px 16px rgba(26,56,132,0.25)",
                     }}
                   >
-                    <Play className="w-4 h-4 text-[#1a3884] fill-[#1a3884] ml-0.5" />
+                    <Play className="w-5 h-5 text-white fill-white ml-0.5" />
                   </div>
                 </div>
               </div>

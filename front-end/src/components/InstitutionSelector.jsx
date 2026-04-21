@@ -126,16 +126,11 @@ const InstitutionSelector = ({ onSelect }) => {
     >
       <div className="relative">
 
-        {/* Ambient background glow for the selector area */}
-        <div className="absolute -inset-2 bg-[#C0C0C0]/5 dark:bg-[#C0C0C0]/10 rounded-none blur-xl pointer-events-none -z-10" />
-
         {/* Input Wrapper */}
         <div className="relative group z-20">
-          <div className="absolute inset-0 bg-[#C0C0C0] rounded-none opacity-0 group-focus-within:opacity-10 blur-lg transition-opacity duration-500" />
-
           <div className="relative flex items-center">
             <div className="absolute left-4 z-20 pointer-events-none">
-              <Search className={`h-5 w-5 transition-colors duration-300 ${searchTerm ? 'text-[#1a3884]' : 'text-gray-400'}`} />
+              <Search className={`h-5 w-5 transition-colors duration-300 ${searchTerm ? 'text-[#1a3884]' : 'text-slate-400'}`} />
             </div>
 
             <Input
@@ -146,7 +141,7 @@ const InstitutionSelector = ({ onSelect }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 200)}
-              className="w-full h-11 pl-11 pr-11 text-sm bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 text-[#002147] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-[#C0C0C0] rounded-none font-semibold shadow-md group-hover:shadow-lg transition-all duration-300"
+              className="w-full h-12 pl-11 pr-11 text-sm bg-white border border-slate-200 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-[#1a3884] rounded-xl font-medium shadow-md group-hover:shadow-lg transition-all duration-300"
             />
 
             {loading && (
@@ -158,10 +153,10 @@ const InstitutionSelector = ({ onSelect }) => {
             {searchTerm && !loading && (
               <button
                 onClick={() => { setSearchTerm(""); setColleges([]); }}
-                className="absolute right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors"
+                className="absolute right-4 text-slate-400 hover:text-slate-600 transition-colors"
                 title="Clear search"
               >
-                <div className="w-5 h-5 flex items-center justify-center rounded-full bg-gray-100 dark:bg-white/10">
+                <div className="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100">
                   <span className="text-[10px]">&times;</span>
                 </div>
               </button>
@@ -170,14 +165,14 @@ const InstitutionSelector = ({ onSelect }) => {
         </div>
 
         {/* Results List - Below Input with absolute positioning */}
-        <div className="relative mt-2">
+        <div className="relative">
           <AnimatePresence>
             {open && searchTerm && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute top-0 left-0 right-0 z-[100] bg-white dark:bg-[#001c3d] border border-gray-200 dark:border-white/10 rounded-none shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
+                className="absolute top-0 left-0 right-0 z-[100] bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
               >
                 {colleges.length > 0 ? (
                   <div className="p-1.5 sm:p-2">

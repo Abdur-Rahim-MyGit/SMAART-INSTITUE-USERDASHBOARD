@@ -5,7 +5,8 @@ import PageTransition from "@/components/PageTransition";
 import VisionBoardSplash from "@/components/VisionBoardSplash";
 import {
   Users, HeartPulse, Sparkles, ArrowUp,
-  BookOpen, Award, CheckCircle2, Circle, Clock, Briefcase, MapPin, DollarSign, Globe, Zap, Shield, Check
+  BookOpen, Award, CheckCircle2, Circle, Clock, Briefcase, MapPin, DollarSign, Globe, Zap, Shield, Check,
+  Code, Database, Cloud
 } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
@@ -54,50 +55,60 @@ const DashboardHome = () => {
       <div className="space-y-6">
 
               {/* NEW HERO SECTION */}
-              <motion.div 
-                initial={{ opacity: 0, y: -20 }} 
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full bg-[#1a3884] py-5 px-4 rounded-none shadow-lg text-center overflow-hidden relative"
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="w-full bg-[#1a3884] py-5 px-6 rounded-none shadow-2xl text-center"
               >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-none blur-3xl -translate-y-1/2 translate-x-1/2" />
-                <div className="relative z-10">
-                  <h1 className="text-2xl md:text-4xl font-black text-white tracking-[0.1em] uppercase mb-1">
-                    WELCOME BACK, {user?.firstName || user?.fullName?.split(' ')[0] || "ABDUL"}
-                  </h1>
-                  <p className="text-blue-100 text-xs md:text-sm font-medium opacity-90">
+                {/* Content */}
+                  <motion.h1
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                    className="text-2xl md:text-4xl font-black text-white tracking-tight mb-3"
+                  >
+                    Welcome Back, {user?.firstName || user?.fullName?.split(' ')[0] || "User"}
+                  </motion.h1>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="text-blue-100 text-sm md:text-base font-medium max-w-2xl mx-auto leading-relaxed"
+                  >
                     Ready to take the next step in your career journey? Let's keep moving forward.
-                  </p>
-                </div>
+                  </motion.p>
               </motion.div>
 
               {/* DYNAMIC COLLEGE BANNERS SECTION */}
               <CollegeBanners />
 
               {/* CONSOLIDATED LEARNING SECTION */}
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }} 
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden"
+                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden"
               >
                 {/* 1. Continue Learning Bar */}
-                <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-none flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
+                <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-11 h-11 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                       <BookOpen className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
                     </div>
                     <div>
-                      <h3 className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500">Continue learning</h3>
-                      <h2 className="text-base font-bold text-[#1a3884] dark:text-white leading-tight">Level 3: Management Basics</h2>
+                      <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Continue learning</h3>
+                      <h2 className="text-lg font-semibold text-slate-900 dark:text-white leading-tight mt-0.5">Capability Building Program</h2>
                     </div>
                   </div>
-                  
-                  <div className="flex items-center gap-6 w-full md:w-auto">
-                    <div className="flex-1 md:w-48 lg:w-64 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-none overflow-hidden border border-slate-200/50 dark:border-slate-700">
-                      <div className="w-[75%] h-full bg-[#1a3884] dark:bg-blue-500 rounded-none"></div>
+
+                  <div className="flex items-center gap-5 w-full md:w-auto">
+                    <div className="flex-1 md:w-48 lg:w-64 h-2 bg-slate-100 dark:bg-slate-800 rounded-lg overflow-hidden">
+                      <div className="w-[75%] h-full bg-[#1a3884] dark:bg-blue-500 rounded-lg"></div>
                     </div>
-                    <span className="text-xs font-black text-[#1a3884] dark:text-blue-400 whitespace-nowrap">75% Complete</span>
-                    <button onClick={() => navigate('/dashboard/courses')} className="bg-[#1a3884] dark:bg-blue-600 hover:bg-[#112558] dark:hover:bg-blue-700 text-white px-6 py-2 rounded-none text-xs font-black transition shadow-sm whitespace-nowrap">
-                      Resume
+                    <span className="text-xs font-semibold text-[#1a3884] dark:text-blue-400 whitespace-nowrap">75% Complete</span>
+                    <button onClick={() => navigate('/dashboard/courses')} className="bg-[#1a3884] dark:bg-blue-600 hover:bg-[#112558] dark:hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm whitespace-nowrap">
+                      Continue Learning
                     </button>
                   </div>
                 </div>
@@ -106,67 +117,52 @@ const DashboardHome = () => {
                 <div className="p-4 bg-slate-50/30 dark:bg-slate-800/10">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
-                      { 
-                        id: 1, 
-                        title: 'PATH 1: MANAGEMENT MASTERY', 
-                        subtitle: 'Module 5: Leading with Empathy', 
-                        progress: 60, 
+                      {
+                        id: 1,
+                        title: 'Software Development',
+                        subtitle: 'Certification: Python, Java',
+                        progress: 60,
                         btnText: 'Continue Path',
-                        icon: <Zap className="w-5 h-5 text-[#1a3884]" />,
+                        icon: <Code className="w-5 h-5 text-[#1a3884]" />,
                         color: 'blue'
                       },
-                      { 
-                        id: 2, 
-                        title: 'PATH 2: DATA ANALYTICS', 
-                        subtitle: 'Lesson 2.1: Advanced SQL Queries', 
-                        progress: 40, 
-                        btnText: 'Resume Lesson',
-                        icon: <Zap className="w-5 h-5 text-indigo-600" />,
+                      {
+                        id: 2,
+                        title: 'Data Analytics',
+                        subtitle: 'Certification: Advanced SQL Queries',
+                        progress: 40,
+                        btnText: 'Continue Path',
+                        icon: <Database className="w-5 h-5 text-indigo-600" />,
                         color: 'indigo'
                       },
-                      { 
-                        id: 3, 
-                        title: 'PATH 3: DIGITAL INNOVATION', 
-                        subtitle: 'Session 1: Product Development Sprints', 
-                        progress: 20, 
-                        btnText: 'Start Session',
-                        icon: <Sparkles className="w-5 h-5 text-amber-600" />,
+                      {
+                        id: 3,
+                        title: 'Cloud Architecture',
+                        subtitle: 'Session 1: Hosting Development Sprints',
+                        progress: 20,
+                        btnText: 'Continue Path',
+                        icon: <Cloud className="w-5 h-5 text-amber-600" />,
                         color: 'amber'
                       }
                     ].map((path) => (
-                      <div 
+                      <div
                         key={path.id}
-                        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-none p-4 shadow-sm group hover:shadow-md transition-all"
+                        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-5 shadow-sm group hover:shadow-md transition-all"
                       >
-                        <div className="flex items-start gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-none bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-100 dark:border-slate-700 shadow-sm">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
                             {path.icon}
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider mb-1 line-clamp-1">{path.title}</h3>
-                            <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 leading-tight line-clamp-1">{path.subtitle}</p>
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">{path.title}</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{path.subtitle}</p>
                           </div>
-                          <div className="w-8 h-8 rounded-none bg-gray-50 dark:bg-gray-800 flex items-center justify-center opacity-40">
-                             <BookOpen className="w-4 h-4 text-gray-400" />
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-4 mb-3">
-                           <div className="relative w-12 h-12 flex-shrink-0">
-                              <svg className="w-full h-full" viewBox="0 0 36 36">
-                                <path className="text-slate-100 dark:text-slate-800" strokeDasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
-                                <path className="text-[#1a3884]" strokeDasharray={`${path.progress}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                              </svg>
-                              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                 <span className="text-[10px] font-black">{path.progress}%</span>
-                              </div>
-                           </div>
-                           <div className="flex-1">
-                              <div className="text-[10px] font-bold text-slate-800 dark:text-slate-300">{path.progress}% Complete</div>
-                           </div>
                         </div>
 
-                        <button className="w-full bg-[#1a3884] dark:bg-blue-600 hover:bg-[#112558] dark:hover:bg-blue-700 text-white py-2 rounded-none text-xs font-black transition shadow-sm">
+                        <button
+                          onClick={() => window.open('http://localhost:5173/', '_blank')}
+                          className="w-full bg-[#1a3884] hover:bg-[#112558] text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
+                        >
                            {path.btnText}
                         </button>
                       </div>
@@ -175,344 +171,72 @@ const DashboardHome = () => {
                 </div>
               </motion.div>
 
-              {/* TOP ROW: Career Direction & Skills by Tier */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                
-                {/* Career Direction Hero (Span 8) */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                  className="lg:col-span-8 bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-none p-4 shadow-[0_4px_20px_rgba(192,192,192,0.2)] flex flex-col"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                     <h2 className="text-xl font-sans font-bold text-[#1a3884] dark:text-white">Career Direction</h2>
-                     <button className="text-xs font-semibold text-[#1a3884] dark:text-blue-400 hover:text-[#C0C0C0] transition">View Evidence</button>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
-                     <div>
-                       <div className="text-2xl font-bold text-slate-800 dark:text-white">12</div>
-                       <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Cluster Roles</div>
-                     </div>
-                     <div>
-                       <div className="text-2xl font-bold text-slate-800 dark:text-white">45</div>
-                       <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Unique Skills</div>
-                     </div>
-                     <div>
-                       <div className="text-2xl font-bold text-slate-800 dark:text-white">120</div>
-                       <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">Days on Platform</div>
-                     </div>
-                  </div>
-                  
-                  <div className="mb-4">
-                     <div className="flex justify-between text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                       <span>14 of 45 skills developed (8 verified, 6 self-declared)</span>
-                     </div>
-                     <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-none overflow-hidden flex shadow-inner">
-                        <div className="h-full bg-green-600 dark:bg-green-500" style={{ width: '25%' }} title="Verified"></div>
-                        <div className="h-full bg-green-300 dark:bg-green-400" style={{ width: '20%' }} title="Self-Declared"></div>
-                     </div>
-                     <button className="text-[9px] font-bold text-[#1a3884] dark:text-blue-400 opacity-80 hover:opacity-100 transition mt-1.5">
-                        Add evidence to strengthen your profile
-                     </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-auto">
-                     {/* Role Eligibility Cards */}
-                     {[
-                       { role: 'Software Engineer', salary: '$80k-$100k', ai: 'High', away: '2 skills away' },
-                       { role: 'Data Analyst', salary: '$70k-$90k', ai: 'Med', away: 'Eligible' },
-                       { role: 'UX Designer', salary: '$75k-$95k', ai: 'Low', away: '1 skill away' },
-                       { role: 'Product Manager', salary: '$90k-$120k', ai: 'High', away: '3 skills away' }
-                     ].map((role, idx) => (
-                       <div key={idx} className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-2.5 rounded-none flex flex-col gap-2 hover:shadow-md transition cursor-pointer">
-                          <div className="flex items-center gap-2">
-                             <div className="w-8 h-8 rounded-none bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
-                                <Briefcase className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
-                             </div>
-                             <div>
-                               <div className="font-bold text-xs leading-tight text-slate-800 dark:text-slate-200">{role.role}</div>
-                               <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{role.salary}</div>
-                             </div>
-                          </div>
-                          <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-none overflow-hidden flex">
-                              <div className="h-full bg-green-500" style={{ width: role.away === 'Eligible' ? '100%' : '60%' }}></div>
-                              {role.away !== 'Eligible' && <div className="h-full bg-green-300" style={{ width: '20%' }}></div>}
-                          </div>
-                          <div className="flex items-center justify-between text-[11px] font-bold">
-                             <span className="px-2 py-1 bg-[#1a3884]/10 dark:bg-blue-900/40 text-[#1a3884] dark:text-blue-300 rounded-md">AI: {role.ai}</span>
-                             <span className={`${role.away === 'Eligible' ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
-                                {role.away === 'Eligible' && <CheckCircle2 className="w-3 h-3 inline mr-1" />}
-                                {role.away}
-                             </span>
-                          </div>
-                       </div>
-                     ))}
-                  </div>
-                </motion.div>
-
-                {/* Skills by Tier (Span 4) */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                  className="lg:col-span-4 bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-none p-4 shadow-[0_4px_20px_rgba(192,192,192,0.2)] flex flex-col"
-                >
-                  <h2 className="text-base font-sans font-bold text-[#1a3884] dark:text-white mb-2">Skills by Tier</h2>
-                  
-                  <div className="flex-1 space-y-3">
-                     <div>
-                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                           <span className="w-1.5 h-1.5 rounded-none bg-green-500"></span>
-                           Tier 1: Foundational
-                        </div>
-                        <div className="flex items-center justify-between p-2 rounded-none border border-green-200 dark:border-green-900/50 bg-green-50/50 dark:bg-green-900/20 hover:bg-green-50 dark:hover:bg-green-900/40 transition cursor-pointer">
-                           <div className="flex items-center gap-3">
-                              <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-500" />
-                              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Basic Excel</span>
-                           </div>
-                           <span className="text-[11px] font-bold px-2 py-1 bg-green-200 dark:bg-green-900 text-green-800 dark:text-green-300 rounded-md">4 roles</span>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                           <span className="w-1.5 h-1.5 rounded-none bg-amber-500"></span>
-                           Tier 2: Intermediate
-                        </div>
-                        <div className="flex items-center justify-between p-2 rounded-none border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-900/20 hover:bg-amber-50 dark:hover:bg-amber-900/40 transition cursor-pointer">
-                           <div className="flex items-center gap-3">
-                              <Clock className="w-5 h-5 text-amber-600 dark:text-amber-500" />
-                              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">SQL Basics</span>
-                           </div>
-                           <span className="text-[11px] font-bold px-2 py-1 bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-300 rounded-md">2 roles</span>
-                        </div>
-                     </div>
-
-                     <div>
-                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
-                           <span className="w-1.5 h-1.5 rounded-none bg-slate-400"></span>
-                           Tier 3: Advanced
-                        </div>
-                        <div className="flex items-center justify-between p-2 rounded-none border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer">
-                           <div className="flex items-center gap-3">
-                              <Circle className="w-5 h-5 text-slate-400 dark:text-slate-500" />
-                              <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Advanced Python</span>
-                           </div>
-                           <span className="text-[11px] font-bold px-2 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-md">1 role</span>
-                        </div>
-                     </div>
-                  </div>
-                  
-                  <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                     <button className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#1a3884] dark:text-blue-400 py-1.5 rounded-none text-[10px] font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm">Job Application</button>
-                     <button className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[#1a3884] dark:text-blue-400 py-1.5 rounded-none text-[10px] font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition shadow-sm">Interview Prep</button>
-                  </div>
-                </motion.div>
-              </div>
-
-              {/* MIDDLE ROW: Next Best Skill, Learning Path, Apply & Tracking */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                
-                {/* Col 1-4: Next Best Skill & Apply Your Skills */}
-                <div className="lg:col-span-4 flex flex-col gap-4">
-                    <motion.div 
-                     initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
-                     className="bg-[#12265A] text-white rounded-none p-4 shadow-lg relative overflow-hidden flex flex-col"
-                   >
-                      <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-400/10 rounded-none blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-                      <div className="z-10 flex flex-col items-start text-left">
-                         <div className="w-8 h-8 bg-white/10 rounded-none flex items-center justify-center mb-3">
-                            <Zap className="w-4 h-4 text-[#C0C0C0]" fill="none" strokeWidth={2} />
-                         </div>
-                         <h3 className="font-bold text-[9px] text-white uppercase tracking-[0.2em] mb-1.5">Next Best Skill</h3>
-                         <h2 className="text-xl font-extrabold font-sans mb-2 leading-none tracking-tight text-white">Python Programming</h2>
-                         <p className="text-[13px] text-white/90 leading-relaxed max-w-[95%] mb-4">
-                            Completing this makes you eligible for 1 more role. (Coursera, ~40 hrs)
-                         </p>
-                         <button className="bg-[#C0C0C0] text-white px-6 py-2 rounded-none text-xs font-bold hover:bg-[#A8A8A8] transition shadow-md">
-                            Start Learning
-                         </button>
-                      </div>
-                   </motion.div>
-
-                   <motion.div 
-                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
-                     className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-none p-4 shadow-sm flex-1"
-                   >
-                      <div className="flex justify-between items-center mb-3">
-                         <h3 className="font-bold text-base font-sans text-[#1a3884] dark:text-white">Apply Your Skills</h3>
-                         <ArrowUp className="w-4 h-4 rotate-45 text-slate-400" />
-                      </div>
-                      <div className="space-y-3">
-                         <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none hover:shadow-md transition cursor-pointer group">
-                            <div className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition">Frontend Internship</div>
-                            <div className="flex gap-1.5 mb-1.5">
-                               <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                               <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                               <Circle className="w-3.5 h-3.5 text-amber-500" />
-                            </div>
-                            <div className="text-[10px] text-slate-500 font-semibold bg-white dark:bg-slate-800 px-2 py-1 rounded-none inline-block border border-slate-100 dark:border-slate-700">Timing: Ready in 2w</div>
-                         </div>
-                         <div className="p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none hover:shadow-md transition cursor-pointer group">
-                            <div className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition">Open Source Project</div>
-                            <div className="flex gap-1.5 mb-1.5">
-                               <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                               <Circle className="w-3.5 h-3.5 text-amber-500" />
-                            </div>
-                            <div className="text-[10px] text-slate-500 font-semibold bg-white dark:bg-slate-800 px-2 py-1 rounded-none inline-block border border-slate-100 dark:border-slate-700">Timing: Now</div>
-                         </div>
-                      </div>
-                   </motion.div>
-                 </div>
-
-                {/* Col 5-9: Learning Path */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-                  className="lg:col-span-5 bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-none p-4 shadow-sm flex flex-col h-full"
-                >
-                   <h2 className="text-base font-sans font-bold text-[#1a3884] dark:text-white mb-2">Learning Path</h2>
-                   
-                   <div className="flex-1 space-y-3">
-                      {/* 5a Your Skill Dev Path */}
-                      <div>
-                         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">1. Your Skill Development Path</h3>
-                         <div className="bg-[#F8F9FA] dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-none p-3 hover:border-[#1a3884]/30 dark:hover:border-blue-500/50 transition">
-                            <div className="flex justify-between items-start mb-2">
-                               <div>
-                                  <div className="flex items-center gap-3 mb-2">
-                                     <span className="w-5 h-5 bg-[#1a3884] text-white text-[10px] font-bold rounded-none flex items-center justify-center">1</span>
-                                     <span className="font-bold text-sm text-slate-800 dark:text-slate-200">Python Programming</span>
-                                  </div>
-                                  <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">Unlocks <span className="text-[#1a3884] dark:text-blue-400 font-bold">2 roles</span> • High priority</div>
-                               </div>
-                               <button className="text-xs font-bold bg-[#1a3884] text-white px-4 py-2 rounded-none hover:bg-[#112558] transition shadow-sm">Mark Complete</button>
-                            </div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 px-3 py-2 rounded-none border border-slate-100 dark:border-slate-700 inline-flex items-center gap-2">
-                               <BookOpen className="w-3.5 h-3.5 text-slate-400" /> Free course: Codecademy (20h)
-                            </div>
-                         </div>
-                      </div>
-
-                      {/* 5b Free Company Training */}
-                      <div>
-                         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">2. Free Company Training</h3>
-                         <div className="bg-[#F8F9FA] dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-none p-3 hover:border-[#1a3884]/30 dark:hover:border-blue-500/50 transition">
-                            <div className="flex justify-between items-start mb-2">
-                               <div>
-                                  <span className="font-bold text-base text-slate-800 dark:text-slate-200 block mb-1">TechCorp Cloud Bootcamp</span>
-                                  <div className="text-xs text-slate-500 flex items-center gap-2 mt-2">
-                                     <Clock className="w-3.5 h-3.5" /> Duration: 4 Weeks
-                                  </div>
-                               </div>
-                               <span className="text-[10px] font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-none border border-purple-200 dark:border-purple-800/50">Hiring Pipeline</span>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-slate-300 font-medium mt-3 bg-white dark:bg-slate-800 p-3 rounded-none border border-slate-100 dark:border-slate-700">
-                               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> AWS</span>
-                               <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-green-500" /> Docker</span>
-                            </div>
-                         </div>
-                      </div>
-
-                      {/* 5c Certifications */}
-                      <div>
-                         <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 border-b border-slate-100 dark:border-slate-800 pb-1">3. Certifications for Advantage</h3>
-                         <div className="bg-[#F8F9FA] dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 rounded-none p-3 hover:border-[#1a3884]/30 dark:hover:border-blue-500/50 transition">
-                            <div className="flex justify-between items-start mb-2">
-                               <div>
-                                  <span className="font-bold text-sm text-slate-800 dark:text-slate-200 block">AWS Solutions Architect</span>
-                                  <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Issued By Amazon</span>
-                               </div>
-                               <span className="text-[9px] font-bold bg-[#C0C0C0]/10 text-[#C0C0C0] px-2 py-0.5 rounded-none border border-[#C0C0C0]/20">Essential</span>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-2 mb-3 mt-2">
-                               <div className="bg-white dark:bg-slate-800 p-2 rounded-none border border-slate-100 dark:border-slate-700 flex flex-col justify-center">
-                                  <span className="text-[9px] text-slate-400 font-semibold uppercase">Cost</span>
-                                  <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">$150</span>
-                               </div>
-                               <div className="bg-white dark:bg-slate-800 p-2 rounded-none border border-slate-100 dark:border-slate-700 flex flex-col justify-center">
-                                  <span className="text-[9px] text-slate-400 font-semibold uppercase">Prep Time</span>
-                                  <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">40 hours</span>
-                               </div>
-                            </div>
-
-                            <ul className="text-sm text-slate-600 dark:text-slate-300 font-medium space-y-2.5">
-                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-none bg-[#C0C0C0]"></div> Industry recognized credential</li>
-                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-none bg-[#C0C0C0]"></div> High ROI for Cloud roles</li>
-                               <li className="flex items-center gap-2.5"><div className="w-1.5 h-1.5 rounded-none bg-[#C0C0C0]"></div> Boosts resume visibility significantly</li>
-                            </ul>
-                         </div>
-                      </div>
-                   </div>
-                </motion.div>
-
-                <div className="lg:col-span-3 flex flex-col gap-4">
-                   <motion.div 
+              <div className="flex flex-col gap-4">
+                   <motion.div
                      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
-                     className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-none p-4 shadow-sm"
+                     className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm"
                    >
-                      <h3 className="font-bold text-sm font-sans mb-2 text-[#1a3884] dark:text-white">Events & Community</h3>
+                      <h3 className="font-semibold text-sm mb-3 text-slate-900 dark:text-white">Events & Community</h3>
                       <div className="flex flex-col gap-2">
-                         <button onClick={() => navigate('/community')} className="w-full flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-none border border-slate-100 dark:border-slate-700 group">
-                            <div className="w-8 h-8 rounded-none bg-[#1a3884]/5 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-[#1a3884]/10 dark:group-hover:bg-blue-900/50 transition whitespace-nowrap overflow-visible">
+                         <button onClick={() => navigate('/community')} className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-lg border border-slate-100 dark:border-slate-700 group">
+                            <div className="w-9 h-9 rounded-lg bg-[#1a3884]/10 dark:bg-blue-900/30 flex items-center justify-center group-hover:bg-[#1a3884]/20 dark:group-hover:bg-blue-900/50 transition">
                                <Users className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
                             </div>
-                            <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex-1 text-left">Community Feed</span>
-                         </button>
-                         
-                         <button onClick={() => navigate('/my-courses')} className="w-full flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-none border border-slate-100 dark:border-slate-700 group">
-                            <div className="w-8 h-8 rounded-none bg-[#C0C0C0]/10 flex items-center justify-center transition">
-                               <BookOpen className="w-4 h-4 text-[#C0C0C0]" />
-                            </div>
-                            <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex-1 text-left">Concept Checks</span>
+                            <span className="font-medium text-sm text-slate-700 dark:text-slate-200 flex-1 text-left">Community Feed</span>
                          </button>
 
-                         <button onClick={() => navigate('/mind-care')} className="w-full flex items-center gap-2 p-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-none border border-slate-100 dark:border-slate-700 group">
-                            <div className="w-8 h-8 rounded-none bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center group-hover:bg-rose-100 dark:group-hover:bg-rose-900/40 transition">
+                         <button onClick={() => navigate('/my-courses')} className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-lg border border-slate-100 dark:border-slate-700 group">
+                            <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center transition">
+                               <BookOpen className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                            </div>
+                            <span className="font-medium text-sm text-slate-700 dark:text-slate-200 flex-1 text-left">Concept Checks</span>
+                         </button>
+
+                         <button onClick={() => navigate('/mind-care')} className="w-full flex items-center gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-800 transition rounded-lg border border-slate-100 dark:border-slate-700 group">
+                            <div className="w-9 h-9 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center group-hover:bg-rose-100 dark:group-hover:bg-rose-900/40 transition">
                                <HeartPulse className="w-4 h-4 text-rose-500 dark:text-rose-400" />
                             </div>
-                            <span className="font-bold text-xs text-slate-800 dark:text-slate-200 flex-1 text-left">Mind Care</span>
+                            <span className="font-medium text-sm text-slate-700 dark:text-slate-200 flex-1 text-left">Mind Care</span>
                          </button>
                       </div>
                    </motion.div>
 
                    {/* Optional Info Cards */}
-                   <motion.div 
+                   <motion.div
                      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
                      className="grid grid-cols-1 gap-3"
                    >
-                      <div className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-none p-3 shadow-sm flex items-center gap-3 hover:shadow-md transition cursor-pointer group">
-                         <div className="w-12 h-12 rounded-none bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center shrink-0 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition">
+                      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition cursor-pointer group">
+                         <div className="w-11 h-11 rounded-lg bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center shrink-0 group-hover:bg-amber-100 dark:group-hover:bg-amber-900/40 transition">
                             <MapPin className="w-5 h-5 text-amber-600 dark:text-amber-500" />
                          </div>
                          <div>
-                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Location Intelligence</div>
-                            <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Tech hubs matching your skills</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-white">Location Intelligence</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tech hubs matching your skills</div>
                          </div>
                       </div>
-                      
-                      <div className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-none p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer group">
-                         <div className="w-12 h-12 rounded-none bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40 transition">
+
+                      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition cursor-pointer group">
+                         <div className="w-11 h-11 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40 transition">
                             <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
                          </div>
                          <div>
-                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Salary Intelligence</div>
-                            <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Market value projection</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-white">Salary Intelligence</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Market value projection</div>
                          </div>
                       </div>
-                      
-                      <div className="bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800 rounded-none p-4 shadow-sm flex items-center gap-4 hover:shadow-md transition cursor-pointer group">
-                         <div className="w-12 h-12 rounded-none bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition">
+
+                      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm flex items-center gap-3 hover:shadow-md transition cursor-pointer group">
+                         <div className="w-11 h-11 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition">
                             <Globe className="w-5 h-5 text-blue-600 dark:text-blue-500" />
                          </div>
                          <div>
-                            <div className="text-xs font-bold text-slate-800 dark:text-slate-200">English Level</div>
-                            <div className="text-[11px] font-semibold text-slate-500 mt-0.5">Professional Working</div>
+                            <div className="text-sm font-semibold text-slate-900 dark:text-white">English Level</div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Professional Working</div>
                          </div>
                       </div>
                    </motion.div>
                 </div>
-              </div>
-
-
 
               {/* BOTTOM STRIP: Tools & Utilities (Kept from old design to maintain functionality) */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
@@ -548,7 +272,7 @@ const DashboardHome = () => {
                  </div>
               </div>
 
-        </div>
+      </div>
     </PageTransition>
   );
 };
