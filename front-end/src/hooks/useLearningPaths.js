@@ -19,7 +19,7 @@ export const useLearningPaths = (userId) => {
 
         // Fetch user's enrolled courses
         const enrollments = await courseEnrollmentAPI.getByStudentAndCourse(userId, '');
-        
+
         // If no enrollments, return empty array
         if (!enrollments || enrollments.length === 0) {
           setPaths([]);
@@ -70,6 +70,8 @@ export const useLearningPaths = (userId) => {
 
   return { paths, loading, error };
 };
+
+export default useLearningPaths;
 
 // Helper function to get icon based on course category
 const getIconForCourse = (category) => {
