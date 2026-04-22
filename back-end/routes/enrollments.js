@@ -2,6 +2,9 @@ const express = require('express');
 const Enrollment = require('../models/Enrollment');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get all enrollments with search and filter functionality
 router.get('/', async (req, res) => {

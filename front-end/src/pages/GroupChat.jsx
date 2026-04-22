@@ -550,7 +550,7 @@ const GroupChat = () => {
                           className="mb-3 rounded-[1.5rem] overflow-hidden cursor-pointer hover:opacity-90 transition-all hover:scale-[1.02]"
                           onClick={() => setViewerMedia({ url: msg.image, type: 'image' })}
                         >
-                          <img src={msg.image} alt="Shared" className="max-w-xs max-h-72 object-cover" />
+                          <img src={msg.image} alt="Shared" className="max-w-xs max-h-72 object-cover" loading="lazy" />
                         </div>
                       )}
                       {msg.video && (
@@ -860,7 +860,7 @@ const GroupChat = () => {
                   <Video className="w-10 h-10 text-white opacity-50" />
                 </div>
               ) : (
-                <img src={previewUrl} alt="Preview" className="h-24 w-auto rounded-2xl border-2 border-gray-100 shadow-lg object-cover" />
+                <img src={previewUrl} alt="Preview" className="h-24 w-auto rounded-2xl border-2 border-gray-100 shadow-lg object-cover" loading="lazy" />
               )}
               <button 
                 onClick={removeMedia}
@@ -954,7 +954,7 @@ const GroupChat = () => {
                   <div key={member._id} className="flex items-center gap-3 group/member">
                     <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden font-bold text-xs text-gray-500">
                       {member.profileImage ? (
-                        <img src={member.profileImage} alt="" className="w-full h-full object-cover" />
+                        <img src={member.profileImage} alt="" className="w-full h-full object-cover" loading="lazy" />
                       ) : (
                         member.fullName?.charAt(0) || '?'
                       )}
@@ -1052,7 +1052,7 @@ const GroupChat = () => {
                           </div>
                         </>
                       ) : (
-                        <img src={media.url} alt="" className="w-full h-full object-cover" />
+                        <img src={media.url} alt="" className="w-full h-full object-cover" loading="lazy" />
                       )}
                       <div className="absolute inset-0 bg-black/0 group-hover/thumb:bg-black/5 transition-colors" />
                     </motion.div>

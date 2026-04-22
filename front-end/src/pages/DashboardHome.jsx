@@ -10,6 +10,7 @@ import useUser from "@/hooks/useUser";
 import useLearningPaths from "@/hooks/useLearningPaths";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
+import { DashboardSkeleton } from "@/components/SkeletonPatterns";
 
 const DashboardHome = () => {
   const { user, loading: userLoading } = useUser();
@@ -32,11 +33,7 @@ const DashboardHome = () => {
   };
 
   if (userLoading || dashboardLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F5F2ED] dark:bg-slate-950">
-        <div className="w-12 h-12 border-4 border-slate-200 border-t-[#1a3884] rounded-none animate-spin"></div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (

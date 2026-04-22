@@ -8,6 +8,9 @@ const College = require('../models/College');
 const upload = require('../middleware/upload');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 

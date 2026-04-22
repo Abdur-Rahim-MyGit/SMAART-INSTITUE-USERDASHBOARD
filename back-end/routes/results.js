@@ -7,6 +7,9 @@ const { notifyAssessmentComplete } = require('../services/notificationService');
 const { getStageByCode, STAGE_DISTRIBUTIONS } = require('../config/stage_distributions');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 console.log("✅ Results Route Loaded with Multi-Stage Support (T1-T4)");
 

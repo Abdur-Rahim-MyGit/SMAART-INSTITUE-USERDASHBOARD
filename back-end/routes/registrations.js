@@ -2,6 +2,9 @@ const express = require('express');
 const Registration = require('../models/Registration');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get unique institutions from registrations
 router.get('/institutions', async (req, res) => {

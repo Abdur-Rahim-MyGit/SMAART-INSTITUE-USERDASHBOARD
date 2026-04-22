@@ -9,6 +9,7 @@ import { assessmentApi } from "@/services/assessmentApi";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import useUser from "@/hooks/useUser";
 import spImage from "@/assets/sp.jpeg";
+import { AssessmentsSkeleton } from "@/components/SkeletonPatterns";
 
 // Theme colors
 const THEME = {
@@ -182,6 +183,7 @@ const SkillsPassportModal = ({ onClose, currentUser, baselineResult }) => {
                   alt="SMAART AI"
                   className="w-full h-full object-cover rounded-2xl"
                   style={{ border: '2px solid rgba(56,189,248,0.25)' }}
+                  loading="lazy"
                 />
               </div>
 
@@ -504,7 +506,11 @@ const MyAssessments = () => {
   return (
     <div className="min-h-screen">
       <main className="p-4 sm:p-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        {loading ? (
+          <AssessmentsSkeleton />
+        ) : (
+          <>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {isFirstLogin && (
               <motion.div initial={{ opacity: 0, y: -20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.5 }} className="mb-6 sm:mb-8">
                 <div className="relative overflow-hidden rounded-2xl p-6 sm:p-8" style={{ background: `linear-gradient(135deg, ${THEME.teal}20, ${THEME.navy})`, border: `2px solid ${THEME.teal}` }}>
@@ -617,6 +623,8 @@ const MyAssessments = () => {
               />
             )}
           </AnimatePresence>
+          </>
+        )}
         </main>
     </div>
   );

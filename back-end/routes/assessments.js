@@ -3,6 +3,9 @@ const Assessment = require('../models/Assessment');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Apply protection to all assessment routes
 router.use(protect);

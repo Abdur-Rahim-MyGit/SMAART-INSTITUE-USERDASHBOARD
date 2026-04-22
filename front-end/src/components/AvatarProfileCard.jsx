@@ -155,7 +155,7 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
                 } ${index === visibleVideoIndex ? 'z-10' : 'z-0'}`}
               muted
               playsInline
-              preload="auto"
+              preload={index === currentVideoIndex ? "auto" : "metadata"}
               loop={index === ANIMATION_SEQUENCE.length - 1} // Only loop the last video
               onEnded={() => handleVideoEnded(index)}
               onPlaying={() => {
