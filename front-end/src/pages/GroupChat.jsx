@@ -55,6 +55,28 @@ const GroupChat = () => {
   const [pollData, setPollData] = useState({ question: '', options: ['', ''], expiresAt: '' });
   const [votingId, setVotingId] = useState(null);
   const [reactingTo, setReactingTo] = useState(null);
+  const longPressTimer = useRef(null);
+  const [longPressMsgId, setLongPressMsgId] = useState(null);
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (reactingTo && !e.target.closest('.emoji-picker-container')) {
+        setReactingTo(null);
+        setLongPressMsgId(null);
+      }
+    };
+
+    if (reactingTo) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [reactingTo]);
 
   useEffect(() => {
     fetchGroupDetails();
@@ -515,11 +537,43 @@ const GroupChat = () => {
                         {msg.senderName}
                       </span>
                     )}
-                    <div className={`relative px-6 py-3.5 shadow-sm break-words transition-all duration-300 ${
-                      isMe 
-                        ? 'bg-[#002147] text-white rounded-[2rem] rounded-br-[0.5rem]' 
-                        : 'bg-white text-gray-800 border border-gray-100 rounded-[2rem] rounded-bl-[0.5rem]'
-                    }`}>
+                    <div 
+                      className={`relative px-6 py-3.5 shadow-sm break-words transition-all duration-300 select-none ${
+                        isMe 
+                          ? 'bg-[#002147] text-white rounded-[2rem] rounded-br-[0.5rem]' 
+                          : 'bg-white text-gray-800 border border-gray-100 rounded-[2rem] rounded-bl-[0.5rem]'
+                      }`}
+                      onMouseDown={() => {
+                        longPressTimer.current = setTimeout(() => {
+                          setLongPressMsgId(msg._id);
+                          setReactingTo(msg._id);
+                        }, 500);
+                      }}
+                      onMouseUp={() => {
+                        if (longPressTimer.current) {
+                          clearTimeout(longPressTimer.current);
+                          longPressTimer.current = null;
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        if (longPressTimer.current) {
+                          clearTimeout(longPressTimer.current);
+                          longPressTimer.current = null;
+                        }
+                      }}
+                      onTouchStart={() => {
+                        longPressTimer.current = setTimeout(() => {
+                          setLongPressMsgId(msg._id);
+                          setReactingTo(msg._id);
+                        }, 500);
+                      }}
+                      onTouchEnd={() => {
+                        if (longPressTimer.current) {
+                          clearTimeout(longPressTimer.current);
+                          longPressTimer.current = null;
+                        }
+                      }}
+                    >
                       {/* Message Actions - Absolute Position */}
                       <div className={`absolute top-2 right-2 flex items-center gap-1 ${isMe ? 'text-white/70' : 'text-gray-400'}`}>
                         {isAdmin && (
@@ -535,15 +589,6 @@ const GroupChat = () => {
                             <Pin className={`w-3.5 h-3.5 ${group.pinnedMessages?.includes(msg._id) ? 'fill-current' : ''}`} />
                           </button>
                         )}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setReactingTo(reactingTo === msg._id ? null : msg._id);
-                          }}
-                          className="p-1 hover:bg-black/10 rounded-full transition-colors"
-                        >
-                          <span className="text-sm">😊</span>
-                        </button>
                       </div>
                       {msg.image && (
                         <div 
@@ -775,16 +820,31 @@ const GroupChat = () => {
                         </div>
                       )}
 
-                      {/* Reaction Picker */}
+                      {/* Emoji Picker - Shows below message on long press */}
                       {reactingTo === msg._id && (
-                        <div className="absolute bottom-full left-0 mb-2 p-2 bg-white rounded-xl shadow-xl border border-gray-100 flex gap-1 z-50 animate-in fade-in zoom-in duration-200">
+                        <div className="emoji-picker-container mt-3 p-2 bg-white rounded-xl shadow-lg border border-gray-100 flex gap-1 z-50">
                           {['👍', '❤️', '😂', '😮', '😢', '🎉'].map(emoji => (
                             <button
                               key={emoji}
                               onClick={async (e) => {
                                 e.stopPropagation();
-                                await groupsAPI.addReaction(id, msg._id, emoji);
+                                // Check if user already has a reaction on this message
+                                const existingReaction = msg.reactions?.find(r => r.user === user?._id || r.userId === user?._id);
+                                if (existingReaction) {
+                                  // If clicking same emoji, remove it (toggle off)
+                                  if (existingReaction.emoji === emoji) {
+                                    await groupsAPI.removeReaction(id, msg._id);
+                                  } else {
+                                    // Replace with new emoji
+                                    await groupsAPI.removeReaction(id, msg._id);
+                                    await groupsAPI.addReaction(id, msg._id, emoji);
+                                  }
+                                } else {
+                                  // Add new reaction
+                                  await groupsAPI.addReaction(id, msg._id, emoji);
+                                }
                                 setReactingTo(null);
+                                setLongPressMsgId(null);
                                 fetchGroupDetails();
                               }}
                               className="p-2 hover:bg-gray-100 rounded-lg text-xl transition-transform hover:scale-110"
@@ -794,7 +854,7 @@ const GroupChat = () => {
                           ))}
                         </div>
                       )}
-                      
+
                       {/* Display Reactions */}
                       {msg.reactions && msg.reactions.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
@@ -808,8 +868,17 @@ const GroupChat = () => {
                               key={emoji}
                               onClick={async (e) => {
                                 e.stopPropagation();
-                                // Toggle reaction logic could be added here
-                                await groupsAPI.addReaction(id, msg._id, emoji);
+                                // Toggle: remove if user already reacted with this emoji
+                                const existingReaction = msg.reactions?.find(r => r.user === user?._id || r.userId === user?._id);
+                                if (existingReaction && existingReaction.emoji === emoji) {
+                                  await groupsAPI.removeReaction(id, msg._id);
+                                } else {
+                                  // Remove any existing reaction first, then add new one
+                                  if (existingReaction) {
+                                    await groupsAPI.removeReaction(id, msg._id);
+                                  }
+                                  await groupsAPI.addReaction(id, msg._id, emoji);
+                                }
                                 fetchGroupDetails();
                               }}
                               className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1 ${

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import html2canvas from "html2canvas";
-import DashboardSidebar from "@/components/DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -223,12 +222,9 @@ const VisionBoardView = () => {
   const scaledHeight = canvasHeight * scale;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <DashboardSidebar />
-
-      <div className="lg:ml-72 min-h-screen flex flex-col">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
               <Button
@@ -334,10 +330,9 @@ const VisionBoardView = () => {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="bg-white border-t border-gray-200 px-6 py-3 text-center text-sm text-gray-500">
-          Created with Vision Board Creator
-        </div>
+      {/* Footer */}
+      <div className="bg-white border-t border-gray-200 px-6 py-3 text-center text-sm text-gray-500">
+        Created with Vision Board Creator
       </div>
     </div>
   );
