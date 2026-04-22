@@ -436,11 +436,11 @@ const LeftSidebar = () => {
         <div className={`flex flex-col items-start p-5 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
           <Link to="/dashboard" className="flex flex-col items-start overflow-hidden">
             {/* SMAART Institute Logo */}
-            <div className="flex items-center transition-all duration-300">
+            <div className={`flex items-center justify-center transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full'}`}>
               <img
                 src={theme === 'dark' ? whiteLogo : blueLogo}
                 alt="SMAART Institute"
-                className="h-12 lg:h-14 w-auto object-contain"
+                className={`w-auto object-contain transition-all duration-300 ${isCollapsed ? 'h-8 max-w-[40px]' : 'h-10 lg:h-12 max-w-[180px] lg:max-w-[200px]'}`}
               />
             </div>
             {!isCollapsed && (
