@@ -7,7 +7,7 @@ import LearningProgress from "@/components/dashboard/LearningProgress";
 import EventsSection from "@/components/dashboard/EventsSection";
 import ToolsStrip from "@/components/dashboard/ToolsStrip";
 import useUser from "@/hooks/useUser";
-import useLearningPaths from "@/hooks/useLearningPaths";
+import { useLearningPaths } from "@/hooks/useLearningPaths";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
 
