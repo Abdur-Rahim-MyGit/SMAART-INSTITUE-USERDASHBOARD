@@ -8,57 +8,56 @@ export const useLearningPaths = (userId) => {
 
   useEffect(() => {
     const fetchLearningPaths = async () => {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch user's enrolled courses
-        const enrollments = await courseEnrollmentAPI.getByStudentAndCourse(userId, '');
+        // Try to fetch from API
+        if (userId) {
+          try {
+            const enrollments = await courseEnrollmentAPI.getByStudentAndCourse(userId, '');
+            
+            if (enrollments && enrollments.length > 0) {
+              const pathsData = await Promise.all(
+                enrollments.map(async (enrollment) => {
+                  try {
+                    const course = await coursesAPI.getById(enrollment.course);
+                    return {
+                      id: course._id,
+                      title: course.title,
+                      subtitle: course.description || 'No description',
+                      progress: enrollment.progress || 0,
+                      btnText: 'Continue Path',
+                      icon: getIconForCourse(course.category),
+                      color: getColorForCourse(course.category),
+                      enrollmentId: enrollment._id
+                    };
+                  } catch (err) {
+                    console.error('Error fetching course details:', err);
+                    return null;
+                  }
+                })
+              );
 
-        // If no enrollments, return empty array
-        if (!enrollments || enrollments.length === 0) {
-          setPaths([]);
-          setLoading(false);
-          return;
+              const validPaths = pathsData
+                .filter(path => path !== null)
+                .sort((a, b) => b.progress - a.progress);
+
+              if (validPaths.length > 0) {
+                setPaths(validPaths);
+                setLoading(false);
+                return;
+              }
+            }
+          } catch (apiErr) {
+            console.log('API fetch failed, using fallback data:', apiErr.message);
+          }
         }
 
-        // Fetch course details for each enrollment
-        const pathsData = await Promise.all(
-          enrollments.map(async (enrollment) => {
-            try {
-              const course = await coursesAPI.getById(enrollment.course);
-              return {
-                id: course._id,
-                title: course.title,
-                subtitle: course.description || 'No description',
-                progress: enrollment.progress || 0,
-                btnText: 'Continue Path',
-                icon: getIconForCourse(course.category),
-                color: getColorForCourse(course.category),
-                enrollmentId: enrollment._id
-              };
-            } catch (err) {
-              console.error('Error fetching course details:', err);
-              return null;
-            }
-          })
-        );
-
-        // Filter out null values and sort by progress
-        const validPaths = pathsData
-          .filter(path => path !== null)
-          .sort((a, b) => b.progress - a.progress);
-
-        setPaths(validPaths);
+        // Use fallback data if API fails or no data
+        setPaths(getFallbackPaths());
       } catch (err) {
-        console.error('Error fetching learning paths:', err);
-        setError(err.message);
-        // Return fallback data on error
+        console.error('Error in fetchLearningPaths:', err);
         setPaths(getFallbackPaths());
       } finally {
         setLoading(false);
@@ -99,7 +98,7 @@ const getColorForCourse = (category) => {
 const getFallbackPaths = () => [
   {
     id: 1,
-    title: 'Software Development',
+    title: 'Software Developer',
     subtitle: 'Certification: Python, Java',
     progress: 60,
     btnText: 'Continue Path',
@@ -108,8 +107,8 @@ const getFallbackPaths = () => [
   },
   {
     id: 2,
-    title: 'Data Analytics',
-    subtitle: 'Certification: Advanced SQL Queries',
+    title: 'AI & ML',
+    subtitle: 'Certification: Machine Learning, Deep Learning',
     progress: 40,
     btnText: 'Continue Path',
     icon: 'Database',
@@ -117,7 +116,7 @@ const getFallbackPaths = () => [
   },
   {
     id: 3,
-    title: 'Cloud Architecture',
+    title: 'Cloud and DevOps',
     subtitle: 'Session 1: Hosting Development Sprints',
     progress: 20,
     btnText: 'Continue Path',
