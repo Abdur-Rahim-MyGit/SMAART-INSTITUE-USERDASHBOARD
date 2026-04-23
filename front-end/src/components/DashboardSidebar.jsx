@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -24,8 +24,10 @@ import {
 import ProfileDropdown from "@/components/ProfileDropdown";
 import InteractiveMenu from "@/components/InteractiveMenu";
 import ChatbotModal from "@/components/ChatbotModal";
+import NotificationToast from "@/components/NotificationToast";
 import useUser from "@/hooks/useUser";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useNotifications } from "@/contexts/NotificationContext";
 import blueLogo from "@/assets/blue.png";
 import whiteLogo from "@/assets/white.png";
 
@@ -81,14 +83,21 @@ const DashboardSidebar = () => {
     return 'Good Evening';
   };
 
-  // Notification state
+  // ── Real-time notifications from context (WebSocket-powered) ──────────
+  const {
+    notifications,
+    unreadCount,
+    wsStatus,
+    markAllRead,
+    refresh: refreshNotifications,
+    fetchNotifications
+  } = useNotifications();
+
   const [notificationOpen, setNotificationOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [notifLoading, setNotifLoading] = useState(false);
   const notificationRef = useRef(null);
 
-  // Auth headers
+  // Auth headers (still needed for test notification endpoint)
   const getAuthHeaders = () => {
     const token = sessionStorage.getItem('token');
     return {
@@ -102,56 +111,18 @@ const DashboardSidebar = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  // Fetch notifications
-  const fetchNotifications = useCallback(async () => {
-    setNotifLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/notifications?limit=10`, {
-        headers: getAuthHeaders()
-      });
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setNotifications(data.notifications || []);
-          setUnreadCount(data.unreadCount || 0);
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching notifications:', err);
-    } finally {
-      setNotifLoading(false);
-    }
-  }, []);
-
-  // Fetch on dropdown open
+  // Fetch notifications when dropdown opens (refresh from server)
   useEffect(() => {
     if (notificationOpen) {
-      fetchNotifications();
+      setNotifLoading(true);
+      fetchNotifications().finally(() => setNotifLoading(false));
     }
   }, [notificationOpen, fetchNotifications]);
 
-  // Fetch unread count on mount and periodically
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/notifications/unread-count`, {
-          headers: getAuthHeaders()
-        });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setUnreadCount(data.unreadCount || 0);
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching unread count:', err);
-      }
-    };
-
-    fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  // WS status colour helper
+  const wsStatusColor = wsStatus === 'connected' ? '#22c55e'
+    : wsStatus === 'connecting' ? '#f59e0b'
+    : '#ef4444';
 
   // Generate test notification
   const generateTestNotification = async () => {
@@ -165,7 +136,7 @@ const DashboardSidebar = () => {
       ];
       const randomNotif = testTypes[Math.floor(Math.random() * testTypes.length)];
 
-      const response = await fetch(`${API_BASE_URL}/notifications/test`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/notifications/test`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(randomNotif)
@@ -173,7 +144,9 @@ const DashboardSidebar = () => {
       const data = await response.json();
 
       if (data.success) {
-        fetchNotifications();
+        // The WS will deliver the new notification automatically;
+        // manual refresh is a fallback for when WS is disconnected.
+        if (wsStatus !== 'connected') refreshNotifications();
       }
     } catch (err) {
       console.error('Error creating test notification:', err);
@@ -190,20 +163,6 @@ const DashboardSidebar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  // Mark all as read
-  const markAllRead = async () => {
-    try {
-      await fetch(`${API_BASE_URL}/notifications/read-all`, {
-        method: 'PATCH',
-        headers: getAuthHeaders()
-      });
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-      setUnreadCount(0);
-    } catch (err) {
-      console.error('Error:', err);
-    }
-  };
 
   // Time ago formatter
   const timeAgo = (date) => {
@@ -305,6 +264,21 @@ const DashboardSidebar = () => {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2 xl:gap-3 shrink-0">
+
+            {/* WS connection status indicator */}
+            <div
+              title={`Notifications: ${wsStatus}`}
+              className="hidden md:flex items-center gap-1.5"
+            >
+              <span
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ backgroundColor: wsStatusColor }}
+              />
+              <span className="text-[10px] text-slate-400"
+                style={{ color: wsStatusColor }}>
+                {wsStatus === 'connected' ? 'Live' : wsStatus === 'connecting' ? '...' : 'Offline'}
+              </span>
+            </div>
 
             {/* Theme Toggle Button */}
             <button
@@ -611,6 +585,9 @@ const DashboardSidebar = () => {
           });
         }}
       />
+
+      {/* Real-time notification toast overlay */}
+      <NotificationToast />
     </>
   );
 };
