@@ -1,19 +1,39 @@
 const Notification = require('../models/Notification');
+const emailService  = require('./emailService');
 
 // Icon and color mappings for notification types
 const NOTIFICATION_CONFIG = {
-  badge: { icon: 'trophy', color: '#FFD700' },
-  assessment: { icon: 'clipboard-check', color: '#30919D' },
-  course: { icon: 'book-open', color: '#4F46E5' },
-  achievement: { icon: 'star', color: '#F59E0B' },
-  community: { icon: 'users', color: '#EC4899' },
-  coaching: { icon: 'calendar', color: '#10B981' },
-  support: { icon: 'headphones', color: '#6366F1' },
-  task: { icon: 'check-circle', color: '#EF4444' },
-  certificate: { icon: 'award', color: '#8B5CF6' },
-  warning: { icon: 'alert-triangle', color: '#F97316' },
-  suspension: { icon: 'shield-off', color: '#DC2626' },
-  system: { icon: 'bell', color: '#64748B' }
+  badge:       { icon: 'trophy',          color: '#FFD700' },
+  assessment:  { icon: 'clipboard-check', color: '#30919D' },
+  course:      { icon: 'book-open',       color: '#4F46E5' },
+  achievement: { icon: 'star',            color: '#F59E0B' },
+  community:   { icon: 'users',           color: '#EC4899' },
+  coaching:    { icon: 'calendar',        color: '#10B981' },
+  support:     { icon: 'headphones',      color: '#6366F1' },
+  task:        { icon: 'check-circle',    color: '#EF4444' },
+  certificate: { icon: 'award',           color: '#8B5CF6' },
+  warning:     { icon: 'alert-triangle',  color: '#F97316' },
+  suspension:  { icon: 'shield-off',      color: '#DC2626' },
+  system:      { icon: 'bell',            color: '#64748B' }
+};
+
+/**
+ * Fire-and-forget email dispatch.
+ * Resolves userId → email, then calls the given emailFn.
+ * Errors are swallowed so email failures never break in-app notifications.
+ *
+ * @param {string|ObjectId} userId
+ * @param {Function} emailFn  – async fn that receives { to, fullName, ...extras }
+ * @param {Object}   extras   – additional payload merged into the email helper args
+ */
+const _sendEmail = (userId, emailFn, extras = {}) => {
+  // Non-blocking – we intentionally do NOT await this
+  emailService.resolveUserEmail(userId)
+    .then(user => {
+      if (!user?.email) return;
+      return emailFn({ to: user.email, fullName: user.fullName, ...extras });
+    })
+    .catch(err => console.error('[NotificationService] Email dispatch error:', err.message));
 };
 
 /**
@@ -54,12 +74,19 @@ const notifyBadgeEarned = async (userId, badge) => {
     return null;
   }
 
+  // 📧 Email – fire-and-forget
+  _sendEmail(userId, emailService.sendBadgeEarnedEmail, {
+    badgeTitle: badge.title,
+    badgeTier:  badge.tier,
+    xpEarned:   badge.xp
+  });
+
   return createNotification({
     userId,
     type: 'badge',
     title: '🏆 New Badge Earned!',
     message: `Congratulations! You've earned the "${badge.title}" badge.`,
-    link: null, // No hyperlinks - display only
+    link: null,
     metadata: {
       badgeId: badge.badgeId,
       xpEarned: badge.xp
@@ -71,6 +98,14 @@ const notifyBadgeEarned = async (userId, badge) => {
  * Notify user about assessment results
  */
 const notifyAssessmentComplete = async (userId, assessment, resultId) => {
+  // 📧 Email – fire-and-forget
+  _sendEmail(userId, emailService.sendAssessmentResultsEmail, {
+    assessmentName: assessment.name || 'Assessment',
+    score:          assessment.score,
+    maxScore:       assessment.maxScore,
+    resultId
+  });
+
   return createNotification({
     userId,
     type: 'assessment',
@@ -87,6 +122,12 @@ const notifyAssessmentComplete = async (userId, assessment, resultId) => {
  * Notify user about course enrollment
  */
 const notifyCourseEnrollment = async (userId, course) => {
+  // 📧 Email – fire-and-forget
+  _sendEmail(userId, emailService.sendCourseEnrollmentEmail, {
+    courseTitle: course.title,
+    startDate:   course.startDate
+  });
+
   return createNotification({
     userId,
     type: 'course',
@@ -116,12 +157,18 @@ const notifyCourseCompleted = async (userId, course) => {
     return null;
   }
 
+  // 📧 Email – fire-and-forget
+  _sendEmail(userId, emailService.sendCourseCompletedEmail, {
+    courseTitle:     course.title,
+    completionDate:  new Date()
+  });
+
   return createNotification({
     userId,
     type: 'course',
     title: '🎓 Course Completed!',
     message: `Amazing! You've completed "${course.title}". Your certificate is ready!`,
-    link: null, // No hyperlinks - display only
+    link: null,
     icon: 'graduation-cap',
     color: '#10B981',
     metadata: {
@@ -276,6 +323,14 @@ const notifySessionScheduled = async (userId, session, coachName) => {
     minute: '2-digit'
   });
 
+  // 📧 Email – fire-and-forget
+  _sendEmail(userId, emailService.sendCoachingSessionEmail, {
+    coachName,
+    sessionDate: session.scheduledAt,
+    sessionTime: new Date(session.scheduledAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    sessionType: session.type || session.sessionType
+  });
+
   return createNotification({
     userId,
     type: 'coaching',
@@ -291,7 +346,14 @@ const notifySessionScheduled = async (userId, session, coachName) => {
 /**
  * Notify user about support ticket response
  */
-const notifyTicketResponse = async (userId, ticketId, ticketSubject) => {
+const notifyTicketResponse = async (userId, ticketId, ticketSubject, agentName) => {
+  // 📧 Email – fire-and-forget
+  _sendEmail(userId, emailService.sendTicketUpdateEmail, {
+    ticketSubject,
+    ticketId,
+    agentName
+  });
+
   return createNotification({
     userId,
     type: 'support',
@@ -307,7 +369,14 @@ const notifyTicketResponse = async (userId, ticketId, ticketSubject) => {
 /**
  * Notify user about certificate issued
  */
-const notifyCertificateIssued = async (userId, certificateType, courseName) => {
+const notifyCertificateIssued = async (userId, certificateType, courseName, certificateId) => {
+  // 📧 Email – fire-and-forget
+  _sendEmail(userId, emailService.sendCertificateEmail, {
+    certificateType,
+    courseName,
+    certificateId
+  });
+
   return createNotification({
     userId,
     type: 'certificate',
@@ -357,6 +426,10 @@ const notifySystemAnnouncement = async (userIds, title, message, link = null) =>
  * Notify user with welcome message on registration
  */
 const notifyWelcome = async (userId, fullName) => {
+  // 📧 Welcome email – we already know the email from the registration context;
+  // however to stay consistent we use the userId-resolver path here too.
+  _sendEmail(userId, emailService.sendWelcomeEmail, {});
+
   return createNotification({
     userId,
     type: 'system',
@@ -389,7 +462,10 @@ const notifyNewCourse = async (userIds, course) => {
 /**
  * Notify user about a moderator warning
  */
-const notifyModerationWarning = async (userId, reason) => {
+const notifyModerationWarning = async (userId, reason, warningCount) => {
+  // 📧 Email – fire-and-forget
+  _sendEmail(userId, emailService.sendModerationWarningEmail, { reason, warningCount });
+
   return createNotification({
     userId,
     type: 'warning',

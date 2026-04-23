@@ -699,7 +699,9 @@
 {"level":"warn","message":"Route /api/career-roles/names not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 13:02:08","url":"/api/career-roles/names"}
 {"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-22 13:32:18"}
 {"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-22 13:32:18"}
-{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-22 13:32:19"}
-{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-23 02:26:16"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-22 13:32:19"{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-23 02:26:16"}
 {"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-23 02:26:16"}
 {"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-23 02:26:17"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-23 15:04:10"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-23 15:04:10"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-23 15:04:11"}
