@@ -15,7 +15,7 @@ export const useLearningPaths = (userId) => {
         // Try to fetch from API
         if (userId) {
           try {
-            const enrollments = await courseEnrollmentAPI.getByStudentAndCourse(userId, '');
+            const enrollments = await courseEnrollmentAPI.getByStudent(userId);
             
             if (enrollments && enrollments.length > 0) {
               const pathsData = await Promise.all(
