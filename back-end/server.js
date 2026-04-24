@@ -101,9 +101,6 @@ mongoose.connect(mongoURI)
     process.exit(1);
   });
 
-// Apply global rate limiter to all API routes
-app.use('/api', generalLimiter);
-
 // Existing Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
