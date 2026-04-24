@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { UserProvider } from "@/contexts/UserContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import AnimatedRoutes from "./components/AnimatedRoutes";
 import SecurityGuard from "@/components/SecurityGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -19,18 +20,20 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <UserProvider>
-          <SidebarProvider>
-            <ErrorBoundary>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <SingleTabGuard>
-                  <AnimatedRoutes />
-                  <SecurityGuard />
-                </SingleTabGuard>
-              </BrowserRouter>
-            </ErrorBoundary>
-          </SidebarProvider>
+          <NotificationProvider>
+            <SidebarProvider>
+              <ErrorBoundary>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <SingleTabGuard>
+                    <AnimatedRoutes />
+                    <SecurityGuard />
+                  </SingleTabGuard>
+                </BrowserRouter>
+              </ErrorBoundary>
+            </SidebarProvider>
+          </NotificationProvider>
         </UserProvider>
       </TooltipProvider>
     </QueryClientProvider>

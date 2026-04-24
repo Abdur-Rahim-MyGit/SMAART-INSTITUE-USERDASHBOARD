@@ -304,6 +304,11 @@ export const courseEnrollmentAPI = {
     return apiCall(`/courseEnrollments?student=${studentId}&course=${courseId}`);
   },
 
+  // Get all enrollments for a student
+  getByStudent: async (studentId) => {
+    return apiCall(`/courseEnrollments/student/${studentId}`);
+  },
+
   // Update task progress
   updateTaskProgress: async (data) => {
     return apiCall('/courseEnrollments/task-progress', {

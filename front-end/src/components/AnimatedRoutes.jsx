@@ -23,6 +23,7 @@ const ModuleViewPage = lazy(() => import('@/pages/ModuleViewPage'));
 const QuotientsGrid = lazy(() => import('@/pages/QuotientsGrid'));
 const VisionBoardGalleryPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardGalleryPro'));
 const VisionBoardEditorPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardEditorPro'));
+const VisionBoardView = lazy(() => import('@/features/visionBoard/pages/VisionBoardView'));
 const MindCareSessions = lazy(() => import('@/pages/MindCareSessions'));
 const GeneralDictionary = lazy(() => import('@/pages/GeneralDictionary'));
 const SMAArtToolkit = lazy(() => import('@/pages/SMAArtToolkit'));
@@ -135,6 +136,7 @@ const AnimatedRoutes = () => {
                       <Route path="/dashboard/vision-boards" element={<VisionBoardGalleryPro />} />
                       <Route path="/vision-board-pro/create" element={<VisionBoardEditorPro />} />
                       <Route path="/vision-board-pro/gallery" element={<VisionBoardGalleryPro />} />
+                      <Route path="/vision-board/view/:id" element={<VisionBoardView />} />
 
                       {/* Toolkit */}
                       <Route path="/smaart-toolkit" element={<SMAArtToolkit />} />

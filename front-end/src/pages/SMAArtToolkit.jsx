@@ -125,7 +125,7 @@ const SMAArtToolkit = () => {
             
             {/* Toolbar - Compact description only */}
             <div className="mb-8 max-w-2xl">
-              <p className="text-[#1a3884] dark:text-[#C0C0C0] text-2xl font-['Dancing_Script'] mb-1">
+              <p className="text-[#1a3884] dark:text-[#C0C0C0] text-2xl font-['Dancing Script',cursive] mb-1">
                 Empower your journey with professional tools...
               </p>
               <p className="text-slate-400 dark:text-slate-500 text-xs font-medium uppercase tracking-widest">
