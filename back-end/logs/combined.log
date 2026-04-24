@@ -699,9 +699,29 @@
 {"level":"warn","message":"Route /api/career-roles/names not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 13:02:08","url":"/api/career-roles/names"}
 {"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-22 13:32:18"}
 {"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-22 13:32:18"}
-{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-22 13:32:19"{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-23 02:26:16"}
-{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-23 02:26:16"}
-{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-23 02:26:17"}
-{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-23 15:04:10"}
-{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-23 15:04:10"}
-{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-23 15:04:11"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-22 13:32:19"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-22 14:12:44"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-22 14:12:44"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-04-22 14:12:44"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-22 14:12:45"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-22 15:18:15"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-22 15:18:16"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-04-22 15:18:16"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-22 15:18:16"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-22 15:18:35"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-22 15:18:35"}
+{"level":"warn","message":"⚠️  Port 5000 in use, attempting fallback port 5001","service":"smaart-minds-api","timestamp":"2026-04-22 15:18:35"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-22 15:18:36"}
+{"level":"info","message":"✅ AI Career Coach Routes Loaded (Inline)","service":"smaart-minds-api","timestamp":"2026-04-22 15:20:05"}
+{"level":"info","message":"✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)","service":"smaart-minds-api","timestamp":"2026-04-22 15:20:06"}
+{"level":"info","message":"✅ MongoDB connected successfully","service":"smaart-minds-api","timestamp":"2026-04-22 15:20:06"}
+{"level":"warn","message":"Route /api/education/structure not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:25:29","url":"/api/education/structure"}
+{"level":"warn","message":"Route /api/career-roles/names not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:25:29","url":"/api/career-roles/names"}
+{"level":"warn","message":"Route /api/education/structure not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:25:29","url":"/api/education/structure"}
+{"level":"warn","message":"Route /api/career-roles/names not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:25:29","url":"/api/career-roles/names"}
+{"level":"warn","message":"Route /api/student/profile not found","method":"POST","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:25:30","url":"/api/student/profile"}
+{"level":"warn","message":"Route /api/education/structure not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:26:27","url":"/api/education/structure"}
+{"level":"warn","message":"Route /api/career-roles/names not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:26:27","url":"/api/career-roles/names"}
+{"level":"warn","message":"Route /api/education/structure not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:26:27","url":"/api/education/structure"}
+{"level":"warn","message":"Route /api/career-roles/names not found","method":"GET","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:26:27","url":"/api/career-roles/names"}
+{"level":"warn","message":"Route /api/student/profile not found","method":"POST","service":"smaart-minds-api","statusCode":404,"timestamp":"2026-04-22 15:46:21","url":"/api/student/profile"}

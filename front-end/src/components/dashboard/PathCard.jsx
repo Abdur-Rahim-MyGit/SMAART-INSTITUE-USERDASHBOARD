@@ -27,7 +27,7 @@ const PathCard = memo(({ path }) => {
       </div>
 
       <button
-        onClick={() => window.open('/learning', '_blank')}
+        onClick={() => window.open('http://localhost:5173/', '_blank')}
         className="w-full text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
         style={{ backgroundColor: COLORS.PRIMARY }}
         onMouseEnter={(e) => e.target.style.backgroundColor = COLORS.PRIMARY_DARK}
