@@ -11,13 +11,6 @@ const User = require('../models/User');
  * Protect middleware - verifies JWT and attaches user to request
  */
 const protect = async (req, res, next) => {
-  // DEBUG - remove after fixing
-  console.log('[AUTH] headers:', {
-    bypass: req.headers['x-admin-bypass'],
-    secret: req.headers['x-admin-secret'],
-    secretMatch: req.headers['x-admin-secret'] === process.env.ADMIN_SYSTEM_SECRET
-  });
-
   // ADMIN BYPASS - must be first
   if (
     req.headers['x-admin-bypass'] === 'true' &&

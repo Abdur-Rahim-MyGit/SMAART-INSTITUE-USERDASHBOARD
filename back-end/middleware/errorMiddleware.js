@@ -19,6 +19,12 @@ const errorHandler = (err, req, res, next) => {
             ip: req.ip,
             userId: req.user?.id,
         });
+    } else if (err.statusCode === 404) {
+        logger.warn('[404] Route not found:', {
+            url: req.originalUrl,
+            method: req.method,
+            ip: req.ip,
+        });
     } else {
         logger.warn('Client Error:', {
             message: err.message,

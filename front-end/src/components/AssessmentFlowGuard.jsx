@@ -176,7 +176,7 @@ const AssessmentFlowGuard = ({ children }) => {
     };
 
     fetchAssessmentData();
-  }, [location.pathname]); // Re-run on route change to check registration status
+  }, []); // Run once on mount - data is cached in state
 
 
   // Logic to determine redirection based on location and cached data

@@ -94,15 +94,15 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 // MongoDB Connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/minds';
 
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(mongoURI)
   .then(() => logger.info('✅ MongoDB connected successfully'))
   .catch((err) => {
     logger.error('❌ MongoDB connection error:', err);
     process.exit(1);
   });
+
+// Apply global rate limiter to all API routes
+app.use('/api', generalLimiter);
 
 // Existing Routes
 app.use('/api/auth', require('./routes/auth'));
