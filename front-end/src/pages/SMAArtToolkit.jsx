@@ -13,6 +13,15 @@ const toolkitSections = [
     badge: "Vault"
   },
   {
+    id: 8,
+    title: "AI Career Chat",
+    description: "Get instant AI-powered career guidance. Ask questions about career paths, skill development, job opportunities, and receive personalized recommendations in real-time.",
+    icon: MessageSquare,
+    path: "/dashboard/ai-career-chat",
+    color: "#1a3884",
+    badge: "AI Assistant"
+  },
+  {
     id: 7,
     title: "Career Intelligence Agent",
     description: "AI-powered Career Intelligence Engine — get personalized career roadmaps, skill gap analysis, job recommendations, and market insights powered by structured data + GPT AI.",
