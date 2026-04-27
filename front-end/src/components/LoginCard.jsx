@@ -35,6 +35,16 @@ const LoginCard = () => {
 
   const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
   const [passwordChangeData, setPasswordChangeData] = useState({ tempToken: "", email: "", fullName: "" });
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Load remembered email
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setLoginEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   useEffect(() => {
     const storedInstitution = sessionStorage.getItem("selectedInstitution");
@@ -107,6 +117,14 @@ const LoginCard = () => {
 
       sessionStorage.setItem("user", JSON.stringify(data.user));
       sessionStorage.setItem("token", data.token);
+
+      // Handle Remember Me
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", normalizedEmail);
+      } else {
+        localStorage.removeItem("rememberedEmail");
+      }
+
       setUser(data.user);
       toast.success("Login successful!");
 
@@ -202,6 +220,9 @@ const LoginCard = () => {
   const handlePasswordChangeSuccess = (data, redirectToDashboard = false) => {
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
+    if (data.user?.isFirstLogin) {
+      sessionStorage.setItem("isFirstLogin", "true");
+    }
     setUser(data.user);
     setShowPasswordChangeModal(false);
     setPasswordChangeData({ tempToken: "", email: "", fullName: "" });
@@ -218,11 +239,50 @@ const LoginCard = () => {
 
   if (showInstitutionSelector) {
     return (
-      <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-xl mx-auto px-0">
-        <InstitutionSelector onSelect={handleInstitutionSelected} />
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+        className="w-full max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto"
+      >
+        {/* ── Card wrapper — matches the LoginCard Soft-UI style exactly ── */}
+        <div
+          className="overflow-hidden bg-white rounded-3xl"
+          style={{
+            border: "1px solid rgba(0, 0, 0, 0.05)",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)",
+          }}
+        >
+          {/* Navy top accent line */}
+          <div className="h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
+
+          {/* Header */}
+          <div className="bg-gray-50 px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
+            {/* Icon badge */}
+            <div className="w-14 h-14 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+              <Building2 className="w-6 h-6 text-[#1a3884]" />
+            </div>
+
+            <h2
+              className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#112b6b] text-center"
+              style={{ letterSpacing: "-0.02em" }}
+            >
+              Select Your Institution
+            </h2>
+            <p className="text-[13px] text-gray-500 mt-2 text-center max-w-[260px] leading-relaxed">
+              Find your college to access your personalised career dashboard.
+            </p>
+          </div>
+
+          {/* Search area */}
+          <div className="px-6 py-7 sm:px-8 sm:py-8">
+            <InstitutionSelector onSelect={handleInstitutionSelected} />
+          </div>
+        </div>
+      </motion.div>
     );
   }
+
 
   return (
     <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-md mx-auto flex flex-col gap-3 sm:gap-4">
@@ -232,30 +292,23 @@ const LoginCard = () => {
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex items-center justify-between gap-3 px-4 py-2"
+        className="flex items-center justify-between gap-3 px-4 py-2 bg-white"
         style={{
-          background: "#ffffff",
-          border: "2px solid #C0C0C0",
-          boxShadow: "0 4px 20px rgba(192, 192, 192, 0.3)",
-          borderRadius: "0px",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
+          borderRadius: "16px",
         }}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-none flex items-center justify-center shrink-0"
-            style={{
-              background: "linear-gradient(135deg, #f8f9fc 0%, #eef2fb 100%)",
-              border: "1px solid rgba(192, 192, 192, 0.4)",
-            }}
-          >
-            <Building2 className="w-5 h-5 text-[#1a3884]" />
-          </div>
+            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center shrink-0">
+              <Building2 className="w-5 h-5 text-[#1a3884]" />
+            </div>
           <div className="min-w-0 flex-1">
-            <p className="font-bold text-[#0d1f4e] text-sm truncate leading-tight">
+            <p className="font-bold text-gray-900 text-sm truncate leading-tight">
               {selectedInstitution?.name}
             </p>
             {selectedInstitution?.location?.city && (
-              <p className="text-[11px] text-gray-400 font-medium truncate mt-0.5">
+              <p className="text-[11px] text-gray-500 font-medium truncate mt-0.5">
                 {selectedInstitution.location.city}
                 {selectedInstitution?.location?.state && (
                   <span className="opacity-70">, {selectedInstitution.location.state}</span>
@@ -266,7 +319,7 @@ const LoginCard = () => {
         </div>
         <button
           onClick={handleChangeInstitution}
-          className="text-[11px] font-bold uppercase tracking-widest text-[#1a3884] hover:text-[#132c6b] transition-colors shrink-0 px-1"
+          className="text-[11px] font-bold uppercase tracking-widest text-[#002147] hover:text-[#00152e] transition-colors shrink-0 px-1"
         >
           Change
         </button>
@@ -277,37 +330,38 @@ const LoginCard = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.45, ease: "easeOut" }}
-        className="overflow-hidden"
+        className="overflow-hidden bg-white relative"
         style={{
-          background: "#ffffff",
-          border: "2px solid #C0C0C0",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.1), 0 0 15px rgba(192, 192, 192, 0.4)",
-          borderRadius: "0px",
+          border: "1px solid rgba(0, 0, 0, 0.04)",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02)",
+          borderRadius: "24px",
         }}
       >
-        <div className="px-5 pt-6 pb-5 sm:px-6 sm:pt-7 sm:pb-6">
+        <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
+        <div className="px-5 pt-7 pb-6 sm:px-8 sm:pt-8 sm:pb-8 relative z-10">
 
           {/* Header */}
-          <div className="flex flex-col items-center text-center mb-5 sm:mb-6">
-            <div
-              className="w-12 h-12 flex items-center justify-center mb-3 shadow-md rounded-none"
+          <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="w-16 h-16 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-lg border border-[#1a3884]/5 relative overflow-hidden"
               style={{
-                background: "linear-gradient(135deg, #1a3884 0%, #102567 100%)",
-                boxShadow: "0 8px 24px rgba(26,56,132,0.30)",
-                width: "52px",
-                height: "52px",
+                boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
               }}
             >
-              <Lock className="w-6 h-6 text-white" />
-            </div>
+              <Lock className="w-7 h-7 text-[#1a3884]" />
+            </motion.div>
+
             <h2
-              className="text-lg sm:text-xl font-extrabold tracking-tight mb-0.5"
-              style={{ color: "#0d1f4e", letterSpacing: "-0.01em" }}
+              className="text-xl sm:text-2xl font-extrabold tracking-tight mb-1 text-[#112b6b]"
+              style={{ letterSpacing: "-0.02em" }}
             >
               Welcome Back
             </h2>
-            <p className="text-gray-400 text-[11px] sm:text-[12px] font-normal">
-              Enter your credentials to access the portal
+            <p className="text-gray-500 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
+              Access your professional learning dashboard
             </p>
           </div>
 
@@ -325,27 +379,30 @@ const LoginCard = () => {
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="login-email"
-                className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest pl-0.5"
-                style={{ color: "#4e5d78" }}
+                className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest pl-0.5 text-gray-500"
               >
                 Email or Student ID
               </label>
               <div
-                className="flex items-center gap-2.5 px-3.5 rounded-none h-10 transition-all group"
+                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden"
                 style={{
-                  background: "#f8f9fc",
-                  border: "1.2px solid #e3e8f4",
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0",
                 }}
                 onFocusCapture={(e) => {
                   e.currentTarget.style.border = "1.5px solid #1a3884";
-                  e.currentTarget.style.background = "#f0f4ff";
+                  e.currentTarget.style.background = "#fff";
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
                 }}
                 onBlurCapture={(e) => {
-                  e.currentTarget.style.border = "1.5px solid #e3e8f4";
-                  e.currentTarget.style.background = "#f5f7fc";
+                  e.currentTarget.style.border = "1px solid #e2e8f0";
+                  e.currentTarget.style.background = "#f8fafc";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                <Mail className="w-4 h-4 shrink-0" style={{ color: "#8fa3c4" }} />
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
+                  <Mail className="w-3.5 h-3.5 shrink-0 text-[#1a3884] group-focus-within:scale-110 transition-transform" />
+                </div>
                 <input
                   id="login-email"
                   type="text"
@@ -355,8 +412,7 @@ const LoginCard = () => {
                   aria-required="true"
                   autoComplete="username"
                   required
-                  className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-medium placeholder:font-normal"
-                  style={{ color: "#0d1f4e" }}
+                  className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
                 />
               </div>
             </div>
@@ -366,38 +422,38 @@ const LoginCard = () => {
               <div className="flex items-center justify-between pl-0.5">
                 <label
                   htmlFor="login-password"
-                  className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest"
-                  style={{ color: "#4e5d78" }}
+                  className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500"
                 >
                   Security Key
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowForgotPassword(true)}
-                  className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-colors"
-                  style={{ color: "#1a3884" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "#0d1f4e")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "#1a3884")}
+                  className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-colors text-[#002147] hover:text-[#00152e]"
                 >
                   Forgot?
                 </button>
               </div>
               <div
-                className="flex items-center gap-2.5 px-3.5 rounded-none h-10 transition-all"
+                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden"
                 style={{
-                  background: "#f8f9fc",
-                  border: "1.2px solid #e3e8f4",
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0",
                 }}
                 onFocusCapture={(e) => {
                   e.currentTarget.style.border = "1.5px solid #1a3884";
-                  e.currentTarget.style.background = "#f0f4ff";
+                  e.currentTarget.style.background = "#fff";
+                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
                 }}
                 onBlurCapture={(e) => {
-                  e.currentTarget.style.border = "1.5px solid #e3e8f4";
-                  e.currentTarget.style.background = "#f5f7fc";
+                  e.currentTarget.style.border = "1px solid #e2e8f0";
+                  e.currentTarget.style.background = "#f8fafc";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
-                <Lock className="w-4 h-4 shrink-0" style={{ color: "#8fa3c4" }} />
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
+                  <Lock className="w-3.5 h-3.5 shrink-0 text-[#1a3884] group-focus-within:scale-110 transition-transform" />
+                </div>
                 <input
                   id="login-password"
                   type={showPassword ? "text" : "password"}
@@ -407,17 +463,13 @@ const LoginCard = () => {
                   aria-required="true"
                   autoComplete="current-password"
                   required
-                  className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-medium placeholder:font-normal"
-                  style={{ color: "#0d1f4e" }}
+                  className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="shrink-0 transition-colors"
-                  style={{ color: "#8fa3c4" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "#1a3884")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "#8fa3c4")}
+                  className="shrink-0 transition-colors text-gray-400 hover:text-[#1a3884] p-1"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -428,20 +480,41 @@ const LoginCard = () => {
               </div>
             </div>
 
+            {/* Remember Me */}
+            <div className="flex items-center justify-between px-1 -mt-1">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative flex items-center justify-center">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="peer appearance-none w-4 h-4 rounded border border-slate-300 checked:bg-[#1a3884] checked:border-[#1a3884] transition-all cursor-pointer"
+                  />
+                  <div className="absolute opacity-0 peer-checked:opacity-100 text-white pointer-events-none transition-opacity">
+                    <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider group-hover:text-gray-700 transition-colors">
+                  Remember Me
+                </span>
+              </label>
+            </div>
+
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="relative w-full h-10 flex items-center justify-center gap-2 font-bold text-sm text-white transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 mt-0.5 disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden rounded-none"
+              className="relative w-full h-12 flex items-center justify-center gap-2 font-bold text-[15px] text-white transition-all duration-300 hover:-translate-y-1 active:translate-y-0 mt-2 disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden rounded-xl shadow-xl shadow-[#112b6b]/20"
               style={{
-                background: "linear-gradient(90deg, #1a3884 0%, #1e47ad 100%)",
-                boxShadow: "0 6px 20px rgba(26,56,132,0.25)",
+                background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)",
               }}
               onMouseEnter={(e) => {
-                if (!isLoading) e.currentTarget.style.boxShadow = "0 10px 32px rgba(26,56,132,0.42)";
+                if (!isLoading) e.currentTarget.style.boxShadow = "0 12px 36px rgba(17,43,107,0.4)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 6px 24px rgba(26,56,132,0.32)";
+                e.currentTarget.style.boxShadow = "0 10px 24px rgba(17,43,107,0.25)";
               }}
             >
               {isLoading ? (
@@ -449,7 +522,12 @@ const LoginCard = () => {
               ) : (
                 <>
                   Access Portal
-                  <ArrowRight className="w-4 h-4" />
+                  <motion.div
+                    animate={{ x: [0, 4, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                  >
+                    <ArrowRight className="w-4 h-4" />
+                  </motion.div>
                 </>
               )}
             </button>
