@@ -4,6 +4,9 @@ const BaseLineResult = require('../models/BaseLineResult');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Apply auth protection
 router.use(protect);

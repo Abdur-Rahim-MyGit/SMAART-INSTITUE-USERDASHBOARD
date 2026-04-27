@@ -4,6 +4,9 @@ const Coach = require('../models/Coach');
 const { notifySessionScheduled } = require('../services/notificationService');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get all coach sessions with filters
 router.get('/', async (req, res) => {

@@ -2,6 +2,9 @@ const express = require('express');
 const Escalation = require('../models/Escalation');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get all escalations with filters
 router.get('/', async (req, res) => {

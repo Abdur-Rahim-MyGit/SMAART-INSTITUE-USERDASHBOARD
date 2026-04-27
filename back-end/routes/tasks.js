@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 const { check, validationResult } = require('express-validator');
 const { protect: auth } = require('../middleware/auth');
 const Task = require('../models/Task');

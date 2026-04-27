@@ -14,6 +14,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CardSkeleton } from "@/components/SkeletonPatterns";
 
 const MyNotes = () => {
     const { toast } = useToast();
@@ -22,6 +23,7 @@ const MyNotes = () => {
     const [showModal, setShowModal] = useState(false);
     const [currentNote, setCurrentNote] = useState({ id: null, title: "", content: "", color: "bg-yellow-100" });
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const colors = [
         { name: "Yellow", value: "bg-yellow-100 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700/50" },
@@ -42,10 +44,13 @@ const MyNotes = () => {
     }, []);
 
     const loadNotes = (userId) => {
+        setLoading(true);
         const savedNotes = localStorage.getItem(`my_notes_${userId}`);
         if (savedNotes) {
             setNotes(JSON.parse(savedNotes));
         }
+        // Simulate a small delay for better UX feel with skeleton
+        setTimeout(() => setLoading(false), 600);
     };
 
     const saveNotes = (updatedNotes) => {
@@ -142,48 +147,54 @@ const MyNotes = () => {
 
                         {/* Notes Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            <AnimatePresence>
-                                {/* Create New Card (Visual shortcut) */}
-                                <motion.div
-                                    layout
-                                    onClick={openNewNote}
-                                    className="min-h-[250px] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group"
-                                >
-                                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                        <Plus className="w-6 h-6 text-slate-400 group-hover:text-blue-500" />
-                                    </div>
-                                    <p className="text-slate-500 font-medium group-hover:text-blue-600">Create New Note</p>
-                                </motion.div>
-
-                                {filteredNotes.map(note => (
+                            {loading ? (
+                                Array.from({ length: 8 }).map((_, i) => (
+                                    <CardSkeleton key={i} />
+                                ))
+                            ) : (
+                                <AnimatePresence>
+                                    {/* Create New Card (Visual shortcut) */}
                                     <motion.div
-                                        key={note.id}
                                         layout
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.9 }}
-                                        onClick={() => openEditNote(note)}
-                                        className={`relative p-6 rounded-2xl border shadow-sm hover:shadow-lg transition-all cursor-pointer group hover:-translate-y-1 ${note.color} flex flex-col`}
+                                        onClick={openNewNote}
+                                        className="min-h-[250px] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group"
                                     >
-                                        <h3 className="font-bold text-lg mb-2 text-slate-800 dark:text-slate-200 line-clamp-1">{note.title}</h3>
-                                        <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-pre-wrap line-clamp-6 flex-1 mb-4 leading-relaxed font-medium">
-                                            {note.content}
-                                        </p>
-                                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5 dark:border-white/5">
-                                            <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                                <Clock className="w-3 h-3" /> {formatDate(note.updatedAt)}
-                                            </span>
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}
-                                                className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors"
-                                                title="Delete note"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
+                                        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                            <Plus className="w-6 h-6 text-slate-400 group-hover:text-blue-500" />
                                         </div>
+                                        <p className="text-slate-500 font-medium group-hover:text-blue-600">Create New Note</p>
                                     </motion.div>
-                                ))}
-                            </AnimatePresence>
+
+                                    {filteredNotes.map(note => (
+                                        <motion.div
+                                            key={note.id}
+                                            layout
+                                            initial={{ opacity: 0, scale: 0.9 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.9 }}
+                                            onClick={() => openEditNote(note)}
+                                            className={`relative p-6 rounded-2xl border shadow-sm hover:shadow-lg transition-all cursor-pointer group hover:-translate-y-1 ${note.color} flex flex-col`}
+                                        >
+                                            <h3 className="font-bold text-lg mb-2 text-slate-800 dark:text-slate-200 line-clamp-1">{note.title}</h3>
+                                            <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-pre-wrap line-clamp-6 flex-1 mb-4 leading-relaxed font-medium">
+                                                {note.content}
+                                            </p>
+                                            <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5 dark:border-white/5">
+                                                <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" /> {formatDate(note.updatedAt)}
+                                                </span>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}
+                                                    className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors"
+                                                    title="Delete note"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            )}
                         </div>
 
                         {filteredNotes.length === 0 && searchQuery && (

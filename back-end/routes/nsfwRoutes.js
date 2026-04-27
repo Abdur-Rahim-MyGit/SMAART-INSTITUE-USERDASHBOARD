@@ -7,6 +7,9 @@
 
 const express = require('express');
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 const { scanImage } = require('../helpers/nsfwModeration');
 
 /**

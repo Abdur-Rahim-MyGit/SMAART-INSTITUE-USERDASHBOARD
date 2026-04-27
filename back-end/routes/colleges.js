@@ -4,6 +4,9 @@ const CollegeBanner = require('../models/CollegeBanner');
 const { searchLimiter } = require('../middleware/rateLimiter');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get all colleges with search functionality - PROTECTED with rate limiting
 router.get('/', searchLimiter, async (req, res) => {

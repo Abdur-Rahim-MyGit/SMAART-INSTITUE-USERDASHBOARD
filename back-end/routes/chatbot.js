@@ -3,6 +3,9 @@ const { protect } = require('../middleware/auth');
 const chatbotService = require('../services/chatbotService');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // In-memory conversation storage (consider using Redis or MongoDB for production)
 const conversations = new Map();

@@ -8,6 +8,9 @@ const { isSessionCompleted, isModuleCompleted } = require('../utils/progressUtil
 const { checkCourseCompletionBadges, checkSkillCompletionBadges } = require('../utils/badgeUtils');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Apply protection to all enrollment routes
 router.use(protect);

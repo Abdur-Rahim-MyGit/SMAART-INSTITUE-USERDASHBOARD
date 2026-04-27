@@ -15,6 +15,9 @@ const { body, validationResult } = require('express-validator');
 const { protect } = require('../middleware/auth');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // === Authentication Flow Constants ===
 const OTP_MAX_ATTEMPTS = 5;

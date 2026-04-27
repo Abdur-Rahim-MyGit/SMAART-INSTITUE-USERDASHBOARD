@@ -2,6 +2,9 @@ const express = require('express');
 const Student = require('../models/Student');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get all students with search and filter functionality
 router.get('/', async (req, res) => {

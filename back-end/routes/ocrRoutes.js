@@ -4,6 +4,9 @@
 
 const express = require('express');
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 const axios = require('axios');
 const FormData = require('form-data');
 

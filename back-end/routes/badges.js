@@ -10,6 +10,9 @@ const {
 const { notifyBadgeEarned } = require('../services/notificationService');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Apply authentication to all routes
 router.use(protect);

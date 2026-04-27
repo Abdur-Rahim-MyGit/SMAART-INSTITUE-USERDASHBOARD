@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { withRetry } = require('../utils/retry');
 
 /**
  * Chatbot Service using Google AI Gemini API
@@ -98,8 +99,8 @@ async function sendMessageGoogleAI(userMessage, conversationHistory = []) {
         });
         contextText += `User: ${userMessage}\nAssistant:`;
 
-        // Call Google AI Gemini API
-        const response = await axios.post(
+        // Call Google AI Gemini API with Retry
+        const response = await withRetry(() => axios.post(
             `${GOOGLE_AI_URL}?key=${GOOGLE_AI_KEY}`,
             {
                 contents: [{
@@ -117,7 +118,7 @@ async function sendMessageGoogleAI(userMessage, conversationHistory = []) {
                     'Content-Type': 'application/json'
                 }
             }
-        );
+        ));
 
         const botMessage = response.data.candidates[0].content.parts[0].text;
 
@@ -151,8 +152,8 @@ async function sendMessageOpenRouter(userMessage, conversationHistory = []) {
             { role: 'user', content: userMessage }
         ];
 
-        // Call OpenRouter API
-        const response = await axios.post(
+        // Call OpenRouter API with Retry
+        const response = await withRetry(() => axios.post(
             OPENROUTER_API_URL,
             {
                 model: MODEL,
@@ -168,7 +169,7 @@ async function sendMessageOpenRouter(userMessage, conversationHistory = []) {
                     'X-Title': 'SMAART Minds Support Bot'
                 }
             }
-        );
+        ));
 
         const botMessage = response.data.choices[0].message.content;
 
