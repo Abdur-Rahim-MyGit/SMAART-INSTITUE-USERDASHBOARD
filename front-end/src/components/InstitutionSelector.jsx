@@ -151,7 +151,7 @@ const InstitutionSelector = ({ onSelect }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 300)}
-              className="w-full h-14 sm:h-[60px] pl-14 pr-12 text-[15px] sm:text-base bg-white border-2 border-slate-200 text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-[4px] focus-visible:ring-[#1a3884]/20 focus-visible:border-[#1a3884] rounded-2xl font-semibold shadow-sm hover:shadow-md transition-all duration-300 ease-out"
+              className="w-full h-11 sm:h-12 pl-11 pr-10 text-[13px] sm:text-sm bg-[#f8fafc] border border-slate-200 text-[#112b6b] placeholder:text-slate-400 focus-visible:outline-none focus-visible:bg-white focus-visible:border-[#1a3884] rounded-xl font-medium transition-all duration-300"
             />
 
             {loading && (
