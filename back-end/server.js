@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require('http');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -7,6 +8,7 @@ const morgan = require('morgan');
 const path = require('path');
 require('dotenv').config();
 const { startCronJobs } = require('./utils/cronJobs');
+const { initWebSocket } = require('./services/websocketService');
 
 // Import logger
 const logger = require('./utils/logger');
@@ -101,6 +103,7 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 // MongoDB Connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/minds';
 
+<<<<<<< HEAD
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -111,6 +114,9 @@ mongoose.connect(mongoURI, {
   retryWrites: true, // Automatically retry write operations upon transient network errors
   retryReads: true // Automatically retry read operations
 })
+=======
+mongoose.connect(mongoURI)
+>>>>>>> 8a93b83bc7f7d9f5fbcf7970758b40c5bd6efd58
   .then(() => logger.info('✅ MongoDB connected successfully'))
   .catch((err) => {
     logger.error('❌ MongoDB connection error:', err);
@@ -234,13 +240,19 @@ const PORT = parseInt(process.env.PORT, 10) || 5000;
 const FALLBACK_PORT = parseInt(process.env.FALLBACK_PORT, 10) || (PORT + 1);
 const HOST = '0.0.0.0'; // Listen on all network interfaces for mobile access
 
+// Wrap Express in a native HTTP server so we can attach WebSockets
+const httpServer = http.createServer(app);
+
+// Attach WebSocket server (same port, path = /ws/notifications)
+initWebSocket(httpServer);
+
 const startServer = (port) => {
-  const server = app.listen(port, HOST, () => {
+  httpServer.listen(port, HOST, () => {
     console.log('\x1b[36m%s\x1b[0m', `\n🚀 Server running: http://localhost:${port}`);
+    console.log('\x1b[32m%s\x1b[0m', `   🔌 WebSocket: ws://localhost:${port}/ws/notifications`);
     console.log('\x1b[32m%s\x1b[0m', `   Mode: ${process.env.NODE_ENV || 'development'}\n`);
-    // logger.info not used here to avoid double formatting if possible, or just use logger.info with new clean format
   });
-  server.on('error', (err) => {
+  httpServer.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
       logger.warn(`⚠️  Port ${port} in use, attempting fallback port ${FALLBACK_PORT}`);
       startServer(FALLBACK_PORT);

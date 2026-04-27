@@ -5,6 +5,8 @@ router.use(generalLimiter);
 
 const Notification = require('../models/Notification');
 const { protect } = require('../middleware/auth');
+const { broadcastToAll } = require('../services/websocketService');
+const { sendSystemAnnouncementEmail } = require('../services/emailService');
 
 /**
  * @route   GET /api/notifications
@@ -272,10 +274,43 @@ router.post('/broadcast', protect, async (req, res) => {
     // Bulk insert
     await Notification.insertMany(notifications);
 
+    // Push real-time update to all currently connected WebSocket clients
+    broadcastToAll({
+      type: 'system',
+      title,
+      message,
+      icon: 'megaphone',
+      color: '#002147',
+      link: null,
+      isRead: false,
+      createdAt: new Date().toISOString()
+    });
+
     res.json({
       success: true,
       message: `Broadcast sent to ${students.length} students`,
       recipientCount: students.length
+    });
+
+    // 📧 Email broadcast – fire-and-forget after response is sent
+    // Fetch emails in background so the HTTP response is instant.
+    setImmediate(async () => {
+      try {
+        const fullStudents = await Student.find({ status: 'active' }).select('email fullName').lean();
+        for (const student of fullStudents) {
+          if (student.email) {
+            await sendSystemAnnouncementEmail({
+              to:       student.email,
+              fullName: student.fullName,
+              title,
+              message,
+            });
+          }
+        }
+        console.log(`[Broadcast] 📧 Emails sent to ${fullStudents.length} students`);
+      } catch (emailErr) {
+        console.error('[Broadcast] Email error:', emailErr.message);
+      }
     });
   } catch (error) {
     console.error('Error broadcasting notification:', error);

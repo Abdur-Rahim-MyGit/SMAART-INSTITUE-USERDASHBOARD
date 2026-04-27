@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import DashboardSidebar from "@/components/DashboardSidebar";
-import DashboardHeader from "@/components/DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -683,20 +681,14 @@ const VisionBoardGalleryPro = () => {
 
 
   return (
-    <div className="h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 overflow-hidden">
-      <DashboardSidebar />
-
-      <div className="flex-1 overflow-y-auto transition-all duration-300">
-        <DashboardHeader />
-
-        <main className="w-full relative py-4 px-4 md:px-8">
+    <main className="w-full relative py-4 px-4 md:px-8 bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 min-h-screen">
           <div className="max-w-[1600px] mx-auto pb-6">
 
             {/* Header Section - Compact */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
               <div className="flex-1 text-center md:text-left">
-                <p className="text-[#1a3884] dark:text-[#C0C0C0] text-3xl md:text-4xl font-['Dancing_Script'] mb-1">
-                  Visualize your goals and manifest your future...
+                <p className="text-[#1a3884] dark:text-[#C0C0C0] text-3xl md:text-4xl font-['Dancing Script',cursive] mb-1">
+                  Visualize your goals and manifest your future.
                 </p>
                 <p className="text-slate-500 dark:text-slate-400 text-sm font-medium max-w-xl">
                   Create, view, and set your active vision board here.
@@ -781,7 +773,6 @@ const VisionBoardGalleryPro = () => {
                 )}
             </div>
           </div>
-        </main>
 
         {/* Delete Confirmation Modal */}
         <DeleteModal
@@ -882,8 +873,7 @@ const VisionBoardGalleryPro = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-    </div>
+    </main>
   );
 };
 

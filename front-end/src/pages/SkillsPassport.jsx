@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Heart, BookOpen, Users, Target, Briefcase, Monitor, Leaf, Download, Shield, Share2, BarChart2, MapPin, Calendar, CheckCircle, ArrowLeft, X } from "lucide-react";
 import { assessmentApi } from "@/services/assessmentApi";
@@ -31,6 +32,7 @@ const SKILL_TAGS = [
 
 const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
     const cardRef = useRef(null);
+    const navigate = useNavigate();
     const [isExporting, setIsExporting] = useState(false);
 
     const userName = user?.fullName || "SMAART Minds";
@@ -156,10 +158,25 @@ const DigitalPassportModal = ({ onClose, user, baselineResult }) => {
                                 <Download className="w-4 h-4" />
                                 {isExporting ? 'Exporting...' : 'Export Credential'}
                             </button>
-                            <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}>
+                            <button
+                                onClick={() => navigate('/skills-passport')}
+                                className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold hover:bg-white/10 transition-colors cursor-pointer"
+                                style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}
+                            >
                                 <BarChart2 className="w-4 h-4" /> View Reports
                             </button>
-                            <button className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}>
+                            <button
+                                onClick={() => {
+                                    const shareUrl = window.location.href;
+                                    navigator.clipboard.writeText(shareUrl).then(() => {
+                                        sonnerToast.success('Profile link copied to clipboard!');
+                                    }).catch(() => {
+                                        sonnerToast.error('Failed to copy link');
+                                    });
+                                }}
+                                className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold hover:bg-white/10 transition-colors cursor-pointer"
+                                style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}
+                            >
                                 <Share2 className="w-4 h-4" /> Share Profile
                             </button>
                         </div>
@@ -341,11 +358,12 @@ const SkillsPassport = () => {
         { id: 'SIQ', name: "Social Interaction", icon: Users, color: "text-rose-600", bar: "bg-rose-600" },
         { id: 'PEQ', name: "Professional Execution", icon: Briefcase, color: "text-emerald-600", bar: "bg-emerald-600" },
         { id: 'DAQ', name: "Digital & AI Literacy", icon: Monitor, color: "text-cyan-600", bar: "bg-cyan-600" },
+        { id: 'SEQ', name: "Sustainability & Ethics", icon: Leaf, color: "text-lime-600", bar: "bg-lime-600" },
     ];
 
-    // Helper: extract 6-quotient scores from a quotientProfile object
+    // Helper: extract 7-quotient scores from a quotientProfile object
     const getScores = (profile) => {
-        if (!profile) return { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0 };
+        if (!profile) return { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0, SEQ: 0 };
         return {
             CRQ: profile.CRQ?.rawScore ?? profile.CRQ?.percentage ?? 0,
             SRQ: profile.SRQ?.rawScore ?? profile.SRQ?.percentage ?? 0,
@@ -353,6 +371,7 @@ const SkillsPassport = () => {
             SIQ: profile.SIQ?.rawScore ?? profile.SIQ?.percentage ?? 0,
             PEQ: profile.PEQ?.rawScore ?? profile.PEQ?.percentage ?? 0,
             DAQ: profile.DAQ?.rawScore ?? profile.DAQ?.percentage ?? 0,
+            SEQ: profile.SEQ?.rawScore ?? profile.SEQ?.percentage ?? 0,
         };
     };
 

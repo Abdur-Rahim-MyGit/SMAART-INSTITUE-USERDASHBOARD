@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const logger = require('./logger');
 
 // Create reusable transporter
 const createTransporter = () => {
@@ -74,7 +75,27 @@ const sendOTPEmail = async (email, otp, fullName = '') => {
   }
 };
 
+// Send generic email for alerts/notifications
+const sendEmail = async (to, subject, htmlContent) => {
+  try {
+    const transporter = createTransporter();
+    const mailOptions = {
+      from: `"SMAART Minds" <${process.env.SMTP_USER}>`,
+      to,
+      subject,
+      html: htmlContent,
+    };
+    const info = await transporter.sendMail(mailOptions);
+    logger.info('Email sent successfully:', { messageId: info.messageId, to });
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    logger.error('Error sending email:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 module.exports = {
   generateOTP,
   sendOTPEmail,
+  sendEmail,
 };

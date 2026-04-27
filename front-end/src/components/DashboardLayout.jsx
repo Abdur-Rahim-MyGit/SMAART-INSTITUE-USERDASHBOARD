@@ -6,6 +6,7 @@ import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import useUser from "@/hooks/useUser";
+import { getBackendUrl } from "@/services/api";
 
 // Page title mapping
 const pageTitles = {
@@ -21,7 +22,9 @@ const pageTitles = {
   '/skills-passport': 'Skills Passport',
   '/dashboard/vision-boards': 'Vision Board',
   '/vision-board': 'Vision Board',
-  '/vision-board-pro/gallery': 'Vision Board',
+  '/vision-board-pro/gallery': 'Vision Board Gallery',
+  '/vision-board-pro/create': 'Vision Board Editor',
+  '/vision-board/view/:id': 'Vision Board',
   '/dashboard/smaart-toolkit': 'Tool Kit',
   '/smaart-toolkit': 'Tool Kit',
   '/dashboard/community': 'Community',
@@ -73,6 +76,8 @@ const breadcrumbMap = {
   'profile': { label: 'Profile', path: '/profile' },
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -80,6 +85,44 @@ const DashboardLayout = () => {
   const { theme } = useTheme();
   const { user } = useUser();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showCollegeLogo, setShowCollegeLogo] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState(null);
+
+  // Fetch profile photo from Registration API
+  useEffect(() => {
+    const fetchProfilePhoto = async () => {
+      if (!user?.email) return;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
+        if (response.ok) {
+          const data = await response.json();
+          // Check for profilePhoto at root level first (new structure), then fallback to otherDetails
+          const photoUrl = data.profilePhoto || data.otherDetails?.profilePhoto || user?.profilePicture;
+          if (photoUrl) {
+            // If it's already a full URL (Cloudinary), use it directly; otherwise prepend backend URL
+            const fullUrl = photoUrl.startsWith('http') ? photoUrl : `${getBackendUrl()}/${photoUrl}`;
+            setProfilePhoto(fullUrl);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching profile photo:", error);
+      }
+    };
+
+    fetchProfilePhoto();
+  }, [user?.email, user?.profilePicture]);
+
+  // Toggle college logo every 5 seconds if user has a college logo
+  useEffect(() => {
+    if (!user?.college?.logo) return;
+
+    const interval = setInterval(() => {
+      setShowCollegeLogo(prev => !prev);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [user?.college?.logo]);
 
   // Update time every second
   useEffect(() => {
@@ -234,19 +277,32 @@ const DashboardLayout = () => {
                   className="relative"
                   aria-label="Profile"
                 >
-                  {user?.profilePicture ? (
-                    <img
-                      src={user.profilePicture}
-                      alt={user.fullName || 'User'}
-                      className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700 hover:ring-[#1a3884] dark:hover:ring-blue-400 transition-all"
-                    />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full bg-[#1a3884] flex items-center justify-center ring-2 ring-slate-200 dark:ring-slate-700 hover:ring-[#1a3884] dark:hover:ring-blue-400 transition-all">
-                      <span className="text-white text-sm font-semibold">
-                        {(user?.firstName?.[0] || user?.fullName?.[0] || 'U').toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {showCollegeLogo && user?.college?.logo ? (
+                      <img
+                        src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
+                        alt={user.college.collegeName || "College Logo"}
+                        className="w-9 h-9 rounded-lg object-contain bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 p-0.5 hover:border-[#1a3884] dark:hover:border-blue-400 transition-all"
+                        onError={() => setShowCollegeLogo(false)}
+                      />
+                    ) : profilePhoto ? (
+                      <img
+                        src={profilePhoto}
+                        alt={user?.fullName || 'User'}
+                        className="w-9 h-9 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-700 hover:ring-[#1a3884] dark:hover:ring-blue-400 transition-all"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-[#1a3884] flex items-center justify-center ring-2 ring-slate-200 dark:ring-slate-700 hover:ring-[#1a3884] dark:hover:ring-blue-400 transition-all">
+                        <span className="text-white text-sm font-semibold">
+                          {(user?.firstName?.[0] || user?.fullName?.[0] || 'U').toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </motion.div>
                 </button>
               </div>
             </div>

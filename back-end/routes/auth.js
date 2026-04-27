@@ -7,6 +7,7 @@ const User = require('../models/User');
 const LoginOtp = require('../models/LoginOtp');
 const { generateOTP, sendOTPEmail } = require('../utils/emailService');
 const { notifyWelcome } = require('../services/notificationService');
+const { sendPasswordChangedEmail } = require('../services/emailService');
 
 // SECURITY: Import rate limiters
 const { loginLimiter, otpLimiter, passwordResetLimiter } = require('../middleware/rateLimiter');
@@ -1179,6 +1180,12 @@ router.post('/reset-password', async (req, res) => {
     // Delete the reset OTP record
     await LoginOtp.deleteOne({ _id: resetOtp._id });
 
+    // 📧 Security alert email (fire-and-forget)
+    sendPasswordChangedEmail({
+      to:       resetOtp.email,
+      fullName: resetOtp.userData?.fullName || '',
+    }).catch(() => {});
+
     res.json({
       message: 'Password reset successful. You can now login with your new password.',
       success: true
@@ -1312,6 +1319,12 @@ router.post('/first-login-change-password', async (req, res) => {
 
     // Delete the temp token
     await LoginOtp.deleteOne({ _id: loginOtp._id });
+
+    // 📧 Security alert email (fire-and-forget)
+    sendPasswordChangedEmail({
+      to:       student.email,
+      fullName: student.fullName,
+    }).catch(() => {});
 
     // Create JWT token with session ID
     const token = jwt.sign(

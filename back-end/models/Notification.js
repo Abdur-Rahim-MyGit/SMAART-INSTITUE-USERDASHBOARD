@@ -1,4 +1,9 @@
 const mongoose = require('mongoose');
+const EventEmitter = require('events');
+
+// Singleton emitter – keeps the model free of WS dependencies
+const notificationEmitter = new EventEmitter();
+notificationEmitter.setMaxListeners(50);
 
 const notificationSchema = new mongoose.Schema({
   userId: {
@@ -111,6 +116,8 @@ notificationSchema.set('toObject', { virtuals: true });
 notificationSchema.statics.createNotification = async function(data) {
   const notification = new this(data);
   await notification.save();
+  // Fire real-time event for WebSocket layer
+  notificationEmitter.emit('new_notification', notification.toJSON());
   return notification;
 };
 
@@ -127,4 +134,7 @@ notificationSchema.statics.markAllAsRead = async function(userId) {
   );
 };
 
-module.exports = mongoose.model('Notification', notificationSchema);
+const NotificationModel = mongoose.model('Notification', notificationSchema);
+
+module.exports = NotificationModel;
+module.exports.notificationEmitter = notificationEmitter;

@@ -134,7 +134,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       flexDirection: 'column',
       overflow: 'hidden'
     }}>
-      <div style={{ position: 'absolute', top: '40px', left: '60px', zIndex: 200, pointerEvents: 'none' }}>
+      <div style={{ position: 'absolute', top: '40px', left: '300px', zIndex: 10, pointerEvents: 'none' }}>
         <div className="flex flex-col gap-4 mb-4">
           <Link 
             to="/dashboard/courses" 

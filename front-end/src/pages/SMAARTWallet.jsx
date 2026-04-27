@@ -94,7 +94,7 @@ const SMAARTWallet = () => {
         { id: "combined", title: "Master Diploma in Comprehensive Readiness", code: "MPD", level: "Master" },
     ];
 
-    const sampleFlashcards = [
+    const defaultFlashcards = [
         { term: "Cognitive Reasoning (CRQ)", definition: "The ability to analyze, synthesize, and evaluate information to derive meaningful conclusions and solve complex problems.", category: "Quotient" },
         { term: "Self-Regulation (SRQ)", definition: "The capacity to manage emotions, thoughts, and behaviors effectively across different situations and towards goals.", category: "Quotient" },
         { term: "Learning Agility (LQ)", definition: "The willingness and ability to learn from experience and then apply those lessons in new and first-time situations.", category: "Quotient" },
@@ -475,7 +475,7 @@ const SMAARTWallet = () => {
                                         </div>
 
                                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {sampleFlashcards.map((card, i) => (
+                                            {defaultFlashcards.map((card, i) => (
                                                 <FlashcardItem key={i} card={card} index={i} />
                                             ))}
                                         </div>
