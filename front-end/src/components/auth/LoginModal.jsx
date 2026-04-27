@@ -1,9 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "@/services/api";
@@ -23,6 +21,14 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   // Password change state (for first-time login after OTP)
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordData, setPasswordData] = useState({ tempToken: "", email: "", fullName: "" });
+  const [rememberMe, setRememberMe] = useState(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setFormData(prev => ({ ...prev, email: savedEmail }));
+      return true;
+    }
+    return false;
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -72,7 +78,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   };
 
   // Handle successful login (after OTP or direct)
-  const handleLoginSuccess = (data) => {
+  const handleLoginSuccess = useCallback((data) => {
     console.log("[LoginModal] Login successful, storing user data:", {
       hasToken: !!data.token,
       hasUser: !!data.user,
@@ -83,24 +89,51 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
     });
 
     toast.success("Login successful!");
+
+    // Always clear mustChangePassword from session data so the guard never fires
+    // on a returning visit after a successful password change
+    const userToStore = {
+      ...data.user,
+      mustChangePassword: false,
+    };
+
     sessionStorage.setItem("token", data.token);
-    sessionStorage.setItem("user", JSON.stringify(data.user));
+    sessionStorage.setItem("user", JSON.stringify(userToStore));
+
+    // Handle Remember Me
+    if (rememberMe) {
+      localStorage.setItem("rememberedEmail", data.user?.email || formData.email);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
 
     console.log("[LoginModal] Data stored in sessionStorage");
     onClose();
 
-    // Navigate based on nextStep or user state
-    const nextStep = data.nextStep || "/dashboard";
-    if (data.user && !data.user.hasRegistration && !data.user.isRegistered) {
-      console.log("[LoginModal] User needs to complete registration - redirecting to /complete-registration");
+    // Navigate based on user state
+    // First-time students who just changed their password need to complete registration
+    if (data.user?.passwordJustChanged && !data.user?.hasRegistration) {
+      console.log("[LoginModal] First-time login, password changed → /complete-registration");
       sessionStorage.setItem("signupEmail", data.user.email);
       sessionStorage.setItem("signupFullName", data.user.fullName);
       navigate("/complete-registration");
-    } else {
-      console.log("[LoginModal] Navigating to:", nextStep);
-      navigate(nextStep);
+      return;
     }
-  };
+
+    // Regular returning user without registration
+    if (data.user && !data.user.hasRegistration && !data.user.isRegistered) {
+      console.log("[LoginModal] User needs to complete registration → /complete-registration");
+      sessionStorage.setItem("signupEmail", data.user.email);
+      sessionStorage.setItem("signupFullName", data.user.fullName);
+      navigate("/complete-registration");
+      return;
+    }
+
+    // All other users → dashboard (or nextStep from backend)
+    const nextStep = data.nextStep || "/dashboard";
+    console.log("[LoginModal] Navigating to:", nextStep);
+    navigate(nextStep);
+  }, [rememberMe, formData.email, onClose, navigate]);
 
   // Handle OTP verification success
   const handleOtpSuccess = (data) => {
@@ -115,8 +148,8 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
       setShowPasswordModal(true);
     } else {
       // Regular login - proceed to dashboard
-      handleLoginSuccess(data);
       setShowOtpModal(false);
+      handleLoginSuccess(data);
     }
   };
 
@@ -132,24 +165,22 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   };
 
   const handlePasswordClose = () => {
+    // Security: don't allow dismissal — close everything and force re-login
     setShowPasswordModal(false);
     setPasswordData({ tempToken: "", email: "", fullName: "" });
-    // Also close main modal since flow was interrupted
     onClose();
   };
-
-  if (!isOpen) return null;
 
   return (
     <>
       <AnimatePresence>
-        {isOpen && !showOtpModal && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        {isOpen && !showOtpModal && !showPasswordModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0"
               onClick={onClose}
             />
 
@@ -157,105 +188,162 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md bg-navy border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+              className="relative w-full max-w-[420px] bg-white overflow-hidden shadow-2xl z-10 flex flex-col"
+              style={{
+                border: "1px solid rgba(0, 0, 0, 0.04)",
+                borderRadius: "24px",
+              }}
             >
-              {/* Decorative Elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-teal/10 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-gold/5 rounded-full blur-[50px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
               {/* Header */}
-              <div className="p-8 pb-0 text-center relative">
+              <div className="bg-gray-50 p-8 flex flex-col items-center justify-center border-b border-gray-100 relative">
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors"
+                  className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
-                <div className="w-16 h-16 bg-gradient-to-br from-teal/20 to-teal/5 rounded-2xl border border-teal/20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal/10">
-                  <Lock className="w-8 h-8 text-teal" />
+                <div className="relative mb-3 z-10 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 w-14 h-14 flex items-center justify-center">
+                  <Lock className="w-6 h-6 text-[#1a3884]" />
                 </div>
-                <h2 className="text-3xl font-sans font-bold text-white mb-2">Welcome Back</h2>
-                <p className="text-white/50">Enter your credentials to access your account</p>
+                <h2 className="text-gray-900 text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
+                  Welcome Back
+                </h2>
+                <p className="text-[13px] text-gray-500 mt-2 text-center px-8">
+                  Enter your registered credentials to access your secure portal.
+                </p>
               </div>
 
               {/* Form */}
               <div className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2 group">
-                    <Label htmlFor="email" className="text-white/70 group-focus-within:text-teal transition-colors">Email Address</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-teal transition-colors" />
-                      <Input
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email / Student ID</label>
+                    <div
+                      className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
+                      onFocusCapture={(e) => {
+                        e.currentTarget.style.border = "1.5px solid #1a3884";
+                        e.currentTarget.style.background = "#fff";
+                        e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                      }}
+                      onBlurCapture={(e) => {
+                        e.currentTarget.style.border = "1px solid #e2e8f0";
+                        e.currentTarget.style.background = "#f8fafc";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    >
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
+                        <Mail className="w-3.5 h-3.5 text-[#1a3884]" />
+                      </div>
+                      <input
                         id="email"
                         name="email"
-                        type="email"
+                        type="text"
+                        autoComplete="username"
                         value={formData.email}
                         onChange={handleChange}
-                        placeholder="john@example.com"
-                        className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-teal focus:ring-1 focus:ring-teal transition-all duration-300 h-12 rounded-xl"
+                        placeholder="your@email.com or Student ID"
+                        className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
                         required
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-2 group">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password" className="text-white/70 group-focus-within:text-teal transition-colors">Password</Label>
-                      <a href="#" className="text-xs font-medium text-teal hover:text-teal-light transition-colors">Forgot Password?</a>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between px-1">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Password</label>
                     </div>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-teal transition-colors" />
-                      <Input
+                    <div
+                      className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
+                      onFocusCapture={(e) => {
+                        e.currentTarget.style.border = "1.5px solid #1a3884";
+                        e.currentTarget.style.background = "#fff";
+                        e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                      }}
+                      onBlurCapture={(e) => {
+                        e.currentTarget.style.border = "1px solid #e2e8f0";
+                        e.currentTarget.style.background = "#f8fafc";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                    >
+                      <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
+                        <Lock className="w-3.5 h-3.5 text-[#1a3884]" />
+                      </div>
+                      <input
                         id="password"
                         name="password"
                         type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
                         value={formData.password}
                         onChange={handleChange}
                         placeholder="••••••••"
-                        className="pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-teal focus:ring-1 focus:ring-teal transition-all duration-300 h-12 rounded-xl"
+                        className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-teal transition-colors"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        className="shrink-0 transition-colors text-gray-400 hover:text-[#1a3884] p-1"
                       >
-                        {showPassword ? (
-                          <EyeOff className="w-5 h-5" />
-                        ) : (
-                          <Eye className="w-5 h-5" />
-                        )}
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
 
+                  {/* Remember Me */}
+                  <div className="flex items-center justify-between px-1 -mt-2">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <div className="relative flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          checked={rememberMe}
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                          className="peer appearance-none w-4 h-4 rounded border border-slate-300 checked:bg-[#1a3884] checked:border-[#1a3884] transition-all cursor-pointer"
+                        />
+                        <div className="absolute opacity-0 peer-checked:opacity-100 text-white pointer-events-none transition-opacity">
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider group-hover:text-gray-700 transition-colors">
+                        Remember Me
+                      </span>
+                    </label>
+                  </div>
+
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 text-white font-bold py-6 rounded-xl shadow-lg shadow-teal-900/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+                    className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 mt-4 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
+                    style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
                     disabled={isLoading}
                   >
                     {isLoading ? (
                       <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
                       <span className="flex items-center gap-2">
-                        Login <ArrowRight className="w-4 h-4" />
+                        Sign In
+                        <motion.div
+                          animate={{ x: [0, 4, 0] }}
+                          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </motion.div>
                       </span>
                     )}
                   </Button>
                 </form>
 
-                <div className="mt-8 text-center">
-                  <p className="text-white/40 text-sm">
+                <div className="mt-8 text-center pt-6 border-t border-gray-50">
+                  <p className="text-gray-400 text-[12px] font-medium">
                     Don't have an account?{" "}
                     <button
                       onClick={() => {
                         onClose();
                         onSwitchToSignup();
                       }}
-                      className="font-bold text-teal hover:text-teal-light transition-colors ml-1"
+                      className="font-bold text-[#1a3884] hover:text-[#112b6b] transition-colors ml-1 underline underline-offset-4"
                     >
-                      Sign Up
+                      Create Account
                     </button>
                   </p>
                 </div>
@@ -288,4 +376,3 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
 };
 
 export default LoginModal;
-

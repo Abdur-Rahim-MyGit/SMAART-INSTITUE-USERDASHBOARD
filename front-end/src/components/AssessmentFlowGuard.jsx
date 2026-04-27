@@ -126,6 +126,22 @@ const AssessmentFlowGuard = ({ children }) => {
           return;
         }
 
+        // ── SECURITY: Force Password Reset Bypass Protection ───────────────
+        // If the user still has mustChangePassword = true they MUST go through
+        // the first-login password-change flow before accessing the dashboard.
+        // This blocks direct URL access even when a valid JWT is present.
+        if (parsedUser.mustChangePassword === true) {
+          console.warn("[AssessmentFlowGuard] mustChangePassword is still true — ejecting to login.");
+          sessionStorage.clear();
+          setIsAuthenticated(false);
+          setLoading(false);
+          navigate("/", {
+            replace: true,
+            state: { forcePasswordChange: true }
+          });
+          return;
+        }
+
         const userId = parsedUser.id || parsedUser._id;
 
         // NEW: Check if registration is completed
