@@ -31,6 +31,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import EmotionChatbot from "@/components/community/EmotionChatbot";
+import CommunityTasks from "@/components/community/CommunityTasks";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { communityAPI } from "@/services/communityApi";
@@ -107,6 +108,88 @@ const formatTimeAgo = (dateString) => {
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 7) return `${diffDays}d ago`;
   return date.toLocaleDateString();
+};
+
+const COMMUNITY_TIPS = [
+  {
+    emoji: "💡",
+    title: "Community Tip",
+    text: "Engage with discussions and help others to earn points and badges. Top contributors get featured on the leaderboard!",
+  },
+  {
+    emoji: "🏆",
+    title: "Quality Score",
+    text: "Your Quality Score (QS) rises with upvotes, hearts, and comments. Post thoughtfully to climb the Popular feed!",
+  },
+  {
+    emoji: "🗣️",
+    title: "Mentor Channel",
+    text: "Have a career or academic question? Post in the Mentor channel — your question goes straight to your assigned mentors and coaches.",
+  },
+  {
+    emoji: "🤝",
+    title: "Support Channel",
+    text: "Feeling overwhelmed? The Support channel connects you with the Emotion Coach AI — a safe, non-judgmental space just for you.",
+  },
+  {
+    emoji: "👥",
+    title: "Student Groups",
+    text: "Create or join a Study Group to collaborate with peers, share resources, and chat in real time in your group's private space.",
+  },
+  {
+    emoji: "📌",
+    title: "Pinned Posts",
+    text: "Pinned posts stay at the top of the Discussion feed regardless of sort order. Look for the PINNED badge on important announcements!",
+  },
+];
+
+const CommunityTipRotator = () => {
+  const [tipIndex, setTipIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setTipIndex((prev) => (prev + 1) % COMMUNITY_TIPS.length);
+        setVisible(true);
+      }, 400);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const tip = COMMUNITY_TIPS[tipIndex];
+
+  return (
+    <div className="bg-gradient-to-br from-[#002147]/8 to-blue-500/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-sm border border-[#002147]/10">
+      <div className="absolute top-0 right-0 w-36 h-36 bg-[#002147]/15 blur-[50px] rounded-full transform translate-x-1/3 -translate-y-1/3" />
+      <div className="absolute bottom-0 left-0 w-28 h-28 bg-blue-400/10 blur-[40px] rounded-full transform -translate-x-1/3 translate-y-1/3" />
+
+      <div
+        className="relative z-10 transition-all duration-400"
+        style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(6px)" }}
+      >
+        <h3 className="text-[#002147] font-bold mb-3 flex items-center gap-2 text-base">
+          <span className="text-xl">{tip.emoji}</span>
+          {tip.title}
+        </h3>
+        <p className="text-gray-600 text-sm leading-6 font-medium">{tip.text}</p>
+      </div>
+
+      {/* Dot indicators */}
+      <div className="relative z-10 flex gap-1.5 mt-4">
+        {COMMUNITY_TIPS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setVisible(false); setTimeout(() => { setTipIndex(i); setVisible(true); }, 300); }}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i === tipIndex ? "bg-[#002147] w-5" : "bg-[#002147]/20 w-1.5 hover:bg-[#002147]/40"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 };
 
 const Community = () => {
@@ -866,6 +949,43 @@ const Community = () => {
       <div className="relative z-10">
         <div className="min-h-screen transition-all duration-300">
           <main className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+
+            {/* ── Page Header ── */}
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-between mb-6"
+            >
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-[#002147] to-blue-700 flex items-center justify-center shadow-lg shadow-blue-900/25">
+                    <Users className="w-4 h-4 text-white" />
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-black text-[#002147] dark:text-white tracking-tight">
+                    Community
+                  </h1>
+                </div>
+                <p className="text-sm text-gray-500 font-medium pl-12">
+                  {currentUser?.fullName || currentUser?.name
+                    ? `Welcome back, ${(currentUser.fullName || currentUser.name).split(" ")[0]}! 👋`
+                    : "Connect, share, and grow with your peers"}
+                </p>
+              </div>
+
+              {/* Notification Bell */}
+              <button
+                onClick={() => navigate("/notifications")}
+                className="relative p-3 bg-white/70 dark:bg-[#1E293B]/70 backdrop-blur-sm rounded-2xl shadow-sm border border-white/60 dark:border-white/10 hover:bg-white hover:shadow-md transition-all group"
+                title="Notifications"
+              >
+                <Bell className="w-5 h-5 text-[#002147] dark:text-white group-hover:scale-110 transition-transform" />
+                {/* Badge — shown when there are notifications */}
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 shadow-sm animate-pulse">
+                  !
+                </span>
+              </button>
+            </motion.div>
+
             {/* Search Bar */}
             <div className="mb-8">
               <div className="relative max-w-2xl mx-auto">
@@ -949,7 +1069,7 @@ const Community = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-12">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5 mb-10">
               {[
                 {
                   label: "Members",
@@ -957,13 +1077,17 @@ const Community = () => {
                   icon: Users,
                   color: "text-[#002147]",
                   bg: "bg-[#002147]/10",
+                  gradient: "from-blue-50 to-white",
+                  pulse: false,
                 },
                 {
                   label: "Discussions",
                   value: stats.totalDiscussions?.toLocaleString() || "0",
                   icon: MessageCircle,
-                  color: "text-[#C0C0C0]",
-                  bg: "bg-[#C0C0C0]/10",
+                  color: "text-indigo-500",
+                  bg: "bg-indigo-500/10",
+                  gradient: "from-indigo-50 to-white",
+                  pulse: false,
                 },
                 {
                   label: "Groups",
@@ -971,6 +1095,8 @@ const Community = () => {
                   icon: Star,
                   color: "text-purple-500",
                   bg: "bg-purple-500/10",
+                  gradient: "from-purple-50 to-white",
+                  pulse: false,
                 },
                 {
                   label: "Active Today",
@@ -978,34 +1104,35 @@ const Community = () => {
                   icon: TrendingUp,
                   color: "text-green-500",
                   bg: "bg-green-500/10",
+                  gradient: "from-green-50 to-white",
+                  pulse: true,
                 },
               ].map((stat, index) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{
-                    y: -2,
-                    boxShadow: "0 10px 20px -5px rgba(0,0,0,0.05)",
-                  }}
-                  className="bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-xl rounded-xl p-3 shadow-sm border border-white/40 dark:border-white/10 transition-all duration-300"
+                  transition={{ delay: index * 0.08 }}
+                  whileHover={{ y: -3, boxShadow: "0 12px 28px -6px rgba(0,0,0,0.07)" }}
+                  className={`bg-gradient-to-br ${stat.gradient} dark:bg-[#1E293B]/60 backdrop-blur-xl rounded-2xl p-4 shadow-sm border border-white/60 dark:border-white/10 transition-all duration-300`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-8 h-8 ${stat.bg} rounded-lg flex items-center justify-center flex-shrink-0`}
-                    >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`w-9 h-9 ${stat.bg} rounded-xl flex items-center justify-center shadow-sm`}>
                       <stat.icon className={`w-4 h-4 ${stat.color}`} />
                     </div>
-                    <div>
-                      <p className="text-xl font-bold text-[#002147] dark:text-white leading-none mb-0.5 tracking-tight">
-                        {stat.value}
-                      </p>
-                      <p className="text-[11px] text-gray-500 font-medium leading-none">
-                        {stat.label}
-                      </p>
-                    </div>
+                    {stat.pulse && (
+                      <span className="flex items-center gap-1">
+                        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                        <span className="text-[9px] text-green-600 font-black uppercase tracking-wider">Live</span>
+                      </span>
+                    )}
                   </div>
+                  <p className="text-2xl font-black text-[#002147] dark:text-white leading-none tracking-tight">
+                    {stat.value}
+                  </p>
+                  <p className="text-[11px] text-gray-500 font-semibold mt-1 uppercase tracking-wider">
+                    {stat.label}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -1016,17 +1143,27 @@ const Community = () => {
               <div className="lg:col-span-2 space-y-6">
                 {/* Start Discussion Button */}
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.015 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
                     setNewPost((prev) => ({ ...prev, channelType }));
-                    console.log("[MODAL] channelType set to:", channelType);
                     setShowNewPostModal(true);
                   }}
-                  className="w-full py-4 bg-gradient-to-r from-[#002147] to-[#002147]/90 text-white font-semibold rounded-2xl shadow-lg shadow-[#002147]/20 transition-all flex items-center justify-center gap-2 mb-2"
+                  className="w-full py-4 relative overflow-hidden bg-gradient-to-r from-[#002147] via-[#003580] to-[#002147] bg-size-200 text-white font-bold rounded-2xl shadow-lg shadow-[#002147]/25 transition-all flex items-center justify-center gap-3 mb-2 group"
                 >
-                  <Plus className="w-5 h-5" />
-                  Start a Discussion
+                  {/* shimmer effect */}
+                  <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                  <div className="w-8 h-8 rounded-xl bg-white/15 flex items-center justify-center">
+                    <Plus className="w-5 h-5" />
+                  </div>
+                  <span className="text-base tracking-wide">
+                    Start a Discussion
+                    {channelType !== "discussion" && (
+                      <span className="ml-2 text-xs font-black opacity-70 uppercase tracking-widest">
+                        ({channelType})
+                      </span>
+                    )}
+                  </span>
                 </motion.button>
 
                 {/* Tabs & Sort */}
@@ -1869,26 +2006,28 @@ const Community = () => {
                       {featuredGroups.map((group) => {
                         const IconComponent = iconMap[group.icon] || Users;
                         return (
-                          <div
+                          <motion.div
                             key={group._id}
-                            className="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/60 hover:shadow-sm transition-all cursor-pointer group/item"
+                            whileHover={{ x: 3 }}
+                            onClick={() => navigate(`/dashboard/groups/${group._id}`)}
+                            className="flex items-center gap-4 p-3 rounded-2xl hover:bg-white hover:shadow-sm transition-all cursor-pointer group/item border border-transparent hover:border-white/60"
                           >
                             <div
-                              className={`w-12 h-12 ${group.color || "bg-[#002147]"} rounded-2xl flex items-center justify-center shadow-sm group-hover/item:scale-105 transition-transform duration-300`}
+                              className={`w-11 h-11 ${group.color || "bg-[#002147]"} rounded-2xl flex items-center justify-center shadow-sm group-hover/item:scale-105 transition-transform duration-300`}
                             >
-                              <IconComponent className="w-6 h-6 text-white" />
+                              <IconComponent className="w-5 h-5 text-white" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[#002147] text-sm font-bold truncate mb-0.5">
                                 {group.name}
                               </p>
-                              <p className="text-gray-500 text-xs flex items-center gap-1">
+                              <p className="text-gray-400 text-xs flex items-center gap-1 font-medium">
                                 <Users className="w-3 h-3" />
-                                {(group.memberCount || 0).toLocaleString()}{" "}
-                                members
+                                {(group.memberCount || 0).toLocaleString()} members
                               </p>
                             </div>
-                          </div>
+                            <ChevronRight className="w-4 h-4 text-gray-300 group-hover/item:text-[#002147] transition-colors flex-shrink-0" />
+                          </motion.div>
                         );
                       })}
                     </div>
@@ -1994,18 +2133,11 @@ const Community = () => {
                   )}
                 </div>
 
-                {/* Quick Tips */}
-                <div className="bg-gradient-to-br from-[#002147]/10 to-blue/10 rounded-3xl p-8 relative overflow-hidden backdrop-blur-sm">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-[#002147]/20 blur-[50px] rounded-full transform translate-x-1/3 -translate-y-1/3"></div>
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 blur-[40px] rounded-full transform -translate-x-1/3 translate-y-1/3"></div>
-                  <h3 className="text-[#002147] font-bold mb-4 relative z-10 flex items-center gap-3 text-lg">
-                    <span className="text-2xl">💡</span> Community Tip
-                  </h3>
-                  <p className="text-gray-700 text-sm leading-7 relative z-10 font-medium">
-                    Engage with discussions and help others to earn points and
-                    badges. Top contributors get featured on the leaderboard!
-                  </p>
-                </div>
+                {/* Community Tips — Rotating */}
+                <CommunityTipRotator />
+
+                {/* 50 Community Challenges */}
+                <CommunityTasks />
               </div>
             </div>
           </main>

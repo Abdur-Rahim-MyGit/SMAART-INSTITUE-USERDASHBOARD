@@ -20,14 +20,14 @@ const generateOTP = () => {
 };
 
 // Send OTP email
-const sendOTPEmail = async (email, otp, fullName = '') => {
+const sendOTPEmail = async (email, otp, fullName = '', subject = '') => {
   try {
     const transporter = createTransporter();
     
     const mailOptions = {
       from: `"SMAART Minds" <${process.env.SMTP_USER}>`,
       to: email,
-      subject: 'Your Login Verification Code - SMAART Minds',
+      subject: subject || 'Your Login Verification Code - SMAART Minds',
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #002147 0%, #30919D 100%); padding: 30px; border-radius: 16px 16px 0 0; text-align: center;">

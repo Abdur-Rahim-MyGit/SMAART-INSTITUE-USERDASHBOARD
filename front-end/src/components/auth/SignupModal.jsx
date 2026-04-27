@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import blueLogo from "@/assets/blue.png";
 
 const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
   const navigate = useNavigate();
@@ -47,14 +48,15 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
   if (!isOpen) return null;
 
   return (
+  return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0"
             onClick={onClose}
           />
 
@@ -62,58 +64,90 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-md bg-navy border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+            className="relative w-full max-w-[420px] bg-white overflow-hidden shadow-2xl z-10 flex flex-col"
+            style={{
+              border: "1px solid rgba(0, 0, 0, 0.04)",
+              borderRadius: "24px",
+            }}
           >
-            {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-teal/10 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gold/5 rounded-full blur-[50px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
             {/* Header */}
-            <div className="p-8 pb-0 text-center relative">
+            <div className="bg-gray-50 p-8 flex flex-col items-center justify-center border-b border-gray-100 relative">
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 text-white/30 hover:text-white transition-colors"
+                className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
-              <div className="w-16 h-16 bg-gradient-to-br from-teal/20 to-teal/5 rounded-2xl border border-teal/20 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-teal/10">
-                <User className="w-8 h-8 text-teal" />
+              <div className="relative mb-3 z-10 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 w-14 h-14 flex items-center justify-center">
+                <User className="w-6 h-6 text-[#1a3884]" />
               </div>
-              <h2 className="text-3xl font-sans font-bold text-white mb-2">Create Account</h2>
-              <p className="text-white/50">Join SMAART Institute today</p>
+              <h2 className="text-gray-900 text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
+                Join SMAART Institute
+              </h2>
+              <p className="text-[13px] text-gray-500 mt-2 text-center px-8">
+                Create your student account to access premium educational resources.
+              </p>
             </div>
 
             {/* Form */}
             <div className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2 group">
-                  <Label htmlFor="fullName" className="text-white/70 group-focus-within:text-teal transition-colors">Full Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-teal transition-colors" />
-                    <Input
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Full Name</label>
+                  <div 
+                    className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
+                    onFocusCapture={(e) => {
+                      e.currentTarget.style.border = "1.5px solid #1a3884";
+                      e.currentTarget.style.background = "#fff";
+                      e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                    }}
+                    onBlurCapture={(e) => {
+                      e.currentTarget.style.border = "1px solid #e2e8f0";
+                      e.currentTarget.style.background = "#f8fafc";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
+                      <User className="w-3.5 h-3.5 text-[#1a3884]" />
+                    </div>
+                    <input
                       id="fullName"
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
-                      placeholder="John Doe"
-                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-teal focus:ring-1 focus:ring-teal transition-all duration-300 h-12 rounded-xl"
+                      placeholder="Enter your full name"
+                      className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2 group">
-                  <Label htmlFor="email" className="text-white/70 group-focus-within:text-teal transition-colors">Email Address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 group-focus-within:text-teal transition-colors" />
-                    <Input
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email Address</label>
+                  <div 
+                    className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
+                    onFocusCapture={(e) => {
+                      e.currentTarget.style.border = "1.5px solid #1a3884";
+                      e.currentTarget.style.background = "#fff";
+                      e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                    }}
+                    onBlurCapture={(e) => {
+                      e.currentTarget.style.border = "1px solid #e2e8f0";
+                      e.currentTarget.style.background = "#f8fafc";
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
+                      <Mail className="w-3.5 h-3.5 text-[#1a3884]" />
+                    </div>
+                    <input
                       id="email"
                       name="email"
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="john@example.com"
-                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-white/20 focus:border-teal focus:ring-1 focus:ring-teal transition-all duration-300 h-12 rounded-xl"
+                      placeholder="your@email.com"
+                      className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
                       required
                     />
                   </div>
@@ -121,30 +155,37 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-teal to-teal-hover text-white font-bold py-6 rounded-xl shadow-lg shadow-teal/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+                  className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 mt-4 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
+                  style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <span className="flex items-center gap-2">
-                      Get Started <ArrowRight className="w-4 h-4" />
+                      Get Started
+                      <motion.div
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </motion.div>
                     </span>
                   )}
                 </Button>
               </form>
 
-              <div className="mt-8 text-center">
-                <p className="text-white/40 text-sm">
+              <div className="mt-8 text-center pt-6 border-t border-gray-50">
+                <p className="text-gray-400 text-[12px] font-medium">
                   Already have an account?{" "}
                   <button
                     onClick={() => {
                       onClose();
                       onSwitchToLogin();
                     }}
-                    className="font-bold text-teal hover:text-teal-light transition-colors ml-1"
+                    className="font-bold text-[#1a3884] hover:text-[#112b6b] transition-colors ml-1 underline underline-offset-4"
                   >
-                    Login
+                    Sign In
                   </button>
                 </p>
               </div>
@@ -153,6 +194,8 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
         </div>
       )}
     </AnimatePresence>
+  );
+};
   );
 };
 

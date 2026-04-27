@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Navbar from "@/components/Navbar";
 import LoginCard from "@/components/LoginCard";
-import { Play, Loader2, AlertCircle } from "lucide-react";
+import { Play, Loader2, AlertCircle, ArrowLeft } from "lucide-react";
 import { apiCall } from "@/services/api";
+import { useTheme } from "@/contexts/ThemeContext";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 
 const videoUrlFallback = "https://player.cloudinary.com/embed/?cloud_name=dlpmrdcqp&public_id=videoplayback_xt7in8";
 
@@ -14,6 +15,8 @@ const Institution = () => {
   const [collegeData, setCollegeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const userData = sessionStorage.getItem("user");
@@ -26,63 +29,100 @@ const Institution = () => {
     const fetchCollegeData = async () => {
       try {
         setLoading(true);
-        console.log(`🔍 Fetching data for institution: ${id}`);
-        const response = await apiCall(`/colleges/name/${encodeURIComponent(id)}`);
+        
+        let targetId = id;
+        if (!targetId) {
+          const stored = sessionStorage.getItem("selectedInstitution");
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            targetId = parsed.name;
+          }
+        }
+
+        if (!targetId) {
+          // No error needed, LoginCard will show the InstitutionSelector automatically
+          setLoading(false);
+          return;
+        }
+
+        const response = await apiCall(`/colleges/name/${encodeURIComponent(targetId)}`);
         
         if (response && response.success) {
-          console.log("✅ Institution data fetched:", response.data);
           setCollegeData(response.data);
         } else {
-          console.warn("⚠️ Institution fetch returned success:false", response);
           setError("Institution details not found");
         }
       } catch (err) {
-        console.error("❌ Error fetching college data:", err);
         setError(`Failed to load: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchCollegeData();
-    }
+    fetchCollegeData();
   }, [id]);
 
-  const currentVideoUrl = (collegeData && collegeData.chairmanVideo) ? collegeData.chairmanVideo : videoUrlFallback;
-  console.log("📺 Rendering video URL:", currentVideoUrl);
+  const baseVideoUrl = (collegeData && collegeData.chairmanVideo) ? collegeData.chairmanVideo : videoUrlFallback;
+  const currentVideoUrl = isPlaying 
+    ? (baseVideoUrl.includes("?") ? `${baseVideoUrl}&autoplay=1` : `${baseVideoUrl}?autoplay=1`) 
+    : baseVideoUrl;
 
   return (
     <div
-      className="min-h-screen relative overflow-x-hidden transition-colors duration-300"
-      style={{ background: "linear-gradient(135deg, #f0f4ff 0%, #eef1f8 40%, #f7f8fa 100%)" }}
+      className="min-h-screen relative overflow-x-hidden transition-colors duration-300 bg-[#f4f7fa] dark:bg-[#002147]"
     >
+      <NeuralBackground theme={theme} />
       {/* Subtle background crest watermark */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div
-          className="absolute right-[-5%] top-[8%] w-[520px] h-[520px] opacity-[0.045]"
+          className="absolute right-[-5%] top-[8%] w-[520px] h-[520px] opacity-[0.03]"
           style={{
             backgroundImage: "url('/smaart-crest.png')",
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
-            filter: "grayscale(1)",
+            filter: "grayscale(1) brightness(1.2)",
           }}
         />
-        {/* Soft radial glows */}
-        <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100 opacity-40 blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-50 opacity-50 blur-[100px]" />
+        {/* Soft radial glows for light mode */}
+        <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100/50 opacity-40 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-100/40 opacity-50 blur-[100px]" />
       </div>
 
       <main className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-10 pb-10 relative z-10">
         <div className="w-full max-w-6xl mx-auto">
 
-          {/* ERROR ALERT */}
-          {error && (
-            <div className="lg:col-span-2 mb-4 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700">
+          {/* NO INSTITUTION — Redirect prompt (replaces generic error for this case) */}
+          {error === "no-institution" ? (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-5 bg-white border border-blue-100 rounded-2xl flex flex-col sm:flex-row items-center gap-4 shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-xl bg-[#1a3884]/8 flex items-center justify-center shrink-0 border border-[#1a3884]/10">
+                <AlertCircle className="w-5 h-5 text-[#1a3884]" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <p className="text-sm font-bold text-gray-900 mb-0.5">No institution selected</p>
+                <p className="text-xs text-gray-500">Please go back and choose your college to access the login portal.</p>
+              </div>
+              <button
+                onClick={() => navigate('/', { replace: true })}
+                className="flex items-center gap-1.5 text-xs font-bold text-[#1a3884] bg-[#1a3884]/5 hover:bg-[#1a3884]/10 px-4 py-2 rounded-xl transition-colors shrink-0 border border-[#1a3884]/15"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Go Back
+              </button>
+            </motion.div>
+          ) : error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 shadow-sm"
+            >
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm font-medium">{error}</p>
-            </div>
+            </motion.div>
           )}
 
           {/* Two-column grid */}
@@ -95,43 +135,42 @@ const Institution = () => {
               transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
               className="flex flex-col gap-0"
             >
-              {/* Outer Card — rounded corners, white bg, strong shadow */}
+              {/* Outer Card — Soft Light UI */}
               <div
-                className="rounded-3xl overflow-hidden"
+                className="rounded-3xl overflow-hidden bg-white"
                 style={{
-                  background: "#ffffff",
-                  border: "1.5px solid rgba(26,56,132,0.14)",
-                  boxShadow: "0 24px 64px rgba(26,56,132,0.13), 0 4px 20px rgba(0,0,0,0.07)",
+                  border: "1px solid rgba(0, 0, 0, 0.04)",
+                  boxShadow: "0 20px 40px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02)",
                 }}
               >
-                {/* Navy blue border-frame around the video */}
+                {/* Frame around the video */}
                 <div
                   className="relative rounded-t-3xl"
                   style={{
-                    background: "linear-gradient(135deg, #0d2257 0%, #1a3884 100%)",
-                    padding: "12px",
+                    background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
+                    padding: "16px",
                   }}
                 >
                   {/* Founder's Message Badge */}
                   <div
-                    className="absolute top-4 left-4 z-20 flex items-center gap-2 px-4 py-2 rounded-full"
+                    className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 rounded-full shadow-sm"
                     style={{
-                      background: "rgba(0, 21, 46, 0.88)",
+                      background: "rgba(255, 255, 255, 0.9)",
                       backdropFilter: "blur(8px)",
-                      border: "1px solid rgba(192,192,192,0.35)",
+                      border: "1px solid rgba(0,0,0,0.05)",
                     }}
                   >
-                    <span className="w-2 h-2 rounded-full bg-[#C0C0C0] animate-pulse shadow-[0_0_8px_rgba(192,192,192,0.7)]" />
-                    <span className="text-[10px] sm:text-[11px] font-bold text-white tracking-widest uppercase">
+                    <span className="w-2 h-2 rounded-full bg-[#002147] animate-pulse shadow-[0_0_8px_rgba(0,33,71,0.4)]" />
+                    <span className="text-[10px] sm:text-[11px] font-bold text-gray-700 tracking-widest uppercase">
                       Founder's Message
                     </span>
                   </div>
 
-                  {/* Video embed — inset inside the navy frame */}
-                  <div className="relative w-full rounded-2xl overflow-hidden" style={{ paddingBottom: "56.25%" }}>
+                  {/* Video embed — inset inside the frame */}
+                  <div className="relative w-full rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)] bg-gray-100" style={{ paddingBottom: "56.25%" }}>
                     {loading ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 rounded-2xl">
-                        <Loader2 className="w-8 h-8 text-white animate-spin" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-2xl">
+                        <Loader2 className="w-8 h-8 text-[#002147] animate-spin" />
                       </div>
                     ) : (
                       <iframe
@@ -142,26 +181,18 @@ const Institution = () => {
                         title="Founder's Message"
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#00152e]/60 via-transparent to-transparent pointer-events-none rounded-2xl" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/40 via-transparent to-transparent pointer-events-none rounded-2xl" />
                   </div>
                 </div>
 
                 {/* Welcome text below */}
                 <div
-                  className="px-6 py-5 sm:px-8 sm:py-6 flex items-center justify-between gap-4 rounded-b-3xl"
-                  style={{ background: "#ffffff", borderTop: "2px solid #0d2257" }}
+                  className="px-6 py-6 sm:px-8 sm:py-7 flex items-center justify-between gap-4 rounded-b-3xl relative overflow-hidden bg-white"
                 >
-                  <div>
+                  <div className="relative z-10">
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 tracking-tight leading-snug">
                       Welcome to{" "}
-                      <span
-                        className="font-extrabold"
-                        style={{
-                          background: "linear-gradient(90deg, #1a3884 0%, #2a5ad4 100%)",
-                          WebkitBackgroundClip: "text",
-                          WebkitTextFillColor: "transparent",
-                        }}
-                      >
+                      <span className="font-extrabold text-[#002147]">
                         Excellence
                       </span>
                     </h2>
@@ -172,10 +203,11 @@ const Institution = () => {
                   </div>
                   {/* Play button */}
                   <div
-                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0 hover:scale-105 transition-transform duration-200 cursor-pointer rounded-full"
+                    onClick={() => setIsPlaying(true)}
+                    className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0 hover:scale-105 transition-transform duration-200 cursor-pointer rounded-full relative z-10"
                     style={{
-                      background: "linear-gradient(135deg, #1a3884 0%, #2a5ad4 100%)",
-                      boxShadow: "0 4px 16px rgba(26,56,132,0.25)",
+                      background: "linear-gradient(135deg, #00152e 0%, #002147 100%)",
+                      boxShadow: "0 8px 24px rgba(0,33,71,0.25)",
                     }}
                   >
                     <Play className="w-5 h-5 text-white fill-white ml-0.5" />

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ShieldCheck, MailOpen } from "lucide-react";
 import { apiCall } from "@/services/api";
 
 const VerifyOTP = () => {
@@ -135,18 +135,28 @@ const VerifyOTP = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-4">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-4 bg-[#f4f7fa] relative overflow-hidden transition-colors duration-300">
+      {/* Background Glows */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100/50 opacity-40 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-100/40 opacity-50 blur-[100px]" />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="glass-effect-glow rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 w-full max-w-md shadow-[var(--shadow-purple)]"
+        className="bg-white rounded-3xl p-6 sm:p-8 md:p-10 w-full max-w-md relative z-10"
+        style={{
+          border: "1px solid rgba(0, 0, 0, 0.04)",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02)",
+        }}
       >
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={handleGoBack}
-          className="flex items-center gap-2 text-accent hover:text-accent/80 mb-4 sm:mb-6 transition text-sm sm:text-base"
+          className="flex items-center gap-2 text-gray-400 hover:text-[#002147] mb-6 sm:mb-8 transition-colors text-sm sm:text-base tracking-wide font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
@@ -156,15 +166,18 @@ const VerifyOTP = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-center mb-6 sm:mb-8"
+          className="text-center mb-8 sm:mb-10"
         >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold text-background mb-1 sm:mb-2">
-            Verify OTP
+          <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-blue-100 shadow-sm transform rotate-3 hover:rotate-0 transition-transform">
+            <ShieldCheck className="w-8 h-8 text-[#002147]" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 mb-2" style={{ letterSpacing: "-0.01em" }}>
+            Two-Step Verification
           </h1>
-          <p className="text-background/70 text-xs sm:text-sm">
-            We've sent a 6-digit code to
+          <p className="text-gray-500 text-sm leading-relaxed px-4">
+            To secure your account, please enter the 6-digit code we just sent to
+            <span className="block mt-1 font-bold text-[#002147]">{email}</span>
           </p>
-          <p className="text-accent font-semibold text-sm sm:text-base break-all">{email}</p>
         </motion.div>
 
         <form onSubmit={handleVerifyOTP} className="space-y-4 sm:space-y-6">
@@ -172,11 +185,14 @@ const VerifyOTP = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="space-y-1.5 sm:space-y-2"
+            className="space-y-2.5"
           >
-            <Label htmlFor="otp" className="text-background text-sm sm:text-base">
-              Enter OTP Code *
-            </Label>
+            <div className="flex justify-between items-end pl-0.5 pr-1">
+              <Label htmlFor="otp" className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+                Security Code
+              </Label>
+              <span className="text-[10px] text-gray-400 font-medium">6 digits</span>
+            </div>
             <Input
               id="otp"
               type="text"
@@ -187,22 +203,22 @@ const VerifyOTP = () => {
                 setOtp(value);
               }}
               maxLength="6"
-              className="bg-secondary/30 border-accent/30 text-background placeholder:text-muted-foreground text-center text-xl sm:text-2xl tracking-widest font-mono h-12 sm:h-14"
+              className="bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 text-center text-xl sm:text-2xl tracking-[0.5em] font-mono h-14 sm:h-16 rounded-xl focus:border-[#002147] focus:ring-4 focus:ring-[#002147]/10 focus:bg-white outline-none transition-all shadow-sm"
               required
             />
-            <p className="text-[10px] sm:text-xs text-background/60">
-              Enter the 6-digit code sent to your email
-            </p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="flex items-center justify-between p-3 sm:p-4 bg-accent/10 rounded-lg border border-accent/20"
+            className="flex items-center justify-between p-3.5 sm:p-4 bg-gray-50 rounded-xl border border-gray-100 shadow-sm"
           >
-            <span className="text-background/80 text-xs sm:text-sm">Time remaining:</span>
-            <span className={`font-mono font-bold text-sm sm:text-base ${timeLeft < 60 ? "text-destructive" : "text-accent"}`}>
+            <div className="flex items-center gap-2">
+              <MailOpen className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-600 text-[11px] sm:text-xs font-semibold uppercase tracking-widest">Time remaining</span>
+            </div>
+            <span className={`font-mono font-bold text-sm sm:text-base ${timeLeft < 60 ? "text-red-500 animate-pulse" : "text-[#002147]"}`}>
               {formatTime(timeLeft)}
             </span>
           </motion.div>
@@ -214,10 +230,14 @@ const VerifyOTP = () => {
           >
             <Button
               type="submit"
-              className="w-full bg-accent hover:bg-accent/90 text-foreground font-semibold py-4 sm:py-6 text-base sm:text-lg h-12 sm:h-14"
               disabled={isLoading || timeLeft === 0}
+              className="w-full h-12 sm:h-14 rounded-xl text-sm sm:text-base font-bold shadow-[0_8px_24px_rgba(0,33,71,0.2)] mt-2 text-white transition-all hover:-translate-y-0.5 relative overflow-hidden group"
+              style={{ background: "linear-gradient(90deg, #00152e 0%, #002147 100%)" }}
             >
-              {isLoading ? "Verifying..." : "Verify OTP"}
+              {isLoading ? "Verifying..." : "Verify & Proceed"}
+              {!isLoading && (
+                 <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+              )}
             </Button>
           </motion.div>
 
@@ -225,32 +245,24 @@ const VerifyOTP = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="text-center"
+            className="text-center mt-6 border-t border-gray-100 pt-6"
           >
-            <p className="text-background/70 text-xs sm:text-sm mb-2 sm:mb-3">
-              Didn't receive the code?
+            <p className="text-gray-500 text-xs sm:text-sm mb-3">
+              Didn't receive the verification code?
             </p>
             <Button
               type="button"
               onClick={handleResendOTP}
               disabled={isLoading}
-              className="w-full bg-secondary/30 hover:bg-secondary/50 text-background border border-accent/30 h-10 sm:h-12 text-sm sm:text-base"
+              className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 h-10 sm:h-11 text-sm font-semibold transition-colors rounded-xl shadow-sm"
             >
-              {isLoading ? "Resending..." : "Resend OTP"}
+              {isLoading ? "Resending..." : "Send New Code"}
             </Button>
           </motion.div>
         </form>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.1 }}
-        transition={{ delay: 0.8 }}
-        className="fixed inset-0 -z-10"
-        style={{
-          backgroundImage: `radial-gradient(circle at 50% 50%, hsl(174 62% 47% / 0.1) 0%, transparent 50%)`,
-        }}
-      />
+      {/* Removed the redundant radial gradient div since we have glows in the main wrapper */}
     </div>
   );
 };

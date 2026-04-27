@@ -4,6 +4,7 @@ import { X, Loader2, Mail, ArrowRight, RefreshCw, AlertTriangle } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { apiCall } from "@/services/api";
+import blueLogo from "@/assets/blue.png";
 
 const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -210,12 +211,12 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0"
             onClick={onClose}
           />
 
@@ -223,39 +224,37 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border-2 border-[#C0C0C0] rounded-none shadow-2xl overflow-hidden z-10 flex flex-col max-h-[calc(100vh-2rem)]"
+            className="relative w-full max-w-[420px] bg-white overflow-hidden shadow-2xl z-10 flex flex-col"
+            style={{
+              border: "1px solid rgba(0, 0, 0, 0.04)",
+              borderRadius: "24px",
+            }}
           >
-            {/* Decorative Elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#1a3884]/5 rounded-full blur-[50px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#C0C0C0]/5 rounded-full blur-[50px] translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-
             {/* Content Switcher: Normal OTP or Force Logout Confirmation */}
             {!showForceLogout ? (
-              <>
+              <div className="flex flex-col">
                 {/* Header */}
-                <div className="p-4 sm:p-5 pb-0 text-center relative">
+                <div className="bg-gray-50 p-8 flex flex-col items-center justify-center border-b border-gray-100 relative">
                   <button
                     onClick={onClose}
-                    aria-label="Close OTP verification"
-                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"
                   >
-                    <X className="w-6 h-6" aria-hidden="true" />
+                    <X className="w-5 h-5" />
                   </button>
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#1a3884]/20 to-[#1a3884]/5 rounded-none border border-[#1a3884]/20 flex items-center justify-center mx-auto mb-3 shadow-md">
+                  <div className="relative mb-3 z-10 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 w-14 h-14 flex items-center justify-center">
                     <Mail className="w-6 h-6 text-[#1a3884]" />
                   </div>
-                  <h2 className="text-lg sm:text-xl font-sans font-bold text-[#002147] mb-1">
+                  <h2 className="text-gray-900 text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
                     Verify Your Email
                   </h2>
-                  <p className="text-gray-500">
-                    We've sent a 6-digit code to<br />
-                    <span className="text-[#1a3884] font-medium">{email}</span>
+                  <p className="text-[13px] text-gray-500 mt-2 text-center px-8">
+                    We've sent a security code to <br />
+                    <span className="text-[#112b6b] font-bold">{email}</span>
                   </p>
                 </div>
 
                 {/* OTP Form */}
-                <div className="p-4 sm:p-5 overflow-y-auto custom-scrollbar">
-                  {/* Screen reader live region for announcements */}
+                <div className="px-8 py-8 overflow-y-auto custom-scrollbar">
                   <div
                     role="status"
                     aria-live="polite"
@@ -265,64 +264,62 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     {announcement}
                   </div>
 
-                  <form onSubmit={handleSubmit} className="space-y-6" aria-label="OTP verification form">
-                    <fieldset>
-                      <legend className="sr-only">Enter the 6-digit verification code sent to {email}</legend>
-                      <div
-                        className="flex justify-center gap-2 sm:gap-3"
-                        onPaste={handlePaste}
-                        role="group"
-                        aria-label="OTP input fields"
-                      >
-                        {otp.map((digit, index) => (
-                          <input
-                            key={index}
-                            ref={(el) => (inputRefs.current[index] = el)}
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            maxLength={1}
-                            value={digit}
-                            onChange={(e) => handleChange(index, e.target.value)}
-                            onKeyDown={(e) => handleKeyDown(index, e)}
-                            aria-label={`Digit ${index + 1} of 6`}
-                            aria-describedby="otp-helper"
-                            autoComplete="one-time-code"
-                            className="w-9 h-11 text-center text-lg font-bold bg-gray-50 border border-gray-200 rounded-none text-[#002147] focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0]/30 transition-all duration-300 outline-none"
-                          />
-                        ))}
-                      </div>
-                      <div className="text-center mt-4">
-                        <p className={`text-sm font-medium ${expirationTime < 60 ? 'text-red-500' : 'text-slate-500'}`}>
-                          OTP Expires in: <span className="font-mono">{formatTime(expirationTime)}</span>
-                        </p>
-                      </div>
-                      <p id="otp-helper" className="sr-only">Enter each digit of your 6-digit verification code</p>
-                    </fieldset>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div
+                      className="flex justify-center gap-2.5"
+                      onPaste={handlePaste}
+                    >
+                      {otp.map((digit, index) => (
+                        <input
+                          key={index}
+                          ref={(el) => (inputRefs.current[index] = el)}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handleChange(index, e.target.value)}
+                          onKeyDown={(e) => handleKeyDown(index, e)}
+                          className="w-10 h-14 text-center text-xl font-bold bg-[#f8fafc] border border-[#e2e8f0] rounded-xl focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 focus:bg-white outline-none transition-all shadow-sm text-[#112b6b]"
+                        />
+                      ))}
+                    </div>
+
+                    <div className="text-center">
+                      <p className={`text-[12px] font-bold uppercase tracking-wider ${expirationTime < 60 ? 'text-red-500' : 'text-slate-400'}`}>
+                        Expires in: <span className="font-mono">{formatTime(expirationTime)}</span>
+                      </p>
+                    </div>
 
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#1a3884] text-white font-bold py-3 rounded-none shadow-md shadow-[#1a3884]/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 h-10"
+                      className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 mt-2 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
+                      style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
                       disabled={isLoading || otp.join("").length !== 6}
                     >
                       {isLoading ? (
                         <Loader2 className="w-5 h-5 animate-spin" />
                       ) : (
                         <span className="flex items-center gap-2">
-                          Verify & Login <ArrowRight className="w-4 h-4" />
+                          Access Portal
+                          <motion.div
+                            animate={{ x: [0, 4, 0] }}
+                            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                          >
+                            <ArrowRight className="w-4 h-4" />
+                          </motion.div>
                         </span>
                       )}
                     </Button>
                   </form>
 
-                  <div className="mt-6 text-center">
-                    <p className="text-gray-500 text-sm mb-2">
+                  <div className="mt-8 text-center pt-6 border-t border-gray-50">
+                    <p className="text-gray-400 text-[12px] font-medium mb-3">
                       Didn't receive the code?
                     </p>
                     <button
                       onClick={handleResend}
                       disabled={resendCooldown > 0 || isResending}
-                      className="inline-flex items-center gap-2 text-[#1a3884] hover:text-[#132c6b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                      className="inline-flex items-center gap-2 text-[#1a3884] hover:text-[#112b6b] transition-all disabled:opacity-50 disabled:cursor-not-allowed font-bold text-[13px] hover:-translate-y-0.5"
                     >
                       {isResending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -334,28 +331,25 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                         : "Resend Code"}
                     </button>
                   </div>
-
-                  <p className="mt-6 text-center text-gray-400 text-xs">
-                    Code expires in 5 minutes
-                  </p>
                 </div>
-              </>
+              </div>
             ) : (
               // Force Logout Confirmation View
-              <div className="p-8 text-center animate-in fade-in zoom-in duration-300">
+              <div className="p-8 text-center bg-white">
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
 
-                <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100">
-                  <AlertTriangle className="w-12 h-12 text-red-500" />
+                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100 shadow-sm relative">
+                  <div className="absolute inset-0 bg-red-100 rounded-full animate-ping opacity-20" />
+                  <AlertTriangle className="w-10 h-10 text-red-500 relative z-10" />
                 </div>
 
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Active Session Detected</h3>
-                <p className="text-gray-600 mb-8 max-w-[280px] mx-auto leading-relaxed">
+                <h3 className="text-[20px] font-extrabold text-gray-900 mb-2">Active Session</h3>
+                <p className="text-[13px] text-gray-500 mb-8 max-w-[280px] mx-auto leading-relaxed">
                   {forceLogoutMessage || "You are already logged in on another device."}
                 </p>
 
@@ -363,25 +357,24 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                   <Button
                     onClick={handleForceLogoutConfirm}
                     disabled={isLoading}
-                    className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-6 rounded-xl shadow-lg shadow-red-500/20"
+                    className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-red-500/20 text-white bg-red-500 hover:bg-red-600 transition-all hover:-translate-y-1 active:translate-y-0"
                   >
                     {isLoading ? (
                       <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    ) : "Log out other device & Login here"}
+                    ) : "Sign out other device"}
                   </Button>
 
                   <Button
                     onClick={handleForceLogoutCancel}
                     variant="ghost"
                     disabled={isLoading}
-                    className="w-full text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                    className="w-full h-11 text-gray-500 hover:text-gray-900 font-bold text-[13px] transition-colors"
                   >
                     Cancel
                   </Button>
                 </div>
               </div>
             )}
-
           </motion.div>
         </div>
       )}

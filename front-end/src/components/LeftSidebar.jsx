@@ -55,7 +55,7 @@ import WomanIdle from "@/assets/Animations/WomanIdle.mp4";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 // SRM Logo URL
-const srmLogo = "https://res.cloudinary.com/dcppk0wx4/image/upload/v1772097854/smaart-minds/images/apdqbj8himb6ynbbmc5v.jpg";
+const srmLogo = "";
 
 // Menu items configuration
 const menuGroups = [

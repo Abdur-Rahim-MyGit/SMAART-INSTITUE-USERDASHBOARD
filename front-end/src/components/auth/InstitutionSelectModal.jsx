@@ -32,7 +32,7 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
             }}
           >
             {/* Navy accent line at top */}
-            <div className="h-1 bg-gradient-to-r from-[#002147] via-[#1a3884] to-[#002147] opacity-90" />
+            <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80 z-20" />
 
             {/* ── Header ── */}
             <div className="relative bg-[#f8fafc] px-8 pt-10 pb-8 flex flex-col items-center border-b border-gray-100 overflow-hidden">
