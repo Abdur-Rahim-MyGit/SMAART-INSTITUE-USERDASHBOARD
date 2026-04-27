@@ -6,59 +6,70 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
 
           {/* ── Backdrop ── */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
             className="absolute inset-0 bg-black/65 backdrop-blur-md"
             onClick={onClose}
           />
 
           {/* ── Card ── */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 24 }}
+            initial={{ opacity: 0, scale: 0.96, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 24 }}
-            transition={{ type: "spring", stiffness: 320, damping: 28 }}
+            exit={{ opacity: 0, scale: 0.96, y: 20 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-lg z-10 overflow-hidden rounded-3xl bg-white shadow-2xl"
-            style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}
+            className="relative w-full max-w-2xl z-10 overflow-hidden rounded-[2rem] bg-white shadow-2xl"
+            style={{ 
+              border: "1px solid rgba(0, 0, 0, 0.06)",
+              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.03)"
+            }}
           >
             {/* Navy accent line at top */}
-            <div className="h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
+            <div className="h-1 bg-gradient-to-r from-[#002147] via-[#1a3884] to-[#002147] opacity-90" />
 
             {/* ── Header ── */}
-            <div className="relative bg-gray-50 px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
+            <div className="relative bg-[#f8fafc] px-8 pt-10 pb-8 flex flex-col items-center border-b border-gray-100 overflow-hidden">
+              {/* Subtle background decoration */}
+              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                   style={{ backgroundImage: 'radial-gradient(#1a3884 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
+              
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+              
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-[#1a3884] hover:text-white transition-all duration-200 group"
-                aria-label="Close"
+                className="absolute top-6 right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:bg-[#1a3884] hover:text-white hover:border-[#1a3884] transition-all duration-300 group z-20"
+                aria-label="Close modal"
               >
-                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
               </button>
 
               {/* Icon badge */}
-              <div className="w-14 h-14 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100">
-                <Building2 className="w-6 h-6 text-[#1a3884]" />
+              <div className="relative z-10 w-16 h-16 flex items-center justify-center mb-5 bg-white rounded-2xl shadow-md border border-gray-100"
+                   style={{ boxShadow: "0 8px 20px rgba(26,56,132,0.08)" }}>
+                <Building2 className="w-7 h-7 text-[#1a3884]" />
               </div>
 
               <h2
-                className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#112b6b] text-center"
+                className="relative z-10 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#002147] text-center"
                 style={{ letterSpacing: "-0.02em" }}
               >
                 Select Your Institution
               </h2>
-              <p className="text-[13px] text-gray-500 mt-2 text-center max-w-[260px] leading-relaxed">
-                Find your college to access your personalised career dashboard.
+              <p className="relative z-10 text-sm text-gray-500 mt-2.5 text-center max-w-[320px] leading-relaxed">
+                Find your college to access your personalized learning and career dashboard.
               </p>
             </div>
 
             {/* ── Body ── */}
-            <div className="px-6 py-7 sm:px-8 sm:py-8 bg-white">
+            <div className="px-6 py-8 sm:px-10 sm:py-10 bg-white">
               <InstitutionSelector onSelect={onInstitutionSelected} />
             </div>
           </motion.div>
