@@ -16,28 +16,6 @@ import SingleTabGuard from "@/components/SingleTabGuard";
 const queryClient = new QueryClient();
 
 const App = () => (
-<<<<<<< HEAD
-  <ErrorBoundary>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <UserProvider>
-            <SidebarProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <SingleTabGuard>
-                  <AnimatedRoutes />
-                  <SecurityGuard />
-                </SingleTabGuard>
-              </BrowserRouter>
-            </SidebarProvider>
-          </UserProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
-  </ErrorBoundary>
-=======
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -60,7 +38,6 @@ const App = () => (
       </TooltipProvider>
     </QueryClientProvider>
   </HelmetProvider>
->>>>>>> 8a93b83bc7f7d9f5fbcf7970758b40c5bd6efd58
 );
 
 export default App;

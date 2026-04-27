@@ -103,7 +103,6 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 // MongoDB Connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/minds';
 
-<<<<<<< HEAD
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -114,9 +113,6 @@ mongoose.connect(mongoURI, {
   retryWrites: true, // Automatically retry write operations upon transient network errors
   retryReads: true // Automatically retry read operations
 })
-=======
-mongoose.connect(mongoURI)
->>>>>>> 8a93b83bc7f7d9f5fbcf7970758b40c5bd6efd58
   .then(() => logger.info('✅ MongoDB connected successfully'))
   .catch((err) => {
     logger.error('❌ MongoDB connection error:', err);
