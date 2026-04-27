@@ -32,22 +32,35 @@ const LandingPage = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [isInstitutionSelectOpen, setIsInstitutionSelectOpen] = useState(false);
 
-  // Immediate redirect for logged-in users before any rendering
-  const [isReady, setIsReady] = useState(false);
+  // If user is already logged in, we need to redirect — start as false only in that case
+  const isLoggedIn = !!sessionStorage.getItem("user");
+  const [isReady, setIsReady] = useState(!isLoggedIn);
 
-  // Auto-open modal if ?modal=true is in the URL (e.g. from Navbar on verify page)
+  // Auto-open modal logic
   useEffect(() => {
+    // 1. Check for ?modal=true query param (manual trigger)
     if (searchParams.get('modal') === 'true') {
       setIsInstitutionSelectOpen(true);
-      // Clean the param from the URL without a page reload
       setSearchParams({}, { replace: true });
+      return;
     }
-  }, [searchParams, setSearchParams]);
+
+    // 2. Auto-trigger on first visit if not logged in and no institution selected
+    // Disabled per user request - no longer auto-triggering the popup
+    // const userData = sessionStorage.getItem("user");
+    // const selectedInst = sessionStorage.getItem("selectedInstitution");
+    // 
+    // if (!userData && !selectedInst && !showSplash) {
+    //   const timer = setTimeout(() => {
+    //     setIsInstitutionSelectOpen(true);
+    //   }, 1000);
+    //   return () => clearTimeout(timer);
+    // }
+  }, [searchParams, setSearchParams, showSplash]);
 
   useEffect(() => {
     // Check for forced logout flagging from api.js
     if (sessionStorage.getItem('kicked_out')) {
-      // Small delay to ensure UI is ready
       setTimeout(() => {
         toast.error("You have been logged out because another device logged in to this account.", {
           duration: 8000,
@@ -86,8 +99,9 @@ const LandingPage = () => {
     }
   }, [navigate]);
 
-  if (!isReady && sessionStorage.getItem("user")) {
-    return null; // Don't render anything if we're about to redirect
+  // Block render only while we know a redirect is imminent
+  if (!isReady) {
+    return null;
   }
 
   const openLogin = () => {
@@ -100,7 +114,8 @@ const LandingPage = () => {
 
   const handleInstitutionSelected = (institution) => {
     setIsInstitutionSelectOpen(false);
-    navigate(`/institution/${encodeURIComponent(institution.name)}`);
+    // After selection, always go to the centralized /login route
+    navigate('/login');
   };
 
   return (

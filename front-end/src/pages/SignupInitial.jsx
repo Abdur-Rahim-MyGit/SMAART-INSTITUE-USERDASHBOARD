@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { apiCall } from "@/services/api";
-
-import whiteLogo from "@/assets/white.png";
+import { UserPlus, Mail, User, ArrowRight } from "lucide-react";
+import blueLogo from "@/assets/blue.png";
 
 const SignupInitial = () => {
   const navigate = useNavigate();
@@ -38,7 +35,6 @@ const SignupInitial = () => {
     setIsLoading(true);
 
     try {
-      // SECURITY FIX #6: Call real backend OTP endpoint
       const data = await apiCall('/auth/send-signup-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,113 +61,210 @@ const SignupInitial = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-4">
+
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="glass-effect-glow rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 w-full max-w-md shadow-[var(--shadow-purple)]"
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-md relative z-10"
       >
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-center mb-6 sm:mb-8"
+        {/* Card */}
+        <div
+          className="bg-white rounded-3xl overflow-hidden"
+          style={{
+            border: "1px solid rgba(0, 0, 0, 0.04)",
+            boxShadow: "0 20px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02)",
+          }}
         >
-          <div className="flex justify-center mb-6">
-            <img src={whiteLogo} alt="SMAART Institute" className="h-20 w-auto object-contain" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-sans font-bold text-background mb-1 sm:mb-2">
-            Create Account
-          </h1>
-          <p className="text-background/70 text-sm sm:text-base">Join SMAART Institute today</p>
-        </motion.div>
+          {/* Top accent line */}
+          <div className="h-[3px] w-full bg-gradient-to-r from-transparent via-[#1a3884] to-transparent opacity-70" />
 
-        <form onSubmit={handleSendOTP} className="space-y-4 sm:space-y-5">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Label htmlFor="fullName" className="text-background text-sm sm:text-base">
-              Full Name *
-            </Label>
-            <Input
-              id="fullName"
-              placeholder="John Doe"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="bg-secondary/30 border-accent/30 text-background mt-1.5 sm:mt-2 h-10 sm:h-11"
-              required
-            />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Label htmlFor="email" className="text-background text-sm sm:text-base">
-              Email Address *
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="john@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-secondary/30 border-accent/30 text-background mt-1.5 sm:mt-2 h-10 sm:h-11"
-              required
-            />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-accent to-accent/80 hover:shadow-lg text-primary-foreground font-semibold py-2.5 sm:py-3 rounded-lg transition-all text-sm sm:text-base h-10 sm:h-12"
+          <div className="px-8 pt-8 pb-8">
+            {/* Logo + Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.4 }}
+              className="flex flex-col items-center text-center mb-8"
             >
-              {isLoading ? "Sending OTP..." : "Send OTP"}
-            </Button>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="text-center"
-          >
-            <p className="text-background/70 text-sm">
-              Already have an account?{" "}
-              <button
-                type="button"
-                onClick={() => navigate("/login")}
-                className="text-accent hover:text-accent/80 font-semibold transition-colors"
+              <div
+                className="w-16 h-16 flex items-center justify-center mb-4 bg-white rounded-2xl border border-[#1a3884]/10"
+                style={{ boxShadow: "0 10px 25px rgba(0,0,0,0.06)" }}
               >
-                Login
-              </button>
-            </p>
-          </motion.div>
-        </form>
+                <img src={blueLogo} alt="SMAART" className="w-10 h-10 object-contain" />
+              </div>
+              <h1
+                className="text-2xl font-extrabold tracking-tight text-[#112b6b] mb-1"
+                style={{ letterSpacing: "-0.02em" }}
+              >
+                Create Account
+              </h1>
+              <p className="text-gray-500 text-[13px] font-medium max-w-[240px]">
+                Join SMAART Institute — your AI-powered career journey starts here
+              </p>
+            </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="mt-8 pt-6 border-t border-accent/20 text-center"
-        >
-          <p className="text-background/60 text-xs">
-            By signing up, you agree to our Terms of Service and Privacy Policy
-          </p>
-        </motion.div>
-      </motion.div >
-    </div >
+            {/* Form */}
+            <form onSubmit={handleSendOTP} className="flex flex-col gap-5">
+
+              {/* Full Name */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+                className="flex flex-col gap-1.5"
+              >
+                <label
+                  htmlFor="signup-fullname"
+                  className="text-[10px] font-bold uppercase tracking-widest pl-0.5 text-gray-500"
+                >
+                  Full Name
+                </label>
+                <div
+                  className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group"
+                  style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}
+                  onFocusCapture={(e) => {
+                    e.currentTarget.style.border = "1.5px solid #1a3884";
+                    e.currentTarget.style.background = "#fff";
+                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                  }}
+                  onBlurCapture={(e) => {
+                    e.currentTarget.style.border = "1px solid #e2e8f0";
+                    e.currentTarget.style.background = "#f8fafc";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all shrink-0">
+                    <User className="w-3.5 h-3.5 text-[#1a3884] group-focus-within:scale-110 transition-transform" />
+                  </div>
+                  <input
+                    id="signup-fullname"
+                    type="text"
+                    placeholder="Your full name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    autoComplete="name"
+                    required
+                    className="flex-1 bg-transparent outline-none text-[13px] font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
+                  />
+                </div>
+              </motion.div>
+
+              {/* Email */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.28, duration: 0.4 }}
+                className="flex flex-col gap-1.5"
+              >
+                <label
+                  htmlFor="signup-email"
+                  className="text-[10px] font-bold uppercase tracking-widest pl-0.5 text-gray-500"
+                >
+                  Email Address
+                </label>
+                <div
+                  className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group"
+                  style={{ background: "#f8fafc", border: "1px solid #e2e8f0" }}
+                  onFocusCapture={(e) => {
+                    e.currentTarget.style.border = "1.5px solid #1a3884";
+                    e.currentTarget.style.background = "#fff";
+                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                  }}
+                  onBlurCapture={(e) => {
+                    e.currentTarget.style.border = "1px solid #e2e8f0";
+                    e.currentTarget.style.background = "#f8fafc";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all shrink-0">
+                    <Mail className="w-3.5 h-3.5 text-[#1a3884] group-focus-within:scale-110 transition-transform" />
+                  </div>
+                  <input
+                    id="signup-email"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    required
+                    className="flex-1 bg-transparent outline-none text-[13px] font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
+                  />
+                </div>
+              </motion.div>
+
+              {/* Submit */}
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.36, duration: 0.4 }}
+              >
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="relative w-full h-12 flex items-center justify-center gap-2 font-bold text-[15px] text-white transition-all duration-300 hover:-translate-y-1 active:translate-y-0 mt-2 disabled:opacity-60 disabled:cursor-not-allowed overflow-hidden rounded-xl shadow-xl shadow-[#112b6b]/20"
+                  style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
+                  onMouseEnter={(e) => {
+                    if (!isLoading) e.currentTarget.style.boxShadow = "0 12px 36px rgba(17,43,107,0.4)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = "0 10px 24px rgba(17,43,107,0.25)";
+                  }}
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      Send Verification Code
+                      <motion.div
+                        animate={{ x: [0, 4, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </motion.div>
+                    </>
+                  )}
+                </button>
+              </motion.div>
+
+              {/* Already have account */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.44 }}
+                className="text-center"
+              >
+                <p className="text-gray-500 text-[13px]">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => navigate("/login")}
+                    className="font-bold text-[#1a3884] hover:text-[#112b6b] transition-colors"
+                  >
+                    Login
+                  </button>
+                </p>
+              </motion.div>
+            </form>
+          </div>
+
+          {/* Footer */}
+          <div className="px-8 pb-6 border-t border-gray-50">
+            <p className="text-center text-[11px] text-gray-400 pt-5 leading-relaxed">
+              By creating an account you agree to our{" "}
+              <span className="font-semibold text-gray-500 cursor-pointer hover:text-[#1a3884] transition-colors">
+                Terms of Service
+              </span>{" "}
+              &{" "}
+              <span className="font-semibold text-gray-500 cursor-pointer hover:text-[#1a3884] transition-colors">
+                Privacy Policy
+              </span>
+            </p>
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
 export default SignupInitial;
-

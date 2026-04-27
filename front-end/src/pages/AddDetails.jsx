@@ -19,8 +19,8 @@ const AddDetails = () => {
     const [existingData, setExistingData] = useState(null);
 
     const [personalDetails, setPersonalDetails] = useState({ fullName: "", nickname: "", dob: "", gender: "", mobileNumber: "", email: "", institution: "", department: "", yearOfStudy: "", yearOfPassing: "", educationLevel: "", profilePhoto: null });
-    const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", marksheet: null });
-    const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", marksheet: null });
+    const [tenthDetails, setTenthDetails] = useState({ schoolName: "", yearOfPassing: "", percentage: "", board: "", marksheet: null });
+    const [twelfthDetails, setTwelfthDetails] = useState({ schoolName: "", stream: "", yearOfPassing: "", percentage: "", board: "", marksheet: null });
     const [higherEducation, setHigherEducation] = useState([{ id: Date.now(), qualificationLevel: "", degree: "", degreeFullName: "", specialization: "", institutionName: "", university: "", yearOfPassing: "", cgpaPercentage: "", degreeStatus: "", certificate: null }]);
     const [extracurricular, setExtracurricular] = useState({ isApplicable: true, items: [{ id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] });
     const [jobPreferences, setJobPreferences] = useState({ items: [{ id: Date.now(), preferredRole: "", jobType: "", preferredLocation1: "", preferredLocation2: "", preferredLocation3: "", willingToRelocate: "", expectedSalary: "" }] });
@@ -139,6 +139,35 @@ const AddDetails = () => {
         };
         fetchData();
     }, [navigate]);
+
+    const handleRoleSearch = (value, index) => {
+        setJobPreferences(prev => {
+            const items = [...prev.items];
+            items[index].preferredRole = value;
+            return { ...prev, items };
+        });
+
+        if (value.length > 1) {
+            const filtered = excelData.roles.filter(role => 
+                role.toLowerCase().includes(value.toLowerCase())
+            ).slice(0, 10);
+            setRoleSuggestions(filtered);
+            setActiveSearchIndex(index);
+        } else {
+            setRoleSuggestions([]);
+            setActiveSearchIndex(null);
+        }
+    };
+
+    const selectRole = (role, index) => {
+        setJobPreferences(prev => {
+            const items = [...prev.items];
+            items[index].preferredRole = role;
+            return { ...prev, items };
+        });
+        setRoleSuggestions([]);
+        setActiveSearchIndex(null);
+    };
 
     const steps = [
         { title: "Profile", icon: <User className="w-4 h-4" /> },
@@ -352,7 +381,7 @@ const AddDetails = () => {
                                     </div>
                                     <div className="space-y-2">
                                         <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Gender</Label>
-                                        <select value={personalDetails.gender} disabled={isFieldDisabled('personal', 'gender')} className={selectClass}>
+                                        <select value={personalDetails.gender} disabled={isFieldDisabled('personal', 'gender')} className={selectClass} onChange={(e) => setPersonalDetails({...personalDetails, gender: e.target.value})}>
                                             <option value="">Select Gender</option>
                                             <option value="male">Male</option>
                                             <option value="female">Female</option>
@@ -367,6 +396,98 @@ const AddDetails = () => {
                                         <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Mobile Number</Label>
                                         <Input value={personalDetails.mobileNumber} disabled={isFieldDisabled('personal', 'mobileNumber')} className={inputClass} />
                                     </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Step 2: 10th Details */}
+                        {currentStep === 2 && (
+                            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8 flex-1">
+                                <div className="grid md:grid-cols-2 gap-x-10 gap-y-8">
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">School Name</Label>
+                                        <Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} disabled={isFieldDisabled('tenth', 'schoolName')} className={inputClass} placeholder="Enter school name" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Board</Label>
+                                        <select value={tenthDetails.board} onChange={(e) => setTenthDetails({ ...tenthDetails, board: e.target.value })} disabled={isFieldDisabled('tenth', 'board')} className={selectClass}>
+                                            <option value="">Select Board</option>
+                                            <option value="CBSE">CBSE</option>
+                                            <option value="ICSE">ICSE</option>
+                                            <option value="State Board">State Board</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Year of Passing</Label>
+                                        <select value={tenthDetails.yearOfPassing} onChange={(e) => setTenthDetails({ ...tenthDetails, yearOfPassing: e.target.value })} disabled={isFieldDisabled('tenth', 'yearOfPassing')} className={selectClass}>
+                                            <option value="">Select Year</option>
+                                            {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Percentage / CGPA</Label>
+                                        <Input value={tenthDetails.percentage} onChange={(e) => setTenthDetails({ ...tenthDetails, percentage: e.target.value })} disabled={isFieldDisabled('tenth', 'percentage')} className={inputClass} placeholder="e.g. 95% or 9.5" />
+                                    </div>
+                                </div>
+                                <div className="pt-4">
+                                    <FileUpload
+                                        label="Upload 10th Marksheet"
+                                        onUpload={(file) => setTenthDetails({ ...tenthDetails, marksheet: file })}
+                                        initialFile={tenthDetails.marksheet}
+                                        disabled={isFieldDisabled('tenth', 'marksheet')}
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Step 3: 12th Details */}
+                        {currentStep === 3 && (
+                            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8 flex-1">
+                                <div className="grid md:grid-cols-2 gap-x-10 gap-y-8">
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">School/College Name</Label>
+                                        <Input value={twelfthDetails.schoolName} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, schoolName: e.target.value })} disabled={isFieldDisabled('twelfth', 'schoolName')} className={inputClass} placeholder="Enter school/college name" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Stream</Label>
+                                        <select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value })} disabled={isFieldDisabled('twelfth', 'stream')} className={selectClass}>
+                                            <option value="">Select Stream</option>
+                                            <option value="Science">Science</option>
+                                            <option value="Commerce">Commerce</option>
+                                            <option value="Arts">Arts</option>
+                                            <option value="Vocational">Vocational</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Board</Label>
+                                        <select value={twelfthDetails.board} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, board: e.target.value })} disabled={isFieldDisabled('twelfth', 'board')} className={selectClass}>
+                                            <option value="">Select Board</option>
+                                            <option value="CBSE">CBSE</option>
+                                            <option value="ICSE">ICSE</option>
+                                            <option value="State Board">State Board</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Year of Passing</Label>
+                                        <select value={twelfthDetails.yearOfPassing} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, yearOfPassing: e.target.value })} disabled={isFieldDisabled('twelfth', 'yearOfPassing')} className={selectClass}>
+                                            <option value="">Select Year</option>
+                                            {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Percentage / CGPA</Label>
+                                        <Input value={twelfthDetails.percentage} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, percentage: e.target.value })} disabled={isFieldDisabled('twelfth', 'percentage')} className={inputClass} placeholder="e.g. 95% or 9.5" />
+                                    </div>
+                                </div>
+                                <div className="pt-4">
+                                    <FileUpload
+                                        label="Upload 12th Marksheet"
+                                        onUpload={(file) => setTwelfthDetails({ ...twelfthDetails, marksheet: file })}
+                                        initialFile={twelfthDetails.marksheet}
+                                        disabled={isFieldDisabled('twelfth', 'marksheet')}
+                                    />
                                 </div>
                             </motion.div>
                         )}
@@ -525,8 +646,124 @@ const AddDetails = () => {
                             </motion.div>
                         )}
 
+                        {/* Step 5: Extracurricular Activities */}
+                        {currentStep === 5 && (
+                            <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6 flex-1">
+                                <div className="flex justify-between items-center mb-4">
+                                    <p className="text-sm text-slate-500">Highlight your achievements beyond academics.</p>
+                                    <Button onClick={() => setExtracurricular({ ...extracurricular, items: [...extracurricular.items, { id: Date.now(), activityType: "", description: "", level: "", achievements: "" }] })} variant="outline" size="sm" className="gap-2 border-[#C0C0C0] text-[#C0C0C0] hover:bg-[#C0C0C0]/10 rounded-full px-4">
+                                        <Plus size={16} /> Add Activity
+                                    </Button>
+                                </div>
+                                <div className="space-y-8">
+                                    {extracurricular.items.map((item, index) => (
+                                        <div key={item.id} className="p-8 border-2 border-[#C0C0C0]/30 bg-[#C0C0C0]/5 relative">
+                                            {extracurricular.items.length > 1 && (
+                                                <button onClick={() => setExtracurricular({ ...extracurricular, items: extracurricular.items.filter(i => i.id !== item.id) })} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors p-2">
+                                                    <Trash2 size={20} />
+                                                </button>
+                                            )}
+                                            <div className="grid md:grid-cols-2 gap-x-10 gap-y-6">
+                                                <div className="space-y-1">
+                                                    <Label className="text-[10px] font-bold text-slate-400 uppercase">Activity Type</Label>
+                                                    <select 
+                                                        value={item.activityType} 
+                                                        onChange={(e) => {
+                                                            const n = [...extracurricular.items];
+                                                            n[index].activityType = e.target.value;
+                                                            setExtracurricular({ ...extracurricular, items: n });
+                                                        }} 
+                                                        className={selectClass}
+                                                    >
+                                                        <option value="">Select Type</option>
+                                                        <option value="Sports">Sports</option>
+                                                        <option value="Arts">Arts</option>
+                                                        <option value="Leadership">Leadership</option>
+                                                        <option value="Volunteering">Volunteering</option>
+                                                        <option value="Technical">Technical</option>
+                                                        <option value="Other">Other</option>
+                                                    </select>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <Label className="text-[10px] font-bold text-slate-400 uppercase">Level</Label>
+                                                    <select 
+                                                        value={item.level} 
+                                                        onChange={(e) => {
+                                                            const n = [...extracurricular.items];
+                                                            n[index].level = e.target.value;
+                                                            setExtracurricular({ ...extracurricular, items: n });
+                                                        }} 
+                                                        className={selectClass}
+                                                    >
+                                                        <option value="">Select Level</option>
+                                                        <option value="School">School</option>
+                                                        <option value="College">College</option>
+                                                        <option value="Zonal">Zonal</option>
+                                                        <option value="District">District</option>
+                                                        <option value="State">State</option>
+                                                        <option value="National">National</option>
+                                                        <option value="International">International</option>
+                                                    </select>
+                                                </div>
+                                                <div className="md:col-span-2 space-y-1">
+                                                    <Label className="text-[10px] font-bold text-slate-400 uppercase">Description</Label>
+                                                    <Input value={item.description} onChange={(e) => {
+                                                        const n = [...extracurricular.items];
+                                                        n[index].description = e.target.value;
+                                                        setExtracurricular({ ...extracurricular, items: n });
+                                                    }} className={inputClass} placeholder="Briefly describe the activity" />
+                                                </div>
+                                                <div className="md:col-span-2 space-y-1">
+                                                    <Label className="text-[10px] font-bold text-slate-400 uppercase">Achievements</Label>
+                                                    <Input value={item.achievements} onChange={(e) => {
+                                                        const n = [...extracurricular.items];
+                                                        n[index].achievements = e.target.value;
+                                                        setExtracurricular({ ...extracurricular, items: n });
+                                                    }} className={inputClass} placeholder="e.g. Won 1st Prize, Captain of the team" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Step 6: Job Preferences (already implemented) */}
+
+                        {/* Step 7: Sector Preferences */}
+                        {currentStep === 7 && (
+                            <motion.div key="step7" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8 flex-1">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-gray-500 text-xs font-bold uppercase tracking-wider">Which sectors interest you the most?</Label>
+                                        <p className="text-xs text-slate-400 mb-4">Select up to 3 sectors you would like to work in.</p>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                            {excelData.sectors.map((sector) => (
+                                                <div 
+                                                    key={sector} 
+                                                    onClick={() => {
+                                                        const isSelected = sectorPreferences.preferredSectors.includes(sector);
+                                                        if (isSelected) {
+                                                            setSectorPreferences({ ...sectorPreferences, preferredSectors: sectorPreferences.preferredSectors.filter(s => s !== sector) });
+                                                        } else if (sectorPreferences.preferredSectors.length < 3) {
+                                                            setSectorPreferences({ ...sectorPreferences, preferredSectors: [...sectorPreferences.preferredSectors, sector] });
+                                                        } else {
+                                                            toast.info("You can select up to 3 preferred sectors");
+                                                        }
+                                                    }}
+                                                    className={`p-3 rounded-xl border-2 cursor-pointer transition-all text-xs font-bold text-center ${sectorPreferences.preferredSectors.includes(sector) ? 'border-[#1a3884] bg-[#1a3884]/5 text-[#1a3884]' : 'border-slate-100 hover:border-slate-200 text-slate-500'}`}
+                                                >
+                                                    {sector}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
                         {/* Generic Section Template for others */}
-                        {![0, 1, 4, 11].includes(currentStep) && (
+                        {![0, 1, 2, 3, 4, 5, 6, 7, 11].includes(currentStep) && (
                              <motion.div key="generic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 space-y-8 flex flex-col items-center justify-center py-12 text-center">
                                 <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                                     <FolderOpen className="w-10 h-10 text-slate-200" />

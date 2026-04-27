@@ -1081,14 +1081,14 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
     const resetToken = crypto.randomBytes(32).toString('hex');
 
     // Delete any existing reset OTP for this email
-    await LoginOtp.deleteMany({ email: normalizedEmail, type: 'password-reset' });
+    await LoginOtp.deleteMany({ email: normalizedEmail, flowType: 'password-reset' });
 
     // Save reset OTP
     const resetOtp = new LoginOtp({
       email: normalizedEmail,
       otp: otp,
       tempToken: resetToken,
-      type: 'password-reset',
+      flowType: 'password-reset',
       userData: {
         userId: user._id,
         userModel: user.constructor.modelName
@@ -1106,6 +1106,44 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
     });
   } catch (err) {
     console.error('Forgot password error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Verify Reset OTP (just verification, before password reset)
+router.post('/verify-reset-otp', async (req, res) => {
+  try {
+    const { resetToken, otp } = req.body;
+
+    if (!resetToken || !otp) {
+      return res.status(400).json({ error: 'Reset token and OTP are required' });
+    }
+
+    const resetOtp = await LoginOtp.findOne({ tempToken: resetToken });
+
+    if (!resetOtp) {
+      return res.status(400).json({ error: 'Reset link expired or invalid. Please request a new one.' });
+    }
+
+    if (resetOtp.attempts >= 5) {
+      await LoginOtp.deleteOne({ _id: resetOtp._id });
+      return res.status(400).json({ error: 'Too many attempts. Please request a new reset link.' });
+    }
+
+    const isValid = await resetOtp.verifyOtp(otp);
+
+    if (!isValid) {
+      resetOtp.attempts += 1;
+      await resetOtp.save();
+      return res.status(400).json({
+        error: 'Invalid OTP',
+        attemptsRemaining: 5 - resetOtp.attempts
+      });
+    }
+
+    res.json({ success: true, message: 'OTP verified successfully' });
+  } catch (err) {
+    console.error('Verify reset OTP error:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -1225,9 +1263,11 @@ router.post('/first-login-change-password', async (req, res) => {
       return res.status(400).json({ error: 'Session expired. Please login again.' });
     }
 
-    // Check for valid flow types (password-change or legacy mustChangePassword)
-    if (!loginOtp.userData?.mustChangePassword && loginOtp.flowType !== 'password-change') {
-      return res.status(400).json({ error: 'Invalid request. Please login again.' });
+    // SECURITY: ONLY accept the 'password-change' flowType.
+    // The old userData.mustChangePassword fallback was removed because userData is
+    // user-supplied and could be crafted to bypass the OTP gate.
+    if (loginOtp.flowType !== 'password-change') {
+      return res.status(403).json({ error: 'Invalid or expired session. Please login again.' });
     }
 
     const Student = require('../models/Student');
@@ -1346,6 +1386,7 @@ router.post('/first-login-change-password', async (req, res) => {
 
     const userResponse = {
       id: student._id,
+      _id: student._id,
       fullName: student.fullName,
       email: student.email,
       gender: student.gender,
@@ -1356,8 +1397,9 @@ router.post('/first-login-change-password', async (req, res) => {
       college: student.college,
       profileImage: student.profileImage,
       hasRegistration: !!registration,
-      isFirstLogin: true, // Flag to show assessments
-      passwordJustChanged: true
+      mustChangePassword: false,   // SECURITY: Explicitly cleared so frontend guard doesn't fire
+      isFirstLogin: true,          // Flag to trigger welcome/assessment flow
+      passwordJustChanged: true    // Used by frontend for smart routing
     };
 
     console.log(`[Auth] Student ${student.email} successfully changed password on first login`);

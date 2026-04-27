@@ -528,7 +528,7 @@ const ComprehensiveSignup = () => {
           className="relative"
         >
           {/* Torn Paper Container */}
-          <div className="bg-white p-4 md:p-6 shadow-[0_15px_60px_-15px_rgba(0,0,0,0.15),0_0_20px_rgba(192,192,192,0.4)] border-2 border-[#C0C0C0] rounded-none relative">
+          <div className="bg-white p-4 md:p-6 shadow-[0_20px_40px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] border border-gray-100 rounded-3xl relative">
             
             <AnimatePresence mode="wait">
             {/* Step 0: Profile Photo */}
@@ -676,7 +676,7 @@ const ComprehensiveSignup = () => {
                   <Button onClick={addHigherEd} variant="outline" size="sm" className="gap-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Degree</Button>
                 </div>
                 {higherEducation.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {higherEducation.length > 1 && <button onClick={() => removeHigherEd(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Degree #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -787,7 +787,7 @@ const ComprehensiveSignup = () => {
                   </div>
                 </div>
                 {extracurricular.isApplicable ? extracurricular.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {extracurricular.items.length > 1 && <button onClick={() => removeExtracurricular(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Activity #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -812,7 +812,7 @@ const ComprehensiveSignup = () => {
                   <Button onClick={addJobPref} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:text-white dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>
                 </div>
                 {jobPreferences.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {jobPreferences.items.length > 1 && <button onClick={() => removeJobPref(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Pref #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -842,7 +842,7 @@ const ComprehensiveSignup = () => {
                           placeholder="Search or enter your preferred role"
                         />
                         {activeSearchIndex === index && roleSuggestions.length > 0 && (
-                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-none shadow-2xl max-h-60 overflow-y-auto no-scrollbar ring-1 ring-black/5">
+                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl max-h-60 overflow-y-auto no-scrollbar ring-1 ring-black/5">
                             <div className="p-2 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-3">
                               SMAART Role Suggestions
                             </div>
@@ -994,7 +994,7 @@ const ComprehensiveSignup = () => {
                   </div>
                 </div>
                 {workExperience.isApplicable ? workExperience.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {workExperience.items.length > 1 && <button onClick={() => removeWorkExperience(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Exp #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -1009,7 +1009,7 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2"><Label>Significant Accomplishments *</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder="Highlight major achievements, contributions, or impacts you made during your tenure." /></div>
                       <div className="md:col-span-2 space-y-4">
                         <Label>Document Type (Select all that apply) *</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-none border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
                           {[
                             { id: "offerLetter", label: "Offer Letter" },
                             { id: "appointmentLetter", label: "Appointment Letter" },
@@ -1040,7 +1040,7 @@ const ComprehensiveSignup = () => {
                         {item.selectedDocs.length > 0 && (
                           <div className="grid md:grid-cols-2 gap-6 pt-2">
                             {item.selectedDocs.map(docId => (
-                              <div key={docId} className="space-y-2 p-4 rounded-none border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
+                              <div key={docId} className="space-y-2 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
                                 <Label className="text-[#1a3884] dark:text-blue-400 font-semibold">
                                   Upload {docId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} *
                                 </Label>
@@ -1074,7 +1074,7 @@ const ComprehensiveSignup = () => {
                   </div>
                 </div>
                 {projects.isApplicable ? projects.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {projects.items.length > 1 && <button onClick={() => removeProject(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Project #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -1115,7 +1115,7 @@ const ComprehensiveSignup = () => {
                   </div>
                 </div>
                 {certificates.isApplicable ? certificates.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-none bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
                     {certificates.items.length > 1 && (
                       <button onClick={() => removeCertificate(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2">
                         <Trash2 size={18} />
@@ -1123,7 +1123,7 @@ const ComprehensiveSignup = () => {
                     )}
                     <h3 className="font-semibold mb-4 text-[#002147]">Cert #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div className="md:col-span-2 p-4 rounded-none border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
+                      <div className="md:col-span-2 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
                         <div className="grid md:grid-cols-2 gap-6 items-center">
                           <div>
                             <Label>Certificate Name / Title *</Label>

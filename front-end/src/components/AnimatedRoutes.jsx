@@ -93,6 +93,7 @@ const AnimatedRoutes = () => {
                     <Route path="/" element={<Landing />} />
                     <Route path="/test" element={<TestPage />} />
                     <Route path="/institution/:id" element={<Institution />} />
+                    <Route path="/login" element={<Institution />} />
                     <Route path="/verify-certificate" element={<VerifyCertificate />} />
                     <Route path="/verify-certificate/:certificateId" element={<VerifyCertificate />} />
                     <Route path="/verify-badge" element={<VerifyBadge />} />
@@ -171,8 +172,8 @@ const AnimatedRoutes = () => {
 
                       {/* Profile */}
                       <Route path="/profile" element={<Profile />} />
-                      <Route path="/add-details" element={<AddDetails />} />
-                      <Route path="/dashboard/add-details" element={<AddDetails />} />
+                      <Route path="/onboarding" element={<AddDetails />} />
+                      <Route path="/dashboard/onboarding" element={<AddDetails />} />
 
                       {/* Other Features */}
                       <Route path="/quotients" element={<QuotientsGrid />} />
