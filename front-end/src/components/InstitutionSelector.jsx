@@ -80,7 +80,8 @@ const InstitutionSelector = ({ onSelect }) => {
       name: institution.name,
       code: institution.code,
       studentCount: institution.studentCount,
-      location: institution.location
+      location: institution.location,
+      logo: institution.logo
     }));
 
     if (onSelect) {
@@ -111,7 +112,8 @@ const InstitutionSelector = ({ onSelect }) => {
           name: college.collegeName,
           code: college.collegeCode,
           studentCount: 0,
-          location: college.address
+          location: college.address,
+          logo: college.logo
         });
       }
     }
@@ -140,7 +142,7 @@ const InstitutionSelector = ({ onSelect }) => {
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
-              onBlur={() => setTimeout(() => setOpen(false), 200)}
+              onBlur={() => setTimeout(() => setOpen(false), 300)}
               className="w-full h-12 pl-11 pr-11 text-sm bg-white border border-slate-200 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-[#1a3884] rounded-xl font-medium shadow-md group-hover:shadow-lg transition-all duration-300"
             />
 
@@ -164,19 +166,20 @@ const InstitutionSelector = ({ onSelect }) => {
           </div>
         </div>
 
-        {/* Results List - Below Input with absolute positioning */}
+        {/* Results List - Flow below input instead of absolute */}
         <div className="relative">
           <AnimatePresence>
             {open && searchTerm && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-0 left-0 right-0 z-[100] bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto custom-scrollbar"
+                initial={{ opacity: 0, height: 0, y: -5 }}
+                animate={{ opacity: 1, height: 'auto', y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -5 }}
+                transition={{ duration: 0.2 }}
+                className="mt-3 z-[100] bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden max-h-[320px] overflow-y-auto custom-scrollbar"
               >
                 {colleges.length > 0 ? (
-                  <div className="p-1.5 sm:p-2">
-                    <p className="px-2 sm:px-3 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-white/5 mb-1">
+                  <div className="p-2 sm:p-3">
+                    <p className="px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 mb-2">
                       Matching Institutions
                     </p>
                     <div className="space-y-1">
@@ -189,26 +192,41 @@ const InstitutionSelector = ({ onSelect }) => {
                               name: college.collegeName,
                               code: college.collegeCode,
                               studentCount: 0,
-                              location: college.address
+                              location: college.address,
+                              logo: college.logo
                             });
                           }}
-                          whileHover={{ x: 4 }}
-                          className={`flex items-center gap-2.5 p-2 cursor-pointer rounded-none transition-all duration-200 group border ${index === focusedIndex
-                            ? "bg-[#C0C0C0]/10 border-[#C0C0C0]/20 shadow-sm"
-                            : "border-transparent hover:bg-gray-50 dark:hover:bg-white/5 hover:border-gray-200 dark:hover:border-white/10"
+                          className={`flex items-center gap-2.5 p-2 cursor-pointer rounded-xl transition-all duration-200 group border ${index === focusedIndex
+                            ? "bg-[#1a3884]/5 border-[#1a3884]/20 shadow-sm"
+                            : "border-transparent hover:bg-gray-50 hover:border-gray-100"
                             }`}
                         >
-                          <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center transition-colors shadow-inner ${index === focusedIndex ? "bg-[#1a3884] text-white" : "bg-gray-100 dark:bg-white/5 text-[#1a3884]"
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm border overflow-hidden shrink-0 ${index === focusedIndex ? "bg-[#1a3884] text-white border-[#1a3884]" : "bg-white text-[#1a3884] border-[#1a3884]/10 group-hover:border-[#1a3884]/30"
                             }`}>
-                            <Building2 className="h-5 w-5" />
+                            {college.logo ? (
+                              <motion.img 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                src={college.logo} 
+                                alt={college.collegeName}
+                                className="w-full h-full object-contain p-1.5"
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.style.display = 'none';
+                                  e.target.parentElement.innerHTML = `<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3"></path><path d="M19 21v-4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v4"></path><path d="M9 7V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3"></path></svg>`;
+                                }}
+                              />
+                            ) : (
+                              <Building2 className={`h-5 w-5 transition-transform duration-300 ${index === focusedIndex ? "scale-110" : "group-hover:scale-110"}`} />
+                            )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="font-bold text-[#002147] dark:text-white truncate group-hover:text-[#1a3884] transition-colors text-sm sm:text-base">
+                            <div className="font-bold text-[#112b6b] truncate group-hover:text-[#1a3884] transition-colors text-sm sm:text-base">
                               {college.collegeName}
                             </div>
                             {college.address && (
-                              <div className="text-[10px] sm:text-[11px] text-gray-500 dark:text-gray-400 mt-0.5 truncate flex items-center gap-1">
-                                <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+                              <div className="text-[10px] sm:text-[11px] text-gray-500 mt-0.5 truncate flex items-center gap-1.5 font-medium">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#00a3e0]/30 group-hover:bg-[#00a3e0] transition-colors" />
                                 {college.address.city}, {college.address.state}
                               </div>
                             )}
