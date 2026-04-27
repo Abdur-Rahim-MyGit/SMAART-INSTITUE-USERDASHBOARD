@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { apiCall } from "@/services/api";
-import { UserPlus, Mail, User, ArrowRight } from "lucide-react";
+import { UserPlus, Mail, User, ArrowRight, Loader2 } from "lucide-react";
 import blueLogo from "@/assets/blue.png";
 
 const SignupInitial = () => {
@@ -263,7 +263,6 @@ const SignupInitial = () => {
           </div>
         </div>
       </motion.div>
-    </div>
   );
 };
 
