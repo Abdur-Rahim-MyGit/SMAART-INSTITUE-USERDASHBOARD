@@ -58,12 +58,12 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
               </div>
 
               <h2
-                className="relative z-10 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#002147] text-center"
+                className="relative z-10 text-xl sm:text-2xl font-extrabold tracking-tight text-[#112b6b] text-center"
                 style={{ letterSpacing: "-0.02em" }}
               >
                 Select Your Institution
               </h2>
-              <p className="relative z-10 text-sm text-gray-500 mt-2.5 text-center max-w-[320px] leading-relaxed">
+              <p className="relative z-10 text-gray-500 text-[12px] sm:text-[13px] font-medium mt-1.5 text-center max-w-[280px] leading-relaxed">
                 Find your college to access your personalized learning and career dashboard.
               </p>
             </div>

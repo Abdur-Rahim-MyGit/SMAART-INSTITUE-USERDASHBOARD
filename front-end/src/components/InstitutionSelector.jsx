@@ -206,7 +206,7 @@ const InstitutionSelector = ({ onSelect }) => {
                           }}
                           className={`flex items-center gap-2.5 p-2 cursor-pointer rounded-xl transition-all duration-300 group border relative overflow-hidden ${
                             selectingId === college.collegeCode 
-                              ? "bg-[#10b981]/10 border-[#10b981]/30 shadow-sm"
+                              ? "bg-[#1a3884]/10 border-[#1a3884]/30 shadow-sm"
                               : index === focusedIndex
                                 ? "bg-[#1a3884]/5 border-[#1a3884]/20 shadow-sm"
                                 : "border-transparent hover:bg-gray-50 hover:border-gray-100"
@@ -218,13 +218,13 @@ const InstitutionSelector = ({ onSelect }) => {
                               initial={{ x: '-100%' }}
                               animate={{ x: '100%' }}
                               transition={{ duration: 0.8, ease: "easeInOut" }}
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-[#10b981]/10 to-transparent pointer-events-none"
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-[#1a3884]/10 to-transparent pointer-events-none"
                             />
                           )}
 
                           <div className={`relative z-10 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm border overflow-hidden shrink-0 ${
                             selectingId === college.collegeCode
-                              ? "bg-[#10b981] text-white border-[#10b981] scale-105"
+                              ? "bg-[#1a3884] text-white border-[#1a3884] scale-105 shadow-md"
                               : index === focusedIndex 
                                 ? "bg-[#1a3884] text-white border-[#1a3884]" 
                                 : "bg-white text-[#1a3884] border-[#1a3884]/10 group-hover:border-[#1a3884]/30"
@@ -256,16 +256,16 @@ const InstitutionSelector = ({ onSelect }) => {
                           </div>
                           <div className="flex-1 min-w-0 relative z-10">
                             <div className={`font-bold truncate transition-colors text-sm sm:text-base ${
-                              selectingId === college.collegeCode ? "text-[#059669]" : "text-[#112b6b] group-hover:text-[#1a3884]"
+                              selectingId === college.collegeCode ? "text-[#112b6b]" : "text-[#112b6b] group-hover:text-[#1a3884]"
                             }`}>
                               {college.collegeName}
                             </div>
                             {college.address && (
                               <div className={`text-[10px] sm:text-[11px] mt-0.5 truncate flex items-center gap-1.5 font-medium transition-colors ${
-                                selectingId === college.collegeCode ? "text-[#059669]/70" : "text-gray-500"
+                                selectingId === college.collegeCode ? "text-[#112b6b]/70" : "text-gray-500"
                               }`}>
                                 <span className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                                  selectingId === college.collegeCode ? "bg-[#10b981]" : "bg-[#00a3e0]/30 group-hover:bg-[#00a3e0]"
+                                  selectingId === college.collegeCode ? "bg-[#1a3884]" : "bg-[#00a3e0]/30 group-hover:bg-[#00a3e0]"
                                 }`} />
                                 {college.address.city}, {college.address.state}
                               </div>
