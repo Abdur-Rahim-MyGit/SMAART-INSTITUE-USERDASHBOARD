@@ -76,6 +76,8 @@ exports.createVisionBoard = async (req, res) => {
       collageImage,
       slotImages,
       textOverlays,
+      shortTermGoals,
+      longTermGoals,
     } = req.body;
 
     // Upload the merged collage image to Cloudinary
@@ -114,6 +116,8 @@ exports.createVisionBoard = async (req, res) => {
       collageImagePublicId: collagePublicId,
       slotImages: slotImages || {},
       textOverlays: textOverlays || {},
+      shortTermGoals: shortTermGoals || [],
+      longTermGoals: longTermGoals || [],
       // Store userId as ObjectId for consistency
       userId: isValidObjectId(userId) ? new mongoose.Types.ObjectId(userId) : userId,
     });
@@ -280,6 +284,8 @@ exports.updateVisionBoard = async (req, res) => {
       collageImage,
       slotImages,
       textOverlays,
+      shortTermGoals,
+      longTermGoals,
     } = req.body;
 
     // Handle collage image update
@@ -316,6 +322,8 @@ exports.updateVisionBoard = async (req, res) => {
     }
     if (slotImages !== undefined) board.slotImages = slotImages;
     if (textOverlays !== undefined) board.textOverlays = textOverlays;
+    if (shortTermGoals !== undefined) board.shortTermGoals = shortTermGoals;
+    if (longTermGoals !== undefined) board.longTermGoals = longTermGoals;
 
     await board.save();
 
@@ -655,6 +663,8 @@ exports.getActiveVision = async (req, res) => {
         title: board.title,
         image: board.collageImage,
         description: board.description,
+        shortTermGoals: board.shortTermGoals,
+        longTermGoals: board.longTermGoals,
       },
     });
   } catch (error) {

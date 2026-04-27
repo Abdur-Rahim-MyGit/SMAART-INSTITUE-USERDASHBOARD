@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Palette, Type, Settings2, X, ChevronLeft, Upload } from "lucide-react";
+import { Palette, Type, Settings2, X, ChevronLeft, Upload, Target } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TemplateSelector from "../panels/TemplateSelector";
 import TypographyPanel from "../panels/TypographyPanel";
@@ -31,7 +31,11 @@ const EditorDrawer = ({
   setAspectRatio,
   currentRatio,
   userUploads,
-  handleUserUpload
+  handleUserUpload,
+  shortTermGoals = [],
+  setShortTermGoals,
+  longTermGoals = [],
+  setLongTermGoals
 }) => {
     
   if (!activePanel) return null;
@@ -53,6 +57,7 @@ const EditorDrawer = ({
            {activePanel === 'style' && <Palette className="w-4 h-4 text-[#1a3884]" />}
            {activePanel === 'text' && <Type className="w-4 h-4 text-[#1a3884]" />}
            {activePanel === 'settings' && <Settings2 className="w-4 h-4 text-[#1a3884]" />}
+           {activePanel === 'goals' && <Target className="w-4 h-4 text-[#1a3884]" />}
            {activePanel}
         </h3>
         <button onClick={closeDrawer} className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors">
@@ -133,9 +138,92 @@ const EditorDrawer = ({
             </div>
         )}
 
+        {/* Goals Panel */}
+        {activePanel === "goals" && (
+            <div className="space-y-6">
+                <div>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
+                        Short Term Goals (1-6 Months)
+                    </h3>
+                    <p className="text-xs text-slate-500 mb-3">Add immediate goals you are working towards.</p>
+                    <div className="space-y-2">
+                        {shortTermGoals.map((goal, index) => (
+                            <div key={index} className="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    defaultValue={goal}
+                                    onBlur={(e) => {
+                                        const newGoals = [...shortTermGoals];
+                                        newGoals[index] = e.target.value;
+                                        setShortTermGoals(newGoals);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            const newGoals = [...shortTermGoals];
+                                            newGoals[index] = e.target.value;
+                                            setShortTermGoals(newGoals);
+                                            e.target.blur();
+                                        }
+                                    }}
+                                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#001229] focus:outline-none focus:border-[#1a3884]"
+                                    placeholder="Enter short term goal..."
+                                />
+                                <button onClick={() => setShortTermGoals(shortTermGoals.filter((_, i) => i !== index))} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
+                        <button 
+                            onClick={() => setShortTermGoals([...shortTermGoals, ""])}
+                            className="w-full py-2 text-sm text-[#1a3884] dark:text-blue-400 font-medium bg-[#1a3884]/5 dark:bg-blue-400/10 hover:bg-[#1a3884]/10 rounded-lg transition-colors"
+                        >
+                            + Add Short Term Goal
+                        </button>
+                    </div>
+                </div>
 
-
-
+                <div>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
+                        Long Term Goals (1-5 Years)
+                    </h3>
+                    <p className="text-xs text-slate-500 mb-3">Add your grand vision and long-term milestones.</p>
+                    <div className="space-y-2">
+                        {longTermGoals.map((goal, index) => (
+                            <div key={index} className="flex gap-2">
+                                <input 
+                                    type="text" 
+                                    defaultValue={goal}
+                                    onBlur={(e) => {
+                                        const newGoals = [...longTermGoals];
+                                        newGoals[index] = e.target.value;
+                                        setLongTermGoals(newGoals);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            const newGoals = [...longTermGoals];
+                                            newGoals[index] = e.target.value;
+                                            setLongTermGoals(newGoals);
+                                            e.target.blur();
+                                        }
+                                    }}
+                                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#001229] focus:outline-none focus:border-[#1a3884]"
+                                    placeholder="Enter long term goal..."
+                                />
+                                <button onClick={() => setLongTermGoals(longTermGoals.filter((_, i) => i !== index))} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))}
+                        <button 
+                            onClick={() => setLongTermGoals([...longTermGoals, ""])}
+                            className="w-full py-2 text-sm text-[#1a3884] dark:text-blue-400 font-medium bg-[#1a3884]/5 dark:bg-blue-400/10 hover:bg-[#1a3884]/10 rounded-lg transition-colors"
+                        >
+                            + Add Long Term Goal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
 
       </div>
       
