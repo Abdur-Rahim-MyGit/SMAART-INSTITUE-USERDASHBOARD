@@ -22,6 +22,7 @@ import {
   X,
   CheckCircle2,
   ArrowRight,
+  Edit,
 } from "lucide-react";
 import {
   getAllVisionBoards,
@@ -39,7 +40,7 @@ import { moderateTextAsync, loadToxicityModel, moderateText } from "../utils/con
 // BOARD CARD COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeactivate, isCurrentVision }) => {
+const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onView, onSetAsActive, onDeactivate, isCurrentVision }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isSettingActive, setIsSettingActive] = useState(false);
   const template =
@@ -120,6 +121,17 @@ const BoardCard = ({ board, onDelete, onDuplicate, onView, onSetAsActive, onDeac
                   onClick={() => setShowMenu(false)}
                 />
                 <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-1 z-30 overflow-hidden">
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(board);
+                      setShowMenu(false);
+                    }}
+                    className="w-full text-left px-4 py-2.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-700"
+                  >
+                    <Edit className="w-3.5 h-3.5" /> Edit
+                  </button>
 
                   <button
                     onClick={(e) => {
@@ -598,6 +610,23 @@ const VisionBoardGalleryPro = () => {
     setViewBoard(board);
   };
 
+  const handleEdit = (board) => {
+    navigate("/vision-board-pro/create", {
+      state: {
+        isEditing: true,
+        boardId: board._id,
+        initialTitle: board.title,
+        initialDescription: board.description,
+        initialShortTermGoals: board.shortTermGoals,
+        initialLongTermGoals: board.longTermGoals,
+        // Optional: you can pass templateId, textOverlays etc if you want full restore,
+        // but since we only save the collage image, full restore is tricky.
+        // We will pass the collageImage as the backgroundImage so they can build on top of it.
+        backgroundImage: board.collageImage
+      }
+    });
+  };
+
   // Handle setting a vision board as active and navigating to dashboard
   const handleSetAsActive = async (board) => {
     try {
@@ -746,6 +775,7 @@ const VisionBoardGalleryPro = () => {
                       board={board}
                       onDelete={setDeleteBoard}
                       onDuplicate={handleDuplicate}
+                      onEdit={handleEdit}
                       onView={handleView}
                       onSetAsActive={handleSetAsActive}
                       onDeactivate={async () => {

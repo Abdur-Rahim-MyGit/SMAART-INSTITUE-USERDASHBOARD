@@ -12,8 +12,10 @@ import { assessmentApi } from "@/services/assessmentApi";
 import BadgeGallery from "@/components/badges/BadgeGallery";
 import CertificateVerification from "@/components/landing/CertificateVerification";
 import UserCertificateUploadModal from "@/components/wallet/UserCertificateUploadModal";
+import CertificateShareModal from "@/components/wallet/CertificateShareModal";
 import { userCertificateApi } from "@/services/userCertificateApi";
 import { toast } from "sonner";
+import { Share2 } from "lucide-react";
 
 /* ══════════════════════════════════════
    SMAART Wallet – Your Professional Vault
@@ -35,6 +37,8 @@ const SMAARTWallet = () => {
     const [stageStatus, setStageStatus] = useState({});
     const [userCertificates, setUserCertificates] = useState([]);
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [selectedShareCert, setSelectedShareCert] = useState(null);
     const [loading, setLoading] = useState(true);
 
     /* ── Data fetch ── */
@@ -329,13 +333,19 @@ const SMAARTWallet = () => {
                                                             </div>
 
                                                             <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => { setSelectedShareCert(cert); setIsShareModalOpen(true); }}
+                                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-none bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all"
+                                                                >
+                                                                    <Share2 className="w-3.5 h-3.5" /> Share
+                                                                </button>
                                                                 <a 
                                                                     href={cert.certificateUrl} 
                                                                     target="_blank" 
                                                                     rel="noopener noreferrer"
                                                                     className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-none bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
                                                                 >
-                                                                    <Download className="w-3.5 h-3.5" /> View File
+                                                                    <Download className="w-3.5 h-3.5" /> View
                                                                 </a>
                                                                 <button 
                                                                     onClick={() => handleDeleteUserCert(cert._id)}
@@ -505,6 +515,12 @@ const SMAARTWallet = () => {
                 isOpen={isUploadModalOpen} 
                 onClose={() => setIsUploadModalOpen(false)}
                 onUploadSuccess={(newCert) => setUserCertificates(prev => [newCert, ...prev])}
+            />
+
+            <CertificateShareModal
+                isOpen={isShareModalOpen}
+                onClose={() => { setIsShareModalOpen(false); setSelectedShareCert(null); }}
+                certificate={selectedShareCert}
             />
         </div>
     );
