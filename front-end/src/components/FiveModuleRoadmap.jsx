@@ -279,12 +279,11 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
                   >
                     <motion.div
                       animate={{ 
-                        borderColor: isSelected && !isLocked ? silver : 'transparent',
                         backgroundColor: isCurrent ? navyBlue : cardNavy,
                         boxShadow: isCurrent 
                           ? `0 0 20px ${silver}, 0 0 40px ${silver}44, inset 0 0 10px ${silver}33` 
                           : (isSelected ? `0 0 15px ${silver}66` : '0 10px 25px rgba(0,0,0,0.3)'),
-                        borderColor: isCurrent || isSelected ? silver : 'transparent',
+                        borderColor: isCurrent || (isSelected && !isLocked) ? silver : 'transparent',
                       }}
                       transition={{ duration: 0.6 }}
                       style={{

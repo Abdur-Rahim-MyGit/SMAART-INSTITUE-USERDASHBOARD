@@ -8,6 +8,9 @@ const { protect } = require("../middleware/auth");
 const cloudinary = uploadMiddleware.cloudinary;
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Apply protection to all vision board routes
 router.use(protect);

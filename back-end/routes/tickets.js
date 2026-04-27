@@ -7,6 +7,9 @@ const upload = require('../middleware/upload');
 const itsmClient = require('../services/itsmClient');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Rate limiter for ticket creation (10 tickets per user per hour)
 // Note: This limiter is applied AFTER the protect middleware, so req.user will always be available

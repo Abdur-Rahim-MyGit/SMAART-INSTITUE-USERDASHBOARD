@@ -2,6 +2,9 @@ const express = require('express');
 const QuestionBank = require('../models/QuestionBank');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get all questions with search and filter functionality
 router.get('/', async (req, res) => {

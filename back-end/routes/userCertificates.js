@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 const UserCertificate = require('../models/UserCertificate');
 const { protect } = require('../middleware/auth');
 const { uploadRegistration } = require('../middleware/upload');

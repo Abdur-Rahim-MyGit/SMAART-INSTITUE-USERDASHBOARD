@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 const CommunityGroup = require('../models/CommunityGroup');
 const User = require('../models/User');
 const Student = require('../models/Student');

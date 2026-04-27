@@ -2,6 +2,9 @@ const express = require('express');
 const Coach = require('../models/Coach');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get all coaches with search and filter functionality
 router.get('/', async (req, res) => {

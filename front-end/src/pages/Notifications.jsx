@@ -19,6 +19,7 @@ import {
   ExternalLink,
   RefreshCw
 } from 'lucide-react';
+import { NotificationsSkeleton } from '@/components/SkeletonPatterns';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -441,9 +442,7 @@ const Notifications = () => {
 
           {/* Content */}
           {loading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="w-10 h-10 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            </div>
+            <NotificationsSkeleton />
           ) : notifications.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}

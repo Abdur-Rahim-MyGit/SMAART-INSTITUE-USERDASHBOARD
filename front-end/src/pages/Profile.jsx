@@ -300,9 +300,7 @@ const Profile = () => {
     <PageTransition>
     <div className="space-y-6">
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-12 h-12 border-4 border-slate-200 border-t-[#1a3884] rounded-full animate-spin"></div>
-        </div>
+        <ProfileSkeleton />
       ) : (
         <main className="container mx-auto px-3 py-4 max-w-6xl">
             {/* Main Grid Layout - Compact */}
@@ -325,6 +323,7 @@ const Profile = () => {
                             src={profilePhoto}
                             alt="Profile"
                             className="w-full h-full object-cover"
+                            loading="lazy"
                           />
                         ) : (
                           <span className="text-2xl font-bold text-white">
@@ -795,7 +794,7 @@ const Profile = () => {
                               >
                                 <div className="aspect-video bg-gradient-to-br from-[#1a3884]/20 to-[#002147]/20 rounded mb-2 flex items-center justify-center overflow-hidden">
                                   {enrollment.course?.thumbnail ? (
-                                    <img src={enrollment.course.thumbnail} alt={enrollment.course?.title} className="w-full h-full object-cover" />
+                                    <img src={enrollment.course.thumbnail} alt={enrollment.course?.title} className="w-full h-full object-cover" loading="lazy" />
                                   ) : (
                                     <BookOpen className="w-5 h-5 text-[#1a3884] dark:text-blue-400 opacity-50" />
                                   )}
@@ -891,6 +890,7 @@ const Profile = () => {
                         src={editData.profilePhoto}
                         alt="Profile"
                         className="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     ) : (
                       <span className="text-3xl font-bold text-white">

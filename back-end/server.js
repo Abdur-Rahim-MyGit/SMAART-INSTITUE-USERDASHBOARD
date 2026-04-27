@@ -13,6 +13,15 @@ const { initWebSocket } = require('./services/websocketService');
 // Import logger
 const logger = require('./utils/logger');
 
+// Global Console Override for Production
+if (process.env.NODE_ENV === 'production') {
+  console.log = (...args) => logger.info(args.join(' '));
+  console.info = (...args) => logger.info(args.join(' '));
+  console.warn = (...args) => logger.warn(args.join(' '));
+  console.error = (...args) => logger.error(args.join(' '));
+  console.debug = () => {}; // Mute debug logs entirely in production
+}
+
 // Critical Environment Variable Check
 const requiredEnv = ['MONGODB_URI', 'JWT_SECRET'];
 const missingEnv = requiredEnv.filter(key => !process.env[key]);
@@ -94,7 +103,20 @@ app.use(express.static(path.join(__dirname, 'uploads')));
 // MongoDB Connection
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/minds';
 
+<<<<<<< HEAD
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 50, // Increase max connection pool size for high concurrency
+  minPoolSize: 10, // Maintain a minimum of 10 connections for faster initial response
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s waiting for a server
+  socketTimeoutMS: 45000, // Close idle sockets after 45s
+  retryWrites: true, // Automatically retry write operations upon transient network errors
+  retryReads: true // Automatically retry read operations
+})
+=======
 mongoose.connect(mongoURI)
+>>>>>>> 8a93b83bc7f7d9f5fbcf7970758b40c5bd6efd58
   .then(() => logger.info('✅ MongoDB connected successfully'))
   .catch((err) => {
     logger.error('❌ MongoDB connection error:', err);
@@ -210,7 +232,7 @@ app.use('/api/notifications', require('./routes/notifications')); // Notificatio
 
 
 // Error Handling Middleware
-const { errorHandler, notFound } = require('./middleware/errorMiddleware');
+const { errorHandler, notFound } = require('./middleware/errorHandler');
 app.use(notFound); // 404 handler
 app.use(errorHandler); // Global error handler
 

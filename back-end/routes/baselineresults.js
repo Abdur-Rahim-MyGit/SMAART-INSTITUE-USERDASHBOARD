@@ -2,6 +2,9 @@ const express = require('express');
 const BaseLineResult = require('../models/BaseLineResult');
 
 const router = express.Router();
+const { generalLimiter } = require('../middleware/rateLimiter');
+router.use(generalLimiter);
+
 
 // Get BaseLine results for a specific user
 router.get('/user/:userId', async (req, res) => {

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { withRetry } = require('../utils/retry');
 
 /**
  * OpenRouter AI Service
@@ -45,7 +46,7 @@ class OpenRouterService {
                 });
             });
 
-            console.log('📤 Sending request to OpenRouter (Axios)...');
+            console.log('📤 Sending request to OpenRouter (Axios with Retry)...');
 
             const requestBody = {
                 model: AI_MODEL,
@@ -59,7 +60,7 @@ class OpenRouterService {
                 requestBody.max_tokens = options.max_tokens || 4000;
             }
 
-            const response = await axios.post(
+            const response = await withRetry(() => axios.post(
                 OPENROUTER_API_URL,
                 requestBody,
                 {
@@ -71,7 +72,7 @@ class OpenRouterService {
                     },
                     timeout: options.timeout || 60000
                 }
-            );
+            ));
 
             console.log('✅ OpenRouter API response received');
 

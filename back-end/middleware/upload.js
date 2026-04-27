@@ -61,11 +61,15 @@ const dynamicStorage = new CloudinaryStorage({
 const fileFilter = (req, file, cb) => {
   // Allowed file types
   const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'image/jpg', 'image/webp', 'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo'];
+  
+  // SECURITY: Strict extension check to prevent MIME spoofing
+  const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.webp', '.mp4', '.mpeg', '.mov', '.avi'];
+  const ext = path.extname(file.originalname).toLowerCase();
 
-  if (allowedMimes.includes(file.mimetype)) {
+  if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WEBP and PDF are allowed.'), false);
+    cb(new Error('Invalid file type or extension. Only specific images, PDFs, and videos are allowed.'), false);
   }
 };
 
@@ -121,10 +125,15 @@ const registrationStorage = new CloudinaryStorage({
 // File filter for registration (includes PDFs)
 const registrationFileFilter = (req, file, cb) => {
   const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'image/jpg', 'image/webp'];
-  if (allowedMimes.includes(file.mimetype)) {
+  
+  // SECURITY: Strict extension check to prevent MIME spoofing
+  const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.webp'];
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG, GIF, WEBP and PDF are allowed.'), false);
+    cb(new Error('Invalid file type or extension. Only specific images and PDFs are allowed.'), false);
   }
 };
 
