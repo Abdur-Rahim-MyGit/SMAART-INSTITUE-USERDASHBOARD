@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Building2, AlertCircle, RefreshCw } from "lucide-react";
+import { Search, Building2, AlertCircle, RefreshCw, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 import { apiCall } from "@/services/api";
@@ -47,6 +47,8 @@ const InstitutionSelector = ({ onSelect }) => {
   //   fetchColleges();
   // }, []);
 
+  const [selectingId, setSelectingId] = useState(null);
+
   // Handle search with debounce
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -72,23 +74,29 @@ const InstitutionSelector = ({ onSelect }) => {
   };
 
   const handleSelect = (institution) => {
+    setSelectingId(institution.code);
     setSelectedInstitution(institution);
     setSearchTerm(institution.name);
-    setOpen(false);
+    
+    // Delay slightly to let the user see the success animation
+    setTimeout(() => {
+      setOpen(false);
+      setSelectingId(null);
 
-    sessionStorage.setItem("selectedInstitution", JSON.stringify({
-      name: institution.name,
-      code: institution.code,
-      studentCount: institution.studentCount,
-      location: institution.location,
-      logo: institution.logo
-    }));
+      sessionStorage.setItem("selectedInstitution", JSON.stringify({
+        name: institution.name,
+        code: institution.code,
+        studentCount: institution.studentCount,
+        location: institution.location,
+        logo: institution.logo
+      }));
 
-    if (onSelect) {
-      onSelect(institution);
-    } else {
-      navigate(`/institution/${encodeURIComponent(institution.name)}`);
-    }
+      if (onSelect) {
+        onSelect(institution);
+      } else {
+        navigate(`/institution/${encodeURIComponent(institution.name)}`);
+      }
+    }, 600);
   };
 
   const handleRetry = () => {
@@ -131,8 +139,8 @@ const InstitutionSelector = ({ onSelect }) => {
         {/* Input Wrapper */}
         <div className="relative group z-20">
           <div className="relative flex items-center">
-            <div className="absolute left-4 z-20 pointer-events-none">
-              <Search className={`h-5 w-5 transition-colors duration-300 ${searchTerm ? 'text-[#1a3884]' : 'text-slate-400'}`} />
+            <div className="absolute left-5 z-20 pointer-events-none">
+              <Search className={`h-5 w-5 transition-colors duration-300 ${open || searchTerm ? 'text-[#1a3884]' : 'text-slate-400'}`} />
             </div>
 
             <Input
@@ -143,7 +151,7 @@ const InstitutionSelector = ({ onSelect }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 300)}
-              className="w-full h-12 pl-11 pr-11 text-sm bg-white border border-slate-200 text-slate-800 placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-[#1a3884] rounded-xl font-medium shadow-md group-hover:shadow-lg transition-all duration-300"
+              className="w-full h-14 sm:h-[60px] pl-14 pr-12 text-[15px] sm:text-base bg-white border-2 border-slate-200 text-slate-800 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-[4px] focus-visible:ring-[#1a3884]/20 focus-visible:border-[#1a3884] rounded-2xl font-semibold shadow-sm hover:shadow-md transition-all duration-300 ease-out"
             />
 
             {loading && (
@@ -196,20 +204,46 @@ const InstitutionSelector = ({ onSelect }) => {
                               logo: college.logo
                             });
                           }}
-                          className={`flex items-center gap-2.5 p-2 cursor-pointer rounded-xl transition-all duration-200 group border ${index === focusedIndex
-                            ? "bg-[#1a3884]/5 border-[#1a3884]/20 shadow-sm"
-                            : "border-transparent hover:bg-gray-50 hover:border-gray-100"
-                            }`}
+                          className={`flex items-center gap-2.5 p-2 cursor-pointer rounded-xl transition-all duration-300 group border relative overflow-hidden ${
+                            selectingId === college.collegeCode 
+                              ? "bg-[#10b981]/10 border-[#10b981]/30 shadow-sm"
+                              : index === focusedIndex
+                                ? "bg-[#1a3884]/5 border-[#1a3884]/20 shadow-sm"
+                                : "border-transparent hover:bg-gray-50 hover:border-gray-100"
+                          }`}
                         >
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm border overflow-hidden shrink-0 ${index === focusedIndex ? "bg-[#1a3884] text-white border-[#1a3884]" : "bg-white text-[#1a3884] border-[#1a3884]/10 group-hover:border-[#1a3884]/30"
-                            }`}>
-                            {college.logo ? (
+                          {/* Success background sweep animation */}
+                          {selectingId === college.collegeCode && (
+                            <motion.div
+                              initial={{ x: '-100%' }}
+                              animate={{ x: '100%' }}
+                              transition={{ duration: 0.8, ease: "easeInOut" }}
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-[#10b981]/10 to-transparent pointer-events-none"
+                            />
+                          )}
+
+                          <div className={`relative z-10 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm border overflow-hidden shrink-0 ${
+                            selectingId === college.collegeCode
+                              ? "bg-[#10b981] text-white border-[#10b981] scale-105"
+                              : index === focusedIndex 
+                                ? "bg-[#1a3884] text-white border-[#1a3884]" 
+                                : "bg-white text-[#1a3884] border-[#1a3884]/10 group-hover:border-[#1a3884]/30"
+                          }`}>
+                            {selectingId === college.collegeCode ? (
+                              <motion.div
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                              >
+                                <Check className="h-5 w-5 text-white" strokeWidth={3} />
+                              </motion.div>
+                            ) : college.logo ? (
                               <motion.img 
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 src={college.logo} 
                                 alt={college.collegeName}
-                                className="w-full h-full object-contain p-1.5"
+                                className="w-full h-full object-contain p-1.5 bg-white"
                                 onError={(e) => {
                                   e.target.onerror = null;
                                   e.target.style.display = 'none';
@@ -220,13 +254,19 @@ const InstitutionSelector = ({ onSelect }) => {
                               <Building2 className={`h-5 w-5 transition-transform duration-300 ${index === focusedIndex ? "scale-110" : "group-hover:scale-110"}`} />
                             )}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-bold text-[#112b6b] truncate group-hover:text-[#1a3884] transition-colors text-sm sm:text-base">
+                          <div className="flex-1 min-w-0 relative z-10">
+                            <div className={`font-bold truncate transition-colors text-sm sm:text-base ${
+                              selectingId === college.collegeCode ? "text-[#059669]" : "text-[#112b6b] group-hover:text-[#1a3884]"
+                            }`}>
                               {college.collegeName}
                             </div>
                             {college.address && (
-                              <div className="text-[10px] sm:text-[11px] text-gray-500 mt-0.5 truncate flex items-center gap-1.5 font-medium">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#00a3e0]/30 group-hover:bg-[#00a3e0] transition-colors" />
+                              <div className={`text-[10px] sm:text-[11px] mt-0.5 truncate flex items-center gap-1.5 font-medium transition-colors ${
+                                selectingId === college.collegeCode ? "text-[#059669]/70" : "text-gray-500"
+                              }`}>
+                                <span className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                                  selectingId === college.collegeCode ? "bg-[#10b981]" : "bg-[#00a3e0]/30 group-hover:bg-[#00a3e0]"
+                                }`} />
                                 {college.address.city}, {college.address.state}
                               </div>
                             )}
