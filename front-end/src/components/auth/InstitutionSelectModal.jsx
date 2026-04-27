@@ -1,61 +1,68 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Building2 } from "lucide-react";
 import InstitutionSelector from "@/components/InstitutionSelector";
 
 const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
-  if (!isOpen) return null;
-
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+
+          {/* ── Backdrop ── */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/65 backdrop-blur-md"
             onClick={onClose}
           />
 
+          {/* ── Card ── */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 30, rotateX: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 30 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-2xl rounded-3xl shadow-2xl z-10 bg-white dark:bg-[#00152e] border border-gray-200 dark:border-white/10 mx-2 sm:mx-0"
+            initial={{ opacity: 0, scale: 0.95, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 24 }}
+            transition={{ type: "spring", stiffness: 320, damping: 28 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-lg z-10 overflow-hidden rounded-3xl bg-white shadow-2xl"
+            style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}
           >
-            {/* Ambient Background Glows */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#1a3884]/10 rounded-full blur-[80px] pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#C0C0C0]/10 rounded-full blur-[80px] pointer-events-none" />
+            {/* Navy accent line at top */}
+            <div className="h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
 
-            {/* Header */}
-            <div className="relative p-6 sm:p-8 text-center border-b border-gray-100 dark:border-white/5 bg-gray-50/50 dark:bg-white/5 backdrop-blur-sm">
+            {/* ── Header ── */}
+            <div className="relative bg-gray-50 px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
+              {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 hover:bg-[#1a3884] hover:text-white dark:hover:bg-[#1a3884] transition-all duration-300 group"
+                className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-[#1a3884] hover:text-white transition-all duration-200 group"
+                aria-label="Close"
               >
-                <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
               </button>
 
-              <div className="mb-4 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#1a3884]/10 dark:bg-[#1a3884]/20 text-[#1a3884] mb-4 shadow-inner ring-1 ring-[#1a3884]/20">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+              {/* Icon badge */}
+              <div className="w-14 h-14 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100">
+                <Building2 className="w-6 h-6 text-[#1a3884]" />
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-sans font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
+              <h2
+                className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#112b6b] text-center"
+                style={{ letterSpacing: "-0.02em" }}
+              >
                 Select Your Institution
               </h2>
-              <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 max-w-sm mx-auto">
-                Find your college to access your personalized career dashboard.
+              <p className="text-[13px] text-gray-500 mt-2 text-center max-w-[260px] leading-relaxed">
+                Find your college to access your personalised career dashboard.
               </p>
             </div>
 
-            {/* Content */}
-            <div className="p-6 sm:p-8 bg-white dark:bg-[#00152e] relative z-20">
+            {/* ── Body ── */}
+            <div className="px-6 py-7 sm:px-8 sm:py-8 bg-white">
               <InstitutionSelector onSelect={onInstitutionSelected} />
             </div>
           </motion.div>
+
         </div>
       )}
     </AnimatePresence>
@@ -63,6 +70,3 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
 };
 
 export default InstitutionSelectModal;
-
-
-
