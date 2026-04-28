@@ -4,9 +4,6 @@ import VisionBoardSplash from "@/components/VisionBoardSplash";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import HeroSection from "@/components/dashboard/HeroSection";
 import LearningProgress from "@/components/dashboard/LearningProgress";
-import EventsSection from "@/components/dashboard/EventsSection";
-import ToolsStrip from "@/components/dashboard/ToolsStrip";
-import VisionGoalsWidget from "@/components/dashboard/VisionGoalsWidget";
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
@@ -120,13 +117,6 @@ const DashboardHome = () => {
           error={pathsError} 
         />
 
-        {/* Events & Community Section */}
-        <div className="flex flex-col gap-4">
-          <EventsSection />
-        </div>
-
-        {/* Tools Strip */}
-        <ToolsStrip />
       </div>
     </PageTransition>
     </ErrorBoundary>

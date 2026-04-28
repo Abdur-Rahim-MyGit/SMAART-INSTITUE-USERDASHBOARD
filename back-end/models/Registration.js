@@ -21,8 +21,9 @@ const registrationSchema = new mongoose.Schema({
   yearOfStudy: String,
   yearOfPassing: String,
 
-  // Address (legacy support)
+  // Address
   address: {
+    street: String,
     doorNo: String,
     city: String,
     state: String,
@@ -33,6 +34,7 @@ const registrationSchema = new mongoose.Schema({
   // 10th Standard Details
   tenthDetails: {
     schoolName: String,
+    board: String,
     yearOfPassing: String,
     percentage: String,
     marksheet: String, // file path
@@ -42,6 +44,7 @@ const registrationSchema = new mongoose.Schema({
   twelfthDetails: {
     schoolName: String,
     stream: String,
+    board: String,
     yearOfPassing: String,
     percentage: String,
     marksheet: String, // file path

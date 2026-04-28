@@ -16,8 +16,7 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
-  Sun,
-  Moon,
+
   Star,
   LogOut,
   User,
@@ -114,7 +113,7 @@ const FEMALE_SEQUENCE = [
 const LeftSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const { user, logout } = useUser();
   const { avatarData } = useAvatar();
@@ -260,15 +259,17 @@ const LeftSidebar = () => {
   }, []);
 
   // Handle logout
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/', { replace: true });
+    } catch (err) {
+      console.error('Logout error:', err);
+      // Fallback navigation if logout fails
+      navigate('/', { replace: true });
+    }
   };
 
-  // Toggle theme
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
 
   // Check if menu item is active
   const isActive = (path) => {
@@ -394,21 +395,6 @@ const LeftSidebar = () => {
 
             {/* Mobile Footer */}
             <div className="p-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
-              <button
-                onClick={() => {
-                  toggleTheme();
-                }}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-              >
-                {theme === 'dark' ? (
-                  <Sun className="w-5 h-5 text-yellow-500" />
-                ) : (
-                  <Moon className="w-5 h-5 text-[#1a3884]" />
-                )}
-                <span className="font-medium text-sm">
-                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                </span>
-              </button>
               <button
                 onClick={() => {
                   handleLogout();
@@ -650,29 +636,7 @@ const LeftSidebar = () => {
             </AnimatePresence>
           </div>
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 ${isCollapsed ? 'justify-center' : ''}`}
-          >
-            <div className="relative">
-              {theme === 'dark' ? (
-                <Sun className="w-5 h-5 text-yellow-500" />
-              ) : (
-                <Moon className="w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-[#1a3884]" />
-              )}
-              {isCollapsed && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-slate-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50">
-                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                </div>
-              )}
-            </div>
-            {!isCollapsed && (
-              <span className="font-medium text-sm ml-2">
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-              </span>
-            )}
-          </button>
+
         </div>
 
         {/* User Profile Section with Hover Card */}
