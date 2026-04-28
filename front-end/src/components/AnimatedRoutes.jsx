@@ -60,9 +60,9 @@ import AssessmentFlowGuard from '@/components/AssessmentFlowGuard';
 
 // Dashboard Layout Wrapper with Auth Guard
 const ProtectedDashboardLayout = () => (
-  <AssessmentFlowGuard>
-    <DashboardLayout />
-  </AssessmentFlowGuard>
+    <AssessmentFlowGuard>
+        <DashboardLayout />
+    </AssessmentFlowGuard>
 );
 
 // Loading fallback
@@ -108,87 +108,88 @@ const AnimatedRoutes = () => {
 
                     {/* Protected Dashboard Routes - Using DashboardLayout */}
                     <Route element={<ProtectedDashboardLayout />}>
-                      {/* Home */}
-                      <Route path="/dashboard" element={<DashboardHome />} />
+                        {/* Home */}
+                        <Route path="/dashboard" element={<DashboardHome />} />
 
-                      {/* Courses */}
-                      <Route path="/my-courses" element={<MyCourses />} />
-                      <Route path="/dashboard/courses" element={<MyCourses />} />
-                      <Route path="/module/:courseId/:moduleId" element={<ModuleViewPage />} />
-                      <Route path="/dashboard/courses/:courseId/modules" element={<ModuleViewPage />} />
-                      <Route path="/dashboard/courses/:courseId/modules/:moduleId/days/:dayId" element={<ModuleViewPage />} />
+                        {/* Courses */}
+                        <Route path="/my-courses" element={<MyCourses />} />
+                        <Route path="/dashboard/courses" element={<MyCourses />} />
+                        <Route path="/module/:courseId/:moduleId" element={<ModuleViewPage />} />
+                        <Route path="/dashboard/courses/:courseId/modules" element={<ModuleViewPage />} />
+                        <Route path="/dashboard/courses/:courseId/modules/:moduleId/days/:dayId" element={<ModuleViewPage />} />
 
-                      {/* Notes */}
-                      <Route path="/dashboard/notes" element={<MyNotes />} />
+                        {/* Notes */}
+                        <Route path="/dashboard/notes" element={<MyNotes />} />
 
-                      {/* Assessments */}
-                      <Route path="/my-assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
-                      <Route path="/dashboard/assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
-                      <Route path="/dashboard/assessment-centre" element={<AssessmentsDashboard />} />
-                      <Route path="/dashboard/assessments/baseline" element={<BaseLineTest />} />
+                        {/* Assessments */}
+                        <Route path="/my-assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
+                        <Route path="/dashboard/assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
+                        <Route path="/dashboard/assessment-centre" element={<AssessmentsDashboard />} />
+                        <Route path="/dashboard/assessments/baseline" element={<BaseLineTest />} />
 
-                      {/* Skills */}
-                      <Route path="/skills-passport" element={<SkillsPassport />} />
-                      <Route path="/dashboard/skills-passport" element={<SkillsPassport />} />
-                      <Route path="/dashboard/skills-vault" element={<DashboardHome />} /> {/* Placeholder - replace with actual SkillsVault component */}
+                        {/* Skills */}
+                        <Route path="/skills-passport" element={<SkillsPassport />} />
+                        <Route path="/dashboard/skills-passport" element={<SkillsPassport />} />
+                        <Route path="/dashboard/skills-vault" element={<DashboardHome />} /> {/* Placeholder - replace with actual SkillsVault component */}
 
-                      {/* Vision Board */}
-                      <Route path="/vision-board" element={<VisionBoardGalleryPro />} />
-                      <Route path="/dashboard/vision-boards" element={<VisionBoardGalleryPro />} />
-                      <Route path="/vision-board-pro/create" element={<VisionBoardEditorPro />} />
-                      <Route path="/vision-board-pro/gallery" element={<VisionBoardGalleryPro />} />
-                      <Route path="/vision-board/view/:id" element={<VisionBoardView />} />
+                        {/* Vision Board */}
+                        <Route path="/vision-board" element={<VisionBoardGalleryPro />} />
+                        <Route path="/dashboard/vision-boards" element={<VisionBoardGalleryPro />} />
+                        <Route path="/vision-board-pro/create" element={<VisionBoardEditorPro />} />
+                        <Route path="/vision-board-pro/gallery" element={<VisionBoardGalleryPro />} />
+                        <Route path="/vision-board/view/:id" element={<VisionBoardView />} />
 
-                      {/* Toolkit */}
-                      <Route path="/smaart-toolkit" element={<SMAArtToolkit />} />
-                      <Route path="/dashboard/smaart-toolkit" element={<SMAArtToolkit />} />
+                        {/* Toolkit */}
+                        <Route path="/smaart-toolkit" element={<SMAArtToolkit />} />
+                        <Route path="/dashboard/smaart-toolkit" element={<SMAArtToolkit />} />
 
-                      {/* Wallet */}
-                      <Route path="/smaart-wallet" element={<SMAARTWallet />} />
-                      <Route path="/dashboard/smaart-wallet" element={<SMAARTWallet />} />
+                        {/* Wallet */}
+                        <Route path="/smaart-wallet" element={<SMAARTWallet />} />
+                        <Route path="/dashboard/smaart-wallet" element={<SMAARTWallet />} />
 
-                      {/* Community */}
-                      <Route path="/community" element={<Community />} />
-                      <Route path="/dashboard/community" element={<Community />} />
-                      <Route path="/dashboard/groups" element={<StudentGroups />} />
-                      <Route path="/dashboard/groups/:id" element={<GroupChat />} />
+                        {/* Community */}
+                        <Route path="/community" element={<Community />} />
+                        <Route path="/dashboard/community" element={<Community />} />
+                        <Route path="/dashboard/groups" element={<StudentGroups />} />
+                        <Route path="/dashboard/groups/:id" element={<GroupChat />} />
 
-                      {/* Library & Dictionary */}
-                      <Route path="/library" element={<Library />} />
-                      <Route path="/dashboard/library" element={<Library />} />
-                      <Route path="/dictionary" element={<GeneralDictionary />} />
-                      <Route path="/dashboard/dictionary" element={<GeneralDictionary />} />
-                      <Route path="/mind-care" element={<MindCareSessions />} />
-                      <Route path="/dashboard/mindcare-sessions" element={<MindCareSessions />} />
+                        {/* Library & Dictionary */}
+                        <Route path="/library" element={<Library />} />
+                        <Route path="/dashboard/library" element={<Library />} />
+                        <Route path="/dictionary" element={<GeneralDictionary />} />
+                        <Route path="/dashboard/dictionary" element={<GeneralDictionary />} />
+                        <Route path="/mind-care" element={<MindCareSessions />} />
+                        <Route path="/dashboard/mindcare-sessions" element={<MindCareSessions />} />
 
-                      {/* Settings & Support */}
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/dashboard/settings" element={<Settings />} />
-                      <Route path="/notifications" element={<Notifications />} />
-                      <Route path="/dashboard/notifications" element={<Notifications />} />
-                      <Route path="/help" element={<Help />} />
-                      <Route path="/tickets" element={<SupportTicketsPage />} />
-                      <Route path="/dashboard/support" element={<SupportTicketsPage />} />
+                        {/* Settings & Support */}
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/dashboard/settings" element={<Settings />} />
+                        <Route path="/notifications" element={<Notifications />} />
+                        <Route path="/dashboard/notifications" element={<Notifications />} />
+                        <Route path="/help" element={<Help />} />
+                        <Route path="/tickets" element={<SupportTicketsPage />} />
+                        <Route path="/dashboard/support" element={<SupportTicketsPage />} />
 
-                      {/* Profile */}
-                      <Route path="/profile" element={<Profile />} />
-                      <Route path="/onboarding" element={<AddDetails />} />
-                      <Route path="/dashboard/onboarding" element={<AddDetails />} />
+                        {/* Profile */}
+                        <Route path="/onboarding" element={<AddDetails />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/dashboard/onboarding" element={<AddDetails />} />
+                        <Route path="/dashboard/profile" element={<Profile />} />
 
-                      {/* Other Features */}
-                      <Route path="/quotients" element={<QuotientsGrid />} />
-                      <Route path="/dashboard/quotients-grid" element={<QuotientsGrid />} />
-                      <Route path="/certificate" element={<Certificate />} />
-                      <Route path="/dashboard/certificate" element={<Certificate />} />
-                      <Route path="/dashboard/performance" element={<Performance />} />
-                      <Route path="/admin/tickets" element={<AdminTickets />} />
+                        {/* Other Features */}
+                        <Route path="/quotients" element={<QuotientsGrid />} />
+                        <Route path="/dashboard/quotients-grid" element={<QuotientsGrid />} />
+                        <Route path="/certificate" element={<Certificate />} />
+                        <Route path="/dashboard/certificate" element={<Certificate />} />
+                        <Route path="/dashboard/performance" element={<Performance />} />
+                        <Route path="/admin/tickets" element={<AdminTickets />} />
 
-                      {/* AI Career Coach Routes */}
-                      <Route path="/dashboard/profile-analysis" element={<ProfileAnalysis />} />
-                      <Route path="/dashboard/resume-builder" element={<ResumeBuilder />} />
+                        {/* AI Career Coach Routes */}
+                        <Route path="/dashboard/profile-analysis" element={<ProfileAnalysis />} />
+                        <Route path="/dashboard/resume-builder" element={<ResumeBuilder />} />
 
-                      {/* Career Data Fetcher */}
-                      <Route path="/dashboard/career-data-fetcher" element={<CareerDataFetcher />} />
+                        {/* Career Data Fetcher */}
+                        <Route path="/dashboard/career-data-fetcher" element={<CareerDataFetcher />} />
                     </Route>
                     <Route path="/assessment/:stage" element={<BaseLineTest />} />
                     <Route path="/assessment/:stage/report" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
