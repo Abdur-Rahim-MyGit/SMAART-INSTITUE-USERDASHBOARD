@@ -168,9 +168,18 @@ router.post('/register-details', upload.fields([
       yearOfPassing: parsedPersonalDetails?.yearOfPassing || '',
       alternateMobile: parsedPersonalDetails?.alternateMobile || '',
 
+      // Address
+      address: {
+        street: parsedPersonalDetails?.address?.street || '',
+        city: parsedPersonalDetails?.address?.city || '',
+        state: parsedPersonalDetails?.address?.state || '',
+        country: parsedPersonalDetails?.address?.country || '',
+      },
+
       // 10th Standard Details
       tenthDetails: {
         schoolName: parsedTenthDetails?.schoolName || '',
+        board: parsedTenthDetails?.board || '',
         yearOfPassing: parsedTenthDetails?.yearOfPassing || '',
         percentage: parsedTenthDetails?.percentage || '',
         marksheet: parsedTenthDetails?.marksheet || '',
@@ -180,6 +189,7 @@ router.post('/register-details', upload.fields([
       twelfthDetails: {
         schoolName: parsedTwelfthDetails?.schoolName || '',
         stream: parsedTwelfthDetails?.stream || '',
+        board: parsedTwelfthDetails?.board || '',
         yearOfPassing: parsedTwelfthDetails?.yearOfPassing || '',
         percentage: parsedTwelfthDetails?.percentage || '',
         marksheet: parsedTwelfthDetails?.marksheet || '',
@@ -383,6 +393,15 @@ router.patch('/register-section', async (req, res) => {
         registration.yearOfStudy = data.yearOfStudy || registration.yearOfStudy;
         registration.yearOfPassing = data.yearOfPassing || registration.yearOfPassing;
         registration.educationLevel = data.educationLevel || registration.educationLevel;
+        
+        if (data.address) {
+          registration.address = {
+            street: data.address.street || registration.address?.street || '',
+            city: data.address.city || registration.address?.city || '',
+            state: data.address.state || registration.address?.state || '',
+            country: data.address.country || registration.address?.country || '',
+          };
+        }
 
         // Sync critical fields to User model
         if (user) {
