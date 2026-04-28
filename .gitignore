@@ -48,3 +48,4 @@ coverage/
 # OS
 Thumbs.db
 .DS_Store
+back-end/logs/
