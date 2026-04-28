@@ -254,7 +254,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                 </div>
 
                 {/* OTP Form */}
-                <div className="px-8 py-8 overflow-y-auto custom-scrollbar">
+                <div className="px-10 py-10 overflow-y-auto custom-scrollbar">
                   <div
                     role="status"
                     aria-live="polite"
@@ -266,7 +266,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div
-                      className="flex justify-center gap-2.5"
+                      className="flex justify-center gap-3"
                       onPaste={handlePaste}
                     >
                       {otp.map((digit, index) => (
@@ -279,7 +279,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                           value={digit}
                           onChange={(e) => handleChange(index, e.target.value)}
                           onKeyDown={(e) => handleKeyDown(index, e)}
-                          className="w-10 h-14 text-center text-xl font-bold bg-[#f8fafc] border border-[#e2e8f0] rounded-xl focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 focus:bg-white outline-none transition-all shadow-sm text-[#112b6b]"
+                          className="w-12 h-16 text-center text-2xl font-bold bg-[#f8fafc] border border-[#e2e8f0] rounded-xl focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 focus:bg-white outline-none transition-all shadow-sm text-[#112b6b]"
                         />
                       ))}
                     </div>

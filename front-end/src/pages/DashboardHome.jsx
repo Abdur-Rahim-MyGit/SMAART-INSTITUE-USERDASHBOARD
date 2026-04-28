@@ -8,6 +8,7 @@ import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
+import VisionGoalsWidget from "@/components/dashboard/VisionGoalsWidget";
 import { AlertCircle } from "lucide-react";
 
 const DashboardHome = () => {
