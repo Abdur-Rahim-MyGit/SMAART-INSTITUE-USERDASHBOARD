@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 
 const userCertificateSchema = new mongoose.Schema({
   userId: {
@@ -29,7 +30,8 @@ const userCertificateSchema = new mongoose.Schema({
     type: String
   },
   qrCodeIdentifier: {
-    type: String
+    type: String,
+    unique: true
   },
   category: {
     type: String,
@@ -37,6 +39,23 @@ const userCertificateSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
+});
+
+// Generate unique identifier for QR and sharing if not provided
+userCertificateSchema.pre('save', function(next) {
+  if (!this.qrCodeIdentifier) {
+    const year = new Date().getFullYear();
+    const randomStr = crypto.randomBytes(3).toString('hex').toUpperCase();
+    this.qrCodeIdentifier = `EXT-${year}-${randomStr}`;
+  }
+  
+  if (!this.verificationUrl) {
+    // We will use the frontend URL + the qr identifier
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
+    this.verificationUrl = `${frontendUrl}/verify-certificate/${this.qrCodeIdentifier}`;
+  }
+  
+  next();
 });
 
 module.exports = mongoose.model('UserCertificate', userCertificateSchema);

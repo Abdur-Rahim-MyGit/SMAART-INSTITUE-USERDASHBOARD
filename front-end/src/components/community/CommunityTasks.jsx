@@ -10,7 +10,10 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const STORAGE_KEY = "smaart_community_tasks";
+import {
+  getCommunityTaskProgress,
+  updateCommunityTaskProgress
+} from "../../services/communityTaskProgressApi";
 
 const TASK_CATEGORIES = [
   {
@@ -133,14 +136,8 @@ const ALL_TASKS = TASK_CATEGORIES.flatMap((cat, catIdx) =>
 const TOTAL = ALL_TASKS.length; // 50
 
 const CommunityTasks = () => {
-  const [completed, setCompleted] = useState(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : {};
-    } catch {
-      return {};
-    }
-  });
+  const [completed, setCompleted] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const [expandedCategories, setExpandedCategories] = useState({
     connect: true,
@@ -150,19 +147,41 @@ const CommunityTasks = () => {
     personal: false,
   });
 
+  useEffect(() => {
+    const fetchProgress = async () => {
+      try {
+        const response = await getCommunityTaskProgress();
+        if (response.success && response.data) {
+          setCompleted(response.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch community tasks progress:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProgress();
+  }, []);
+
   const completedCount = Object.values(completed).filter(Boolean).length;
   const progressPct = Math.round((completedCount / TOTAL) * 100);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(completed));
-    } catch {
-      // ignore
-    }
-  }, [completed]);
-
-  const toggleTask = (taskId) => {
-    setCompleted((prev) => ({ ...prev, [taskId]: !prev[taskId] }));
+  const toggleTask = async (taskId) => {
+    // To prevent race conditions from rapid clicking, we use functional state
+    // and wait to capture the exact mutated state before sending to API
+    setCompleted((prev) => {
+      const newState = { ...prev, [taskId]: !prev[taskId] };
+      
+      // Fire-and-forget API call with the exact new state
+      updateCommunityTaskProgress(newState).catch(err => {
+        console.error("Failed to sync community task progress:", err);
+        alert("Failed to save progress. The backend server might need a restart or is unreachable.");
+        // Revert state on failure
+        setCompleted(prev);
+      });
+      
+      return newState;
+    });
   };
 
   const toggleCategory = (catId) => {
@@ -178,6 +197,19 @@ const CommunityTasks = () => {
     if (completedCount < 50) return "Final push! 🏅";
     return "Community Champion! 🏆";
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-sm p-5 animate-pulse">
+        <div className="h-10 bg-gray-200 rounded-xl w-1/2 mb-4"></div>
+        <div className="h-4 bg-gray-200 rounded-full w-full mb-6"></div>
+        <div className="space-y-3">
+          <div className="h-12 bg-gray-100 rounded-2xl w-full"></div>
+          <div className="h-12 bg-gray-100 rounded-2xl w-full"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 hover:bg-white/80 transition-all duration-300">
