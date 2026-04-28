@@ -47,6 +47,16 @@ const visionBoardProSchema = new mongoose.Schema({
     default: "",
   },
 
+  shortTermGoals: [{
+    type: String,
+    trim: true,
+  }],
+
+  longTermGoals: [{
+    type: String,
+    trim: true,
+  }],
+
   // Template configuration
   templateId: {
     type: String,

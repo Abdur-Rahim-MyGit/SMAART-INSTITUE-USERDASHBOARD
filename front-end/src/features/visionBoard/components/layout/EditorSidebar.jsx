@@ -4,7 +4,8 @@ import {
   Type,
   LayoutTemplate,
   Upload,
-  Settings2
+  Settings2,
+  Target
 } from "lucide-react";
 
 const EditorSidebar = ({ activePanel, setActivePanel }) => {
@@ -13,6 +14,7 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
     { id: "text", icon: Type, label: "Text" },
     { id: "style", icon: Palette, label: "Style" },
     { id: "settings", icon: Settings2, label: "Canva Size" },
+    { id: "goals", icon: Target, label: "Goals" },
   ];
 
   return (

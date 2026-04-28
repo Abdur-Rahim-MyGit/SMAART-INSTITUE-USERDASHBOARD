@@ -104,6 +104,9 @@ const DashboardHome = () => {
           userName={user?.firstName || user?.fullName?.split(' ')[0] || "User"} 
         />
 
+        {/* Vision Goals Widget */}
+        <VisionGoalsWidget />
+
         {/* College Banners */}
         <CollegeBanners />
 

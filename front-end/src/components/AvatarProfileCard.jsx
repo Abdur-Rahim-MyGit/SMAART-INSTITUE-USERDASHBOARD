@@ -198,7 +198,7 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
         <div className="space-y-2.5">
           {/* Primary Action: View Profile */}
           <button
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate('/dashboard/profile')}
             className="group relative w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-white transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden"
           >
             <span className="text-sm font-medium relative z-10">View Profile</span>

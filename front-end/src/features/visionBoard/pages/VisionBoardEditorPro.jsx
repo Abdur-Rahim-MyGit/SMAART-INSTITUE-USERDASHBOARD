@@ -8,7 +8,7 @@ import {
   GRID_TEMPLATES,
   ASPECT_RATIOS,
 } from "../templates/gridTemplates";
-import { createVisionBoard } from "../services/visionBoardProApi";
+import { createVisionBoard, updateVisionBoard } from "../services/visionBoardProApi";
 import {
   moderateText,
   moderateTextAsync,
@@ -59,12 +59,20 @@ const VisionBoardEditorPro = () => {
   const initialTitle = (location.state?.initialTitle || "Untitled Vision Board").slice(0, TITLE_CHAR_LIMIT);
   const initialDescription = (location.state?.initialDescription || "").slice(0, DESCRIPTION_CHAR_LIMIT);
 
+  const initialShortTermGoals = location.state?.initialShortTermGoals || [];
+  const initialLongTermGoals = location.state?.initialLongTermGoals || [];
+
+  const isEditing = location.state?.isEditing || false;
+  const boardId = location.state?.boardId || null;
+
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
+  const [shortTermGoals, setShortTermGoals] = useState(initialShortTermGoals);
+  const [longTermGoals, setLongTermGoals] = useState(initialLongTermGoals);
   const [templateId, setTemplateId] = useState("grid-2x2");
   const [aspectRatio, setAspectRatio] = useState("1:1");
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
-  const [backgroundImage, setBackgroundImage] = useState(null);
+  const [backgroundImage, setBackgroundImage] = useState(location.state?.backgroundImage || null);
   const [borderRadius, setBorderRadius] = useState(8);
   const [gap, setGap] = useState(8);
   const [images, setImages] = useState({});
@@ -481,14 +489,25 @@ const VisionBoardEditorPro = () => {
         collageImage: collageBase64, 
         slotImages: images, 
         textOverlays: textOverlays, 
+        shortTermGoals,
+        longTermGoals,
       };
 
-      await createVisionBoard(boardData);
-      toast({
-        title: "Saved!",
-        description: "Vision board created successfully",
-      });
-      // Redirect to gallery after creating
+      if (isEditing && boardId) {
+        await updateVisionBoard(boardId, boardData);
+        toast({
+          title: "Updated!",
+          description: "Vision board updated successfully",
+        });
+      } else {
+        await createVisionBoard(boardData);
+        toast({
+          title: "Saved!",
+          description: "Vision board created successfully",
+        });
+      }
+      
+      // Redirect to gallery after saving
       navigate("/vision-board-pro/gallery");
     } catch (error) {
       console.error("Save error:", error);
@@ -572,6 +591,10 @@ const VisionBoardEditorPro = () => {
                 currentRatio={currentRatio}
                 userUploads={userUploads}
                 handleUserUpload={handleUserUpload}
+                shortTermGoals={shortTermGoals}
+                setShortTermGoals={setShortTermGoals}
+                longTermGoals={longTermGoals}
+                setLongTermGoals={setLongTermGoals}
             />
         )}
 
