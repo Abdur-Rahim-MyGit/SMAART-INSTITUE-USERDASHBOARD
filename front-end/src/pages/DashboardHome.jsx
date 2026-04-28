@@ -88,10 +88,12 @@ const DashboardHome = () => {
   return (
     <ErrorBoundary>
       <PageTransition>
-      {/* Vision Board Splash Overlay */}
+      {/* Vision Board Splash Overlay - Temporarily Hidden */}
+      {/* 
       {showVisionSplash && (
         <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
-      )}
+      )} 
+      */}
       
       {/* Student Onboarding */}
       {!showVisionSplash && user && (
@@ -105,8 +107,8 @@ const DashboardHome = () => {
           userName={user?.firstName || user?.fullName?.split(' ')[0] || "User"} 
         />
 
-        {/* Vision Goals Widget */}
-        <VisionGoalsWidget />
+        {/* Vision Goals Widget - Temporarily Hidden per request */}
+        {/* <VisionGoalsWidget /> */}
 
         {/* College Banners */}
         <CollegeBanners />
