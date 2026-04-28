@@ -688,10 +688,10 @@ const VisionBoardGalleryPro = () => {
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
               <div className="flex-1 text-center md:text-left">
                 <p className="text-[#1a3884] dark:text-[#C0C0C0] text-3xl md:text-4xl font-['Dancing Script',cursive] mb-1">
-                  Visualize your goals and manifest your future.
+                  Visualize Your Goals. Manifest Your Future.
                 </p>
                 <p className="text-slate-500 dark:text-slate-400 text-sm font-medium max-w-xl">
-                  Create, view, and set your active vision board here.
+Create up to 3 personalized vision boards to turn your aspirations into reality and stay focused on your journey.
                 </p>
               </div>
 
@@ -729,12 +729,12 @@ const VisionBoardGalleryPro = () => {
                 <div className="w-20 h-20 bg-[#1a3884]/10 rounded-full flex items-center justify-center mb-6">
                   <Images className="w-8 h-8 text-[#1a3884]" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">No vision boards found</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">No vision Boards Yet</h3>
                 <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-8">
-                  Start your journey by creating your first vision board today.
+Start building your future by creating your first vision board. You can create up to 3 boards to organize your goals and ambitions.
                 </p>
                 <Button onClick={handleCreateNew} className="bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl px-8 h-12 font-bold shadow-lg hover:shadow-[#1a3884]/25">
-                  <Plus className="w-5 h-5 mr-2" /> Create Board
+                  <Plus className="w-5 h-5 mr-2" /> Create Vision Board
                 </Button>
               </div>
             ) : (
@@ -809,8 +809,9 @@ const VisionBoardGalleryPro = () => {
                 className="bg-white dark:bg-[#0f172a] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200 dark:border-slate-700"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">What's your dream?</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Add a title and a short description to start your new vision board.</p>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">What's your Vision ?</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Give your vision a name and a brief description to start manifesting your goals.
+</p>
 
                 <div className="space-y-4">
                   <div>
@@ -847,7 +848,7 @@ const VisionBoardGalleryPro = () => {
                         handleInstantCheck(val, "description");
                       }}
                       rows={3}
-                      placeholder="Briefly describe what you want to achieve..."
+                      placeholder="Describe what you want to achieve and why it matters to you…"
                       maxLength={DESCRIPTION_CHAR_LIMIT}
                       className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
                     />

@@ -264,7 +264,7 @@ const LoginCard = () => {
             </div>
 
             <h2
-              className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#112b6b] text-center"
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] text-center"
               style={{ letterSpacing: "-0.02em" }}
             >
               Select Your Institution
@@ -361,7 +361,7 @@ const LoginCard = () => {
               Welcome Back
             </h2>
             <p className="text-gray-500 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
-              Access your professional learning dashboard
+Access your personalized learning and career dashboard
             </p>
           </div>
 
@@ -424,7 +424,7 @@ const LoginCard = () => {
                   htmlFor="login-password"
                   className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500"
                 >
-                  Security Key
+                 Password
                 </label>
                 <button
                   type="button"
