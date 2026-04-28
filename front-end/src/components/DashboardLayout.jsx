@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, Bell, Settings, Search, Command, Clock } from "lucide-react";
+import { ChevronRight, Bell, Settings, Search, Command, Clock, Sun, Moon } from "lucide-react";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -82,11 +82,16 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isCollapsed } = useSidebar();
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { user } = useUser();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showCollegeLogo, setShowCollegeLogo] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
+
+  // Toggle Theme
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   // Fetch profile photo from Registration API
   useEffect(() => {
@@ -242,6 +247,15 @@ const DashboardLayout = () => {
 
               {/* Divider */}
               <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
+
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors"
+                aria-label="Toggle Theme"
+              >
+                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
 
               {/* Settings Button */}
               <button
