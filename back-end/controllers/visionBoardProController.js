@@ -145,7 +145,6 @@ exports.createVisionBoard = async (req, res) => {
 exports.getAllVisionBoards = async (req, res) => {
   try {
     const userId = getUserId(req);
-    console.log('[VisionBoardPro] getAllVisionBoards - userId:', userId, 'type:', typeof userId);
     
     if (!userId) {
       return res.status(400).json({
@@ -156,13 +155,11 @@ exports.getAllVisionBoards = async (req, res) => {
 
     // Use helper function to build query that matches both string and ObjectId
     const userQuery = buildUserQuery(userId);
-    console.log('[VisionBoardPro] Query:', JSON.stringify(userQuery));
 
     const boards = await VisionBoardPro.find(userQuery)
       .sort({ createdAt: -1 })
       .lean();
 
-    console.log('[VisionBoardPro] Found boards:', boards.length);
 
     res.status(200).json({
       success: true,
@@ -538,7 +535,6 @@ exports.setActiveVision = async (req, res) => {
 
     if (updateResult) {
       console.log('Student update successful');
-      console.log('Updated Student activeVisionBoardId:', updateResult.activeVisionBoardId);
     } else {
       // Fall back to User collection
       console.log('Student not found, trying User collection...');
@@ -587,7 +583,6 @@ exports.setActiveVision = async (req, res) => {
 exports.getActiveVision = async (req, res) => {
   try {
     const userId = getUserId(req);
-    console.log('=== getActiveVision called ===');
     console.log('userId:', userId);
 
     if (!userId || userId === 'undefined' || userId === 'null') {
@@ -613,12 +608,10 @@ exports.getActiveVision = async (req, res) => {
 
     // Try Student collection first (most common for logged-in students)
     const student = await Student.findById(userId).select("activeVisionBoardId");
-    console.log('Student found:', student ? 'Yes' : 'No');
 
     if (student) {
       activeVisionBoardId = student.activeVisionBoardId;
       accountType = 'Student';
-      console.log('Student activeVisionBoardId:', student.activeVisionBoardId);
     } else {
       // Fall back to User collection
       const user = await User.findById(userId).select("activeVisionBoardId");
@@ -631,7 +624,6 @@ exports.getActiveVision = async (req, res) => {
     }
 
     if (!activeVisionBoardId) {
-      console.log('No active vision board set for this', accountType || 'account');
       return res.status(200).json({
         success: true,
         data: null,

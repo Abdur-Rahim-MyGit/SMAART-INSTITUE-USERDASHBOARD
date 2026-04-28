@@ -48,11 +48,8 @@ router.get('/', async (req, res) => {
             .sort({ courseCode: 1 })  // Sort by courseCode ascending (CRS00001, CRS00002, etc.)
             .limit(parseInt(limit));
 
-        console.log(`📚 Fetched ${courses.length} courses with full module data`);
         if (courses.length > 0) {
-            console.log(`📊 First course: ${courses[0].title}, Modules: ${courses[0].modules?.length || 0}`);
             if (courses[0].modules && courses[0].modules.length > 0) {
-                console.log(`📖 First module: ${courses[0].modules[0].title}, Days: ${courses[0].modules[0].days?.length || 0}`);
             }
         }
 

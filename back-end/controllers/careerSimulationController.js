@@ -321,7 +321,6 @@ const runSimulation = async (req, res) => {
             if (!availableRoles || availableRoles.length === 0) {
                 throw new Error('No roles found in Excel database');
             }
-            console.log(`   📊 Excel database ready — ${availableRoles.length} roles available`);
         } catch (excelErr) {
             console.error('❌ Excel load failed:', excelErr.message);
             return res.status(500).json({ error: 'Career database unavailable. Please try again.' });
