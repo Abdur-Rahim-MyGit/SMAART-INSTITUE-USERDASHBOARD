@@ -167,6 +167,7 @@ router.post('/register-details', upload.fields([
       yearOfStudy: parsedPersonalDetails?.yearOfStudy || '',
       yearOfPassing: parsedPersonalDetails?.yearOfPassing || '',
       alternateMobile: parsedPersonalDetails?.alternateMobile || '',
+      bio: parsedPersonalDetails?.bio || '',
 
       // Address
       address: {
@@ -393,6 +394,9 @@ router.patch('/register-section', async (req, res) => {
         registration.yearOfStudy = data.yearOfStudy || registration.yearOfStudy;
         registration.yearOfPassing = data.yearOfPassing || registration.yearOfPassing;
         registration.educationLevel = data.educationLevel || registration.educationLevel;
+        registration.bio = data.bio || registration.bio;
+        registration.timezone = data.timezone || registration.timezone;
+        registration.dateFormat = data.dateFormat || registration.dateFormat;
         
         if (data.address) {
           registration.address = {
@@ -407,6 +411,9 @@ router.patch('/register-section', async (req, res) => {
         if (user) {
           if (data.fullName) user.fullName = data.fullName;
           if (data.mobileNumber) user.mobile = data.mobileNumber;
+          if (data.bio) user.bio = data.bio;
+          if (data.timezone) user.timezone = data.timezone;
+          if (data.dateFormat) user.dateFormat = data.dateFormat;
           await user.save();
         }
       },

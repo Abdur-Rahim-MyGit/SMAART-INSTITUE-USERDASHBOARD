@@ -15,6 +15,7 @@ import { toast as sonnerToast } from "sonner";
 import { useTheme } from "@/contexts/ThemeContext";
 import { QRCodeSVG } from "qrcode.react";
 import { getBackendUrl } from "@/services/api";
+import { useTranslation } from "react-i18next";
 import spImage from "@/assets/sp.jpeg";
 
 // --- Custom Styles for Micro-animations ---
@@ -57,13 +58,13 @@ const PremiumStyles = () => (
 // --- Constants & Metadata ---
 
 const QUOTIENTS = [
-    { id: 'CRQ', name: "Cognitive Reasoning", icon: Brain, desc: "Problem solving, critical thinking, and pattern recognition." },
-    { id: 'SRQ', name: "Self-regulation", icon: Heart, desc: "Emotional intelligence, discipline, and stress management." },
-    { id: 'LQ', name: "Learning Agility", icon: BookOpen, desc: "Ability to learn quickly and adapt to new situations." },
-    { id: 'SIQ', name: "Social Intelligence", icon: Users, desc: "Interpersonal skills, empathy, and collaborative mindset." },
-    { id: 'PEQ', name: "Professional Execution", icon: Briefcase, desc: "Deliverability, reliability, and technical proficiency." },
-    { id: 'DAQ', name: "Digital & AI", icon: Monitor, desc: "Fluency with digital tools and AI-driven workflows." },
-    { id: 'SEQ', name: "Sustainability & Ethics", icon: Leaf, desc: "Commitment to ethical practices and environmental awareness." },
+    { id: 'CRQ', icon: Brain },
+    { id: 'SRQ', icon: Heart },
+    { id: 'LQ', icon: BookOpen },
+    { id: 'SIQ', icon: Users },
+    { id: 'PEQ', icon: Briefcase },
+    { id: 'DAQ', icon: Monitor },
+    { id: 'SEQ', icon: Leaf },
 ];
 
 // --- Sub-components ---
@@ -223,6 +224,7 @@ const RadarChart = ({ data, theme }) => {
 // --- Main Page Component ---
 
 const SkillsPassport = () => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const navigate = useNavigate();
     const containerRef = useRef(null);
@@ -349,10 +351,10 @@ const SkillsPassport = () => {
             const imgH = (canvas.height * imgW) / canvas.width;
             pdf.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
             pdf.save(`SkillsPassport_${currentUser?.fullName || 'User'}.pdf`);
-            sonnerToast.success("Passport exported successfully!");
+            sonnerToast.success(t("common.success_export") || "Passport exported successfully!");
         } catch (err) {
             console.error('PDF export failed:', err);
-            sonnerToast.error("Export failed. Please try again.");
+            sonnerToast.error(t("common.error_export") || "Export failed. Please try again.");
         } finally {
             setIsExporting(false);
         }
@@ -400,10 +402,10 @@ const SkillsPassport = () => {
                                     className="flex flex-wrap gap-4 justify-center lg:justify-start"
                                 >
                                     <div className="px-5 py-2 rounded-full bg-white/15 backdrop-blur-xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/20">
-                                        Digital Skills Passport
+                                        {t("skills_passport.title")}
                                     </div>
                                     <div className="px-5 py-2 rounded-full bg-emerald-500/80 backdrop-blur-xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/20 flex items-center gap-2 shimmer-effect">
-                                        <BadgeCheck className="w-4 h-4" /> Employer Verifiable
+                                        <BadgeCheck className="w-4 h-4" /> {t("skills_passport.verifiable")}
                                     </div>
                                 </motion.div>
 
@@ -413,7 +415,7 @@ const SkillsPassport = () => {
                                     transition={{ delay: 0.4 }}
                                     className="text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight"
                                 >
-                                    The Future of <br /> <span className="text-glow">Verified Talent.</span>
+                                    {t("skills_passport.hero_title")}
                                 </motion.h1>
                                 <motion.p
                                     initial={{ opacity: 0 }}
@@ -421,7 +423,7 @@ const SkillsPassport = () => {
                                     transition={{ delay: 0.5 }}
                                     className="text-xl opacity-90 max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0"
                                 >
-                                    Your secure, AI-verified competency credential. Designed for employers who demand proof, and professionals who demand growth.
+                                    {t("skills_passport.hero_desc")}
                                 </motion.p>
 
                                 <div className="flex flex-wrap gap-5 pt-4 justify-center lg:justify-start">
@@ -432,7 +434,7 @@ const SkillsPassport = () => {
                                         disabled={isExporting}
                                         className="flex items-center gap-3 px-10 py-5 rounded-2xl bg-white text-slate-900 font-black text-lg hover:bg-slate-100 transition-all shadow-[0_20px_40px_rgba(0,0,0,0.2)] active:scale-95 disabled:opacity-70 shimmer-effect"
                                     >
-                                        {isExporting ? <span className="animate-pulse">Processing...</span> : <><Download className="w-6 h-6" /> Get Passport PDF</>}
+                                        {isExporting ? <span className="animate-pulse">{t("common.processing") || "Processing..."}</span> : <><Download className="w-6 h-6" /> {t("skills_passport.get_pdf")}</>}
                                     </motion.button>
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
@@ -443,7 +445,7 @@ const SkillsPassport = () => {
                                         }}
                                         className="flex items-center gap-3 px-10 py-5 rounded-2xl border-2 border-white/30 text-white font-black text-lg hover:bg-white/10 transition-all active:scale-95 backdrop-blur-md"
                                     >
-                                        <Share2 className="w-6 h-6" /> Share Identity
+                                        <Share2 className="w-6 h-6" /> {t("skills_passport.share")}
                                     </motion.button>
                                 </div>
                             </div>
@@ -479,16 +481,16 @@ const SkillsPassport = () => {
                                         <p className="text-indigo-500 dark:text-indigo-400 text-sm font-black uppercase tracking-[0.2em] mt-1">{passportId}</p>
                                     </div>
                                 </div>
-                                <div className="px-4 py-1.5 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30">Verified</div>
+                                <div className="px-4 py-1.5 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30">{t("common.verified") || "Verified"}</div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="rounded-[32px] p-6 bg-slate-50 dark:bg-slate-900/60 text-center border border-slate-100 dark:border-slate-700 group-hover:border-indigo-500/30 transition-colors">
-                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Global Readiness</p>
+                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t("skills_passport.global_readiness")}</p>
                                     <h2 className="text-5xl font-black text-indigo-600 dark:text-indigo-400">{latestScore}%</h2>
                                 </div>
                                 <div className="rounded-[32px] p-6 bg-slate-50 dark:bg-slate-900/60 text-center border border-slate-100 dark:border-slate-700 group-hover:border-emerald-500/30 transition-colors">
-                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">PLVI Band</p>
+                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t("skills_passport.plvi_band")}</p>
                                     <h2 className="text-5xl font-black text-emerald-500">{baselineResult?.stageBand || "A"}</h2>
                                 </div>
                             </div>
@@ -496,9 +498,9 @@ const SkillsPassport = () => {
                             <div className="rounded-3xl p-5 bg-gradient-to-r from-slate-900 to-indigo-900 text-white flex items-center justify-between shadow-2xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl" />
                                 <div className="relative z-10">
-                                    <p className="text-[10px] opacity-70 font-black uppercase tracking-widest">Secure Trust Protocol</p>
+                                    <p className="text-[10px] opacity-70 font-black uppercase tracking-widest">{t("skills_passport.secure_protocol")}</p>
                                     <p className="text-xs font-bold mt-1 flex items-center gap-2">
-                                        <Shield className="w-3 h-3 text-emerald-400" /> Public Verification Live
+                                        <Shield className="w-3 h-3 text-emerald-400" /> {t("skills_passport.verification_live")}
                                     </p>
                                 </div>
                                 <div className="w-16 h-16 bg-white rounded-2xl p-2 shadow-2xl relative z-10">
@@ -512,10 +514,10 @@ const SkillsPassport = () => {
                     <div className="max-w-4xl mx-auto px-4 mt-16 mb-8">
                         <div className="flex flex-wrap justify-center gap-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl p-3 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
                             {[
-                                { id: 'smart', label: 'Smart Course', icon: Sparkles },
-                                { id: 'other', label: 'Other Course', icon: ExternalLink },
-                                { id: 'certificates', label: 'Certificates', icon: Award },
-                                { id: 'projects', label: 'Projects', icon: Layout }
+                                { id: 'smart', label: t('skills_passport.tabs.smart'), icon: Sparkles },
+                                { id: 'other', label: t('skills_passport.tabs.other'), icon: ExternalLink },
+                                { id: 'certificates', label: t('skills_passport.tabs.certificates'), icon: Award },
+                                { id: 'projects', label: t('skills_passport.tabs.projects'), icon: Layout }
                             ].map((tab) => (
                                 <button
                                     key={tab.id}
@@ -546,30 +548,30 @@ const SkillsPassport = () => {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                                         <StatCard
                                             icon={TrendingUp}
-                                            label="Growth Delta"
+                                            label={t("skills_passport.stats.growth_delta")}
                                             value={`+${growth}%`}
-                                            sub="Verified Progression"
+                                            sub={t("common.verified_progression") || "Verified Progression"}
                                             colorClass="text-emerald-500"
                                         />
                                         <StatCard
                                             icon={Zap}
-                                            label="Momentum Score"
-                                            value="High"
-                                            sub="Skill Acquisition Rate"
+                                            label={t("skills_passport.stats.momentum")}
+                                            value={t("common.high") || "High"}
+                                            sub={t("common.skill_acquisition_rate") || "Skill Acquisition Rate"}
                                             colorClass="text-orange-500"
                                         />
                                         <StatCard
                                             icon={BadgeCheck}
-                                            label="Skill Badges"
+                                            label={t("skills_passport.stats.badges")}
                                             value="14"
-                                            sub="Competency Aligned"
+                                            sub={t("common.competency_aligned") || "Competency Aligned"}
                                             colorClass="text-blue-500"
                                         />
                                         <StatCard
                                             icon={ShieldCheck}
-                                            label="Trust Rating"
+                                            label={t("skills_passport.stats.trust")}
                                             value="99.2"
-                                            sub="Integrity Verified"
+                                            sub={t("common.integrity_verified") || "Integrity Verified"}
                                             colorClass="text-indigo-500"
                                         />
                                     </div>
@@ -590,10 +592,10 @@ const SkillsPassport = () => {
                                                         <IconBox className="bg-indigo-600 text-white">
                                                             <Sparkles className="w-6 h-6" />
                                                         </IconBox>
-                                                        <h2 className="text-4xl font-black text-slate-800 dark:text-white">Competency DNA</h2>
+                                                        <h2 className="text-4xl font-black text-slate-800 dark:text-white">{t("skills_passport.dna.title")}</h2>
                                                     </div>
                                                     <p className="text-slate-500 dark:text-slate-400 font-medium text-lg max-w-md mx-auto md:mx-0">
-                                                        A multi-dimensional breakdown of your verified cognitive and professional strengths.
+                                                        {t("skills_passport.dna.desc")}
                                                     </p>
                                                 </div>
                                                 <div className="w-64 h-64 flex-shrink-0 mx-auto md:mx-0">
@@ -619,7 +621,7 @@ const SkillsPassport = () => {
                                                                     <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                                                         <q.icon className="w-4 h-4" />
                                                                     </div>
-                                                                    {q.name}
+                                                                    {t(`quotients.${q.id}.name`)}
                                                                 </span>
                                                                 <span className="text-sm font-black text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-lg">
                                                                     {score}%
@@ -640,7 +642,7 @@ const SkillsPassport = () => {
                                                                         exit={{ opacity: 0, height: 0 }}
                                                                         className="text-xs text-slate-500 font-bold p-3 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border"
                                                                     >
-                                                                        {q.desc}
+                                                                        {t(`quotients.${q.id}.desc`)}
                                                                     </motion.p>
                                                                 )}
                                                             </AnimatePresence>
@@ -656,11 +658,11 @@ const SkillsPassport = () => {
                                                 <IconBox className="bg-emerald-600 text-white">
                                                     <Award className="w-6 h-6" />
                                                 </IconBox>
-                                                <h2 className="text-4xl font-black text-slate-800 dark:text-white">Verified Proficiency</h2>
+                                                <h2 className="text-4xl font-black text-slate-800 dark:text-white">{t("skills_passport.proficiency.title")}</h2>
                                             </div>
                                             <div className="space-y-14">
                                                 <div>
-                                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8">Gold Standard Verified</h4>
+                                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8">{t("skills_passport.proficiency.gold_standard")}</h4>
                                                     <div className="flex flex-wrap gap-4">
                                                         {verifiedSkills.map(skill => <SkillBadge key={skill} skill={skill} verified={true} />)}
                                                     </div>
@@ -674,7 +676,7 @@ const SkillsPassport = () => {
                                                 <IconBox className="bg-cyan-600 text-white">
                                                     <BarChart3 className="w-6 h-6" />
                                                 </IconBox>
-                                                <h2 className="text-3xl font-black text-slate-800 dark:text-white">Timeline</h2>
+                                                <h2 className="text-3xl font-black text-slate-800 dark:text-white">{t("skills_passport.timeline.title")}</h2>
                                             </div>
                                             <div className="space-y-6 relative">
                                                 <div className="absolute left-10 top-10 bottom-10 w-[2px] bg-slate-200 dark:bg-slate-800" />
@@ -688,11 +690,11 @@ const SkillsPassport = () => {
                                                             <div className={`absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-4 ${isCompleted ? "bg-indigo-600 border-indigo-200" : "bg-slate-300 border-slate-100"}`} />
                                                             <div className="flex justify-between items-center">
                                                                 <div>
-                                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Stage {idx + 1}</p>
-                                                                    <h4 className="text-xl font-black">{isBaseline ? "Baseline" : `Assessment ${stage}`}</h4>
+                                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("skills_passport.timeline.assessment")} {idx + 1}</p>
+                                                                    <h4 className="text-xl font-black">{isBaseline ? t("skills_passport.timeline.baseline") : `${t("skills_passport.timeline.assessment")} ${stage}`}</h4>
                                                                 </div>
                                                                 <div className="text-right">
-                                                                    <p className="text-2xl font-black text-indigo-600">{isCompleted ? `${score}%` : "Pending"}</p>
+                                                                    <p className="text-2xl font-black text-indigo-600">{isCompleted ? `${score}%` : t("common.pending") || "Pending"}</p>
                                                                 </div>
                                                             </div>
                                                         </motion.div>
@@ -719,7 +721,7 @@ const SkillsPassport = () => {
                                             <IconBox className="bg-orange-600 text-white">
                                                 <ExternalLink className="w-6 h-6" />
                                             </IconBox>
-                                            <h2 className="text-3xl font-black text-slate-800 dark:text-white">Other Institute Courses</h2>
+                                            <h2 className="text-3xl font-black text-slate-800 dark:text-white">{t("skills_passport.other_courses.title")}</h2>
                                         </div>
                                         {fullDetails.otherCourses.length > 0 ? (
                                             <div className="grid md:grid-cols-2 gap-8">
@@ -737,7 +739,7 @@ const SkillsPassport = () => {
                                         ) : (
                                             <div className="text-center py-20 opacity-50">
                                                 <BookOpen className="w-16 h-16 mx-auto mb-4" />
-                                                <p className="font-bold">No external courses found.</p>
+                                                <p className="font-bold">{t("skills_passport.other_courses.none")}</p>
                                             </div>
                                         )}
                                     </div>
@@ -757,7 +759,7 @@ const SkillsPassport = () => {
                                             <IconBox className="bg-emerald-600 text-white">
                                                 <Award className="w-6 h-6" />
                                             </IconBox>
-                                            <h2 className="text-3xl font-black text-slate-800 dark:text-white">Earned Certificates</h2>
+                                            <h2 className="text-3xl font-black text-slate-800 dark:text-white">{t("skills_passport.certificates.title")}</h2>
                                         </div>
                                         {fullDetails.certificates.length > 0 ? (
                                             <div className="grid md:grid-cols-3 gap-8">
@@ -776,7 +778,7 @@ const SkillsPassport = () => {
                                         ) : (
                                             <div className="text-center py-20 opacity-50">
                                                 <Award className="w-16 h-16 mx-auto mb-4" />
-                                                <p className="font-bold">No certificates earned yet.</p>
+                                                <p className="font-bold">{t("skills_passport.certificates.none")}</p>
                                             </div>
                                         )}
                                     </div>
@@ -796,7 +798,7 @@ const SkillsPassport = () => {
                                             <IconBox className="bg-purple-600 text-white">
                                                 <Layout className="w-6 h-6" />
                                             </IconBox>
-                                            <h2 className="text-3xl font-black text-slate-800 dark:text-white">Showcase Projects</h2>
+                                            <h2 className="text-3xl font-black text-slate-800 dark:text-white">{t("skills_passport.projects.title")}</h2>
                                         </div>
                                         {fullDetails.projects.length > 0 ? (
                                             <div className="space-y-8">

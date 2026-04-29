@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   Home,
   BookOpen,
@@ -59,33 +60,33 @@ const srmLogo = "";
 // Menu items configuration
 const menuGroups = [
   {
-    title: "MAIN MENU",
+    title: "sidebar.group_main",
     items: [
-      { icon: Home, label: "Home", path: "/dashboard", badge: null },
-      { icon: BookOpen, label: "My Course", path: "/dashboard/courses", badge: null },
-      { icon: ClipboardCheck, label: "Assessments", path: "/dashboard/assessment-centre", badge: null },
-      { icon: Wrench, label: "Tool Kit", path: "/dashboard/smaart-toolkit", badge: null },
+      { icon: Home, label: "sidebar.dashboard", path: "/dashboard", badge: null },
+      { icon: BookOpen, label: "sidebar.courses", path: "/dashboard/courses", badge: null },
+      { icon: ClipboardCheck, label: "sidebar.assessments", path: "/dashboard/assessment-centre", badge: null },
+      { icon: Wrench, label: "sidebar.toolkit", path: "/dashboard/smaart-toolkit", badge: null },
     ]
   },
   {
-    title: "SKILLS & GROWTH",
+    title: "sidebar.group_skills",
     items: [
-      { icon: Award, label: "Skills Vault", path: "/dashboard/skills-vault", badge: null },
-      { icon: ShieldCheck, label: "Skills Passport", path: "/dashboard/skills-passport", badge: null },
-      { icon: Lightbulb, label: "Vision Board", path: "/dashboard/vision-boards", badge: null },
+      { icon: Award, label: "sidebar.skills_vault", path: "/dashboard/skills-vault", badge: null },
+      { icon: ShieldCheck, label: "sidebar.skills_passport", path: "/dashboard/skills-passport", badge: null },
+      { icon: Lightbulb, label: "sidebar.vision_board", path: "/dashboard/vision-boards", badge: null },
     ]
   },
   {
-    title: "COMMUNITY",
+    title: "sidebar.group_community",
     items: [
-      { icon: Users, label: "Community", path: "/dashboard/community", badge: null },
+      { icon: Users, label: "sidebar.community", path: "/dashboard/community", badge: null },
     ]
   },
   {
-    title: "SYSTEM",
+    title: "sidebar.group_system",
     items: [
-      { icon: Settings, label: "Settings", path: "/dashboard/settings", badge: null },
-      { icon: HelpCircle, label: "Help & Support", path: "/dashboard/support", badge: null },
+      { icon: Settings, label: "sidebar.settings", path: "/dashboard/settings", badge: null },
+      { icon: HelpCircle, label: "sidebar.help", path: "/dashboard/support", badge: null },
     ]
   }
 ];
@@ -113,6 +114,7 @@ const FEMALE_SEQUENCE = [
 const LeftSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const { user, logout } = useUser();
@@ -127,7 +129,7 @@ const LeftSidebar = () => {
   // Auto-toggle between profile photo and college logo
   useEffect(() => {
     if (!user?.college?.logo) return;
-    
+
     const interval = setInterval(() => {
       setShowCollegeLogo(prev => !prev);
     }, 5000); // Toggle every 5 seconds
@@ -329,7 +331,7 @@ const LeftSidebar = () => {
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="fixed left-0 top-0 h-screen w-[280px] z-[100] lg:hidden bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col"
           >
-                    {/* Mobile Header */}
+            {/* Mobile Header */}
             <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
                 <img
@@ -355,7 +357,7 @@ const LeftSidebar = () => {
               {menuGroups.map((group, groupIndex) => (
                 <div key={group.title} className="mb-6">
                   <p className="px-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">
-                    {group.title}
+                    {t(group.title)}
                   </p>
                   <div className="space-y-1">
                     {group.items.map((item, itemIndex) => {
@@ -371,14 +373,13 @@ const LeftSidebar = () => {
                           <Link
                             to={item.path}
                             onClick={() => setIsMobileOpen(false)}
-                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                              active
-                                ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/25'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                            }`}
+                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
+                              ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/25'
+                              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                              }`}
                           >
                             <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-[#1a3884]'}`} />
-                            <span className="font-medium text-sm">{item.label}</span>
+                            <span className="font-medium text-sm">{t(item.label)}</span>
                             {item.badge && (
                               <span className="ml-auto px-2 py-0.5 text-[10px] font-bold bg-emerald-500 text-white rounded-full">
                                 {item.badge}
@@ -403,7 +404,7 @@ const LeftSidebar = () => {
                 className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
               >
                 <LogOut className="w-5 h-5" />
-                <span className="font-medium text-sm">Logout</span>
+                <span className="font-medium text-sm">{t("sidebar.logout")}</span>
               </button>
             </div>
           </motion.aside>
@@ -450,7 +451,7 @@ const LeftSidebar = () => {
                     exit={{ opacity: 0 }}
                     className="px-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2"
                   >
-                    {group.title}
+                    {t(group.title)}
                   </motion.p>
                 )}
               </AnimatePresence>
@@ -465,23 +466,21 @@ const LeftSidebar = () => {
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${
-                        active
-                          ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/25'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
-                      } ${isCollapsed ? 'justify-center' : ''}`}
+                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${active
+                        ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/25'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        } ${isCollapsed ? 'justify-center' : ''}`}
                     >
                       {/* Icon */}
                       <div className={`relative ${isCollapsed ? '' : ''}`}>
                         <Icon
-                          className={`w-5 h-5 transition-colors ${
-                            active ? 'text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-[#1a3884]'
-                          }`}
+                          className={`w-5 h-5 transition-colors ${active ? 'text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-[#1a3884]'
+                            }`}
                         />
                         {/* Tooltip for collapsed state */}
                         {isCollapsed && (
                           <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-slate-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
-                            {item.label}
+                            {t(item.label)}
                           </div>
                         )}
                       </div>
@@ -495,7 +494,7 @@ const LeftSidebar = () => {
                             exit={{ opacity: 0, x: -10 }}
                             className="font-medium text-sm whitespace-nowrap flex-1 ml-2"
                           >
-                            {item.label}
+                            {t(item.label)}
                           </motion.span>
                         )}
                       </AnimatePresence>
@@ -699,7 +698,7 @@ const LeftSidebar = () => {
                 exit={{ opacity: 0, y: 20, scale: 0.9 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
                 className="fixed z-[9999] pointer-events-auto"
-                style={{ 
+                style={{
                   left: '20px',
                   bottom: '120px',
                   width: '220px'
