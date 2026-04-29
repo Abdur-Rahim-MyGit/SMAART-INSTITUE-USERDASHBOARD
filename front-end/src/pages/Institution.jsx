@@ -162,7 +162,7 @@ const Institution = () => {
                   >
                     <span className="w-2 h-2 rounded-full bg-[#002147] animate-pulse shadow-[0_0_8px_rgba(0,33,71,0.4)]" />
                     <span className="text-[10px] sm:text-[11px] font-bold text-gray-700 tracking-widest uppercase">
-                      Founder's Message
+                      Leadership Message
                     </span>
                   </div>
 
@@ -191,14 +191,14 @@ const Institution = () => {
                 >
                   <div className="relative z-10">
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 tracking-tight leading-snug">
-                      Welcome to{" "}
+                      A Message from {" "}
                       <span className="font-extrabold text-[#002147]">
-                        Excellence
+                        Your Institution
                       </span>
                     </h2>
                     <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
-                      Discover a world of opportunities and unlock your true
-                      potential with our comprehensive learning ecosystem.
+                      Hear from your institution’s leadership as they introduce this platform and share their best wishes for your learning journey and future success.
+
                     </p>
                   </div>
                   {/* Play button */}

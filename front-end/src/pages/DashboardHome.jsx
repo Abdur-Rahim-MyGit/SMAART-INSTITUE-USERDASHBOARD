@@ -4,13 +4,11 @@ import VisionBoardSplash from "@/components/VisionBoardSplash";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import HeroSection from "@/components/dashboard/HeroSection";
 import LearningProgress from "@/components/dashboard/LearningProgress";
-import EventsSection from "@/components/dashboard/EventsSection";
-import ToolsStrip from "@/components/dashboard/ToolsStrip";
-import VisionGoalsWidget from "@/components/dashboard/VisionGoalsWidget";
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
+import VisionGoalsWidget from "@/components/dashboard/VisionGoalsWidget";
 import { AlertCircle } from "lucide-react";
 
 const DashboardHome = () => {
@@ -90,10 +88,12 @@ const DashboardHome = () => {
   return (
     <ErrorBoundary>
       <PageTransition>
-      {/* Vision Board Splash Overlay */}
+      {/* Vision Board Splash Overlay - Temporarily Hidden */}
+      {/* 
       {showVisionSplash && (
         <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
-      )}
+      )} 
+      */}
       
       {/* Student Onboarding */}
       {!showVisionSplash && user && (
@@ -107,8 +107,8 @@ const DashboardHome = () => {
           userName={user?.firstName || user?.fullName?.split(' ')[0] || "User"} 
         />
 
-        {/* Vision Goals Widget */}
-        <VisionGoalsWidget />
+        {/* Vision Goals Widget - Temporarily Hidden per request */}
+        {/* <VisionGoalsWidget /> */}
 
         {/* College Banners */}
         <CollegeBanners />
@@ -120,13 +120,6 @@ const DashboardHome = () => {
           error={pathsError} 
         />
 
-        {/* Events & Community Section */}
-        <div className="flex flex-col gap-4">
-          <EventsSection />
-        </div>
-
-        {/* Tools Strip */}
-        <ToolsStrip />
       </div>
     </PageTransition>
     </ErrorBoundary>

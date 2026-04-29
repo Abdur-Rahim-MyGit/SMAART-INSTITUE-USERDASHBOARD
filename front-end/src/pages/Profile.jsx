@@ -24,7 +24,8 @@ import {
   Loader2,
   Rocket,
   Trash2,
-  Trash
+  Trash,
+  MapPinHouse
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -445,7 +446,12 @@ const Profile = () => {
                   {/* Personal Information Card */}
                   <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
                     <div className="flex justify-between items-center mb-8">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">Personal Information</h3>
+                      <div className="flex gap-2 items-center">
+                        <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
+                          <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Personal Information</h3>
+                      </div>
                       <button
                         onClick={() => handleOpenEditModal('personalDetails', {
                           fullName: formData.name,
@@ -478,7 +484,12 @@ const Profile = () => {
                   {/* Address Card */}
                   <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
                     <div className="flex justify-between items-center mb-8">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">Address</h3>
+                      <div className="flex gap-2 items-center">
+                        <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
+                          <MapPinHouse className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Address</h3>
+                      </div>
                       <button
                         onClick={() => handleOpenEditModal('address', {
                           street: formData.street,
@@ -504,55 +515,75 @@ const Profile = () => {
                   {(formData.higherEducation?.length > 0 || formData.tenthDetails || formData.twelfthDetails) && (
                     <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
                       <div className="flex justify-between items-center mb-8">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Educational History</h3>
-                        <button
-                          onClick={() => handleOpenEditModal('higherEducation', formData.higherEducation)}
-                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
-                        >
-                          Edit <Edit2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <hr className="my-6 border-gray-200 dark:border-slate-700" />
-                      <div className="space-y-6">
-                        {formData.higherEducation?.map((edu, idx) => (
-                          <div key={idx} className="flex gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
-                            <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                              <GraduationCap className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                                <h4 className="font-bold text-gray-900 dark:text-white">{edu.institutionName}</h4>
-                                <span className="text-[10px] bg-[#1a3884]/10 text-[#1a3884] px-2 py-0.5 rounded-full font-bold uppercase">Higher Ed</span>
-                              </div>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">{edu.degreeFullName || edu.degree} • {edu.specialization}</p>
-                              <p className="text-xs text-gray-400 mt-1">Passing Year: {edu.yearOfPassing} • Score: {edu.cgpaPercentage}%</p>
-                            </div>
+                        <div className="flex gap-2 items-center">
+                          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+                            <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                           </div>
-                        ))}
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Educational History</h3>
+                        </div>
+                      </div>
+                      <div className="space-y-6">
+                        {formData.higherEducation && formData.higherEducation.length > 0 ? (
+                          formData.higherEducation.map((edu, idx) => (
+                            <div key={idx} className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
+                              <div className="flex-1">
+                                <div className="flex flex-col gap-1 mb-2">
+                                  <h5 className="font-bold text-gray-900 dark:text-white">Higher Education</h5>
+                                  <hr className="my-3 border-gray-200 dark:border-slate-700" />
+                                  <h6 className="font-semibold text-gray-900 dark:text-white">{edu.institutionName}</h6>
+                                </div>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{edu.degreeFullName || edu.degree} • {edu.specialization}</p>
+                                <p className="text-xs text-gray-400 mt-1">Passing Year: {edu.yearOfPassing} • Score: {edu.cgpaPercentage}%</p>
+                              </div>
+                              <button
+                                onClick={() => handleOpenEditModal('higherEducation', formData.higherEducation)}
+                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                              >
+                                Edit <Edit2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-6 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-gray-100 dark:border-slate-800 flex flex-col items-center justify-center text-center">
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">No higher education details added yet.</p>
+                            <button
+                              onClick={() => handleOpenEditModal('higherEducation', [])}
+                              className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm"
+                            >
+                              <Plus className="w-4 h-4" /> Add Higher Education
+                            </button>
+                          </div>
+                        )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {formData.twelfthDetails && (
-                            <div className="flex gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
-                              <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                                <BookOpen className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
-                              </div>
+                            <div className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
                               <div>
                                 <h4 className="font-bold text-gray-900 dark:text-white">12th Standard</h4>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">{formData.twelfthDetails.schoolName}</p>
                                 <p className="text-xs text-gray-400 mt-1">{formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}</p>
                               </div>
+                              <button
+                                onClick={() => handleOpenEditModal('twelfthDetails', formData.twelfthDetails)}
+                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                              >
+                                Edit <Edit2 className="w-3 h-3" />
+                              </button>
                             </div>
                           )}
                           {formData.tenthDetails && (
-                            <div className="flex gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
-                              <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                                <BookOpen className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
-                              </div>
+                            <div className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
                               <div>
                                 <h4 className="font-bold text-gray-900 dark:text-white">10th Standard</h4>
                                 <p className="text-sm text-gray-500 dark:text-gray-400">{formData.tenthDetails.schoolName}</p>
                                 <p className="text-xs text-gray-400 mt-1">{formData.tenthDetails.percentage}% • {formData.tenthDetails.yearOfPassing}</p>
                               </div>
+                              <button
+                                onClick={() => handleOpenEditModal('tenthDetails', formData.tenthDetails)}
+                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                              >
+                                Edit <Edit2 className="w-3 h-3" />
+                              </button>
                             </div>
                           )}
                         </div>
@@ -573,8 +604,8 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('workExperience', formData.workExperience)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-400"
-                        >
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        > Edit
                           <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -610,9 +641,9 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('projects', formData.projects)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-400"
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          Edit <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="space-y-4">
@@ -645,9 +676,9 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('certificates', formData.certificates)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-400"
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          Edit <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -680,9 +711,9 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('extracurricular', formData.extracurricular)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-400"
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          Edit <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="flex flex-col gap-4">
@@ -728,9 +759,9 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('jobPreferences', formData.jobPreferences)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-400"
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          Edit <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="space-y-4">
@@ -767,9 +798,9 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('careerGoals', formData.careerGoals)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-400"
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          <Edit2 className="w-4 h-4" />
+                          Edit <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="space-y-4">
@@ -875,6 +906,22 @@ const Profile = () => {
                             <ModalInput label="City" value={editFormData.city} onChange={(val) => setEditFormData({ ...editFormData, city: val })} />
                             <ModalInput label="State" value={editFormData.state} onChange={(val) => setEditFormData({ ...editFormData, state: val })} />
                             <ModalInput label="Country" value={editFormData.country} onChange={(val) => setEditFormData({ ...editFormData, country: val })} />
+                          </div>
+                        )}
+                        {activeEditSection === 'twelfthDetails' && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <ModalInput label="School Name" value={editFormData.schoolName} onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })} />
+                            <ModalInput label="Board" value={editFormData.board} onChange={(val) => setEditFormData({ ...editFormData, board: val })} />
+                            <ModalInput label="Percentage" value={editFormData.percentage} onChange={(val) => setEditFormData({ ...editFormData, percentage: val })} />
+                            <ModalInput label="Year of Passing" value={editFormData.yearOfPassing} onChange={(val) => setEditFormData({ ...editFormData, yearOfPassing: val })} />
+                          </div>
+                        )}
+                        {activeEditSection === 'tenthDetails' && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <ModalInput label="School Name" value={editFormData.schoolName} onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })} />
+                            <ModalInput label="Board" value={editFormData.board} onChange={(val) => setEditFormData({ ...editFormData, board: val })} />
+                            <ModalInput label="Percentage" value={editFormData.percentage} onChange={(val) => setEditFormData({ ...editFormData, percentage: val })} />
+                            <ModalInput label="Year of Passing" value={editFormData.yearOfPassing} onChange={(val) => setEditFormData({ ...editFormData, yearOfPassing: val })} />
                           </div>
                         )}
                         {activeEditSection === 'careerGoals' && (

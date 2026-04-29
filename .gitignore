@@ -21,6 +21,8 @@ back-end/uploads/
 
 # Logs
 *.log
+combined.log
+error.log
 logs/
 npm-debug.log*
 yarn-debug.log*
@@ -48,3 +50,4 @@ coverage/
 # OS
 Thumbs.db
 .DS_Store
+back-end/logs/

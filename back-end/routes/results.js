@@ -83,7 +83,6 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
 
         if (existingResult) {
             console.log(`🔄 [DEBUG] Resuming result ${existingResult._id}`);
-            console.log(`📊 [DEBUG] Assessment ID: ${assessmentId}, Name: ${assessment.assessmentName}, Qs in Assm: ${assessment.questions ? assessment.questions.length : 'NULL'}`);
 
             let questionOrder = existingResult.questionOrder || [];
 
@@ -107,7 +106,6 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                 };
             }).filter(q => q !== null);
 
-            console.log(`📊 [DEBUG] Validated questions count: ${questions.length}`);
 
             // Failsafe 2: If questions still empty but assessment has them
             if (questions.length === 0 && assessment.questions && assessment.questions.length > 0) {
@@ -432,7 +430,6 @@ router.post('/:resultId/submit', async (req, res) => {
 
         // Process stage-specific scoring
         if (stageInfo) {
-            console.log(`📊 Calculating ${stageInfo.stage} (${stageInfo.name}) Quotient Scores...`);
 
             // Fetch full question details for quotient mapping
             const fullAssessment = await Assessment.findById(result.assessmentId);
@@ -594,7 +591,6 @@ router.post('/:resultId/submit', async (req, res) => {
                     const BaseLineResult = require('../models/BaseLineResult');
                     const baselineUtils = require('../utils/baselineUtils');
 
-                    console.log('📊 Calculating refined Base Line scores...');
                     const profileData = baselineUtils.calculateBaseLineProfile(assessment, result);
 
                     await result.save();
@@ -656,7 +652,6 @@ router.get('/user/:userId', async (req, res) => {
         const { userId } = req.params;
         const { status } = req.query;
 
-        console.log('📥 Fetching results for userId:', userId, 'status:', status);
 
         let query = { userId };
         if (status) {
@@ -667,7 +662,6 @@ router.get('/user/:userId', async (req, res) => {
             .select('assessmentName assessmentCode completionStatus submittedAt startedAt scores answeredQuestions totalQuestions')
             .sort({ createdAt: -1 });
 
-        console.log('📊 Found', results.length, 'results for user:', userId);
 
         res.json({
             success: true,

@@ -637,7 +637,6 @@ router.get('/register-details/:email', async (req, res) => {
         } else {
           user = student;
           userSource = 'Student';
-          console.log(`[register-details] Found student: ${student.fullName}`);
         }
       }
     }
@@ -646,7 +645,6 @@ router.get('/register-details/:email', async (req, res) => {
     if (!user) {
       const regByEmail = await Registration.findOne({ email: normalizedEmail });
       if (regByEmail) {
-        console.log(`[register-details] Found registration by email: ${regByEmail.fullName || 'no name'}`);
         return res.json({
           ...regByEmail.toObject(),
           fullName: regByEmail.fullName,
@@ -657,7 +655,6 @@ router.get('/register-details/:email', async (req, res) => {
 
     // If no user found anywhere, return generic response
     if (!user) {
-      console.log(`[register-details] No user found for email: ${normalizedEmail}`);
       return res.json({
         fullName: null,
         email: normalizedEmail,
@@ -700,7 +697,6 @@ router.get('/register-details/:email', async (req, res) => {
     }
 
     if (registration) {
-      console.log(`[register-details] Found registration for ${normalizedEmail}: ${registration.fullName || user.fullName}`);
       return res.json({
         ...registration.toObject(),
         fullName: registration.fullName || user.fullName,
@@ -711,7 +707,6 @@ router.get('/register-details/:email', async (req, res) => {
     }
 
     // Return user data without registration — include all available fields
-    console.log(`[register-details] Returning ${userSource} data for ${normalizedEmail}: ${user.fullName}`);
     const userObj = user.toObject ? user.toObject() : user;
     if (fallbackCollege && !userObj.college) {
       userObj.college = fallbackCollege;
@@ -722,7 +717,6 @@ router.get('/register-details/:email', async (req, res) => {
       otherDetails: {}
     });
   } catch (err) {
-    console.error('[register-details] Error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

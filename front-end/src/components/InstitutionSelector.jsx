@@ -145,7 +145,7 @@ const InstitutionSelector = ({ onSelect }) => {
 
             <Input
               type="text"
-              placeholder="Search your University or College..."
+              placeholder="Type to search for your college…"
               value={searchTerm}
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
@@ -229,15 +229,7 @@ const InstitutionSelector = ({ onSelect }) => {
                                 ? "bg-[#1a3884] text-white border-[#1a3884]" 
                                 : "bg-white text-[#1a3884] border-[#1a3884]/10 group-hover:border-[#1a3884]/30"
                           }`}>
-                            {selectingId === college.collegeCode ? (
-                              <motion.div
-                                initial={{ scale: 0, rotate: -180 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                              >
-                                <Check className="h-5 w-5 text-white" strokeWidth={3} />
-                              </motion.div>
-                            ) : college.logo ? (
+                            {college.logo ? (
                               <motion.img 
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
