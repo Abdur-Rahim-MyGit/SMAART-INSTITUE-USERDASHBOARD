@@ -23,6 +23,14 @@ const registrationSchema = new mongoose.Schema({
   dateFormat: { type: String, default: 'DD/MM/YYYY' },
   yearOfStudy: String,
   yearOfPassing: String,
+  notificationPrefs: {
+    email: { type: Boolean, default: true },
+    push: { type: Boolean, default: true },
+    assessments: { type: Boolean, default: true },
+    courses: { type: Boolean, default: true },
+    coaching: { type: Boolean, default: true },
+    community: { type: Boolean, default: true }
+  },
 
   // Address
   address: {

@@ -397,6 +397,7 @@ router.patch('/register-section', async (req, res) => {
         registration.bio = data.bio || registration.bio;
         registration.timezone = data.timezone || registration.timezone;
         registration.dateFormat = data.dateFormat || registration.dateFormat;
+        registration.notificationPrefs = data.notificationPrefs || registration.notificationPrefs;
         
         if (data.address) {
           registration.address = {

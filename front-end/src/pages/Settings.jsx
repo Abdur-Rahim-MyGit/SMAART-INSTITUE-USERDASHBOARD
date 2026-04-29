@@ -26,8 +26,17 @@ const Settings = () => {
   });
 
   const [languageFormData, setLanguageFormData] = useState({
-    timezone: "Asia/Kolkata",
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata",
     dateFormat: "DD/MM/YYYY"
+  });
+  
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    email: true,
+    push: true,
+    assessments: true,
+    courses: true,
+    coaching: true,
+    community: true
   });
 
   const [showFAQ, setShowFAQ] = useState(false);
@@ -74,9 +83,12 @@ const Settings = () => {
             bio: data.bio || ""
           });
           setLanguageFormData({
-            timezone: data.timezone || "Asia/Kolkata",
+            timezone: data.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Kolkata",
             dateFormat: data.dateFormat || "DD/MM/YYYY"
           });
+          if (data.notificationPrefs) {
+            setNotificationPrefs(data.notificationPrefs);
+          }
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -163,6 +175,54 @@ const Settings = () => {
     }
   };
 
+  const handleSaveNotifications = async () => {
+    if (!user?.email) return;
+
+    setSaving(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/register-section`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          section: 'personalDetails',
+          data: {
+            notificationPrefs
+          }
+        })
+      });
+
+      if (response.ok) {
+        toast.success("Notification preferences updated");
+        await refreshUser();
+      } else {
+        toast.error("Failed to update preferences");
+      }
+    } catch (error) {
+      console.error("Error saving notification settings:", error);
+      toast.error("Connection error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSave = () => {
+    switch (activeTab) {
+      case "profile":
+        handleSaveProfile();
+        break;
+      case "notifications":
+        handleSaveNotifications();
+        break;
+      case "language":
+        handleSaveLanguage();
+        break;
+      default:
+        toast.info("Settings updated locally");
+        break;
+    }
+  };
+
   const settingsTabs = [
     { id: "profile", label: t("settings.profile_settings"), icon: User, description: "Manage your personal information" },
     { id: "notifications", label: t("settings.notifications"), icon: Bell, description: "Configure notification preferences" },
@@ -234,23 +294,29 @@ const Settings = () => {
         );
 
       case "notifications":
+        const notificationItems = [
+          { id: "email", label: "Email Notifications", description: "Receive updates via email" },
+          { id: "push", label: "Push Notifications", description: "Get push notifications on your device" },
+          { id: "assessments", label: "Assessment Reminders", description: "Remind me about pending assessments" },
+          { id: "courses", label: "Course Updates", description: "Notify me about new course content" },
+          { id: "coaching", label: "Coach Session Reminders", description: "Reminders for scheduled coaching sessions" },
+          { id: "community", label: "Community Activity", description: "Updates from community discussions" },
+        ];
         return (
           <div className="space-y-6">
-            {[
-              { label: "Email Notifications", description: "Receive updates via email" },
-              { label: "Push Notifications", description: "Get push notifications on your device" },
-              { label: "Assessment Reminders", description: "Remind me about pending assessments" },
-              { label: "Course Updates", description: "Notify me about new course content" },
-              { label: "Coach Session Reminders", description: "Reminders for scheduled coaching sessions" },
-              { label: "Community Activity", description: "Updates from community discussions" },
-            ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+            {notificationItems.map((item) => (
+              <div key={item.id} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
                 <div>
                   <h4 className="text-gray-900 dark:text-white font-medium">{item.label}</h4>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">{item.description}</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" defaultChecked className="sr-only peer" />
+                  <input 
+                    type="checkbox" 
+                    checked={notificationPrefs[item.id]} 
+                    onChange={(e) => setNotificationPrefs(prev => ({ ...prev, [item.id]: e.target.checked }))}
+                    className="sr-only peer" 
+                  />
                   <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#1a3884]"></div>
                 </label>
               </div>
@@ -350,10 +416,16 @@ const Settings = () => {
                 onChange={handleLanguageChange}
                 className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#1a3884]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884]"
               >
-                <option value="Asia/Kolkata">Asia/Kolkata (GMT+5:30)</option>
-                <option value="America/New_York">America/New_York (GMT-5)</option>
-                <option value="Europe/London">Europe/London (GMT+0)</option>
-                <option value="Asia/Tokyo">Asia/Tokyo (GMT+9)</option>
+                <option value="Asia/Kolkata">Asia/Kolkata (IST - GMT+5:30)</option>
+                <option value="America/New_York">America/New_York (EST/EDT - GMT-5)</option>
+                <option value="Europe/London">Europe/London (GMT/BST - GMT+0)</option>
+                <option value="Asia/Tokyo">Asia/Tokyo (JST - GMT+9)</option>
+                <option value="Asia/Dubai">Asia/Dubai (GST - GMT+4)</option>
+                <option value="Europe/Paris">Europe/Paris (CET/CEST - GMT+1)</option>
+                <option value="Australia/Sydney">Australia/Sydney (AEST/AEDT - GMT+10)</option>
+                <option value="Pacific/Auckland">Pacific/Auckland (NZST/NZDT - GMT+12)</option>
+                <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT - GMT-8)</option>
+                <option value="Asia/Singapore">Asia/Singapore (SGT - GMT+8)</option>
               </select>
             </div>
             <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
@@ -591,7 +663,7 @@ const Settings = () => {
                 Cancel
               </button>
               <button
-                onClick={handleSaveProfile}
+                onClick={handleSave}
                 disabled={saving}
                 className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
