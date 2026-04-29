@@ -1,10 +1,12 @@
 const express = require('express');
 const { body, validationResult, query, param } = require('express-validator');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const SupportTicket = require('../models/SupportTicket');
 const { protect, authorize } = require('../middleware/auth');
-const upload = require('../middleware/upload');
+const { uploadSupportAttachments } = require('../middleware/upload');
 const itsmClient = require('../services/itsmClient');
+const { notifyTicketResponse, createNotification } = require('../services/notificationService');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
@@ -75,7 +77,7 @@ const handleValidationErrors = (req, res, next) => {
 router.post('/',
   protect,
   ticketCreationLimiter,
-  upload.array('attachments', 3), // Max 3 attachments
+  uploadSupportAttachments.array('attachments', 3), // Max 3 attachments
   ticketValidation,
   handleValidationErrors,
   async (req, res) => {
@@ -92,6 +94,7 @@ router.post('/',
         filename: file.filename,
         originalName: file.originalname,
         path: file.path,
+        publicUrl: `/uploads/${path.basename(file.path)}`,
         mimetype: file.mimetype,
         size: file.size
       })) : [];
@@ -449,13 +452,13 @@ router.put('/:id',
 
       // Add response if provided
       if (response && response.trim().length > 0) {
-      const responderId = req.user._id || req.user.id;
+        const responderId = req.user._id || req.user.id;
 
-      ticket.responses.push({
-        message: response.trim(),
-        respondedBy: responderId,
-        respondedAt: new Date()
-      });
+        ticket.responses.push({
+          message: response.trim(),
+          respondedBy: responderId,
+          respondedAt: new Date()
+        });
 
         // Auto-update status to in-progress if still open
         if (ticket.status === 'open') {
@@ -484,6 +487,32 @@ router.put('/:id',
         { path: 'userId', select: 'fullName email userId profileImage' },
         { path: 'responses.respondedBy', select: 'fullName email role' }
       ]);
+
+      const shouldNotifyTicketOwner = !response?.trim()
+        && status && ['resolved', 'closed', 'in-progress'].includes(status);
+
+      if (shouldNotifyTicketOwner) {
+        await createNotification({
+          userId: ticket.userId._id || ticket.userId,
+          type: 'support',
+          title: 'Ticket Status Updated',
+          message: `Your support ticket "${ticket.title}" is now ${ticket.status}.`,
+          link: '/tickets',
+          metadata: {
+            ticketId: ticket._id,
+            status: ticket.status
+          }
+        });
+      }
+
+      if (response?.trim()) {
+        await notifyTicketResponse(
+          ticket.userId._id || ticket.userId,
+          ticket._id.toString(),
+          ticket.title,
+          req.user.fullName || 'Support Team'
+        );
+      }
 
       res.json({
         success: true,
@@ -542,6 +571,13 @@ router.post('/:id/response',
         { path: 'userId', select: 'fullName email userId profileImage' },
         { path: 'responses.respondedBy', select: 'fullName email role' }
       ]);
+
+      await notifyTicketResponse(
+        ticket.userId._id || ticket.userId,
+        ticket._id.toString(),
+        ticket.title,
+        req.user.fullName || 'Support Team'
+      );
 
       res.json({
         success: true,
@@ -681,6 +717,17 @@ router.post('/sync-worknote', async (req, res) => {
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found for ref: ' + externalRef });
     }
+
+    await createNotification({
+      userId: ticket.userId,
+      type: 'support',
+      title: 'Support Reply Received',
+      message: `Support replied to "${ticket.title}".`,
+      link: '/tickets',
+      metadata: {
+        ticketId: ticket._id
+      }
+    });
 
     res.json({ success: true });
   } catch (err) {

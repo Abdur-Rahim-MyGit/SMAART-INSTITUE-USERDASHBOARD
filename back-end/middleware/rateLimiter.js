@@ -52,10 +52,10 @@ const passwordResetLimiter = rateLimit({
   legacyHeaders: false
 });
 
-// College search rate limiter - 30 requests per minute (anti-enumeration)
+// College search rate limiter - 100 requests per minute (increased for development)
 const searchLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 30,
+  max: 100,
   message: {
     error: 'Too many search requests. Please slow down.',
     retryAfter: 1
@@ -64,10 +64,10 @@ const searchLimiter = rateLimit({
   legacyHeaders: false
 });
 
-// General API rate limiter - 100 requests per minute
+// General API rate limiter - 1000 requests per minute (increased for development)
 const generalLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 100,
+  max: 1000,
   message: {
     error: 'Too many requests. Please try again later.',
     retryAfter: 1

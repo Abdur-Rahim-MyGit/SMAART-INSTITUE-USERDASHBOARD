@@ -4,14 +4,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
+import { UserProvider } from "@/contexts/UserContextFixed";
 import { SidebarProvider } from "@/contexts/SidebarContext";
-import { UserProvider } from "@/contexts/UserContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
-import AnimatedRoutes from "./components/AnimatedRoutes";
-import SecurityGuard from "@/components/SecurityGuard";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import SingleTabGuard from "@/components/SingleTabGuard";
-
+import AnimatedRoutes from "./components/AnimatedRoutes";
 
 const queryClient = new QueryClient();
 
@@ -19,22 +17,21 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <UserProvider>
-          <NotificationProvider>
-            <SidebarProvider>
-              <ErrorBoundary>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <SingleTabGuard>
+        <BrowserRouter>
+          <ThemeProvider>
+            <UserProvider>
+              <NotificationProvider>
+                <SidebarProvider>
+                  <ErrorBoundary>
+                    <Toaster />
+                    <Sonner />
                     <AnimatedRoutes />
-                    <SecurityGuard />
-                  </SingleTabGuard>
-                </BrowserRouter>
-              </ErrorBoundary>
-            </SidebarProvider>
-          </NotificationProvider>
-        </UserProvider>
+                  </ErrorBoundary>
+                </SidebarProvider>
+              </NotificationProvider>
+            </UserProvider>
+          </ThemeProvider>
+        </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
   </HelmetProvider>

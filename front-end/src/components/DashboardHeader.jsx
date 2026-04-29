@@ -1,12 +1,9 @@
 import { motion } from "framer-motion";
-import { Bell, Settings, Search, ChevronRight, Command } from "lucide-react";
-import ProfileDropdown from "@/components/ProfileDropdown";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import NotificationBell from "@/components/NotificationBell";
+import { useLocation } from "react-router-dom";
 
 const DashboardHeader = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-
   // Map routes to page titles
   const getPageTitle = () => {
     const path = location.pathname;
@@ -85,6 +82,10 @@ const DashboardHeader = () => {
         >
           {getPageTitle()}
         </motion.h1>
+      </div>
+
+      <div className="absolute right-4 top-6 z-40">
+        <NotificationBell />
       </div>
 
       {/* Bottom Silver Line */}

@@ -12,17 +12,25 @@ const CollegeBanners = () => {
 
   useEffect(() => {
     const fetchBanners = async () => {
+      console.log('[CollegeBanners] User data:', user);
       // Both user.college and user.collegeId are checked just in case
       const collegeId = user?.college?._id || user?.college || user?.collegeId;
+      console.log('[CollegeBanners] College ID:', collegeId);
       if (!collegeId) {
+        console.log('[CollegeBanners] No college ID found, skipping banner fetch');
         setLoading(false);
         return;
       }
       
       try {
+        console.log('[CollegeBanners] Fetching banners for college:', collegeId);
         const response = await apiCall(`/colleges/${collegeId}/banners`);
+        console.log('[CollegeBanners] Banners response:', response);
         if (response?.success && response.data?.length > 0) {
           setBanners(response.data);
+          console.log('[CollegeBanners] Banners loaded:', response.data.length);
+        } else {
+          console.log('[CollegeBanners] No banners found');
         }
       } catch (error) {
         console.error("Failed to fetch college banners", error);

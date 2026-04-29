@@ -24,7 +24,12 @@ const DashboardHome = () => {
   }, []);
 
   useEffect(() => {
-    if (user && !userLoading) setDashboardLoading(false);
+    console.log('[DashboardHome] User data:', user);
+    console.log('[DashboardHome] User loading:', userLoading);
+    if (user && !userLoading) {
+      console.log('[DashboardHome] User loaded, setting dashboard loading to false');
+      setDashboardLoading(false);
+    }
   }, [user, userLoading]);
 
   // Timeout fallback for unresponsive API
