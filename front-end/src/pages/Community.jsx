@@ -37,6 +37,7 @@ import { useState, useEffect, useRef } from "react";
 import { communityAPI } from "@/services/communityApi";
 import { groupsAPI } from "@/services/groupsApi";
 import { moderateText } from "@/utils/contentModeration";
+import { useTranslation } from "react-i18next";
 
 // Icon mapping for groups
 const iconMap = {
@@ -80,22 +81,29 @@ const REACTION_TYPES = [
   },
 ];
 
-const BestAnswerBadge = () => (
-  <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-lg border border-green-200">
-    <CheckCircle className="w-3 h-3 text-green-600" />
-    BEST ANSWER
-  </div>
-);
+const BestAnswerBadge = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-lg border border-green-200">
+      <CheckCircle className="w-3 h-3 text-green-600" />
+      {t("community.badges.best_answer")}
+    </div>
+  );
+};
 
-const AdminBadge = () => (
-  <div className="flex items-center gap-1 px-1.5 py-0.5 bg-[#002147] text-white text-[9px] font-black rounded flex-shrink-0">
-    <Star className="w-2.5 h-2.5 fill-current text-yellow-500" />
-    OFFICIAL
-  </div>
-);
+const AdminBadge = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-center gap-1 px-1.5 py-0.5 bg-[#002147] text-white text-[9px] font-black rounded flex-shrink-0">
+      <Star className="w-2.5 h-2.5 fill-current text-yellow-500" />
+      {t("community.badges.official")}
+    </div>
+  );
+};
 
 // Helper to format time ago
-const formatTimeAgo = (dateString) => {
+const formatTimeAgo = (dateString, t) => {
+  if (!t) return "Just now"; // Fallback
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now - date;
@@ -103,47 +111,48 @@ const formatTimeAgo = (dateString) => {
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 1) return t("community.time.just_now") || "Just now";
+  if (diffMins < 60) return `${diffMins}${t("community.time.min_short") || "m"} ${t("community.time.ago") || "ago"}`;
+  if (diffHours < 24) return `${diffHours}${t("community.time.hour_short") || "h"} ${t("community.time.ago") || "ago"}`;
+  if (diffDays < 7) return `${diffDays}${t("community.time.day_short") || "d"} ${t("community.time.ago") || "ago"}`;
   return date.toLocaleDateString();
 };
 
 const COMMUNITY_TIPS = [
   {
     emoji: "💡",
-    title: "Community Tip",
-    text: "Engage with discussions and help others to earn points and badges. Top contributors get featured on the leaderboard!",
+    title: "community.tips.guidelines.title",
+    text: "community.tips.guidelines.text",
   },
   {
     emoji: "🏆",
-    title: "Quality Score",
-    text: "Your Quality Score (QS) rises with upvotes, hearts, and comments. Post thoughtfully to climb the Popular feed!",
+    title: "community.tips.quality.title",
+    text: "community.tips.quality.text",
   },
   {
     emoji: "🗣️",
-    title: "Mentor Channel",
-    text: "Have a career or academic question? Post in the Mentor channel — your question goes straight to your assigned mentors and coaches.",
+    title: "community.tips.mentor.title",
+    text: "community.tips.mentor.text",
   },
   {
     emoji: "🤝",
-    title: "Support Channel",
-    text: "Feeling overwhelmed? The Support channel connects you with the Emotion Coach AI — a safe, non-judgmental space just for you.",
+    title: "community.tips.support.title",
+    text: "community.tips.support.text",
   },
   {
     emoji: "👥",
-    title: "Student Groups",
-    text: "Create or join a Study Group to collaborate with peers, share resources, and chat in real time in your group's private space.",
+    title: "community.tips.groups.title",
+    text: "community.tips.groups.text",
   },
   {
     emoji: "📌",
-    title: "Pinned Posts",
-    text: "Pinned posts stay at the top of the Discussion feed regardless of sort order. Look for the PINNED badge on important announcements!",
+    title: "community.tips.pinned.title",
+    text: "community.tips.pinned.text",
   },
 ];
 
 const CommunityTipRotator = () => {
+  const { t } = useTranslation();
   const [tipIndex, setTipIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
@@ -171,9 +180,9 @@ const CommunityTipRotator = () => {
       >
         <h3 className="text-[#002147] font-bold mb-3 flex items-center gap-2 text-base">
           <span className="text-xl">{tip.emoji}</span>
-          {tip.title}
+          {t(tip.title)}
         </h3>
-        <p className="text-gray-600 text-sm leading-6 font-medium">{tip.text}</p>
+        <p className="text-gray-600 text-sm leading-6 font-medium">{t(tip.text)}</p>
       </div>
 
       {/* Dot indicators */}
@@ -193,6 +202,7 @@ const CommunityTipRotator = () => {
 };
 
 const Community = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("discussions");
   const [currentUser, setCurrentUser] = useState(null);
@@ -1090,7 +1100,7 @@ const Community = () => {
                   pulse: false,
                 },
                 {
-                  label: "Groups",
+                  label: t("community.stats.groups"),
                   value: stats.totalGroups?.toLocaleString() || "0",
                   icon: Star,
                   color: "text-purple-500",
@@ -1099,7 +1109,7 @@ const Community = () => {
                   pulse: false,
                 },
                 {
-                  label: "Active Today",
+                  label: t("community.stats.active"),
                   value: stats.activeToday?.toLocaleString() || "0",
                   icon: TrendingUp,
                   color: "text-green-500",
@@ -1157,10 +1167,10 @@ const Community = () => {
                     <Plus className="w-5 h-5" />
                   </div>
                   <span className="text-base tracking-wide">
-                    Start a Discussion
+                    {t("community.new_post_button") || "Start a Discussion"}
                     {channelType !== "discussion" && (
                       <span className="ml-2 text-xs font-black opacity-70 uppercase tracking-widest">
-                        ({channelType})
+                        ({t(`community.channels.${channelType}`)})
                       </span>
                     )}
                   </span>
@@ -1169,17 +1179,21 @@ const Community = () => {
                 {/* Tabs & Sort */}
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
                   <div className="flex gap-2 p-1 bg-white/50 backdrop-blur-sm rounded-xl w-fit">
-                    {["discussions", "my posts", "bookmarks"].map((tab) => (
+                    {[
+                      { id: "discussions", label: t("community.tabs.discussions") },
+                      { id: "my posts", label: t("community.tabs.my_posts") },
+                      { id: "bookmarks", label: t("community.tabs.bookmarks") }
+                    ].map((tab) => (
                       <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
                         className={`px-5 py-2.5 rounded-lg text-sm font-medium capitalize transition-all duration-300 ${
-                          activeTab === tab
+                          activeTab === tab.id
                             ? "bg-white dark:bg-[#1E293B] text-[#002147] dark:text-white shadow-sm ring-1 ring-gray-100 dark:ring-gray-700"
                             : "text-gray-500 dark:text-gray-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/10"
                         }`}
                       >
-                        {tab}
+                        {tab.label}
                       </button>
                     ))}
                   </div>
@@ -1189,7 +1203,7 @@ const Community = () => {
                       onClick={() => setSortBy("createdAt")}
                       className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${sortBy === "createdAt" ? "bg-[#002147] text-white shadow-md" : "text-gray-500 hover:bg-white/50"}`}
                     >
-                      NEWEST
+                      {t("community.sort.newest") || "NEWEST"}
                     </button>
                     <button
                       onClick={() => setSortBy("popularity")}
@@ -1305,7 +1319,7 @@ const Community = () => {
                                 )}
                                 {discussion.isPinned && (
                                   <span className="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                                    PINNED
+                                    {t("community.badges.pinned") || "PINNED"}
                                   </span>
                                 )}
                                 {discussion.author?.role === "admin" && (
@@ -1333,7 +1347,7 @@ const Community = () => {
                                 <span>{getAuthorName(discussion.author)}</span>
                                 <span>•</span>
                                 <span>
-                                  {formatTimeAgo(discussion.createdAt)}
+                                  {formatTimeAgo(discussion.createdAt, t)}
                                 </span>
                               </div>
                             </div>
@@ -1634,7 +1648,7 @@ const Community = () => {
                                         handleReact(discussion._id, react.type);
                                       }}
                                       className="w-9 h-9 flex items-center justify-center transition-transform text-xl hover:bg-gray-100 rounded-xl"
-                                      title={react.label}
+                                      title={t(`community.reactions.${react.type}`) || react.label}
                                     >
                                       {react.emoji}
                                     </motion.button>
@@ -1708,7 +1722,7 @@ const Community = () => {
                                 setShowShareModal(true);
                               }}
                               className="p-1.5 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-all"
-                              title="Share to Group"
+                              title={t("community.share_to_group") || "Share to Group"}
                             >
                               <Share2 className="w-4 h-4" />
                             </button>
@@ -1719,7 +1733,7 @@ const Community = () => {
                                 setReportingId(discussion._id);
                               }}
                               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                              title="Report Discussion"
+                              title={t("community.report_discussion") || "Report Discussion"}
                             >
                               <Bell className="w-4 h-4" />
                             </button>
@@ -1736,7 +1750,7 @@ const Community = () => {
                               >
                                 <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                   <MessageCircle className="w-3 h-3" />
-                                  Comments ({discussion.replies?.length || 0})
+                                  {t("community.comments")} ({discussion.replies?.length || 0})
                                 </h4>
 
                                 {discussion.replies?.map((reply) => {
@@ -1778,7 +1792,7 @@ const Community = () => {
                                               {getAuthorName(reply.author)}
                                             </span>
                                             <span className="text-[10px] text-gray-400">
-                                              {formatTimeAgo(reply.createdAt)}
+                                              {formatTimeAgo(reply.createdAt, t)}
                                             </span>
                                           </div>
                                         </div>
@@ -1995,11 +2009,11 @@ const Community = () => {
                     <div className="p-2 bg-yellow-100 rounded-xl">
                       <Star className="w-5 h-5 text-yellow-600" />
                     </div>
-                    My Groups
+                    {t("community.my_groups") || "My Groups"}
                   </h3>
                   {featuredGroups.length === 0 ? (
                     <p className="text-gray-500 text-sm text-center py-4">
-                      No groups available
+                      {t("community.no_groups") || "No groups available"}
                     </p>
                   ) : (
                     <div className="space-y-4">
@@ -2023,7 +2037,7 @@ const Community = () => {
                               </p>
                               <p className="text-gray-400 text-xs flex items-center gap-1 font-medium">
                                 <Users className="w-3 h-3" />
-                                {(group.memberCount || 0).toLocaleString()} members
+                                {(group.memberCount || 0).toLocaleString()} {t("community.members") || "members"}
                               </p>
                             </div>
                             <ChevronRight className="w-4 h-4 text-gray-300 group-hover/item:text-[#002147] transition-colors flex-shrink-0" />
@@ -2037,7 +2051,7 @@ const Community = () => {
                       onClick={() => navigate("/dashboard/groups")}
                       className="flex-1 py-3 text-sm font-semibold text-[#002147] bg-[#002147]/5 hover:bg-[#002147]/10 rounded-2xl transition-all"
                     >
-                      View My Groups
+                      {t("community.view_my_groups") || "View My Groups"}
                     </button>
                     <button
                       onClick={() =>
@@ -2047,7 +2061,7 @@ const Community = () => {
                       }
                       className="flex-1 py-3 text-sm font-semibold text-white bg-[#002147] hover:bg-[#002147]/90 rounded-2xl transition-all shadow-lg shadow-blue-900/20"
                     >
-                      Create Group
+                      {t("community.create_group") || "Create Group"}
                     </button>
                   </div>
                 </div>
@@ -2058,7 +2072,7 @@ const Community = () => {
                     <div className="p-2 bg-orange-100 rounded-xl">
                       <Trophy className="w-5 h-5 text-yellow-600" />
                     </div>
-                    Top Contributors
+                    {t("community.top_contributors") || "Top Contributors"}
                   </h3>
                   {topContributors.length === 0 ? (
                     <p className="text-gray-500 text-sm text-center py-4">
@@ -2156,7 +2170,7 @@ const Community = () => {
                     <div className="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center">
                       <Plus className="w-6 h-6 text-blue-600" />
                     </div>
-                    New Discussion
+                    {t("community.new_discussion_title") || "New Discussion"}
                   </h2>
                   <button
                     onClick={() => setShowNewPostModal(false)}
@@ -2171,7 +2185,7 @@ const Community = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
-                          Post Title
+                          {t("community.post_title") || "Post Title"}
                         </label>
                         <input
                           type="text"
@@ -2189,7 +2203,7 @@ const Community = () => {
 
                       <div>
                         <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
-                          Category
+                          {t("community.category") || "Category"}
                         </label>
                         <div className="relative">
                           <select
@@ -2219,7 +2233,7 @@ const Community = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                           <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
-                            Channel
+                            {t("community.channel") || "Channel"}
                           </label>
                           {isMentorChannel ? (
                             <div className="px-4 py-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
@@ -2286,7 +2300,7 @@ const Community = () => {
                             content: e.target.value,
                           }))
                         }
-                        placeholder="Go ahead, share your story or ask a question..."
+                        placeholder={t("community.post_content_placeholder") || "Go ahead, share your story or ask a question..."}
                         rows={showPollEditor ? 3 : 6}
                         className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium leading-relaxed placeholder:text-gray-300 focus:bg-white focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all resize-none"
                       />
@@ -2303,7 +2317,7 @@ const Community = () => {
                             <TrendingUp className="w-4 h-4 text-blue-600" />
                           </div>
                           <h4 className="text-sm font-black text-[#002147] uppercase tracking-wider">
-                            Create a Poll
+                            {t("community.create_poll") || "Create a Poll"}
                           </h4>
                         </div>
 
@@ -2394,7 +2408,7 @@ const Community = () => {
 
                     <div>
                       <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
-                        Media Attachment
+                        {t("community.media_attachment") || "Media Attachment"}
                       </label>
                       <div
                         onDragOver={handleDragOver}
@@ -2494,7 +2508,7 @@ const Community = () => {
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        Publish Discussion
+                        {t("community.publish_discussion") || "Publish Discussion"}
                       </>
                     )}
                   </button>
@@ -2515,7 +2529,7 @@ const Community = () => {
                   <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                     <h3 className="text-lg font-bold text-[#002147] flex items-center gap-2">
                       <Bell className="w-5 h-5 text-red-500" />
-                      Report Content
+                      {t("community.report_content") || "Report Content"}
                     </h3>
                     <button
                       onClick={() => setReportingId(null)}
@@ -2597,7 +2611,7 @@ const Community = () => {
                 >
                   <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                     <h3 className="text-xl font-bold text-[#002147]">
-                      Share to Groups
+                      {t("community.share_to_groups_title") || "Share to Groups"}
                     </h3>
                     <button
                       onClick={() => {

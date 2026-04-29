@@ -28,6 +28,7 @@ import {
   MapPinHouse
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL, getBackendUrl } from "@/services/api";
@@ -39,6 +40,7 @@ import PageTransition from "@/components/PageTransition";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, loading: userLoading, refreshUser } = useUser();
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -450,7 +452,7 @@ const Profile = () => {
                         <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                           <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Personal Information</h3>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.personal_information")}</h3>
                       </div>
                       <button
                         onClick={() => handleOpenEditModal('personalDetails', {
@@ -519,7 +521,7 @@ const Profile = () => {
                           <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
                             <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Educational History</h3>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.educational_history")}</h3>
                         </div>
                       </div>
                       <div className="space-y-6">
@@ -528,7 +530,7 @@ const Profile = () => {
                             <div key={idx} className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
                               <div className="flex-1">
                                 <div className="flex flex-col gap-1 mb-2">
-                                  <h5 className="font-bold text-gray-900 dark:text-white">Higher Education</h5>
+                                  <h5 className="font-bold text-gray-900 dark:text-white">{t("profile_page.higher_education")}</h5>
                                   <hr className="my-3 border-gray-200 dark:border-slate-700" />
                                   <h6 className="font-semibold text-gray-900 dark:text-white">{edu.institutionName}</h6>
                                 </div>
@@ -600,7 +602,7 @@ const Profile = () => {
                           <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                             <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Work Experience</h3>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.work_experience")}</h3>
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('workExperience', formData.workExperience)}
