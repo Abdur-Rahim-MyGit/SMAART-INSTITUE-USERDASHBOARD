@@ -225,7 +225,8 @@ const AssessmentFlowGuard = ({ children }) => {
       }
     }
 
-    setNextPath(requiredPath);
+    // setNextPath(requiredPath); // Removed blocking redirection
+    setNextPath(null); 
 
   }, [location.pathname, assessmentData]);
 
@@ -269,30 +270,10 @@ const AssessmentFlowGuard = ({ children }) => {
   }
 
   // If there's a required assessment path
-  if (nextPath) {
-    // If we are NOT currently at the required path, redirect
-    if (location.pathname !== nextPath) {
-      // Show dev skip option before redirecting (dev mode only)
-      if (showDevSkip && import.meta.env.DEV) {
-        return (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-[#001229]">
-            <p className="text-white font-medium mb-4">Redirecting to required assessment...</p>
-            <p className="text-white/60 text-sm mb-6">Next: {nextPath}</p>
-            {/* Developer Skip Button - SECURITY FIX #5: Only shown in dev mode */}
-            <button
-              onClick={handleDevSkip}
-              className="text-xs text-white/40 hover:text-white bg-white/5 hover:bg-white/10 px-6 py-3 rounded-lg uppercase tracking-widest font-bold transition-colors border border-white/10"
-            >
-              ⚡ DEV: Skip All Assessments
-            </button>
-            {/* Auto redirect after a short delay if not skipped */}
-            <Navigate to={nextPath} replace />
-          </div>
-        );
-      }
-      return <Navigate to={nextPath} replace />;
-    }
-  }
+    // Removed auto-redirect to required assessment to allow free navigation
+    // if (location.pathname !== nextPath) {
+    //   return <Navigate to={nextPath} replace />;
+    // }
 
   // If NOT authenticated (logged out user pressing back button), redirect to login
   if (!isAuthenticated) {

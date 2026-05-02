@@ -151,14 +151,12 @@ const VisionGoalsWidget = () => {
                   </div>
                   <div className="absolute bottom-2 left-0 right-0 text-center font-['Caveat',cursive] text-slate-500 dark:text-slate-400 text-lg opacity-80">
                     My Vision
-                  </div>
-                </div>
+              </div>
+            </div>
               </div>
             ) : (
                <div className="w-full aspect-square max-w-[320px] mx-auto rounded-3xl bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center p-8 text-center">
-               <div className="w-full aspect-square max-w-[320px] mx-auto rounded-3xl bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center p-8 text-center">
                   <Star className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
-                  <p className="text-slate-500 font-medium mb-4">No canvas design yet.</p>
                   <button onClick={handleEdit} className="px-4 py-2 bg-[#1a3884] text-white rounded-full text-sm font-bold shadow-md hover:bg-blue-800 transition-colors">
                     Create Design
                   </button>

@@ -13,24 +13,6 @@ const toolkitSections = [
     badge: "Vault"
   },
   {
-    id: 8,
-    title: "AI Career Chat",
-    description: "Get instant AI-powered career guidance. Ask questions about career paths, skill development, job opportunities, and receive personalized recommendations in real-time.",
-    icon: MessageSquare,
-    path: "/dashboard/ai-career-chat",
-    color: "#1a3884",
-    badge: "AI Assistant"
-  },
-  {
-    id: 7,
-    title: "Career Intelligence Agent",
-    description: "AI-powered Career Intelligence Engine — get personalized career roadmaps, skill gap analysis, job recommendations, and market insights powered by structured data + GPT AI.",
-    icon: Database,
-    path: "/dashboard/career-data-fetcher",
-    color: "#1a3884",
-    badge: "AI + Data"
-  },
-  {
     id: 3,
     title: "SMAART AI Resume Builder",
     description: "Craft ATS-optimized resumes that stand out. Leverage AI to generate impactful summaries and role-specific content that maximizes your interview chances.",
@@ -38,15 +20,6 @@ const toolkitSections = [
     path: "/dashboard/resume-builder",
     color: "#1a3884",
     badge: "Professional"
-  },
-  {
-    id: 2,
-    title: "Profile Analysis",
-    description: "Transform your career potential with deep AI analysis. Get comprehensive skill gap assessments, role recommendations, and a personalized roadmap to success.",
-    icon: User,
-    path: "/dashboard/profile-analysis",
-    color: "#1a3884",
-    badge: "Comprehensive"
   },
   {
     id: 6,

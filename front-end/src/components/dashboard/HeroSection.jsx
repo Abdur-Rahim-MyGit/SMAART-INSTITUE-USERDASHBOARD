@@ -1,9 +1,10 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { ANIMATION_DELAYS, ANIMATION_DURATIONS } from "@/constants/dashboard";
-import { Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = memo(({ userName }) => {
+  const navigate = useNavigate();
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}

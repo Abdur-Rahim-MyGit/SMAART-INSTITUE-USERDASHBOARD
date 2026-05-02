@@ -44,7 +44,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
             {averageProgress}% Complete
           </span>
           <button 
-            onClick={() => window.open('http://localhost:5173/', '_blank')}
+            onClick={() => navigate('/dashboard/courses')}
             className="dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm whitespace-nowrap"
             style={{ backgroundColor: COLORS.PRIMARY }}
             onMouseEnter={(e) => e.target.style.backgroundColor = COLORS.PRIMARY_DARK}

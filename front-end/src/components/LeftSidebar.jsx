@@ -70,7 +70,7 @@ const menuGroups = [
   {
     title: "SKILLS & GROWTH",
     items: [
-      { icon: Award, label: "Skills Vault", path: "/dashboard/skills-vault", badge: null },
+      { icon: Award, label: "Skills Vault", path: "/dashboard/smaart-wallet", badge: null },
       { icon: ShieldCheck, label: "Skills Passport", path: "/dashboard/skills-passport", badge: null },
       { icon: Lightbulb, label: "Vision Board", path: "/dashboard/vision-boards", badge: null },
     ]

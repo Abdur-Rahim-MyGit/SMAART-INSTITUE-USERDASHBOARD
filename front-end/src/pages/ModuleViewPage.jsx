@@ -15,6 +15,9 @@ import FlashcardTask from "@/components/FlashcardTask";
 import ModulePathway from "@/components/ModulePathway";
 import FloatingDictionary from "@/components/FloatingDictionary";
 import FiveModuleRoadmap from "@/components/FiveModuleRoadmap";
+import ModernVideoPlayer from "@/components/ModernVideoPlayer";
+import LearningFlowPlayer from "@/components/LearningFlowPlayer";
+import { LEARNING_FLOW_DATA } from "@/data/learningFlowData";
 
 const IntroScreen = ({ lines, onFinish }) => {
   const [currentLineIndex, setCurrentLineIndex] = useState(0);
@@ -109,6 +112,7 @@ const ModuleViewPage = () => {
   const [earnedBadge, setEarnedBadge] = useState(null);
   const [finishedIntros, setFinishedIntros] = useState({}); // Track which video intros have been seen
   const [activeTaskIndex, setActiveTaskIndex] = useState(0);
+  const [learningFlow, setLearningFlow] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
   useEffect(() => {
@@ -254,6 +258,29 @@ const ModuleViewPage = () => {
               console.error("Error fetching enrollment progress:", err);
             }
           }
+
+          // NEW: Load Learning Flow Data
+          // Try to find matching flow data by ID or title
+          let flowKey = null;
+          if (courseData.id && LEARNING_FLOW_DATA[courseData.id]) {
+            flowKey = courseData.id;
+          } else if (courseId && LEARNING_FLOW_DATA[courseId]) {
+            flowKey = courseId;
+          } else {
+            // Try matching by title
+            const entries = Object.entries(LEARNING_FLOW_DATA);
+            const match = entries.find(([key, flow]) => 
+              flow.title.toLowerCase() === courseData.title.toLowerCase()
+            );
+            if (match) flowKey = match[0];
+          }
+
+          if (flowKey) {
+            setLearningFlow(LEARNING_FLOW_DATA[flowKey]);
+          } else {
+            // Default to S01 if nothing else found for testing
+            setLearningFlow(LEARNING_FLOW_DATA['S01']);
+          }
         }
       } catch (error) {
         console.error('Critical fetchData error:', error);
@@ -294,7 +321,7 @@ const ModuleViewPage = () => {
       return getModuleCompletedCount(selectedModule - 1).completed >= (prevMod.days?.length || 3);
     })();
 
-    if (!isActuallyUnlocked) {
+    if (false) { // Disabled route guard for direct access
       console.warn(`[RouteGuard] Blocking access to M${selectedModule} S${selectedDay}: Day is LOCKED.`);
       toast.error("Finish previous session's videos to unlock!");
       navigateToDays(selectedModule);
@@ -595,21 +622,7 @@ const ModuleViewPage = () => {
   };
 
   const isDayUnlocked = (moduleId, dayIndex, moduleObj) => {
-    if (dayIndex === 0) return true; // First day always unlocked
-    const mod = moduleObj || modules.find(m => m.id === moduleId);
-    if (!mod || !mod.days) return false;
-
-    // STRICT SEQUENTIAL LOCK: Current session is unlocked ONLY if 
-    // ALL previous sessions are completed.
-    for (let i = 0; i < dayIndex; i++) {
-      if (!checkSessionCompletion(moduleId, mod.days[i])) {
-        // Find if a previous session is not complete
-        console.log(`[Progression] S${dayIndex + 1} is LOCKED because S${i + 1} is incomplete.`);
-        return false;
-      }
-    }
-
-    return true;
+    return true; // All days unlocked
   };
 
   const isStepUnlocked = (mId, dId, stepIndex, steps) => {
@@ -666,6 +679,21 @@ const ModuleViewPage = () => {
       <FiveModuleRoadmap 
         courseData={courseData} 
         onModuleSelect={(mod) => navigateToDay(mod.id, 1)} 
+      />
+    );
+  }
+
+  // Use Learning Flow Player when module and day are selected
+  if (selectedModule && selectedDay) {
+    return (
+      <LearningFlowPlayer
+        courseData={courseData}
+        learningFlow={learningFlow}
+        selectedModule={selectedModule}
+        selectedDay={selectedDay}
+        onBack={navigateToCourses}
+        videoCompletionMap={videoCompletionMap}
+        onVideoProgressUpdate={handleVideoProgressUpdate}
       />
     );
   }

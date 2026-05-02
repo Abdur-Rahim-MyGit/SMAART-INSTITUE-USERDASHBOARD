@@ -234,7 +234,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
               const isSelected = selectedModule?.level === module.level;
               const isCompleted = module.progress === 100;
               const isCurrent = module.level === visualActiveLevel && !isCompleted;
-              const isLocked = module.level > visualActiveLevel;
+              const isLocked = false; // All modules unlocked
               
               return (
                 <g key={i} onClick={() => !isLocked && setSelectedModule(module)} style={{ cursor: isLocked ? 'not-allowed' : 'pointer', opacity: isLocked ? 0.8 : 1 }}>

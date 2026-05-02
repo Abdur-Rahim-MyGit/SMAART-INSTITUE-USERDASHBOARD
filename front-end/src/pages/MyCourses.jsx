@@ -1,28 +1,28 @@
-import { motion, AnimatePresence } from "framer-motion";
-import CoursePathway from "@/components/CoursePathway";
+import CourseStructure from "@/components/CourseStructure";
 import FloatingDictionary from "@/components/FloatingDictionary";
 import { useNavigate } from "react-router-dom";
 
 const MyCourses = () => {
   const navigate = useNavigate();
 
-  const handleCourseClick = (courseIdOrObject) => {
-    const id = typeof courseIdOrObject === 'object' ? courseIdOrObject.id : courseIdOrObject;
-    navigate(`/dashboard/courses/${id}/modules`);
+  const handleCourseClick = (courseId) => {
+    navigate(`/dashboard/courses/${courseId}/player`);
+  };
+
+  // Mock user progress - this should come from your API/state management
+  const userProgress = {
+    completedCourses: [],
+    completedStages: [],
+    tracksCompleted: [],
+    assessmentsPassed: [],
+    currentCourse: null,
   };
 
   return (
-    <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="w-full"
-      >
-        {/* Course Pathway */}
-        <CoursePathway onCourseClick={handleCourseClick} />
-      </motion.div>
+    <>
+      <CourseStructure onCourseClick={handleCourseClick} userProgress={userProgress} />
       <FloatingDictionary />
-    </div>
+    </>
   );
 };
 

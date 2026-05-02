@@ -825,11 +825,16 @@ const BaseLineTest = () => {
                 </button>
 
                 <button
-                  onClick={() => navigate("/dashboard")}
-                  className="px-6 py-3 bg-[#002147] text-white rounded-lg font-bold hover:bg-[#003366] transition-colors flex items-center gap-2 shadow-md"
+                  onClick={() => {
+                    if (stageKey === 'T1') navigate("/dashboard/courses");
+                    else if (stageKey === 'T2') navigate("/dashboard/courses/S11/player"); // Start Capability
+                    else if (stageKey === 'T3') navigate("/dashboard/courses/S20/player"); // Start Leadership
+                    else navigate("/dashboard/skills-passport");
+                  }}
+                  className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1"
                 >
                   <TrendingUp className="w-4 h-4" />
-                  Go to Dashboard
+                  Continue My Journey
                 </button>
 
                 <button

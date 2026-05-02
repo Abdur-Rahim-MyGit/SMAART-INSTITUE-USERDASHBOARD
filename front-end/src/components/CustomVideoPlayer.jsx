@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Confetti from 'react-confetti';
 
-const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onNext }, ref) => {
+const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onNext, nextLabel = "Next Lesson" }, ref) => {
 
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -749,7 +749,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                   }}
                   className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#287a84] text-white font-bold hover:shadow-lg hover:shadow-[#1a3884]/40 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
                 >
-                  Next Lesson
+                  {onNext ? nextLabel : 'Continue to Content'}
                   <Play className="w-4 h-4 fill-current" />
                 </button>
               </motion.div>
