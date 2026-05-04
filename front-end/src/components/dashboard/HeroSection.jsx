@@ -24,7 +24,7 @@ const HeroSection = memo(({ userName }) => {
           transition={{ delay: ANIMATION_DELAYS.HERO, duration: ANIMATION_DURATIONS.NORMAL }}
           className="text-xl sm:text-2xl font-bold text-white tracking-tight"
         >
-          Welcome Back, <span className="text-blue-200">{userName || "User"}</span>
+          {t("dashboard.welcome")}, <span className="text-blue-200">{userName || "User"}</span>
         </motion.h1>
 
         <motion.p
@@ -33,7 +33,7 @@ const HeroSection = memo(({ userName }) => {
           transition={{ delay: ANIMATION_DELAYS.SUBTITLE, duration: ANIMATION_DURATIONS.NORMAL }}
           className="text-blue-100/90 text-[13px] sm:text-sm font-medium mt-1 leading-relaxed max-w-2xl"
         >
-          Ready to take the next step in your career journey? Let's keep moving forward.
+          {t("dashboard.ready_message")}
         </motion.p>
       </div>
     </motion.div>

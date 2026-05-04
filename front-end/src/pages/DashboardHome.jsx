@@ -10,8 +10,10 @@ import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
 import VisionGoalsWidget from "@/components/dashboard/VisionGoalsWidget";
 import { AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const DashboardHome = () => {
+  const { t } = useTranslation();
   const { user, loading: userLoading } = useUser();
   const { paths, loading: pathsLoading, error: pathsError } = useLearningPaths(user?._id);
   const [showVisionSplash, setShowVisionSplash] = useState(false);
@@ -71,15 +73,15 @@ const DashboardHome = () => {
         <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
           <AlertCircle className="w-8 h-8 text-red-500" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Unable to Connect</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t("dashboard.unable_to_connect")}</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mb-6">
-          We couldn't connect to the server. Please check your connection or try again. If you're running locally, ensure your backend server is running on the correct port.
+          {t("dashboard.connection_error")}
         </p>
         <button 
           onClick={() => window.location.reload()}
           className="px-6 py-2.5 bg-gradient-to-r from-[#002147] to-[#1a3884] text-white rounded-full font-semibold shadow-md hover:shadow-lg transition-all"
         >
-          Reload Dashboard
+          {t("dashboard.reload")}
         </button>
       </div>
     );

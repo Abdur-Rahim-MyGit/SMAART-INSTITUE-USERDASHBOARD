@@ -1,0 +1,263 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "profile": "My Profile",
+    "settings": "Settings",
+    "courses": "My Courses",
+    "results": "Results",
+    "assessments": "Assessments",
+    "toolkit": "Toolkit",
+    "skills_vault": "Skills Vault",
+    "skills_passport": "Skills Passport",
+    "vision_board": "Vision Board",
+    "community": "Community",
+    "help": "Help & Support",
+    "logout": "Logout",
+    "group_main": "Main Menu",
+    "group_skills": "Skills & Growth",
+    "group_community": "Community",
+    "group_system": "System"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile_settings": "Profile Settings",
+    "notifications": "Notifications",
+    "privacy": "Privacy & Security",
+    "appearance": "Appearance",
+    "language": "Language & Region",
+    "help": "Help & Support",
+    "save_changes": "Save Changes",
+    "cancel": "Cancel",
+    "language_region": "Language & Region"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "ready_message": "Ready to take the next step in your career journey? Let's keep moving forward.",
+    "overview": "Overview",
+    "recent_activity": "Recent Activity",
+    "my_courses": "My Courses",
+    "upcoming_tasks": "Upcoming Tasks",
+    "view_all": "View All",
+    "unable_to_connect": "Unable to connect",
+    "connection_error": "We couldn't connect to the server. Please check your connection or try again.",
+    "reload": "Reload Dashboard",
+    "continue_learning": "Continue Learning",
+    "capability_program": "Capability Program",
+    "complete": "Complete",
+    "retry": "Retry",
+    "no_paths": "No learning paths yet",
+    "browse_courses": "Browse Courses",
+    "unable_to_load_paths": "Unable to load paths"
+  },
+  "profile_page": {
+    "personal_information": "Personal Information",
+    "contact_information": "Contact Information",
+    "educational_history": "Educational History",
+    "higher_education": "Higher Education",
+    "work_experience": "Work Experience",
+    "professional_experience": "Professional Experience",
+    "vision_goals": "Vision & Goals",
+    "edit_profile": "Edit Profile",
+    "save": "Save",
+    "full_name": "Full Name",
+    "phone": "Phone",
+    "institution": "Institution",
+    "department": "Department"
+  },
+  "profile": {
+    "display_name": "Display Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "bio": "Biography"
+  },
+  "skills_passport": {
+    "title": "Digital Skills Passport",
+    "verifiable": "Employer Verifiable",
+    "hero_title": "The future of verified talent.",
+    "hero_desc": "Your secure, AI-verified credential of capability. Designed for employers who demand proof, and professionals who seek growth.",
+    "get_pdf": "Get Passport PDF",
+    "share": "Share Identity",
+    "global_readiness": "Global Readiness",
+    "plvi_band": "PLVI Band",
+    "secure_protocol": "Secure Trust Protocol",
+    "verification_live": "Public Verification is Live",
+    "tabs": {
+      "smart": "Smart Course",
+      "other": "Other Course",
+      "certificates": "Certificates",
+      "projects": "Projects"
+    },
+    "stats": {
+      "growth_delta": "Growth Delta",
+      "momentum": "Momentum Score",
+      "badges": "Skill Badges",
+      "trust": "Trust Rating"
+    },
+    "dna": {
+      "title": "Competency DNA",
+      "desc": "A multi-dimensional breakdown of your verified cognitive and professional strengths."
+    },
+    "proficiency": {
+      "title": "Verified Proficiency",
+      "gold_standard": "Gold Standard Verified"
+    },
+    "timeline": {
+      "title": "Timeline",
+      "baseline": "Baseline",
+      "assessment": "Assessment"
+    },
+    "other_courses": {
+      "title": "Other Institute Courses",
+      "none": "No external courses found."
+    },
+    "certificates": {
+      "title": "Certificates Earned",
+      "none": "No certificates earned yet."
+    },
+    "projects": {
+      "title": "Projects Showcase",
+      "none": "No projects showcased yet."
+    }
+  },
+  "quotients": {
+    "CRQ": {
+      "name": "Cognitive Reasoning",
+      "desc": "Problem solving, critical thinking, and pattern recognition."
+    },
+    "SRQ": {
+      "name": "Self-Regulation",
+      "desc": "Emotional intelligence, discipline, and stress management."
+    },
+    "LQ": {
+      "name": "Learning Agility",
+      "desc": "Ability to learn quickly and adapt to new situations."
+    },
+    "SIQ": {
+      "name": "Social Intelligence",
+      "desc": "Interpersonal skills, empathy, and collaborative mindset."
+    },
+    "PEQ": {
+      "name": "Professional Execution",
+      "desc": "Delivery capability, reliability, and technical proficiency."
+    },
+    "DAQ": {
+      "name": "Digital & AI",
+      "desc": "Fluency with digital tools and AI-driven workflows."
+    },
+    "SEQ": {
+      "name": "Sustainability & Ethics",
+      "desc": "Commitment to ethical practices and environmental awareness."
+    }
+  },
+  "community": {
+    "title": "Community",
+    "tabs": {
+      "discussions": "Discussions",
+      "my_posts": "My Posts",
+      "bookmarks": "Bookmarks"
+    },
+    "stats": {
+      "members": "Total Members",
+      "discussions": "Discussions",
+      "groups": "Student Groups",
+      "active": "Active Today"
+    },
+    "badges": {
+      "official": "OFFICIAL",
+      "best_answer": "BEST ANSWER",
+      "pinned": "PINNED"
+    },
+    "time": {
+      "just_now": "Just now",
+      "ago": "ago",
+      "min_short": "m",
+      "hour_short": "h",
+      "day_short": "d"
+    },
+    "channels": {
+      "discussion": "Discussion",
+      "mentor": "Mentor",
+      "support": "Support"
+    },
+    "new_post": "New Post",
+    "new_post_button": "Start a Discussion",
+    "search": "Search discussions...",
+    "sort_by": "Sort by",
+    "sort": {
+      "newest": "NEWEST",
+      "popular": "POPULAR",
+      "quality": "HIGH QUALITY"
+    },
+    "load_more": "Load More",
+    "loading": "Loading...",
+    "no_discussions": "No discussions found.",
+    "comments": "Comments",
+    "share_to_group": "Share to Group",
+    "report_discussion": "Report Discussion",
+    "my_groups": "My Groups",
+    "no_groups": "No groups available",
+    "view_my_groups": "View My Groups",
+    "create_group": "Create Group",
+    "top_contributors": "Top Contributors",
+    "new_discussion_title": "New Discussion",
+    "post_title": "Post Title",
+    "category": "Category",
+    "channel": "Channel",
+    "post_content_placeholder": "Go ahead, share your story or ask a question...",
+    "create_poll": "Create a Poll",
+    "media_attachment": "Media Attachment",
+    "publish_discussion": "Publish Discussion",
+    "report_content": "Report Content",
+    "share_to_groups_title": "Share to Groups",
+    "reactions": {
+      "like": "Like",
+      "heart": "Love",
+      "insight": "Insightful",
+      "care": "Supportive",
+      "celebrate": "Brilliant"
+    },
+    "tips": {
+      "guidelines": {
+        "title": "Community Tip",
+        "text": "Engage with discussions and help others to earn points and badges. Top contributors get featured on the leaderboard!"
+      },
+      "quality": {
+        "title": "Quality Score",
+        "text": "Your Quality Score (QS) rises with upvotes, hearts, and comments. Post thoughtfully to climb the Popular feed!"
+      },
+      "mentor": {
+        "title": "Mentor Channel",
+        "text": "Have a career or academic question? Post in the Mentor channel — your question goes straight to your assigned mentors and coaches."
+      },
+      "support": {
+        "title": "Support Channel",
+        "text": "Feeling overwhelmed? The Support channel connects you with the Emotion Coach AI — a safe, non-judgmental space just for you."
+      },
+      "groups": {
+        "title": "Student Groups",
+        "text": "Create or join a Study Group to collaborate with peers, share resources, and chat in real time in your group's private space."
+      },
+      "pinned": {
+        "title": "Pinned Posts",
+        "text": "Pinned posts stay at the top of the Discussion feed regardless of sort order. Look for the PINNED badge on important announcements!"
+      }
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "verified": "Verified",
+    "pending": "Pending",
+    "retry": "Retry",
+    "high": "High",
+    "verified_progression": "Verified Progression",
+    "skill_acquisition_rate": "Skill Acquisition Rate",
+    "competency_aligned": "Competency Aligned",
+    "integrity_verified": "Integrity Verified",
+    "success_export": "Successfully exported!",
+    "error_export": "Export failed. Please try again."
+  }
+}

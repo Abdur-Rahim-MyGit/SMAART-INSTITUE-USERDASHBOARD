@@ -3,9 +3,11 @@ import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_DELAYS, COLORS } from "@/constants/dashboard";
+import { useTranslation } from "react-i18next";
 import PathCard from "./PathCard";
 
 const LearningProgress = memo(({ paths, loading, error }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const averageProgress = useMemo(() => 
     paths.length > 0 
@@ -28,8 +30,8 @@ const LearningProgress = memo(({ paths, loading, error }) => {
             <BookOpen className="w-5 h-5 dark:text-blue-400" style={{ color: COLORS.PRIMARY }} />
           </div>
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Continue learning</h3>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white leading-tight mt-0.5">Capability Building Program</h2>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{t("dashboard.continue_learning")}</h3>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white leading-tight mt-0.5">{t("dashboard.capability_program")}</h2>
           </div>
         </div>
 
@@ -41,7 +43,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
             ></div>
           </div>
           <span className="text-xs font-semibold dark:text-blue-400 whitespace-nowrap" style={{ color: COLORS.PRIMARY }}>
-            {averageProgress}% Complete
+            {averageProgress}% {t("dashboard.complete")}
           </span>
           <button 
             onClick={() => navigate('/dashboard/courses')}
@@ -50,7 +52,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
             onMouseEnter={(e) => e.target.style.backgroundColor = COLORS.PRIMARY_DARK}
             onMouseLeave={(e) => e.target.style.backgroundColor = COLORS.PRIMARY}
           >
-            Continue Learning
+            {t("dashboard.continue_learning")}
           </button>
         </div>
       </div>
@@ -74,19 +76,19 @@ const LearningProgress = memo(({ paths, loading, error }) => {
           </div>
         ) : error ? (
           <div className="text-center py-8">
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Unable to load learning paths</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t("dashboard.unable_to_load_paths")}</p>
             <button 
               onClick={() => window.location.reload()}
               className="text-sm dark:text-blue-400 font-semibold hover:underline"
               style={{ color: COLORS.PRIMARY }}
             >
-              Retry
+              {t("dashboard.retry")}
             </button>
           </div>
         ) : paths.length === 0 ? (
           <div className="text-center py-8">
             <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">No learning paths yet</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t("dashboard.no_paths")}</p>
             <button 
               onClick={() => navigate('/dashboard/courses')}
               className="text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition"
@@ -94,7 +96,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
               onMouseEnter={(e) => e.target.style.backgroundColor = COLORS.PRIMARY_DARK}
               onMouseLeave={(e) => e.target.style.backgroundColor = COLORS.PRIMARY}
             >
-              Browse Courses
+              {t("dashboard.browse_courses")}
             </button>
           </div>
         ) : (

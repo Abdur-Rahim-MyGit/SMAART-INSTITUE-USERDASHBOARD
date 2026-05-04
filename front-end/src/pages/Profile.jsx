@@ -14,14 +14,21 @@ import {
   Award,
   FileText,
   User,
+  Users,
+  Briefcase,
 
   Plus,
   X,
   Camera,
   Save,
-  Loader2
+  Loader2,
+  Rocket,
+  Trash2,
+  Trash,
+  MapPinHouse
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL, getBackendUrl } from "@/services/api";
@@ -33,6 +40,7 @@ import PageTransition from "@/components/PageTransition";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, loading: userLoading, refreshUser } = useUser();
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -86,6 +94,11 @@ const Profile = () => {
   const [editData, setEditData] = useState({ name: "", profilePhoto: null });
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
+
+  // Section Editing State
+  const [activeEditSection, setActiveEditSection] = useState(null); // e.g., 'personal', 'address', 'education', etc.
+  const [editFormData, setEditFormData] = useState({});
+  const [showSectionModal, setShowSectionModal] = useState(false);
 
   // Force refresh user details on mount to get latest badges/progress
   useEffect(() => {
@@ -144,7 +157,10 @@ const Profile = () => {
             state: (user.address || reg.address)?.state || "",
             country: (user.address || reg.address)?.country || "",
             address: (user.address || reg.address) ?
-              `${(user.address || reg.address).city || ""}`.replace(/^,\s*/, '').replace(/,\s*$/, '').replace(/(,\s*)+/g, ', ')
+              `${(user.address || reg.address).city || ""}`
+                .replace(new RegExp("^,\\s*"), '')
+                .replace(new RegExp(",\\s*$"), '')
+                .replace(new RegExp("(,\\s*)+", "g"), ', ')
               : "",
 
             // New Comprehensive Fields
@@ -287,6 +303,43 @@ const Profile = () => {
     }
   };
 
+  const handleOpenEditModal = (section, initialData) => {
+    setActiveEditSection(section);
+    setEditFormData(JSON.parse(JSON.stringify(initialData))); // Deep clone
+    setShowSectionModal(true);
+  };
+
+  const handleSaveSection = async () => {
+    if (!user?.email || !activeEditSection) return;
+
+    setSavingProfile(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/register-section`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          section: activeEditSection,
+          data: editFormData
+        })
+      });
+
+      if (response.ok) {
+        toast.success(`${activeEditSection.charAt(0).toUpperCase() + activeEditSection.slice(1)} updated successfully`);
+        await refreshUser();
+        setShowSectionModal(false);
+      } else {
+        const err = await response.json();
+        toast.error(err.message || `Failed to update ${activeEditSection}`);
+      }
+    } catch (error) {
+      console.error('Error saving section:', error);
+      toast.error('Connection error. Please try again.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
   const getInitials = (name) => {
     return name
       .split(" ")
@@ -302,330 +355,669 @@ const Profile = () => {
     return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
+  const formatSectionTitle = (title) => {
+    if (!title) return "";
+    return title
+      .replace(new RegExp("([A-Z])", "g"), ' $1')
+      .replace(new RegExp("^."), str => str.toUpperCase())
+      .trim();
+  };
+
   // Profile.jsx
 
   return (
-    <PageTransition>
-      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] pb-12 transition-colors duration-300">
-        {loading ? (
-          <ProfileSkeleton />
-        ) : (
-          <main className="container mx-auto px-4 py-6 max-w-6xl">
-            {/* Header section with page title */}
-            <div className="mb-8 flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">My Profile</h1>
-            </div>
-
-            {/* Profile Overview Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-6"
-            >
-              <div className="relative group">
-                <div className="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-slate-800 shadow-lg">
-                  {profilePhoto ? (
-                    <img
-                      src={profilePhoto}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <span className="text-4xl font-bold text-white">
-                      {getInitials(formData.name)}
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={() => { setEditData({ name: formData.name, profilePhoto: profilePhoto }); setShowEditModal(true); }}
-                  className="absolute bottom-2 right-2 w-8 h-8 bg-[#1a3884] dark:bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform"
-                >
-                  <Camera className="w-4 h-4" />
-                </button>
+    <>
+      <PageTransition>
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] pb-12 transition-colors duration-300">
+          {loading ? (
+            <ProfileSkeleton />
+          ) : (
+            <main className="container mx-auto px-4 py-6 max-w-6xl">
+              {/* Header section with page title */}
+              <div className="mb-8 flex justify-between items-center">
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">My Profile</h1>
               </div>
 
-              <div className="text-center md:text-left flex-1">
-                <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-4 mb-2">
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                    {formData.nickname || formData.name || "Student"}
-                  </h2>
-                </div>
-                <p className="font-medium text-lg">
-                  Student
-                </p>
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-4">
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                    <span className="text-sm font-medium">{formData.address || "Not specified"}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Building className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                    <span className="text-sm font-medium">{formData.institution || "Institution not set"}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status Badge */}
-              <div className="hidden lg:block bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-4 py-2 rounded-2xl">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                  <span className="text-sm font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">Active</span>
-                </div>
-              </div>
-            </motion.div>
-
-            <AnimatePresence mode="wait">
+              {/* Profile Overview Card */}
               <motion.div
-                key="info"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="space-y-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-6"
               >
-                {/* Personal Information Card */}
-                <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
-                  <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Personal Information</h3>
-                    <button
-                      onClick={() => navigate('/dashboard/onboarding')}
-                      className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
-                    >
-                      Edit <Edit2 className="w-4 h-4" />
-                    </button>
+                <div className="relative group">
+                  <div className="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-slate-800 shadow-lg">
+                    {profilePhoto ? (
+                      <img
+                        src={profilePhoto}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className="text-4xl font-bold text-white">
+                        {getInitials(formData.name)}
+                      </span>
+                    )}
                   </div>
-                  <hr className="my-6 border-gray-200 dark:border-slate-700" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12">
-                    <InfoField label="Full Name" value={formData.name} />
-                    <InfoField label="Email Address" value={formData.email} />
-                    <InfoField label="Phone Number" value={formData.phone || "Not set"} />
-                    <InfoField label="Date of Birth" value={formatDate(formData.dateOfBirth)} />
-                    <InfoField label="Gender" value={formData.gender || "Not set"} />
-                    <InfoField label="User Role" value="Student" />
-                    <InfoField label="Member Since" value={memberSince || "Not available"} />
-                    <InfoField label="Education Level" value={formData.educationLevel || "Not set"} />
-                    <InfoField label="Department" value={formData.department || "Not set"} />
+                  <button
+                    onClick={() => { setEditData({ name: formData.name, profilePhoto: profilePhoto }); setShowEditModal(true); }}
+                    className="absolute bottom-2 right-2 w-8 h-8 bg-[#1a3884] dark:bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform"
+                  >
+                    <Camera className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="text-center md:text-left flex-1">
+                  <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-4 mb-2">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                      {formData.nickname || formData.name || "Student"}
+                    </h2>
+                  </div>
+                  <p className="font-medium text-lg">
+                    Student
+                  </p>
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-4">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm font-medium">{formData.address || "Not specified"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Building className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                      <span className="text-sm font-medium">{formData.institution || "Institution not set"}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Address Card */}
-                <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
-                  <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Address</h3>
-                    <button
-                      onClick={() => navigate('/dashboard/onboarding')}
-                      className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
-                    >
-                      Edit <Edit2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                  <hr className="my-6 border-gray-200 dark:border-slate-700" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-12">
-                    <InfoField label="Street" value={formData.street || "Not specified"} />
-                    <InfoField label="City" value={formData.city || "Not specified"} />
-                    <InfoField label="State" value={formData.state || "Not specified"} />
-                    <InfoField label="Country" value={formData.country || "Not specified"} />
+                {/* Status Badge */}
+                <div className="hidden lg:block bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-4 py-2 rounded-2xl">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span className="text-sm font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">Active</span>
                   </div>
                 </div>
+              </motion.div>
 
-                {/* Education Card */}
-                {(formData.higherEducation?.length > 0 || formData.tenthDetails || formData.twelfthDetails) && (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key="info"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="space-y-6"
+                >
+                  {/* Personal Information Card */}
                   <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
                     <div className="flex justify-between items-center mb-8">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">Educational History</h3>
+                      <div className="flex gap-2 items-center">
+                        <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
+                          <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.personal_information")}</h3>
+                      </div>
+                      <button
+                        onClick={() => handleOpenEditModal('personalDetails', {
+                          fullName: formData.name,
+                          nickname: formData.nickname,
+                          mobileNumber: formData.phone,
+                          dob: formData.dateOfBirth,
+                          gender: formData.gender,
+                          educationLevel: formData.educationLevel,
+                          department: formData.department
+                        })}
+                        className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                      >
+                        Edit <Edit2 className="w-4 h-4" />
+                      </button>
                     </div>
                     <hr className="my-6 border-gray-200 dark:border-slate-700" />
-                    <div className="space-y-6">
-                      {formData.higherEducation?.map((edu, idx) => (
-                        <div key={idx} className="flex gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
-                          <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                            <GraduationCap className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                              <h4 className="font-bold text-gray-900 dark:text-white">{edu.institutionName}</h4>
-                              <span className="text-[10px] bg-[#1a3884]/10 text-[#1a3884] px-2 py-0.5 rounded-full font-bold uppercase">Higher Ed</span>
-                            </div>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">{edu.degreeFullName || edu.degree} • {edu.specialization}</p>
-                            <p className="text-xs text-gray-400 mt-1">Passing Year: {edu.yearOfPassing} • Score: {edu.cgpaPercentage}%</p>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12">
+                      <InfoField label="Full Name" value={formData.name} />
+                      <InfoField label="Email Address" value={formData.email} />
+                      <InfoField label="Phone Number" value={formData.phone || "Not set"} />
+                      <InfoField label="Date of Birth" value={formatDate(formData.dateOfBirth)} />
+                      <InfoField label="Gender" value={formData.gender || "Not set"} />
+                      <InfoField label="User Role" value="Student" />
+                      <InfoField label="Member Since" value={memberSince || "Not available"} />
+                      <InfoField label="Education Level" value={formData.educationLevel || "Not set"} />
+                      <InfoField label="Department" value={formData.department || "Not set"} />
+                    </div>
+                  </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {formData.twelfthDetails && (
-                          <div className="flex gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
-                            <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                              <BookOpen className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
+                  {/* Address Card */}
+                  <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <div className="flex justify-between items-center mb-8">
+                      <div className="flex gap-2 items-center">
+                        <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
+                          <MapPinHouse className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Address</h3>
+                      </div>
+                      <button
+                        onClick={() => handleOpenEditModal('address', {
+                          street: formData.street,
+                          city: formData.city,
+                          state: formData.state,
+                          country: formData.country
+                        })}
+                        className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                      >
+                        Edit <Edit2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <hr className="my-6 border-gray-200 dark:border-slate-700" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-12">
+                      <InfoField label="Street" value={formData.street || "Not specified"} />
+                      <InfoField label="City" value={formData.city || "Not specified"} />
+                      <InfoField label="State" value={formData.state || "Not specified"} />
+                      <InfoField label="Country" value={formData.country || "Not specified"} />
+                    </div>
+                  </div>
+
+                  {/* Education Card */}
+                  {(formData.higherEducation?.length > 0 || formData.tenthDetails || formData.twelfthDetails) && (
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                      <div className="flex justify-between items-center mb-8">
+                        <div className="flex gap-2 items-center">
+                          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+                            <GraduationCap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.educational_history")}</h3>
+                        </div>
+                      </div>
+                      <div className="space-y-6">
+                        {formData.higherEducation && formData.higherEducation.length > 0 ? (
+                          formData.higherEducation.map((edu, idx) => (
+                            <div key={idx} className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
+                              <div className="flex-1">
+                                <div className="flex flex-col gap-1 mb-2">
+                                  <h5 className="font-bold text-gray-900 dark:text-white">{t("profile_page.higher_education")}</h5>
+                                  <hr className="my-3 border-gray-200 dark:border-slate-700" />
+                                  <h6 className="font-semibold text-gray-900 dark:text-white">{edu.institutionName}</h6>
+                                </div>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{edu.degreeFullName || edu.degree} • {edu.specialization}</p>
+                                <p className="text-xs text-gray-400 mt-1">Passing Year: {edu.yearOfPassing} • Score: {edu.cgpaPercentage}%</p>
+                              </div>
+                              <button
+                                onClick={() => handleOpenEditModal('higherEducation', formData.higherEducation)}
+                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                              >
+                                Edit <Edit2 className="w-3 h-3" />
+                              </button>
                             </div>
-                            <div>
-                              <h4 className="font-bold text-gray-900 dark:text-white">12th Standard</h4>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">{formData.twelfthDetails.schoolName}</p>
-                              <p className="text-xs text-gray-400 mt-1">{formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}</p>
-                            </div>
+                          ))
+                        ) : (
+                          <div className="p-6 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-gray-100 dark:border-slate-800 flex flex-col items-center justify-center text-center">
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">No higher education details added yet.</p>
+                            <button
+                              onClick={() => handleOpenEditModal('higherEducation', [])}
+                              className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm"
+                            >
+                              <Plus className="w-4 h-4" /> Add Higher Education
+                            </button>
                           </div>
                         )}
-                        {formData.tenthDetails && (
-                          <div className="flex gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
-                            <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
-                              <BookOpen className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {formData.twelfthDetails && (
+                            <div className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
+                              <div>
+                                <h4 className="font-bold text-gray-900 dark:text-white">12th Standard</h4>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{formData.twelfthDetails.schoolName}</p>
+                                <p className="text-xs text-gray-400 mt-1">{formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}</p>
+                              </div>
+                              <button
+                                onClick={() => handleOpenEditModal('twelfthDetails', formData.twelfthDetails)}
+                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                              >
+                                Edit <Edit2 className="w-3 h-3" />
+                              </button>
                             </div>
-                            <div>
-                              <h4 className="font-bold text-gray-900 dark:text-white">10th Standard</h4>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">{formData.tenthDetails.schoolName}</p>
-                              <p className="text-xs text-gray-400 mt-1">{formData.tenthDetails.percentage}% • {formData.tenthDetails.yearOfPassing}</p>
+                          )}
+                          {formData.tenthDetails && (
+                            <div className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
+                              <div>
+                                <h4 className="font-bold text-gray-900 dark:text-white">10th Standard</h4>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{formData.tenthDetails.schoolName}</p>
+                                <p className="text-xs text-gray-400 mt-1">{formData.tenthDetails.percentage}% • {formData.tenthDetails.yearOfPassing}</p>
+                              </div>
+                              <button
+                                onClick={() => handleOpenEditModal('tenthDetails', formData.tenthDetails)}
+                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                              >
+                                Edit <Edit2 className="w-3 h-3" />
+                              </button>
                             </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Professional Experience & Achievements */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Work Experience */}
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
+                            <Briefcase className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                           </div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.work_experience")}</h3>
+                        </div>
+                        <button
+                          onClick={() => handleOpenEditModal('workExperience', formData.workExperience)}
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        > Edit
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {formData.workExperience && formData.workExperience.length > 0 ? (
+                          formData.workExperience.map((exp, idx) => (
+                            <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                              <h4 className="font-bold text-gray-900 dark:text-white">{exp.role || exp.title}</h4>
+                              <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{exp.companyName || exp.organization}</p>
+                              <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                                <Clock className="w-3 h-3" />
+                                <span>{exp.duration || "Duration not set"}</span>
+                              </div>
+                              {exp.description && (
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">{exp.description}</p>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">No work experience added yet.</p>
                         )}
                       </div>
                     </div>
-                  </div>
-                )}
 
-                {/* Career & Goals Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Career Preferences */}
-                  <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Career Preferences</h3>
-                    <div className="space-y-4">
-                      {formData.jobPreferences && formData.jobPreferences.length > 0 ? (
-                        formData.jobPreferences.map((job, idx) => (
-                          <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
-                            <h4 className="font-bold text-gray-900 dark:text-white">{job.preferredRole}</h4>
-                            <div className="grid grid-cols-2 gap-4 mt-3">
-                              <div>
-                                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Job Type</p>
-                                <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">{job.jobType}</p>
+                    {/* Projects */}
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
+                            <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Projects</h3>
+                        </div>
+                        <button
+                          onClick={() => handleOpenEditModal('projects', formData.projects)}
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        >
+                          Edit <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {formData.projects && formData.projects.length > 0 ? (
+                          formData.projects.map((project, idx) => (
+                            <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                              <h4 className="font-bold text-gray-900 dark:text-white">{project.title}</h4>
+                              {project.link && (
+                                <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 mt-1">
+                                  View Project <Plus className="w-2 h-2" />
+                                </a>
+                              )}
+                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{project.description}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">No projects showcased yet.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Certificates */}
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
+                            <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Certifications</h3>
+                        </div>
+                        <button
+                          onClick={() => handleOpenEditModal('certificates', formData.certificates)}
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        >
+                          Edit <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {formData.certificates && formData.certificates.length > 0 ? (
+                          formData.certificates.map((cert, idx) => (
+                            <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                              <h4 className="font-bold text-gray-900 dark:text-white text-sm">{cert.title}</h4>
+                              <p className="text-[10px] text-gray-500 mt-1">{cert.issuer}</p>
+                              {cert.link && (
+                                <a href={getPreviewUrl(cert.link)} target="_blank" rel="noopener noreferrer" className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-2 inline-block">
+                                  View Certificate
+                                </a>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500 italic col-span-2">No certificates listed yet.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Extracurricular & Others */}
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-xl">
+                            <Users className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Extracurricular</h3>
+                        </div>
+                        <button
+                          onClick={() => handleOpenEditModal('extracurricular', formData.extracurricular)}
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        >
+                          Edit <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="flex flex-col gap-4">
+                        {formData.extracurricular && formData.extracurricular.length > 0 ? (
+                          formData.extracurricular.map((item, idx) => (
+                            <div key={idx} className="p-4 bg-orange-50/50 dark:bg-orange-900/10 rounded-2xl border border-orange-100 dark:border-orange-800/30">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className="font-bold text-gray-900 dark:text-white text-sm">
+                                  {typeof item === 'string' ? item : item.activityType}
+                                </h4>
+                                {item.level && (
+                                  <span className="text-[10px] bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-400 px-2 py-0.5 rounded-full font-bold uppercase">
+                                    {item.level}
+                                  </span>
+                                )}
                               </div>
-                              <div>
-                                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Location</p>
-                                <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">{job.preferredLocation}</p>
+                              {item.description && (
+                                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                  {item.description}
+                                </p>
+                              )}
+                              {item.achievements && (
+                                <p className="text-[10px] text-orange-600 dark:text-orange-400 mt-2 font-medium italic">
+                                  🏆 {item.achievements}
+                                </p>
+                              )}
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">No extracurricular activities mentioned.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Career Preferences */}
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
+                            <Building className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                          </div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Career Preferences</h3>
+                        </div>
+                        <button
+                          onClick={() => handleOpenEditModal('jobPreferences', formData.jobPreferences)}
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        >
+                          Edit <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {formData.jobPreferences && formData.jobPreferences.length > 0 ? (
+                          formData.jobPreferences.map((job, idx) => (
+                            <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                              <h4 className="font-bold text-gray-900 dark:text-white">{job.preferredRole}</h4>
+                              <div className="grid grid-cols-2 gap-4 mt-3">
+                                <div>
+                                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Job Type</p>
+                                  <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">{job.jobType}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Location</p>
+                                  <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">{job.preferredLocation}</p>
+                                </div>
                               </div>
                             </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-gray-500 italic">No job preferences set.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Goals */}
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-cyan-50 dark:bg-cyan-900/30 rounded-xl">
+                            <Rocket className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                           </div>
-                        ))
-                      ) : (
-                        <p className="text-sm text-gray-500 italic">No job preferences set.</p>
-                      )}
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Career Goals</h3>
+                        </div>
+                        <button
+                          onClick={() => handleOpenEditModal('careerGoals', formData.careerGoals)}
+                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        >
+                          Edit <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {formData.careerGoals ? (
+                          <>
+                            <GoalItem label="Short Term" value={formData.careerGoals.shortTerm} />
+                            <GoalItem label="Medium Term" value={formData.careerGoals.mediumTerm} />
+                            <GoalItem label="Long Term" value={formData.careerGoals.longTerm} />
+                          </>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
+                </motion.div>
+              </AnimatePresence>
 
-                  {/* Goals */}
-                  <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Career Goals</h3>
-                    <div className="space-y-4">
-                      {formData.careerGoals ? (
-                        <>
-                          <GoalItem label="Short Term" value={formData.careerGoals.shortTerm} />
-                          <GoalItem label="Medium Term" value={formData.careerGoals.mediumTerm} />
-                          <GoalItem label="Long Term" value={formData.careerGoals.longTerm} />
-                        </>
-                      ) : (
-                        <p className="text-sm text-gray-500 italic">No career goals set yet.</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </main>
-        )}
-
-        {/* Edit Profile Modal */}
-        <AnimatePresence>
-          {showEditModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
-              onClick={() => setShowEditModal(false)}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-md w-full p-8"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Modal Header */}
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Change Profile Photo</h3>
-                  <button
+              {/* Profile Photo Modal */}
+              <AnimatePresence>
+                {showEditModal && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
                     onClick={() => setShowEditModal(false)}
-                    className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-500" />
-                  </button>
-                </div>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                      className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-md w-full p-8"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Change Profile Photo</h3>
+                        <button onClick={() => setShowEditModal(false)} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                          <X className="w-5 h-5 text-gray-500" />
+                        </button>
+                      </div>
+                      <div className="flex flex-col items-center mb-8">
+                        <div className="relative mb-4">
+                          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl">
+                            {editData.profilePhoto ? <img src={editData.profilePhoto} alt="Profile" className="w-full h-full object-cover" /> : <span className="text-4xl font-bold text-white">{getInitials(editData.name)}</span>}
+                          </div>
+                          <label className="absolute bottom-1 right-1 w-10 h-10 bg-[#1a3884] dark:bg-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg">
+                            {uploadingPhoto ? <Loader2 className="w-5 h-5 text-white animate-spin" /> : <Camera className="w-5 h-5 text-white" />}
+                            <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
+                          </label>
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <button onClick={() => setShowEditModal(false)} className="flex-1 py-3 px-4 border border-gray-200 dark:border-slate-700 rounded-2xl text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+                        <button onClick={handleSaveProfile} disabled={savingProfile || uploadingPhoto || !editData.profilePhoto} className="flex-1 py-3 px-4 bg-[#1a3884] text-white rounded-2xl font-bold hover:bg-[#277a84] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg">
+                          {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+                        </button>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-                {/* Profile Photo Section */}
-                <div className="flex flex-col items-center mb-8">
-                  <div className="relative mb-4">
-                    <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl">
-                      {editData.profilePhoto ? (
-                        <img
-                          src={editData.profilePhoto}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-4xl font-bold text-white">
-                          {getInitials(editData.name)}
-                        </span>
-                      )}
-                    </div>
-                    {/* Camera button overlay */}
-                    <label className="absolute bottom-1 right-1 w-10 h-10 bg-[#1a3884] dark:bg-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg">
-                      {uploadingPhoto ? (
-                        <Loader2 className="w-5 h-5 text-white animate-spin" />
-                      ) : (
-                        <Camera className="w-5 h-5 text-white" />
-                      )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoUpload}
-                        className="hidden"
-                        disabled={uploadingPhoto}
-                      />
-                    </label>
-                  </div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Click the camera icon to upload a new photo</p>
-                </div>
+              {/* Global Section Edit Modal */}
+              <AnimatePresence>
+                {showSectionModal && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[110] p-4 overflow-y-auto"
+                    onClick={() => setShowSectionModal(false)}
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                      className="bg-white dark:bg-slate-900 rounded-[32px] shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flex items-center justify-between mb-8 sticky top-0 bg-white dark:bg-slate-900 z-10 pb-4 border-b border-gray-100 dark:border-slate-800">
+                        <div>
+                          <h3 className="text-2xl font-black text-gray-900 dark:text-white">Edit {formatSectionTitle(activeEditSection)}</h3>
+                          <p className="text-xs text-gray-400 mt-1">Keep your profile up to date for better opportunities</p>
+                        </div>
+                        <button onClick={() => setShowSectionModal(false)} className="p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                          <X className="w-6 h-6 text-gray-400" />
+                        </button>
+                      </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-4">
-                  <button
-                    onClick={() => setShowEditModal(false)}
-                    className="flex-1 py-3 px-4 border border-gray-200 dark:border-slate-700 rounded-2xl text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveProfile}
-                    disabled={savingProfile || uploadingPhoto || !editData.profilePhoto}
-                    className="flex-1 py-3 px-4 bg-[#1a3884] text-white rounded-2xl font-bold hover:bg-[#277a84] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[#1a3884]/20"
-                  >
-                    {savingProfile ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        Save
-                      </>
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
+                      <div className="space-y-6">
+                        {activeEditSection === 'personalDetails' && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <ModalInput label="Full Name" value={editFormData.fullName} onChange={(val) => setEditFormData({ ...editFormData, fullName: val })} />
+                            <ModalInput label="Nick Name" value={editFormData.nickname} onChange={(val) => setEditFormData({ ...editFormData, nickname: val })} />
+                            <ModalInput label="Phone Number" value={editFormData.mobileNumber} onChange={(val) => setEditFormData({ ...editFormData, mobileNumber: val })} />
+                            <ModalInput label="Date of Birth" type="date" value={editFormData.dob} onChange={(val) => setEditFormData({ ...editFormData, dob: val })} />
+                            <ModalSelect label="Gender" value={editFormData.gender} options={['Male', 'Female', 'Other']} onChange={(val) => setEditFormData({ ...editFormData, gender: val })} />
+                            <ModalInput label="Department" value={editFormData.department} onChange={(val) => setEditFormData({ ...editFormData, department: val })} />
+                          </div>
+                        )}
+                        {activeEditSection === 'address' && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <ModalInput label="Street" value={editFormData.street} onChange={(val) => setEditFormData({ ...editFormData, street: val })} />
+                            <ModalInput label="City" value={editFormData.city} onChange={(val) => setEditFormData({ ...editFormData, city: val })} />
+                            <ModalInput label="State" value={editFormData.state} onChange={(val) => setEditFormData({ ...editFormData, state: val })} />
+                            <ModalInput label="Country" value={editFormData.country} onChange={(val) => setEditFormData({ ...editFormData, country: val })} />
+                          </div>
+                        )}
+                        {activeEditSection === 'twelfthDetails' && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <ModalInput label="School Name" value={editFormData.schoolName} onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })} />
+                            <ModalInput label="Board" value={editFormData.board} onChange={(val) => setEditFormData({ ...editFormData, board: val })} />
+                            <ModalInput label="Percentage" value={editFormData.percentage} onChange={(val) => setEditFormData({ ...editFormData, percentage: val })} />
+                            <ModalInput label="Year of Passing" value={editFormData.yearOfPassing} onChange={(val) => setEditFormData({ ...editFormData, yearOfPassing: val })} />
+                          </div>
+                        )}
+                        {activeEditSection === 'tenthDetails' && (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <ModalInput label="School Name" value={editFormData.schoolName} onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })} />
+                            <ModalInput label="Board" value={editFormData.board} onChange={(val) => setEditFormData({ ...editFormData, board: val })} />
+                            <ModalInput label="Percentage" value={editFormData.percentage} onChange={(val) => setEditFormData({ ...editFormData, percentage: val })} />
+                            <ModalInput label="Year of Passing" value={editFormData.yearOfPassing} onChange={(val) => setEditFormData({ ...editFormData, yearOfPassing: val })} />
+                          </div>
+                        )}
+                        {activeEditSection === 'careerGoals' && (
+                          <div className="space-y-6">
+                            <ModalTextarea label="Short Term Goal" value={editFormData.shortTerm} onChange={(val) => setEditFormData({ ...editFormData, shortTerm: val })} />
+                            <ModalTextarea label="Medium Term Goal" value={editFormData.mediumTerm} onChange={(val) => setEditFormData({ ...editFormData, mediumTerm: val })} />
+                            <ModalTextarea label="Long Term Goal" value={editFormData.longTerm} onChange={(val) => setEditFormData({ ...editFormData, longTerm: val })} />
+                          </div>
+                        )}
+                        {['higherEducation', 'workExperience', 'projects', 'certificates', 'jobPreferences', 'extracurricular'].includes(activeEditSection) && (
+                          <div className="space-y-8">
+                            {Array.isArray(editFormData) && editFormData.map((item, idx) => (
+                              <div key={idx} className="p-6 bg-gray-50 dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 relative">
+                                <button onClick={() => { const newArr = [...editFormData]; newArr.splice(idx, 1); setEditFormData(newArr); }} className="absolute top-4 right-4 p-2 bg-red-50 dark:bg-red-900 text-red-500 rounded-xl transition-opacity">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {activeEditSection === 'higherEducation' && (
+                                    <>
+                                      <ModalInput label="Institution" value={item.institutionName} onChange={(v) => { const n = [...editFormData]; n[idx].institutionName = v; setEditFormData(n); }} />
+                                      <ModalInput label="Degree" value={item.degreeFullName} onChange={(v) => { const n = [...editFormData]; n[idx].degreeFullName = v; setEditFormData(n); }} />
+                                      <ModalInput label="Year" value={item.yearOfPassing} onChange={(v) => { const n = [...editFormData]; n[idx].yearOfPassing = v; setEditFormData(n); }} />
+                                      <ModalInput label="CGPA or Score" value={item.cgpaPercentage} onChange={(v) => { const n = [...editFormData]; n[idx].cgpaPercentage = v; setEditFormData(n); }} />
+                                    </>
+                                  )}
+                                  {activeEditSection === 'workExperience' && (
+                                    <>
+                                      <ModalInput label="Company" value={item.companyName || item.organization} onChange={(v) => { const n = [...editFormData]; n[idx].companyName = v; setEditFormData(n); }} />
+                                      <ModalInput label="Role" value={item.role || item.title} onChange={(v) => { const n = [...editFormData]; n[idx].role = v; setEditFormData(n); }} />
+                                      <ModalInput label="Duration" value={item.duration} onChange={(v) => { const n = [...editFormData]; n[idx].duration = v; setEditFormData(n); }} />
+                                      <div className="md:col-span-2"><ModalTextarea label="Description" value={item.description} onChange={(v) => { const n = [...editFormData]; n[idx].description = v; setEditFormData(n); }} /></div>
+                                    </>
+                                  )}
+                                  {activeEditSection === 'projects' && (
+                                    <>
+                                      <ModalInput label="Project Title" value={item.title} onChange={(v) => { const n = [...editFormData]; n[idx].title = v; setEditFormData(n); }} />
+                                      <ModalInput label="Link" value={item.link} onChange={(v) => { const n = [...editFormData]; n[idx].link = v; setEditFormData(n); }} />
+                                      <div className="md:col-span-2"><ModalTextarea label="Description" value={item.description} onChange={(v) => { const n = [...editFormData]; n[idx].description = v; setEditFormData(n); }} /></div>
+                                    </>
+                                  )}
+                                  {activeEditSection === 'certificates' && (
+                                    <>
+                                      <ModalInput label="Certificate Title" value={item.title} onChange={(v) => { const n = [...editFormData]; n[idx].title = v; setEditFormData(n); }} />
+                                      <ModalInput label="Issuer" value={item.issuer || item.issuingOrg} onChange={(v) => { const n = [...editFormData]; n[idx].issuer = v; setEditFormData(n); }} />
+                                      <ModalInput label="Link" value={item.link || item.verificationUrl} onChange={(v) => { const n = [...editFormData]; n[idx].link = v; setEditFormData(n); }} />
+                                    </>
+                                  )}
+                                  {activeEditSection === 'extracurricular' && (
+                                    <>
+                                      <ModalInput label="Activity Type" value={typeof item === 'string' ? item : item.activityType} onChange={(v) => { const n = [...editFormData]; n[idx] = typeof item === 'string' ? v : { ...item, activityType: v }; setEditFormData(n); }} />
+                                      <ModalInput label="Level" value={item.level} onChange={(v) => { const n = [...editFormData]; n[idx].level = v; setEditFormData(n); }} />
+                                      <div className="md:col-span-2"><ModalTextarea label="Description" value={item.description} onChange={(v) => { const n = [...editFormData]; n[idx].description = v; setEditFormData(n); }} /></div>
+                                    </>
+                                  )}
+                                  {activeEditSection === 'jobPreferences' && (
+                                    <>
+                                      <ModalInput label="Preferred Role" value={item.preferredRole} onChange={(v) => { const n = [...editFormData]; n[idx].preferredRole = v; setEditFormData(n); }} />
+                                      <ModalInput label="Location" value={item.preferredLocation || item.preferredLocation1} onChange={(v) => { const n = [...editFormData]; n[idx].preferredLocation = v; setEditFormData(n); }} />
+                                      <ModalSelect label="Job Type" value={item.jobType} options={['Full-time', 'Part-time', 'Internship', 'Contract', 'Remote']} onChange={(v) => { const n = [...editFormData]; n[idx].jobType = v; setEditFormData(n); }} />
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                            <button
+                              onClick={() => {
+                                const newItem = activeEditSection === 'extracurricular' ? { activityType: "", level: "", description: "" }
+                                  : activeEditSection === 'workExperience' ? { companyName: "", role: "", duration: "", description: "" }
+                                    : activeEditSection === 'projects' ? { title: "", link: "", description: "" }
+                                      : activeEditSection === 'certificates' ? { title: "", issuer: "", link: "" }
+                                        : activeEditSection === 'jobPreferences' ? { preferredRole: "", preferredLocation: "", jobType: "" }
+                                          : { institutionName: "", degreeFullName: "", yearOfPassing: "", cgpaPercentage: "" };
+                                setEditFormData([...(Array.isArray(editFormData) ? editFormData : []), newItem]);
+                              }}
+                              className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-[24px] text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all flex items-center justify-center gap-2 font-bold"
+                            >
+                              <Plus className="w-5 h-5" /> Add Another Item
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-10 flex gap-4 sticky bottom-0 bg-white dark:bg-slate-900 pt-4 border-t border-gray-100 dark:border-slate-800">
+                        <button onClick={() => setShowSectionModal(false)} className="flex-1 py-4 rounded-[20px] font-black text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all">Cancel</button>
+                        <button onClick={handleSaveSection} disabled={savingProfile} className="flex-[2] py-4 bg-[#1a3884] text-white rounded-[20px] font-black hover:bg-blue-700 transition-all shadow-xl flex items-center justify-center gap-2">{savingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} Save Changes</button>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </main>
           )}
-        </AnimatePresence>
-      </div>
-    </PageTransition>
+        </div>
+      </PageTransition>
+    </>
   );
 };
 
@@ -643,6 +1035,48 @@ const GoalItem = ({ label, value }) => (
   <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
     <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">{label}</p>
     <p className="text-xs font-semibold text-gray-700 dark:text-gray-200 leading-relaxed">{value || "No goal set yet."}</p>
+  </div>
+);
+
+const ModalInput = ({ label, value, onChange, type = "text" }) => (
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">{label}</label>
+    <input
+      type={type}
+      value={value || ""}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none"
+      placeholder={`Enter ${label.toLowerCase()}`}
+    />
+  </div>
+);
+
+const ModalSelect = ({ label, value, options, onChange }) => (
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">{label}</label>
+    <select
+      value={value || ""}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none appearance-none"
+    >
+      <option value="">Select {label}</option>
+      {options.map((opt) => (
+        <option key={opt} value={opt.toLowerCase()}>{opt}</option>
+      ))}
+    </select>
+  </div>
+);
+
+const ModalTextarea = ({ label, value, onChange }) => (
+  <div className="space-y-1.5">
+    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">{label}</label>
+    <textarea
+      value={value || ""}
+      onChange={(e) => onChange(e.target.value)}
+      rows={3}
+      className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none resize-none"
+      placeholder={`Enter your ${label.toLowerCase()}...`}
+    />
   </div>
 );
 

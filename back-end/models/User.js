@@ -71,6 +71,19 @@ const userSchema = new mongoose.Schema({
     default: null
   },
   profileImage: String,
+  bio: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  timezone: {
+    type: String,
+    default: 'Asia/Kolkata'
+  },
+  dateFormat: {
+    type: String,
+    default: 'DD/MM/YYYY'
+  },
   // Active vision board for dashboard display
   activeVisionBoardId: {
     type: mongoose.Schema.Types.ObjectId,
