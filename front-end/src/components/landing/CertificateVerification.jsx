@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Lock, Zap, Shield, Hash, ScanLine, Database, QrCode } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Award, Lock, Zap, Shield, Hash, ScanLine, Database, QrCode, ImageIcon } from 'lucide-react';
 import apiCall from '@/services/api';
 import { toast } from 'sonner';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 
 const CertificateVerification = () => {
     const [certificateId, setCertificateId] = useState('');
@@ -11,54 +11,43 @@ const CertificateVerification = () => {
     const [isVerifying, setIsVerifying] = useState(false);
     const [activeTab, setActiveTab] = useState('id'); // 'id' or 'scan'
     const [error, setError] = useState(null);
+    const [isQrScanning, setIsQrScanning] = useState(false);
+    const [qrScanError, setQrScanError] = useState(null);
+    const fileInputRef = useRef(null);
     const scannerRef = useRef(null);
 
-    // Handle QR Scanner Lifecycle
-    useEffect(() => {
-        let scanner = null;
+    // Handle QR image file selection
+    const handleFileSelect = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-        if (activeTab === 'scan') {
-            // Include a small delay to ensure the DOM element is mounted by AnimatePresence
-            const timer = setTimeout(() => {
-                const element = document.getElementById('reader-landing');
-                if (element) {
-                    try {
-                        scanner = new Html5QrcodeScanner('reader-landing', {
-                            fps: 10,
-                            qrbox: { width: 250, height: 250 },
-                            aspectRatio: 1.0,
-                            showTorchButtonIfSupported: true
-                        }, false); // verbose=false
+        setQrScanError(null);
+        setIsQrScanning(true);
 
-                        scanner.render((decodedText) => {
-                            handleScanSuccess(decodedText, scanner);
-                        }, (error) => {
-                            // Ignore scan errors as they happen frequently when no QR is in view
-                        });
+        try {
+            // We need a hidden element for Html5Qrcode to work with scanFile
+            const html5Qrcode = new Html5Qrcode("reader-landing-hidden");
+            const decodedText = await html5Qrcode.scanFile(file, false);
 
-                        scannerRef.current = scanner;
-                    } catch (err) {
-                        console.error("Failed to initialize scanner", err);
-                        toast.error("Could not start camera. Please ensure permissions are granted.");
-                        setActiveTab('id');
-                    }
-                }
-            }, 300); // 300ms delay for animation
-            return () => clearTimeout(timer);
-        }
-
-        return () => {
-            // Cleanup function
-            if (scannerRef.current) {
-                try {
-                    scannerRef.current.clear().catch(e => console.error("Error clearing scanner", e));
-                } catch (e) {
-                    console.error("Error clearing scanner", e);
-                }
-                scannerRef.current = null;
+            let certId = decodedText.trim();
+            if (decodedText.includes('/verify-certificate/')) {
+                certId = decodedText.split('/verify-certificate/').pop().trim();
+            } else if (decodedText.startsWith('http')) {
+                const url = new URL(decodedText);
+                const pathParts = url.pathname.split('/');
+                certId = pathParts[pathParts.length - 1].trim();
             }
-        };
-    }, [activeTab]);
+
+            setCertificateId(certId);
+            verifyCertificate(certId);
+        } catch (err) {
+            console.error('QR scan error:', err);
+            setQrScanError('No QR code found in this image. Please try a clearer photo.');
+        } finally {
+            setIsQrScanning(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
 
     const handleScanSuccess = (decodedText, scannerInstance) => {
         try {
@@ -212,27 +201,27 @@ const CertificateVerification = () => {
 
                                             <div className="absolute inset-0 flex flex-col items-center justify-center text-white pb-4">
                                                 <ShieldCheck className="w-10 h-10 mb-2 text-[#C0C0C0]" />
-                                                <h3 className="text-xl font-bold font-heading tracking-wide">Credential Check</h3>
+                                                <h3 className="text-xl text-white font-bold font-heading tracking-wide">Credential Check</h3>
                                             </div>
                                         </div>
 
                                         <div className="px-6 md:px-10 pb-10 pt-6 flex-grow flex flex-col -mt-6">
                                             {/* Tab Switcher */}
-                                            <div className="bg-white dark:bg-[#000F24] p-1 rounded-none shadow-lg border border-gray-100 dark:border-white/10 flex mb-8 mx-auto relative z-10 max-w-sm w-full">
+                                            <div className="flex mt-10 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl mb-10 border border-slate-200/50 dark:border-white/5 shadow-inner max-w-sm mx-auto relative z-10 w-full">
                                                 <button
                                                     onClick={() => { setActiveTab('id'); setVerificationResult(null); setError(null); }}
-                                                    className={`flex-1 py-3 px-4 rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'id'
-                                                        ? 'bg-[#1a3884] text-white shadow-md'
-                                                        : 'text-gray-500 hover:text-[#1a3884] dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                                                    className={`flex-1 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all duration-300 ${activeTab === 'id'
+                                                        ? 'bg-white dark:bg-slate-800 text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
+                                                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                                                 >
                                                     <Hash className="w-3.5 h-3.5" />
-                                                    ByID
+                                                    Manual ID
                                                 </button>
                                                 <button
                                                     onClick={() => { setActiveTab('scan'); setVerificationResult(null); setError(null); }}
-                                                    className={`flex-1 py-3 px-4 rounded-none text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 ${activeTab === 'scan'
-                                                        ? 'bg-[#C0C0C0] text-[#002147] shadow-md'
-                                                        : 'text-gray-500 hover:text-[#1a3884] dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'}`}
+                                                    className={`flex-1 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all duration-300 ${activeTab === 'scan'
+                                                        ? 'bg-white dark:bg-slate-800 text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
+                                                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                                                 >
                                                     <QrCode className="w-3.5 h-3.5" />
                                                     Scan QR
@@ -247,11 +236,49 @@ const CertificateVerification = () => {
                                                             initial={{ opacity: 0, scale: 0.95 }}
                                                             animate={{ opacity: 1, scale: 1 }}
                                                             exit={{ opacity: 0, scale: 0.95 }}
-                                                            className="w-full relative py-4"
+                                                            className="w-full text-center py-6"
                                                         >
-                                                            <p className="text-center text-sm text-gray-500 dark:text-gray-400 mb-4">Point your camera at the certificate QR code</p>
-                                                            <div className="rounded-none overflow-hidden border-2 border-[#C0C0C0] bg-black relative aspect-square max-w-[300px] mx-auto shadow-2xl">
-                                                                <div id="reader-landing" className="w-full h-full" />
+                                                            {/* Hidden elements for scanner */}
+                                                            <input
+                                                                ref={fileInputRef}
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="hidden"
+                                                                onChange={handleFileSelect}
+                                                            />
+                                                            <div id="reader-landing-hidden" className="hidden"></div>
+
+                                                            <div className="flex flex-col items-center gap-6">
+                                                                <div className="w-24 h-24 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center group-hover:border-[#1a3884] transition-colors">
+                                                                    {isQrScanning ? (
+                                                                        <Loader2 className="w-10 h-10 text-[#1a3884] animate-spin" />
+                                                                    ) : (
+                                                                        <ImageIcon className="w-10 h-10 text-slate-300 dark:text-slate-700" />
+                                                                    )}
+                                                                </div>
+
+                                                                <div className="space-y-2">
+                                                                    <h4 className="text-lg font-bold text-slate-800 dark:text-white">Select a QR code image</h4>
+                                                                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[240px] mx-auto">
+                                                                        Pick a photo of the certificate from your gallery or files
+                                                                    </p>
+                                                                </div>
+
+                                                                {qrScanError && (
+                                                                    <div className="px-4 py-2 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-xl text-xs text-red-600 dark:text-red-400">
+                                                                        {qrScanError}
+                                                                    </div>
+                                                                )}
+
+                                                                <button
+                                                                    type="button"
+                                                                    disabled={isQrScanning}
+                                                                    onClick={() => fileInputRef.current?.click()}
+                                                                    className="w-full max-w-sm h-14 bg-[#1a3884] hover:bg-[#0d1f4d] text-white rounded-2xl font-bold shadow-xl shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
+                                                                >
+                                                                    <ImageIcon className="w-5 h-5 text-white/70" />
+                                                                    Choose Image
+                                                                </button>
                                                             </div>
                                                         </motion.div>
                                                     ) : (
@@ -263,29 +290,33 @@ const CertificateVerification = () => {
                                                             onSubmit={handleSubmit}
                                                             className="space-y-6 w-full max-w-sm mx-auto"
                                                         >
-                                                            <div className="text-center mb-2">
-                                                                <p className="text-sm text-gray-500 dark:text-gray-400">Enter the unique Certificate ID</p>
-                                                            </div>
-                                                            <div className="relative">
-                                                                <input
-                                                                    type="text"
-                                                                    value={certificateId}
-                                                                    onChange={(e) => setCertificateId(e.target.value)}
-                                                                    placeholder="e.g. SMAART-202X-XXXX"
-                                                                    className="w-full h-14 px-4 text-center text-lg font-mono font-bold bg-gray-50 dark:bg-[#000F24] border-2 border-gray-200 dark:border-white/10 rounded-none focus:border-[#C0C0C0] focus:ring-0 transition-colors text-[#1a3884] dark:text-white placeholder:text-gray-300 dark:placeholder:text-gray-700"
-                                                                />
+                                                            <div className="space-y-3">
+                                                                <label className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] ml-1">
+                                                                    Certificate Identifier
+                                                                </label>
+                                                                <div className="relative group">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={certificateId}
+                                                                        onChange={(e) => setCertificateId(e.target.value)}
+                                                                        placeholder="e.g. SMAART-CAP-2025-ABC12"
+                                                                        className="w-full h-16 px-6 pl-14 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/5 transition-all outline-none font-medium"
+                                                                    />
+                                                                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600 group-focus-within:text-[#1a3884] transition-colors" />
+                                                                </div>
                                                             </div>
 
                                                             <button
                                                                 type="submit"
                                                                 disabled={isVerifying || !certificateId.trim()}
-                                                                className="w-full bg-[#1a3884] hover:bg-[#0d1f4d] text-white h-14 rounded-none font-bold shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-wide text-sm"
+                                                                className="w-full h-16 bg-[#1a3884] hover:bg-[#0d1f4d] text-white rounded-2xl font-bold shadow-xl shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
                                                             >
                                                                 {isVerifying ? (
-                                                                    <Loader2 className="w-5 h-5 animate-spin text-[#C0C0C0]" />
+                                                                    <Loader2 className="w-5 h-5 animate-spin text-white/50" />
                                                                 ) : (
                                                                     <>
-                                                                        Verify Now
+                                                                        <ShieldCheck className="w-5 h-5 text-white/70 group-hover:scale-110 transition-transform" />
+                                                                        Authenticate Now
                                                                     </>
                                                                 )}
                                                             </button>

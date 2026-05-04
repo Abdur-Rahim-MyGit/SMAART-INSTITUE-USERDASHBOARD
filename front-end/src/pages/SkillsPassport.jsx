@@ -22,35 +22,54 @@ import spImage from "@/assets/sp.jpeg";
 const PremiumStyles = () => (
     <style dangerouslySetInnerHTML={{
         __html: `
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        @keyframes mesh {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        .shimmer-effect {
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) rotate(-45deg); }
+            100% { transform: translateX(100%) rotate(-45deg); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .mesh-bg {
+            background: linear-gradient(-45deg, #6366f1, #a855f7, #06b6d4, #10b981);
+            background-size: 400% 400%;
+            animation: mesh 15s ease infinite;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .holographic {
             position: relative;
             overflow: hidden;
         }
-        .shimmer-effect::after {
+        .holographic::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shimmer 2s infinite;
+            top: -100%; left: -100%; width: 300%; height: 300%;
+            background: linear-gradient(
+                45deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 55%,
+                transparent 100%
+            );
+            animation: shimmer 6s infinite linear;
+            pointer-events: none;
         }
-        .glass-morphism {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .dark .glass-morphism {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .text-glow {
-            text-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
-        }
-        .perspective-1000 {
-            perspective: 1000px;
+        .perspective-2000 {
+            perspective: 2000px;
         }
     `}} />
 );
@@ -85,20 +104,23 @@ const IconBox = ({ children, className = "" }) => (
 
 const StatCard = ({ icon: Icon, label, value, sub, colorClass = "text-slate-800 dark:text-white" }) => (
     <motion.div
-        whileHover={{ y: -8, scale: 1.02 }}
+        whileHover={{ y: -10, scale: 1.02 }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="rounded-[32px] shadow-lg border border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/60 backdrop-blur-md p-6 group transition-all"
+        className="rounded-[32px] border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl p-7 group transition-all shadow-[0_20px_50px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_30px_60px_-15px_rgba(99,102,241,0.2)]"
     >
-        <div className="flex items-start justify-between">
-            <div>
-                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{label}</p>
-                <h3 className={`text-3xl font-black mt-2 tracking-tight ${colorClass}`}>{value}</h3>
-                <p className="text-xs mt-2 text-slate-400 dark:text-slate-500 font-bold">{sub}</p>
-            </div>
-            <div className="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
+        <div className="flex flex-col gap-5">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 bg-slate-50 dark:bg-slate-800/50 group-hover:scale-110 ${colorClass.replace('text-', 'bg-').replace('-500', '-500/10')} ${colorClass}`}>
                 <Icon className="w-6 h-6" />
+            </div>
+            <div>
+                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">{label}</p>
+                <h3 className={`text-3xl font-black tracking-tighter ${colorClass}`}>{value}</h3>
+                <p className="text-[10px] mt-2 text-slate-400 dark:text-slate-500 font-bold flex items-center gap-2">
+                    <div className={`w-1.5 h-1.5 rounded-full ${colorClass.replace('text-', 'bg-')}`} />
+                    {sub}
+                </p>
             </div>
         </div>
     </motion.div>
@@ -377,7 +399,7 @@ const SkillsPassport = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors p-4 md:p-8 relative overflow-x-hidden">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors p-3 md:p-8 relative overflow-x-hidden">
             <PremiumStyles />
             <AnimatedBackground />
 
@@ -385,13 +407,13 @@ const SkillsPassport = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="max-w-7xl mx-auto space-y-12"
+                className="max-w-7xl mx-auto space-y-8 md:space-y-12"
                 ref={containerRef}
             >
-                <div className="rounded-[48px] overflow-hidden shadow-2xl border border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 backdrop-blur-3xl transition-all">
-                    <div className="bg-gradient-to-br from-indigo-700 via-violet-600 to-cyan-500 p-8 md:p-16 text-white relative">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none" />
+                <div className="rounded-[32px] md:rounded-[48px] overflow-hidden shadow-2xl border border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 backdrop-blur-3xl transition-all">
+                    <div className="bg-slate-100 dark:bg-slate-900/50 p-6 sm:p-10 md:p-16 text-slate-900 dark:text-white relative transition-colors">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none" />
 
                         <div className="max-w-5xl mx-auto relative z-10 text-center lg:text-left">
                             <div className="space-y-10">
@@ -401,10 +423,10 @@ const SkillsPassport = () => {
                                     transition={{ delay: 0.3 }}
                                     className="flex flex-wrap gap-4 justify-center lg:justify-start"
                                 >
-                                    <div className="px-5 py-2 rounded-full bg-white/15 backdrop-blur-xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/20">
+                                    <div className="px-5 py-2 rounded-full bg-slate-200 dark:bg-white/10 backdrop-blur-xl text-[10px] font-black uppercase tracking-[0.2em] border border-slate-300 dark:border-white/20">
                                         {t("skills_passport.title")}
                                     </div>
-                                    <div className="px-5 py-2 rounded-full bg-emerald-500/80 backdrop-blur-xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/20 flex items-center gap-2 shimmer-effect">
+                                    <div className="px-5 py-2 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 backdrop-blur-xl text-[10px] font-black uppercase tracking-[0.2em] border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
                                         <BadgeCheck className="w-4 h-4" /> {t("skills_passport.verifiable")}
                                     </div>
                                 </motion.div>
@@ -413,7 +435,7 @@ const SkillsPassport = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
-                                    className="text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight"
+                                    className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight text-slate-900 dark:text-white"
                                 >
                                     {t("skills_passport.hero_title")}
                                 </motion.h1>
@@ -421,7 +443,7 @@ const SkillsPassport = () => {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.5 }}
-                                    className="text-xl opacity-90 max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0"
+                                    className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl font-medium leading-relaxed mx-auto lg:mx-0"
                                 >
                                     {t("skills_passport.hero_desc")}
                                 </motion.p>
@@ -432,7 +454,7 @@ const SkillsPassport = () => {
                                         whileTap={{ scale: 0.95 }}
                                         onClick={handleExport}
                                         disabled={isExporting}
-                                        className="flex items-center gap-3 px-10 py-5 rounded-2xl bg-white text-slate-900 font-black text-lg hover:bg-slate-100 transition-all shadow-[0_20px_40px_rgba(0,0,0,0.2)] active:scale-95 disabled:opacity-70 shimmer-effect"
+                                        className="flex items-center gap-3 px-10 py-5 rounded-2xl bg-indigo-600 text-white font-black text-lg hover:bg-indigo-700 transition-all shadow-[0_20px_40px_rgba(99,102,241,0.2)] active:scale-95 disabled:opacity-70"
                                     >
                                         {isExporting ? <span className="animate-pulse">{t("common.processing") || "Processing..."}</span> : <><Download className="w-6 h-6" /> {t("skills_passport.get_pdf")}</>}
                                     </motion.button>
@@ -443,7 +465,7 @@ const SkillsPassport = () => {
                                             navigator.clipboard.writeText(window.location.href);
                                             sonnerToast.success("Profile link copied!");
                                         }}
-                                        className="flex items-center gap-3 px-10 py-5 rounded-2xl border-2 border-white/30 text-white font-black text-lg hover:bg-white/10 transition-all active:scale-95 backdrop-blur-md"
+                                        className="flex items-center gap-3 px-10 py-5 rounded-2xl border-2 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-black text-lg hover:bg-slate-50 dark:hover:bg-white/5 transition-all active:scale-95 backdrop-blur-md"
                                     >
                                         <Share2 className="w-6 h-6" /> {t("skills_passport.share")}
                                     </motion.button>
@@ -452,23 +474,39 @@ const SkillsPassport = () => {
                         </div>
                     </div>
 
-                    {/* 3D Passport Card */}
-                    <div className="pt-12 perspective-1000 max-w-2xl mx-auto px-4">
+                    {/* 3D Vertical Passport Card */}
+                    <div className="pt-8 md:pt-12 perspective-1000 md:perspective-2000 max-w-[340px] md:max-w-sm mx-auto px-4">
                         <motion.div
                             style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
                             onMouseMove={handleMouseMove}
                             onMouseLeave={handleMouseLeave}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="rounded-[40px] border-0 shadow-[0_50px_100px_rgba(0,0,0,0.3)] bg-white dark:bg-slate-800 text-slate-900 dark:text-white p-10 space-y-8 relative overflow-hidden group"
+                            initial={{ opacity: 0, scale: 0.9, y: 50 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                            className="rounded-[32px] md:rounded-[48px] border border-slate-200/50 dark:border-white/10 bg-white dark:bg-slate-900 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.2)] dark:shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] p-6 md:p-10 space-y-6 md:space-y-8 relative overflow-hidden group holographic"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            {/* Animated Background Mesh */}
+                            <div className="absolute inset-0 mesh-bg opacity-[0.03] dark:opacity-[0.07] pointer-events-none" />
+                            
+                            {/* Card Top: Branding */}
+                            <div className="flex justify-between items-center relative z-10">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                        <Sparkles className="w-5 h-5 text-white" />
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Skills Passport</span>
+                                </div>
+                                <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                    <BadgeCheck className="w-3.5 h-3.5" />
+                                    Verified
+                                </div>
+                            </div>
 
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-5">
-                                    <div className="w-24 h-24 rounded-[32px] overflow-hidden bg-slate-100 dark:bg-slate-700 border-4 border-white dark:border-slate-600 shadow-2xl transform transition-transform group-hover:scale-110">
+                            {/* Card Mid: Profile & Identification */}
+                            <div className="text-center space-y-6 relative z-10">
+                                <div className="relative inline-block">
+                                    <div className="absolute -inset-4 bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-2xl relative z-10 transition-transform duration-700 group-hover:scale-105">
                                         <img
                                             src={profilePhoto}
                                             alt={userName}
@@ -476,43 +514,74 @@ const SkillsPassport = () => {
                                             onError={(e) => { e.target.src = spImage; }}
                                         />
                                     </div>
-                                    <div>
-                                        <h3 className="text-3xl font-black tracking-tight">{userName}</h3>
-                                        <p className="text-indigo-500 dark:text-indigo-400 text-sm font-black uppercase tracking-[0.2em] mt-1">{passportId}</p>
+                                    <div className="absolute bottom-0 right-0 p-2 rounded-full bg-indigo-600 border-4 border-white dark:border-slate-900 text-white z-20 shadow-xl">
+                                        <ShieldCheck className="w-4 h-4" />
                                     </div>
                                 </div>
-                                <div className="px-4 py-1.5 rounded-full bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30">{t("common.verified") || "Verified"}</div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="rounded-[32px] p-6 bg-slate-50 dark:bg-slate-900/60 text-center border border-slate-100 dark:border-slate-700 group-hover:border-indigo-500/30 transition-colors">
-                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t("skills_passport.global_readiness")}</p>
-                                    <h2 className="text-5xl font-black text-indigo-600 dark:text-indigo-400">{latestScore}%</h2>
-                                </div>
-                                <div className="rounded-[32px] p-6 bg-slate-50 dark:bg-slate-900/60 text-center border border-slate-100 dark:border-slate-700 group-hover:border-emerald-500/30 transition-colors">
-                                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">{t("skills_passport.plvi_band")}</p>
-                                    <h2 className="text-5xl font-black text-emerald-500">{baselineResult?.stageBand || "A"}</h2>
+                                
+                                <div>
+                                    <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-2">{userName}</h3>
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/50 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-[0.2em] border border-slate-200 dark:border-slate-700">
+                                        {passportId}
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="rounded-3xl p-5 bg-gradient-to-r from-slate-900 to-indigo-900 text-white flex items-center justify-between shadow-2xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl" />
-                                <div className="relative z-10">
-                                    <p className="text-[10px] opacity-70 font-black uppercase tracking-widest">{t("skills_passport.secure_protocol")}</p>
-                                    <p className="text-xs font-bold mt-1 flex items-center gap-2">
-                                        <Shield className="w-3 h-3 text-emerald-400" /> {t("skills_passport.verification_live")}
-                                    </p>
+                            {/* Card Stats: Circular Progress */}
+                            <div className="grid grid-cols-2 gap-4 relative z-10">
+                                <div className="p-5 rounded-[32px] bg-slate-50/50 dark:bg-slate-800/30 border border-slate-100 dark:border-white/5 text-center group/stat transition-all hover:bg-white dark:hover:bg-slate-800/60">
+                                    <div className="relative w-16 h-16 mx-auto mb-3">
+                                        <svg className="w-full h-full transform -rotate-90">
+                                            <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-slate-200 dark:text-slate-700" />
+                                            <motion.circle
+                                                cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="6" fill="transparent"
+                                                strokeDasharray={175.9}
+                                                initial={{ strokeDashoffset: 175.9 }}
+                                                animate={{ strokeDashoffset: 175.9 - (175.9 * latestScore) / 100 }}
+                                                transition={{ duration: 1.5, ease: "easeOut" }}
+                                                className="text-indigo-600"
+                                            />
+                                        </svg>
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <span className="text-xs font-black text-slate-900 dark:text-white">{latestScore}%</span>
+                                        </div>
+                                    </div>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t("skills_passport.global_readiness")}</p>
                                 </div>
-                                <div className="w-16 h-16 bg-white rounded-2xl p-2 shadow-2xl relative z-10">
-                                    <QRCodeSVG value={window.location.href} className="w-full h-full" />
+                                
+                                <div className="p-5 rounded-[32px] bg-slate-50/50 dark:bg-slate-800/30 border border-slate-100 dark:border-white/5 text-center transition-all hover:bg-white dark:hover:bg-slate-800/60">
+                                    <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                                        <TrendingUp className="w-8 h-8" />
+                                    </div>
+                                    <h4 className="text-xs font-black text-slate-900 dark:text-white mb-1">{baselineResult?.stageBand || "A"}</h4>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t("skills_passport.plvi_band")}</p>
+                                </div>
+                            </div>
+
+                            {/* Card Footer: QR & Verification */}
+                            <div className="pt-6 border-t border-slate-100 dark:border-white/5 flex items-center justify-between relative z-10">
+                                <div className="space-y-1">
+                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Digital Trust Protocol</p>
+                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-500">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        Secure & Live
+                                    </div>
+                                </div>
+                                <div className="w-16 h-16 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-xl transition-transform duration-500 hover:scale-110">
+                                    <QRCodeSVG 
+                                        value={window.location.href} 
+                                        className="w-full h-full" 
+                                        fgColor={theme === 'dark' ? '#ffffff' : '#000000'}
+                                        bgColor="transparent"
+                                    />
                                 </div>
                             </div>
                         </motion.div>
                     </div>
 
                     {/* Tab Navigation */}
-                    <div className="max-w-4xl mx-auto px-4 mt-16 mb-8">
-                        <div className="flex flex-wrap justify-center gap-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl p-3 rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div className="max-w-4xl mx-auto px-2 sm:px-4 mt-12 md:mt-16 mb-8">
+                        <div className="flex sm:flex-wrap justify-start sm:justify-center gap-2 md:gap-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl p-2 md:p-3 rounded-[24px] md:rounded-[32px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto no-scrollbar">
                             {[
                                 { id: 'smart', label: t('skills_passport.tabs.smart'), icon: Sparkles },
                                 { id: 'other', label: t('skills_passport.tabs.other'), icon: ExternalLink },
@@ -522,9 +591,9 @@ const SkillsPassport = () => {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black text-sm transition-all relative overflow-hidden ${activeTab === tab.id
-                                            ? "bg-indigo-600 text-white shadow-xl shadow-indigo-500/30 scale-105"
-                                            : "text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white"
+                                    className={`flex items-center gap-2 md:gap-3 px-5 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-xs md:text-sm transition-all relative overflow-hidden flex-shrink-0 ${activeTab === tab.id
+                                        ? "bg-indigo-600 text-white shadow-xl shadow-indigo-500/30 scale-105"
+                                        : "text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white"
                                         }`}
                                 >
                                     <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? "animate-pulse" : ""}`} />
@@ -534,7 +603,7 @@ const SkillsPassport = () => {
                         </div>
                     </div>
 
-                    <div className="p-8 md:p-16 pt-0 space-y-20 relative">
+                    <div className="p-4 sm:p-8 md:p-16 pt-0 space-y-12 md:space-y-20 relative">
                         <AnimatePresence mode="wait">
                             {activeTab === 'smart' && (
                                 <motion.div
@@ -581,7 +650,7 @@ const SkillsPassport = () => {
                                         <motion.div
                                             whileInView={{ opacity: 1, scale: 1 }}
                                             initial={{ opacity: 0, scale: 0.98 }}
-                                            className="rounded-[48px] border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl p-10 md:p-14 shadow-sm relative overflow-hidden"
+                                            className="rounded-[32px] md:rounded-[48px] border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl p-6 sm:p-10 md:p-14 shadow-sm relative overflow-hidden"
                                         >
                                             <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
                                                 <Brain className="w-64 h-64" />
@@ -842,12 +911,12 @@ const SkillsPassport = () => {
             <motion.div
                 whileInView={{ scale: 1 }}
                 initial={{ scale: 0.95 }}
-                className="rounded-[60px] p-12 md:p-20 bg-gradient-to-br from-indigo-600 via-violet-700 to-indigo-900 text-white flex flex-col md:flex-row items-center justify-between gap-12 shadow-[0_40px_100px_rgba(79,70,229,0.3)] relative overflow-hidden group"
+                className="rounded-[40px] md:rounded-[60px] p-8 sm:p-12 md:p-20 bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white flex flex-col md:flex-row items-center justify-between gap-12 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-white/5 relative overflow-hidden group transition-colors"
             >
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full translate-x-1/3 -translate-y-1/3 blur-3xl" />
+                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full translate-x-1/3 -translate-y-1/3 blur-3xl" />
                 <div className="space-y-6 text-center md:text-left relative z-10">
-                    <h2 className="text-5xl md:text-6xl font-black tracking-tight leading-none">Ready for the <br /> Next Level?</h2>
-                    <p className="opacity-80 font-bold text-xl max-w-xl">
+                    <h2 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-none text-slate-900 dark:text-white">Ready for the <br className="hidden md:block" /> Next Level?</h2>
+                    <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 font-bold max-w-xl">
                         Your Skills Passport is a living document. Continue your assessments to unlock advanced certifications.
                     </p>
                 </div>
@@ -855,7 +924,7 @@ const SkillsPassport = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate('/dashboard/assessments')}
-                    className="bg-white text-slate-900 px-14 py-7 rounded-3xl font-black text-2xl hover:bg-slate-50 transition-all shimmer-effect"
+                    className="bg-indigo-600 text-white px-14 py-7 rounded-3xl font-black text-2xl hover:bg-indigo-700 transition-all shadow-[0_20px_40px_rgba(99,102,241,0.2)]"
                 >
                     Continue Journey
                 </motion.button>

@@ -89,10 +89,10 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
             <Button
               className="text-white font-semibold shadow-lg"
               style={{ backgroundColor: '#1a3884', boxShadow: '0 10px 15px -3px rgba(26, 56, 132, 0.4)', border: '1px solid #C0C0C0' }}
-              onClick={onSignupClick}
+              onClick={() => scrollToSection("#contact")}
             >
               <UserPlus className="w-4 h-4 mr-2" />
-              Get Started
+              Get Enquiry
             </Button>
           </div>
         </div>
@@ -143,13 +143,13 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
               <Button
                 className="text-white justify-start"
                 style={{ backgroundColor: '#1a3884', border: '1px solid #C0C0C0' }}
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onSignupClick();
-                }}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    scrollToSection("#contact");
+                  }}
               >
                 <UserPlus className="w-4 h-4 mr-2" />
-                Get Started
+                Enquiry
               </Button>
             </div>
           </motion.div>

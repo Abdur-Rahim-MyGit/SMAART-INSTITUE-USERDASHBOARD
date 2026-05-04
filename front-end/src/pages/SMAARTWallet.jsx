@@ -169,7 +169,8 @@ const SMAARTWallet = () => {
                                 {activeTab === "overview" && (
                                     <div className="space-y-6">
                                         {/* Quick Stats */}
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {/* Quick Stats */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                                             {[
                                                 { label: "Certificates", value: certificateTypes.length, icon: Award, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
                                                 { label: "Badges Earned", value: badges.length, icon: Trophy, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
