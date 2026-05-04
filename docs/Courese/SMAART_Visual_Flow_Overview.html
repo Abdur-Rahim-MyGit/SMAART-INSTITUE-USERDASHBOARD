@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMAART Course Architecture — Visual Overview</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --navy: #1B3A6B; --teal: #0D7377; --amber: #D4691F; --green: #2E7D32;
+    --red: #C62828; --purple: #6A1B9A; --indigo: #283593; --blue: #1565C0;
+    --navy-l: #E8EDF5; --teal-l: #E0F4F4; --amber-l: #FFF3E0; --green-l: #E8F5E9;
+    --red-l: #FFEBEE; --purple-l: #F3E5F5; --indigo-l: #E8EAF6;
+    --bg: #F7F8FC; --card: #FFFFFF; --text: #1A1A2E; --mid: #555573;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, #0D2447 40%, var(--indigo) 100%);
+    padding: 60px 40px 50px; text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: 52px; color: #fff; letter-spacing: -1px; position: relative; }
+  .hero h1 span { color: #5BCCCC; }
+  .hero p { font-size: 17px; color: rgba(255,255,255,0.75); margin-top: 12px; max-width: 600px; margin-left: auto; margin-right: auto; position: relative; }
+  .hero .badge { display: inline-block; background: var(--amber); color: #fff; font-size: 12px; font-weight: 600; padding: 4px 14px; border-radius: 20px; margin-top: 16px; letter-spacing: 1px; text-transform: uppercase; position: relative; }
+
+  /* ── SECTION TITLES ── */
+  .section { padding: 48px 32px; max-width: 1300px; margin: 0 auto; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 30px; color: var(--navy); border-left: 5px solid var(--teal); padding-left: 18px; margin-bottom: 8px; }
+  .section-sub { font-size: 15px; color: var(--mid); margin-bottom: 32px; padding-left: 23px; }
+
+  /* ── METRIC CARDS ── */
+  .metrics { display: grid; grid-template-columns: repeat(6,1fr); gap: 16px; padding: 32px 32px 0; max-width: 1300px; margin: 0 auto; }
+  .metric { background: var(--card); border-radius: 12px; padding: 22px 18px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,.06); border-top: 4px solid var(--teal); }
+  .metric .num { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 900; color: var(--navy); }
+  .metric .lbl { font-size: 12px; color: var(--mid); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
+
+  /* ── THE PROGRAMME FLOW ── */
+  .flow { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 0 32px 32px; max-width: 1300px; margin: 0 auto; }
+  .flow-stage { flex: 1; min-width: 200px; }
+  .flow-arrow { display: flex; align-items: center; padding: 0 8px; margin-top: 50px; }
+  .flow-arrow svg { width: 28px; height: 28px; fill: var(--teal); }
+  .stage-header { border-radius: 12px 12px 0 0; padding: 16px; text-align: center; }
+  .stage-header .tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: .8; }
+  .stage-header .name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; margin-top: 4px; }
+  .stage-header .q { font-size: 12px; margin-top: 6px; opacity: .8; }
+  .stage-courses { border: 2px solid; border-top: none; border-radius: 0 0 12px 12px; padding: 12px; }
+  .course-pill { border-radius: 8px; padding: 9px 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .course-pill .code { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; min-width: 36px; }
+  .course-pill .info { flex: 1; }
+  .course-pill .title { font-size: 12px; font-weight: 600; line-height: 1.3; }
+  .course-pill .fw { font-family: 'DM Mono', monospace; font-size: 10px; opacity: .7; }
+  .gate { border-radius: 10px; padding: 12px 16px; margin-top: 12px; text-align: center; border: 2px dashed; }
+  .gate .g-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; }
+  .gate .g-sub { font-size: 11px; margin-top: 3px; opacity: .8; }
+
+  /* CAPACITY */
+  .cap .stage-header { background: linear-gradient(135deg, #1B3A6B, #2563B0); color: white; }
+  .cap .stage-courses { border-color: #1B3A6B30; }
+  .cap .course-pill { background: var(--navy-l); }
+  .cap .course-pill .code { color: var(--navy); }
+  .cap .course-pill .title { color: var(--navy); }
+  .cap .gate { border-color: var(--navy); background: var(--navy-l); color: var(--navy); }
+
+  /* CAPABILITY */
+  .cap2 .stage-header { background: linear-gradient(135deg, #6A1B9A, #9C27B0); color: white; }
+  .cap2 .stage-courses { border-color: #6A1B9A30; }
+  .cap2 .course-pill { background: var(--purple-l); }
+  .cap2 .course-pill .code { color: var(--purple); }
+  .cap2 .course-pill .title { color: var(--purple); }
+  .cap2 .course-pill.gateway { background: var(--indigo-l); }
+  .cap2 .course-pill.gateway .code, .cap2 .course-pill.gateway .title { color: var(--indigo); }
+  .cap2 .gate { border-color: var(--purple); background: var(--purple-l); color: var(--purple); }
+
+  /* LEADERSHIP */
+  .lead .stage-header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white; }
+  .lead .stage-courses { border-color: #2E7D3230; }
+  .lead .course-pill { background: var(--green-l); }
+  .lead .course-pill .code { color: var(--green); }
+  .lead .course-pill .title { color: var(--green); }
+  .lead .course-pill.sq-gate { background: var(--teal-l); }
+  .lead .course-pill.sq-gate .code, .lead .course-pill.sq-gate .title { color: var(--teal); }
+  .lead .gate { border-color: var(--green); background: var(--green-l); color: var(--green); }
+
+  /* ── TRACKS ── */
+  .tracks { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+  .track-card { border-radius: 14px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+  .track-header { padding: 20px; text-align: center; }
+  .track-header .icon { font-size: 32px; margin-bottom: 8px; }
+  .track-header .name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; color: white; }
+  .track-header .desc { font-size: 12px; color: rgba(255,255,255,.8); margin-top: 6px; }
+  .track-body { padding: 16px; }
+  .track-comp { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; margin-bottom: 8px; }
+  .track-comp .tc { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; min-width: 52px; }
+  .track-comp .fw-badge { font-family: 'DM Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+  .track-comp .tname { font-size: 12px; font-weight: 600; flex: 1; }
+  .piq .track-header { background: linear-gradient(135deg, var(--amber), #B45309); }
+  .piq .track-comp { background: var(--amber-l); color: var(--amber); }
+  .piq .fw-badge { background: var(--amber); color: white; }
+  .aiq .track-header { background: linear-gradient(135deg, var(--indigo), var(--blue)); }
+  .aiq .track-comp { background: var(--indigo-l); color: var(--indigo); }
+  .aiq .fw-badge { background: var(--indigo); color: white; }
+  .sq .track-header { background: linear-gradient(135deg, var(--teal), var(--green)); }
+  .sq .track-comp { background: var(--teal-l); color: var(--teal); }
+  .sq .fw-badge { background: var(--teal); color: white; }
+  .prereq-tag { font-size: 11px; font-weight: 600; border-radius: 6px; padding: 5px 12px; margin: 0 16px 12px; display: block; text-align: center; }
+  .capstone-box { margin: 12px 16px 16px; border-radius: 8px; padding: 12px; text-align: center; border: 2px dashed; }
+  .capstone-box .ct { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; }
+  .capstone-box .cs { font-size: 11px; margin-top: 4px; }
+
+  /* ── COURSE ANATOMY ── */
+  .anatomy { display: grid; grid-template-columns: repeat(8,1fr); gap: 0; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+  .anatomy-step { padding: 20px 12px; text-align: center; position: relative; }
+  .anatomy-step .step-letter { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; }
+  .anatomy-step .step-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-top: 6px; }
+  .anatomy-step .step-time { font-family: 'DM Mono', monospace; font-size: 11px; margin-top: 8px; opacity: .8; }
+  .anatomy-step .step-type { font-size: 10px; margin-top: 4px; opacity: .7; border-radius: 4px; padding: 2px 6px; display: inline-block; }
+  .s-a { background: #1B3A6B; color: white; }
+  .s-b { background: #2563B0; color: white; }
+  .s-c { background: #0D7377; color: white; }
+  .s-d { background: #2E7D32; color: white; }
+  .s-e { background: #6A1B9A; color: white; }
+  .s-f { background: #388E3C; color: white; }
+  .s-g { background: #D4691F; color: white; }
+  .s-h { background: #546E7A; color: white; }
+  .anatomy-plus { display: flex; align-items: center; }
+  .assess-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; border-radius: 14px; overflow: hidden; border: 2px solid var(--navy); margin-top: 16px; }
+  .assess-part { padding: 18px 14px; text-align: center; }
+  .assess-part .pn { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600; opacity: .7; }
+  .assess-part .pt { font-size: 14px; font-weight: 700; margin-top: 4px; }
+  .assess-part .pw { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 900; margin-top: 8px; }
+  .assess-part .pd { font-size: 11px; margin-top: 4px; opacity: .8; }
+  .a-mcq { background: var(--navy-l); color: var(--navy); }
+  .a-fib { background: var(--teal-l); color: var(--teal); }
+  .a-sjt { background: var(--purple-l); color: var(--purple); }
+
+  /* ── SRI ── */
+  .sri-bands { display: flex; gap: 8px; align-items: stretch; }
+  .sri-band { flex: 1; border-radius: 10px; padding: 16px 12px; text-align: center; }
+  .sri-band .sb-score { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600; }
+  .sri-band .sb-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; margin-top: 6px; }
+  .sri-band .sb-desc { font-size: 11px; margin-top: 6px; opacity: .8; }
+  .sri-cats { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-top: 20px; }
+  .sri-cat { border-radius: 10px; padding: 16px 12px; text-align: center; border: 2px solid; }
+  .sri-cat .sc-wt { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; }
+  .sri-cat .sc-name { font-size: 12px; font-weight: 700; margin-top: 4px; }
+  .sri-cat .sc-desc { font-size: 11px; margin-top: 6px; opacity: .8; }
+
+  /* ── TIERS ── */
+  .tiers { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+  .tier-card { border-radius: 14px; overflow: hidden; border: 2px solid; }
+  .tier-header { padding: 24px; text-align: center; }
+  .tier-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; }
+  .tier-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 20px; margin-top: 8px; text-transform: uppercase; letter-spacing: .8px; }
+  .tier-body { padding: 16px; }
+  .tier-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
+  .tier-row .feat { color: var(--text); font-weight: 500; }
+  .tier-row .val { font-weight: 700; font-size: 12px; }
+  .t1 { border-color: #1B3A6B; }
+  .t1 .tier-header { background: var(--navy-l); color: var(--navy); }
+  .t1 .tier-badge { background: var(--navy); color: white; }
+  .t1 .tier-row:nth-child(odd) { background: var(--navy-l); }
+  .t2 { border-color: var(--teal); }
+  .t2 .tier-header { background: var(--teal-l); color: var(--teal); }
+  .t2 .tier-badge { background: var(--teal); color: white; }
+  .t2 .tier-row:nth-child(odd) { background: var(--teal-l); }
+  .t3 { border-color: var(--amber); }
+  .t3 .tier-header { background: var(--amber-l); color: var(--amber); }
+  .t3 .tier-badge { background: var(--amber); color: white; }
+  .t3 .tier-row:nth-child(odd) { background: var(--amber-l); }
+  .yes { color: var(--green); }
+  .no { color: var(--red); opacity: .6; }
+  .add { color: var(--amber); }
+
+  /* ── QUOTIENTS ── */
+  .quotients { display: grid; grid-template-columns: repeat(7,1fr); gap: 12px; }
+  .q-card { border-radius: 12px; padding: 16px 12px; text-align: center; border: 2px solid; }
+  .q-code { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 700; }
+  .q-name { font-size: 11px; font-weight: 600; margin-top: 6px; line-height: 1.3; }
+  .q-stage { font-size: 10px; margin-top: 6px; opacity: .7; text-transform: uppercase; }
+  .q-wef { font-size: 10px; margin-top: 6px; opacity: .6; font-style: italic; }
+
+  /* ── PATHWAY ── */
+  .pathways { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .path-card { border-radius: 12px; padding: 20px 16px; border: 2px solid; }
+  .path-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 900; }
+  .path-who { font-size: 12px; margin-top: 6px; opacity: .8; }
+  .path-time { font-family: 'DM Mono', monospace; font-size: 11px; margin-top: 10px; font-weight: 600; }
+  .p-std { border-color: var(--green); background: var(--green-l); color: var(--green); }
+  .p-acc { border-color: var(--blue); background: var(--indigo-l); color: var(--indigo); }
+  .p-fnd { border-color: var(--amber); background: var(--amber-l); color: var(--amber); }
+  .p-cat { border-color: var(--red); background: var(--red-l); color: var(--red); }
+
+  /* ── FOOTER ── */
+  footer { background: var(--navy); color: rgba(255,255,255,.6); text-align: center; padding: 28px; font-size: 13px; margin-top: 60px; }
+  footer strong { color: white; }
+
+  .label-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .6px; margin-left: 6px; }
+  .divider { height: 2px; background: linear-gradient(90deg, var(--teal), transparent); margin: 12px 0 28px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>SMAART <span>Course Architecture</span></h1>
+  <p>Complete visual overview — 25 Human Intelligence Courses, 3 Readiness Tracks, 4 Stage Assessments, and the SRI Scoring Engine</p>
+  <div class="badge">April 2026 · Version 3.0 · All 8 Documents Consolidated</div>
+</div>
+
+<!-- METRICS -->
+<div class="metrics">
+  <div class="metric"><div class="num">25</div><div class="lbl">HI Courses</div></div>
+  <div class="metric"><div class="num">15</div><div class="lbl">Track Courses</div></div>
+  <div class="metric"><div class="num">4</div><div class="lbl">Stage Assessments</div></div>
+  <div class="metric"><div class="num">7</div><div class="lbl">Quotients</div></div>
+  <div class="metric"><div class="num">10</div><div class="lbl">Standards</div></div>
+  <div class="metric"><div class="num" style="font-size:28px">300–900</div><div class="lbl">SRI Range</div></div>
+</div>
+
+<!-- SECTION: PROGRAMME FLOW -->
+<div class="section">
+  <div class="section-title">The Core Programme: 3 Stages, 25 Courses</div>
+  <div class="section-sub">Sequential and gated — a student cannot skip stages. Each stage gate requires ALL courses passed at ≥70% AND the stage assessment taken.</div>
+
+  <div class="flow">
+    <!-- T1 -->
+    <div class="flow-stage" style="min-width:140px">
+      <div class="stage-header" style="background:linear-gradient(135deg,#455A64,#263238);color:white;border-radius:12px;">
+        <div class="tag">Day 1</div>
+        <div class="name" style="font-size:18px">T1 Baseline</div>
+        <div class="q">21 SJTs · All 7 Quotients</div>
+      </div>
+      <div style="padding:12px;border:2px solid #455A6430;border-top:none;border-radius:0 0 12px 12px;">
+        <div style="font-size:11px;color:#455A64;text-align:center;padding:8px;">No prior learning needed. Establishes S_baseline — the starting point for measuring all future growth.</div>
+        <div class="gate" style="border-color:#455A64;background:#ECEFF1;color:#455A64;">
+          <div class="g-title">Dashboard Unlocks</div>
+          <div class="g-sub">First course becomes available</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow"><svg viewBox="0 0 24 24"><path d="M8 5l8 7-8 7"/></svg></div>
+
+    <!-- CAPACITY -->
+    <div class="flow-stage cap">
+      <div class="stage-header">
+        <div class="tag">Stage 1 · Years 1–2</div>
+        <div class="name">CAPACITY</div>
+        <div class="q">CRQ · SRQ · PEQ · SIQ begins</div>
+      </div>
+      <div class="stage-courses" style="border-color:#1B3A6B30;">
+        <div class="course-pill"><span class="code">S01</span><div class="info"><div class="title">Analytical Thinking</div><div class="fw">CLEAR-5</div></div></div>
+        <div class="course-pill"><span class="code">S02</span><div class="info"><div class="title">Problem Decomposition</div><div class="fw">BREAK-4</div></div></div>
+        <div class="course-pill"><span class="code">S03</span><div class="info"><div class="title">Critical Thinking</div><div class="fw">READ-3</div></div></div>
+        <div class="course-pill"><span class="code">S04</span><div class="info"><div class="title">Data Literacy</div><div class="fw">COUNT-3</div></div></div>
+        <div class="course-pill" style="background:#E8F5E9"><span class="code" style="color:#2E7D32">S05★</span><div class="info"><div class="title" style="color:#2E7D32">Resilience & Adaptability</div><div class="fw">RESET-4 · PIQ unlocks</div></div></div>
+        <div class="course-pill"><span class="code">S06</span><div class="info"><div class="title">Accelerated Learning</div><div class="fw">SPRINT-4</div></div></div>
+        <div class="course-pill" style="background:#FFF3E0"><span class="code" style="color:#D4691F">S07</span><div class="info"><div class="title" style="color:#D4691F">Priority Management</div><div class="fw">OWN-4</div></div></div>
+        <div class="course-pill"><span class="code">S08</span><div class="info"><div class="title">Quality Consciousness</div><div class="fw">CHECK-3</div></div></div>
+        <div class="course-pill"><span class="code">S09</span><div class="info"><div class="title">Commercial Awareness</div><div class="fw">VALUE-4</div></div></div>
+        <div class="course-pill"><span class="code">S10</span><div class="info"><div class="title">Professional Networking</div><div class="fw">LINK-4</div></div></div>
+        <div class="gate">
+          <div class="g-title">T2 Gate Assessment</div>
+          <div class="g-sub">ALL 10 courses at ≥70% + T2 taken</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow"><svg viewBox="0 0 24 24"><path d="M8 5l8 7-8 7" stroke="#6A1B9A" stroke-width="2.5" fill="none"/></svg></div>
+
+    <!-- CAPABILITY -->
+    <div class="flow-stage cap2">
+      <div class="stage-header">
+        <div class="tag">Stage 2 · Years 2–3</div>
+        <div class="name">CAPABILITY</div>
+        <div class="q">SIQ · DAQ · SEQ introduced</div>
+      </div>
+      <div class="stage-courses" style="border-color:#6A1B9A30;">
+        <div class="course-pill"><span class="code">S11</span><div class="info"><div class="title">Professional Communication</div><div class="fw">SIGNAL-3</div></div></div>
+        <div class="course-pill"><span class="code">S12</span><div class="info"><div class="title">Empathy & Listening</div><div class="fw">MIRROR-3</div></div></div>
+        <div class="course-pill"><span class="code">S13</span><div class="info"><div class="title">Team Collaboration</div><div class="fw">TEAM-4</div></div></div>
+        <div class="course-pill"><span class="code">S14</span><div class="info"><div class="title">Constructive Disagreement</div><div class="fw">BRIDGE-3</div></div></div>
+        <div class="course-pill gateway"><span class="code">S15★</span><div class="info"><div class="title">AI-Augmented Work</div><div class="fw">GUARD-4 · AIQ Track unlocks</div></div></div>
+        <div class="course-pill gateway"><span class="code">S16</span><div class="info"><div class="title">Systems Thinking</div><div class="fw">ZOOM-3</div></div></div>
+        <div class="course-pill"><span class="code">S17</span><div class="info"><div class="title">Professional Presentation</div><div class="fw">STAGE-4</div></div></div>
+        <div class="course-pill"><span class="code">S18</span><div class="info"><div class="title">Stakeholder Orientation</div><div class="fw">SERVE-4</div></div></div>
+        <div class="course-pill"><span class="code">S19</span><div class="info"><div class="title">Negotiation</div><div class="fw">DEAL-4</div></div></div>
+        <div class="gate" style="border-color:var(--purple);background:var(--purple-l);color:var(--purple);">
+          <div class="g-title">T3 Gate Assessment</div>
+          <div class="g-sub">ALL 9 courses at ≥70% + T3 taken</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow"><svg viewBox="0 0 24 24"><path d="M8 5l8 7-8 7" stroke="#2E7D32" stroke-width="2.5" fill="none"/></svg></div>
+
+    <!-- LEADERSHIP -->
+    <div class="flow-stage lead">
+      <div class="stage-header">
+        <div class="tag">Stage 3 · Year 3+</div>
+        <div class="name">LEADERSHIP</div>
+        <div class="q">LQ · SEQ · Full quotient set</div>
+      </div>
+      <div class="stage-courses" style="border-color:#2E7D3230;">
+        <div class="course-pill"><span class="code">S20</span><div class="info"><div class="title">Uncertainty Decisions</div><div class="fw">EDGE-4</div></div></div>
+        <div class="course-pill sq-gate"><span class="code">S21★</span><div class="info"><div class="title">Ethical Judgment</div><div class="fw">LENS-4 · SQ Track unlocks</div></div></div>
+        <div class="course-pill sq-gate"><span class="code">S22</span><div class="info"><div class="title">Developing Others</div><div class="fw">GROW-4</div></div></div>
+        <div class="course-pill sq-gate"><span class="code">S23</span><div class="info"><div class="title">Effective Delegation</div><div class="fw">HAND-4</div></div></div>
+        <div class="course-pill sq-gate"><span class="code">S24</span><div class="info"><div class="title">Leading Change</div><div class="fw">MOVE-4</div></div></div>
+        <div class="course-pill"><span class="code">S25</span><div class="info"><div class="title">Creative Thinking</div><div class="fw">FLIP-3</div></div></div>
+        <div class="gate" style="border-color:var(--green);background:var(--green-l);color:var(--green);">
+          <div class="g-title">T4 Final Assessment</div>
+          <div class="g-sub">All 6 courses ≥70% + T4 = Skills Passport</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow"><svg viewBox="0 0 24 24"><path d="M8 5l8 7-8 7" stroke="#D4691F" stroke-width="2.5" fill="none"/></svg></div>
+
+    <!-- PASSPORT -->
+    <div class="flow-stage" style="min-width:150px;">
+      <div class="stage-header" style="background:linear-gradient(135deg,var(--amber),#B45309);color:white;border-radius:12px;">
+        <div class="tag">Final Output</div>
+        <div class="name" style="font-size:18px">Skills Passport</div>
+        <div class="q">SRI · 10 Standards · Certifications</div>
+      </div>
+      <div style="padding:12px;border:2px solid #D4691F30;border-top:none;border-radius:0 0 12px 12px;">
+        <div style="font-size:11px;color:var(--amber);font-weight:600;padding:6px;text-align:center;">QR-scannable · Employer-verified</div>
+        <div style="font-size:11px;padding:6px 4px;color:var(--mid)">SRI 300–900 · 10 Standards (★ ratings) · Track certifications · Technical skills · Growth trajectory T1→T4</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: COURSE ANATOMY -->
+<div class="section">
+  <div class="section-title">Inside One Course: The 8-Step Framework</div>
+  <div class="section-sub">Every one of the 40 courses uses exactly this structure. ~40 min learning + 7 min assessment = ~47 min total per course.</div>
+
+  <div class="anatomy">
+    <div class="anatomy-step s-a">
+      <div class="step-letter">A</div>
+      <div class="step-name">Why This Matters</div>
+      <div class="step-time">4 min</div>
+      <div class="step-type" style="background:rgba(255,255,255,.2)">Read</div>
+    </div>
+    <div class="anatomy-step s-b">
+      <div class="step-letter">B</div>
+      <div class="step-name">Story</div>
+      <div class="step-time">6 min</div>
+      <div class="step-type" style="background:rgba(255,255,255,.2)">Narrative</div>
+    </div>
+    <div class="anatomy-step s-c">
+      <div class="step-letter">C</div>
+      <div class="step-name">Framework</div>
+      <div class="step-time">7 min</div>
+      <div class="step-type" style="background:rgba(255,255,255,.2)">Accordion</div>
+    </div>
+    <div class="anatomy-step s-d">
+      <div class="step-letter">D</div>
+      <div class="step-name">Practice</div>
+      <div class="step-time">8 min</div>
+      <div class="step-type" style="background:rgba(255,255,255,.2)">SJT Rank</div>
+    </div>
+    <div class="anatomy-step s-e">
+      <div class="step-letter">E</div>
+      <div class="step-name">Flash Card</div>
+      <div class="step-time">2 min</div>
+      <div class="step-type" style="background:rgba(255,255,255,.2)">Flip Card</div>
+    </div>
+    <div class="anatomy-step s-f">
+      <div class="step-letter">F</div>
+      <div class="step-name">Extended Practice</div>
+      <div class="step-time">6 min</div>
+      <div class="step-type" style="background:rgba(255,255,255,.2)">SJT Rank ↑</div>
+    </div>
+    <div class="anatomy-step s-g">
+      <div class="step-letter">G</div>
+      <div class="step-name">Case Study</div>
+      <div class="step-time">5 min</div>
+      <div class="step-type" style="background:rgba(255,255,255,.2)">Mon–Fri + MCQ</div>
+    </div>
+    <div class="anatomy-step s-h" style="position:relative;">
+      <div class="step-letter">H</div>
+      <div class="step-name">Personal Notes</div>
+      <div class="step-time">Optional</div>
+      <div class="step-type" style="background:rgba(255,255,255,.2)">Unscored</div>
+    </div>
+  </div>
+
+  <div class="assess-steps">
+    <div class="assess-part a-mcq">
+      <div class="pn">Part A</div>
+      <div class="pt">Multiple Choice</div>
+      <div class="pw">15%</div>
+      <div class="pd">3 MCQs · 2 min · Pool of 50</div>
+    </div>
+    <div class="assess-part a-fib">
+      <div class="pn">Part B</div>
+      <div class="pt">Fill in the Blank</div>
+      <div class="pw">10%</div>
+      <div class="pd">1 FIB · 1 min · Pool of 24</div>
+    </div>
+    <div class="assess-part a-sjt">
+      <div class="pn">Part C — The Core</div>
+      <div class="pt">Situational Judgment Tests</div>
+      <div class="pw">75%</div>
+      <div class="pd">3 SJTs · 4 min · Pool of 15 · Scored by Kendall's tau-b · Pass: ≥70%</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: THE THREE TRACKS -->
+<div class="section">
+  <div class="section-title">The Three Readiness Tracks</div>
+  <div class="section-sub">Specialist certifications running alongside the core programme. Each has 5 courses + a 30-minute multi-stage capstone. Available on different tiers.</div>
+
+  <div class="tracks">
+    <!-- PIQ -->
+    <div class="track-card">
+      <div class="track-header piq">
+        <div class="icon">🧠</div>
+        <div class="name">PIQ Track</div>
+        <div class="desc">Personal Intelligence · Feeds PEQ Quotient</div>
+      </div>
+      <span class="prereq-tag" style="background:var(--amber-l);color:var(--amber)">Prerequisite: S05 RESET-4 · From Year 1</span>
+      <div class="track-body">
+        <div class="track-comp piq"><span class="tc">PIQ-1</span><span class="fw-badge">REFLECT-3</span><span class="tname">Self-Awareness</span></div>
+        <div class="track-comp piq"><span class="tc">PIQ-2</span><span class="fw-badge">STEADY-4</span><span class="tname">Emotional Regulation</span></div>
+        <div class="track-comp piq"><span class="tc">PIQ-3</span><span class="fw-badge">EVOLVE-3</span><span class="tname">Growth Mindset</span></div>
+        <div class="track-comp piq"><span class="tc">PIQ-4</span><span class="fw-badge">DRIVE-4</span><span class="tname">Purpose & Motivation</span></div>
+        <div class="track-comp piq"><span class="tc">PIQ-5</span><span class="fw-badge">STAND-3</span><span class="tname">Professional Confidence</span></div>
+      </div>
+      <div class="capstone-box" style="border-color:var(--amber);background:var(--amber-l);color:var(--amber)">
+        <div class="ct">Capstone: Weighted Concern Ranking</div>
+        <div class="cs">5-stage SJT + priority-setting under shifting context · ≥65% = SMAART PIQ Certified</div>
+      </div>
+    </div>
+
+    <!-- AIQ -->
+    <div class="track-card">
+      <div class="track-header aiq">
+        <div class="icon">🤖</div>
+        <div class="name">AIQ Track</div>
+        <div class="desc">AI Readiness · Feeds DAQ Quotient</div>
+      </div>
+      <span class="prereq-tag" style="background:var(--indigo-l);color:var(--indigo)">Prerequisite: S15 GUARD-4 + External AI cert · From Year 2</span>
+      <div class="track-body">
+        <div class="track-comp aiq"><span class="tc">AIQ-1</span><span class="fw-badge">DIRECT-4</span><span class="tname">Orchestrating AI Partners</span></div>
+        <div class="track-comp aiq"><span class="tc">AIQ-2</span><span class="fw-badge">VERIFY-4</span><span class="tname">Judging AI Work</span></div>
+        <div class="track-comp aiq"><span class="tc">AIQ-3</span><span class="fw-badge">SPLIT-3</span><span class="tname">Designing Human-AI Split</span></div>
+        <div class="track-comp aiq"><span class="tc">AIQ-4</span><span class="fw-badge">TRUST-4</span><span class="tname">Governing AI Responsibly</span></div>
+        <div class="track-comp aiq"><span class="tc">AIQ-5</span><span class="fw-badge">FUTURE-3</span><span class="tname">Evolving With AI</span></div>
+      </div>
+      <div class="capstone-box" style="border-color:var(--indigo);background:var(--indigo-l);color:var(--indigo)">
+        <div class="ct">Capstone: Timeline Reconstruction</div>
+        <div class="cs">5-stage SJT + implementation sequencing (8-action timeline) · ≥65% = SMAART AIQ Certified</div>
+      </div>
+    </div>
+
+    <!-- SQ -->
+    <div class="track-card">
+      <div class="track-header sq">
+        <div class="icon">🌍</div>
+        <div class="name">SQ Track</div>
+        <div class="desc">Sustainability Readiness · Feeds SEQ Quotient</div>
+      </div>
+      <span class="prereq-tag" style="background:var(--teal-l);color:var(--teal)">Prerequisite: S21 LENS-4 · From Year 3 only</span>
+      <div class="track-body">
+        <div class="track-comp sq"><span class="tc">SQ-1</span><span class="fw-badge">PLANET-3</span><span class="tname">Sustainability Literacy</span></div>
+        <div class="track-comp sq"><span class="tc">SQ-2</span><span class="fw-badge">GREEN-4</span><span class="tname">Sustainable Decisions</span></div>
+        <div class="track-comp sq"><span class="tc">SQ-3</span><span class="fw-badge">CYCLE-3</span><span class="tname">Circular Thinking</span></div>
+        <div class="track-comp sq"><span class="tc">SQ-4</span><span class="fw-badge">REPORT-4</span><span class="tname">Impact Communication</span></div>
+        <div class="track-comp sq"><span class="tc">SQ-5</span><span class="fw-badge">SEED-3</span><span class="tname">Green Innovation</span></div>
+      </div>
+      <div class="capstone-box" style="border-color:var(--teal);background:var(--teal-l);color:var(--teal)">
+        <div class="ct">Capstone: Stakeholder Response Matrix</div>
+        <div class="cs">5-stage SJT + 4-stakeholder response selection · ≥65% = SMAART SQ Certified</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SRI SCORE -->
+<div class="section">
+  <div class="section-title">The SRI Score (300–900)</div>
+  <div class="section-sub">Five weighted categories — zero demographic inputs. Think of it as a credit score for employment readiness.</div>
+
+  <div class="sri-cats">
+    <div class="sri-cat" style="border-color:var(--navy);background:var(--navy-l);color:var(--navy)">
+      <div class="sc-wt">30%</div><div class="sc-name">Track Completion (TC)</div>
+      <div class="sc-desc">Courses completed against chosen career direction</div>
+    </div>
+    <div class="sri-cat" style="border-color:var(--blue);background:var(--indigo-l);color:var(--indigo)">
+      <div class="sc-wt">30%</div><div class="sc-name">Performance Calibration (PC)</div>
+      <div class="sc-desc">Quality of SJT scores across courses + stage assessments</div>
+    </div>
+    <div class="sri-cat" style="border-color:var(--green);background:var(--green-l);color:var(--green)">
+      <div class="sc-wt">20%</div><div class="sc-name">Learning Consistency (LC)</div>
+      <div class="sc-desc">Daily micro-challenge engagement + streaks + active rate</div>
+    </div>
+    <div class="sri-cat" style="border-color:var(--amber);background:var(--amber-l);color:var(--amber)">
+      <div class="sc-wt">10%</div><div class="sc-name">Behavioural Range (BR)</div>
+      <div class="sc-desc">Breadth across all 7 quotients — not narrow specialisation</div>
+    </div>
+    <div class="sri-cat" style="border-color:var(--purple);background:var(--purple-l);color:var(--purple)">
+      <div class="sc-wt">10%</div><div class="sc-name">Growth Trajectory (GT)</div>
+      <div class="sc-desc">Improvement from T1 baseline to T4. Floored at zero.</div>
+    </div>
+  </div>
+
+  <div class="sri-bands" style="margin-top:20px;">
+    <div class="sri-band" style="background:var(--red-l);color:var(--red)"><div class="sb-score">300–449</div><div class="sb-name">Emerging</div><div class="sb-desc">Building foundations</div></div>
+    <div class="sri-band" style="background:var(--amber-l);color:var(--amber)"><div class="sb-score">450–549</div><div class="sb-name">Developing</div><div class="sb-desc">Building capability</div></div>
+    <div class="sri-band" style="background:#FFFDE7;color:#F9A825"><div class="sb-score">550–649</div><div class="sb-name">Capable</div><div class="sb-desc">First job with support</div></div>
+    <div class="sri-band" style="background:var(--green-l);color:var(--green)"><div class="sb-score">650–749</div><div class="sb-name">Proficient</div><div class="sb-desc">Placement-ready</div></div>
+    <div class="sri-band" style="background:var(--navy-l);color:var(--navy)"><div class="sb-score">750–900</div><div class="sb-name">Advanced</div><div class="sb-desc">Highly employable</div></div>
+  </div>
+</div>
+
+<!-- 7 QUOTIENTS -->
+<div class="section">
+  <div class="section-title">The 7 Professional Quotients</div>
+  <div class="section-sub">Each quotient measures a dimension of workplace readiness that AI cannot fully replicate. They develop across the three stages.</div>
+  <div class="quotients">
+    <div class="q-card" style="border-color:var(--navy);background:var(--navy-l)"><div class="q-code" style="color:var(--navy)">CRQ</div><div class="q-name" style="color:var(--navy)">Cognitive Readiness</div><div class="q-stage" style="color:var(--navy)">Capacity</div><div class="q-wef">WEF #1 Analytical Thinking</div></div>
+    <div class="q-card" style="border-color:#37474F;background:#ECEFF1"><div class="q-code" style="color:#37474F">SRQ</div><div class="q-name" style="color:#37474F">Self-Recovery Readiness</div><div class="q-stage">Capacity</div><div class="q-wef">WEF #2 Resilience</div></div>
+    <div class="q-card" style="border-color:var(--amber);background:var(--amber-l)"><div class="q-code" style="color:var(--amber)">PEQ</div><div class="q-name" style="color:var(--amber)">Personal Effectiveness</div><div class="q-stage" style="color:var(--amber)">Capacity</div><div class="q-wef">WEF #5 Motivation</div></div>
+    <div class="q-card" style="border-color:var(--purple);background:var(--purple-l)"><div class="q-code" style="color:var(--purple)">SIQ</div><div class="q-name" style="color:var(--purple)">Social Intelligence</div><div class="q-stage" style="color:var(--purple)">Capability</div><div class="q-wef">WEF #3 Leadership</div></div>
+    <div class="q-card" style="border-color:var(--indigo);background:var(--indigo-l)"><div class="q-code" style="color:var(--indigo)">DAQ</div><div class="q-name" style="color:var(--indigo)">Digital & AI Readiness</div><div class="q-stage" style="color:var(--indigo)">Capability</div><div class="q-wef">WEF #6 Tech Literacy</div></div>
+    <div class="q-card" style="border-color:var(--green);background:var(--green-l)"><div class="q-code" style="color:var(--green)">LQ</div><div class="q-name" style="color:var(--green)">Innovation & Learning</div><div class="q-stage" style="color:var(--green)">Leadership</div><div class="q-wef">WEF #4 Creative Thinking</div></div>
+    <div class="q-card" style="border-color:var(--teal);background:var(--teal-l)"><div class="q-code" style="color:var(--teal)">SEQ</div><div class="q-name" style="color:var(--teal)">Stewardship & Ethics</div><div class="q-stage" style="color:var(--teal)">Leadership</div><div class="q-wef">WEF #10 Sustainability</div></div>
+  </div>
+</div>
+
+<!-- TIERS -->
+<div class="section">
+  <div class="section-title">The Three Product Tiers</div>
+  <div class="section-sub">All 25 HI courses are on every tier. Tiers differ in which tracks are included, support depth, and renewal duration.</div>
+  <div class="tiers">
+    <div class="tier-card t1">
+      <div class="tier-header"><div class="tier-name">SMAART Core</div><div class="tier-badge">Tier 1</div></div>
+      <div class="tier-body">
+        <div class="tier-row"><span class="feat">All 25 HI Courses</span><span class="val yes">✓</span></div>
+        <div class="tier-row"><span class="feat">AIQ Track</span><span class="val yes">✓ Included</span></div>
+        <div class="tier-row"><span class="feat">SQ Track</span><span class="val add">Add-on</span></div>
+        <div class="tier-row"><span class="feat">PIQ Track</span><span class="val add">Add-on</span></div>
+        <div class="tier-row"><span class="feat">Interview Prep</span><span class="val no">✗</span></div>
+        <div class="tier-row"><span class="feat">Dedicated Coach</span><span class="val no">✗</span></div>
+        <div class="tier-row"><span class="feat">Renewal</span><span class="val">1 year</span></div>
+        <div class="tier-row"><span class="feat">Passport Mode</span><span class="val">Foundation</span></div>
+        <div class="tier-row"><span class="feat">Best For</span><span class="val" style="font-size:11px">Budget institutions</span></div>
+      </div>
+    </div>
+    <div class="tier-card t2">
+      <div class="tier-header"><div class="tier-name">SMAART Standard</div><div class="tier-badge">Tier 2 · Most Popular</div></div>
+      <div class="tier-body">
+        <div class="tier-row"><span class="feat">All 25 HI Courses</span><span class="val yes">✓</span></div>
+        <div class="tier-row"><span class="feat">AIQ Track</span><span class="val yes">✓ Included</span></div>
+        <div class="tier-row"><span class="feat">SQ Track</span><span class="val yes">✓ Included</span></div>
+        <div class="tier-row"><span class="feat">PIQ Track</span><span class="val add">Add-on</span></div>
+        <div class="tier-row"><span class="feat">Interview Prep</span><span class="val yes">✓</span></div>
+        <div class="tier-row"><span class="feat">Monthly Challenges</span><span class="val yes">✓</span></div>
+        <div class="tier-row"><span class="feat">Renewal</span><span class="val">1 year</span></div>
+        <div class="tier-row"><span class="feat">Passport Mode</span><span class="val">Standard</span></div>
+        <div class="tier-row"><span class="feat">Best For</span><span class="val" style="font-size:11px">Most institutions</span></div>
+      </div>
+    </div>
+    <div class="tier-card t3">
+      <div class="tier-header"><div class="tier-name">SMAART Complete</div><div class="tier-badge">Tier 3 · Premium</div></div>
+      <div class="tier-body">
+        <div class="tier-row"><span class="feat">All 25 HI Courses</span><span class="val yes">✓</span></div>
+        <div class="tier-row"><span class="feat">AIQ Track</span><span class="val yes">✓ Included</span></div>
+        <div class="tier-row"><span class="feat">SQ Track</span><span class="val yes">✓ Included</span></div>
+        <div class="tier-row"><span class="feat">PIQ Track</span><span class="val yes">✓ Included</span></div>
+        <div class="tier-row"><span class="feat">Interview Prep + Coach</span><span class="val yes">✓</span></div>
+        <div class="tier-row"><span class="feat">Framework Retention</span><span class="val yes">✓</span></div>
+        <div class="tier-row"><span class="feat">Renewal</span><span class="val">2 years</span></div>
+        <div class="tier-row"><span class="feat">Passport Mode</span><span class="val">Complete</span></div>
+        <div class="tier-row"><span class="feat">Best For</span><span class="val" style="font-size:11px">IIMs · Top colleges</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PATHWAYS -->
+<div class="section">
+  <div class="section-title">Four Entry Pathways</div>
+  <div class="section-sub">Every student is automatically assigned a pathway at onboarding based on their programme type, year, and work experience. T1 is always the first step regardless.</div>
+  <div class="pathways">
+    <div class="path-card p-std">
+      <div class="path-name">STANDARD</div>
+      <div class="path-who">UG students joining Year 1, Sem 1. The default pathway.</div>
+      <div class="path-time">3–4 years · Full programme · Track A SJTs</div>
+    </div>
+    <div class="path-card p-acc">
+      <div class="path-name">ACCELERATED</div>
+      <div class="path-who">PG/MBA students with 12+ months work experience.</div>
+      <div class="path-time">2 years compressed · Track B SJTs (harder professional scenarios)</div>
+    </div>
+    <div class="path-card p-fnd">
+      <div class="path-name">FOUNDATION</div>
+      <div class="path-who">PG/MBA students with under 12 months experience (fresh MBA).</div>
+      <div class="path-time">2 years · Mixed SJT difficulty · Full T4 professional-level</div>
+    </div>
+    <div class="path-card p-cat">
+      <div class="path-name">CATCH_UP</div>
+      <div class="path-who">UG late joiners — Year 2, 3, or 4 entry.</div>
+      <div class="path-time">Remaining semesters · Priority Pathway algorithm · Lighter T1 (14 SJTs)</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <strong>SMAART Course Architecture</strong> · Complete Visual Overview · April 2026 · Version 3.0<br>
+  Confidential — Internal Use Only · Based on Documents 1, 1B, 2, 2A, 3, 4, 5, 6, 7, 8
+</footer>
+
+</body>
+</html>

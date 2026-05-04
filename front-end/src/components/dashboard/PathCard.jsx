@@ -1,8 +1,10 @@
 import { memo } from "react";
 import { Code, Database, Cloud, BookOpen } from "lucide-react";
 import { COLORS, COURSE_COLORS } from "@/constants/dashboard";
+import { useNavigate } from "react-router-dom";
 
 const PathCard = memo(({ path }) => {
+  const navigate = useNavigate();
   const IconComponent = { Code, Database, Cloud, BookOpen }[path.icon] || BookOpen;
   
   const getIconColor = (color) => {
@@ -27,7 +29,7 @@ const PathCard = memo(({ path }) => {
       </div>
 
       <button
-        onClick={() => window.open('http://localhost:5173/', '_blank')}
+        onClick={() => navigate('/dashboard/courses')}
         className="w-full text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
         style={{ backgroundColor: COLORS.PRIMARY }}
         onMouseEnter={(e) => e.target.style.backgroundColor = COLORS.PRIMARY_DARK}

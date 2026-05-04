@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, RotateCcw, Lightbulb, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const FlashcardTask = ({ content, onComplete, isCompleted }) => {
+const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -14,12 +14,12 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
     setHasMarkedComplete(isCompleted || false);
   }, [isCompleted]);
 
-  const cards = content?.cards || [];
-  const currentCard = cards[currentIndex];
+  const flashcards = cards || [];
+  const currentCard = flashcards[currentIndex];
 
   const handleNext = () => {
     setIsFlipped(false);
-    if (currentIndex < cards.length - 1) {
+    if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   };
@@ -122,12 +122,12 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
             </button>
 
             <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
-              {currentIndex + 1} / {cards.length}
+              {currentIndex + 1} / {flashcards.length}
             </span>
 
             <button
               onClick={handleNext}
-              disabled={currentIndex === cards.length - 1}
+              disabled={currentIndex === flashcards.length - 1}
               className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <ChevronRight size={20} />
@@ -146,7 +146,7 @@ const FlashcardTask = ({ content, onComplete, isCompleted }) => {
           ) : (
             <div className="w-full max-w-md px-6 py-3 bg-green-100 dark:bg-green-900/30 border-2 border-green-500 dark:border-green-600 text-green-700 dark:text-green-400 font-bold rounded-xl flex items-center justify-center gap-2">
               <CheckCircle2 size={20} />
-              Completed - You can still review these cards
+              Review Mode - You've completed these cards
             </div>
           )}
         </div>

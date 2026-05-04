@@ -129,21 +129,29 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
     <motion.div
       initial={{ opacity: 0, y: 15, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      className={`relative overflow-hidden rounded-3xl border border-white/10 bg-[#0f172a] shadow-2xl ${className}`}
+      className={`relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#0f172a] via-[#1a1f35] to-[#0f172a] shadow-2xl ${className}`}
       style={{
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+        boxShadow: '0 35px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 40px rgba(99, 102, 241, 0.15)'
       }}
     >
-      {/* Background Ambience */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/40 via-[#0f172a] to-[#0f172a]" />
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-50" />
+      {/* Animated Background Gradient */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-500/15 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent" />
+      </div>
+      
+      {/* Top Glow Line */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/80 to-transparent opacity-70" />
+      <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent opacity-50" />
 
       {/* Animation Section - Floating Card Style */}
       <div className="relative z-10 pt-6 px-6 pb-2">
-        <div className="relative aspect-[4/5] w-full mx-auto rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-2xl flex items-center justify-center bg-black/40 backdrop-blur-sm group">
+        <div className="relative aspect-[4/5] w-full mx-auto rounded-2xl overflow-hidden ring-1 ring-white/10 shadow-2xl flex items-center justify-center bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-md group">
 
-          {/* Inner Glow Border */}
-          <div className="absolute inset-0 rounded-2xl border border-white/5 z-20 pointer-events-none group-hover:border-white/10 transition-colors" />
+          {/* Animated Inner Glow Border */}
+          <div className="absolute inset-0 rounded-2xl border border-white/5 z-20 pointer-events-none group-hover:border-purple-500/30 transition-all duration-500" />
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-purple-500/10 to-transparent z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           {/* Video Playback */}
           {ANIMATION_SEQUENCE.map((src, index) => (
@@ -171,18 +179,23 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="absolute bottom-3 inset-x-3 h-10 bg-black/40 backdrop-blur-md rounded-xl border border-white/10 flex items-center justify-between px-3 z-30"
+            className="absolute bottom-3 inset-x-3 h-11 bg-gradient-to-r from-black/60 to-black/40 backdrop-blur-xl rounded-xl border border-white/10 flex items-center justify-between px-3 z-30 shadow-xl"
           >
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-300 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <Star className="w-3.5 h-3.5 text-white fill-white" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-400 via-amber-400 to-yellow-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
+                <Flame className="w-4 h-4 text-white" />
               </div>
               <span className="text-white font-bold text-sm tracking-wide">Level {avatarData?.level || 1}</span>
             </div>
 
             {/* Mini Progress Bar */}
-            <div className="w-16 h-1.5 bg-white/10 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-amber-300 to-amber-500 rounded-full" style={{ width: `${levelProgress}%` }} />
+            <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: `${levelProgress}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="h-full bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-500 rounded-full shadow-lg shadow-orange-500/30"
+              />
             </div>
           </motion.div>
         </div>
@@ -190,45 +203,52 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
 
       {/* Profile Info & Actions */}
       <div className="relative z-10 p-5 space-y-4">
-        <div className="text-center space-y-0.5">
-          <h3 className="text-xl font-bold text-white tracking-tight">{user.fullName || 'Student'}</h3>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{user.role || 'Student'}</p>
+        <div className="text-center space-y-1.5">
+          <h3 className="text-2xl font-bold text-white tracking-tight">{user.fullName || 'Student'}</h3>
+          <p className="text-purple-300 text-sm font-semibold uppercase tracking-wider">{user.role || 'Student'}</p>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-3">
+          {/* Feature Action: Skills Passport */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate('/dashboard/skills-passport')}
+            className="group relative w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-500 hover:via-indigo-500 hover:to-purple-500 text-white shadow-xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all duration-300 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+            <div className="relative flex items-center justify-center gap-2">
+              <Trophy className="w-4.5 h-4.5" />
+              <span className="text-sm font-bold uppercase tracking-wide">Skills Passport</span>
+              <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </motion.button>
+
           {/* Primary Action: View Profile */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/dashboard/profile')}
-            className="group relative w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-white transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden"
+            className="group relative w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden"
           >
             <span className="text-sm font-medium relative z-10">View Profile</span>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all relative z-10" />
-          </button>
-
-          {/* Feature Action: Skills Passport */}
-          <button
-            onClick={() => navigate('/dashboard/skills-passport')}
-            className="group relative w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 active:scale-[0.98] overflow-hidden"
-          >
-            <div className="relative flex items-center justify-center gap-2">
-              <Trophy className="w-4 h-4" />
-              <span className="text-sm font-bold uppercase tracking-wide">Skills Passport</span>
-              <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-          </button>
+            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all relative z-10" />
+          </motion.button>
 
           {/* Secondary Action: Logout */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={async () => {
               // Use UserContext logout to properly clear backend session
               await logout();
               navigate('/', { replace: true });
             }}
-            className="w-full py-2.5 rounded-xl flex items-center justify-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-xs font-medium group"
+            className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium group"
           >
             <LogOut className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
             Sign Out
-          </button>
+          </motion.button>
         </div>
       </div>
     </motion.div>

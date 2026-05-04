@@ -490,22 +490,7 @@ const ModuleView = ({ courseId, onBack }) => {
             <div
               className="w-full bg-white rounded-3xl p-5 sm:p-8 shadow-xl flex-1 border border-gray-100 relative overflow-hidden"
             >
-              {/* Task Lock Overlay */}
-              {isLocked && (
-                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center p-4 sm:p-8 bg-gray-50/95 backdrop-blur-[4px] text-center rounded-3xl">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-orange-100 flex items-center justify-center mb-3 sm:mb-4 shadow-md">
-                        <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-orange-500 animate-pulse" />
-                    </div>
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-1 sm:mb-2">Tasks Locked</h3>
-                    <p className="text-xs sm:text-sm text-gray-600 max-w-[200px] mb-3 sm:mb-4 font-medium">
-                        Finish watching the video to unlock today's learning tasks.
-                    </p>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-orange-600 px-3 sm:px-4 py-1.5 sm:py-2 bg-white rounded-full border-2 border-orange-100 shadow-sm flex items-center gap-2">
-                        <Play className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-orange-600" />
-                        In Progress
-                    </div>
-                </div>
-              )}
+              {/* Task Lock removed for direct access */}
 
               <div className="flex items-center justify-between mb-4 sm:mb-6">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-800">Today's Tasks</h3>

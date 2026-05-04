@@ -197,6 +197,10 @@ const LoginCard = () => {
 
     sessionStorage.setItem("token", data.token);
     sessionStorage.setItem("user", JSON.stringify(data.user));
+    // Store session expiry for client-side 3-hour countdown
+    if (data.sessionExpiresAt) {
+      sessionStorage.setItem("sessionExpiresAt", data.sessionExpiresAt);
+    }
     setUser(data.user);
     setShowOtpModal(false);
     resetUserIdCache();

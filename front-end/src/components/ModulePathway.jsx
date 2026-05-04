@@ -171,12 +171,7 @@ const ModulePathway = ({ modules, onModuleClick, getModuleCompletedCount }) => {
             const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
             
             // Unlock logic: First module unlocked, OR previous module has progress/done
-            const isLocked = index !== 0 && (() => {
-              const prevMod = modules[index - 1];
-              if (!prevMod) return true;
-              const { completed, total } = getModuleCompletedCount(prevMod.id);
-              return completed < total;
-            })();
+            const isLocked = false; // All modules unlocked
 
             const isAbove = true;
 

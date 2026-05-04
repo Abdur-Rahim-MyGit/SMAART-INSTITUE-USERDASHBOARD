@@ -126,10 +126,15 @@ export const apiCall = async (endpoint, options = {}) => {
       clearTimeout(id);
 
       if (response.status === 401) {
-        // Check if it's a "kicked out" scenario
+        // Distinguish between session types for user-facing messages
         try {
           const errorBody = await response.clone().json();
-          if (errorBody.message && (errorBody.message.includes("Session invalid") || errorBody.message.includes("logged out"))) {
+          if (errorBody.expired) {
+            // Hard 3-hour session wall reached
+            sessionStorage.setItem("session_expired", "true");
+          } else if (errorBody.kicked || (errorBody.message && 
+            (errorBody.message.includes("Session invalid") || errorBody.message.includes("logged out")))) {
+            // Logged in from another device — this session was killed
             sessionStorage.setItem("kicked_out", "true");
           }
         } catch (e) {
@@ -138,6 +143,7 @@ export const apiCall = async (endpoint, options = {}) => {
 
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("user");
+        sessionStorage.removeItem("sessionExpiresAt");
         localStorage.removeItem("user"); // FIX #4: Clear localStorage too
 
         // Use window.location to force redirect and UI reset

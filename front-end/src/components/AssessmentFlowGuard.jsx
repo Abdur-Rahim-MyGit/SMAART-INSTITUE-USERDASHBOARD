@@ -4,6 +4,8 @@ import { assessmentApi } from "@/services/assessmentApi";
 import { apiCall } from "@/services/api";
 import { Loader2 } from "lucide-react";
 import DashboardLoader from "@/components/DashboardLoader";
+import useTabSwitchProctor from "@/hooks/useTabSwitchProctor";
+import TabSwitchWarningOverlay from "@/components/TabSwitchWarningOverlay";
 
 /**
  * AssessmentFlowGuard component
@@ -19,6 +21,27 @@ const AssessmentFlowGuard = ({ children }) => {
   const [showDevSkip, setShowDevSkip] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // === PROCTORING: Active only on assessment routes ===
+  const isAssessmentRoute =
+    location.pathname.startsWith("/assessment/") ||
+    location.pathname.startsWith("/dashboard/assessments/");
+
+  const handleAutoSubmit = useCallback(() => {
+    // Navigate back to dashboard with a flag indicating auto-submission
+    navigate("/dashboard", {
+      replace: true,
+      state: { assessmentAutoSubmitted: true }
+    });
+  }, [navigate]);
+
+  const {
+    warningLevel,
+    isWarningVisible,
+    clearWarning,
+    violations,
+    maxWarnings,
+  } = useTabSwitchProctor(isAssessmentRoute, handleAutoSubmit);
 
   // Configuration for assessment order - Only Base Line Test required
   const assessmentOrder = [
@@ -225,7 +248,8 @@ const AssessmentFlowGuard = ({ children }) => {
       }
     }
 
-    setNextPath(requiredPath);
+    // setNextPath(requiredPath); // Removed blocking redirection
+    setNextPath(null); 
 
   }, [location.pathname, assessmentData]);
 
@@ -269,30 +293,10 @@ const AssessmentFlowGuard = ({ children }) => {
   }
 
   // If there's a required assessment path
-  if (nextPath) {
-    // If we are NOT currently at the required path, redirect
-    if (location.pathname !== nextPath) {
-      // Show dev skip option before redirecting (dev mode only)
-      if (showDevSkip && import.meta.env.DEV) {
-        return (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-[#001229]">
-            <p className="text-white font-medium mb-4">Redirecting to required assessment...</p>
-            <p className="text-white/60 text-sm mb-6">Next: {nextPath}</p>
-            {/* Developer Skip Button - SECURITY FIX #5: Only shown in dev mode */}
-            <button
-              onClick={handleDevSkip}
-              className="text-xs text-white/40 hover:text-white bg-white/5 hover:bg-white/10 px-6 py-3 rounded-lg uppercase tracking-widest font-bold transition-colors border border-white/10"
-            >
-              ⚡ DEV: Skip All Assessments
-            </button>
-            {/* Auto redirect after a short delay if not skipped */}
-            <Navigate to={nextPath} replace />
-          </div>
-        );
-      }
-      return <Navigate to={nextPath} replace />;
-    }
-  }
+    // Removed auto-redirect to required assessment to allow free navigation
+    // if (location.pathname !== nextPath) {
+    //   return <Navigate to={nextPath} replace />;
+    // }
 
   // If NOT authenticated (logged out user pressing back button), redirect to login
   if (!isAuthenticated) {
@@ -300,7 +304,19 @@ const AssessmentFlowGuard = ({ children }) => {
   }
 
   // If no required path (all done) OR we are already at the required path, render children
-  return children;
+  return (
+    <>
+      {/* Tab-Switch Proctoring Overlay — shown on top of assessment content */}
+      <TabSwitchWarningOverlay
+        warningLevel={warningLevel}
+        isVisible={isWarningVisible}
+        onDismiss={clearWarning}
+        violations={violations}
+        maxWarnings={maxWarnings}
+      />
+      {children}
+    </>
+  );
 };
 
 export default AssessmentFlowGuard;

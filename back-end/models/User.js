@@ -101,6 +101,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  // Hard 3-hour session expiry — set on login, checked on every request
+  sessionExpiresAt: {
+    type: Date,
+    default: null
+  },
   badges: [{
     badgeId: String,
     title: String,

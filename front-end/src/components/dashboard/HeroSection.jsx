@@ -1,12 +1,10 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { ANIMATION_DELAYS, ANIMATION_DURATIONS } from "@/constants/dashboard";
-import { Sparkles } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = memo(({ userName }) => {
-  const { t } = useTranslation();
-  
+  const navigate = useNavigate();
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}

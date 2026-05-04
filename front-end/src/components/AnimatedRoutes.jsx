@@ -20,6 +20,7 @@ const SkillsPassport = lazy(() => import('@/pages/SkillsPassport'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const AddDetails = lazy(() => import('@/pages/AddDetails'));
 const ModuleViewPage = lazy(() => import('@/pages/ModuleViewPage'));
+const CoursePlayer = lazy(() => import('@/pages/CoursePlayer'));
 const QuotientsGrid = lazy(() => import('@/pages/QuotientsGrid'));
 const VisionBoardGalleryPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardGalleryPro'));
 const VisionBoardEditorPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardEditorPro'));
@@ -114,6 +115,7 @@ const AnimatedRoutes = () => {
                         {/* Courses */}
                         <Route path="/my-courses" element={<MyCourses />} />
                         <Route path="/dashboard/courses" element={<MyCourses />} />
+                        <Route path="/dashboard/courses/:courseId/player" element={<CoursePlayer />} />
                         <Route path="/module/:courseId/:moduleId" element={<ModuleViewPage />} />
                         <Route path="/dashboard/courses/:courseId/modules" element={<ModuleViewPage />} />
                         <Route path="/dashboard/courses/:courseId/modules/:moduleId/days/:dayId" element={<ModuleViewPage />} />
@@ -130,7 +132,7 @@ const AnimatedRoutes = () => {
                         {/* Skills */}
                         <Route path="/skills-passport" element={<SkillsPassport />} />
                         <Route path="/dashboard/skills-passport" element={<SkillsPassport />} />
-                        <Route path="/dashboard/skills-vault" element={<DashboardHome />} /> {/* Placeholder - replace with actual SkillsVault component */}
+                        <Route path="/dashboard/skills-vault" element={<SMAARTWallet />} />
 
                         {/* Vision Board */}
                         <Route path="/vision-board" element={<VisionBoardGalleryPro />} />

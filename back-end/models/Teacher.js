@@ -73,6 +73,11 @@ const teacherSchema = new mongoose.Schema({
   currentSessionId: {
     type: String,
     default: null
+  },
+  // Hard 3-hour session expiry — set on login, checked on every request
+  sessionExpiresAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true

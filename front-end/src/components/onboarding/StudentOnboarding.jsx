@@ -106,16 +106,16 @@ const StudentOnboarding = ({ user }) => {
       )
     },
     {
-      title: "AI Career Coach",
-      description: "Ask tutor questions 24/7. Interact with our advanced AI to resolve module queries and receive personalized career guidance at any time.",
-      icon: MessageSquare,
+      title: "SMAART Toolkit",
+      description: "Professional tools at your fingertips. Access a curated collection of resources including resume builder, dictionary, library, and wellness tools.",
+      icon: Lightbulb,
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
         <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
            <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
-             <MessageSquare className="w-8 h-8" />
+             <Lightbulb className="w-8 h-8" />
            </div>
-           <p className="text-sm text-slate-600 text-center">Whether you need help with a complex concept or tips on improving your resume, our AI coach is always here to assist.</p>
+           <p className="text-sm text-slate-600 text-center">Explore our toolkit to enhance your learning experience with specialized resources designed for your success.</p>
         </div>
       )
     },
