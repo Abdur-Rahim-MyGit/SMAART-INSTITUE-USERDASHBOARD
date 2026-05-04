@@ -1,15 +1,16 @@
 import CourseStructure from "@/components/CourseStructure";
 import FloatingDictionary from "@/components/FloatingDictionary";
 import { useNavigate } from "react-router-dom";
+import useUser from "@/hooks/useUser";
 
 const MyCourses = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
 
   const handleCourseClick = (courseId) => {
     navigate(`/dashboard/courses/${courseId}/player`);
   };
 
-  // Mock user progress - this should come from your API/state management
   const userProgress = {
     completedCourses: [],
     completedStages: [],
@@ -20,7 +21,11 @@ const MyCourses = () => {
 
   return (
     <>
-      <CourseStructure onCourseClick={handleCourseClick} userProgress={userProgress} />
+      <CourseStructure
+        onCourseClick={handleCourseClick}
+        userProgress={userProgress}
+        user={user}
+      />
       <FloatingDictionary />
     </>
   );

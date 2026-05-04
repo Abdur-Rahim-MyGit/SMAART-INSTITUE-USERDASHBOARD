@@ -162,6 +162,8 @@ const registrationSchema = new mongoose.Schema({
   
   // Single-session enforcement fields
   currentSessionId: { type: String, default: null },
+  // Hard 3-hour session expiry — set on login, checked on every request
+  sessionExpiresAt: { type: Date, default: null },
   lastLogin: { type: Date, default: null },
   previousLogin: { type: Date, default: null },
   

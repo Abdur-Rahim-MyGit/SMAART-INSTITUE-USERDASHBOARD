@@ -4,6 +4,8 @@ import { assessmentApi } from "@/services/assessmentApi";
 import { apiCall } from "@/services/api";
 import { Loader2 } from "lucide-react";
 import DashboardLoader from "@/components/DashboardLoader";
+import useTabSwitchProctor from "@/hooks/useTabSwitchProctor";
+import TabSwitchWarningOverlay from "@/components/TabSwitchWarningOverlay";
 
 /**
  * AssessmentFlowGuard component
@@ -19,6 +21,27 @@ const AssessmentFlowGuard = ({ children }) => {
   const [showDevSkip, setShowDevSkip] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // === PROCTORING: Active only on assessment routes ===
+  const isAssessmentRoute =
+    location.pathname.startsWith("/assessment/") ||
+    location.pathname.startsWith("/dashboard/assessments/");
+
+  const handleAutoSubmit = useCallback(() => {
+    // Navigate back to dashboard with a flag indicating auto-submission
+    navigate("/dashboard", {
+      replace: true,
+      state: { assessmentAutoSubmitted: true }
+    });
+  }, [navigate]);
+
+  const {
+    warningLevel,
+    isWarningVisible,
+    clearWarning,
+    violations,
+    maxWarnings,
+  } = useTabSwitchProctor(isAssessmentRoute, handleAutoSubmit);
 
   // Configuration for assessment order - Only Base Line Test required
   const assessmentOrder = [
@@ -281,7 +304,19 @@ const AssessmentFlowGuard = ({ children }) => {
   }
 
   // If no required path (all done) OR we are already at the required path, render children
-  return children;
+  return (
+    <>
+      {/* Tab-Switch Proctoring Overlay — shown on top of assessment content */}
+      <TabSwitchWarningOverlay
+        warningLevel={warningLevel}
+        isVisible={isWarningVisible}
+        onDismiss={clearWarning}
+        violations={violations}
+        maxWarnings={maxWarnings}
+      />
+      {children}
+    </>
+  );
 };
 
 export default AssessmentFlowGuard;

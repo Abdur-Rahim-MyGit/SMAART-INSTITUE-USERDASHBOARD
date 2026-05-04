@@ -82,7 +82,20 @@ const protect = async (req, res, next) => {
         if (!req.user.currentSessionId || req.user.currentSessionId !== decoded.sessionId) {
           return res.status(401).json({
             success: false,
+            kicked: true,
             message: 'Session invalid or expired. You have been logged out because of a login on another device.'
+          });
+        }
+
+        // SECURITY: Hard 3-hour session expiry enforcement
+        if (req.user.sessionExpiresAt && new Date(req.user.sessionExpiresAt) < new Date()) {
+          // Invalidate session in DB
+          req.user.currentSessionId = null;
+          await req.user.updateOne({ currentSessionId: null, sessionExpiresAt: null });
+          return res.status(401).json({
+            success: false,
+            expired: true,
+            message: 'Your session has expired after 3 hours. Please log in again.'
           });
         }
       }

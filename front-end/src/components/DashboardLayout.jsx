@@ -7,6 +7,8 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import useUser from "@/hooks/useUser";
 import { getBackendUrl } from "@/services/api";
+import useSessionGuard from "@/hooks/useSessionGuard";
+import SessionExpiryWarning from "@/components/SessionExpiryWarning";
 
 // Page title mapping
 const pageTitles = {
@@ -83,10 +85,17 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const { isCollapsed } = useSidebar();
   const { theme, setTheme } = useTheme();
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showCollegeLogo, setShowCollegeLogo] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
+
+  // === SESSION GUARD: 3-hour expiry monitoring ===
+  const handleSessionExpired = () => {
+    logout();
+    navigate('/', { replace: true, state: { sessionExpired: true } });
+  };
+  const { showWarning, secondsLeft, dismissWarning } = useSessionGuard(handleSessionExpired);
 
   // Toggle Theme
   const toggleTheme = () => {
@@ -196,6 +205,13 @@ const DashboardLayout = () => {
 
   return (
     <div className={`min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] transition-colors duration-300`}>
+      {/* Session Expiry Warning Modal */}
+      <SessionExpiryWarning
+        isVisible={showWarning}
+        secondsLeft={secondsLeft}
+        onDismiss={dismissWarning}
+      />
+
       {/* Left Sidebar */}
       <LeftSidebar />
 

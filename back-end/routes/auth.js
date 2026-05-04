@@ -907,17 +907,20 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
 
     // Generate NEW Session ID
     const sessionId = require('crypto').randomUUID();
+    const SESSION_DURATION_MS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
+    const sessionExpiresAt = new Date(Date.now() + SESSION_DURATION_MS);
 
-    // Update user with new session ID and lastLogin timestamp
+    // Update user with new session ID, expiry, and lastLogin timestamp
     // First, get the current lastLogin to store as previousLogin
     const currentUser = await UserModel.findById(user._id);
     await UserModel.findByIdAndUpdate(user._id, {
       currentSessionId: sessionId,
+      sessionExpiresAt: sessionExpiresAt, // Hard 3-hour expiry wall
       previousLogin: currentUser?.lastLogin || null,
       lastLogin: new Date()
     });
 
-    // Re-issue JWT token with sessionId included
+    // Re-issue JWT token with sessionId included — expires in 3 hours
     const token = jwt.sign(
       {
         userId: user._id,
@@ -927,7 +930,7 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
         sessionId: sessionId // CRITICAL: Bind token to this specific session
       },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '3h' } // Hard 3-hour session limit
     );
 
     // Ensure user object has consistent IDs even if stored data is stale
@@ -948,14 +951,15 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 3 * 60 * 60 * 1000 // 3 hours — matches session duration
     });
 
     res.json({
       message: 'Login successful',
       token,
       user,
-      sessionId, // Include sessionId for frontend tracking
+      sessionId,           // Include sessionId for frontend tracking
+      sessionExpiresAt,    // ISO timestamp — frontend uses this for countdown timer
       nextStep
     });
   } catch (err) {
@@ -1427,6 +1431,8 @@ router.post('/first-login-change-password', async (req, res) => {
 router.post('/renew-token', protect, async (req, res) => {
   try {
     const user = req.user;
+    const SESSION_DURATION_MS = 3 * 60 * 60 * 1000; // 3 hours
+    const sessionExpiresAt = new Date(Date.now() + SESSION_DURATION_MS);
 
     // Issue a fresh token with the same claims, preserving sessionId
     const payload = {
@@ -1438,17 +1444,20 @@ router.post('/renew-token', protect, async (req, res) => {
     // CRITICAL: Preserve sessionId for single-session enforcement
     if (user.currentSessionId) payload.sessionId = user.currentSessionId;
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3h' });
 
-    // Set refreshed HttpOnly cookie
+    // Reset the 3-hour session expiry wall in DB
+    await user.updateOne({ sessionExpiresAt });
+
+    // Set refreshed HttpOnly cookie (3 hours)
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 3 * 60 * 60 * 1000, // 3 hours
     });
 
-    res.json({ success: true, token });
+    res.json({ success: true, token, sessionExpiresAt });
   } catch (err) {
     console.error('[Token Renewal] Error:', err.message);
     res.status(500).json({ error: 'Failed to renew token' });

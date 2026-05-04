@@ -65,6 +65,7 @@ export const UserProvider = ({ children }) => {
         sessionStorage.clear();
         localStorage.removeItem("user");
         localStorage.removeItem("token");
+        localStorage.removeItem("sessionExpiresAt");
         
         // Set a flag so the LandingPage can show a clean toast message
         sessionStorage.setItem("logged_out_other_tab", "true");
@@ -125,6 +126,7 @@ export const UserProvider = ({ children }) => {
     sessionStorage.clear();
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("sessionExpiresAt");
     
     setUser(null);
     console.log('[Logout] Logout complete');
