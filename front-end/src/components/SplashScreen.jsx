@@ -18,7 +18,7 @@ const SplashScreen = ({ onComplete }) => {
         // Safety timeout to ensure splash always completes
         const timer = setTimeout(() => {
             onComplete?.();
-        }, 3000); // 1.5s delay + 1s duration + 0.5s buffer
+        }, 5000); // 4s delay + 1s duration fade-out
         return () => clearTimeout(timer);
     }, [onComplete]);
 
@@ -27,7 +27,7 @@ const SplashScreen = ({ onComplete }) => {
             className="fixed inset-0 z-[100] bg-navy flex items-center justify-center overflow-hidden global-splash-screen"
             initial={{ opacity: 1 }}
             animate={{ opacity: 0 }}
-            transition={{ duration: 1, delay: 1.5, ease: "easeInOut" }}
+            transition={{ duration: 1, delay: 4, ease: "easeInOut" }}
             onAnimationComplete={onComplete}
         >
             {/* Background: Connected Minds (Neural Network) */}

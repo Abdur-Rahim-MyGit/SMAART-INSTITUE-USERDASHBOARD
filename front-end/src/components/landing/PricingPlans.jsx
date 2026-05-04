@@ -44,7 +44,7 @@ const PricingPlans = () => {
                     <p className="text-gray-600 dark:text-gray-200">We form long-term, institutional partnerships to drive ecosystem-wide impact.</p>
                 </div>
 
-                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
+                <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
                     {plans.map((plan, index) => (
                         <motion.div
                             key={plan.name}
@@ -55,7 +55,7 @@ const PricingPlans = () => {
                             className={`relative rounded-2xl p-8 border ${plan.highlight
                                 ? "bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border-[#1a3884] dark:border-[#C0C0C0] shadow-[0_0_40px_rgba(26,56,132,0.15)]"
                                 : "bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-[#C0C0C0] dark:hover:border-white/20"
-                                } backdrop-blur-sm transition-all duration-300`}
+                                } backdrop-blur-sm transition-all duration-300 flex flex-col h-full`}
                         >
                             {plan.highlight && (
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#1a3884] dark:bg-[#C0C0C0] text-white dark:text-[#002147] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border border-[#C0C0C0] dark:border-white">
@@ -77,7 +77,7 @@ const PricingPlans = () => {
 
                             <p className="text-gray-600 dark:text-gray-200 text-sm mb-8 min-h-[40px]">{plan.description}</p>
 
-                            <div className="space-y-4 mb-8">
+                            <div className="space-y-4 mb-10 flex-grow">
                                 {plan.features.map((feature) => (
                                     <div key={feature} className="flex items-start gap-3 text-sm text-gray-600 dark:text-white">
                                         <Check className={`w-4 h-4 mt-0.5 ${plan.highlight ? "text-[#C0C0C0]" : "text-blue-400 dark:text-blue-300"}`} />
@@ -86,15 +86,17 @@ const PricingPlans = () => {
                                 ))}
                             </div>
 
-                            <Button
-                                variant="default"
-                                className={`w-full h-12 rounded-xl text-base font-semibold transition-all duration-300 ${plan.highlight
-                                    ? "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#C0C0C0] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#C0C0C0]"
-                                    : "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#C0C0C0] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#C0C0C0]"
-                                    }`}
-                            >
-                                {plan.cta}
-                            </Button>
+                            <div className="mt-auto">
+                                <Button
+                                    variant="default"
+                                    className={`w-full h-12 rounded-xl text-base font-semibold transition-all duration-300 ${plan.highlight
+                                        ? "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#C0C0C0] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#C0C0C0]"
+                                        : "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#C0C0C0] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#C0C0C0]"
+                                        }`}
+                                >
+                                    {plan.cta}
+                                </Button>
+                            </div>
                         </motion.div>
                     ))}
                 </div>
