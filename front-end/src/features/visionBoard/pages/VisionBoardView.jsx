@@ -198,15 +198,15 @@ const VisionBoardView = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f7fb] dark:bg-[#06101d]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#1a3884]" />
       </div>
     );
   }
 
   if (!board) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#f4f7fb] dark:bg-[#06101d]">
         <p className="text-gray-500">Vision board not found</p>
       </div>
     );
@@ -222,25 +222,30 @@ const VisionBoardView = () => {
   const scaledHeight = canvasHeight * scale;
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
+    <div className="min-h-screen bg-[#f4f7fb] dark:bg-[#06101d]">
+      <div className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-[#0b1627]">
+          <div className="border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
+            <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
+              <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/vision-board-pro/gallery")}
+                className="rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Back to Gallery
               </Button>
-              <div className="h-6 w-px bg-gray-200" />
+              <div className="hidden h-6 w-px bg-slate-200 sm:block dark:bg-slate-700" />
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">
+                <div className="mb-2 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300">
+                  Presentation View
+                </div>
+                <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
                   {board.title}
                 </h1>
-                <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     {formatDate(board.createdAt)}
@@ -254,11 +259,12 @@ const VisionBoardView = () => {
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant="outline"
                 onClick={handleDownload}
                 disabled={isDownloading}
+                className="rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
               >
                 {isDownloading ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -268,8 +274,15 @@ const VisionBoardView = () => {
                 Download PNG
               </Button>
               <Button
-                onClick={() => navigate(`/vision-board-pro/create`, { state: { editBoardId: id } })}
-                className="bg-[#1a3884] hover:bg-[#132c6b] text-white shadow-[0_0_15px_rgba(26,56,132,0.5)] hover:shadow-[0_0_25px_rgba(26,56,132,0.7)]"
+                onClick={() =>
+                  navigate(`/vision-board-pro/create`, {
+                    state: {
+                      isEditing: true,
+                      boardId: id,
+                    },
+                  })
+                }
+                className="rounded-xl bg-[#1a3884] text-white hover:bg-[#132c6b]"
               >
                 <Edit className="w-4 h-4 mr-2" />
                 Edit
@@ -277,24 +290,22 @@ const VisionBoardView = () => {
             </div>
           </div>
           {board.description && (
-            <p className="text-gray-600 mt-3">{board.description}</p>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-600 dark:text-slate-300">{board.description}</p>
           )}
         </div>
 
-        {/* Canvas Display */}
-        <div className="flex-1 p-4 sm:p-6 overflow-auto">
-          <div className="flex justify-center">
-            {/* Pro boards have a pre-rendered collageImage, legacy boards use elements */}
+        <div className="bg-[radial-gradient(circle_at_top,#f8fafc_0%,#edf2f8_100%)] p-4 sm:p-6 dark:bg-[radial-gradient(circle_at_top,#12213b_0%,#07101d_100%)]">
+          <div className="flex justify-center overflow-auto rounded-[24px] border border-slate-200/80 bg-white/45 p-4 backdrop-blur dark:border-white/10 dark:bg-slate-950/20 sm:p-6">
             {collageImage ? (
               <div
                 ref={canvasRef}
-                className="relative rounded-xl shadow-lg overflow-hidden"
+                className="relative overflow-hidden rounded-[24px] border border-white/80 shadow-[0_30px_70px_rgba(15,23,42,0.18)] dark:border-white/10"
                 style={{ maxWidth: '100%', maxHeight: '75vh' }}
               >
                 <img
                   src={collageImage}
                   alt={board.title}
-                  className="w-full h-full object-contain rounded-xl"
+                  className="h-full w-full rounded-[24px] object-contain"
                   style={{ maxHeight: '75vh' }}
                 />
               </div>
@@ -305,7 +316,7 @@ const VisionBoardView = () => {
               >
                 <div
                   ref={canvasRef}
-                  className="relative rounded-xl shadow-lg overflow-hidden"
+                  className="relative overflow-hidden rounded-[24px] border border-white/80 shadow-[0_30px_70px_rgba(15,23,42,0.18)] dark:border-white/10"
                   style={{
                     width: canvasWidth,
                     height: canvasHeight,
@@ -330,10 +341,11 @@ const VisionBoardView = () => {
           </div>
         </div>
 
-      {/* Footer */}
-      <div className="bg-white border-t border-gray-200 px-6 py-3 text-center text-sm text-gray-500">
-        Created with Vision Board Creator
+        <div className="border-t border-slate-200 px-6 py-4 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+          Designed in Vision Board Studio
+        </div>
       </div>
+    </div>
     </div>
   );
 };

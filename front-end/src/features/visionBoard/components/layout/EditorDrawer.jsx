@@ -1,15 +1,114 @@
-import React, { useRef } from "react";
-import { Palette, Type, Settings2, X, ChevronLeft, Upload, Target } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import React from "react";
+import { motion } from "framer-motion";
+import {
+  Palette,
+  Type,
+  Sticker,
+  Settings2,
+  X,
+  ChevronLeft,
+  Target,
+  LayoutTemplate,
+  Layers3,
+} from "lucide-react";
 import TemplateSelector from "../panels/TemplateSelector";
 import TypographyPanel from "../panels/TypographyPanel";
 import StylePanel from "../panels/StylePanel";
+import LayersPanel from "../panels/LayersPanel";
+import AssetsPanel from "../panels/AssetsPanel";
 import { ASPECT_RATIOS } from "../../templates/gridTemplates";
+
+const PANEL_META = {
+  templates: {
+    title: "Layout",
+    description: "Choose a strong structure first, then refine the composition.",
+    icon: LayoutTemplate,
+  },
+  assets: {
+    title: "Assets",
+    description: "Build richer boards with shapes, badges, decorative packs, and saved uploads.",
+    icon: Sticker,
+  },
+  text: {
+    title: "Typography",
+    description: "Add headlines, affirmations, and supporting copy.",
+    icon: Type,
+  },
+  style: {
+    title: "Canvas Style",
+    description: "Tune colors, spacing, corners, and the overall mood.",
+    icon: Palette,
+  },
+  layers: {
+    title: "Layers",
+    description: "Organize stacking order, lock content, and control precision tools.",
+    icon: Layers3,
+  },
+  settings: {
+    title: "Canvas Size",
+    description: "Match the board ratio to phone, desktop, or presentation needs.",
+    icon: Settings2,
+  },
+  goals: {
+    title: "Goals",
+    description: "Keep short-term and long-term goals visible while you design.",
+    icon: Target,
+  },
+};
+
+const GoalList = ({ title, description, goals, setGoals, placeholder, accentClass }) => (
+  <div className="space-y-3">
+    <div>
+      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h3>
+      <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">{description}</p>
+    </div>
+
+    <div className="space-y-2">
+      {goals.map((goal, index) => (
+        <div key={`${title}-${index}`} className="flex gap-2">
+          <input
+            type="text"
+            defaultValue={goal}
+            onBlur={(e) => {
+              const nextGoals = [...goals];
+              nextGoals[index] = e.target.value;
+              setGoals(nextGoals);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const nextGoals = [...goals];
+                nextGoals[index] = e.target.value;
+                setGoals(nextGoals);
+                e.target.blur();
+              }
+            }}
+            className="flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-[#1a3884] dark:border-slate-700 dark:bg-[#09111f] dark:text-white"
+            placeholder={placeholder}
+          />
+          <button
+            type="button"
+            onClick={() => setGoals(goals.filter((_, i) => i !== index))}
+            className="rounded-xl p-2 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      ))}
+
+      <button
+        type="button"
+        onClick={() => setGoals([...goals, ""])}
+        className={`w-full rounded-xl py-2 text-sm font-medium transition-colors ${accentClass}`}
+      >
+        + Add Goal
+      </button>
+    </div>
+  </div>
+);
 
 const EditorDrawer = ({
   activePanel,
   setActivePanel,
-  // Props for Panels
   templateId,
   handleTemplateChange,
   textOverlays,
@@ -27,218 +126,214 @@ const EditorDrawer = ({
   backgroundImage,
   setBackgroundImage,
   handleBackgroundUpload,
+  layers,
+  selectedLayer,
+  selectedLayers,
+  handleSelectLayer,
+  handleRenameLayer,
+  handleToggleLayerVisibility,
+  handleToggleLayerLock,
+  handleMoveLayerForward,
+  handleMoveLayerBackward,
+  snapEnabled,
+  setSnapEnabled,
+  handleApplyAlignment,
+  selectedImage,
+  handleUpdateSelectedImage,
+  handleDuplicateImage,
+  handleDuplicateAsset,
+  handleResetSelectedImage,
+  userUploads,
+  handleUserUpload,
+  handleAddAssetToCanvas,
+  handleAddUploadToCanvas,
+  selectedText,
   aspectRatio,
   setAspectRatio,
   currentRatio,
-  userUploads,
-  handleUserUpload,
   shortTermGoals = [],
   setShortTermGoals,
   longTermGoals = [],
-  setLongTermGoals
+  setLongTermGoals,
 }) => {
-    
   if (!activePanel) return null;
 
   const closeDrawer = () => setActivePanel(null);
+  const currentMeta = PANEL_META[activePanel];
+  const HeaderIcon = currentMeta?.icon || LayoutTemplate;
 
   return (
-    <div className="fixed inset-x-0 bottom-[60px] top-auto h-[50vh] z-40 bg-white dark:bg-[#0b1f38] border-t border-slate-200 dark:border-white/10 flex flex-col shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] rounded-t-2xl lg:static lg:w-[340px] lg:h-full lg:border-r lg:border-t-0 lg:shadow-xl lg:rounded-none transition-all duration-300">
-      
-      {/* Mobile Drag Handle */}
-      <div className="w-full flex justify-center pt-2 pb-1 lg:hidden">
-        <div className="w-10 h-1 bg-slate-200 dark:bg-white/20 rounded-full"></div>
+    <motion.div
+      initial={{ opacity: 0, y: 18, x: 0 }}
+      animate={{ opacity: 1, y: 0, x: 0 }}
+      exit={{ opacity: 0, y: 12, x: -10 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+      className="fixed inset-x-0 bottom-[68px] top-auto z-40 flex h-[64vh] flex-col rounded-t-3xl border-t border-slate-200 bg-white shadow-[0_-12px_28px_rgba(15,23,42,0.12)] lg:static lg:h-full lg:w-[360px] lg:rounded-none lg:border-r lg:border-t-0 lg:border-slate-200 lg:bg-[#f8fafc] lg:shadow-none dark:border-slate-800 dark:bg-[#0d1626] lg:dark:border-slate-800 lg:dark:bg-[#0d1626] xl:w-[380px]">
+      <div className="flex w-full justify-center pb-1 pt-2 lg:hidden">
+        <div className="h-1 w-10 rounded-full bg-slate-200 dark:bg-white/20" />
       </div>
 
-      {/* Drawer Header */}
-      <div className="h-10 lg:h-14 border-b border-slate-200 dark:border-white/10 flex items-center justify-between px-4 bg-slate-50 dark:bg-white/5 rounded-t-2xl lg:rounded-none">
-        <h3 className="font-semibold text-sm lg:text-base text-slate-800 dark:text-white capitalize flex items-center gap-2">
-           {activePanel === 'templates' && <Type className="w-4 h-4 text-[#1a3884]" />} {/* Using Type icon as placeholder for templates if LayoutTemplate is not imported, or just reuse an existing one. Actually LayoutTemplate was not imported in this file. Let's check imports. */}
-           {activePanel === 'style' && <Palette className="w-4 h-4 text-[#1a3884]" />}
-           {activePanel === 'text' && <Type className="w-4 h-4 text-[#1a3884]" />}
-           {activePanel === 'settings' && <Settings2 className="w-4 h-4 text-[#1a3884]" />}
-           {activePanel === 'goals' && <Target className="w-4 h-4 text-[#1a3884]" />}
-           {activePanel}
-        </h3>
-        <button onClick={closeDrawer} className="p-1 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors">
-            <X className="w-4 h-4 text-slate-500" />
-        </button>
+      <div className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50/95 px-5 py-4 backdrop-blur dark:border-slate-800 dark:bg-[#0d1626]/95">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300">
+              <HeaderIcon className="h-4.5 w-4.5" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                {currentMeta?.title}
+              </h3>
+              <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                {currentMeta?.description}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={closeDrawer}
+            className="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-white/10"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
-      {/* Drawer Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 pb-8 lg:pb-24">
-        
-        {/* Templates Panel */}
+      <div className="custom-scrollbar flex-1 overflow-y-auto px-4 pb-8 pt-4 sm:px-5 lg:pb-28">
         {activePanel === "templates" && (
-            <div className="space-y-4">
-                <p className="text-xs text-slate-500 mb-2">Choose a layout structure for your vision board.</p>
-                <TemplateSelector
-                    selectedTemplate={templateId}
-                    onSelect={handleTemplateChange}
-                />
-            </div>
+          <div className="space-y-4">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+              Template Library
+            </p>
+            <TemplateSelector
+              selectedTemplate={templateId}
+              onSelect={handleTemplateChange}
+            />
+          </div>
         )}
 
-        {/* Text Panel */}
         {activePanel === "text" && (
-            <TypographyPanel
-                onAddText={handleAddText}
-                textOverlays={textOverlays}
-                onUpdateText={handleUpdateText}
-                onDeleteText={handleDeleteText}
-                selectedTextId={selectedTextId}
-                onSelectText={handleSelectText}
-            />
+          <TypographyPanel
+            onAddText={handleAddText}
+            textOverlays={textOverlays}
+            onUpdateText={handleUpdateText}
+            onDeleteText={handleDeleteText}
+            selectedTextId={selectedTextId}
+            onSelectText={handleSelectText}
+          />
         )}
 
-        {/* Style Panel */}
+        {activePanel === "assets" && (
+          <AssetsPanel
+            userUploads={userUploads}
+            onUploadAsset={handleUserUpload}
+            onAddAssetToCanvas={handleAddAssetToCanvas}
+            onAddUploadToCanvas={handleAddUploadToCanvas}
+          />
+        )}
+
         {activePanel === "style" && (
-            <StylePanel
-                backgroundColor={backgroundColor}
-                setBackgroundColor={setBackgroundColor}
-                borderRadius={borderRadius}
-                setBorderRadius={setBorderRadius}
-                gap={gap}
-                setGap={setGap}
-                backgroundImage={backgroundImage}
-                setBackgroundImage={setBackgroundImage}
-                handleBackgroundUpload={handleBackgroundUpload}
-            />
+          <StylePanel
+            backgroundColor={backgroundColor}
+            setBackgroundColor={setBackgroundColor}
+            borderRadius={borderRadius}
+            setBorderRadius={setBorderRadius}
+            gap={gap}
+            setGap={setGap}
+            backgroundImage={backgroundImage}
+            setBackgroundImage={setBackgroundImage}
+            handleBackgroundUpload={handleBackgroundUpload}
+          />
         )}
 
-        {/* Settings Panel (Resize etc) */}
+        {activePanel === "layers" && (
+          <LayersPanel
+            layers={layers}
+            selectedLayer={selectedLayer}
+            selectedLayers={selectedLayers}
+            onSelectLayer={handleSelectLayer}
+            onRenameLayer={handleRenameLayer}
+            onToggleVisibility={handleToggleLayerVisibility}
+            onToggleLock={handleToggleLayerLock}
+            onMoveForward={handleMoveLayerForward}
+            onMoveBackward={handleMoveLayerBackward}
+            snapEnabled={snapEnabled}
+            setSnapEnabled={setSnapEnabled}
+            onApplyAlignment={handleApplyAlignment}
+            selectedImage={selectedImage}
+            onUpdateImage={handleUpdateSelectedImage}
+            onDuplicateImage={handleDuplicateImage}
+            onDuplicateAsset={handleDuplicateAsset}
+            onResetImage={handleResetSelectedImage}
+            selectedText={selectedText}
+          />
+        )}
+
         {activePanel === "settings" && (
-            <div className="space-y-6">
-                <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
-                    Canvas Size
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                    {Object.entries(ASPECT_RATIOS).map(([key, ratio]) => (
-                    <button
-                        key={key}
-                        onClick={() => setAspectRatio(key)}
-                        className={`px-3 py-3 text-xs rounded-xl transition-all text-left border ${aspectRatio === key
-                        ? "bg-[#1a3884]/20 text-[#1a3884] font-medium border-[#1a3884]"
-                        : "bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-white/50 border-transparent hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white"
-                        }`}
-                    >
-                        <div className="font-medium mb-0.5">{key}</div>
-                        <div className="text-[10px] opacity-60">
-                        {ratio.width}×{ratio.height}
-                        </div>
-                    </button>
-                    ))}
-                </div>
-                </div>
-                
-                <div className="bg-slate-100 dark:bg-white/5 p-4 rounded-lg text-xs text-slate-600 dark:text-white/60">
-                    <p>Current Dimensions: <strong>{currentRatio?.width} x {currentRatio?.height} px</strong></p>
-                </div>
+          <div className="space-y-6">
+            <div>
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                Aspect Ratio
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(ASPECT_RATIOS).map(([key, ratio]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setAspectRatio(key)}
+                    className={`rounded-2xl border px-3 py-3 text-left text-xs transition-all ${
+                      aspectRatio === key
+                        ? "border-[#1a3884] bg-[#1a3884]/8 text-[#1a3884] dark:bg-[#1a3884]/15 dark:text-blue-300"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:bg-slate-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <div className="mb-0.5 font-semibold">{key}</div>
+                    <div className="text-[10px] opacity-60">
+                      {ratio.width} x {ratio.height}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300">
+              <p className="mb-1 font-semibold text-slate-900 dark:text-white">Current Output</p>
+              <p>{currentRatio?.width} x {currentRatio?.height} px</p>
+            </div>
+          </div>
         )}
 
-        {/* Goals Panel */}
         {activePanel === "goals" && (
-            <div className="space-y-6">
-                <div>
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                        Short Term Goals (1-6 Months)
-                    </h3>
-                    <p className="text-xs text-slate-500 mb-3">Add immediate goals you are working towards.</p>
-                    <div className="space-y-2">
-                        {shortTermGoals.map((goal, index) => (
-                            <div key={index} className="flex gap-2">
-                                <input 
-                                    type="text" 
-                                    defaultValue={goal}
-                                    onBlur={(e) => {
-                                        const newGoals = [...shortTermGoals];
-                                        newGoals[index] = e.target.value;
-                                        setShortTermGoals(newGoals);
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            const newGoals = [...shortTermGoals];
-                                            newGoals[index] = e.target.value;
-                                            setShortTermGoals(newGoals);
-                                            e.target.blur();
-                                        }
-                                    }}
-                                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#001229] focus:outline-none focus:border-[#1a3884]"
-                                    placeholder="Enter short term goal..."
-                                />
-                                <button onClick={() => setShortTermGoals(shortTermGoals.filter((_, i) => i !== index))} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg">
-                                    <X className="w-4 h-4" />
-                                </button>
-                            </div>
-                        ))}
-                        <button 
-                            onClick={() => setShortTermGoals([...shortTermGoals, ""])}
-                            className="w-full py-2 text-sm text-[#1a3884] dark:text-blue-400 font-medium bg-[#1a3884]/5 dark:bg-blue-400/10 hover:bg-[#1a3884]/10 rounded-lg transition-colors"
-                        >
-                            + Add Short Term Goal
-                        </button>
-                    </div>
-                </div>
+          <div className="space-y-6">
+            <GoalList
+              title="Short Term Goals"
+              description="Near-term targets for the next one to six months."
+              goals={shortTermGoals}
+              setGoals={setShortTermGoals}
+              placeholder="Enter short-term goal..."
+              accentClass="bg-[#1a3884]/6 text-[#1a3884] hover:bg-[#1a3884]/10 dark:bg-blue-400/10 dark:text-blue-300"
+            />
 
-                <div>
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">
-                        Long Term Goals (1-5 Years)
-                    </h3>
-                    <p className="text-xs text-slate-500 mb-3">Add your grand vision and long-term milestones.</p>
-                    <div className="space-y-2">
-                        {longTermGoals.map((goal, index) => (
-                            <div key={index} className="flex gap-2">
-                                <input 
-                                    type="text" 
-                                    defaultValue={goal}
-                                    onBlur={(e) => {
-                                        const newGoals = [...longTermGoals];
-                                        newGoals[index] = e.target.value;
-                                        setLongTermGoals(newGoals);
-                                    }}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            const newGoals = [...longTermGoals];
-                                            newGoals[index] = e.target.value;
-                                            setLongTermGoals(newGoals);
-                                            e.target.blur();
-                                        }
-                                    }}
-                                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#001229] focus:outline-none focus:border-[#1a3884]"
-                                    placeholder="Enter long term goal..."
-                                />
-                                <button onClick={() => setLongTermGoals(longTermGoals.filter((_, i) => i !== index))} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg">
-                                    <X className="w-4 h-4" />
-                                </button>
-                            </div>
-                        ))}
-                        <button 
-                            onClick={() => setLongTermGoals([...longTermGoals, ""])}
-                            className="w-full py-2 text-sm text-[#1a3884] dark:text-blue-400 font-medium bg-[#1a3884]/5 dark:bg-blue-400/10 hover:bg-[#1a3884]/10 rounded-lg transition-colors"
-                        >
-                            + Add Long Term Goal
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <GoalList
+              title="Long Term Goals"
+              description="Bigger milestones that anchor the broader vision."
+              goals={longTermGoals}
+              setGoals={setLongTermGoals}
+              placeholder="Enter long-term goal..."
+              accentClass="bg-emerald-500/8 text-emerald-700 hover:bg-emerald-500/12 dark:bg-emerald-500/10 dark:text-emerald-300"
+            />
+          </div>
         )}
-
       </div>
-      
-      {/* Collapse Handle (Optional, styling enhancement) */}
-      <div 
-        className="absolute top-1/2 -right-3 transform -translate-y-1/2 w-3 h-12 bg-white dark:bg-[#0b1f38] border border-l-0 border-slate-200 dark:border-white/10 rounded-r-md flex items-center justify-center cursor-pointer shadow-sm z-0 text-slate-400 hover:text-slate-600"
+
+      <div
+        className="absolute top-1/2 -right-3 z-0 hidden h-12 w-3 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-r-md border border-l-0 border-slate-200 bg-white text-slate-400 shadow-sm hover:text-slate-600 dark:border-slate-800 dark:bg-[#0d1626] lg:flex"
         onClick={closeDrawer}
         title="Close Panel"
       >
-        <ChevronLeft className="w-3 h-3" />
+        <ChevronLeft className="h-3 w-3" />
       </div>
-
-    </div>
+    </motion.div>
   );
 };
 
 export default EditorDrawer;
-

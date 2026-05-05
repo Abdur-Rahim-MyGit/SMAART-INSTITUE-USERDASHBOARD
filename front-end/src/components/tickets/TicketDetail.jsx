@@ -14,6 +14,7 @@ import {
   CheckCircle
 } from "lucide-react";
 import { updateTicket, addUserResponse } from "@/services/ticketApi";
+import { getBackendUrl } from "@/services/api";
 
 const STATUS_CONFIG = {
   'open': {
@@ -58,6 +59,22 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
   const statusConfig = STATUS_CONFIG[ticket.status] || STATUS_CONFIG['open'];
   const priorityConfig = PRIORITY_CONFIG[ticket.priority] || PRIORITY_CONFIG['medium'];
   const categoryConfig = CATEGORY_CONFIG[ticket.category] || CATEGORY_CONFIG['other'];
+
+  const getAttachmentUrl = (file) => {
+    if (file.publicUrl) {
+      return `${getBackendUrl()}${file.publicUrl}`;
+    }
+
+    if (file.path?.startsWith('http://') || file.path?.startsWith('https://')) {
+      return file.path;
+    }
+
+    if (file.filename) {
+      return `${getBackendUrl()}/uploads/${file.filename}`;
+    }
+
+    return '#';
+  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleString('en-US', {
@@ -238,8 +255,10 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
                 {ticket.attachments.map((file, index) => (
                   <a
                     key={index}
-                    href={file.path}
+                    href={getAttachmentUrl(file)}
                     download={file.originalName}
+                    target="_blank"
+                    rel="noreferrer"
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#002147] border border-[#1a3884]/30 hover:border-[#1a3884] transition-colors group"
                   >
                     <Paperclip className="w-4 h-4 text-[#1a3884]" />

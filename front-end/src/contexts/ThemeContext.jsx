@@ -1,30 +1,111 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { apiCall } from '../services/api';
 
 const ThemeContext = createContext({
-  theme: 'dark',
-  setTheme: () => { },
+  theme: 'system',
+  setTheme: () => {},
+  loading: true,
 });
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    // Check localStorage first, default to 'light'
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme || 'light';
-  });
+  const [theme, setTheme] = useState('system');
+  const [loading, setLoading] = useState(true);
+
+  const applyTheme = (themeValue) => {
+    const root = document.documentElement;
+    root.classList.remove('light', 'dark');
+
+    if (themeValue === 'system') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.classList.add(prefersDark ? 'dark' : 'light');
+      return;
+    }
+
+    root.classList.add(themeValue);
+  };
+
+  const persistThemePreference = async (themeValue) => {
+    localStorage.setItem('theme', themeValue);
+
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      return;
+    }
+
+    try {
+      await apiCall('/users/settings', {
+        method: 'PUT',
+        body: JSON.stringify({
+          appearance: {
+            theme: themeValue,
+          },
+        }),
+      });
+    } catch (error) {
+      console.warn('Failed to persist theme preference:', error.message);
+    }
+  };
+
+  const handleThemeChange = (newTheme) => {
+    setTheme(newTheme);
+    applyTheme(newTheme);
+    persistThemePreference(newTheme);
+  };
 
   useEffect(() => {
-    // Apply theme to document
-    const root = document.documentElement;
-    console.log('Applying theme to root:', theme);
-    root.classList.remove('light', 'dark');
-    root.classList.add(theme);
+    let isMounted = true;
 
-    // Save to localStorage
-    localStorage.setItem('theme', theme);
+    const loadTheme = async () => {
+      const fallbackTheme = localStorage.getItem('theme') || 'system';
+      if (isMounted) {
+        setTheme(fallbackTheme);
+        applyTheme(fallbackTheme);
+        setLoading(false);
+      }
+
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        return;
+      }
+
+      try {
+        const response = await apiCall('/users/settings');
+        const remoteTheme = response?.data?.appearance?.theme;
+
+        if (isMounted && remoteTheme && remoteTheme !== fallbackTheme) {
+          setTheme(remoteTheme);
+          applyTheme(remoteTheme);
+          localStorage.setItem('theme', remoteTheme);
+        }
+      } catch (error) {
+        console.warn('Failed to load persisted theme:', error.message);
+      }
+    };
+
+    loadTheme();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = () => {
+      if (theme === 'system') {
+        applyTheme('system');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme: handleThemeChange, loading }}>
       {children}
     </ThemeContext.Provider>
   );

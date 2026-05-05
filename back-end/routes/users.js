@@ -1,11 +1,14 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const Registration = require('../models/Registration');
 const User = require('../models/User');
 const Student = require('../models/Student');
 const College = require('../models/College');
 const upload = require('../middleware/upload');
+const { protect } = require('../middleware/auth');
+const { createDefaultUserSettings } = require('../models/schemas/userSettings');
 
 const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
@@ -13,6 +16,56 @@ router.use(generalLimiter);
 
 
 const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const cloneDefaultUserSettings = () => createDefaultUserSettings();
+
+const normalizeUserSettings = (settings = {}, profileOverrides = {}) => {
+  const defaults = cloneDefaultUserSettings();
+
+  return {
+    profile: {
+      ...defaults.profile,
+      ...(settings.profile || {}),
+      ...profileOverrides,
+      email: profileOverrides.email || settings?.profile?.email || defaults.profile.email
+    },
+    notifications: {
+      ...defaults.notifications,
+      ...(settings.notifications || {})
+    },
+    privacy: {
+      ...defaults.privacy,
+      ...(settings.privacy || {})
+    },
+    appearance: {
+      ...defaults.appearance,
+      ...(settings.appearance || {})
+    },
+    language: {
+      ...defaults.language,
+      ...(settings.language || {})
+    }
+  };
+};
+
+const resolveSettingsProfile = async (account) => {
+  const registration = await Registration.findOne({
+    $or: [
+      { userId: account._id },
+      { email: account.email }
+    ]
+  }).lean();
+
+  return {
+    registration,
+    profile: {
+      displayName: account.fullName || registration?.fullName || '',
+      email: account.email || registration?.email || '',
+      phone: account.mobile || registration?.mobileNumber || '',
+      bio: account.settings?.profile?.bio || ''
+    }
+  };
+};
 
 // Create/Update Registration Details with file uploads
 router.post('/register-details', upload.fields([
@@ -729,6 +782,106 @@ router.get('/register-details/:email', async (req, res) => {
   }
 });
 
+// Get current user settings
+router.get('/settings', protect, async (req, res) => {
+  try {
+    const { profile } = await resolveSettingsProfile(req.user);
+    const settings = normalizeUserSettings(req.user.settings, profile);
+
+    return res.json({
+      success: true,
+      data: settings
+    });
+  } catch (err) {
+    console.error('[users/settings][GET] Error:', err);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to load user settings'
+    });
+  }
+});
+
+// Save current user settings
+router.put('/settings', protect, async (req, res) => {
+  try {
+    const incomingSettings = req.body || {};
+    const existingProfile = await resolveSettingsProfile(req.user);
+    const mergedIncomingSettings = {
+      ...(req.user.settings || {}),
+      ...incomingSettings,
+      profile: {
+        ...(req.user.settings?.profile || {}),
+        ...(incomingSettings.profile || {})
+      },
+      notifications: {
+        ...(req.user.settings?.notifications || {}),
+        ...(incomingSettings.notifications || {})
+      },
+      privacy: {
+        ...(req.user.settings?.privacy || {}),
+        ...(incomingSettings.privacy || {})
+      },
+      appearance: {
+        ...(req.user.settings?.appearance || {}),
+        ...(incomingSettings.appearance || {})
+      },
+      language: {
+        ...(req.user.settings?.language || {}),
+        ...(incomingSettings.language || {})
+      }
+    };
+
+    const settings = normalizeUserSettings(mergedIncomingSettings, {
+      displayName: incomingSettings?.profile?.displayName || existingProfile.profile.displayName,
+      email: req.user.email || existingProfile.profile.email,
+      phone: incomingSettings?.profile?.phone || existingProfile.profile.phone,
+      bio: incomingSettings?.profile?.bio || existingProfile.profile.bio
+    });
+
+    req.user.settings = settings;
+
+    if (settings.profile.displayName && req.user.fullName !== settings.profile.displayName) {
+      req.user.fullName = settings.profile.displayName;
+    }
+
+    if (typeof settings.profile.phone === 'string' && req.user.mobile !== settings.profile.phone) {
+      req.user.mobile = settings.profile.phone;
+    }
+
+    await req.user.save();
+
+    if (existingProfile.registration) {
+      const registrationUpdates = {};
+
+      if (existingProfile.registration.fullName !== settings.profile.displayName) {
+        registrationUpdates.fullName = settings.profile.displayName;
+      }
+
+      if (existingProfile.registration.mobileNumber !== settings.profile.phone) {
+        registrationUpdates.mobileNumber = settings.profile.phone;
+      }
+
+      if (Object.keys(registrationUpdates).length > 0) {
+        await Registration.updateOne(
+          { _id: existingProfile.registration._id },
+          { $set: registrationUpdates }
+        );
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: 'Settings saved successfully',
+      data: settings
+    });
+  } catch (err) {
+    console.error('[users/settings][PUT] Error:', err);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to save user settings'
+    });
+  }
+});
 // Create User (for signup without password)
 router.post('/create', async (req, res) => {
   try {
@@ -854,3 +1007,5 @@ router.get('/verify-badge/:badgeId', async (req, res) => {
 });
 
 module.exports = router;
+
+

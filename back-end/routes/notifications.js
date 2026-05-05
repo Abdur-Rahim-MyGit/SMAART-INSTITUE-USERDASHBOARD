@@ -5,46 +5,48 @@ router.use(generalLimiter);
 
 const Notification = require('../models/Notification');
 const { protect } = require('../middleware/auth');
-const { broadcastToAll } = require('../services/websocketService');
+const {
+  broadcastToAll,
+  sendUnreadCountUpdate,
+  emitNotificationStateToUser,
+  emitNotificationsClearedToUser,
+} = require('../services/websocketService');
 const { sendSystemAnnouncementEmail } = require('../services/emailService');
 
-/**
- * @route   GET /api/notifications
- * @desc    Get user's notifications with pagination
- * @access  Private
- */
+const getAuthenticatedUserId = (req) => (req.user?._id || req.user?.id || '').toString();
+
 router.get('/', protect, async (req, res) => {
   try {
     const { page = 1, limit = 20, unreadOnly = false } = req.query;
-    const userId = req.user.id;
+    const userId = getAuthenticatedUserId(req);
 
     const query = { userId };
     if (unreadOnly === 'true') {
       query.isRead = false;
     }
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
 
     const [notifications, total, unreadCount] = await Promise.all([
       Notification.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(parseInt(limit))
+        .limit(parseInt(limit, 10))
         .lean(),
       Notification.countDocuments(query),
-      Notification.getUnreadCount(userId)
+      Notification.getUnreadCount(userId),
     ]);
 
     res.json({
       success: true,
       notifications,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
         total,
-        pages: Math.ceil(total / parseInt(limit))
+        pages: Math.ceil(total / parseInt(limit, 10)),
       },
-      unreadCount
+      unreadCount,
     });
   } catch (error) {
     console.error('Error fetching notifications:', error);
@@ -52,14 +54,9 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
-/**
- * @route   GET /api/notifications/unread-count
- * @desc    Get count of unread notifications
- * @access  Private
- */
 router.get('/unread-count', protect, async (req, res) => {
   try {
-    const unreadCount = await Notification.getUnreadCount(req.user.id);
+    const unreadCount = await Notification.getUnreadCount(getAuthenticatedUserId(req));
     res.json({ success: true, unreadCount });
   } catch (error) {
     console.error('Error getting unread count:', error);
@@ -67,22 +64,24 @@ router.get('/unread-count', protect, async (req, res) => {
   }
 });
 
-/**
- * @route   PATCH /api/notifications/:id/read
- * @desc    Mark a notification as read
- * @access  Private
- */
 router.patch('/:id/read', protect, async (req, res) => {
   try {
+    const userId = getAuthenticatedUserId(req);
     const notification = await Notification.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
+      { _id: req.params.id, userId },
       { $set: { isRead: true } },
       { new: true }
-    );
+    ).lean();
 
     if (!notification) {
       return res.status(404).json({ success: false, message: 'Notification not found' });
     }
+
+    emitNotificationStateToUser(userId, {
+      action: 'read',
+      notificationId: req.params.id,
+    });
+    await sendUnreadCountUpdate(userId);
 
     res.json({ success: true, notification });
   } catch (error) {
@@ -91,18 +90,18 @@ router.patch('/:id/read', protect, async (req, res) => {
   }
 });
 
-/**
- * @route   PATCH /api/notifications/read-all
- * @desc    Mark all notifications as read
- * @access  Private
- */
 router.patch('/read-all', protect, async (req, res) => {
   try {
-    const result = await Notification.markAllAsRead(req.user.id);
-    res.json({ 
-      success: true, 
+    const userId = getAuthenticatedUserId(req);
+    const result = await Notification.markAllAsRead(userId);
+
+    emitNotificationStateToUser(userId, { action: 'read_all' });
+    await sendUnreadCountUpdate(userId);
+
+    res.json({
+      success: true,
       message: 'All notifications marked as read',
-      modifiedCount: result.modifiedCount
+      modifiedCount: result.modifiedCount,
     });
   } catch (error) {
     console.error('Error marking all as read:', error);
@@ -110,18 +109,18 @@ router.patch('/read-all', protect, async (req, res) => {
   }
 });
 
-/**
- * @route   DELETE /api/notifications/clear-all
- * @desc    Delete all notifications for user
- * @access  Private
- */
 router.delete('/clear-all', protect, async (req, res) => {
   try {
-    const result = await Notification.deleteMany({ userId: req.user.id });
-    res.json({ 
-      success: true, 
+    const userId = getAuthenticatedUserId(req);
+    const result = await Notification.deleteMany({ userId });
+
+    emitNotificationsClearedToUser(userId);
+    await sendUnreadCountUpdate(userId);
+
+    res.json({
+      success: true,
       message: 'All notifications cleared',
-      deletedCount: result.deletedCount
+      deletedCount: result.deletedCount,
     });
   } catch (error) {
     console.error('Error clearing notifications:', error);
@@ -129,21 +128,23 @@ router.delete('/clear-all', protect, async (req, res) => {
   }
 });
 
-/**
- * @route   DELETE /api/notifications/:id
- * @desc    Delete a notification
- * @access  Private
- */
 router.delete('/:id', protect, async (req, res) => {
   try {
+    const userId = getAuthenticatedUserId(req);
     const notification = await Notification.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user.id
-    });
+      userId,
+    }).lean();
 
     if (!notification) {
       return res.status(404).json({ success: false, message: 'Notification not found' });
     }
+
+    emitNotificationStateToUser(userId, {
+      action: 'delete',
+      notificationId: req.params.id,
+    });
+    await sendUnreadCountUpdate(userId);
 
     res.json({ success: true, message: 'Notification deleted' });
   } catch (error) {
@@ -152,11 +153,6 @@ router.delete('/:id', protect, async (req, res) => {
   }
 });
 
-/**
- * @route   POST /api/notifications/test
- * @desc    Create a test notification (Development only)
- * @access  Private
- */
 router.post('/test', protect, async (req, res) => {
   if (process.env.NODE_ENV === 'production') {
     return res.status(403).json({ success: false, message: 'Not available in production' });
@@ -164,13 +160,13 @@ router.post('/test', protect, async (req, res) => {
 
   try {
     const notification = await Notification.createNotification({
-      userId: req.user.id,
+      userId: getAuthenticatedUserId(req),
       type: req.body.type || 'system',
-      title: req.body.title || '🔔 Test Notification',
+      title: req.body.title || 'Test Notification',
       message: req.body.message || 'This is a test notification to verify the system is working correctly.',
       icon: req.body.icon || 'bell',
       color: req.body.color || '#30919D',
-      link: req.body.link || '/dashboard'
+      link: req.body.link || '/dashboard',
     });
 
     res.json({ success: true, notification });
@@ -180,29 +176,21 @@ router.post('/test', protect, async (req, res) => {
   }
 });
 
-/**
- * @route   GET /api/notifications/summary
- * @desc    Get consolidated notification summary (daily progress, badges, login times)
- * @access  Private
- */
 router.get('/summary', protect, async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = getAuthenticatedUserId(req);
     const User = require('../models/User');
     const Student = require('../models/Student');
     const UserBadge = require('../models/UserBadge');
     const CourseEnrollment = require('../models/CourseEnrollment');
 
-    // Get user data (try both User and Student collections)
     let userData = await User.findById(userId).select('lastLogin previousLogin fullName');
     if (!userData) {
       userData = await Student.findById(userId).select('lastLogin previousLogin fullName');
     }
 
-    // Get badges earned count
     const badgesEarned = await UserBadge.countDocuments({ userId });
 
-    // Get today's completed sessions
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
@@ -212,11 +200,10 @@ router.get('/summary', protect, async (req, res) => {
     let todayCompletedSessions = 0;
 
     for (const enrollment of enrollments) {
-      if (enrollment.dayProgress) {
-        for (const [dayKey, dayData] of enrollment.dayProgress.entries()) {
-          if (dayData.completedAt && new Date(dayData.completedAt) >= today && new Date(dayData.completedAt) < tomorrow) {
-            todayCompletedSessions++;
-          }
+      if (!enrollment.dayProgress) continue;
+      for (const [, dayData] of enrollment.dayProgress.entries()) {
+        if (dayData.completedAt && new Date(dayData.completedAt) >= today && new Date(dayData.completedAt) < tomorrow) {
+          todayCompletedSessions += 1;
         }
       }
     }
@@ -229,8 +216,8 @@ router.get('/summary', protect, async (req, res) => {
         currentLogin: userData?.lastLogin || new Date(),
         badgesEarned,
         todayCompletedSessions,
-        totalEnrollments: enrollments.length
-      }
+        totalEnrollments: enrollments.length,
+      },
     });
   } catch (error) {
     console.error('Error fetching notification summary:', error);
@@ -238,14 +225,8 @@ router.get('/summary', protect, async (req, res) => {
   }
 });
 
-/**
- * @route   POST /api/notifications/broadcast
- * @desc    Broadcast a notification to all students (Admin only)
- * @access  Private (Admin)
- */
 router.post('/broadcast', protect, async (req, res) => {
   try {
-    // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({ success: false, message: 'Admin access required' });
     }
@@ -256,25 +237,21 @@ router.post('/broadcast', protect, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Title and message are required' });
     }
 
-    // Get all students
     const Student = require('../models/Student');
     const students = await Student.find({ status: 'active' }).select('_id');
 
-    // Create notifications for all students
-    const notifications = students.map(student => ({
+    const notifications = students.map((student) => ({
       userId: student._id,
       type: 'system',
-      title: title,
-      message: message,
+      title,
+      message,
       icon: 'megaphone',
-      color: '#002147', // Navy blue for admin announcements
-      link: null // No hyperlinks - display only
+      color: '#002147',
+      link: null,
     }));
 
-    // Bulk insert
     await Notification.insertMany(notifications);
 
-    // Push real-time update to all currently connected WebSocket clients
     broadcastToAll({
       type: 'system',
       title,
@@ -283,31 +260,29 @@ router.post('/broadcast', protect, async (req, res) => {
       color: '#002147',
       link: null,
       isRead: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     });
 
     res.json({
       success: true,
       message: `Broadcast sent to ${students.length} students`,
-      recipientCount: students.length
+      recipientCount: students.length,
     });
 
-    // 📧 Email broadcast – fire-and-forget after response is sent
-    // Fetch emails in background so the HTTP response is instant.
     setImmediate(async () => {
       try {
         const fullStudents = await Student.find({ status: 'active' }).select('email fullName').lean();
         for (const student of fullStudents) {
           if (student.email) {
             await sendSystemAnnouncementEmail({
-              to:       student.email,
+              to: student.email,
               fullName: student.fullName,
               title,
               message,
             });
           }
         }
-        console.log(`[Broadcast] 📧 Emails sent to ${fullStudents.length} students`);
+        console.log(`[Broadcast] Emails sent to ${fullStudents.length} students`);
       } catch (emailErr) {
         console.error('[Broadcast] Email error:', emailErr.message);
       }

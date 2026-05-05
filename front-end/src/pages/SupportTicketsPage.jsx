@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, LifeBuoy, MessageSquare, History, Plus, Loader2, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, LifeBuoy, MessageSquare, History, Plus, Loader2, Clock, CheckCircle2, AlertCircle, Filter, RefreshCw } from 'lucide-react';
 import TicketForm from '@/components/tickets/TicketForm';
 import TicketDetail from '@/components/tickets/TicketDetail';
-// import { ticketApi } from '@/services/ticketApi'; // Removed unused invalid import
+import { getMyTickets } from '@/services/ticketApi';
 
 const SupportTicketsPage = () => {
   const location = useLocation();
@@ -14,6 +14,8 @@ const SupportTicketsPage = () => {
   const [activeTab, setActiveTab] = useState('create'); // 'create' | 'history'
   const [tickets, setTickets] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Format chatbot conversation if present
   useEffect(() => {
@@ -37,19 +39,16 @@ const SupportTicketsPage = () => {
     if (activeTab === 'history') {
       fetchTickets();
     }
-  }, [activeTab]);
+  }, [activeTab, statusFilter]);
 
   const fetchTickets = async () => {
     try {
       setLoadingHistory(true);
-      const token = sessionStorage.getItem('token'); // Or however you store it
-      // Direct fetch for now if service doesn't exist, verify import later
-      const response = await fetch('http://localhost:5000/api/tickets', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setTickets(data.data);
+      const filters = {};
+      if (statusFilter) filters.status = statusFilter;
+      const response = await getMyTickets(filters);
+      if (response.success) {
+        setTickets(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch tickets", error);
@@ -183,6 +182,71 @@ const SupportTicketsPage = () => {
                 exit={{ opacity: 0, x: -20 }}
                 className="space-y-4"
               >
+                {/* Filters */}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowFilters(!showFilters)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${
+                        showFilters || statusFilter
+                          ? "border-[#1a3884] text-[#1a3884]"
+                          : "border-[#1a3884]/30 text-gray-400"
+                      }`}
+                    >
+                      <Filter className="w-4 h-4" />
+                      Filters
+                      {statusFilter && (
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-[#1a3884]/20">1</span>
+                      )}
+                    </button>
+                    <button
+                      onClick={fetchTickets}
+                      disabled={loadingHistory}
+                      className="p-2 rounded-xl border border-[#1a3884]/30 text-gray-400 hover:text-white hover:border-[#1a3884] transition-colors"
+                    >
+                      <RefreshCw className={`w-4 h-4 ${loadingHistory ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('create')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    New Ticket
+                  </button>
+                </div>
+
+                {/* Filter Options */}
+                <AnimatePresence>
+                  {showFilters && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 shadow-sm dark:shadow-none">
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-sm text-gray-400 mr-2">Status:</span>
+                          {['', 'open', 'in-progress', 'resolved', 'closed'].map((status) => (
+                            <button
+                              key={status}
+                              onClick={() => setStatusFilter(status)}
+                              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                                statusFilter === status
+                                  ? "bg-[#1a3884] text-white"
+                                  : "bg-gray-100 dark:bg-[#001229] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                              }`}
+                            >
+                              {status || 'All'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 {loadingHistory ? (
                   <div className="py-20 flex flex-col items-center justify-center text-slate-400">
                     <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#1a3884]" />
