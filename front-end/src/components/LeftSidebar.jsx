@@ -24,7 +24,8 @@ import {
   Trophy,
   X,
   Sparkles,
-  CheckCheck
+  CheckCheck,
+  Compass
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -71,7 +72,8 @@ const menuGroups = [
   {
     title: "sidebar.group_skills",
     items: [
-      { icon: Award, label: "Skills Vault", path: "/dashboard/smaart-wallet", badge: null },
+      { icon: Award, label: "Skills Vault", path: "/dashboard/skills-vault", badge: null },
+      { icon: Compass, label: "Career Direc", path: "/dashboard/career-direction", badge: null },
       { icon: ShieldCheck, label: "Skills Passport", path: "/dashboard/skills-passport", badge: null },
       { icon: Lightbulb, label: "Vision Board", path: "/dashboard/vision-boards", badge: null },
     ]
@@ -146,8 +148,8 @@ const LeftSidebar = () => {
         const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
         if (response.ok) {
           const data = await response.json();
-          // Check for profilePhoto at root level first (new structure), then fallback to otherDetails
-          const photoUrl = data.profilePhoto || data.otherDetails?.profilePhoto;
+          // Check for profilePhoto at root level first (new structure), then fallback to otherDetails or user object
+          const photoUrl = data.profilePhoto || data.otherDetails?.profilePhoto || user?.profileImage || user?.profilePicture;
           if (photoUrl) {
             // If it's already a full URL (Cloudinary), use it directly; otherwise prepend backend URL
             const fullUrl = photoUrl.startsWith('http') ? photoUrl : `${getBackendUrl()}/${photoUrl}`;
@@ -160,7 +162,7 @@ const LeftSidebar = () => {
     };
 
     fetchProfilePhoto();
-  }, [user?.email]);
+  }, [user?.email, user?.profileImage, user?.profilePicture]);
 
   // Notifications state
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -334,15 +336,21 @@ const LeftSidebar = () => {
             {/* Mobile Header */}
             <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <img
+                {/* <img
                   src={theme === 'dark' ? whiteLogo : blueLogo}
                   alt="SMAART"
                   className="h-12 w-auto object-contain"
                   onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                />
-                <div className="h-12 w-12 bg-[#1a3884] rounded-xl items-center justify-center hidden">
+                /> */}
+                {/* <div className="h-12 w-12 bg-[#1a3884] rounded-xl items-center justify-center hidden">
                   <Sparkles className="w-6 h-6 text-white" />
-                </div>
+                </div> */}
+                <span
+                  className="text-2xl font-extrabold tracking-tight"
+                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
+                >
+                  SMAART
+                </span>
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
@@ -422,13 +430,30 @@ const LeftSidebar = () => {
         {/* Logo Section */}
         <div className={`flex flex-col items-start p-5 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
           <Link to="/dashboard" className="flex flex-col items-start overflow-hidden">
-            {/* SMAART Institute Logo */}
-            <div className={`flex items-center justify-center transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full'}`}>
+            {/* SMAART Institute Logo - commented out, using text instead */}
+            {/* <div className={`flex items-center justify-center transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full'}`}>
               <img
                 src={theme === 'dark' ? whiteLogo : blueLogo}
                 alt="SMAART Institute"
                 className={`w-auto object-contain transition-all duration-300 ${isCollapsed ? 'h-8 max-w-[40px]' : 'h-10 lg:h-12 max-w-[180px] lg:max-w-[200px]'}`}
               />
+            </div> */}
+            <div className={`flex items-center justify-center transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full'}`}>
+              {isCollapsed ? (
+                <span
+                  className="text-lg font-extrabold tracking-tight"
+                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
+                >
+                  S
+                </span>
+              ) : (
+                <span
+                  className="text-2xl font-extrabold tracking-tight"
+                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
+                >
+                  SMAART
+                </span>
+              )}
             </div>
             {!isCollapsed && (
               <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
@@ -653,13 +678,13 @@ const LeftSidebar = () => {
                   src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
                   alt={user.college.collegeName || "College Logo"}
                   className="w-10 h-10 rounded-lg object-contain bg-white dark:bg-slate-800 border-2 border-white dark:border-slate-700 p-1"
-                  onError={(e) => {
+                  onError={() => {
                     setShowCollegeLogo(false);
                   }}
                 />
-              ) : profilePhoto || user?.profilePicture ? (
+              ) : (profilePhoto || user?.profileImage || user?.profilePicture) ? (
                 <img
-                  src={profilePhoto || user.profilePicture}
+                  src={profilePhoto || (user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${getBackendUrl()}/${user.profileImage}` : user?.profilePicture))}
                   alt={user.fullName || 'User'}
                   className="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-slate-700"
                 />

@@ -46,8 +46,8 @@ const DashboardHeader = () => {
       '/tickets': 'Support Tickets',
       '/dashboard/add-details': 'Add Details',
       '/add-details': 'Add Details',
-      '/dashboard/smaart-wallet': 'SMAART Wallet',
-      '/smaart-wallet': 'SMAART Wallet',
+      '/dashboard/skills-vault': 'Skills Vault',
+      '/skills-vault': 'Skills Vault',
     };
     return titleMap[path] || 'Dashboard';
   };

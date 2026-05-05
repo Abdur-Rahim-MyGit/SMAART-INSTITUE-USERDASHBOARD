@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { Share2 } from "lucide-react";
 
 /* ══════════════════════════════════════
-   SMAART Wallet – Your Professional Vault
+   Skills Vault – Your Professional Vault
    ══════════════════════════════════════ */
 
 const TABS = [
@@ -29,7 +29,7 @@ const TABS = [
     { id: "flashcards", label: "Flashcards", icon: Zap },
 ];
 
-const SMAARTWallet = () => {
+const SkillsVault = () => {
     const navigate = useNavigate();
     const { user, loading: userLoading } = useUser();
     const [activeTab, setActiveTab] = useState("overview");
@@ -194,9 +194,9 @@ const SMAARTWallet = () => {
 
                                         {/* What's in your wallet */}
                                         <div className="bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
-                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">What's in your SMAART Wallet?</h3>
+                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">What's in your Skills Vault?</h3>
                                             <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
-                                                Your SMAART Wallet is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources. Here's what you'll find:
+                                                Your Skills Vault is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources. Here's what you'll find:
                                             </p>
                                             <div className="grid sm:grid-cols-2 gap-4">
                                                 {[
@@ -576,4 +576,4 @@ const FlashcardItem = ({ card, index }) => {
     );
 };
 
-export default SMAARTWallet;
+export default SkillsVault;
