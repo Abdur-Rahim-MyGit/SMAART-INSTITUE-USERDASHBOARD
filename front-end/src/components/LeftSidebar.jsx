@@ -345,12 +345,14 @@ const LeftSidebar = () => {
                 {/* <div className="h-12 w-12 bg-[#1a3884] rounded-xl items-center justify-center hidden">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div> */}
-                <span
-                  className="text-2xl font-extrabold tracking-tight"
-                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
-                >
-                  SMAART
-                </span>
+                {(location.pathname === '/dashboard' || location.pathname === '/dashboard/') && (
+                  <span
+                    className="text-2xl font-extrabold tracking-tight"
+                    style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
+                  >
+                    SMAART
+                  </span>
+                )}
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
@@ -438,27 +440,35 @@ const LeftSidebar = () => {
                 className={`w-auto object-contain transition-all duration-300 ${isCollapsed ? 'h-8 max-w-[40px]' : 'h-10 lg:h-12 max-w-[180px] lg:max-w-[200px]'}`}
               />
             </div> */}
-            <div className={`flex items-center justify-center transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full'}`}>
-              {isCollapsed ? (
-                <span
-                  className="text-lg font-extrabold tracking-tight"
-                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
-                >
-                  S
-                </span>
-              ) : (
-                <span
-                  className="text-2xl font-extrabold tracking-tight"
-                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
-                >
-                  SMAART
-                </span>
-              )}
-            </div>
-            {!isCollapsed && (
-              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
-                Craft Your Career
-              </span>
+            {(location.pathname === '/dashboard' || location.pathname === '/dashboard/') ? (
+              <>
+                <div className={`flex items-center justify-center transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full'}`}>
+                  {isCollapsed ? (
+                    <span
+                      className="text-lg font-extrabold tracking-tight"
+                      style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
+                    >
+                      S
+                    </span>
+                  ) : (
+                    <span
+                      className="text-2xl font-extrabold tracking-tight"
+                      style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
+                    >
+                      SMAART
+                    </span>
+                  )}
+                </div>
+                {!isCollapsed && (
+                  <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
+                    Craft Your Career
+                  </span>
+                )}
+              </>
+            ) : (
+              // On inner pages, we can either show nothing or a minimal spacer/icon
+              // Based on user request "dont show this", we'll hide it.
+              <div className="h-4" />
             )}
           </Link>
         </div>

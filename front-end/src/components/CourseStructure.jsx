@@ -391,7 +391,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#1a3884]">
-                    Official Programme
+                    Core Programme
                   </span>
                   <h1 className="text-4xl font-extrabold text-[#112b6b] tracking-tight" style={{ letterSpacing: "-0.03em" }}>
                     My Learning Journey
