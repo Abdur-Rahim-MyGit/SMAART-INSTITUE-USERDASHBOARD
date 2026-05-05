@@ -39,6 +39,16 @@ const buildUserQuery = (userId) => {
   return { $or: queries };
 };
 
+const buildOwnedBoardQuery = (boardId, userId) => ({
+  _id: boardId,
+  ...buildUserQuery(userId),
+});
+
+const clonePlain = (value, fallback) => {
+  if (value === undefined || value === null) return fallback;
+  return JSON.parse(JSON.stringify(value));
+};
+
 /**
  * Create a new vision board
  * Stores merged collage image AND individual editable data
@@ -76,6 +86,8 @@ exports.createVisionBoard = async (req, res) => {
       collageImage,
       slotImages,
       textOverlays,
+      assetOverlays,
+      userUploads,
       shortTermGoals,
       longTermGoals,
     } = req.body;
@@ -109,6 +121,7 @@ exports.createVisionBoard = async (req, res) => {
         width: canvasSettings?.width || 1080,
         height: canvasSettings?.height || 1080,
         backgroundColor: canvasSettings?.backgroundColor || "#ffffff",
+        backgroundImage: canvasSettings?.backgroundImage || null,
         borderRadius: canvasSettings?.borderRadius || 8,
         gap: canvasSettings?.gap || 8,
       },
@@ -116,6 +129,8 @@ exports.createVisionBoard = async (req, res) => {
       collageImagePublicId: collagePublicId,
       slotImages: slotImages || {},
       textOverlays: textOverlays || {},
+      assetOverlays: assetOverlays || {},
+      userUploads: userUploads || [],
       shortTermGoals: shortTermGoals || [],
       longTermGoals: longTermGoals || [],
       // Store userId as ObjectId for consistency
@@ -219,6 +234,14 @@ exports.getBoardCount = async (req, res) => {
 exports.getVisionBoard = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
 
     if (!isValidObjectId(id)) {
       return res.status(400).json({
@@ -227,12 +250,12 @@ exports.getVisionBoard = async (req, res) => {
       });
     }
 
-    const board = await VisionBoardPro.findById(id);
+    const board = await VisionBoardPro.findOne(buildOwnedBoardQuery(id, userId));
 
     if (!board) {
       return res.status(404).json({
         success: false,
-        message: "Vision board not found",
+        message: "Vision board not found or does not belong to you",
       });
     }
 
@@ -257,6 +280,14 @@ exports.getVisionBoard = async (req, res) => {
 exports.updateVisionBoard = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
 
     if (!isValidObjectId(id)) {
       return res.status(400).json({
@@ -265,11 +296,11 @@ exports.updateVisionBoard = async (req, res) => {
       });
     }
 
-    const board = await VisionBoardPro.findById(id);
+    const board = await VisionBoardPro.findOne(buildOwnedBoardQuery(id, userId));
     if (!board) {
       return res.status(404).json({
         success: false,
-        message: "Vision board not found",
+        message: "Vision board not found or does not belong to you",
       });
     }
 
@@ -281,6 +312,8 @@ exports.updateVisionBoard = async (req, res) => {
       collageImage,
       slotImages,
       textOverlays,
+      assetOverlays,
+      userUploads,
       shortTermGoals,
       longTermGoals,
     } = req.body;
@@ -319,6 +352,8 @@ exports.updateVisionBoard = async (req, res) => {
     }
     if (slotImages !== undefined) board.slotImages = slotImages;
     if (textOverlays !== undefined) board.textOverlays = textOverlays;
+    if (assetOverlays !== undefined) board.assetOverlays = assetOverlays;
+    if (userUploads !== undefined) board.userUploads = userUploads;
     if (shortTermGoals !== undefined) board.shortTermGoals = shortTermGoals;
     if (longTermGoals !== undefined) board.longTermGoals = longTermGoals;
 
@@ -345,6 +380,14 @@ exports.updateVisionBoard = async (req, res) => {
 exports.deleteVisionBoard = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
 
     if (!isValidObjectId(id)) {
       return res.status(400).json({
@@ -353,11 +396,11 @@ exports.deleteVisionBoard = async (req, res) => {
       });
     }
 
-    const board = await VisionBoardPro.findById(id);
+    const board = await VisionBoardPro.findOne(buildOwnedBoardQuery(id, userId));
     if (!board) {
       return res.status(404).json({
         success: false,
-        message: "Vision board not found",
+        message: "Vision board not found or does not belong to you",
       });
     }
 
@@ -366,7 +409,7 @@ exports.deleteVisionBoard = async (req, res) => {
       await deleteImage(board.collageImagePublicId);
     }
 
-    await VisionBoardPro.findByIdAndDelete(id);
+    await VisionBoardPro.deleteOne(buildOwnedBoardQuery(id, userId));
 
     res.status(200).json({
       success: true,
@@ -389,6 +432,14 @@ exports.deleteVisionBoard = async (req, res) => {
 exports.duplicateVisionBoard = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
 
     if (!isValidObjectId(id)) {
       return res.status(400).json({
@@ -398,7 +449,6 @@ exports.duplicateVisionBoard = async (req, res) => {
     }
 
     // Check if user has reached the maximum limit
-    const userId = getUserId(req);
     // Use helper function to build query that matches both string and ObjectId
     const userQuery = buildUserQuery(userId);
     const existingBoardsCount = await VisionBoardPro.countDocuments(userQuery);
@@ -412,11 +462,11 @@ exports.duplicateVisionBoard = async (req, res) => {
       });
     }
 
-    const original = await VisionBoardPro.findById(id);
+    const original = await VisionBoardPro.findOne(buildOwnedBoardQuery(id, userId));
     if (!original) {
       return res.status(404).json({
         success: false,
-        message: "Vision board not found",
+        message: "Vision board not found or does not belong to you",
       });
     }
 
@@ -424,10 +474,16 @@ exports.duplicateVisionBoard = async (req, res) => {
       title: `${original.title} (Copy)`,
       description: original.description,
       templateId: original.templateId,
-      canvasSettings: original.canvasSettings,
+      canvasSettings: clonePlain(original.canvasSettings, {}),
       collageImage: original.collageImage,
+      slotImages: clonePlain(original.slotImages, {}),
+      textOverlays: clonePlain(original.textOverlays, {}),
+      assetOverlays: clonePlain(original.assetOverlays, {}),
+      userUploads: clonePlain(original.userUploads, []),
+      shortTermGoals: clonePlain(original.shortTermGoals, []),
+      longTermGoals: clonePlain(original.longTermGoals, []),
       // Note: We share the same image URL, no publicId to avoid accidental deletion
-      userId: original.userId,
+      userId: isValidObjectId(userId) ? new mongoose.Types.ObjectId(userId) : userId,
     });
 
     await duplicate.save();

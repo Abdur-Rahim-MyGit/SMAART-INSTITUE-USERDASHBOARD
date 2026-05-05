@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Move, RotateCw } from "lucide-react";
-import { TEXT_EFFECTS } from "../../utils/constants";
 
-const TextOverlay = ({
-  overlay,
+const AssetOverlay = ({
+  asset,
   isSelected,
   onSelect,
   onUpdate,
@@ -19,6 +18,14 @@ const TextOverlay = ({
   const [isTransforming, setIsTransforming] = useState(false);
   const [transformStart, setTransformStart] = useState(null);
 
+  const assetSize = useMemo(
+    () => ({
+      width: asset.width || 160,
+      height: asset.height || 120,
+    }),
+    [asset.height, asset.width]
+  );
+
   const getClientCoords = (event) => {
     if (event.touches && event.touches.length > 0) {
       return { clientX: event.touches[0].clientX, clientY: event.touches[0].clientY };
@@ -26,60 +33,13 @@ const TextOverlay = ({
     return { clientX: event.clientX, clientY: event.clientY };
   };
 
-  const handleDragStart = (event) => {
-    if (overlay.locked) {
-      return;
-    }
-    event.stopPropagation();
-    event.preventDefault();
-    const { clientX, clientY } = getClientCoords(event);
-    const canvasRect = canvasRef?.current?.getBoundingClientRect();
-    if (!canvasRect) {
-      return;
-    }
-
-    const currentPixelX = (overlay.position.x / 100) * canvasRect.width;
-    const currentPixelY = (overlay.position.y / 100) * canvasRect.height;
-    const mouseX = clientX - canvasRect.left;
-    const mouseY = clientY - canvasRect.top;
-
-    setIsDragging(true);
-    setDragOffset({
-      x: mouseX - currentPixelX,
-      y: mouseY - currentPixelY,
-    });
-    onSelect();
-  };
-
-  const getOverlayCenter = () => {
+  const getAssetCenter = () => {
     const canvasRect = canvasRef?.current?.getBoundingClientRect();
     if (!canvasRect) return null;
     return {
-      x: canvasRect.left + ((overlay.position.x || 50) / 100) * canvasRect.width,
-      y: canvasRect.top + ((overlay.position.y || 50) / 100) * canvasRect.height,
+      x: canvasRect.left + ((asset.position?.x || 50) / 100) * canvasRect.width,
+      y: canvasRect.top + ((asset.position?.y || 50) / 100) * canvasRect.height,
     };
-  };
-
-  const handleTransformStart = (event) => {
-    if (overlay.locked) {
-      return;
-    }
-    event.stopPropagation();
-    event.preventDefault();
-    const center = getOverlayCenter();
-    const { clientX, clientY } = getClientCoords(event);
-    if (!center) {
-      return;
-    }
-
-    setIsTransforming(true);
-    setTransformStart({
-      scale: overlay.scale || 1,
-      rotation: overlay.rotation || 0,
-      angle: Math.atan2(clientY - center.y, clientX - center.x),
-      distance: Math.max(Math.hypot(clientX - center.x, clientY - center.y), 24),
-    });
-    onSelect();
   };
 
   const getSpacingGuideState = (x, y, canvasRect) => {
@@ -107,6 +67,44 @@ const TextOverlay = ({
     return { spacingX, spacingY };
   };
 
+  const handleDragStart = (event) => {
+    if (asset.locked) return;
+    event.stopPropagation();
+    event.preventDefault();
+    const { clientX, clientY } = getClientCoords(event);
+    const canvasRect = canvasRef?.current?.getBoundingClientRect();
+    if (!canvasRect) return;
+
+    const currentPixelX = ((asset.position?.x || 50) / 100) * canvasRect.width;
+    const currentPixelY = ((asset.position?.y || 50) / 100) * canvasRect.height;
+    const mouseX = clientX - canvasRect.left;
+    const mouseY = clientY - canvasRect.top;
+
+    setIsDragging(true);
+    setDragOffset({
+      x: mouseX - currentPixelX,
+      y: mouseY - currentPixelY,
+    });
+    onSelect();
+  };
+
+  const handleTransformStart = (event) => {
+    if (asset.locked) return;
+    event.stopPropagation();
+    event.preventDefault();
+    const center = getAssetCenter();
+    const { clientX, clientY } = getClientCoords(event);
+    if (!center) return;
+    setIsTransforming(true);
+    setTransformStart({
+      scale: asset.scale || 1,
+      rotation: asset.rotation || 0,
+      angle: Math.atan2(clientY - center.y, clientX - center.x),
+      distance: Math.max(Math.hypot(clientX - center.x, clientY - center.y), 24),
+    });
+    onSelect();
+  };
+
   useEffect(() => {
     if (!isDragging && !isTransforming) {
       return undefined;
@@ -115,19 +113,15 @@ const TextOverlay = ({
     const handleMove = (event) => {
       const { clientX, clientY } = getClientCoords(event);
       const canvasRect = canvasRef?.current?.getBoundingClientRect();
-      if (!canvasRect) {
-        return;
-      }
+      if (!canvasRect) return;
 
       if (isTransforming && transformStart) {
-        const center = getOverlayCenter();
-        if (!center) {
-          return;
-        }
+        const center = getAssetCenter();
+        if (!center) return;
         const nextAngle = Math.atan2(clientY - center.y, clientX - center.x);
         const nextDistance = Math.max(Math.hypot(clientX - center.x, clientY - center.y), 24);
         const rotationDelta = ((nextAngle - transformStart.angle) * 180) / Math.PI;
-        const nextScale = Math.min(Math.max(transformStart.scale * (nextDistance / transformStart.distance), 0.35), 4);
+        const nextScale = Math.min(Math.max(transformStart.scale * (nextDistance / transformStart.distance), 0.3), 4);
 
         onUpdate({
           rotation: Math.round(transformStart.rotation + rotationDelta),
@@ -135,6 +129,8 @@ const TextOverlay = ({
         });
         return;
       }
+
+      if (!isDragging) return;
 
       const mouseX = clientX - canvasRect.left;
       const mouseY = clientY - canvasRect.top;
@@ -175,45 +171,23 @@ const TextOverlay = ({
       window.removeEventListener("touchend", handleEnd);
       window.removeEventListener("touchcancel", handleEnd);
     };
-  }, [canvasRef, dragOffset, isDragging, isTransforming, onGuideChange, onUpdate, overlay.position.x, overlay.position.y, snapEnabled, transformStart]);
-
-  const getEffectStyle = () => {
-    const effect = TEXT_EFFECTS.find((entry) => entry.id === overlay.effect);
-    return effect?.style || {};
-  };
-
-  const getBackgroundStyle = () => {
-    const style = overlay.backgroundStyle || "none";
-    if (style === "pill") {
-      return {
-        backgroundColor: overlay.backgroundColor || "rgba(255,255,255,0.92)",
-        borderRadius: "999px",
-        color: overlay.color,
-      };
-    }
-
-    if (style === "soft") {
-      return {
-        backgroundColor: overlay.backgroundColor || "rgba(15,23,42,0.35)",
-        borderRadius: "16px",
-      };
-    }
-
-    return {};
-  };
+  }, [asset.position?.x, asset.position?.y, asset.rotation, asset.scale, canvasRef, dragOffset.x, dragOffset.y, isDragging, isTransforming, onGuideChange, onUpdate, snapEnabled, transformStart]);
 
   return (
     <div
-      className="absolute z-50 cursor-move select-none touch-none"
+      className="absolute z-40 select-none touch-none"
       style={{
-        left: `${overlay.position.x}%`,
-        top: `${overlay.position.y}%`,
-        transform: `translate(-50%, -50%) rotate(${overlay.rotation || 0}deg) scale(${overlay.scale || 1})`,
-        pointerEvents: "auto",
-        zIndex: overlay.zIndex || 50,
+        left: `${asset.position?.x || 50}%`,
+        top: `${asset.position?.y || 50}%`,
+        width: `${assetSize.width}px`,
+        height: `${assetSize.height}px`,
+        transform: `translate(-50%, -50%) rotate(${asset.rotation || 0}deg) scale(${asset.scale || 1})`,
+        transformOrigin: "center center",
+        zIndex: asset.zIndex || 40,
+        opacity: asset.opacity ?? 1,
       }}
-      onMouseDown={overlay.locked ? undefined : handleDragStart}
-      onTouchStart={overlay.locked ? undefined : handleDragStart}
+      onMouseDown={asset.locked ? undefined : handleDragStart}
+      onTouchStart={asset.locked ? undefined : handleDragStart}
       onClick={(event) => {
         event.stopPropagation();
         event.preventDefault();
@@ -221,35 +195,19 @@ const TextOverlay = ({
       }}
     >
       <div
-        className={`relative rounded-xl px-3 py-2 transition-all ${
+        className={`relative h-full w-full transition-all ${
           isSelected
             ? "ring-2 ring-[#1a3884] ring-offset-2 ring-offset-white dark:ring-[#7aa2ff] dark:ring-offset-[#0f172a]"
             : ""
         }`}
-        style={{
-          fontFamily: overlay.fontFamily,
-          fontSize: `${overlay.fontSize}px`,
-          fontWeight: overlay.fontWeight || "400",
-          fontStyle: overlay.fontStyle || "normal",
-          color: overlay.color,
-          textAlign: overlay.align,
-          whiteSpace: "pre-wrap",
-          lineHeight: overlay.lineHeight || 1.15,
-          letterSpacing: `${overlay.letterSpacing || 0}px`,
-          opacity: overlay.opacity ?? 1,
-          width: "max-content",
-          maxWidth: `${overlay.maxWidth || 280}px`,
-          backgroundColor: isSelected ? "rgba(255,255,255,0.08)" : "transparent",
-          backdropFilter: isSelected ? "blur(6px)" : "none",
-          ...getBackgroundStyle(),
-          ...getEffectStyle(),
-        }}
       >
+        <img src={asset.src} alt={asset.name || "Asset"} draggable={false} className="h-full w-full object-contain" />
+
         {isSelected && (
           <>
             <div className="absolute -top-8 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-slate-900/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-lg backdrop-blur-md">
               <Move className="h-3 w-3" />
-              {overlay.locked ? "Locked Text" : "Drag Text"}
+              {asset.locked ? "Locked Asset" : "Drag Asset"}
             </div>
             <button
               type="button"
@@ -262,10 +220,9 @@ const TextOverlay = ({
             </button>
           </>
         )}
-        {overlay.text}
       </div>
     </div>
   );
 };
 
-export default TextOverlay;
+export default AssetOverlay;

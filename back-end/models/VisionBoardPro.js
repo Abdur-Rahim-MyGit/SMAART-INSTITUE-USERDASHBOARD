@@ -5,34 +5,6 @@ const mongoose = require("mongoose");
  * PicsArt-style vision board - stores merged collage image AND editable data
  */
 
-// Sub-schema for text overlay (without auto _id)
-const textOverlaySchema = new mongoose.Schema({
-  text: String,
-  fontFamily: String,
-  fontSize: Number,
-  fontWeight: String,
-  fontStyle: String,
-  color: String,
-  effect: String,
-  align: String,
-  rotation: { type: Number, default: 0 },
-  position: {
-    x: { type: Number, default: 50 },
-    y: { type: Number, default: 50 },
-  },
-}, { _id: false });
-
-// Sub-schema for slot image (without auto _id)
-const slotImageSchema = new mongoose.Schema({
-  url: String,
-  position: {
-    x: { type: Number, default: 0 },
-    y: { type: Number, default: 0 },
-  },
-  scale: { type: Number, default: 1 },
-  rotation: { type: Number, default: 0 },
-}, { _id: false });
-
 const visionBoardProSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -110,15 +82,28 @@ const visionBoardProSchema = new mongoose.Schema({
   // Individual slot images (for editing)
   slotImages: {
     type: Map,
-    of: slotImageSchema,
+    of: mongoose.Schema.Types.Mixed,
     default: new Map(),
   },
 
   // Text overlays (for editing)
   textOverlays: {
     type: Map,
-    of: textOverlaySchema,
+    of: mongoose.Schema.Types.Mixed,
     default: new Map(),
+  },
+
+  // Canvas assets / stickers / reusable overlays
+  assetOverlays: {
+    type: Map,
+    of: mongoose.Schema.Types.Mixed,
+    default: new Map(),
+  },
+
+  // Saved upload tray for reuse inside the editor
+  userUploads: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: [],
   },
 
   // User reference

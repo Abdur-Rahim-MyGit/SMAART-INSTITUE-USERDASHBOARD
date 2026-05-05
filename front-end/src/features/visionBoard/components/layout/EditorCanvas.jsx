@@ -1,6 +1,7 @@
-import React, { useRef } from "react";
+import React from "react";
 import ImageSlot from "../editor/ImageSlot";
 import TextOverlay from "../editor/TextOverlay";
+import AssetOverlay from "../editor/AssetOverlay";
 
 const EditorCanvas = ({
   canvasRef,
@@ -15,23 +16,55 @@ const EditorCanvas = ({
   handleImageUpload,
   handleImageUpdate,
   handleImageRemove,
-  selectedSlot,
-  setSelectedSlot,
+  clearSelection,
+  selectedLayers,
+  setSelectedLayers,
   textOverlays,
-  selectedTextId,
+  assetOverlays,
   setSelectedTextId,
   handleSelectText,
+  handleSelectAsset,
+  handleSelectLayer,
   handleUpdateText,
-  zoomLevel
+  handleUpdateAsset,
+  zoomLevel,
+  snapEnabled,
+  guideState,
+  setGuideState,
 }) => {
+  const overlayPeers = [
+    ...Object.entries(textOverlays || {})
+      .filter(([, overlay]) => !overlay.hidden)
+      .map(([id, overlay]) => ({
+        id,
+        type: "text",
+        x: overlay.position?.x || 50,
+        y: overlay.position?.y || 50,
+      })),
+    ...Object.entries(assetOverlays || {})
+      .filter(([, asset]) => !asset.hidden)
+      .map(([id, asset]) => ({
+        id,
+        type: "asset",
+        x: asset.position?.x || 50,
+        y: asset.position?.y || 50,
+      })),
+  ];
+
   return (
-    <div className="flex-1 overflow-auto bg-[#e5e7eb] dark:bg-[#0f172a] relative flex items-center justify-center p-8 pb-28 lg:pb-8 custom-scrollbar">
-      {/* Canvas Wrapper for Zoom/Pan */}
+    <div className="custom-scrollbar relative flex flex-1 items-center justify-center overflow-auto bg-[radial-gradient(circle_at_top,#eff6ff_0%,#f8fafc_36%,#eef2f7_100%)] p-4 pb-28 dark:bg-[radial-gradient(circle_at_top,#172554_0%,#0b1220_28%,#040814_100%)] sm:p-5 lg:p-8 lg:pb-8">
+      <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:linear-gradient(to_right,rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.12)_1px,transparent_1px)] [background-size:32px_32px] dark:opacity-20" />
+      <div className="absolute left-5 top-5 hidden rounded-full border border-white/60 bg-white/70 px-3 py-1 text-[11px] font-medium text-slate-500 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-slate-400 xl:block">
+        Studio Preview
+      </div>
+
       <div 
-        className="relative transition-all duration-200 ease-out custom-shadow origin-top-left flex-shrink-0"
+        className="relative flex-shrink-0 origin-top-left transition-all duration-300 ease-out"
         style={{
             width: displayWidth * (zoomLevel / 100),
             height: displayHeight * (zoomLevel / 100),
+            maxWidth: "100%",
+            maxHeight: "100%",
         }}
       >
         <div
@@ -44,7 +77,7 @@ const EditorCanvas = ({
         >
             <div
                 ref={canvasRef}
-                className="w-full h-full relative bg-white shadow-2xl overflow-hidden custom-canvas-border"
+                className="relative h-full w-full overflow-hidden border border-slate-200/80 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.15)] transition-all duration-300 dark:border-slate-700/60 custom-canvas-border"
                 style={{
                     backgroundColor,
                     borderRadius: `${Math.min(borderRadius, 32)}px`,
@@ -52,13 +85,10 @@ const EditorCanvas = ({
                 }}
                 onClick={(e) => {
                     e.stopPropagation();
-                    setSelectedSlot(null);
-                    setSelectedTextId(null);
+                    clearSelection();
+                    setGuideState({ vertical: false, horizontal: false });
                 }}
             >
-                {/* Google Fonts are loaded from index.html <head> for proper caching */}
-
-                {/* Background Image Layer */}
                 {backgroundImage && (
                     <img
                         src={backgroundImage}
@@ -68,7 +98,6 @@ const EditorCanvas = ({
                     />
                 )}
 
-                {/* Image Slots */}
                 {currentTemplate.slots.map((slot) => (
                     <ImageSlot
                         key={slot.id}
@@ -76,30 +105,78 @@ const EditorCanvas = ({
                         image={images[slot.id]}
                         gap={gap}
                         borderRadius={borderRadius}
-                        isSelected={selectedSlot === slot.id}
-                        onSelect={(id) => {
-                            setSelectedSlot(id);
-                            setSelectedTextId(null);
+                        isSelected={selectedLayers.some((entry) => entry.type === "image" && entry.id === slot.id)}
+                        onSelect={(id, additive) => {
+                            handleSelectLayer(id, "image", additive);
                         }}
                         onImageUpload={handleImageUpload}
                         onImageUpdate={handleImageUpdate}
                         onImageRemove={handleImageRemove}
+                        snapEnabled={snapEnabled}
+                        onGuideChange={setGuideState}
                     />
                 ))}
 
-                {/* Text Overlays */}
-                {Object.entries(textOverlays).map(([id, overlay]) => (
+                {Object.entries(textOverlays)
+                  .filter(([, overlay]) => !overlay.hidden)
+                  .map(([id, overlay]) => (
                     <TextOverlay
                         key={id}
                         overlay={overlay}
-                        isSelected={selectedTextId === id}
-                        onSelect={() => handleSelectText(id)}
+                        isSelected={selectedLayers.some((entry) => entry.type === "text" && entry.id === id)}
+                        onSelect={(additive) => handleSelectText(id, additive)}
                         onUpdate={(updates) => handleUpdateText(id, updates)}
-                        canvasWidth={displayWidth}
-                        canvasHeight={displayHeight}
                         canvasRef={canvasRef}
+                        snapEnabled={snapEnabled}
+                        peers={overlayPeers}
+                        overlayType="text"
+                        overlayId={id}
+                        onGuideChange={setGuideState}
                     />
                 ))}
+
+                {Object.entries(assetOverlays || {})
+                  .filter(([, asset]) => !asset.hidden)
+                  .map(([id, asset]) => (
+                    <AssetOverlay
+                        key={id}
+                        asset={asset}
+                        isSelected={selectedLayers.some((entry) => entry.type === "asset" && entry.id === id)}
+                        onSelect={(additive) => handleSelectAsset(id, additive)}
+                        onUpdate={(updates) => handleUpdateAsset(id, updates)}
+                        canvasRef={canvasRef}
+                        snapEnabled={snapEnabled}
+                        peers={overlayPeers}
+                        overlayType="asset"
+                        overlayId={id}
+                        onGuideChange={setGuideState}
+                    />
+                ))}
+
+                {(guideState?.vertical || guideState?.horizontal || guideState?.spacingX || guideState?.spacingY) && (
+                  <div className="pointer-events-none absolute inset-0 z-[120]">
+                    {guideState.vertical && (
+                      <div className="absolute bottom-0 top-0 left-1/2 w-px -translate-x-1/2 bg-[#1a3884]/60" />
+                    )}
+                    {guideState.horizontal && (
+                      <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-[#1a3884]/60" />
+                    )}
+                    {(guideState.spacingX || guideState.spacingY) && (
+                      <div className="absolute right-3 top-3 flex flex-col gap-1">
+                        {guideState.spacingX ? (
+                          <div className="rounded-full bg-slate-900/82 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-lg backdrop-blur-md">
+                            X Gap {guideState.spacingX}px
+                          </div>
+                        ) : null}
+                        {guideState.spacingY ? (
+                          <div className="rounded-full bg-slate-900/82 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-lg backdrop-blur-md">
+                            Y Gap {guideState.spacingY}px
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                )}
             </div>
         </div>
       </div>
