@@ -27,6 +27,7 @@ import Notes from "@/components/Notes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import FloatingDictionary from "@/components/FloatingDictionary";
 
 const LearningFlowPlayer = ({ 
   courseData, 
@@ -431,6 +432,7 @@ const LearningFlowPlayer = ({
           </div>
         </div>
       </div>
+      <FloatingDictionary />
     </div>
   );
 };

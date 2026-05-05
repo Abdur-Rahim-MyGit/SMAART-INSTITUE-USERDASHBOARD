@@ -246,8 +246,12 @@ const DashboardLayout = () => {
             <div className="flex flex-col shrink-0">
               {/* Subtle Breadcrumb */}
               <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 opacity-60">
-                <span>SMAART</span>
-                <ChevronRight className="w-2.5 h-2.5" />
+                {(location.pathname === '/dashboard' || location.pathname === '/dashboard/') && (
+                  <>
+                    <span>SMAART</span>
+                    <ChevronRight className="w-2.5 h-2.5" />
+                  </>
+                )}
                 <span>Dashboard</span>
               </div>
               
