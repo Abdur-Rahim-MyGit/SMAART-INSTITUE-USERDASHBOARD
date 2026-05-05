@@ -124,7 +124,7 @@ const SMAArtToolkit = () => {
               </div>
               <div className="space-y-4">
                 <h1 className="text-5xl md:text-6xl font-black text-[#0f172a] tracking-tight leading-none">
-                  SMAARt - <span className="text-[#1a3884]">Toolkit</span>
+                  SMAART - <span className="text-[#1a3884]">Toolkit</span>
                 </h1>
                 <p className="text-[#1a3884] dark:text-[#C0C0C0] text-3xl font-['Dancing Script',cursive] mb-1">
                   Empower your journey with professional tools...
