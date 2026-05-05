@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { motion } from "framer-motion";
 import { Code, Database, Cloud, BookOpen } from "lucide-react";
 import { COLORS, COURSE_COLORS } from "@/constants/dashboard";
 import { useNavigate } from "react-router-dom";
@@ -17,25 +18,26 @@ const PathCard = memo(({ path }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-5 shadow-sm group hover:shadow-md transition-all">
-      <div className="flex items-start gap-3 mb-3">
-        <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
-          <IconComponent className={`w-5 h-5 ${getIconColor(path.color)}`} />
+    <div className="bg-white dark:bg-slate-800/40 backdrop-blur-sm rounded-2xl p-6 transition-all duration-300 group relative border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-xl dark:shadow-black/20"
+         style={{
+           boxShadow: "0 4px 20px rgba(0, 0, 0, 0.03)"
+         }}>
+      <div className="flex items-start gap-4 mb-6">
+        <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center border border-gray-100 dark:border-slate-700 shadow-sm group-hover:scale-110 group-hover:border-[#1a3884] dark:group-hover:border-blue-400 transition-all duration-300">
+          <IconComponent className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">{path.title}</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{path.subtitle}</p>
+          <h3 className="text-base font-extrabold text-[#112b6b] dark:text-white mb-1 tracking-tight" style={{ letterSpacing: "-0.01em" }}>{path.title}</h3>
+          <p className="text-[12px] text-gray-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-2">{path.subtitle}</p>
         </div>
       </div>
 
       <button
         onClick={() => navigate('/dashboard/courses')}
-        className="w-full text-white py-2.5 rounded-lg text-sm font-semibold transition-all"
-        style={{ backgroundColor: COLORS.PRIMARY }}
-        onMouseEnter={(e) => e.target.style.backgroundColor = COLORS.PRIMARY_DARK}
-        onMouseLeave={(e) => e.target.style.backgroundColor = COLORS.PRIMARY}
+        className="w-full h-11 bg-[#f8fafc] dark:bg-slate-800 hover:bg-[#112b6b] dark:hover:bg-blue-600 text-[#112b6b] dark:text-blue-400 hover:text-white dark:hover:text-white border border-gray-100 dark:border-slate-700 hover:border-[#112b6b] rounded-xl text-[13px] font-bold transition-all duration-300 flex items-center justify-center gap-2 group/btn"
       >
         {path.btnText}
+        <motion.span animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} className="opacity-0 group-hover/btn:opacity-100">→</motion.span>
       </button>
     </div>
   );

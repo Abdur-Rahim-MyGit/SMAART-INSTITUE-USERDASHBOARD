@@ -49,7 +49,7 @@ const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
 const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
 const Performance = lazy(() => import('@/pages/Performance'));
-const SMAARTWallet = lazy(() => import('@/pages/SMAARTWallet'));
+const SkillsVault = lazy(() => import('@/pages/SkillsVault'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
 
 // AI Career Coach pages
@@ -132,7 +132,7 @@ const AnimatedRoutes = () => {
                         {/* Skills */}
                         <Route path="/skills-passport" element={<SkillsPassport />} />
                         <Route path="/dashboard/skills-passport" element={<SkillsPassport />} />
-                        <Route path="/dashboard/skills-vault" element={<SMAARTWallet />} />
+                        <Route path="/dashboard/skills-vault" element={<SkillsVault />} />
 
                         {/* Vision Board */}
                         <Route path="/vision-board" element={<VisionBoardGalleryPro />} />
@@ -145,9 +145,9 @@ const AnimatedRoutes = () => {
                         <Route path="/smaart-toolkit" element={<SMAArtToolkit />} />
                         <Route path="/dashboard/smaart-toolkit" element={<SMAArtToolkit />} />
 
-                        {/* Wallet */}
-                        <Route path="/smaart-wallet" element={<SMAARTWallet />} />
-                        <Route path="/dashboard/smaart-wallet" element={<SMAARTWallet />} />
+                        {/* Skills Vault */}
+                        <Route path="/skills-vault" element={<SkillsVault />} />
+                        <Route path="/dashboard/skills-vault" element={<SkillsVault />} />
 
                         {/* Community */}
                         <Route path="/community" element={<Community />} />

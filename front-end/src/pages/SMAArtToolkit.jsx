@@ -5,10 +5,10 @@ import { useNavigate } from "react-router-dom";
 const toolkitSections = [
   {
     id: 0,
-    title: "SMAART Wallet",
+    title: "Skills Vault",
     description: "Your professional vault — securely store and showcase your certificates, badges, course progress, and key learning flashcards all in one centralized place.",
     icon: Shield,
-    path: "/dashboard/smaart-wallet",
+    path: "/dashboard/skills-vault",
     color: "#1a3884",
     badge: "Vault"
   },

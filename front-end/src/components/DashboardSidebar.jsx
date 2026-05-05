@@ -39,7 +39,7 @@ const menuItems = [
   { icon: Brain, label: "Assessment Centre", path: "/dashboard/assessment-centre" },
   { icon: Lightbulb, label: "Vision Boards", path: "/dashboard/vision-boards" },
   { icon: Zap, label: "SMAART Toolkit", path: "/dashboard/smaart-toolkit" },
-  { icon: Wallet, label: "SMAART Wallet", path: "/dashboard/smaart-wallet" },
+  { icon: Wallet, label: "Skills Vault", path: "/dashboard/skills-vault" },
   { icon: Users, label: "Community", path: "/dashboard/community" },
   { icon: ClipboardCheck, label: "My Notes", path: "/dashboard/notes" },
 ];
@@ -230,7 +230,7 @@ const DashboardSidebar = () => {
               { label: 'Assessments', path: '/dashboard/assessment-centre' },
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
-              { label: 'Wallet', path: '/dashboard/smaart-wallet' },
+              { label: 'Skills Vault', path: '/dashboard/skills-vault' },
               { label: 'Help', path: null, isHelp: true }
             ].map(item => {
               const isActive = location.pathname === item.path ||

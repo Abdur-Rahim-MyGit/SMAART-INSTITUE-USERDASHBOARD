@@ -58,7 +58,7 @@ const CollegeBanners = () => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.3 }}
-        className="relative w-full overflow-hidden rounded-none mb-4 shadow-sm group bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
+        className="relative w-full overflow-hidden rounded-2xl mb-4 shadow-sm group bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
       >
         <div className="relative aspect-[21/9] sm:aspect-[32/9] lg:aspect-[40/9] w-full bg-slate-100 dark:bg-slate-800">
           <AnimatePresence mode="wait">
@@ -92,13 +92,13 @@ const CollegeBanners = () => {
             <>
               <button
                 onClick={prevBanner}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-none bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={nextBanner}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-none bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -108,7 +108,7 @@ const CollegeBanners = () => {
                   <button
                     key={idx}
                     onClick={() => setCurrentIndex(idx)}
-                    className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-none transition-all duration-300 ${
+                    className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
                       idx === currentIndex ? 'bg-white w-4 sm:w-6' : 'bg-white/50 hover:bg-white/80'
                     }`}
                   />

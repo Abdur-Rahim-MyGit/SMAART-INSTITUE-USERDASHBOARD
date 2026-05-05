@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
   BookOpen, Target, Crown, Lock, CheckCircle2,
-  ArrowLeft, ChevronRight, Zap, TrendingUp,
-  Play, GraduationCap, Sparkles
+  ArrowLeft, Zap, TrendingUp,
+  Play, GraduationCap, ArrowRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { STAGES } from "@/data/courseStructureData";
@@ -11,43 +11,25 @@ import { STAGES } from "@/data/courseStructureData";
 /* ─── Stage visual config ─── */
 const STAGE_CONFIG = {
   1: {
-    gradient: "from-[#1a3884] via-[#0f2d6b] to-[#0a1f4e]",
-    accentGlow: "rgba(26,56,132,0.4)",
-    accentLight: "rgba(26,56,132,0.12)",
-    accentBorder: "rgba(26,56,132,0.25)",
-    badgeBg: "#e8edf8",
-    badgeText: "#1a3884",
-    iconBg: "linear-gradient(135deg,#1a3884,#2952c3)",
-    progressColor: "#1a3884",
+    gradient: "from-[#112b6b] to-[#1a3884]",
+    gradientText: "from-[#112b6b] via-[#1a3884] to-[#4c6ef5]",
     tag: "Stage 1",
     Icon: BookOpen,
-    emoji: "📚",
+    color: "#112b6b"
   },
   2: {
-    gradient: "from-[#6d28d9] via-[#5b21b6] to-[#3b0f8c]",
-    accentGlow: "rgba(109,40,217,0.4)",
-    accentLight: "rgba(109,40,217,0.10)",
-    accentBorder: "rgba(109,40,217,0.25)",
-    badgeBg: "#f0ebff",
-    badgeText: "#6d28d9",
-    iconBg: "linear-gradient(135deg,#7c3aed,#9f67fa)",
-    progressColor: "#7c3aed",
+    gradient: "from-[#1a3884] to-[#2b5a9e]",
+    gradientText: "from-[#1a3884] via-[#2b5a9e] to-[#6a93d4]",
     tag: "Stage 2",
     Icon: Target,
-    emoji: "🎯",
+    color: "#1a3884"
   },
   3: {
-    gradient: "from-[#b45309] via-[#92400e] to-[#6b2d05]",
-    accentGlow: "rgba(180,83,9,0.4)",
-    accentLight: "rgba(180,83,9,0.10)",
-    accentBorder: "rgba(180,83,9,0.25)",
-    badgeBg: "#fef3e2",
-    badgeText: "#b45309",
-    iconBg: "linear-gradient(135deg,#d97706,#f59e0b)",
-    progressColor: "#d97706",
+    gradient: "from-[#002147] to-[#112b6b]",
+    gradientText: "from-[#002147] via-[#112b6b] to-[#2a4d9e]",
     tag: "Stage 3",
     Icon: Crown,
-    emoji: "👑",
+    color: "#002147"
   },
 };
 
@@ -56,188 +38,194 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
   const { Icon } = cfg;
   const total = stage.totalCourses;
   const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  
+  const spotlightBackground = useMotionTemplate`
+    radial-gradient(
+      600px circle at ${mouseX}px ${mouseY}px,
+      rgba(26, 56, 132, 0.05),
+      transparent 80%
+    )
+  `;
+
+  function handleMouseMove({ currentTarget, clientX, clientY }) {
+    let { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
 
   return (
-    <motion.button
-      initial={{ opacity: 0, y: 32 }}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay, ease: "easeOut" }}
-      onClick={onClick}
-      disabled={!isUnlocked}
-      className="relative w-full text-left overflow-hidden rounded-3xl group focus:outline-none"
-      style={{
-        boxShadow: isUnlocked
-          ? `0 24px 64px ${cfg.accentGlow}, 0 4px 16px rgba(0,0,0,0.08)`
-          : "0 8px 24px rgba(0,0,0,0.06)",
-        cursor: isUnlocked ? "pointer" : "not-allowed",
-      }}
-      whileHover={isUnlocked ? { y: -6, scale: 1.012 } : {}}
-      whileTap={isUnlocked ? { scale: 0.98 } : {}}
+      transition={{ duration: 0.6, delay, ease: "easeOut" }}
     >
-      {/* Dark gradient background */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${cfg.gradient} transition-opacity duration-300`} />
+      <button
+        onClick={onClick}
+        disabled={!isUnlocked}
+        onMouseMove={handleMouseMove}
+        className={`w-full text-left p-8 rounded-[24px] transition-all duration-500 group relative overflow-hidden ${
+          isUnlocked
+            ? "bg-white dark:bg-[#001835] hover:-translate-y-2"
+            : "bg-gray-50 dark:bg-[#001835]/40 cursor-not-allowed opacity-60"
+        }`}
+        style={{
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+          boxShadow: isUnlocked 
+            ? "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)" 
+            : "none"
+        }}
+      >
+        {/* Spotlight Effect */}
+        {isUnlocked && (
+          <motion.div
+            className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100"
+            style={{
+              background: spotlightBackground,
+            }}
+          />
+        )}
 
-      {/* Noise texture overlay */}
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none"
-        style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
-
-      {/* Glow orb */}
-      {isUnlocked && (
-        <div className="absolute -top-12 -right-12 w-56 h-56 rounded-full pointer-events-none opacity-25 blur-3xl"
-          style={{ background: "white" }} />
-      )}
-
-      {/* Lock overlay */}
-      {!isUnlocked && (
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-2">
-          <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center">
-            <Lock className="w-6 h-6 text-white/70" />
+        <div className="relative z-10">
+          <div className="flex items-start gap-6">
+            {/* Icon Box - Matching LoginCard style */}
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${
+              isUnlocked 
+                ? "bg-white border-gray-100 group-hover:scale-110 group-hover:shadow-md" 
+                : "bg-gray-100 border-gray-200"
+            }`}>
+              <Icon className={`w-8 h-8 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-3">
+                <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${
+                  isUnlocked ? "text-[#1a3884]" : "text-gray-400"
+                }`}>
+                  {cfg.tag}
+                </span>
+                {!isUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
+              </div>
+              
+              <h3 className={`text-2xl font-extrabold tracking-tight mb-2 ${
+                isUnlocked
+                  ? "text-[#112b6b]"
+                  : "text-gray-400"
+              }`} style={{ letterSpacing: "-0.02em" }}>
+                {stage.name}
+              </h3>
+              <p className="text-[13px] text-gray-500 mb-6 line-clamp-2 leading-relaxed font-medium">
+                {stage.description}
+              </p>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                    isUnlocked ? "text-gray-700" : "text-gray-400"
+                  }`}>
+                    Progression
+                  </span>
+                  <span className={`text-[11px] font-bold ${
+                    isUnlocked ? "text-[#1a3884]" : "text-gray-400"
+                  }`}>
+                    {completedCount}/{total} Courses
+                  </span>
+                </div>
+                
+                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct}%` }}
+                    transition={{ duration: 1, delay: delay + 0.3 }}
+                    className="h-full rounded-full"
+                    style={{
+                      background: isUnlocked 
+                        ? "linear-gradient(90deg, #112b6b 0%, #1a3884 100%)" 
+                        : "#e2e8f0"
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-white/60 text-sm font-semibold">Complete previous stage to unlock</p>
         </div>
-      )}
-
-      <div className="relative z-10 p-7 md:p-8">
-        {/* Top row */}
-        <div className="flex items-start justify-between mb-6">
-          <div>
-            <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-widest uppercase mb-3"
-              style={{ background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.85)" }}>
-              {cfg.tag}
-            </span>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white" style={{ letterSpacing: "-0.03em" }}>
-              {stage.name}
-            </h2>
-            <p className="text-white/60 text-sm mt-1 font-medium">{stage.subtitle}</p>
-          </div>
-
-          <div className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl text-2xl"
-            style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)" }}>
-            {cfg.emoji}
-          </div>
-        </div>
-
-        {/* Description */}
-        <p className="text-white/70 text-sm leading-relaxed mb-6">{stage.description}</p>
-
-        {/* Progress */}
-        <div className="mb-5">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-white/60 text-xs font-semibold uppercase tracking-wider">Progress</span>
-            <span className="text-white font-bold text-sm">{completedCount}/{total} courses</span>
-          </div>
-          <div className="h-2 bg-white/15 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 1, delay: delay + 0.3 }}
-              className="h-full bg-white rounded-full"
-            />
-          </div>
-        </div>
-
-        {/* Bottom row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            {Array.from({ length: Math.min(total, 10) }).map((_, i) => (
-              <div key={i} className="w-2 h-2 rounded-full"
-                style={{ background: i < completedCount ? "white" : "rgba(255,255,255,0.2)" }} />
-            ))}
-            {total > 10 && <span className="text-white/50 text-xs ml-1">+{total - 10}</span>}
-          </div>
-
-          {isUnlocked && (
-            <motion.div
-              className="flex items-center gap-2 text-white font-bold text-sm"
-              animate={{ x: [0, 4, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            >
-              <span>Explore</span>
-              <ChevronRight className="w-4 h-4" />
-            </motion.div>
-          )}
-        </div>
-      </div>
-    </motion.button>
+      </button>
+    </motion.div>
   );
 };
 
 /* ─── Single course card inside the stage view ─── */
-const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick, accentColor, delay }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 16 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.35, delay }}
-    onClick={onClick}
-    className="relative rounded-2xl border cursor-pointer group transition-all duration-300"
-    style={{
-      background: isCompleted
-        ? "linear-gradient(135deg,#f0fdf4,#dcfce7)"
-        : isCurrent
-        ? `linear-gradient(135deg,${accentColor}10,${accentColor}05)`
-        : isUnlocked
-        ? "white"
-        : "#f8fafc",
-      border: isCompleted
-        ? "1.5px solid #86efac"
-        : isCurrent
-        ? `1.5px solid ${accentColor}`
-        : "1.5px solid rgba(0,0,0,0.06)",
-      boxShadow: isCurrent
-        ? `0 8px 24px ${accentColor}20`
-        : isCompleted
-        ? "0 4px 12px rgba(34,197,94,0.12)"
-        : "0 2px 8px rgba(0,0,0,0.04)",
-      opacity: !isUnlocked ? 0.5 : 1,
-    }}
-  >
-    <div className="p-5">
-      {/* ID badge + status */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-lg"
-          style={{
-            background: isCompleted ? "#bbf7d0" : isCurrent ? `${accentColor}18` : "#f1f5f9",
-            color: isCompleted ? "#15803d" : isCurrent ? accentColor : "#64748b",
-          }}>
-          {course.id}
-        </span>
-
-        <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{
-            background: isCompleted ? "#22c55e" : isCurrent ? accentColor : isUnlocked ? "#f1f5f9" : "#e2e8f0",
-          }}>
+const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick, delay }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay }}
+      onClick={onClick}
+      className={`relative rounded-2xl p-5 cursor-pointer transition-all duration-300 group overflow-hidden ${
+        isCompleted
+          ? "bg-green-50/50"
+          : isCurrent
+          ? "bg-white shadow-lg"
+          : isUnlocked
+          ? "bg-white hover:shadow-md hover:-translate-y-1"
+          : "bg-gray-50/50 cursor-not-allowed opacity-60"
+      }`}
+      style={{
+        border: isCurrent 
+          ? "1.5px solid #1a3884" 
+          : "1px solid rgba(0, 0, 0, 0.05)",
+        boxShadow: isCurrent 
+          ? "0 10px 25px rgba(26, 56, 132, 0.1)" 
+          : isUnlocked && !isCompleted ? "0 4px 12px rgba(0,0,0,0.03)" : "none"
+      }}
+    >
+      <div className="flex items-start gap-4">
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 border ${
+          isCompleted
+            ? "bg-green-500 border-green-600 text-white shadow-sm"
+            : isCurrent
+            ? "bg-[#1a3884] border-[#112b6b] text-white shadow-md"
+            : isUnlocked
+            ? "bg-white border-gray-100 text-gray-400 group-hover:border-[#1a3884]/30 group-hover:text-[#1a3884]"
+            : "bg-gray-100 border-gray-200 text-gray-400"
+        }`}>
           {isCompleted ? (
-            <CheckCircle2 className="w-4 h-4 text-white" />
+            <CheckCircle2 className="w-5 h-5" />
           ) : !isUnlocked ? (
-            <Lock className="w-3.5 h-3.5 text-slate-400" />
+            <Lock className="w-5 h-5" />
           ) : isCurrent ? (
-            <Play className="w-3.5 h-3.5 text-white" />
+            <Play className="w-5 h-5" />
           ) : (
-            <span className="text-xs font-bold text-slate-500">{index + 1}</span>
+            <span className="text-sm font-bold">{index + 1}</span>
           )}
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <span className={`inline-block text-[9px] font-bold px-2 py-0.5 rounded-md mb-2 uppercase tracking-widest ${
+            isCompleted
+              ? "bg-green-100 text-green-700"
+              : isCurrent
+              ? "bg-[#1a3884]/10 text-[#1a3884]"
+              : "bg-gray-100 text-gray-500"
+          }`}>
+            {course.id}
+          </span>
+          
+          <h4 className={`font-bold text-[15px] mb-1 leading-tight ${
+            isUnlocked ? "text-[#112b6b]" : "text-gray-400"
+          }`}>
+            {course.title}
+          </h4>
+          <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-1 font-medium">
+            {course.subtitle}
+          </p>
         </div>
       </div>
-
-      {/* Title */}
-      <h4 className="font-bold text-sm text-slate-800 leading-snug mb-1 group-hover:text-slate-900 transition-colors">
-        {course.title}
-      </h4>
-      <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{course.subtitle}</p>
-
-      {/* CTA */}
-      {isUnlocked && !isCompleted && (
-        <div className="mt-3 flex items-center gap-1.5 text-xs font-bold"
-          style={{ color: isCurrent ? accentColor : "#94a3b8" }}>
-          {isCurrent ? (
-            <><Play className="w-3 h-3" /> Continue</>
-          ) : (
-            <><Zap className="w-3 h-3" /> Start</>
-          )}
-        </div>
-      )}
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 /* ─── Stage detail view ─── */
 const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) => {
@@ -246,81 +234,80 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
   const pct = Math.round((completedCount / stage.totalCourses) * 100);
 
   const isCourseUnlocked = (courseId) => {
-    const idx = stage.courses.findIndex(c => c.id === courseId);
-    if (idx === 0) return true;
-    return userProgress.completedCourses?.includes(stage.courses[idx - 1].id);
+    return true; // Unlocked all
   };
 
   const handleCourseClick = (course, courseUnlocked) => {
-    if (!courseUnlocked) {
-      const idx = stage.courses.findIndex(c => c.id === course.id);
-      const prev = stage.courses[idx - 1];
-      toast.error(`Complete "${prev.title}" first!`, {
-        description: "This is a sequential learning journey.",
-      });
-      return;
-    }
+    // Logic bypass: all courses are unlocked
     if (onCourseClick) onCourseClick(course.id);
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 40 }}
+      initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -40 }}
+      exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      {/* Stage hero header */}
-      <div className={`relative overflow-hidden rounded-3xl mb-8 bg-gradient-to-br ${cfg.gradient} p-8 md:p-10`}
-        style={{ boxShadow: `0 32px 80px ${cfg.accentGlow}` }}>
-        <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        className="group flex items-center gap-2 text-[#112b6b] text-sm font-bold uppercase tracking-widest mb-8 hover:text-[#1a3884] transition-colors"
+      >
+        <div className="w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 flex items-center justify-center group-hover:shadow-md transition-all">
+          <ArrowLeft className="w-4 h-4" />
+        </div>
+        Back to Dashboard
+      </button>
 
-        {/* Back button */}
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-white/70 hover:text-white text-sm font-bold mb-6 transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          All Programmes
-        </button>
-
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-widest uppercase mb-3"
-              style={{ background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.9)" }}>
-              {cfg.tag} · {stage.totalCourses} Courses
-            </span>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-2" style={{ letterSpacing: "-0.04em" }}>
-              {stage.name}
-            </h1>
-            <p className="text-white/65 text-base max-w-xl">{stage.description}</p>
+      {/* Stage header - Premium Style */}
+      <div className="bg-white rounded-[24px] p-8 mb-8 relative overflow-hidden"
+           style={{
+             border: "1px solid rgba(0, 0, 0, 0.05)",
+             boxShadow: "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)"
+           }}>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 relative z-10">
+          <div className="flex items-start gap-6">
+            <div className={`w-20 h-20 rounded-[22px] bg-white border border-gray-100 shadow-sm flex items-center justify-center flex-shrink-0 text-[#1a3884]`}>
+              <Icon className="w-10 h-10" />
+            </div>
+            <div>
+              <span className={`text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884]`}>
+                {cfg.tag} · {stage.totalCourses} Modules
+              </span>
+              <h1 className="text-3xl font-extrabold text-[#112b6b] mt-1" style={{ letterSpacing: "-0.02em" }}>
+                {stage.name}
+              </h1>
+              <p className="text-[14px] text-gray-500 mt-2 font-medium max-w-lg">
+                {stage.description}
+              </p>
+            </div>
           </div>
 
-          {/* Stats */}
-          <div className="flex gap-4 flex-shrink-0">
-            <div className="rounded-2xl px-5 py-4 text-center" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}>
-              <div className="text-3xl font-extrabold text-white">{pct}%</div>
-              <div className="text-white/60 text-xs font-semibold mt-0.5">Complete</div>
+          {/* Stats Badges */}
+          <div className="flex items-center gap-4">
+            <div className="px-5 py-3 bg-gray-50 rounded-2xl border border-gray-100 text-center min-w-[100px]">
+              <div className="text-2xl font-extrabold text-[#112b6b] leading-tight">{pct}%</div>
+              <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Progress</div>
             </div>
-            <div className="rounded-2xl px-5 py-4 text-center" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}>
-              <div className="text-3xl font-extrabold text-white">{completedCount}</div>
-              <div className="text-white/60 text-xs font-semibold mt-0.5">Done</div>
-            </div>
-            <div className="rounded-2xl px-5 py-4 text-center" style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}>
-              <div className="text-3xl font-extrabold text-white">{stage.totalCourses - completedCount}</div>
-              <div className="text-white/60 text-xs font-semibold mt-0.5">Left</div>
+            <div className="px-5 py-3 bg-gray-50 rounded-2xl border border-gray-100 text-center min-w-[100px]">
+              <div className="text-2xl font-extrabold text-[#112b6b] leading-tight">{completedCount}</div>
+              <div className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Completed</div>
             </div>
           </div>
         </div>
 
-        {/* Progress bar */}
-        <div className="mt-6">
-          <div className="h-2.5 bg-white/15 rounded-full overflow-hidden">
+        {/* Enhanced Progress bar */}
+        <div className="mt-8">
+          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${pct}%` }}
-              transition={{ duration: 1.2 }}
-              className="h-full bg-white rounded-full"
+              transition={{ duration: 1 }}
+              className="h-full rounded-full"
+              style={{
+                background: "linear-gradient(90deg, #112b6b 0%, #1a3884 100%)"
+              }}
             />
           </div>
         </div>
@@ -328,27 +315,24 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
 
       {/* Assessment gate banner */}
       {stage.assessmentGate && (
-        <div className="mb-6 flex items-center gap-4 p-4 rounded-2xl border"
-          style={{ background: cfg.accentLight, borderColor: cfg.accentBorder }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: cfg.iconBg }}>
-            <TrendingUp className="w-5 h-5 text-white" />
+        <div className="mb-8 flex items-center gap-5 p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0">
+            <TrendingUp className="w-6 h-6 text-[#1a3884]" />
           </div>
           <div className="flex-1">
-            <h4 className="font-bold text-slate-800 text-sm">Assessment Gate: {stage.assessmentGate}</h4>
-            <p className="text-slate-500 text-xs">Pass this assessment (70%+) after completing all courses to unlock the next stage</p>
+            <h4 className="font-bold text-[#112b6b] text-[15px]">Assessment Required: {stage.assessmentGate}</h4>
+            <p className="text-gray-500 text-[13px] font-medium">Complete all modules and achieve 70%+ to unlock next stage</p>
           </div>
           {userProgress.assessmentsPassed?.includes(stage.assessmentGate) ? (
-            <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-green-100 text-green-700">✓ Passed</span>
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 uppercase tracking-wider">Passed</div>
           ) : (
-            <span className="px-3 py-1.5 rounded-full text-xs font-bold"
-              style={{ background: cfg.accentLight, color: cfg.progressColor }}>Pending</span>
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-slate-50 text-gray-500 border border-slate-100 uppercase tracking-wider">Locked</div>
           )}
         </div>
       )}
 
       {/* Course grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {stage.courses.map((course, idx) => {
           const isCompleted = userProgress.completedCourses?.includes(course.id);
           const isCurrent = userProgress.currentCourse === course.id;
@@ -363,7 +347,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
               isCurrent={isCurrent}
               isUnlocked={courseUnlocked}
               onClick={() => handleCourseClick(course, courseUnlocked)}
-              accentColor={cfg.progressColor}
+              accentColor="#1a3884"
               delay={idx * 0.04}
             />
           );
@@ -378,12 +362,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
   const [selectedStageId, setSelectedStageId] = useState(null);
 
   const isStageUnlocked = (stage) => {
-    if (stage.id === 1) return true;
-    const prevStage = STAGES[stage.id - 2];
-    return (
-      userProgress.completedStages?.includes(prevStage.id) &&
-      userProgress.assessmentsPassed?.includes(prevStage.assessmentGate)
-    );
+    return true; // Unlocked all
   };
 
   const selectedStage = STAGES.find(s => s.id === selectedStageId);
@@ -394,62 +373,65 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
   const overallPct = Math.round((totalCompleted / totalCourses) * 100);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#090f1e] transition-colors duration-300">
-      {/* ── Page header ── */}
-      <div className="relative bg-white dark:bg-[#0d1526] border-b border-slate-100 dark:border-white/5 overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 80% 60% at 60% -10%, rgba(26,56,132,0.07) 0%, transparent 70%)" }} />
-        <div className="max-w-7xl mx-auto px-6 md:px-12 py-10 md:py-14 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <GraduationCap className="w-5 h-5 text-[#1a3884]" />
-                <span className="text-xs font-bold uppercase tracking-widest text-[#1a3884]">
-                  Human Intelligence Programme
-                </span>
+    <div className="min-h-screen bg-[#f8fafc] transition-colors duration-500 relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
+        <div className="absolute top-[20%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
+      </div>
+
+      {/* Page header */}
+      <div className="bg-white border-b border-gray-100 relative z-10 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-12">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center shadow-md border border-gray-100">
+                  <GraduationCap className="w-7 h-7 text-[#1a3884]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#1a3884]">
+                    Official Programme
+                  </span>
+                  <h1 className="text-4xl font-extrabold text-[#112b6b] tracking-tight" style={{ letterSpacing: "-0.03em" }}>
+                    My Learning Journey
+                  </h1>
+                </div>
               </div>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white"
-                style={{ letterSpacing: "-0.03em" }}>
-                My Learning Journey
-              </h1>
-              <p className="text-slate-500 mt-1">Three stages. {totalCourses} courses. Your path to leadership.</p>
+              <p className="text-[15px] text-gray-500 font-medium max-w-lg leading-relaxed">
+                Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability.
+              </p>
             </div>
 
-            {/* Overall progress pill */}
-            <div className="flex items-center gap-5 bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 shadow-sm">
-              <div>
-                <div className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-0.5">Overall</div>
-                <div className="text-3xl font-extrabold text-[#1a3884] dark:text-blue-400">{overallPct}%</div>
+            {/* Overall progress card */}
+            <div className="flex items-center gap-8 bg-white border border-gray-100 rounded-3xl px-8 py-6 shadow-xl shadow-gray-200/40">
+              <div className="text-center">
+                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Overall</div>
+                <div className="text-3xl font-extrabold text-[#1a3884] leading-tight">{overallPct}%</div>
               </div>
-              <div className="h-12 w-px bg-slate-200 dark:bg-slate-700" />
-              <div className="text-sm text-slate-500 space-y-0.5">
-                <div className="font-semibold text-slate-700 dark:text-slate-300">{totalCompleted} completed</div>
-                <div>{totalCourses - totalCompleted} remaining</div>
-              </div>
-              <div className="relative w-14 h-14">
-                <svg className="w-full h-full -rotate-90" viewBox="0 0 56 56">
-                  <circle cx="28" cy="28" r="24" fill="none" stroke="#e2e8f0" strokeWidth="5" />
-                  <circle cx="28" cy="28" r="24" fill="none" stroke="#1a3884" strokeWidth="5"
-                    strokeDasharray={`${2 * Math.PI * 24}`}
-                    strokeDashoffset={`${2 * Math.PI * 24 * (1 - overallPct / 100)}`}
-                    strokeLinecap="round" />
-                </svg>
-                <Sparkles className="absolute inset-0 m-auto w-4 h-4 text-[#1a3884]" />
+              <div className="h-12 w-px bg-gray-100" />
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  <span className="text-[13px] font-bold text-[#112b6b]">{totalCompleted} Completed</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+                  <span className="text-[13px] font-bold text-gray-400">{totalCourses - totalCompleted} Remaining</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Main content ── */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-10">
+      {/* Main content */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 relative z-10">
         <AnimatePresence mode="wait">
           {!selectedStageId ? (
             /* Category cards view */
             <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }}>
-
-              {/* 3 big cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {STAGES.map((stage, i) => {
                   const cfg = STAGE_CONFIG[stage.id];
                   const unlocked = isStageUnlocked(stage);
@@ -462,14 +444,8 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
                       cfg={cfg}
                       isUnlocked={unlocked}
                       completedCount={completed}
-                      delay={i * 0.12}
+                      delay={i * 0.15}
                       onClick={() => {
-                        if (!unlocked) {
-                          toast.error(`${stage.name} is locked!`, {
-                            description: "Complete the previous stage and pass its assessment to unlock this.",
-                          });
-                          return;
-                        }
                         setSelectedStageId(stage.id);
                       }}
                     />

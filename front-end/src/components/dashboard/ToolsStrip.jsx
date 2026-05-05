@@ -13,11 +13,11 @@ const ToolsStrip = memo(() => {
         initial={{ opacity: 0, scale: 0.9 }} 
         animate={{ opacity: 1, scale: 1 }} 
         transition={{ delay: ANIMATION_DELAYS.TOOLS_WALLET }}
-        onClick={() => navigate('/smaart-wallet')}
+        onClick={() => navigate('/skills-vault')}
         className="flex items-center gap-3 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-none px-6 py-3 shadow-sm hover:shadow-md transition"
         style={{ borderColor: COLORS.SILVER }}
       >
-        <span className="font-bold text-sm dark:text-white" style={{ color: COLORS.PRIMARY }}>Wallet & Badges</span>
+        <span className="font-bold text-sm dark:text-white" style={{ color: COLORS.PRIMARY }}>Skills Vault</span>
         <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-700 pl-3">
           <Award className="w-4 h-4" style={{ color: COLORS.SILVER }} />
           <Shield className="w-4 h-4" style={{ color: COLORS.SILVER }} />
