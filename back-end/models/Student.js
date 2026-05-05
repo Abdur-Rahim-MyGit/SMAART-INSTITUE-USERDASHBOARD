@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Counter = require('./Counter');
+const { createDefaultUserSettings, userSettingsSchema } = require('./schemas/userSettings');
 
 const studentSchema = new mongoose.Schema({
   studentId: {
@@ -93,59 +94,55 @@ const studentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  // Active vision board for dashboard display
   activeVisionBoardId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'VisionBoardPro',
     default: null
   },
   lastLogin: Date,
-  // First login password change requirement
   mustChangePassword: {
     type: Boolean,
-    default: true  // New students must change password on first login
+    default: true
   },
   isFirstLogin: {
     type: Boolean,
-    default: true  // Track if this is student's first login
+    default: true
   },
   passwordChangedAt: Date,
-
-  // === NEW: Authentication Flow Flags ===
-  // True after completing student registration form
   isRegistered: {
     type: Boolean,
     default: false
   },
-  // True after completing all mandatory assessments
   isAssessmentCompleted: {
     type: Boolean,
     default: false
   },
-  // Account lock for failed OTP attempts (null = not locked)
   accountLockedUntil: {
     type: Date,
     default: null
   },
-  // Track OTP verification attempts (reset after success)
   otpAttempts: {
     type: Number,
     default: 0
   },
-  // Rate limiting for OTP resends
   lastOtpSentAt: {
     type: Date,
     default: null
   },
-  // Session management for One Person Login
   currentSessionId: {
     type: String,
     default: null
   },
+<<<<<<< HEAD
   // Hard 3-hour session expiry — set on login, checked on every request
   sessionExpiresAt: {
     type: Date,
     default: null
+=======
+  settings: {
+    type: userSettingsSchema,
+    default: createDefaultUserSettings
+>>>>>>> dharshh
   },
   badges: [{
     badgeId: String,
@@ -160,22 +157,19 @@ const studentSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Hash password before saving
 studentSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
-    return next(); // CRITICAL FIX: Added return to prevent double hashing
+    return next();
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
-// Match password
 studentSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Generate student ID (atomic counter to prevent race conditions)
 studentSchema.pre('save', async function (next) {
   if (!this.studentId) {
     try {
@@ -192,7 +186,6 @@ studentSchema.pre('save', async function (next) {
   next();
 });
 
-// Indexes for better query performance
 studentSchema.index({ email: 1 }, { unique: true });
 studentSchema.index({ studentId: 1 }, { unique: true, sparse: true });
 studentSchema.index({ college: 1 });
@@ -202,3 +195,4 @@ studentSchema.index({ assignedTeacher: 1 });
 studentSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Student', studentSchema);
+

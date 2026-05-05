@@ -1,2 +1,2 @@
-import { useUser } from '@/contexts/UserContext';
+import { useUser } from '@/contexts/UserContextFixed';
 export default useUser;

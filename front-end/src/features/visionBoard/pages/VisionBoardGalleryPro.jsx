@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -40,11 +40,9 @@ import { moderateTextAsync, loadToxicityModel, moderateText } from "../utils/con
 // BOARD CARD COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
-const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onView, onSetAsActive, onDeactivate, isCurrentVision }) => {
+const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onView, onSetAsActive, onDeactivate, isCurrentVision, viewMode = "grid" }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isSettingActive, setIsSettingActive] = useState(false);
-  const template =
-    GRID_TEMPLATES[board.templateId] || GRID_TEMPLATES["grid-2x2"];
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -60,56 +58,63 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onView, onSetAsActive
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className={`group relative bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${isCurrentVision ? 'border-[#1a3884] ring-2 ring-[#1a3884]/20 shadow-[#1a3884]/10' : 'border-slate-200 dark:border-slate-700 hover:border-[#1a3884]/50 dark:hover:border-[#1a3884]/50'
+      className={`group relative overflow-hidden rounded-2xl border bg-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:bg-[#0f172a] ${viewMode === "list" ? "md:flex" : ""} ${isCurrentVision
+        ? "border-[#1a3884]/40 shadow-[0_18px_40px_rgba(26,56,132,0.14)]"
+        : "border-slate-200 shadow-sm hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700"
         }`}
     >
-      {/* Active Vision Badge */}
       {isCurrentVision && (
-        <div className="absolute top-0 left-0 right-0 bg-[#1a3884] text-white text-[9px] font-bold py-1 px-2 text-center z-10 shadow-sm tracking-widest uppercase">
-          <Star className="w-2.5 h-2.5 inline mr-1 mb-0.5 fill-white" />
-          Active Vision
+        <div className="absolute left-4 top-4 z-10 inline-flex items-center gap-1 rounded-full border border-white/80 bg-white/92 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1a3884] shadow-sm backdrop-blur dark:border-white/10 dark:bg-[#081120]/90 dark:text-blue-300">
+          <Star className="h-3 w-3 fill-current" />
+          Active
         </div>
       )}
 
-      {/* Collage Image */}
-      <div className={`relative aspect-square bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden ${isCurrentVision ? 'mt-5 border-t border-slate-100 dark:border-slate-700' : ''}`}>
+      <div className={`relative overflow-hidden bg-slate-100 dark:bg-slate-900 ${viewMode === "list" ? "md:w-[320px] md:flex-shrink-0" : "aspect-[4/5]"}`}>
         {board.collageImage ? (
           <img
             src={board.collageImage}
             alt={board.title}
-            className="w-full h-full object-contain bg-slate-200 dark:bg-slate-950 transition-transform duration-500 group-hover:scale-105"
+            className={`h-full w-full transition-transform duration-500 group-hover:scale-[1.03] ${viewMode === "list" ? "object-cover md:min-h-[260px]" : "object-cover"}`}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
-            <Images className="w-16 h-16" />
+          <div className="flex h-full w-full items-center justify-center text-slate-300 dark:text-slate-700">
+            <Images className="h-14 w-14" />
           </div>
         )}
 
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-          <div className="flex flex-col gap-3">
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-950/70 via-slate-950/30 to-transparent" />
+
+        <div className="absolute inset-0 flex items-center justify-center bg-slate-950/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <div className="flex gap-2">
             <Button
               size="sm"
               onClick={() => onView(board)}
-              className="bg-white hover:bg-slate-100 text-slate-900 font-semibold px-6 shadow-lg transform hover:scale-105 transition-all rounded-full"
+              className="rounded-full bg-white px-5 font-semibold text-slate-900 shadow-lg hover:bg-slate-100"
             >
               <Eye className="w-4 h-4 mr-2" />
-              View Full
+              Preview
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onEdit(board)}
+              className="rounded-full border-white/60 bg-white/10 px-5 font-semibold text-white backdrop-blur hover:bg-white/20"
+            >
+              <Edit className="mr-2 h-4 w-4" />
+              Edit
             </Button>
           </div>
         </div>
 
-
-
-        {/* Menu Button */}
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
+        <div className="absolute right-3 top-3 z-20 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <div className="relative">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center shadow-lg transition-colors border border-slate-200 dark:border-slate-600"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/70 bg-white/92 text-slate-700 shadow-lg transition-colors hover:bg-slate-100 dark:border-white/10 dark:bg-[#081120]/90 dark:text-slate-200 dark:hover:bg-slate-800"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
@@ -120,15 +125,24 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onView, onSetAsActive
                   className="fixed inset-0 z-10"
                   onClick={() => setShowMenu(false)}
                 />
-                <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl py-1 z-30 overflow-hidden">
-
+                <div className="absolute right-0 top-full z-30 mt-2 w-40 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-slate-700 dark:bg-slate-800">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDuplicate(board);
+                      setShowMenu(false);
+                    }}
+                    className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                  >
+                    <Copy className="w-3.5 h-3.5" /> Duplicate
+                  </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onEdit(board);
                       setShowMenu(false);
                     }}
-                    className="w-full text-left px-4 py-2.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center gap-2 transition-colors border-b border-slate-100 dark:border-slate-700"
+                    className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/50"
                   >
                     <Edit className="w-3.5 h-3.5" /> Edit
                   </button>
@@ -150,58 +164,66 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onView, onSetAsActive
         </div>
       </div>
 
-      {/* Footer Info */}
-      <div className="p-3.5 relative">
-        <div className="mb-3">
-          <h3 className="font-bold text-slate-800 dark:text-white truncate text-sm mb-0.5" title={board.title}>
+      <div className="space-y-4 p-4 md:flex-1">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+              {isCurrentVision ? "Displayed" : "Saved"}
+            </span>
+            <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+              {formatDate(board.createdAt)}
+            </p>
+          </div>
+          <h3 className="truncate text-base font-semibold text-slate-900 dark:text-white" title={board.title}>
             {board.title}
           </h3>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
-            <Calendar className="w-3 h-3" />
-            {formatDate(board.createdAt)}
+          <p className="line-clamp-2 min-h-[2.5rem] text-sm text-slate-500 dark:text-slate-400">
+            {board.description || "A curated board of visual goals and personal direction."}
           </p>
         </div>
 
-        <Button
-          size="sm"
-          onClick={async (e) => {
-            e.stopPropagation();
-            setIsSettingActive(true);
-            if (isCurrentVision) {
-              await onDeactivate(board);
-            } else {
-              await onSetAsActive(board);
-            }
-            setIsSettingActive(false);
-          }}
-          disabled={isSettingActive}
-          className={`w-full text-[10px] font-bold h-8 shadow-sm relative overflow-hidden transition-all duration-300 rounded-lg group/btn ${isCurrentVision
-            ? 'bg-green-50 dark:bg-green-900/20 border-2 border-green-500 text-green-700 dark:text-green-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 hover:text-red-600'
-            : 'bg-[#1a3884] hover:bg-[#132c6b] text-white border-0 hover:shadow-md hover:-translate-y-0.5'
-            }`}
-        >
-          {isSettingActive ? (
-            <>
-              <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
-              Processing...
-            </>
-          ) : isCurrentVision ? (
-            <>
-              <span className="flex items-center group-hover/btn:hidden">
-                <CheckCircle2 className="w-3 h-3 mr-1.5" />
-                Active Vision
-              </span>
-              <span className="hidden group-hover/btn:flex items-center">
-                <EyeOff className="w-3 h-3 mr-1.5" />
-                Deactivate
-              </span>
-            </>
-          ) : (
-            <>
-              Set as Active Goal
-            </>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onView(board)}
+            className="flex-1 rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+          >
+            View
+          </Button>
+          <Button
+            size="sm"
+            onClick={async (e) => {
+              e.stopPropagation();
+              setIsSettingActive(true);
+              if (isCurrentVision) {
+                await onDeactivate(board);
+              } else {
+                await onSetAsActive(board);
+              }
+              setIsSettingActive(false);
+            }}
+            disabled={isSettingActive}
+            className={`flex-1 rounded-xl font-semibold ${isCurrentVision
+              ? "bg-emerald-600 text-white hover:bg-emerald-700"
+              : "bg-[#1a3884] text-white hover:bg-[#132c6b]"
+              }`}
+          >
+            {isSettingActive ? (
+              <>
+                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                Saving
+              </>
+            ) : isCurrentVision ? (
+              <>
+                <CheckCircle2 className="mr-2 h-3.5 w-3.5" />
+                Active
+              </>
+            ) : (
+              "Set Active"
+            )}
+          </Button>
+        </div>
       </div>
     </motion.div>
   );
@@ -441,9 +463,47 @@ const VisionBoardGalleryPro = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("recent");
+  const [viewMode, setViewMode] = useState("grid");
 
   const TITLE_CHAR_LIMIT = 50;
   const DESCRIPTION_CHAR_LIMIT = 250;
+
+  const filteredBoards = useMemo(() => {
+    let nextBoards = [...boards];
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.trim().toLowerCase();
+      nextBoards = nextBoards.filter((board) =>
+        board.title?.toLowerCase().includes(query) ||
+        board.description?.toLowerCase().includes(query)
+      );
+    }
+
+    if (statusFilter === "active") {
+      nextBoards = nextBoards.filter((board) => currentVisionId === board._id);
+    }
+
+    if (statusFilter === "draft") {
+      nextBoards = nextBoards.filter((board) => currentVisionId !== board._id);
+    }
+
+    nextBoards.sort((a, b) => {
+      if (sortBy === "name") {
+        return (a.title || "").localeCompare(b.title || "");
+      }
+
+      if (sortBy === "oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
+      }
+
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    return nextBoards;
+  }, [boards, currentVisionId, searchQuery, sortBy, statusFilter]);
 
   // Load boards and check current vision
   useEffect(() => {
@@ -708,101 +768,176 @@ const VisionBoardGalleryPro = () => {
     }
   };
 
+  const handleDeactivate = async () => {
+    try {
+      await clearActiveVision();
+      setCurrentVisionId(null);
+      toast({
+        title: "Vision Deactivated",
+        description: "Vision board removed from dashboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to deactivate vision board",
+        variant: "destructive",
+      });
+    }
+  };
+
 
   return (
-    <main className="w-full relative py-4 px-4 md:px-8 bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 min-h-screen">
-          <div className="max-w-[1600px] mx-auto pb-6">
-
-            {/* Header Section - Compact */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-6">
-              <div className="flex-1 text-center md:text-left">
-                <p className="text-[#1a3884] dark:text-[#C0C0C0] text-3xl md:text-4xl font-['Dancing Script',cursive] mb-1">
-                  Visualize Your Goals. Manifest Your Future.
-                </p>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium max-w-xl">
-Create up to 3 personalized vision boards to turn your aspirations into reality and stay focused on your journey.
-                </p>
+    <main className="min-h-screen w-full bg-[#f3f6fb] px-4 py-5 transition-colors duration-300 dark:bg-[#06101d] md:px-8">
+      <div className="mx-auto max-w-[1600px] pb-6">
+        <section className="rounded-[28px] border border-slate-200 bg-white px-6 py-6 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-8 md:py-8">
+          <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+            <div className="max-w-3xl">
+              <div className="mb-3 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300">
+                Vision Board Library
               </div>
-
-              <div className="flex items-center gap-4 shrink-0">
-                <div className="flex items-center text-xs font-bold text-[#1a3884]/70 dark:text-[#C0C0C0]/70 bg-white/50 dark:bg-[#1e293b]/50 px-4 py-2 rounded-xl border border-[#1a3884]/10 dark:border-[#C0C0C0]/10 shadow-sm">
-                  <Grid3X3 className="w-3.5 h-3.5 mr-2 opacity-50" />
-                  {boards.length} / {maxAllowed} BOARDS
-                </div>
-
-                <Button
-                  onClick={handleCreateNew}
-                  disabled={!canCreateMore}
-                  className={`h-11 px-6 rounded-xl font-bold shadow-lg transition-all ${canCreateMore
-                    ? "bg-[#1a3884] hover:bg-[#132c6b] text-white hover:-translate-y-0.5"
-                    : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed border-0"
-                    }`}
-                >
-                  <Plus className="w-5 h-5 mr-2" />
-                  Create New Board
-                </Button>
-              </div>
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+                Build a cleaner, clearer picture of where you want to go.
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400 md:text-base">
+                Create focused visual boards for different goals, keep one active on the dashboard,
+                and return anytime to refine your direction without losing clarity.
+              </p>
             </div>
 
-            {/* Content Container */}
-            <div className="relative">
-
-            {/* Content */}
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-32 space-y-4">
-                <Loader2 className="w-12 h-12 text-[#1a3884] animate-spin" />
-                <p className="text-slate-400 animate-pulse">Loading your visions...</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
+                <Grid3X3 className="h-3.5 w-3.5" />
+                {boards.length} of {maxAllowed} boards
               </div>
-            ) : boards.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-24 text-center bg-white dark:bg-[#1e293b] rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm border-dashed">
-                <div className="w-20 h-20 bg-[#1a3884]/10 rounded-full flex items-center justify-center mb-6">
-                  <Images className="w-8 h-8 text-[#1a3884]" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">No vision Boards Yet</h3>
-                <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-8">
-Start building your future by creating your first vision board. You can create up to 3 boards to organize your goals and ambitions.
-                </p>
-                <Button onClick={handleCreateNew} className="bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl px-8 h-12 font-bold shadow-lg hover:shadow-[#1a3884]/25">
-                  <Plus className="w-5 h-5 mr-2" /> Create Vision Board
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                <AnimatePresence>
-                  {boards.map(board => (
-                    <BoardCard
-                      key={board._id}
-                      board={board}
-                      onDelete={setDeleteBoard}
-                      onDuplicate={handleDuplicate}
-                      onEdit={handleEdit}
-                      onView={handleView}
-                      onSetAsActive={handleSetAsActive}
-                      onDeactivate={async () => {
-                        // Inline deactivate handler
-                        try {
-                          await clearActiveVision();
-                          setCurrentVisionId(null);
-                          toast({
-                            title: "Vision Deactivated",
-                            description: "Vision board removed from dashboard.",
-                          });
-                        } catch (error) {
-                          toast({
-                            title: "Error",
-                            description: "Failed to deactivate vision board",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                      isCurrentVision={currentVisionId === board._id}
-                    />
-                  ))}
-                </AnimatePresence>
-              </div>
-                )}
+              <Button
+                onClick={handleCreateNew}
+                disabled={!canCreateMore}
+                className={`h-11 rounded-2xl px-6 font-semibold ${canCreateMore
+                  ? "bg-[#1a3884] text-white hover:bg-[#132c6b]"
+                  : "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-slate-800"
+                  }`}
+              >
+                <Plus className="mr-2 h-4.5 w-4.5" />
+                Create New Board
+              </Button>
             </div>
           </div>
+
+          {boards.length > 0 && (
+            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/40 lg:flex-row lg:items-center lg:justify-between">
+              <div className="relative w-full max-w-md">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search boards by title or description"
+                  className="h-11 rounded-xl border-slate-200 bg-white pl-10 dark:border-slate-700 dark:bg-[#081120]"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-[#081120]">
+                  {[
+                    { id: "all", label: "All" },
+                    { id: "active", label: "Active" },
+                    { id: "draft", label: "Saved" },
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setStatusFilter(option.id)}
+                      className={`rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${statusFilter === option.id
+                        ? "bg-[#1a3884] text-white"
+                        : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                        }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="h-11 rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none dark:border-slate-700 dark:bg-[#081120] dark:text-slate-200"
+                >
+                  <option value="recent">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="name">Name</option>
+                </select>
+
+                <div className="inline-flex rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-[#081120]">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("grid")}
+                    className={`rounded-lg p-2 ${viewMode === "grid" ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white" : "text-slate-400"}`}
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode("list")}
+                    className={`rounded-lg p-2 ${viewMode === "list" ? "bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white" : "text-slate-400"}`}
+                  >
+                    <List className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <div className="mt-6">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-32 space-y-4">
+              <Loader2 className="h-12 w-12 animate-spin text-[#1a3884]" />
+              <p className="animate-pulse text-slate-400">Loading your boards...</p>
+            </div>
+          ) : boards.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-white py-24 text-center shadow-sm dark:border-slate-700 dark:bg-[#0b1627]">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#1a3884]/10">
+                <Images className="h-8 w-8 text-[#1a3884]" />
+              </div>
+              <h3 className="mb-2 text-2xl font-semibold text-slate-900 dark:text-white">No boards yet</h3>
+              <p className="mx-auto mb-8 max-w-md text-slate-500 dark:text-slate-400">
+                Start with one clear board, then add more as your goals branch into different areas.
+              </p>
+              <Button onClick={handleCreateNew} className="h-11 rounded-2xl bg-[#1a3884] px-8 font-semibold text-white hover:bg-[#132c6b]">
+                <Plus className="mr-2 h-4.5 w-4.5" />
+                Create Vision Board
+              </Button>
+            </div>
+          ) : filteredBoards.length === 0 ? (
+            <div className="rounded-[28px] border border-slate-200 bg-white px-6 py-20 text-center shadow-sm dark:border-slate-800 dark:bg-[#0b1627]">
+              <Search className="mx-auto mb-4 h-10 w-10 text-slate-300 dark:text-slate-600" />
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">No boards match those filters</h3>
+              <p className="mt-2 text-slate-500 dark:text-slate-400">Try another search term or switch back to all boards.</p>
+            </div>
+          ) : (
+            <div className={viewMode === "grid"
+              ? "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              : "grid grid-cols-1 gap-4"
+            }>
+              <AnimatePresence>
+                {filteredBoards.map((board) => (
+                  <BoardCard
+                    key={board._id}
+                    board={board}
+                    onDelete={setDeleteBoard}
+                    onDuplicate={handleDuplicate}
+                    onEdit={handleEdit}
+                    onView={handleView}
+                    onSetAsActive={handleSetAsActive}
+                    onDeactivate={handleDeactivate}
+                    isCurrentVision={currentVisionId === board._id}
+                    viewMode={viewMode}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+      </div>
 
         {/* Delete Confirmation Modal */}
         <DeleteModal

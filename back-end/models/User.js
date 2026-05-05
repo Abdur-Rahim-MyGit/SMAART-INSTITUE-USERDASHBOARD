@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const Counter = require('./Counter');
+const { createDefaultUserSettings, userSettingsSchema } = require('./schemas/userSettings');
 
 const userSchema = new mongoose.Schema({
   userId: {
@@ -22,10 +23,9 @@ const userSchema = new mongoose.Schema({
   },
   mobile: {
     type: String,
-    required: false, // Optional - can be filled during registration
+    required: false,
     validate: {
       validator: function (v) {
-        // Only validate if value is provided
         return !v || /^[0-9]{10}$/.test(v);
       },
       message: 'Please provide a valid 10-digit mobile number'
@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: false, // Optional - set during first-login flow
+    required: false,
     minlength: 6,
     select: false
   },
@@ -51,10 +51,8 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'College'
   },
-  // Teacher-specific fields
   department: String,
   subject: String,
-  // Student-specific fields
   rollNumber: String,
   section: String,
   assignedTeacher: {
@@ -71,6 +69,7 @@ const userSchema = new mongoose.Schema({
     default: null
   },
   profileImage: String,
+<<<<<<< HEAD
   bio: {
     type: String,
     trim: true,
@@ -85,6 +84,8 @@ const userSchema = new mongoose.Schema({
     default: 'DD/MM/YYYY'
   },
   // Active vision board for dashboard display
+=======
+>>>>>>> dharshh
   activeVisionBoardId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'VisionBoardPro',
@@ -95,16 +96,25 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   },
   lastLogin: Date,
-  previousLogin: Date, // Login timestamp before current session
-  // Session management for One Person Login
+  previousLogin: Date,
   currentSessionId: {
     type: String,
     default: null
   },
+<<<<<<< HEAD
   // Hard 3-hour session expiry — set on login, checked on every request
   sessionExpiresAt: {
     type: Date,
     default: null
+=======
+  mustChangePassword: {
+    type: Boolean,
+    default: false
+  },
+  settings: {
+    type: userSettingsSchema,
+    default: createDefaultUserSettings
+>>>>>>> dharshh
   },
   badges: [{
     badgeId: String,
@@ -119,17 +129,15 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password') || !this.password) {
-    return next(); // CRITICAL FIX: Added return to prevent double hashing and hashing empty password
+    return next();
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
-// Generate user ID before saving (atomic counter to prevent race conditions)
 userSchema.pre('save', async function (next) {
   if (!this.userId) {
     try {
@@ -146,7 +154,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Indexes for better query performance
 userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ userId: 1 }, { unique: true, sparse: true });
 userSchema.index({ college: 1 });
@@ -154,9 +161,9 @@ userSchema.index({ role: 1, status: 1 });
 userSchema.index({ createdAt: -1 });
 userSchema.index({ mobile: 1 });
 
-// Match password
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 module.exports = mongoose.model('User', userSchema);
+

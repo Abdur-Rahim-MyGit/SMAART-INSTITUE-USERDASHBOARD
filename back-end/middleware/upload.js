@@ -82,6 +82,36 @@ const upload = multer({
   }
 });
 
+const supportAttachmentFileFilter = (req, file, cb) => {
+  const allowedMimes = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/jpg',
+    'image/webp',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/plain'
+  ];
+  const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.webp', '.doc', '.docx', '.txt'];
+  const ext = path.extname(file.originalname).toLowerCase();
+
+  if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Invalid attachment type. Only images, PDFs, DOC, DOCX, and TXT files are allowed.'), false);
+  }
+};
+
+const uploadSupportAttachments = multer({
+  storage,
+  fileFilter: supportAttachmentFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  }
+});
+
 // Create multer instance with default Cloudinary storage
 const uploadCloudinary = multer({
   storage: defaultStorage,
@@ -239,6 +269,7 @@ const uploadCommunity = multer({
 });
 
 module.exports = upload;
+module.exports.uploadSupportAttachments = uploadSupportAttachments;
 module.exports.uploadCloudinary = uploadCloudinary;
 module.exports.uploadDynamic = uploadDynamic;
 module.exports.uploadRegistration = uploadRegistration;
