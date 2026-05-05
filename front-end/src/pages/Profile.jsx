@@ -382,7 +382,7 @@ const Profile = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-6"
+                className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-8 mb-6"
               >
                 <div className="relative group">
                   <div className="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-slate-800 shadow-lg">
@@ -1023,9 +1023,9 @@ const Profile = () => {
 
 // Helper Components for the redesigned layout
 const InfoField = ({ label, value }) => (
-  <div className="flex flex-col">
+  <div className="flex flex-col min-w-0">
     <span className="text-gray-400 dark:text-gray-500 text-[11px] uppercase font-bold tracking-wider mb-1">{label}</span>
-    <span className="text-gray-900 dark:text-white text-base font-semibold truncate" title={value}>
+    <span className="text-gray-900 dark:text-white text-sm sm:text-base font-semibold break-words" title={value}>
       {value || "Not set"}
     </span>
   </div>

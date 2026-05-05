@@ -142,15 +142,17 @@ const VerifyCertificate = () => {
                         transition={{ delay: 0.1 }}
                         className="lg:col-span-5 space-y-6"
                     >
-                        <div className="bg-white dark:bg-[#001835]/80 backdrop-blur-xl rounded-3xl p-6 border border-[#C0C0C0] shadow-2xl shadow-[#C0C0C0]/10 ring-1 ring-black/5 dark:ring-white/5">
+                        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 md:p-10 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#1a3884]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                            <div className="relative z-10">
 
                             {/* Toggle Switch */}
-                            <div className="flex bg-gray-100 dark:bg-[#000F24] p-1.5 rounded-xl mb-8 border border-gray-200 dark:border-white/5">
+                            <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl mb-10 border border-slate-200/50 dark:border-white/5 shadow-inner">
                                 <button
                                     onClick={() => setIsScanning(false)}
-                                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${!isScanning
-                                        ? 'bg-white dark:bg-[#1a3884] text-[#1a3884] dark:text-white shadow-md'
-                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                    className={`flex-1 py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2.5 ${!isScanning
+                                        ? 'bg-white dark:bg-slate-800 text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                         }`}
                                 >
                                     <Hash className="w-4 h-4" />
@@ -158,9 +160,9 @@ const VerifyCertificate = () => {
                                 </button>
                                 <button
                                     onClick={() => setIsScanning(true)}
-                                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 ${isScanning
-                                        ? 'bg-white dark:bg-[#1a3884] text-[#1a3884] dark:text-white shadow-md'
-                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                    className={`flex-1 py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2.5 ${isScanning
+                                        ? 'bg-white dark:bg-slate-800 text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                         }`}
                                 >
                                     <ScanLine className="w-4 h-4" />
@@ -232,36 +234,35 @@ const VerifyCertificate = () => {
                                         onSubmit={handleSubmit}
                                         className="space-y-5"
                                     >
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                                        <div className="space-y-3">
+                                            <label className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] ml-1">
                                                 Certificate Identifier
                                             </label>
                                             <div className="relative group">
-                                                <div className="absolute inset-0 bg-gradient-to-r from-[#C0C0C0]/20 to-[#1a3884]/20 rounded-xl blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none" />
                                                 <input
                                                     type="text"
                                                     value={certificateId}
                                                     onChange={(e) => setCertificateId(e.target.value)}
                                                     placeholder="e.g. SMAART-CAP-2025-ABC12"
-                                                    className="relative w-full px-5 py-4 pl-12 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-black/20 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-[#C0C0C0] focus:border-transparent transition-all font-mono shadow-inner"
+                                                    className="w-full h-16 px-6 pl-14 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-600 focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/5 transition-all outline-none font-medium"
                                                 />
-                                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+                                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600 group-focus-within:text-[#1a3884] transition-colors" />
                                             </div>
                                         </div>
 
                                         <button
                                             type="submit"
                                             disabled={isVerifying || !certificateId.trim()}
-                                            className="w-full bg-gradient-to-r from-[#1a3884] to-[#0d1f4d] hover:from-[#2a4d9e] hover:to-[#1a3884] text-white py-4 rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 hover:shadow-[#1a3884]/50 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group border border-white/5"
+                                            className="w-full h-16 bg-[#1a3884] hover:bg-[#0d1f4d] text-white rounded-2xl font-bold shadow-xl shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
                                         >
                                             {isVerifying ? (
                                                 <>
-                                                    <Loader2 className="w-5 h-5 animate-spin text-[#C0C0C0]" />
+                                                    <Loader2 className="w-5 h-5 animate-spin text-white/50" />
                                                     Verifying...
                                                 </>
                                             ) : (
                                                 <>
-                                                    <ShieldCheck className="w-5 h-5 text-[#C0C0C0] group-hover:scale-110 transition-transform" />
+                                                    <ShieldCheck className="w-5 h-5 text-white/70 group-hover:scale-110 transition-transform" />
                                                     Authenticate Now
                                                 </>
                                             )}
@@ -269,6 +270,7 @@ const VerifyCertificate = () => {
                                     </motion.form>
                                 )}
                             </AnimatePresence>
+                            </div>
                         </div>
 
                         {/* Trust Badges */}

@@ -29,11 +29,11 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
     const sectionId = item.toLowerCase().replace(/\s+/g, '-');
 
     // Special case for Verify Certificate - direct route exists
-    if (item === "Verify Certificate") {
-      navigate("/verify-certificate");
-      setMobileMenuOpen(false);
-      return;
-    }
+    // if (item === "Verify Certificate") {
+    //   navigate("/verify-certificate");
+    //   setMobileMenuOpen(false);
+    //   return;
+    // }
 
     if (location.pathname === "/") {
       const element = document.getElementById(sectionId);
@@ -102,10 +102,10 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                   Log in
                 </button>
                 <button
-                  onClick={() => onSignupClick ? onSignupClick() : navigate('/?modal=true')}
+                  onClick={() => handleNavItemClick("contact")}
                   className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#132c6b] hover:from-[#132c6b] hover:to-[#0d1f4d] text-white text-sm font-bold rounded-xl transition-all duration-300 shadow-lg shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-0.5 border border-[#C0C0C0]/30"
                 >
-                  Get Started
+                  Enquiry
                 </button>
               </div>
             </div>

@@ -521,6 +521,21 @@ const ComprehensiveSignup = () => {
       </header>
 
       <div className="max-w-4xl mx-auto py-4 px-4 relative z-10">
+        {/* Progress Bar */}
+        <div className="mb-6 px-2">
+            <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+                <span>Step {currentStep + 1} of {steps.length}</span>
+                <span>{Math.round(((currentStep + 1) / steps.length) * 100)}% Complete</span>
+            </div>
+            <div className="h-1.5 w-full bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                    className="h-full bg-gradient-to-r from-[#1a3884] to-[#2d5dc7] rounded-full"
+                />
+            </div>
+        </div>
+
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 
           animate={{ opacity: 1, y: 0 }} 
@@ -528,7 +543,7 @@ const ComprehensiveSignup = () => {
           className="relative"
         >
           {/* Torn Paper Container */}
-          <div className="bg-white p-4 md:p-6 shadow-[0_20px_40px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] border border-gray-100 rounded-3xl relative">
+          <div className="bg-white p-5 md:p-8 shadow-[0_20px_40px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] border border-gray-100 rounded-3xl relative">
             
             <AnimatePresence mode="wait">
             {/* Step 0: Profile Photo */}
@@ -1172,31 +1187,37 @@ const ComprehensiveSignup = () => {
           </AnimatePresence>
 
           {/* Redesigned Footer - Inside the torn paper card */}
-              <div className="w-full flex justify-end items-center gap-8">
-                {currentStep > 0 && (
-                  <button 
-                    onClick={handlePrevStep}
-                    className="text-lg font-sans text-gray-500 hover:text-gray-800 transition-colors"
-                  >
-                    Previous
-                  </button>
-                )}
-                {currentStep < steps.length - 1 ? (
-                  <button 
-                    onClick={handleNextStep}
-                    className="text-lg font-sans text-[#1a3884] font-bold hover:opacity-80 transition-opacity"
-                  >
-                    Next
-                  </button>
-                ) : (
-                  <button 
-                    onClick={handleSubmit}
-                    disabled={isLoading}
-                    className="text-lg font-sans text-[#C0C0C0] font-bold hover:opacity-80 transition-opacity flex items-center gap-2"
-                  >
-                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Complete"}
-                  </button>
-                )}
+              <div className="w-full flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
+                  <div className="flex items-center gap-4">
+                    {currentStep > 0 && (
+                      <button 
+                        onClick={handlePrevStep}
+                        className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all"
+                      >
+                        Previous
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    {currentStep < steps.length - 1 ? (
+                      <button 
+                        onClick={handleNextStep}
+                        className="px-8 py-3 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-blue-800 transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2"
+                      >
+                        Next
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="px-8 py-3 rounded-xl bg-[#C0C0C0] text-slate-900 text-sm font-bold hover:bg-slate-300 transition-all shadow-lg flex items-center gap-2"
+                      >
+                        {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Complete Registration"}
+                      </button>
+                    )}
+                  </div>
               </div>
             </div>
           </motion.div>

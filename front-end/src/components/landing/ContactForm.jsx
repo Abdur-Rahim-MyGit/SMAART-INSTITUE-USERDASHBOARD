@@ -241,7 +241,7 @@ const ContactForm = () => {
                               </>
                             ) : (
                               <>
-                                Send Inquiry
+                                Send Enquiry
                                 <Send className="ml-3 h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                               </>
                             )}
