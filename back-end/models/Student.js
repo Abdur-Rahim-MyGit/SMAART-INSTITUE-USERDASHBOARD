@@ -133,16 +133,14 @@ const studentSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-<<<<<<< HEAD
-  // Hard 3-hour session expiry — set on login, checked on every request
+// Hard 3-hour session expiry — set on login, checked on every request
   sessionExpiresAt: {
     type: Date,
     default: null
-=======
+  },
   settings: {
     type: userSettingsSchema,
     default: createDefaultUserSettings
->>>>>>> dharshh
   },
   badges: [{
     badgeId: String,

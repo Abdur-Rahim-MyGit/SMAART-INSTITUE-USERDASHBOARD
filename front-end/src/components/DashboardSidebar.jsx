@@ -216,15 +216,10 @@ const DashboardSidebar = () => {
               { label: 'Assessments', path: '/dashboard/assessment-centre' },
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
-<<<<<<< HEAD
-              { label: 'Skills Vault', path: '/dashboard/skills-vault' },
-              { label: 'Help', path: null, isHelp: true }
-            ].map(item => {
-=======
+{ label: 'Skills Vault', path: '/dashboard/skills-vault' },
               { label: 'Wallet', path: '/dashboard/smaart-wallet' },
               { label: 'Help', path: null, isHelp: true },
             ].map((item) => {
->>>>>>> dharshh
               const isActive = location.pathname === item.path ||
                 (item.path !== '/dashboard' && location.pathname.startsWith(item.path));
 

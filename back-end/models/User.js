@@ -69,8 +69,7 @@ const userSchema = new mongoose.Schema({
     default: null
   },
   profileImage: String,
-<<<<<<< HEAD
-  bio: {
+bio: {
     type: String,
     trim: true,
     default: ''
@@ -84,8 +83,6 @@ const userSchema = new mongoose.Schema({
     default: 'DD/MM/YYYY'
   },
   // Active vision board for dashboard display
-=======
->>>>>>> dharshh
   activeVisionBoardId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'VisionBoardPro',
@@ -101,12 +98,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-<<<<<<< HEAD
-  // Hard 3-hour session expiry — set on login, checked on every request
+// Hard 3-hour session expiry — set on login, checked on every request
   sessionExpiresAt: {
     type: Date,
     default: null
-=======
+  },
   mustChangePassword: {
     type: Boolean,
     default: false
@@ -114,7 +110,6 @@ const userSchema = new mongoose.Schema({
   settings: {
     type: userSettingsSchema,
     default: createDefaultUserSettings
->>>>>>> dharshh
   },
   badges: [{
     badgeId: String,
