@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
     Brain, CheckCircle2, ChevronRight,
-    FileText, ArrowRight, Clock, Play, Eye, Info, Layers, Award, TrendingUp, ShieldCheck
+    FileText, ArrowRight, Clock, Play, Eye, Info, Layers, Award, TrendingUp
 } from "lucide-react";
 import { assessmentApi } from "@/services/assessmentApi";
 import useUser from "@/hooks/useUser";
@@ -82,12 +82,6 @@ const AssessmentsDashboard = () => {
                     {/* Hero Section – Matching Image 1 */}
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
                         <div className="space-y-6">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50/80 border border-blue-100 text-[#4f46e5] text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">
-                                <div className="w-4 h-4 rounded-full bg-[#4f46e5]/10 flex items-center justify-center border border-[#4f46e5]/20">
-                                    <ShieldCheck className="w-2.5 h-2.5" />
-                                </div>
-                                Certified Assessment Suite
-                            </div>
                             <div className="space-y-4">
                                 <h1 className="text-5xl md:text-6xl font-black text-[#0f172a] tracking-tight leading-none">
                                     Assessments - <span className="text-[#1a3884]">Centre</span>
@@ -102,7 +96,7 @@ const AssessmentsDashboard = () => {
                         <div className="bg-white rounded-[32px] p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.06)] border border-slate-50 flex items-center gap-10 min-w-[320px]">
                             <div className="space-y-1">
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Overall</p>
-                                <h3 className="text-5xl font-black text-[#1a3884]">{pct}%</h3>
+                                <h3 className="text-5xl font-black text-[#1a3884]">{pct}</h3>
                             </div>
                             <div className="h-16 w-px bg-slate-100" />
                             <div className="space-y-2">

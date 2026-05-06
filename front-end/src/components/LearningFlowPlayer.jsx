@@ -36,7 +36,6 @@ const LearningFlowPlayer = ({
   selectedDay, 
   onBack,
   videoCompletionMap,
-  videoCompletionMap,
   onVideoProgressUpdate
 }) => {
   const navigate = useNavigate();
