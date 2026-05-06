@@ -88,10 +88,16 @@ const SignupInitial = () => {
               className="flex flex-col items-center text-center mb-8"
             >
               <div
-                className="w-16 h-16 flex items-center justify-center mb-4 bg-white rounded-2xl border border-[#1a3884]/10"
-                style={{ boxShadow: "0 10px 25px rgba(0,0,0,0.06)" }}
+                className="w-24 h-24 flex items-center justify-center mb-4 bg-white rounded-2xl border border-[#1a3884]/10 shadow-lg"
               >
-                <img src={blueLogo} alt="SMAART" className="w-10 h-10 object-contain" />
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-black tracking-tighter text-[#1a3884] leading-none">
+                    SMAART
+                  </span>
+                  <span className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                    Institute
+                  </span>
+                </div>
               </div>
               <h1
                 className="text-2xl font-extrabold tracking-tight text-[#112b6b] mb-1"

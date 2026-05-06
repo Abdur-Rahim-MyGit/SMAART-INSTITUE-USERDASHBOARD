@@ -46,7 +46,7 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
       <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo Lockup */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative h-14 sm:h-16 w-auto flex items-center justify-center p-1">
+          <div className="relative h-20 sm:h-24 w-auto flex items-center justify-center p-1">
             <img src={whiteLogo} alt="SMAART Institute" className="h-full w-auto object-contain" />
           </div>
           <div className="flex flex-col">
