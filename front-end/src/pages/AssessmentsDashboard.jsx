@@ -143,7 +143,7 @@ const AssessmentsDashboard = () => {
                                 </div>
 
                                 <div className="mt-5 max-w-2xl space-y-3">
-                                    <h1 className="text-3xl font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-4xl lg:text-[2.8rem] lg:leading-[1.02]">
+                                    <h1 className="text-[2rem] font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-[2.35rem] lg:text-[2.5rem] lg:leading-[1.04]">
                                         Assessments - <span className="text-[#1a3884] dark:text-blue-300">Centre</span>
                                     </h1>
                                     <p className="max-w-2xl text-sm font-medium leading-7 text-slate-600 dark:text-slate-300 sm:text-base">

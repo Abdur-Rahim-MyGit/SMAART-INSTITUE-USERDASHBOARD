@@ -135,7 +135,7 @@ const SMAArtToolkit = () => {
                 Intelligence Suite
               </div>
               <div className="space-y-4">
-                <h1 className="max-w-3xl text-2xl font-semibold tracking-[-0.04em] text-[#0f172a] sm:text-3xl dark:text-white">
+                <h1 className="max-w-3xl text-[2rem] font-black tracking-tight text-[#0f172a] sm:text-[2.35rem] lg:text-[2.5rem] lg:leading-[1.04] dark:text-white">
                   SMAART - <span className="text-[#1a3884]">Toolkit</span>
                 </h1>
                 <p className="max-w-xl text-base font-medium tracking-[0.01em] text-[#3654a1] dark:text-[#d7def0] sm:text-lg">
