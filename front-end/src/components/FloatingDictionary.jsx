@@ -108,30 +108,52 @@ const FloatingDictionary = () => {
 
     return (
         <>
-            {/* Floating Button */}
-            <motion.button
+            {/* Floating Bar Trigger */}
+            <motion.div
+                layout
                 onClick={() => setOpen(!open)}
-                className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] text-white shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 flex items-center justify-center transition-all duration-300 group"
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.95 }}
-                title="Quick Dictionary"
+                className="fixed bottom-8 left-1/2 lg:left-auto lg:right-8 z-50 h-14 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-[#1a3884] dark:text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/20 dark:border-slate-700/50 flex items-center gap-4 px-5 cursor-pointer hover:shadow-blue-600/20 transition-all duration-300 group overflow-hidden"
+                initial={{ y: 100, x: "-50%", opacity: 0 }}
+                animate={{ 
+                    y: 0, 
+                    x: typeof window !== 'undefined' && window.innerWidth < 1024 ? "-50%" : "0%",
+                    opacity: 1 
+                }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
             >
-                <AnimatePresence mode="wait">
-                    {open ? (
-                        <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
-                            <X className="w-5 h-5" />
-                        </motion.div>
-                    ) : (
-                        <motion.div key="book" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
-                            <Book className="w-5 h-5" />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                {/* Pulse ring when closed */}
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform">
+                    <AnimatePresence mode="wait">
+                        {open ? (
+                            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                                <X className="w-4 h-4 text-white" />
+                            </motion.div>
+                        ) : (
+                            <motion.div key="book" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                                <Book className="w-4 h-4 text-white" />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+                
                 {!open && (
-                    <span className="absolute inset-0 rounded-full border-2 border-blue-400/40 animate-ping pointer-events-none" />
+                    <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex flex-col pr-4"
+                    >
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 leading-none mb-1">Quick Search</span>
+                        <span className="text-sm font-bold tracking-tight text-slate-500 dark:text-slate-400 whitespace-nowrap italic">Look up a word...</span>
+                    </motion.div>
                 )}
-            </motion.button>
+
+                {/* Status dot */}
+                {!open && (
+                    <div className="flex items-center gap-1.5 ml-auto">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    </div>
+                )}
+            </motion.div>
 
             {/* Panel */}
             <AnimatePresence>

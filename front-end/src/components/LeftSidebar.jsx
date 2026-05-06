@@ -73,7 +73,7 @@ const menuGroups = [
     title: "sidebar.group_skills",
     items: [
       { icon: Award, label: "Skills Vault", path: "/dashboard/skills-vault", badge: null },
-      { icon: Compass, label: "Career Direc", path: "/dashboard/career-direction", badge: null },
+      { icon: Compass, label: "Career Direction", path: "/dashboard/career-direction", badge: null },
       { icon: ShieldCheck, label: "Skills Passport", path: "/dashboard/skills-passport", badge: null },
       { icon: Lightbulb, label: "Vision Board", path: "/dashboard/vision-boards", badge: null },
     ]
@@ -336,21 +336,14 @@ const LeftSidebar = () => {
             {/* Mobile Header */}
             <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                {/* <img
-                  src={theme === 'dark' ? whiteLogo : blueLogo}
-                  alt="SMAART"
-                  className="h-12 w-auto object-contain"
-                  onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                /> */}
-                {/* <div className="h-12 w-12 bg-[#1a3884] rounded-xl items-center justify-center hidden">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div> */}
-                <span
-                  className="text-2xl font-extrabold tracking-tight"
-                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
-                >
-                  SMAART
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
+                    SMAART
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] ml-0.5">
+                    Institute
+                  </span>
+                </div>
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
@@ -428,38 +421,26 @@ const LeftSidebar = () => {
         onMouseEnter={() => isCollapsed && toggleSidebar()}
       >
         {/* Logo Section */}
-        <div className={`flex flex-col items-start p-5 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
+        <div className={`flex flex-col items-start py-3 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
           <Link to="/dashboard" className="flex flex-col items-start overflow-hidden">
-            {/* SMAART Institute Logo - commented out, using text instead */}
-            {/* <div className={`flex items-center justify-center transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full'}`}>
-              <img
-                src={theme === 'dark' ? whiteLogo : blueLogo}
-                alt="SMAART Institute"
-                className={`w-auto object-contain transition-all duration-300 ${isCollapsed ? 'h-8 max-w-[40px]' : 'h-10 lg:h-12 max-w-[180px] lg:max-w-[200px]'}`}
-              />
-            </div> */}
-            <div className={`flex items-center justify-center transition-all duration-300 ${isCollapsed ? 'w-10' : 'w-full'}`}>
               {isCollapsed ? (
-                <span
-                  className="text-lg font-extrabold tracking-tight"
-                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
-                >
-                  S
-                </span>
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20">
+                  <span className="text-xl font-black text-white">S</span>
+                </div>
               ) : (
-                <span
-                  className="text-2xl font-extrabold tracking-tight"
-                  style={{ fontFamily: "'Outfit', sans-serif", color: theme === 'dark' ? '#fff' : '#1a3884' }}
-                >
-                  SMAART
-                </span>
+                <div className="flex flex-col items-start">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl lg:text-3xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
+                      SMAART
+                    </span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] ml-0.5">
+                    Institute
+                  </span>
+                </div>
               )}
-            </div>
-            {!isCollapsed && (
-              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-1">
-                Craft Your Career
-              </span>
-            )}
+
           </Link>
         </div>
 
