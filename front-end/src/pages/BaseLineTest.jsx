@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { assessmentApi } from "@/services/assessmentApi";
@@ -9,10 +9,10 @@ import BadgeModal from "@/components/badges/BadgeModal";
 
 // Stage configuration map
 const STAGE_MAP = {
-  T1: { code: 'ASM00001', name: 'Baseline', title: 'Base Line Test', questionLimit: 36 },
-  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34 },
-  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36 },
-  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34 },
+  T1: { code: 'ASM00001', name: 'Baseline', title: 'Base Line Test', questionLimit: 36, durationMinutes: 45 },
+  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40 },
+  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36, durationMinutes: 45 },
+  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34, durationMinutes: 40 },
 };
 
 // Helper function to get band colors - MINIMAL MONOCHROME THEME
@@ -111,6 +111,9 @@ const BaseLineTest = () => {
   const stageConfig = STAGE_MAP[stageKey] || STAGE_MAP.T1;
   const assessmentCode = stageConfig.code;
   const questionLimit = stageConfig.questionLimit;
+  const stageDurationSeconds = stageConfig.durationMinutes * 60;
+  const timerStartStorageKey = `${stageKey}_startTime`;
+  const timerWarningStorageKey = `${stageKey}_oneMinuteWarningShown`;
 
   // State management
   const [user, setUser] = useState(null);
@@ -128,6 +131,13 @@ const BaseLineTest = () => {
   const [testResults, setTestResults] = useState(null);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [remainingSeconds, setRemainingSeconds] = useState(stageDurationSeconds);
+  const [interactionLocked, setInteractionLocked] = useState(false);
+  const [timeExpired, setTimeExpired] = useState(false);
+
+  const timerStartRef = useRef(null);
+  const timeoutSubmitTriggeredRef = useRef(false);
+  const oneMinuteAlertShownRef = useRef(false);
 
   // Badge notification state
   const [earnedBadge, setEarnedBadge] = useState(null);
@@ -161,6 +171,45 @@ const BaseLineTest = () => {
   // Calculate progress based on answered questions
   const answeredCount = Object.keys(selectedAnswers).length;
   const progress = questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0;
+  const isLastFiveMinutes = remainingSeconds <= 300;
+  const allQuestionsAnswered = questions.length > 0 && answeredCount === questions.length;
+
+  const clearTimerPersistence = useCallback(() => {
+    localStorage.removeItem(timerStartStorageKey);
+    localStorage.removeItem(timerWarningStorageKey);
+  }, [timerStartStorageKey, timerWarningStorageKey]);
+
+  const formatCountdown = useCallback((totalSeconds) => {
+    const safeSeconds = Math.max(totalSeconds, 0);
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  }, []);
+
+  const finalizeUnansweredQuestions = useCallback(async () => {
+    if (!resultId || questions.length === 0) return;
+
+    const unansweredQuestions = questions.filter((question) => !selectedAnswers[question._id]);
+    if (unansweredQuestions.length === 0) return;
+
+    const fallbackAnswers = {};
+    unansweredQuestions.forEach((question) => {
+      fallbackAnswers[question._id] = "UNANSWERED";
+    });
+
+    setSelectedAnswers((prev) => ({ ...prev, ...fallbackAnswers }));
+
+    await Promise.all(
+      unansweredQuestions.map((question) =>
+        assessmentApi.saveAnswer(
+          resultId,
+          question._id,
+          "UNANSWERED",
+          question.questionText || ""
+        )
+      )
+    );
+  }, [questions, resultId, selectedAnswers]);
 
   // Check authentication and fetch assessment on mount
   useEffect(() => {
@@ -190,6 +239,7 @@ const BaseLineTest = () => {
         const stageCheck = await assessmentApi.getStageResult(userId, stageKey).catch(() => ({ success: false }));
         
         if (stageCheck.success && stageCheck.data) {
+          clearTimerPersistence();
           if (isReportMode) {
             console.log("✅ Result found in report mode, displaying resultsUI");
             setTestResults(stageCheck.data);
@@ -205,6 +255,7 @@ const BaseLineTest = () => {
         }
 
         if (isReportMode) {
+          clearTimerPersistence();
           throw new Error(`Report not found for ${stageConfig.title}. Have you completed it yet?`);
         }
 
@@ -280,7 +331,7 @@ const BaseLineTest = () => {
     };
 
     initializeAssessment();
-  }, [navigate, stageKey]);
+  }, [clearTimerPersistence, navigate, stageKey]);
 
   // Timer: Reset when question changes
   useEffect(() => {
@@ -298,7 +349,7 @@ const BaseLineTest = () => {
 
   // Save answer to backend (Optimistic UI)
   const selectOption = async (optionValue) => {
-    if (!currentQuestionId || !resultId) return;
+    if (!currentQuestionId || !resultId || interactionLocked || submitted) return;
 
     // 1. Update UI immediately (Optimistic)
     setSelectedAnswers(prev => ({
@@ -328,6 +379,7 @@ const BaseLineTest = () => {
   };
 
   const nextQ = () => {
+    if (interactionLocked || submitted) return;
     const timeRequired = 5000; // 5 seconds
     if (timeElapsed < timeRequired) {
       return; // Block navigation if timer hasn't elapsed
@@ -338,36 +390,125 @@ const BaseLineTest = () => {
   };
   const prevQ = () => { /* Disabled as per user request */ };
 
-  const submit = async () => {
-    if (!resultId || submitting) return;
+  const submit = useCallback(async ({ reason = "manual", redirectAfterSubmit = false, forceTimeoutCompletion = false } = {}) => {
+    if (!resultId || submitting || submitted) return;
+    if (reason === "manual" && !allQuestionsAnswered) {
+      toast.warning("Answer all questions before submitting the test.");
+      return;
+    }
 
-    // REMOVED ALERT as per user request
-    // if (answeredCount < questions.length) {
-    //   if (!window.confirm(`You have only answered ${answeredCount} out of ${questions.length} questions. Are you sure you want to submit?`)) {
-    //     return;
-    //   }
-    // }
+    let submitSucceeded = false;
 
     try {
       setSubmitting(true);
+      setInteractionLocked(true);
+
+      if (forceTimeoutCompletion) {
+        await finalizeUnansweredQuestions();
+      }
+
       const response = await assessmentApi.submitAssessment(resultId);
 
       if (response.success) {
+        submitSucceeded = true;
+        clearTimerPersistence();
         setSubmitted(true);
         setTestResults(response.data);
 
-        // Handle badges earned upon submission
         if (response.data.badgesEarned && response.data.badgesEarned.length > 0) {
           handleBadgesEarned(response.data.badgesEarned);
+        }
+
+        if (redirectAfterSubmit || reason === "timeout") {
+          navigate(`/assessment/${stageKey}/report`, { replace: true });
         }
       }
     } catch (err) {
       console.error("Error submitting assessment:", err);
-      alert(err.message || "Failed to submit assessment.");
+      if (reason === "timeout") {
+        const userId = user?.id || user?._id;
+
+        if (userId) {
+          try {
+            const existingReport = await assessmentApi.getStageResult(userId, stageKey);
+            if (existingReport.success && existingReport.data) {
+              clearTimerPersistence();
+              setSubmitted(true);
+              setTestResults(existingReport.data);
+              navigate(`/assessment/${stageKey}/report`, { replace: true });
+              return;
+            }
+          } catch (reportLookupError) {
+            console.error("Timeout report lookup failed:", reportLookupError);
+          }
+        }
+
+        alert("Time is up. Your assessment was ended and we could not confirm the submission result.");
+        navigate("/dashboard/assessment-centre", { replace: true });
+      } else {
+        alert(err.message || "Failed to submit assessment.");
+      }
     } finally {
       setSubmitting(false);
+      if (!submitSucceeded && reason !== "timeout") {
+        setInteractionLocked(false);
+      }
     }
-  };
+  }, [allQuestionsAnswered, clearTimerPersistence, finalizeUnansweredQuestions, navigate, resultId, stageKey, submitted, submitting, user]);
+
+  useEffect(() => {
+    if (loading || submitted || !resultId) return;
+
+    let persistedStartTime = Number(localStorage.getItem(timerStartStorageKey));
+    if (!Number.isFinite(persistedStartTime) || persistedStartTime <= 0 || persistedStartTime > Date.now()) {
+      persistedStartTime = Date.now();
+      localStorage.setItem(timerStartStorageKey, String(persistedStartTime));
+    }
+
+    timerStartRef.current = persistedStartTime;
+    oneMinuteAlertShownRef.current = localStorage.getItem(timerWarningStorageKey) === "1";
+
+    const updateCountdown = () => {
+      if (!timerStartRef.current) return;
+
+      if (localStorage.getItem(timerStartStorageKey) !== String(timerStartRef.current)) {
+        localStorage.setItem(timerStartStorageKey, String(timerStartRef.current));
+      }
+
+      const elapsedSeconds = Math.floor((Date.now() - timerStartRef.current) / 1000);
+      const nextRemainingSeconds = Math.max(stageDurationSeconds - elapsedSeconds, 0);
+      setRemainingSeconds(nextRemainingSeconds);
+
+      if (nextRemainingSeconds <= 60 && nextRemainingSeconds > 0 && !oneMinuteAlertShownRef.current) {
+        oneMinuteAlertShownRef.current = true;
+        localStorage.setItem(timerWarningStorageKey, "1");
+        alert("Only 1 minute left!");
+        toast.warning("Only 1 minute left!");
+      }
+
+      if (nextRemainingSeconds === 0 && !timeoutSubmitTriggeredRef.current) {
+        timeoutSubmitTriggeredRef.current = true;
+        setTimeExpired(true);
+        setInteractionLocked(true);
+        setShowExitWarning(false);
+        toast.error("Time is up. Submitting your assessment...");
+        submit({ reason: "timeout", redirectAfterSubmit: true, forceTimeoutCompletion: true });
+      }
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(timer);
+  }, [
+    loading,
+    resultId,
+    stageDurationSeconds,
+    submitted,
+    submit,
+    timerStartStorageKey,
+    timerWarningStorageKey,
+  ]);
 
   // Proctoring Logic - Anti-Cheat
   const [warnings, setWarnings] = useState(0);
@@ -409,7 +550,7 @@ const BaseLineTest = () => {
         const newCount = prev + 1;
         if (newCount >= MAX_WARNINGS) {
           // Force Submit
-          submit();
+          submit({ reason: "violation", redirectAfterSubmit: true });
           toast.error("Test terminated due to multiple violations.");
           return newCount;
         }
@@ -429,7 +570,11 @@ const BaseLineTest = () => {
     // Block Exit
     const beforeUnload = (e) => { e.preventDefault(); e.returnValue = ""; };
     window.addEventListener("beforeunload", beforeUnload);
-    const onPopState = () => { window.history.pushState(null, "", window.location.href); setShowExitWarning(true); };
+    const onPopState = () => {
+      window.history.pushState(null, "", window.location.href);
+      setShowExitWarning(true);
+      toast.warning("Back navigation is disabled during the assessment.");
+    };
     window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", onPopState);
 
@@ -481,8 +626,18 @@ const BaseLineTest = () => {
               <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0B1120] relative z-10">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
-                  <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
-                    Time: <span className="font-mono text-[#1a3884]">{Math.floor(timeElapsed / 1000)}s</span>
+                  <div className="text-right">
+                    <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
+                      Time Left:{" "}
+                      <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#1a3884]"}`}>
+                        {formatCountdown(remainingSeconds)}
+                      </span>
+                    </div>
+                    {isLastFiveMinutes && (
+                      <p className="mt-1 text-[11px] md:text-xs font-bold uppercase tracking-wider text-red-500">
+                        Time Almost Up!
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -516,6 +671,7 @@ const BaseLineTest = () => {
                       <button
                         key={option.value}
                         onClick={() => selectOption(option.value)}
+                        disabled={interactionLocked || submitting || timeExpired}
                         className={`group relative p-3 md:p-5 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-left hover:scale-[1.01] active:scale-[0.99] ${isSelected
                           ? 'border-[#1a3884] bg-[#1a3884]/10 shadow-[0_0_30px_-10px_rgba(26,56,132,0.3)]'
                           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-[#1a3884]/50 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -546,7 +702,7 @@ const BaseLineTest = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         onClick={nextQ}
-                        disabled={timeElapsed < 5000}
+                        disabled={timeElapsed < 5000 || interactionLocked || submitting || timeExpired}
                         className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#1a3884]/20 transition-all flex items-center gap-2 ${timeElapsed < 5000
                           ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
                           : 'bg-[#1a3884] text-white hover:bg-[#277a84] hover:shadow-2xl hover:-translate-y-1'
@@ -571,14 +727,23 @@ const BaseLineTest = () => {
               {/* Footer Controls */}
               <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-[#0B1120] flex justify-end items-center backdrop-blur-sm">
                 <button
-                  onClick={submit}
-                  disabled={submitting}
-                  className={`px-6 md:px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-sm md:text-base bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-lg shadow-amber-500/20 hover:-translate-y-0.5`}
+                  onClick={() => submit()}
+                  disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered}
+                  className={`px-6 md:px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-sm md:text-base ${
+                    allQuestionsAnswered
+                      ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-lg shadow-amber-500/20 hover:-translate-y-0.5"
+                      : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                  }`}
                 >
                   {submitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       Submitting...
+                    </>
+                  ) : !allQuestionsAnswered ? (
+                    <>
+                      <Lock className="w-5 h-5" />
+                      Answer All Questions
                     </>
                   ) : (
                     <>
@@ -633,7 +798,7 @@ const BaseLineTest = () => {
               {/* DEV: Auto Answer */}
               <div className="pt-4 border-t border-dashed border-slate-200 dark:border-slate-800 opacity-50 hover:opacity-100 transition-opacity">
                 <button
-                  disabled={submitting}
+                  disabled={submitting || interactionLocked || timeExpired}
                   onClick={async () => {
                     try {
                       const btn = document.activeElement;
@@ -652,11 +817,7 @@ const BaseLineTest = () => {
                         batch.forEach(q => { newAnswers[q._id] = 'RANDOM'; });
                         setSelectedAnswers(prev => ({ ...prev, ...newAnswers }));
                       }
-                      const response = await assessmentApi.submitAssessment(resultId);
-                      if (response.success) {
-                        setSubmitted(true);
-                        setTestResults(response.data);
-                      }
+                      await submit({ reason: "manual", redirectAfterSubmit: false });
                     } catch (err) {
                       console.error("Fast submit failed:", err);
                     } finally {
@@ -860,10 +1021,9 @@ const BaseLineTest = () => {
                 <XCircle className="w-10 h-10 text-amber-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">Don't Leave Yet!</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-center mb-8">You're solving the questions brilliantly. Leaving now will pause your progress. Finish strong!</p>
+              <p className="text-slate-500 dark:text-slate-400 text-center mb-8">Back navigation is disabled during the assessment. Use the submit button when you are ready to leave.</p>
               <div className="flex flex-col gap-3">
-                <button onClick={() => setShowExitWarning(false)} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Get Back to Test</button>
-                <button onClick={() => navigate("/dashboard/assessment-centre")} className="w-full py-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold transition-colors">Exit Anyway</button>
+                <button onClick={() => setShowExitWarning(false)} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Continue Assessment</button>
               </div>
             </motion.div>
           </div>
