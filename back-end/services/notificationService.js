@@ -359,7 +359,7 @@ const notifyTicketResponse = async (userId, ticketId, ticketSubject, agentName) 
     type: 'support',
     title: '📩 Ticket Update',
     message: `New response on your ticket: "${ticketSubject.substring(0, 50)}..."`,
-    link: `/support/ticket/${ticketId}`,
+    link: '/tickets',
     metadata: {
       ticketId
     }

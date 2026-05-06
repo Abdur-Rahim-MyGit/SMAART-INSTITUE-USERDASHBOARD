@@ -14,7 +14,6 @@ import {
   Settings,
   HelpCircle,
   Bell,
-  ShieldCheck,
   CheckCheck,
   Sun,
   Moon,
@@ -22,12 +21,12 @@ import {
   ClipboardCheck
 } from "lucide-react";
 import ProfileDropdown from "@/components/ProfileDropdown";
-import InteractiveMenu from "@/components/InteractiveMenu";
 import ChatbotModal from "@/components/ChatbotModal";
 import NotificationToast from "@/components/NotificationToast";
 import useUser from "@/hooks/useUser";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useNotifications } from "@/contexts/NotificationContext";
+import { apiCall } from "@/services/api";
 import blueLogo from "@/assets/blue.png";
 import whiteLogo from "@/assets/white.png";
 
@@ -46,7 +45,7 @@ const menuItems = [
 
 const bottomMenuItems = [
   { icon: Settings, label: "Settings", path: "/dashboard/settings" },
-  { icon: HelpCircle, label: "Help" }, // No path - opens chatbot modal
+  { icon: HelpCircle, label: "Help" },
 ];
 
 const DashboardSidebar = () => {
@@ -57,8 +56,20 @@ const DashboardSidebar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const notificationRef = useRef(null);
 
-  // Update time every second
+  const {
+    notifications,
+    unreadCount,
+    wsStatus,
+    markRead,
+    markAllRead,
+    refresh: refreshNotifications,
+    fetchNotifications,
+  } = useNotifications();
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -66,16 +77,14 @@ const DashboardSidebar = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Format time
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
     });
   };
 
-  // Get greeting based on time
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -83,88 +92,56 @@ const DashboardSidebar = () => {
     return 'Good Evening';
   };
 
-  // ── Real-time notifications from context (WebSocket-powered) ──────────
-  const {
-    notifications,
-    unreadCount,
-    wsStatus,
-    markAllRead,
-    refresh: refreshNotifications,
-    fetchNotifications
-  } = useNotifications();
-
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const [notifLoading, setNotifLoading] = useState(false);
-  const notificationRef = useRef(null);
-
-  // Auth headers (still needed for test notification endpoint)
-  const getAuthHeaders = () => {
-    const token = sessionStorage.getItem('token');
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : ''
-    };
-  };
-
-  // Toggle Theme
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
-  // Fetch notifications when dropdown opens (refresh from server)
   useEffect(() => {
     if (notificationOpen) {
       setNotifLoading(true);
-      fetchNotifications().finally(() => setNotifLoading(false));
+      fetchNotifications(1, false).finally(() => setNotifLoading(false));
     }
   }, [notificationOpen, fetchNotifications]);
 
-  // WS status colour helper
   const wsStatusColor = wsStatus === 'connected' ? '#22c55e'
     : wsStatus === 'connecting' ? '#f59e0b'
     : '#ef4444';
 
-  // Generate test notification
   const generateTestNotification = async () => {
     try {
       const testTypes = [
-        { type: 'badge', title: '🏆 New Badge Earned!', message: 'Congratulations! You earned the "Quick Learner" badge.' },
-        { type: 'assessment', title: '📊 Assessment Results Ready', message: 'Your Baseline Assessment results are available.' },
-        { type: 'course', title: '📚 New Course Available', message: 'Check out "Leadership Essentials" - now available!' },
-        { type: 'achievement', title: '🎉 Level Up!', message: 'You reached Level 5! New avatar items unlocked.' },
-        { type: 'system', title: '👋 Welcome!', message: 'Welcome to SMAART Institute! Start your learning journey today.' }
+        { type: 'badge', title: 'New Badge Earned!', message: 'Congratulations! You earned the Quick Learner badge.' },
+        { type: 'assessment', title: 'Assessment Results Ready', message: 'Your Baseline Assessment results are available.' },
+        { type: 'course', title: 'New Course Available', message: 'Check out Leadership Essentials, now available.' },
+        { type: 'achievement', title: 'Level Up!', message: 'You reached Level 5. New avatar items unlocked.' },
+        { type: 'system', title: 'Welcome!', message: 'Welcome to SMAART Institute! Start your learning journey today.' },
       ];
       const randomNotif = testTypes[Math.floor(Math.random() * testTypes.length)];
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/notifications/test`, {
+      const data = await apiCall('/notifications/test', {
         method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(randomNotif)
+        body: JSON.stringify(randomNotif),
       });
-      const data = await response.json();
 
-      if (data.success) {
-        // The WS will deliver the new notification automatically;
-        // manual refresh is a fallback for when WS is disconnected.
-        if (wsStatus !== 'connected') refreshNotifications();
+      if (data.success && wsStatus !== 'connected') {
+        refreshNotifications();
       }
-    } catch (err) {
-      console.error('Error creating test notification:', err);
+    } catch (error) {
+      console.error('Error creating test notification:', error);
     }
   };
 
-  // Close dropdown on outside click
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (notificationRef.current && !notificationRef.current.contains(e.target)) {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setNotificationOpen(false);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Time ago formatter
   const timeAgo = (date) => {
     const secs = Math.floor((Date.now() - new Date(date)) / 1000);
     if (secs < 60) return 'now';
@@ -173,7 +150,21 @@ const DashboardSidebar = () => {
     return `${Math.floor(secs / 86400)}d`;
   };
 
-  // Prevent background scroll when mobile drawer is open
+  const handleNotificationClick = async (notification) => {
+    if (!notification.isRead) {
+      await markRead(notification._id);
+    }
+
+    setNotificationOpen(false);
+
+    if (notification.link) {
+      navigate(notification.link);
+      return;
+    }
+
+    navigate('/notifications');
+  };
+
   useEffect(() => {
     if (isMobileOpen) {
       const original = document.body.style.overflow;
@@ -186,17 +177,14 @@ const DashboardSidebar = () => {
 
   return (
     <>
-      {/* Top Navigation Bar */}
-      <header className="fixed top-0 left-0 right-0 z-[80] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-slate-200/60 dark:border-white/10 shadow-md transition-all duration-300">
-        <div className="flex items-center justify-between px-4 lg:px-8 h-18 py-3">
-
-          {/* Left: Logo Section */}
-          <div className="flex items-center gap-3 shrink-0">
+      <header className="fixed top-0 left-0 right-0 z-[80] border-b border-slate-200/60 bg-white/95 shadow-md backdrop-blur-xl transition-all duration-300 dark:border-white/10 dark:bg-slate-900/95">
+        <div className="flex h-18 items-center justify-between px-4 py-3 lg:px-8">
+          <div className="flex shrink-0 items-center gap-3">
             <button
-              className="lg:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
             >
-              {isMobileOpen ? <X className="w-5 h-5 text-slate-600 dark:text-slate-300" /> : <Menu className="w-5 h-5 text-slate-600 dark:text-slate-300" />}
+              {isMobileOpen ? <X className="h-5 w-5 text-slate-600 dark:text-slate-300" /> : <Menu className="h-5 w-5 text-slate-600 dark:text-slate-300" />}
             </button>
 
             <div className="flex items-center gap-3">
@@ -214,8 +202,7 @@ const DashboardSidebar = () => {
                 </div>
               </Link>
 
-              {/* Time Display */}
-              <div className="hidden md:flex flex-col ml-2">
+              <div className="ml-2 hidden flex-col md:flex">
                 <span className="text-xs font-semibold text-[#1a3884] dark:text-blue-400">
                   {formatTime(currentTime)}
                 </span>
@@ -226,8 +213,7 @@ const DashboardSidebar = () => {
             </div>
           </div>
 
-          {/* Center: Desktop Navigation Menu - Responsive Gap and Flex */}
-          <div className="hidden lg:flex flex-1 items-center justify-center gap-2 xl:gap-6 px-4">
+          <div className="hidden flex-1 items-center justify-center gap-2 px-4 lg:flex xl:gap-6">
             {[
               { label: 'Home', path: '/dashboard' },
               { label: 'Courses', path: '/dashboard/courses' },
@@ -248,16 +234,16 @@ const DashboardSidebar = () => {
                     if (item.isHelp) setIsChatbotOpen(true);
                     else if (item.path) navigate(item.path);
                   }}
-                  className={`text-[11px] xl:text-sm font-bold transition-all duration-200 relative group py-1 whitespace-nowrap ${isActive
+                  className={`relative group py-1 text-[11px] font-bold whitespace-nowrap transition-all duration-200 xl:text-sm ${isActive
                     ? 'text-[#1a3884]'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-[#1a3884] dark:hover:text-[#1a3884]'
+                    : 'text-slate-600 hover:text-[#1a3884] dark:text-slate-300 dark:hover:text-[#1a3884]'
                     }`}
                 >
                   {item.label}
                   {isActive && (
                     <motion.span
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1a3884] rounded-none"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 rounded-none bg-[#1a3884]"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -266,50 +252,41 @@ const DashboardSidebar = () => {
             })}
           </div>
 
-          {/* Right: Actions */}
-          <div className="flex items-center gap-2 xl:gap-3 shrink-0">
-
-            {/* WS connection status indicator */}
+          <div className="flex shrink-0 items-center gap-2 xl:gap-3">
             <div
               title={`Notifications: ${wsStatus}`}
-              className="hidden md:flex items-center gap-1.5"
+              className="hidden items-center gap-1.5 md:flex"
             >
               <span
-                className="w-2 h-2 rounded-full animate-pulse"
+                className="h-2 w-2 animate-pulse rounded-full"
                 style={{ backgroundColor: wsStatusColor }}
               />
-              <span className="text-[10px] text-slate-400"
-                style={{ color: wsStatusColor }}>
+              <span className="text-[10px] text-slate-400" style={{ color: wsStatusColor }}>
                 {wsStatus === 'connected' ? 'Live' : wsStatus === 'connecting' ? '...' : 'Offline'}
               </span>
             </div>
 
-            {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-none text-slate-500 hover:text-[#1a3884] hover:bg-slate-100 dark:text-slate-400 dark:hover:text-[#1a3884] dark:hover:bg-slate-800 transition-all"
+              className="rounded-none p-2 text-slate-500 transition-all hover:bg-slate-100 hover:text-[#1a3884] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-[#1a3884]"
               aria-label="Toggle Theme"
             >
-              {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
 
-            {/* Notification Bell */}
             <div className="relative" ref={notificationRef}>
               <button
                 onClick={() => setNotificationOpen(!notificationOpen)}
-                className="p-2 mr-1 rounded-none text-slate-400 hover:text-[#1a3884] hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all relative group/nav"
+                className="group/nav relative mr-1 rounded-none p-2 text-slate-400 transition-all hover:bg-blue-50 hover:text-[#1a3884] dark:hover:bg-blue-900/20"
               >
-                <Bell className="w-5 h-5 group-hover/nav:animate-bounce" />
-                {unreadCount > 0 ? (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-none border-2 border-white dark:border-slate-900">
+                <Bell className="h-5 w-5 group-hover/nav:animate-bounce" />
+                {unreadCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-none border-2 border-white bg-red-500 text-[10px] font-bold text-white dark:border-slate-900">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
-                ) : (
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-none border-2 border-white dark:border-slate-900 shadow-sm" />
                 )}
               </button>
 
-              {/* Notification Dropdown */}
               <AnimatePresence>
                 {notificationOpen && (
                   <motion.div
@@ -317,16 +294,15 @@ const DashboardSidebar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute -right-12 sm:right-0 mt-2 w-[300px] sm:w-96 bg-white dark:bg-slate-900 rounded-none shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                    className="absolute -right-12 mt-2 w-[300px] overflow-hidden rounded-none border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:right-0 sm:w-96"
                     style={{ zIndex: 9999 }}
                   >
-                    {/* Header */}
-                    <div className="px-4 py-3 bg-gradient-to-r from-slate-900 to-slate-800 flex items-center justify-between">
+                    <div className="flex items-center justify-between bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Bell className="w-5 h-5 text-white" />
+                        <Bell className="h-5 w-5 text-white" />
                         <h3 className="font-semibold text-white">Notifications</h3>
                         {unreadCount > 0 && (
-                          <span className="bg-white/20 text-white text-xs px-2 py-0.5 rounded-none">
+                          <span className="rounded-none bg-white/20 px-2 py-0.5 text-xs text-white">
                             {unreadCount} new
                           </span>
                         )}
@@ -334,67 +310,62 @@ const DashboardSidebar = () => {
                       <div className="flex items-center gap-2">
                         {unreadCount > 0 && (
                           <button onClick={markAllRead} className="text-white/80 hover:text-white" title="Mark all read">
-                            <CheckCheck className="w-4 h-4" />
+                            <CheckCheck className="h-4 w-4" />
                           </button>
                         )}
                         <button onClick={() => setNotificationOpen(false)} className="text-white/80 hover:text-white">
-                          <X className="w-4 h-4" />
+                          <X className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
 
-                    {/* List */}
                     <div className="max-h-[350px] overflow-y-auto bg-white dark:bg-slate-900">
                       {notifLoading ? (
                         <div className="flex justify-center py-10">
-                          <div className="w-8 h-8 border-2 border-[#1a3884] border-t-transparent rounded-full animate-spin" />
+                          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1a3884] border-t-transparent" />
                         </div>
                       ) : notifications.length === 0 ? (
-                        <div className="flex flex-col items-center py-10 text-center px-4">
-                          <div className="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-none flex items-center justify-center mb-3">
-                            <Bell className="w-7 h-7 text-slate-400" />
+                        <div className="flex flex-col items-center px-4 py-10 text-center">
+                          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-none bg-slate-100 dark:bg-slate-800">
+                            <Bell className="h-7 w-7 text-slate-400" />
                           </div>
-                          <p className="text-slate-500 dark:text-slate-400 font-medium">No notifications yet</p>
+                          <p className="font-medium text-slate-500 dark:text-slate-400">No notifications yet</p>
                           <button
                             onClick={generateTestNotification}
-                            className="mt-4 px-4 py-2 bg-[#1a3884] text-white text-sm font-medium rounded-lg hover:bg-[#112558] transition-colors"
+                            className="mt-4 rounded-lg bg-[#1a3884] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#112558]"
                           >
                             Generate Test Notification
                           </button>
                         </div>
                       ) : (
                         <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                          {notifications.map((n) => (
+                          {notifications.map((notification) => (
                             <div
-                              key={n._id}
-                              onClick={() => {
-                                if (n.link) navigate(n.link);
-                                setNotificationOpen(false);
-                              }}
-                              className={`px-4 py-3 flex items-start gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${!n.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+                              key={notification._id}
+                              onClick={() => handleNotificationClick(notification)}
+                              className={`flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 ${!notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
                             >
                               <div
-                                className="w-10 h-10 rounded-none flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: `${n.color || '#2563EB'}20` }}
+                                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none"
+                                style={{ backgroundColor: `${notification.color || '#2563EB'}20` }}
                               >
-                                <Bell className="w-5 h-5" style={{ color: n.color || '#2563EB' }} />
+                                <Bell className="h-5 w-5" style={{ color: notification.color || '#2563EB' }} />
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-start">
-                                  <p className="font-medium text-sm text-slate-900 dark:text-white truncate">{n.title}</p>
-                                  <span className="text-xs text-slate-400 ml-2">{timeAgo(n.createdAt)}</span>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-start justify-between">
+                                  <p className="truncate text-sm font-medium text-slate-900 dark:text-white">{notification.title}</p>
+                                  <span className="ml-2 text-xs text-slate-400">{timeAgo(notification.createdAt)}</span>
                                 </div>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-0.5">{n.message}</p>
+                                <p className="mt-0.5 line-clamp-2 text-sm text-slate-500 dark:text-slate-400">{notification.message}</p>
                               </div>
-                              {!n.isRead && <div className="w-2 h-2 bg-[#1a3884] rounded-none mt-2" />}
+                              {!notification.isRead && <div className="mt-2 h-2 w-2 rounded-none bg-[#1a3884]" />}
                             </div>
                           ))}
                         </div>
                       )}
                     </div>
 
-                    {/* Footer */}
-                    <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700">
+                    <div className="border-t border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
                       <button
                         onClick={() => {
                           navigate('/notifications');
@@ -410,7 +381,6 @@ const DashboardSidebar = () => {
               </AnimatePresence>
             </div>
 
-            {/* Profile */}
             <div id="nav-profile">
               <ProfileDropdown />
             </div>
@@ -418,20 +388,18 @@ const DashboardSidebar = () => {
         </div>
       </header>
 
-      {/* Mobile Overlay */}
       <AnimatePresence>
         {isMobileOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[90] lg:hidden"
+            className="fixed inset-0 z-[90] bg-black/50 backdrop-blur-sm lg:hidden"
             onClick={() => setIsMobileOpen(false)}
           />
         )}
       </AnimatePresence>
 
-      {/* Mobile Sidebar */}
       <AnimatePresence>
         {isMobileOpen && (
           <motion.aside
@@ -439,10 +407,9 @@ const DashboardSidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 h-screen w-[280px] flex flex-col z-[100] lg:hidden bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-2xl"
+            className="fixed left-0 top-0 z-[100] flex h-screen w-[280px] flex-col border-r border-slate-100 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 lg:hidden"
           >
-            {/* Mobile Header */}
-            <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between border-b border-slate-100 p-4 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Link to="/" className="flex items-center group" onClick={() => setIsMobileOpen(false)}>
                   <div className="flex flex-col items-start">
@@ -456,9 +423,9 @@ const DashboardSidebar = () => {
                 </Link>
 
                 {user?.college?.logo && (
-                  <div className="flex items-center gap-2 ml-1">
-                    <div className="h-5 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1" />
-                    <div className="h-8 w-auto flex items-center justify-center transition-all duration-300">
+                  <div className="ml-1 flex items-center gap-2">
+                    <div className="mx-1 h-5 w-[1px] bg-slate-200 dark:bg-slate-700" />
+                    <div className="flex h-8 w-auto items-center justify-center transition-all duration-300">
                       <img
                         src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
                         alt={user.college.collegeName || "College Logo"}
@@ -467,23 +434,22 @@ const DashboardSidebar = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {!user?.college?.logo && (
-                  <span className="font-bold text-base text-slate-900 dark:text-white ml-1">
+                  <span className="ml-1 text-base font-bold text-slate-900 dark:text-white">
                     SMAART<span className="text-[#1a3884]"> Institute</span>
                   </span>
                 )}
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
               >
-                <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                <X className="h-5 w-5 text-slate-500 dark:text-slate-400" />
               </button>
             </div>
 
-            {/* Mobile Navigation */}
-            <nav className="flex-1 py-4 px-3 overflow-y-auto">
+            <nav className="flex-1 overflow-y-auto px-3 py-4">
               <div className="space-y-1">
                 {menuItems.map((item, index) => {
                   const Icon = item.icon;
@@ -499,12 +465,12 @@ const DashboardSidebar = () => {
                       <Link
                         to={item.path}
                         onClick={() => setIsMobileOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive
+                        className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${isActive
                           ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/30'
-                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                          : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800'
                           }`}
                       >
-                        <Icon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-[#1a3884]'}`} />
+                        <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-[#1a3884]'}`} />
                         <span className="font-medium">{item.label}</span>
                       </Link>
                     </motion.div>
@@ -513,34 +479,31 @@ const DashboardSidebar = () => {
               </div>
             </nav>
 
-            {/* Mobile Theme Toggle */}
-            <div className="p-3 border-t border-slate-100 dark:border-slate-800">
+            <div className="border-t border-slate-100 p-3 dark:border-slate-800">
               <button
                 onClick={toggleTheme}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
               >
-                {theme === 'dark' ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-[#1a3884]" />}
+                {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-500" /> : <Moon className="h-5 w-5 text-[#1a3884]" />}
                 <span className="font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
               </button>
             </div>
 
-            {/* Mobile Skills Passport */}
             <div className="p-3">
               <Link
                 to="/dashboard/skills-passport"
                 onClick={() => setIsMobileOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200"
+                className="flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200"
                 style={{
                   background: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 50%, #C0C0C0 100%)',
                 }}
               >
-                <Award className="w-5 h-5 text-slate-900" />
+                <Award className="h-5 w-5 text-slate-900" />
                 <span className="font-bold text-slate-900">Skills Passport</span>
               </Link>
             </div>
 
-            {/* Mobile Bottom */}
-            <div className="p-3 space-y-1 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+            <div className="space-y-1 border-t border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
               {bottomMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isHelpButton = item.label === 'Help';
@@ -553,10 +516,10 @@ const DashboardSidebar = () => {
                         setIsMobileOpen(false);
                         setIsChatbotOpen(true);
                       }}
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all w-full"
+                      className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-slate-500 transition-all hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                     >
-                      <Icon className="w-5 h-5" />
-                      <span className="font-medium text-sm">{item.label}</span>
+                      <Icon className="h-5 w-5" />
+                      <span className="text-sm font-medium">{item.label}</span>
                     </button>
                   );
                 }
@@ -566,10 +529,10 @@ const DashboardSidebar = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMobileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all"
+                    className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-slate-500 transition-all hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                   >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-medium text-sm">{item.label}</span>
+                    <Icon className="h-5 w-5" />
+                    <span className="text-sm font-medium">{item.label}</span>
                   </Link>
                 );
               })}
@@ -580,7 +543,6 @@ const DashboardSidebar = () => {
 
       <div className="h-[72px]" />
 
-      {/* Chatbot Modal */}
       <ChatbotModal
         isOpen={isChatbotOpen}
         onClose={() => setIsChatbotOpen(false)}
@@ -591,12 +553,9 @@ const DashboardSidebar = () => {
         }}
       />
 
-      {/* Real-time notification toast overlay */}
       <NotificationToast />
     </>
   );
 };
 
 export default DashboardSidebar;
-
-

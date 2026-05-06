@@ -1,59 +1,52 @@
-import React, { useState } from "react";
-import { ZoomIn, ZoomOut, Maximize, HelpCircle } from "lucide-react";
+import React from "react";
+import { ZoomIn, ZoomOut, Maximize } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 const EditorBottomBar = ({ zoomLevel, setZoomLevel, onFitToScreen }) => {
   return (
-    <div className="hidden lg:flex h-10 bg-white dark:bg-[#1a3884] border-t border-slate-200 dark:border-white/10 items-center justify-between px-4 fixed bottom-0 left-0 right-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-        {/* Left: Spacer */}
-        <div className="flex items-center gap-4">
+    <div className="pointer-events-none fixed bottom-[82px] left-1/2 z-50 flex w-[calc(100%-1.5rem)] max-w-[360px] -translate-x-1/2 lg:bottom-4 lg:w-auto lg:max-w-none">
+      <div className="pointer-events-auto flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 px-2.5 py-2 shadow-[0_16px_40px_rgba(15,23,42,0.14)] backdrop-blur transition-all dark:border-slate-700 dark:bg-[#0b1220]/92 sm:gap-3 sm:px-3 lg:w-auto">
+        <button
+          onClick={() => setZoomLevel(Math.max(10, zoomLevel - 10))}
+          className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+          title="Zoom out"
+        >
+          <ZoomOut className="h-3.5 w-3.5" />
+        </button>
+
+        <div className="min-w-0 flex-1 lg:w-28 lg:flex-none">
+          <Slider
+            value={[zoomLevel]}
+            min={10}
+            max={300}
+            step={1}
+            onValueChange={(val) => setZoomLevel(val[0])}
+            className="cursor-pointer"
+          />
         </div>
 
-        {/* Right: Zoom Controls */}
-        <div className="flex items-center gap-4">
-            <button className="text-slate-500 hover:text-slate-800" title="Help">
-                <HelpCircle className="w-4 h-4" />
-            </button>
-            
-            <div className="w-px h-4 bg-slate-300"></div>
+        <button
+          onClick={() => setZoomLevel(Math.min(300, zoomLevel + 10))}
+          className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+          title="Zoom in"
+        >
+          <ZoomIn className="h-3.5 w-3.5" />
+        </button>
 
-            <div className="flex items-center gap-2">
-                <button 
-                    onClick={() => setZoomLevel(Math.max(10, zoomLevel - 10))}
-                    className="text-slate-500 hover:text-slate-800 p-1"
-                >
-                    <ZoomOut className="w-3.5 h-3.5" />
-                </button>
-                
-                <div className="w-24">
-                     <Slider
-                        value={[zoomLevel]}
-                        min={10}
-                        max={300}
-                        step={1}
-                        onValueChange={(val) => setZoomLevel(val[0])}
-                        className="cursor-pointer"
-                    />
-                </div>
-                
-                <button 
-                    onClick={() => setZoomLevel(Math.min(300, zoomLevel + 10))}
-                    className="text-slate-500 hover:text-slate-800 p-1"
-                >
-                    <ZoomIn className="w-3.5 h-3.5" />
-                </button>
+        <div className="w-px self-stretch bg-slate-200 dark:bg-slate-700" />
 
-                <span className="text-xs font-mono w-10 text-center">{Math.round(zoomLevel)}%</span>
-            </div>
-            
-            <button 
-                onClick={onFitToScreen}
-                className="text-slate-500 hover:text-slate-800 p-1" 
-                title="Fit to Screen"
-            >
-                <Maximize className="w-3.5 h-3.5" />
-            </button>
-        </div>
+        <span className="w-10 text-center text-[11px] font-semibold text-slate-600 dark:text-slate-300 sm:w-12 sm:text-xs">
+          {Math.round(zoomLevel)}%
+        </span>
+
+        <button
+          onClick={onFitToScreen}
+          className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+          title="Fit to screen"
+        >
+          <Maximize className="h-3.5 w-3.5" />
+        </button>
+      </div>
     </div>
   );
 };

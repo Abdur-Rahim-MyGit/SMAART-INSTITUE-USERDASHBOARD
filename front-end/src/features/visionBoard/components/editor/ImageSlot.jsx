@@ -1,9 +1,13 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Upload, Trash2, RefreshCw, ZoomIn, ZoomOut, RotateCw } from "lucide-react";
-
-// ═══════════════════════════════════════════════════════════════════════════
-// IMAGE SLOT COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ImagePlus,
+  Move,
+  RefreshCw,
+  RotateCw,
+  Trash2,
+  ZoomIn,
+  ZoomOut,
+} from "lucide-react";
 
 const ImageSlot = ({
   slot,
@@ -15,79 +19,92 @@ const ImageSlot = ({
   onImageUpload,
   onImageUpdate,
   onImageRemove,
+  snapEnabled,
+  onGuideChange,
 }) => {
   const fileInputRef = useRef(null);
-  const slotRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [initialPinchDistance, setInitialPinchDistance] = useState(null);
   const [initialScale, setInitialScale] = useState(1);
+  const [isTransforming, setIsTransforming] = useState(false);
+  const [transformStart, setTransformStart] = useState(null);
 
-  // Gap in percentage based on canvas width
-  // Convert pixel gap to approximate percentage offset (canvas base ~600px, so gap/6 ≈ gap as %)
-  const gapPercent = gap / 6; // Convert gap pixels to percentage
+  const gapPercent = gap / 6;
+  const imageScale = Math.round((image?.scale || 1) * 100);
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files?.[0];
+  const handleFileSelect = (event) => {
+    const file = event.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        onImageUpload(slot.id, event.target.result);
+      reader.onload = (loadEvent) => {
+        onImageUpload(slot.id, loadEvent.target.result);
       };
       reader.readAsDataURL(file);
     }
-    e.target.value = "";
+    event.target.value = "";
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleDrop = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
 
-    // First check for files dragged from the OS
-    const file = e.dataTransfer.files?.[0];
+    const file = event.dataTransfer.files?.[0];
     if (file && file.type.startsWith("image/")) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        onImageUpload(slot.id, event.target.result);
+      reader.onload = (loadEvent) => {
+        onImageUpload(slot.id, loadEvent.target.result);
       };
       reader.readAsDataURL(file);
       return;
     }
 
-    // Then check for base64/URL data dragged from the Uploads panel
-    const imageUrl = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("image/url");
+    const imageUrl =
+      event.dataTransfer.getData("text/uri-list") ||
+      event.dataTransfer.getData("image/url");
     if (imageUrl) {
       onImageUpload(slot.id, imageUrl);
     }
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
   };
 
-  // Calculate distance between two touch points
   const getTouchDistance = (touches) => {
-    if (touches.length < 2) return null;
+    if (touches.length < 2) {
+      return null;
+    }
+
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.sqrt(dx * dx + dy * dy);
   };
 
-  // Get client coordinates from mouse or touch event
-  const getClientCoords = (e) => {
-    if (e.touches && e.touches.length > 0) {
-      return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
+  const getClientCoords = (event) => {
+    if (event.touches && event.touches.length > 0) {
+      return { clientX: event.touches[0].clientX, clientY: event.touches[0].clientY };
     }
-    return { clientX: e.clientX, clientY: e.clientY };
+    return { clientX: event.clientX, clientY: event.clientY };
   };
 
-  // Image panning within slot - Mouse
-  const handleMouseDown = (e) => {
-    if (!image) return;
-    // Removed e.preventDefault() to allow click events to bubble up for selection
-    // We handle native drag prevention via draggable={false} on the img
-    const { clientX, clientY } = getClientCoords(e);
+  const getSlotCenter = () => {
+    const element = fileInputRef.current?.closest("[data-slot-root='true']");
+    if (!element) return null;
+    const rect = element.getBoundingClientRect();
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    };
+  };
+
+  const handleMouseDown = (event) => {
+    if (!image) {
+      return;
+    }
+
+    const { clientX, clientY } = getClientCoords(event);
     setIsDragging(true);
     setDragStart({
       x: clientX - (image.position?.x || 0),
@@ -95,21 +112,20 @@ const ImageSlot = ({
     });
   };
 
-  // Image panning within slot - Touch (with pinch-to-zoom support)
-  const handleTouchStart = (e) => {
-    if (!image) return;
-    e.stopPropagation();
+  const handleTouchStart = (event) => {
+    if (!image) {
+      return;
+    }
+    event.stopPropagation();
 
-    // Check for pinch gesture (2 fingers)
-    if (e.touches.length === 2) {
-      const distance = getTouchDistance(e.touches);
+    if (event.touches.length === 2) {
+      const distance = getTouchDistance(event.touches);
       setInitialPinchDistance(distance);
       setInitialScale(image.scale || 1);
       return;
     }
 
-    // Single finger - pan
-    const { clientX, clientY } = getClientCoords(e);
+    const { clientX, clientY } = getClientCoords(event);
     setIsDragging(true);
     setDragStart({
       x: clientX - (image.position?.x || 0),
@@ -117,16 +133,34 @@ const ImageSlot = ({
     });
   };
 
+  const handleTransformStart = (event) => {
+    if (!image || isLocked || isHidden) {
+      return;
+    }
+    event.stopPropagation();
+    event.preventDefault();
+    const center = getSlotCenter();
+    const { clientX, clientY } = getClientCoords(event);
+    if (!center) return;
 
+    setIsTransforming(true);
+    setTransformStart({
+      scale: image.scale || 1,
+      rotation: image.rotation || 0,
+      angle: Math.atan2(clientY - center.y, clientX - center.x),
+      distance: Math.max(Math.hypot(clientX - center.x, clientY - center.y), 24),
+    });
+  };
 
   useEffect(() => {
-    if (!image) return;
+    if (!image) {
+      return undefined;
+    }
 
-    const handleTouchMove = (e) => {
-      // Pinch-to-zoom
-      if (e.touches.length === 2 && initialPinchDistance) {
-        e.preventDefault();
-        const newDistance = getTouchDistance(e.touches);
+    const handleTouchMove = (event) => {
+      if (event.touches.length === 2 && initialPinchDistance) {
+        event.preventDefault();
+        const newDistance = getTouchDistance(event.touches);
         if (newDistance) {
           const scaleFactor = newDistance / initialPinchDistance;
           const newScale = Math.min(Math.max(initialScale * scaleFactor, 0.25), 4);
@@ -135,31 +169,81 @@ const ImageSlot = ({
         return;
       }
 
-      // Single finger pan
-      if (isDragging && e.touches.length === 1) {
-        const { clientX, clientY } = getClientCoords(e);
-        const newX = clientX - dragStart.x;
-        const newY = clientY - dragStart.y;
-        onImageUpdate(slot.id, { position: { x: newX, y: newY } });
+      if (isTransforming && transformStart) {
+        event.preventDefault();
+        const center = getSlotCenter();
+        if (!center) return;
+        const { clientX, clientY } = getClientCoords(event);
+        const nextAngle = Math.atan2(clientY - center.y, clientX - center.x);
+        const nextDistance = Math.max(Math.hypot(clientX - center.x, clientY - center.y), 24);
+        const rotationDelta = ((nextAngle - transformStart.angle) * 180) / Math.PI;
+        const nextScale = Math.min(Math.max(transformStart.scale * (nextDistance / transformStart.distance), 0.25), 4);
+        onImageUpdate(slot.id, {
+          scale: Number(nextScale.toFixed(2)),
+          rotation: Math.round(transformStart.rotation + rotationDelta),
+        });
+        return;
+      }
+
+      if (isDragging && event.touches.length === 1) {
+        const { clientX, clientY } = getClientCoords(event);
+        const rawX = clientX - dragStart.x;
+        const rawY = clientY - dragStart.y;
+        const shouldSnapX = snapEnabled && Math.abs(rawX) < 12;
+        const shouldSnapY = snapEnabled && Math.abs(rawY) < 12;
+        onGuideChange?.({ vertical: shouldSnapX, horizontal: shouldSnapY, spacingX: null, spacingY: null });
+        onImageUpdate(slot.id, {
+          position: {
+            x: shouldSnapX ? 0 : rawX,
+            y: shouldSnapY ? 0 : rawY,
+          },
+        });
       }
     };
 
-    const handleMouseMove = (e) => {
-      if (!isDragging) return;
-      const newX = e.clientX - dragStart.x;
-      const newY = e.clientY - dragStart.y;
-      onImageUpdate(slot.id, { position: { x: newX, y: newY } });
+    const handleMouseMove = (event) => {
+      if (isTransforming && transformStart) {
+        const center = getSlotCenter();
+        if (!center) return;
+        const nextAngle = Math.atan2(event.clientY - center.y, event.clientX - center.x);
+        const nextDistance = Math.max(Math.hypot(event.clientX - center.x, event.clientY - center.y), 24);
+        const rotationDelta = ((nextAngle - transformStart.angle) * 180) / Math.PI;
+        const nextScale = Math.min(Math.max(transformStart.scale * (nextDistance / transformStart.distance), 0.25), 4);
+        onImageUpdate(slot.id, {
+          scale: Number(nextScale.toFixed(2)),
+          rotation: Math.round(transformStart.rotation + rotationDelta),
+        });
+        return;
+      }
+
+      if (!isDragging) {
+        return;
+      }
+
+      const rawX = event.clientX - dragStart.x;
+      const rawY = event.clientY - dragStart.y;
+      const shouldSnapX = snapEnabled && Math.abs(rawX) < 12;
+      const shouldSnapY = snapEnabled && Math.abs(rawY) < 12;
+      onGuideChange?.({ vertical: shouldSnapX, horizontal: shouldSnapY, spacingX: null, spacingY: null });
+
+      onImageUpdate(slot.id, {
+        position: {
+          x: shouldSnapX ? 0 : rawX,
+          y: shouldSnapY ? 0 : rawY,
+        },
+      });
     };
 
     const handleEnd = () => {
       setIsDragging(false);
+      setIsTransforming(false);
+      setTransformStart(null);
       setInitialPinchDistance(null);
+      onGuideChange?.({ vertical: false, horizontal: false, spacingX: null, spacingY: null });
     };
 
-    // Mouse events
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleEnd);
-    // Touch events
     window.addEventListener("touchmove", handleTouchMove, { passive: false });
     window.addEventListener("touchend", handleEnd);
     window.addEventListener("touchcancel", handleEnd);
@@ -171,9 +255,20 @@ const ImageSlot = ({
       window.removeEventListener("touchend", handleEnd);
       window.removeEventListener("touchcancel", handleEnd);
     };
-  }, [isDragging, dragStart, image, slot.id, onImageUpdate, initialPinchDistance, initialScale]);
+  }, [
+    dragStart,
+    image,
+    initialPinchDistance,
+    initialScale,
+    isDragging,
+    isTransforming,
+    onImageUpdate,
+    onGuideChange,
+    snapEnabled,
+    slot.id,
+    transformStart,
+  ]);
 
-  // Pure percentage-based positioning matching gridTemplates.js structure
   const slotStyle = {
     position: "absolute",
     left: `calc(${slot.x}% + ${gapPercent / 2}%)`,
@@ -182,18 +277,30 @@ const ImageSlot = ({
     height: `calc(${slot.height}% - ${gapPercent}%)`,
     borderRadius: `${borderRadius}px`,
     overflow: "hidden",
-    zIndex: 10,
+    zIndex: image?.zIndex || 10,
   };
+
+  const isHidden = Boolean(image?.hidden);
+  const isLocked = Boolean(image?.locked);
+  const fitMode = image?.fitMode || "fit";
+  const imageFilter = `brightness(${image?.brightness ?? 100}%) contrast(${image?.contrast ?? 100}%) blur(${image?.blur ?? 0}px)`;
 
   return (
     <div
-      ref={slotRef}
+      data-slot-root="true"
       style={slotStyle}
-      className={`relative transition-all ${isSelected ? "ring-2 ring-teal-500 ring-offset-2" : ""
-        } ${!image ? "bg-slate-200/80 hover:bg-slate-300/80" : ""}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect(slot.id);
+      className={`group relative transition-all ${
+        isSelected
+          ? "ring-2 ring-[#1a3884] ring-offset-4 ring-offset-white dark:ring-[#7aa2ff] dark:ring-offset-[#0f172a]"
+          : ""
+      } ${
+        !image
+          ? "border border-dashed border-slate-300/90 bg-slate-100/90 hover:border-slate-400 hover:bg-slate-200/80 dark:border-white/15 dark:bg-white/[0.06] dark:hover:border-white/25 dark:hover:bg-white/10"
+          : ""
+      }`}
+      onClick={(event) => {
+        event.stopPropagation();
+        onSelect(slot.id, event.shiftKey || event.metaKey || event.ctrlKey);
       }}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
@@ -207,145 +314,189 @@ const ImageSlot = ({
       />
 
       {image ? (
-        // Image display with pan/zoom support (touch + mouse)
         <div
-          className="absolute inset-0 cursor-move overflow-hidden flex items-center justify-center touch-none"
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onClick={(e) => {
-             e.stopPropagation();
-             onSelect(slot.id);
+          className="absolute inset-0 flex cursor-move items-center justify-center overflow-hidden touch-none"
+          onMouseDown={isLocked || isHidden ? undefined : handleMouseDown}
+          onTouchStart={isLocked || isHidden ? undefined : handleTouchStart}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSelect(slot.id, event.shiftKey || event.metaKey || event.ctrlKey);
           }}
-          style={{ backgroundColor: "transparent" }}
         >
-          <img
-            src={image.url}
-            alt={`Slot ${slot.id}`}
-            draggable={false}
-            className="pointer-events-none select-none"
-            style={{
-              maxWidth: "none",
-              maxHeight: "none",
-              width: "auto",
-              height: "auto",
-              minWidth: "100%",
-              minHeight: "100%",
-              objectFit: "contain",
-              position: "absolute",
-              left: `calc(50% + ${image.position?.x || 0}px)`,
-              top: `calc(50% + ${image.position?.y || 0}px)`,
-              transform: `translate(-50%, -50%) scale(${image.scale || 1}) rotate(${image.rotation || 0}deg)`,
-              transformOrigin: "center center",
-            }}
-          />
+          {!isHidden ? (
+            <img
+              src={image.url}
+              alt={`Slot ${slot.id}`}
+              draggable={false}
+              className="pointer-events-none absolute select-none"
+              style={{
+                maxWidth: "none",
+                maxHeight: "none",
+                width: "auto",
+                height: "auto",
+                minWidth: "100%",
+                minHeight: "100%",
+                objectFit: fitMode === "fit" ? "contain" : "cover",
+                left: `calc(50% + ${image.position?.x || 0}px)`,
+                top: `calc(50% + ${image.position?.y || 0}px)`,
+                transform: `translate(-50%, -50%) scale(${image.scale || 1}) rotate(${image.rotation || 0}deg)`,
+                transformOrigin: "center center",
+                filter: imageFilter,
+              }}
+            />
+          ) : null}
 
-
-          {/* Image controls overlay - only when selected */}
-          {isSelected && (
-            <>
-              {/* Top right controls - Delete & Replace */}
-              <div className="absolute top-2 right-2 flex gap-2 z-10">
-                <button
-                  className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onImageRemove(slot.id);
-                  }}
-                  onTouchEnd={(e) => {
-                     e.stopPropagation();
-                     onImageRemove(slot.id);
-                  }}
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </button>
-                <button
-                  className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
-                   onTouchEnd={(e) => {
-                     e.stopPropagation();
-                     fileInputRef.current?.click();
-                  }}
-                >
-                  <RefreshCw className="w-4 h-4 text-slate-700" />
-                </button>
-              </div>
-
-              {/* Bottom controls - Zoom & Rotate */}
-              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2 z-10 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5">
-                <button
-                  className="p-1 hover:bg-white/20 rounded-full text-white transition-colors"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const newScale = Math.max((image.scale || 1) - 0.25, 0.25);
-                    onImageUpdate(slot.id, { scale: newScale });
-                  }}
-                   onTouchEnd={(e) => {
-                     e.stopPropagation();
-                     e.preventDefault(); // Prevent click handling on wrapper
-                     const newScale = Math.max((image.scale || 1) - 0.25, 0.25);
-                     onImageUpdate(slot.id, { scale: newScale });
-                  }}
-                >
-                  <ZoomOut className="w-4 h-4" />
-                </button>
-                <div className="w-px h-4 bg-white/30 self-center mx-1" />
-                <button
-                  className="p-1 hover:bg-white/20 rounded-full text-white transition-colors"
-                   onClick={(e) => {
-                    e.stopPropagation();
-                    const newScale = Math.min((image.scale || 1) + 0.25, 4);
-                    onImageUpdate(slot.id, { scale: newScale });
-                  }}
-                   onTouchEnd={(e) => {
-                     e.stopPropagation();
-                     e.preventDefault();
-                     const newScale = Math.min((image.scale || 1) + 0.25, 4);
-                     onImageUpdate(slot.id, { scale: newScale });
-                  }}
-                >
-                  <ZoomIn className="w-4 h-4" />
-                </button>
-                <div className="w-px h-4 bg-white/30 self-center mx-1" />
-                <button
-                  className="p-1 hover:bg-white/20 rounded-full text-white transition-colors"
-                   onClick={(e) => {
-                    e.stopPropagation();
-                    const newRotation = (image.rotation || 0) + 90;
-                    onImageUpdate(slot.id, { rotation: newRotation });
-                  }}
-                   onTouchEnd={(e) => {
-                     e.stopPropagation();
-                     e.preventDefault();
-                     const newRotation = (image.rotation || 0) + 90;
-                     onImageUpdate(slot.id, { rotation: newRotation });
-                  }}
-                >
-                  <RotateCw className="w-4 h-4" />
-                </button>
-              </div>
-            </>
+          {image?.tint && image.tint !== "rgba(0,0,0,0)" && !isHidden && (
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{ backgroundColor: image.tint }}
+            />
           )}
 
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+
+          {isSelected && !isHidden && (
+            <>
+              <div className="absolute left-2 top-2 z-10 rounded-full bg-black/55 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-md">
+                {isLocked ? "Locked layer" : fitMode === "crop" ? "Drag to crop" : "Drag to reposition"}
+              </div>
+
+              <div className="absolute right-2 top-2 z-10 flex gap-2">
+                <button
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/92 shadow-md transition hover:bg-white"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onImageRemove(slot.id);
+                  }}
+                  onTouchEnd={(event) => {
+                    event.stopPropagation();
+                    onImageRemove(slot.id);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </button>
+                <button
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/92 shadow-md transition hover:bg-white"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                  onTouchEnd={(event) => {
+                    event.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                  disabled={isLocked}
+                >
+                  <RefreshCw className="h-4 w-4 text-slate-700" />
+                </button>
+              </div>
+
+              <div className="absolute bottom-2 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/60 px-3 py-2 backdrop-blur-md">
+                <button
+                  className="rounded-full p-1 text-white transition-colors hover:bg-white/20"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (isLocked) return;
+                    onImageUpdate(slot.id, {
+                      scale: Math.max((image.scale || 1) - 0.25, 0.25),
+                    });
+                  }}
+                  onTouchEnd={(event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    if (isLocked) return;
+                    onImageUpdate(slot.id, {
+                      scale: Math.max((image.scale || 1) - 0.25, 0.25),
+                    });
+                  }}
+                >
+                  <ZoomOut className="h-4 w-4" />
+                </button>
+                <div className="min-w-[3rem] text-center text-[11px] font-semibold text-white">
+                  {imageScale}%
+                </div>
+                <button
+                  className="rounded-full p-1 text-white transition-colors hover:bg-white/20"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (isLocked) return;
+                    onImageUpdate(slot.id, {
+                      scale: Math.min((image.scale || 1) + 0.25, 4),
+                    });
+                  }}
+                  onTouchEnd={(event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    if (isLocked) return;
+                    onImageUpdate(slot.id, {
+                      scale: Math.min((image.scale || 1) + 0.25, 4),
+                    });
+                  }}
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </button>
+                <div className="h-4 w-px bg-white/30" />
+                <button
+                  className="rounded-full p-1 text-white transition-colors hover:bg-white/20"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (isLocked) return;
+                    onImageUpdate(slot.id, {
+                      rotation: (image.rotation || 0) + 90,
+                    });
+                  }}
+                  onTouchEnd={(event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    if (isLocked) return;
+                    onImageUpdate(slot.id, {
+                      rotation: (image.rotation || 0) + 90,
+                    });
+                  }}
+                >
+                  <RotateCw className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="absolute bottom-2 left-2 z-10 rounded-full bg-white/92 px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm">
+                <span className="inline-flex items-center gap-1.5">
+                  <Move className="h-3.5 w-3.5" />
+                  {isLocked ? "Locked" : "Selected"}
+                </span>
+              </div>
+
+              {!isLocked && (
+                <button
+                  type="button"
+                  className="absolute -bottom-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-[#1a3884] text-white shadow-lg"
+                  onMouseDown={handleTransformStart}
+                  onTouchStart={handleTransformStart}
+                  title="Resize and rotate"
+                >
+                  <RotateCw className="h-4 w-4" />
+                </button>
+              )}
+            </>
+          )}
         </div>
       ) : (
-        // Empty slot - tap/click to upload (mobile-friendly)
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer text-slate-500 hover:text-slate-600 active:bg-slate-300/60 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
+          className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center text-slate-500 transition-colors hover:text-slate-700 active:bg-slate-300/60 dark:text-white/45 dark:hover:text-white/75"
+          onClick={(event) => {
+            event.stopPropagation();
             fileInputRef.current?.click();
           }}
-          onTouchEnd={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
+          onTouchEnd={(event) => {
+            event.stopPropagation();
+            event.preventDefault();
             fileInputRef.current?.click();
           }}
         >
-          <Upload className="w-6 h-6 sm:w-8 sm:h-8 mb-1 sm:mb-2 opacity-50" />
-          <span className="text-[10px] sm:text-xs font-medium">Tap to Add</span>
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/90 shadow-sm dark:bg-white/10">
+            <ImagePlus className="h-6 w-6 opacity-70" />
+          </div>
+          <span className="text-xs font-semibold">Add Image</span>
+          <span className="mt-1 text-[11px] opacity-70">Tap or drop media here</span>
         </div>
       )}
     </div>
