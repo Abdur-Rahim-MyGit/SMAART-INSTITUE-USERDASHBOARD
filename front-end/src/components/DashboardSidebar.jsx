@@ -189,12 +189,16 @@ const DashboardSidebar = () => {
 
             <div className="flex items-center gap-3">
               <Link to="/dashboard" className="flex items-center group">
-                <div className="flex h-11 w-auto items-center justify-center transition-all duration-300">
-                  <img
-                    src={theme === 'dark' ? whiteLogo : blueLogo}
-                    alt="SMAART Institute"
-                    className="h-9 w-auto object-contain lg:h-11"
-                  />
+                <div className="flex flex-col items-start transition-all duration-300">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
+                      SMAART
+                    </span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] ml-0.5">
+                    Institute
+                  </span>
                 </div>
               </Link>
 
@@ -408,12 +412,13 @@ const DashboardSidebar = () => {
             <div className="flex items-center justify-between border-b border-slate-100 p-4 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Link to="/" className="flex items-center group" onClick={() => setIsMobileOpen(false)}>
-                  <div className="flex h-8 w-auto items-center justify-center transition-all duration-300">
-                    <img
-                      src={theme === 'dark' ? whiteLogo : blueLogo}
-                      alt="SMAART Institute"
-                      className="h-7 w-auto object-contain"
-                    />
+                  <div className="flex flex-col items-start">
+                    <span className="text-xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
+                      SMAART
+                    </span>
+                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-0.5">
+                      Institute
+                    </span>
                   </div>
                 </Link>
 
