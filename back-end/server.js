@@ -155,6 +155,7 @@ app.use('/api/chatbot', require('./routes/chatbot')); // AI Chatbot Support
 // Community Routes
 app.use('/api/community', require('./routes/community'));
 app.use('/api/groups', require('./routes/groups'));
+app.use('/api/announcements', require('./routes/announcements')); // Role-based announcements
 app.use('/api/moderation', require('./routes/moderationQueue'));
 app.use('/api/moderation/actions', require('./routes/moderation'));
 app.use('/api/ppi', require('./routes/ppiRoutes'));
