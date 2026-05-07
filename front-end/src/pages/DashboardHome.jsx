@@ -38,9 +38,11 @@ const DashboardHome = () => {
   useEffect(() => {
     let timeout;
     if (userLoading || dashboardLoading) {
+      console.log(`[DashboardHome] Setting timeout for userLoading:${userLoading}, dashboardLoading:${dashboardLoading}`);
       timeout = setTimeout(() => {
+        console.warn('[DashboardHome] Loading timeout reached - showing connection error screen');
         setLoadingError(true);
-      }, 15000); // 15 seconds max wait
+      }, 30000); // 30 seconds max wait
     }
     return () => clearTimeout(timeout);
   }, [userLoading, dashboardLoading]);
@@ -78,16 +80,28 @@ const DashboardHome = () => {
         <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
           <AlertCircle className="w-8 h-8 text-red-500" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t("dashboard.unable_to_connect")}</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Connection Issues?</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mb-6">
-          {t("dashboard.connection_error")}
+          We're having trouble loading your dashboard. This could be due to a slow connection or an expired session.
         </p>
-        <button 
-          onClick={() => window.location.reload()}
-          className="px-6 py-2.5 bg-gradient-to-r from-[#002147] to-[#1a3884] text-white rounded-full font-semibold shadow-md hover:shadow-lg transition-all"
-        >
-          {t("dashboard.reload")}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] text-white rounded-full font-semibold shadow-md hover:shadow-lg transition-all"
+          >
+            Try Again
+          </button>
+          <button 
+            onClick={() => {
+              sessionStorage.clear();
+              localStorage.clear();
+              window.location.href = '/';
+            }}
+            className="px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-full font-semibold hover:bg-slate-50 transition-all"
+          >
+            Logout & Reset
+          </button>
+        </div>
       </div>
     );
   }

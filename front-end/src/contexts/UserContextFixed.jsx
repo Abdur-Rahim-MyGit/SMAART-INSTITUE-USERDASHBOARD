@@ -63,17 +63,25 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const initUser = () => {
-      const storedUser = sessionStorage.getItem("user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        // Refresh details in background if token exists
-        const token = sessionStorage.getItem('token');
-        if (parsedUser.email && token) {
-          fetchUserDetails(parsedUser.email);
+      try {
+        const storedUser = sessionStorage.getItem("user");
+        if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser && typeof parsedUser === 'object') {
+            setUser(parsedUser);
+            // Refresh details in background if token exists
+            const token = sessionStorage.getItem('token');
+            if (parsedUser.email && token) {
+              fetchUserDetails(parsedUser.email);
+            }
+          }
         }
+      } catch (err) {
+        console.error("[UserContext] Failed to parse stored user:", err);
+        sessionStorage.removeItem("user");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initUser();

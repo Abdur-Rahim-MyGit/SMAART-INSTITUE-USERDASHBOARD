@@ -334,13 +334,16 @@ const LeftSidebar = () => {
             className="fixed left-0 top-0 h-screen w-[280px] z-[100] lg:hidden bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col"
           >
             {/* Mobile Header */}
-            <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+            <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="flex flex-col">
-                  <span className="text-2xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
-                    SMAART
-                  </span>
-                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] ml-0.5">
+                <div className="flex flex-col items-start">
+                  <div className="flex items-center gap-1">
+                    <span className="text-2xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
+                      SMAART
+                    </span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
                     Institute
                   </span>
                 </div>
@@ -420,27 +423,25 @@ const LeftSidebar = () => {
         className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-xl`}
         onMouseEnter={() => isCollapsed && toggleSidebar()}
       >
-        {/* Logo Section */}
-        <div className={`flex flex-col items-start py-3 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
+        <div className={`flex flex-col items-start py-6 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
           <Link to="/dashboard" className="flex flex-col items-start overflow-hidden">
               {isCollapsed ? (
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20">
                   <span className="text-xl font-black text-white">S</span>
                 </div>
               ) : (
-                <div className="flex flex-col items-start">
-                  <div className="flex items-baseline gap-1">
+                <div className="flex flex-col items-start transition-all duration-300 transform hover:scale-105">
+                  <div className="flex items-center gap-1">
                     <span className="text-2xl lg:text-3xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
                       SMAART
                     </span>
                     <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
                   </div>
-                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] ml-0.5">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
                     Institute
                   </span>
                 </div>
               )}
-
           </Link>
         </div>
 
