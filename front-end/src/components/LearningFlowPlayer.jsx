@@ -189,7 +189,12 @@ const LearningFlowPlayer = ({
   const isCurrentStepCompleted = completedSteps[activeStep];
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[#f8fafc] dark:bg-[#020617]">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-[#f8fafc] dark:bg-[#020617] relative">
+      {/* Background Decorative Blurs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[10%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
+      </div>
       {/* Left Sidebar - Learning Path */}
       <div className="w-full lg:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
         <div className="p-6 border-b border-slate-100 dark:border-slate-800">
@@ -224,10 +229,10 @@ const LearningFlowPlayer = ({
                 key={step}
                 onClick={() => isUnlocked && setActiveStep(step)}
                 disabled={!isUnlocked}
-                className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all ${
+                className={`w-full p-3.5 rounded-2xl flex items-center gap-3 transition-all duration-300 group ${
                   isActive 
-                    ? 'bg-indigo-50 dark:bg-indigo-900/20 border-2 border-indigo-500' 
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-800 border-2 border-transparent'
+                    ? 'bg-white shadow-md border border-[#1a3884]/10 ring-1 ring-[#1a3884]/5' 
+                    : 'hover:bg-slate-50 border border-transparent'
                 }`}
               >
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
@@ -324,72 +329,72 @@ const LearningFlowPlayer = ({
                 {renderStepContent()}
 
                 {/* Navigation Action Area */}
-                <div className="mt-12 mb-8 flex flex-col items-center">
-                  <AnimatePresence>
-                    {isCurrentStepCompleted && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="w-full max-w-md"
-                      >
-                        <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 rounded-2xl p-6 text-center mb-6">
-                          <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-green-500/20">
-                            <CheckCircle2 className="text-white w-6 h-6" />
-                          </div>
-                          <h3 className="text-lg font-bold text-green-900 dark:text-green-100">
-                            Step Complete: {stepMetadata[activeStep].title}
-                          </h3>
-                          <p className="text-sm text-green-700 dark:text-green-400 mt-1">
-                            {isLastStep ? "You've finished the entire learning flow!" : `Ready to move on to the next step?`}
-                          </p>
+                  <div className="mt-12 mb-8 flex flex-col items-center w-full">
+                    {/* Progress Indicator Card */}
+                    <div className="w-full max-w-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/50 dark:border-white/5 rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-black/20 text-center mb-8 relative overflow-hidden group">
+                      <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#1a3884] to-transparent opacity-50" />
+                      
+                      {isCurrentStepCompleted ? (
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-widest mb-4">
+                          <CheckCircle2 size={12} /> Step Validated
                         </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-4">
+                          <Play size={12} /> Step in Progress
+                        </div>
+                      )}
 
-                          <Button
-                            onClick={() => {
-                              if (isLastStep) {
-                                // Milestone Course Logic
-                                const courseIdStr = String(courseData?.courseCode || courseData?.id || "");
-                                if (courseIdStr.includes("S10")) {
-                                  navigate("/assessment/T2");
-                                } else if (courseIdStr.includes("S19")) {
-                                  navigate("/assessment/T3");
-                                } else if (courseIdStr.includes("S25")) {
-                                  navigate("/assessment/T4");
-                                } else {
-                                  onBack();
-                                }
-                              } else {
-                                setActiveStep(nextStep);
-                                // Scroll to top of content
-                                document.querySelector('.overflow-y-auto')?.scrollTo({ top: 0, behavior: 'smooth' });
-                              }
-                            }}
-                            className={`w-full py-6 text-lg font-bold rounded-2xl shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] ${
-                              isLastStep 
-                                ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' 
-                                : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/20'
-                            }`}
-                          >
-                            {isLastStep ? (
-                              <>
-                                {String(courseData?.courseCode || courseData?.id || "").includes("S10") || 
-                                 String(courseData?.courseCode || courseData?.id || "").includes("S19") || 
-                                 String(courseData?.courseCode || courseData?.id || "").includes("S25") ? (
-                                  <>Take Stage Assessment <Trophy className="ml-2 w-6 h-6" /></>
-                                ) : (
-                                  <>Complete Lesson <CheckCircle2 className="ml-2 w-6 h-6" /></>
-                                )}
-                              </>
+                      <h3 className="text-2xl font-black text-[#112b6b] dark:text-white mb-2">
+                        {isLastStep ? "Module Concluded" : `Continue your journey`}
+                      </h3>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 max-w-sm mx-auto">
+                        {isLastStep 
+                          ? "You have successfully navigated through all stages of this module." 
+                          : `Ready to explore "${nextStep ? stepMetadata[nextStep].title : ''}"?`}
+                      </p>
+
+                      <Button
+                        onClick={() => {
+                          if (isLastStep) {
+                            // Milestone Course Logic
+                            const courseIdStr = String(courseData?.courseCode || courseData?.id || "");
+                            if (courseIdStr.includes("S10")) {
+                              navigate("/assessment/T2");
+                            } else if (courseIdStr.includes("S19")) {
+                              navigate("/assessment/T3");
+                            } else if (courseIdStr.includes("S25")) {
+                              navigate("/assessment/T4");
+                            } else {
+                              onBack();
+                            }
+                          } else {
+                            setActiveStep(nextStep);
+                            // Scroll to top of content
+                            document.querySelector('.overflow-y-auto')?.scrollTo({ top: 0, behavior: 'smooth' });
+                          }
+                        }}
+                        className={`w-full py-8 text-lg font-black rounded-2xl shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
+                          isLastStep 
+                            ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' 
+                            : 'bg-[#1a3884] hover:bg-[#112b6b] shadow-[#1a3884]/20'
+                        }`}
+                      >
+                        {isLastStep ? (
+                          <>
+                            {String(courseData?.courseCode || courseData?.id || "").includes("S10") || 
+                             String(courseData?.courseCode || courseData?.id || "").includes("S19") || 
+                             String(courseData?.courseCode || courseData?.id || "").includes("S25") ? (
+                              <>Take Stage Assessment <Trophy className="ml-2 w-6 h-6" /></>
                             ) : (
-                              <>Continue to {stepMetadata[nextStep].title} <ArrowRight className="ml-2 w-6 h-6" /></>
+                              <>Complete Lesson <CheckCircle2 className="ml-2 w-6 h-6" /></>
                             )}
-                          </Button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* All steps unlocked, lock message removed */}
-                </div>
+                          </>
+                        ) : (
+                          <>Continue to {stepMetadata[nextStep].title} <ArrowRight className="ml-2 w-6 h-6" /></>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
               </motion.div>
             </AnimatePresence>
 
