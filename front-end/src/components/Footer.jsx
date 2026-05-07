@@ -36,12 +36,15 @@ const Footer = () => {
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 border ${logoBoxClass}`}>
                                 <span className="font-heading font-bold text-2xl text-white">S</span>
                             </div>
-                            <div className="flex flex-col">
-                                <span className={`text-xl font-bold tracking-tight leading-none transition-colors ${theme === 'dark' ? 'text-white' : 'text-[#1a3884]'}`}>
-                                    SMAART<span className="text-[#C0C0C0]"> Institute</span>
-                                </span>
-                                <span className={`text-[10px] uppercase tracking-widest leading-none mt-1.5 font-semibold ${subTextColor}`}>
-                                    Employability & Impact
+                            <div className="flex flex-col items-start">
+                                <div className="flex items-center gap-1">
+                                    <span className={`text-xl font-black tracking-tighter leading-none transition-colors ${theme === 'dark' ? 'text-white' : 'text-[#1a3884]'}`}>
+                                        SMAART
+                                    </span>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
+                                </div>
+                                <span className={`text-[10px] font-bold uppercase tracking-[0.3em] leading-none mt-1 transition-colors ${subTextColor}`}>
+                                    Institute
                                 </span>
                             </div>
                         </Link>

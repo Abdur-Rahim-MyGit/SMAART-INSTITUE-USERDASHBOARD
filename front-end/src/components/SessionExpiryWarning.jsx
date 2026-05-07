@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, LogOut, RefreshCw, ShieldAlert } from 'lucide-react';
 import { apiCall } from '@/services/api';
-import { useUser } from '@/contexts/UserContext';
+import useUser from "@/hooks/useUser";
 import { toast } from 'sonner';
 
 /**

@@ -190,13 +190,13 @@ const DashboardSidebar = () => {
             <div className="flex items-center gap-3">
               <Link to="/dashboard" className="flex items-center group">
                 <div className="flex flex-col items-start transition-all duration-300">
-                  <div className="flex items-baseline gap-1">
+                  <div className="flex items-center gap-1">
                     <span className="text-2xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
                       SMAART
                     </span>
                     <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
                   </div>
-                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] ml-0.5">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
                     Institute
                   </span>
                 </div>
@@ -414,10 +414,13 @@ const DashboardSidebar = () => {
               <div className="flex items-center gap-2">
                 <Link to="/" className="flex items-center group" onClick={() => setIsMobileOpen(false)}>
                   <div className="flex flex-col items-start">
-                    <span className="text-xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
-                      SMAART
-                    </span>
-                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] ml-0.5">
+                    <div className="flex items-center gap-1">
+                      <span className="text-xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
+                        SMAART
+                      </span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
+                    </div>
+                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">
                       Institute
                     </span>
                   </div>
@@ -437,9 +440,17 @@ const DashboardSidebar = () => {
                 )}
 
                 {!user?.college?.logo && (
-                  <span className="ml-1 text-base font-bold text-slate-900 dark:text-white">
-                    SMAART<span className="text-[#1a3884]"> Institute</span>
-                  </span>
+                  <div className="flex flex-col items-start ml-2">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
+                        SMAART
+                      </span>
+                      <div className="w-1 h-1 rounded-full bg-[#C0C0C0]" />
+                    </div>
+                    <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">
+                      Institute
+                    </span>
+                  </div>
                 )}
               </div>
               <button

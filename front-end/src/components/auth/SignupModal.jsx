@@ -196,8 +196,6 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
     </AnimatePresence>
   );
 };
-  );
-};
 
 export default SignupModal;
 

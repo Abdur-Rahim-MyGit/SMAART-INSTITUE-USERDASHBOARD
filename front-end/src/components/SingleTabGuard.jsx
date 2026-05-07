@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
-import { useUser } from "@/contexts/UserContext";
+import useUser from "@/hooks/useUser";
 
 /**
  * SingleTabGuard prevents a user from opening the application

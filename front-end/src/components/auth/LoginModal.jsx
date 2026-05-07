@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "@/services/api";
 import LoginOtpModal from "./LoginOtpModal";
 import FirstLoginPasswordModal from "./FirstLoginPasswordModal";
+import useUser from "@/hooks/useUser";
 
 const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
   // Password change state (for first-time login after OTP)
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordData, setPasswordData] = useState({ tempToken: "", email: "", fullName: "" });
+  const { login } = useUser();
   const [rememberMe, setRememberMe] = useState(() => {
     const savedEmail = localStorage.getItem("rememberedEmail");
     if (savedEmail) {
@@ -97,8 +99,8 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
       mustChangePassword: false,
     };
 
-    sessionStorage.setItem("token", data.token);
-    sessionStorage.setItem("user", JSON.stringify(userToStore));
+    // Use the login function from context to update global state
+    login(userToStore, data.token);
 
     // Handle Remember Me
     if (rememberMe) {
@@ -107,7 +109,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
       localStorage.removeItem("rememberedEmail");
     }
 
-    console.log("[LoginModal] Data stored in sessionStorage");
+    console.log("[LoginModal] Data stored and state updated");
     onClose();
 
     // Navigate based on user state
@@ -133,7 +135,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
     const nextStep = data.nextStep || "/dashboard";
     console.log("[LoginModal] Navigating to:", nextStep);
     navigate(nextStep);
-  }, [rememberMe, formData.email, onClose, navigate]);
+  }, [rememberMe, formData.email, onClose, navigate, login]);
 
   // Handle OTP verification success
   const handleOtpSuccess = (data) => {
