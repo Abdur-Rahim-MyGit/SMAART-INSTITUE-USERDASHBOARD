@@ -28,7 +28,7 @@ const buildVisibilityFilter = (user) => {
       ...baseFilter,
       $or: [
         { targetType: 'all' },
-        { targetType: 'college', targetCollegeIds: user.college }
+        { targetType: 'college', targetCollegeIds: user.college?._id || user.college }
       ]
     };
   }
@@ -38,7 +38,7 @@ const buildVisibilityFilter = (user) => {
     ...baseFilter,
     $or: [
       { targetType: 'all' },
-      { targetType: 'college', targetCollegeIds: user.college }
+      { targetType: 'college', targetCollegeIds: user.college?._id || user.college }
     ]
   };
 };
@@ -47,7 +47,7 @@ const buildVisibilityFilter = (user) => {
 // Returns announcements visible to the current user, sorted pinned-first
 router.get('/', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user) return res.status(401).json({ success: false, error: 'User not found' });
 
     const filter = buildVisibilityFilter(user);
@@ -81,7 +81,7 @@ router.get('/', protect, async (req, res) => {
 // Create a new announcement (admin / college_admin only)
 router.post('/', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user || !canPost(user.role)) {
       return res.status(403).json({ success: false, error: 'Not authorised to post announcements' });
     }
@@ -98,7 +98,7 @@ router.post('/', protect, async (req, res) => {
 
     if (user.role === 'college_admin') {
       resolvedTarget = 'college';
-      resolvedCollegeIds = [user.college];
+      resolvedCollegeIds = [user.college?._id || user.college];
     }
 
     const announcement = await Announcement.create({
@@ -129,7 +129,7 @@ router.post('/', protect, async (req, res) => {
 // Edit an announcement — admin edits any, college_admin edits only their own
 router.put('/:id', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user || !canPost(user.role)) {
       return res.status(403).json({ success: false, error: 'Not authorised' });
     }
@@ -165,7 +165,7 @@ router.put('/:id', protect, async (req, res) => {
 // ─── DELETE /api/announcements/:id ──────────────────────────────────────────
 router.delete('/:id', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user || !canPost(user.role)) {
       return res.status(403).json({ success: false, error: 'Not authorised' });
     }
@@ -189,7 +189,7 @@ router.delete('/:id', protect, async (req, res) => {
 // Toggle pin — SMAART admin only
 router.patch('/:id/pin', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user || !isAdmin(user.role)) {
       return res.status(403).json({ success: false, error: 'Only SMAART Admin can pin announcements' });
     }
