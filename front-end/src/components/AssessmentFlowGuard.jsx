@@ -138,8 +138,10 @@ const AssessmentFlowGuard = ({ children }) => {
         }
 
         const userData = sessionStorage.getItem("user");
-        if (!userData) {
+        if (!userData || userData === "undefined" || userData === "null") {
+          setIsAuthenticated(false);
           setLoading(false);
+          navigate("/", { replace: true });
           return;
         }
 

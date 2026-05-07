@@ -344,8 +344,8 @@ router.post('/login',
       let collegeInfo = null;
 
       // Determine if input is email or ID
-      const isEmail = String(email).match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-      const identifier = email.trim(); // Can be email or ID
+      const identifier = String(email || '').trim();
+      const isEmail = identifier.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
       // NOTE: normalizedEmail is primarily used for email-based lookups.
       // For ID based logins, we'll derive the actual email from the resolved user record.
       const normalizedEmail = isEmail ? identifier.toLowerCase() : identifier;
@@ -386,7 +386,14 @@ router.post('/login',
       }
 
       // Execute Student Search
+      console.log('--- LOGIN DEBUG START ---');
+      console.log('Identifier:', identifier);
+      console.log('isEmail:', isEmail);
+      console.log('collegeId:', collegeId);
+      console.log('institutionToCheck:', institutionToCheck);
+      
       user = await Student.findOne(studentQuery).populate('college', 'logo collegeName').select('+password');
+      console.log('Student found:', !!user);
 
       if (user) {
         userType = 'student';
@@ -399,6 +406,7 @@ router.post('/login',
         if (collegeId) teacherQuery.college = collegeId;
 
         user = await Teacher.findOne(teacherQuery).populate('college', 'logo collegeName').select('+password');
+        console.log('Teacher found:', !!user);
 
         if (user) {
           userType = 'teacher';
@@ -428,8 +436,10 @@ router.post('/login',
               { institution: collegeInfo?.collegeName }
             ]
           });
+          console.log('Registration (with inst) found:', !!user);
         } else {
           user = await Registration.findOne({ email: normalizedEmail });
+          console.log('Registration (no inst) found:', !!user);
         }
         if (user) {
           userType = 'registration';

@@ -88,13 +88,22 @@ const DashboardLayout = () => {
   const { t } = useTranslation();
   const { isCollapsed } = useSidebar();
   const { theme, setTheme } = useTheme();
-  const { user, logout } = useUser();
+  const { user, loading: userLoading, logout } = useUser();
   const { notifications, unreadCount, markRead } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showCollegeLogo, setShowCollegeLogo] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
+
+  // === AUTH PROTECTION ===
+  useEffect(() => {
+    const hasToken = sessionStorage.getItem('token');
+    if (!userLoading && !user && !hasToken) {
+      console.warn('[DashboardLayout] No session found, redirecting to home');
+      navigate('/', { replace: true });
+    }
+  }, [user, userLoading, navigate]);
 
   // === SESSION GUARD: 3-hour expiry monitoring ===
   const handleSessionExpired = () => {

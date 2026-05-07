@@ -125,7 +125,7 @@ const AssessmentsDashboard = () => {
         <div className="space-y-6">
             <main className="px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
                 <div className="mx-auto max-w-7xl space-y-8 lg:space-y-10">
-                    <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_315px] xl:items-start">
+                    <div className="grid gap-3 xl:grid-cols-1 xl:items-start">
                         <motion.section
                             initial={{ opacity: 0, y: 22, scale: 0.99 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -152,7 +152,7 @@ const AssessmentsDashboard = () => {
                                     </p>
                                 </div>
 
-                                <div className="mt-6 grid gap-3 sm:grid-cols-3 xl:max-w-2xl">
+                                <div className="mt-6 hidden grid gap-3 sm:grid-cols-3 xl:max-w-2xl">
                                     {METRICS.map((metric, index) => {
                                         const Icon = metric.icon;
 
@@ -183,6 +183,7 @@ const AssessmentsDashboard = () => {
                             </div>
                         </motion.section>
 
+                        {/* Hidden as per user request
                         <motion.aside
                             initial={{ opacity: 0, y: 22, scale: 0.99 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -262,6 +263,7 @@ const AssessmentsDashboard = () => {
                                 </p>
                             </div>
                         </motion.aside>
+                        */}
                     </div>
 
                     <motion.section

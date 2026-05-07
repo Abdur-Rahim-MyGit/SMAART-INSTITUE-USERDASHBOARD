@@ -12,11 +12,11 @@ import LoginOtpModal from "./auth/LoginOtpModal";
 import ForgotPasswordModal from "./auth/ForgotPasswordModal";
 import FirstLoginPasswordModal from "./auth/FirstLoginPasswordModal";
 import { resetUserIdCache } from "@/features/visionBoard/services/visionBoardProApi";
-import { useUser } from "@/contexts/UserContext";
+import useUser from "@/hooks/useUser";
 
 const LoginCard = () => {
   const navigate = useNavigate();
-  const { setUser } = useUser();
+  const { login } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [showInstitutionSelector, setShowInstitutionSelector] = useState(true);
   const [selectedInstitution, setSelectedInstitution] = useState(null);
@@ -115,17 +115,16 @@ const LoginCard = () => {
         return;
       }
 
-      sessionStorage.setItem("user", JSON.stringify(data.user));
-      sessionStorage.setItem("token", data.token);
+      login(data.user, data.token);
 
       // Handle Remember Me
       if (rememberMe) {
+        const normalizedEmail = loginEmail.trim().toLowerCase();
         localStorage.setItem("rememberedEmail", normalizedEmail);
       } else {
         localStorage.removeItem("rememberedEmail");
       }
-
-      setUser(data.user);
+      
       toast.success("Login successful!");
 
       if (data.user.hasRegistration) {
@@ -195,13 +194,12 @@ const LoginCard = () => {
       return;
     }
 
-    sessionStorage.setItem("token", data.token);
-    sessionStorage.setItem("user", JSON.stringify(data.user));
+    login(data.user, data.token);
+    
     // Store session expiry for client-side 3-hour countdown
     if (data.sessionExpiresAt) {
       sessionStorage.setItem("sessionExpiresAt", data.sessionExpiresAt);
     }
-    setUser(data.user);
     setShowOtpModal(false);
     resetUserIdCache();
 
@@ -222,12 +220,7 @@ const LoginCard = () => {
   };
 
   const handlePasswordChangeSuccess = (data, redirectToDashboard = false) => {
-    sessionStorage.setItem("token", data.token);
-    sessionStorage.setItem("user", JSON.stringify(data.user));
-    if (data.user?.isFirstLogin) {
-      sessionStorage.setItem("isFirstLogin", "true");
-    }
-    setUser(data.user);
+    login(data.user, data.token);
     setShowPasswordChangeModal(false);
     setPasswordChangeData({ tempToken: "", email: "", fullName: "" });
     resetUserIdCache();

@@ -46,15 +46,15 @@ const LandingNavbar = ({ onLoginClick, onSignupClick }) => {
       <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo Lockup */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="relative h-20 sm:h-24 w-auto flex items-center justify-center p-1">
-            <img src={whiteLogo} alt="SMAART Institute" className="h-full w-auto object-contain" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-white font-sans font-bold text-xl leading-none tracking-tight drop-shadow-md">
-              SMAART <span style={{ color: '#C0C0C0' }}>Institute</span>
-            </span>
-            <span className="text-[10px] font-medium tracking-wider uppercase opacity-80" style={{ color: '#F0F0F2' }}>
-              Unlock Potential
+          <div className="flex flex-col items-start transition-all duration-300 transform group-hover:scale-105">
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-black tracking-tighter text-white leading-none drop-shadow-md">
+                SMAART
+              </span>
+              <div className="w-2 h-2 rounded-full bg-[#C0C0C0] shadow-lg" />
+            </div>
+            <span className="text-[11px] font-bold text-[#C0C0C0] uppercase tracking-[0.3em] ml-0.5 opacity-90">
+              Institute
             </span>
           </div>
         </Link>

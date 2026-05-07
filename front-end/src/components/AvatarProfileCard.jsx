@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useAvatar from '@/hooks/useAvatar';
-import { useUser } from '@/contexts/UserContext';
+import useUser from "@/hooks/useUser";
 
 // Import Video Assets
 import ToddlerBoyIdle from '@/assets/Animations/ToddlerBoyIdle.mp4';

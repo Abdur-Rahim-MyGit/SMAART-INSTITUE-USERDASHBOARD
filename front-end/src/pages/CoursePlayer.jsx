@@ -128,25 +128,25 @@ const CoursePlayer = () => {
 
   const handleStartCourse = () => {
     setShowIntro(false);
-    setActiveStep('A');
+    setActiveStep('1');
     setVideoWatched(false);
   };
 
-  const handleStepClick = (stepLetter) => {
-    if (!isStepLocked(stepLetter)) {
-      setActiveStep(activeStep === stepLetter ? null : stepLetter);
+  const handleStepClick = (stepNumber) => {
+    if (!isStepLocked(stepNumber)) {
+      setActiveStep(activeStep === stepNumber ? null : stepNumber);
       setVideoWatched(false);
     } else {
-      toast.error(`Please complete Step ${String.fromCharCode(stepLetter.charCodeAt(0) - 1)} first!`);
+      toast.error(`Please complete Step ${parseInt(stepNumber) - 1} first!`);
     }
   };
 
-  const handleStepComplete = (stepLetter) => {
-    setCompletedSteps(prev => ({ ...prev, [stepLetter]: true }));
+  const handleStepComplete = (stepNumber) => {
+    setCompletedSteps(prev => ({ ...prev, [stepNumber]: true }));
     
-    // Check if all 8 steps are completed
-    const allSteps = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-    const newCompletedSteps = { ...completedSteps, [stepLetter]: true };
+    // Check if all 9 steps are completed
+    const allSteps = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const newCompletedSteps = { ...completedSteps, [stepNumber]: true };
     const allCompleted = allSteps.every(step => newCompletedSteps[step]);
     
     if (allCompleted) {
@@ -155,22 +155,20 @@ const CoursePlayer = () => {
       setActiveStep(null);
     } else {
       // Auto-advance to next step
-      const nextStep = String.fromCharCode(stepLetter.charCodeAt(0) + 1);
+      const nextStep = (parseInt(stepNumber) + 1).toString();
       setActiveStep(nextStep);
       setVideoWatched(false);
     }
   };
 
 
-  const isStepLocked = (stepLetter) => {
-    if (stepLetter === 'A') return false;
-    const prevStep = String.fromCharCode(stepLetter.charCodeAt(0) - 1);
-    return !completedSteps[prevStep];
+  const isStepLocked = (stepNumber) => {
+    return false; // Unlocked all for testing
   };
 
-  const getStepStatus = (stepLetter) => {
-    if (completedSteps[stepLetter]) return 'completed';
-    if (isStepLocked(stepLetter)) return 'locked';
+  const getStepStatus = (stepNumber) => {
+    if (completedSteps[stepNumber]) return 'completed';
+    if (isStepLocked(stepNumber)) return 'locked';
     return 'available';
   };
 
@@ -244,8 +242,8 @@ const CoursePlayer = () => {
                   videoUrl={stepData.videoUrl}
                   title={stepData.title}
                   onProgressUpdate={handleVideoProgressUpdate}
-                  onNext={activeStep !== 'H' ? () => {
-                    const nextStep = String.fromCharCode(activeStep.charCodeAt(0) + 1);
+                  onNext={activeStep !== '9' ? () => {
+                    const nextStep = (parseInt(activeStep) + 1).toString();
                     handleStepComplete(activeStep);
                     setActiveStep(nextStep);
                     setVideoWatched(false);
@@ -304,7 +302,7 @@ const CoursePlayer = () => {
             onComplete={() => handleStepComplete(stepLetter)}
             isCompleted={isStepCompleted}
             onNextLesson={handleNextLesson}
-            showNextLesson={congratulationAcknowledged && stepLetter === 'H'}
+            showNextLesson={congratulationAcknowledged && stepNumber === '9'}
             courseId={courseId}
           />
         );
@@ -516,15 +514,12 @@ const CoursePlayer = () => {
                       </div>
                     )}
                     
-                    {activeStep && activeStep !== 'H' && (
+                    {activeStep && activeStep !== '9' && (
                       <div className="mt-8 flex justify-end">
                         <button
-                          disabled={
-                            (learningFlowData?.steps[activeStep]?.videoUrl && !videoWatched) ||
-                            (learningFlowData?.steps[activeStep]?.contentType !== 'video-text' && !completedSteps[activeStep])
-                          }
+                          disabled={false}
                           onClick={() => {
-                            const nextStep = String.fromCharCode(activeStep.charCodeAt(0) + 1);
+                            const nextStep = (parseInt(activeStep) + 1).toString();
                             handleStepComplete(activeStep);
                             setActiveStep(nextStep);
                             setVideoWatched(false);
@@ -542,7 +537,7 @@ const CoursePlayer = () => {
                       </div>
                     )}
 
-                    {activeStep === 'H' && congratulationAcknowledged && (
+                    {activeStep === '9' && congratulationAcknowledged && (
                       <button
                         onClick={handleNextLesson}
                         className="w-full px-6 py-4 bg-gradient-to-r from-[#1a3884] to-[#0D7377] hover:from-[#002147] hover:to-[#0a5a5e] text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] mt-4"
@@ -591,13 +586,13 @@ const CoursePlayer = () => {
                     <div className="flex items-center justify-between text-sm mb-2">
                       <span className="text-gray-500">Learning Flow</span>
                       <span className="font-semibold text-[#112b6b] dark:text-white">
-                        {Object.keys(completedSteps).length}/8
+                        {Object.keys(completedSteps).length}/9
                       </span>
                     </div>
                     <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-[#0D7377] rounded-full transition-all duration-300"
-                        style={{ width: `${(Object.keys(completedSteps).length / 8) * 100}%` }}
+                        style={{ width: `${(Object.keys(completedSteps).length / 9) * 100}%` }}
                       />
                     </div>
                   </div>
@@ -623,7 +618,7 @@ const CoursePlayer = () => {
                   Learning Flow
                 </h3>
                 <div className="space-y-2">
-                  {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map((step) => {
+                  {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((step) => {
                     const status = getStepStatus(step);
                     const stepData = learningFlowData?.steps[step];
                     const isActive = activeStep === step;

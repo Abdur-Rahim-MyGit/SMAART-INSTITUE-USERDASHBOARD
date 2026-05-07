@@ -63,17 +63,25 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const initUser = () => {
-      const storedUser = sessionStorage.getItem("user");
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        // Refresh details in background if token exists
-        const token = sessionStorage.getItem('token');
-        if (parsedUser.email && token) {
-          fetchUserDetails(parsedUser.email);
+      try {
+        const storedUser = sessionStorage.getItem("user");
+        if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
+          const parsedUser = JSON.parse(storedUser);
+          if (parsedUser && typeof parsedUser === 'object') {
+            setUser(parsedUser);
+            // Refresh details in background if token exists
+            const token = sessionStorage.getItem('token');
+            if (parsedUser.email && token) {
+              fetchUserDetails(parsedUser.email);
+            }
+          }
         }
+      } catch (err) {
+        console.error("[UserContext] Failed to parse stored user:", err);
+        sessionStorage.removeItem("user");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initUser();
@@ -106,6 +114,16 @@ export const UserProvider = ({ children }) => {
     }
   }, [user?.email, fetchUserDetails]);
 
+  const login = useCallback((userData, token) => {
+    console.log('[UserContext] Login function called with user:', userData?.email);
+    if (token) sessionStorage.setItem("token", token);
+    if (userData) {
+      const userToStore = { ...userData };
+      sessionStorage.setItem("user", JSON.stringify(userToStore));
+      setUser(userToStore);
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     console.log('[Logout] Starting logout process...');
     
@@ -116,6 +134,9 @@ export const UserProvider = ({ children }) => {
     
     // Set flag for clean logout message
     sessionStorage.setItem("logged_out_other_tab", "true");
+    
+    // Reset state
+    setUser(null);
     
     // Redirect
     window.location.replace("/");
@@ -130,7 +151,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading, refreshUser, logout, updateUser }}>
+    <UserContext.Provider value={{ user, loading, login, refreshUser, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );

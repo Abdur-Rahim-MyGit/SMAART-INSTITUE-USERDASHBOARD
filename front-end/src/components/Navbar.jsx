@@ -60,13 +60,13 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
             <div className="flex flex-col items-start transition-all duration-300 transform group-hover:scale-105">
-              <div className="flex items-baseline gap-1">
+              <div className="flex items-center gap-1">
                 <span className="text-3xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
                   SMAART
                 </span>
                 <div className="w-2 h-2 rounded-full bg-[#C0C0C0]" />
               </div>
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em] ml-0.5">
+              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
                 Institute
               </span>
             </div>
