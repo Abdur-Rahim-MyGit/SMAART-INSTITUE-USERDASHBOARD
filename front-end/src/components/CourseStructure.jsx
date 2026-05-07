@@ -3,7 +3,8 @@ import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "fram
 import {
   BookOpen, Target, Crown, Lock, CheckCircle2,
   ArrowLeft, Zap, TrendingUp,
-  Play, GraduationCap, ArrowRight, ChevronRight
+  Play, GraduationCap, ArrowRight, ChevronRight,
+  Brain, Bot, Leaf
 } from "lucide-react";
 import { toast } from "sonner";
 import { STAGES, TRACKS } from "@/data/courseStructureData";
@@ -183,10 +184,12 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
       >
         <div className="relative z-10">
           <div className="flex items-center gap-4 mb-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-sm border ${
-              isUnlocked ? "bg-white border-gray-100" : "bg-gray-100 border-gray-200"
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border transition-all duration-300 ${
+              isUnlocked ? "bg-white border-gray-100 group-hover:shadow-md group-hover:scale-105" : "bg-gray-100 border-gray-200"
             }`}>
-              {track.icon}
+              {track.id === 'PIQ' && <Brain className={`w-6 h-6 ${isUnlocked ? "text-purple-500" : "text-gray-400"}`} />}
+              {track.id === 'AIQ' && <Bot className={`w-6 h-6 ${isUnlocked ? "text-blue-500" : "text-gray-400"}`} />}
+              {track.id === 'SQ' && <Leaf className={`w-6 h-6 ${isUnlocked ? "text-emerald-500" : "text-gray-400"}`} />}
             </div>
             <div>
               <span className={`text-[9px] font-bold uppercase tracking-[0.2em] ${
