@@ -22,7 +22,7 @@ import {
   Brain
 } from "lucide-react";
 import { apiCall } from "@/services/api";
-import { useUser } from "@/contexts/UserContext";
+import useUser from "@/hooks/useUser";
 import { toast } from "sonner";
 
 const DOMAINS = [

@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "fram
 import {
   BookOpen, Target, Crown, Lock, CheckCircle2,
   ArrowLeft, Zap, TrendingUp,
-  Play, GraduationCap, ArrowRight
+  Play, GraduationCap, ArrowRight, ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { STAGES, TRACKS } from "@/data/courseStructureData";
@@ -338,52 +338,52 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
         Back to Overview
       </button>
 
-      {/* Stage header - Elevated Vision Board Style */}
-      <section className="rounded-[28px] border border-slate-200 bg-white px-6 py-8 mb-10 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-10 md:py-12 transition-all duration-300 relative overflow-hidden">
+      {/* Stage header - Refined and Sized Appropriately */}
+      <section className="rounded-[24px] border border-slate-200 bg-white px-6 py-6 mb-8 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-8 md:py-8 transition-all duration-300 relative overflow-hidden">
         {/* Background Decorative Gradient */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-slate-50/50 to-transparent dark:from-white/5 pointer-events-none" />
         
-        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-10 relative z-10">
-          <div className="flex items-start gap-8">
-            <div className={`w-24 h-24 rounded-[26px] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-xl flex items-center justify-center flex-shrink-0 text-[#1a3884] dark:text-blue-400 transform group-hover:scale-105 transition-transform duration-500`}>
-              <Icon className="w-12 h-12" />
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-8 relative z-10">
+          <div className="flex items-start gap-6">
+            <div className={`w-20 h-20 rounded-[22px] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-lg flex items-center justify-center flex-shrink-0 text-[#1a3884] dark:text-blue-400 transform transition-transform duration-500`}>
+              <Icon className="w-10 h-10" />
             </div>
             <div>
-              <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">
+              <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">
                 Your Learning Journey <ChevronRight className="w-3 h-3" /> {cfg.tag}
               </div>
               
-              <div className="mb-4 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300 shadow-sm">
+              <div className="mb-3 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300 shadow-sm">
                 {stage.totalCourses} Specialized Modules
               </div>
               
-              <h1 className="text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white md:text-5xl leading-[1.1]" style={{ letterSpacing: "-0.04em" }}>
+              <h1 className="text-2xl font-extrabold tracking-tight text-[#112b6b] dark:text-white md:text-3xl leading-[1.2]" style={{ letterSpacing: "-0.02em" }}>
                 {stage.name}
               </h1>
               
-              <p className="mt-4 text-[16px] text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
+              <p className="mt-2 text-[14px] text-slate-500 dark:text-slate-400 font-medium max-w-lg leading-relaxed">
                 {stage.description}
               </p>
             </div>
           </div>
 
-          {/* Stats Section - Matched with main header style */}
+          {/* Stats Section - Refined sizes */}
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-5 group-hover:opacity-10 transition duration-1000"></div>
-            <div className="relative flex items-center gap-8 bg-slate-50/50 dark:bg-[#001835] border border-slate-100 dark:border-white/5 rounded-[22px] px-8 py-7 shadow-sm overflow-hidden">
+            <div className="relative flex items-center gap-6 bg-slate-50/50 dark:bg-[#001835] border border-slate-100 dark:border-white/5 rounded-[20px] px-6 py-5 shadow-sm overflow-hidden">
               <div className="text-center">
-                <div className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Stage Progress</div>
-                <div className="text-4xl font-black text-[#1a3884] dark:text-blue-400 leading-none tabular-nums">{pct}%</div>
+                <div className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Stage Progress</div>
+                <div className="text-3xl font-black text-[#1a3884] dark:text-blue-400 leading-none tabular-nums">{pct}%</div>
               </div>
-              <div className="h-12 w-px bg-slate-200 dark:bg-white/10" />
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-[13px] font-bold text-[#112b6b] dark:text-slate-200">{completedCount} Modules Mastered</span>
+              <div className="h-10 w-px bg-slate-200 dark:bg-white/10" />
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="text-[12px] font-bold text-[#112b6b] dark:text-slate-200">{completedCount} Mastered</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
-                  <span className="text-[13px] font-bold text-slate-400">{stage.totalCourses - completedCount} Remaining</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
+                  <span className="text-[12px] font-bold text-slate-400">{stage.totalCourses - completedCount} Remaining</span>
                 </div>
               </div>
             </div>
@@ -391,13 +391,13 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
         </div>
 
         {/* Enhanced Progress bar */}
-        <div className="mt-12">
-          <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 shadow-inner">
+        <div className="mt-8">
+          <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 shadow-inner">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${pct}%` }}
               transition={{ duration: 1.5, ease: "circOut" }}
-              className="h-full rounded-full bg-gradient-to-r from-[#112b6b] via-[#1a3884] to-[#4c6ef5] shadow-[0_0_15px_rgba(26,56,132,0.4)]"
+              className="h-full rounded-full bg-gradient-to-r from-[#112b6b] via-[#1a3884] to-[#4c6ef5]"
             />
           </div>
         </div>
@@ -481,56 +481,58 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
         <div className="absolute top-[20%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
       </div>
 
-      {/* Page header - Vision Board Inspired Style */}
-      <div className="relative z-10 px-6 md:px-12 py-8">
-        <div className="max-w-7xl mx-auto">
-          <section className="rounded-[28px] border border-slate-200 bg-white px-6 py-8 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-10 md:py-10 transition-all duration-300">
-            <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-10">
-              <div className="max-w-3xl">
-                <div className="mb-4 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300 shadow-sm">
-                  <GraduationCap className="w-3.5 h-3.5 mr-2" />
-                  Core Programme
-                </div>
-                
-                <h1 className="text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white md:text-5xl leading-[1.1]" style={{ letterSpacing: "-0.04em" }}>
-                  Your Learning Journey
-                </h1>
-                
-                <p className="mt-4 text-[16px] text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
-                  Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence.
-                </p>
-              </div>
-
-              {/* Overall progress card - Refined for attractiveness */}
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                <div className="relative flex items-center gap-8 bg-white dark:bg-[#001835] border border-slate-100 dark:border-white/5 rounded-[22px] px-8 py-7 shadow-xl shadow-gray-200/40 dark:shadow-black/20 overflow-hidden">
-                  <div className="text-center relative z-10">
-                    <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">Overall Completion</div>
-                    <div className="text-4xl font-black text-[#1a3884] dark:text-blue-400 leading-none tabular-nums">{overallPct}%</div>
-                  </div>
-                  <div className="h-12 w-px bg-slate-100 dark:bg-white/10" />
-                  <div className="space-y-2 relative z-10">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/30" />
-                      <span className="text-[13px] font-bold text-[#112b6b] dark:text-slate-200">{totalCompleted} Modules Mastered</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700" />
-                      <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500">{totalCourses - totalCompleted} Steps Ahead</span>
-                    </div>
+      {/* Page header - Vision Board Inspired Style - Hidden when stage selected */}
+      {!selectedStageId && (
+        <div className="relative z-10 px-6 md:px-12 py-8">
+          <div className="max-w-7xl mx-auto">
+            <section className="rounded-[28px] border border-slate-200 bg-white px-6 py-8 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-10 md:py-10 transition-all duration-300">
+              <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-10">
+                <div className="max-w-3xl">
+                  <div className="mb-4 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300 shadow-sm">
+                    <GraduationCap className="w-3.5 h-3.5 mr-2" />
+                    Core Programme
                   </div>
                   
-                  {/* Subtle background icon */}
-                  <div className="absolute -right-4 -bottom-4 opacity-[0.03] dark:opacity-[0.05] rotate-12">
-                    <GraduationCap className="w-24 h-24 text-[#1a3884] dark:text-white" />
+                  <h1 className="text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white md:text-5xl leading-[1.1]" style={{ letterSpacing: "-0.04em" }}>
+                    Your Learning Journey
+                  </h1>
+                  
+                  <p className="mt-4 text-[16px] text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
+                    Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence.
+                  </p>
+                </div>
+
+                {/* Overall progress card - Refined for attractiveness */}
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
+                  <div className="relative flex items-center gap-8 bg-white dark:bg-[#001835] border border-slate-100 dark:border-white/5 rounded-[22px] px-8 py-7 shadow-xl shadow-gray-200/40 dark:shadow-black/20 overflow-hidden">
+                    <div className="text-center relative z-10">
+                      <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">Overall Completion</div>
+                      <div className="text-4xl font-black text-[#1a3884] dark:text-blue-400 leading-none tabular-nums">{overallPct}%</div>
+                    </div>
+                    <div className="h-12 w-px bg-slate-100 dark:bg-white/10" />
+                    <div className="space-y-2 relative z-10">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/30" />
+                        <span className="text-[13px] font-bold text-[#112b6b] dark:text-slate-200">{totalCompleted} Modules Mastered</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700" />
+                        <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500">{totalCourses - totalCompleted} Steps Ahead</span>
+                      </div>
+                    </div>
+                    
+                    {/* Subtle background icon */}
+                    <div className="absolute -right-4 -bottom-4 opacity-[0.03] dark:opacity-[0.05] rotate-12">
+                      <GraduationCap className="w-24 h-24 text-[#1a3884] dark:text-white" />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 relative z-10">

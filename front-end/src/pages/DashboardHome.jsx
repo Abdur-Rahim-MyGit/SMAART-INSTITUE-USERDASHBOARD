@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
 import VisionBoardSplash from "@/components/VisionBoardSplash";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -19,6 +20,7 @@ const DashboardHome = () => {
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const hasSeenSplash = sessionStorage.getItem('visionSplashShown');
@@ -26,18 +28,25 @@ const DashboardHome = () => {
   }, []);
 
   useEffect(() => {
-    console.log('[DashboardHome] User data:', user);
-    console.log('[DashboardHome] User loading:', userLoading);
+    // If loading is finished and user is still null, redirect to login
+    if (!userLoading && !user) {
+      console.warn('[DashboardHome] No authenticated user found, redirecting to login');
+      navigate('/');
+      return;
+    }
+
     if (user && !userLoading) {
       console.log('[DashboardHome] User loaded, setting dashboard loading to false');
       setDashboardLoading(false);
     }
-  }, [user, userLoading]);
+  }, [user, userLoading, navigate]);
 
-  // Timeout fallback for unresponsive API
+  // Timeout fallback for unresponsive API or stuck loading state
   useEffect(() => {
     let timeout;
-    if (userLoading || dashboardLoading) {
+    // Only set timeout if we are actually waiting for data and have an active session intent
+    const hasToken = sessionStorage.getItem('token');
+    if ((userLoading || dashboardLoading) && hasToken) {
       console.log(`[DashboardHome] Setting timeout for userLoading:${userLoading}, dashboardLoading:${dashboardLoading}`);
       timeout = setTimeout(() => {
         console.warn('[DashboardHome] Loading timeout reached - showing connection error screen');
