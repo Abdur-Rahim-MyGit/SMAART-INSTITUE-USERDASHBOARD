@@ -368,26 +368,19 @@ const NoticesFeed = ({ currentUser }) => {
                     <div className="relative">
                       {(() => {
                         const hasReacted = ann.reactions?.some(r => r.userId?.toString() === currentUser?._id?.toString());
-                        const userReaction = ann.reactions?.find(r => r.userId?.toString() === currentUser?._id?.toString());
-                        
+                        if (hasReacted) return null;
+
                         return (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setActivePicker(activePicker === ann._id ? null : ann._id);
                             }}
-                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 ${
-                              activePicker === ann._id ? "bg-gray-100 scale-110" : ""
-                            }`}
+                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 ${activePicker === ann._id ? "bg-gray-100 scale-110" : ""
+                              }`}
                             title="React"
                           >
-                            {hasReacted ? (
-                              <span className="text-xl filter drop-shadow-sm">
-                                {userReaction.emoji}
-                              </span>
-                            ) : (
-                              <Heart className="w-5 h-5 text-gray-400" />
-                            )}
+                            <Heart className="w-5 h-5 cursor-pointer text-black hover:text-red-500" />
                           </button>
                         );
                       })()}
