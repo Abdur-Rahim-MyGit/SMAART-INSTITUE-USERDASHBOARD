@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star } from "lucide-react";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import MCQPractice from "@/components/MCQPractice";
 import FlashcardTask from "@/components/FlashcardTask";
@@ -302,7 +302,7 @@ const CoursePlayer = () => {
             onComplete={() => handleStepComplete(stepLetter)}
             isCompleted={isStepCompleted}
             onNextLesson={handleNextLesson}
-            showNextLesson={congratulationAcknowledged && stepNumber === '9'}
+            showNextLesson={congratulationAcknowledged && stepLetter === '9'}
             courseId={courseId}
           />
         );
@@ -517,22 +517,16 @@ const CoursePlayer = () => {
                     {activeStep && activeStep !== '9' && (
                       <div className="mt-8 flex justify-end">
                         <button
-                          disabled={false}
                           onClick={() => {
                             const nextStep = (parseInt(activeStep) + 1).toString();
                             handleStepComplete(activeStep);
                             setActiveStep(nextStep);
                             setVideoWatched(false);
                           }}
-                          className={`px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg ${
-                            (learningFlowData?.steps[activeStep]?.videoUrl && !videoWatched) ||
-                            (learningFlowData?.steps[activeStep]?.contentType !== 'video-text' && !completedSteps[activeStep])
-                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-60'
-                              : 'bg-gradient-to-r from-[#1a3884] to-[#0D7377] text-white hover:shadow-xl transform hover:scale-[1.02]'
-                          }`}
+                          className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#1a3884] via-[#1a3884] to-[#0D7377] text-white font-bold transition-all flex items-center gap-2 shadow-[0_10px_30px_-10px_rgba(26,56,132,0.4)] hover:shadow-[0_20px_40px_-10px_rgba(26,56,132,0.5)] transform hover:scale-[1.02] active:scale-95 group"
                         >
                           Continue to Next Step
-                          <ChevronRight className="w-5 h-5" />
+                          <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </button>
                       </div>
                     )}
@@ -540,7 +534,7 @@ const CoursePlayer = () => {
                     {activeStep === '9' && congratulationAcknowledged && (
                       <button
                         onClick={handleNextLesson}
-                        className="w-full px-6 py-4 bg-gradient-to-r from-[#1a3884] to-[#0D7377] hover:from-[#002147] hover:to-[#0a5a5e] text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] mt-4"
+                        className="w-full px-6 py-5 bg-gradient-to-r from-[#1a3884] via-[#002147] to-[#0D7377] text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2 shadow-xl hover:shadow-2xl transform hover:scale-[1.02] mt-4"
                       >
                         Unlock Next Course
                         <ChevronRight className="w-4 h-4" />
@@ -561,63 +555,73 @@ const CoursePlayer = () => {
               className="space-y-6"
             >
               {/* Progress Card */}
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700"
-                style={{
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)',
-                }}
+              <div className="bg-white dark:bg-[#001835] rounded-[28px] p-7 border border-slate-100 dark:border-slate-800 relative overflow-hidden group shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]"
               >
-                <h3 className="text-lg font-bold text-[#112b6b] dark:text-white mb-4">Your Progress</h3>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-gray-500">Video Progress</span>
-                      <span className="font-semibold text-[#112b6b] dark:text-white">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#1a3884]/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-[#1a3884]/10 transition-colors" />
+                
+                <h3 className="text-lg font-bold text-[#112b6b] dark:text-white mb-5 flex items-center gap-2">
+                  <Target className="w-5 h-5 text-[#1a3884]" />
+                  Learning Progress
+                </h3>
+                
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <span>Video Content</span>
+                      <span className="text-[#1a3884]">
                         {Math.round((videoProgress / 100) * 100)}%
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#1a3884] rounded-full transition-all duration-300"
-                        style={{ width: `${(videoProgress / 100) * 100}%` }}
+                    <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(videoProgress / 100) * 100}%` }}
+                        className="h-full bg-gradient-to-r from-[#1a3884] to-blue-400 rounded-full"
                       />
                     </div>
                   </div>
-                  <div>
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-gray-500">Learning Flow</span>
-                      <span className="font-semibold text-[#112b6b] dark:text-white">
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
+                      <span>Flow Steps</span>
+                      <span className="text-[#0D7377]">
                         {Object.keys(completedSteps).length}/9
                       </span>
                     </div>
-                    <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#0D7377] rounded-full transition-all duration-300"
-                        style={{ width: `${(Object.keys(completedSteps).length / 9) * 100}%` }}
+                    <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(Object.keys(completedSteps).length / 9) * 100}%` }}
+                        className="h-full bg-gradient-to-r from-[#0D7377] to-emerald-400 rounded-full"
                       />
                     </div>
                   </div>
+
                   {isCompleted && (
-                    <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
-                      <span className="text-sm font-semibold text-green-700 dark:text-green-300">
-                        Course Completed!
+                    <motion.div 
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 mt-2"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+                        <CheckCircle2 className="w-5 h-5" />
+                      </div>
+                      <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">
+                        Course Mastery Achieved
                       </span>
-                    </div>
+                    </motion.div>
                   )}
                 </div>
               </div>
 
               {/* Learning Flow Steps */}
-              <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700"
-                style={{
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)',
-                }}
+              <div className="bg-white dark:bg-[#001835] rounded-[28px] p-7 border border-slate-100 dark:border-slate-800 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]"
               >
-                <h3 className="text-lg font-bold text-[#112b6b] dark:text-white mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-[#112b6b] dark:text-white mb-5 flex items-center gap-2">
                   <PlayCircle className="w-5 h-5 text-[#1a3884]" />
-                  Learning Flow
+                  Curriculum Flow
                 </h3>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((step) => {
                     const status = getStepStatus(step);
                     const stepData = learningFlowData?.steps[step];
@@ -628,43 +632,44 @@ const CoursePlayer = () => {
                         key={step}
                         disabled={status === 'locked'}
                         onClick={() => handleStepClick(step)}
-                        className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
+                        className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 relative group ${
                           isActive
-                            ? 'bg-[#1a3884] text-white shadow-lg'
+                            ? 'bg-[#1a3884] text-white shadow-xl shadow-blue-900/20 ring-4 ring-blue-50 dark:ring-blue-900/20'
                             : status === 'completed'
-                            ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                            ? 'bg-white border border-emerald-100 dark:bg-emerald-950/10 dark:border-emerald-900/30'
                             : status === 'locked'
-                            ? 'bg-gray-50 dark:bg-slate-900/10 opacity-50 cursor-not-allowed grayscale'
-                            : 'bg-gray-50 dark:bg-slate-800/50 hover:bg-gray-100 dark:hover:bg-slate-800 border border-gray-100 dark:border-gray-700'
+                            ? 'bg-slate-50 dark:bg-slate-900/40 opacity-40 cursor-not-allowed grayscale'
+                            : 'bg-white border border-slate-100 hover:border-blue-200 hover:shadow-md dark:bg-slate-900/40 dark:border-slate-800'
                         }`}
                       >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-105 ${
                           isActive ? 'bg-white/20' : 
-                          status === 'completed' ? 'bg-green-500' : 
-                          status === 'locked' ? 'bg-gray-200' : 'bg-[#1a3884]/10'
+                          status === 'completed' ? 'bg-emerald-500' : 
+                          status === 'locked' ? 'bg-slate-200 dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800 text-[#1a3884]'
                         }`}>
                           {status === 'completed' ? (
-                            <CheckCircle2 className="w-4 h-4 text-white" />
+                            <CheckCircle2 className="w-5 h-5 text-white" />
                           ) : status === 'locked' ? (
-                            <Lock className="w-3 h-3 text-gray-400" />
+                            <Lock className="w-4 h-4 text-slate-400" />
                           ) : (
-                            <span className={`font-bold text-sm ${isActive ? 'text-white' : 'text-[#1a3884]'}`}>{step}</span>
+                            <span className={`font-black text-sm ${isActive ? 'text-white' : 'text-[#1a3884]'}`}>{step}</span>
                           )}
                         </div>
-                        <div className="flex-1 text-left">
-                          <h4 className={`font-semibold text-sm ${isActive ? 'text-white' : status === 'completed' ? 'text-green-700 dark:text-green-300' : 'text-[#112b6b] dark:text-white'}`}>
+                        <div className="flex-1 text-left min-w-0">
+                          <h4 className={`font-bold text-sm truncate ${isActive ? 'text-white' : status === 'completed' ? 'text-emerald-700 dark:text-emerald-400' : 'text-[#112b6b] dark:text-white'}`}>
                             {stepData?.title || 'Step ' + step}
                           </h4>
-                          <p className={`text-xs ${isActive ? 'text-white/70' : 'text-gray-500'}`}>
-                            {stepData?.subtitle || ''}
+                          <p className={`text-[11px] font-medium uppercase tracking-wider ${isActive ? 'text-white/70' : 'text-slate-400'}`}>
+                            {stepData?.duration || '5-10 min'}
                           </p>
                         </div>
-                        <ChevronRight className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-400'} transition-transform ${isActive ? 'rotate-90' : ''}`} />
+                        <ChevronRight className={`w-4 h-4 transition-transform ${isActive ? 'text-white rotate-90' : 'text-slate-300'} group-hover:translate-x-1`} />
                       </button>
                     );
                   })}
                 </div>
               </div>
+
 
             </motion.div>
             </div>

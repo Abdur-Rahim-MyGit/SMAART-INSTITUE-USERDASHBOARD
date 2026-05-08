@@ -24,25 +24,20 @@ const buildVisibilityFilter = (user) => {
     return baseFilter;
   }
 
-  if (user.role === 'college_admin') {
-    // College admin sees: all-target + their own college
+  const collegeId = user.college?._id || user.college;
+
+  if (user.role === 'college_admin' || user.role === 'student') {
     return {
       ...baseFilter,
       $or: [
         { targetType: 'all' },
-        { targetType: 'college', targetCollegeIds: user.college?._id || user.college }
+        { targetType: 'college', targetCollegeIds: collegeId }
       ]
     };
   }
 
-  // Student sees: all-target + announcements for their college
-  return {
-    ...baseFilter,
-    $or: [
-      { targetType: 'all' },
-      { targetType: 'college', targetCollegeIds: user.college?._id || user.college }
-    ]
-  };
+  // Fallback (shouldn't really be reached for valid users)
+  return baseFilter;
 };
 
 // ─── GET /api/announcements ──────────────────────────────────────────────────
@@ -50,8 +45,6 @@ const buildVisibilityFilter = (user) => {
 router.get('/', protect, async (req, res) => {
   try {
     const user = req.user;
-    if (!user) return res.status(401).json({ success: false, error: 'User not found' });
-
     const filter = buildVisibilityFilter(user);
     const { dateFilter } = req.query; // 'today' | 'week' | undefined
 
@@ -67,7 +60,7 @@ router.get('/', protect, async (req, res) => {
 
     const announcements = await Announcement.find(filter)
       .populate('createdById', 'fullName role college')
-      .populate('targetCollegeIds', 'name')
+      .populate('targetCollegeIds', 'collegeName')
       .sort({ isPinned: -1, createdAt: -1 })
       .limit(50)
       .lean();
