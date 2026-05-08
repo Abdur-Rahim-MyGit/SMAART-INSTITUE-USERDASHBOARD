@@ -23,8 +23,8 @@ const Community = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-24 selection:bg-[#002147]/20">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-        
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+
         {/* ── Header Section ────────────────────────────────────────────── */}
         <div className="mb-10">
           <div className="flex items-center gap-4 mb-4">
@@ -67,7 +67,7 @@ const Community = () => {
         >
           {/* Decorative background glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-          
+
           <div className="relative z-10">
             <NoticesFeed currentUser={currentUser} />
           </div>

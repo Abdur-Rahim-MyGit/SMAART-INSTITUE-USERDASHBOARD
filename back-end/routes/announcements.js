@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Announcement = require('../models/Announcement');
 const User = require('../models/User');
+const Student = require('../models/Student');
+const Notification = require('../models/Notification');
 const { protect } = require('../middleware/auth');
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -118,6 +120,45 @@ router.post('/', protect, async (req, res) => {
       .populate('targetCollegeIds', 'name')
       .lean();
 
+    // ── Generate Notifications ──────────────────────────────────────────────
+    setImmediate(async () => {
+      try {
+        let recipientQuery = { status: 'active' };
+        if (resolvedTarget === 'college' && resolvedCollegeIds.length > 0) {
+          recipientQuery.college = { $in: resolvedCollegeIds };
+        }
+
+        const students = await Student.find(recipientQuery).select('_id').lean();
+        
+        if (students.length > 0) {
+          const notifications = students.map(student => ({
+            userId: student._id,
+            type: 'system',
+            title: `New Announcement: ${title}`,
+            message: description.length > 100 ? `${description.substring(0, 97)}...` : description,
+            icon: 'megaphone',
+            color: '#002147',
+            link: '/community',
+            metadata: {
+              postId: announcement._id,
+              senderId: user._id,
+              senderName: user.fullName
+            }
+          }));
+
+          // Using Notification.createNotification for each to trigger WS events
+          // or we can use insertMany and then manually trigger if needed.
+          // Since createNotification handles the emitter, we'll loop or use a custom bulk emit.
+          for (const n of notifications) {
+            await Notification.createNotification(n);
+          }
+          console.log(`[Announcements] Notifications sent to ${students.length} students`);
+        }
+      } catch (err) {
+        console.error('[Announcements] Notification error:', err);
+      }
+    });
+
     res.status(201).json({ success: true, data: populated });
   } catch (err) {
     console.error('[Announcements] POST error:', err);
@@ -203,6 +244,52 @@ router.patch('/:id/pin', protect, async (req, res) => {
     res.json({ success: true, data: { isPinned: announcement.isPinned } });
   } catch (err) {
     console.error('[Announcements] PIN error:', err);
+    res.status(500).json({ success: false, error: 'Server error' });
+  }
+});
+
+// ─── PATCH /api/announcements/:id/react ─────────────────────────────────────
+// Toggle/Update reaction — Any authenticated user
+router.patch('/:id/react', protect, async (req, res) => {
+  try {
+    const user = req.user;
+    const { emoji } = req.body;
+
+    if (!user) return res.status(401).json({ success: false, error: 'Not authenticated' });
+    if (!emoji) return res.status(400).json({ success: false, error: 'Emoji is required' });
+
+    const announcement = await Announcement.findById(req.params.id);
+    if (!announcement) return res.status(404).json({ success: false, error: 'Announcement not found' });
+
+    if (!announcement.reactions) announcement.reactions = [];
+
+    const existingIndex = announcement.reactions.findIndex(
+      (r) => r.userId.toString() === user._id.toString()
+    );
+
+    if (existingIndex > -1) {
+      if (announcement.reactions[existingIndex].emoji === emoji) {
+        // Remove reaction if same emoji
+        announcement.reactions.splice(existingIndex, 1);
+      } else {
+        // Update emoji if different
+        announcement.reactions[existingIndex].emoji = emoji;
+      }
+    } else {
+      // Add new reaction
+      announcement.reactions.push({ userId: user._id, emoji });
+    }
+
+    await announcement.save();
+
+    res.json({ 
+      success: true, 
+      data: { 
+        reactions: announcement.reactions
+      } 
+    });
+  } catch (err) {
+    console.error('[Announcements] REACT error:', err);
     res.status(500).json({ success: false, error: 'Server error' });
   }
 });
