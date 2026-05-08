@@ -150,7 +150,7 @@ const NoticesFeed = ({ currentUser }) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search announcements…"
-          className="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm font-semibold text-[#002147] placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[#002147]/5 focus:border-[#002147]/30 focus:bg-white transition-all shadow-sm"
+          className="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-2xl text-sm font-semibold text-[#002147] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[#002147]/5 focus:border-[#002147]/30 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
         />
         {searchQuery && (
           <button
@@ -165,14 +165,14 @@ const NoticesFeed = ({ currentUser }) => {
       {/* ── Filter row: Date + Role + Clear ────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         {/* Date filter pills */}
-        <div className="flex items-center gap-1 p-1 bg-gray-100/50 rounded-xl border border-gray-200 shadow-sm">
+        <div className="flex items-center gap-1 p-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
           {DATE_FILTERS.map((f) => (
             <button
               key={f.key}
               onClick={() => setDateFilter(f.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${dateFilter === f.key
                 ? "bg-[#002147] text-white shadow-sm"
-                : "text-gray-500 hover:text-[#002147] hover:bg-white/70"
+                : "text-gray-500 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/70 dark:hover:bg-slate-700/70"
                 }`}
             >
               {f.label}
@@ -184,7 +184,7 @@ const NoticesFeed = ({ currentUser }) => {
         {/* <span className="text-gray-200 font-light hidden sm:block">|</span> */}
 
         {/* Role filter pills */}
-        <div className="flex items-center gap-1 p-1 bg-white/50 backdrop-blur-sm rounded-xl border border-white/60 shadow-sm">
+        <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/60 dark:border-slate-700 shadow-sm">
           {/* <span className="pl-2 pr-1">
             <SlidersHorizontal className="w-3 h-3 text-gray-400" />
           </span> */}
@@ -194,7 +194,7 @@ const NoticesFeed = ({ currentUser }) => {
               onClick={() => setRoleFilter(f.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === f.key
                 ? "bg-[#002147] text-white shadow-sm"
-                : "text-gray-500 hover:text-[#002147] hover:bg-white/70"
+                : "text-gray-500 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/70 dark:hover:bg-slate-700/70"
                 }`}
             >
               {f.label}
@@ -233,28 +233,28 @@ const NoticesFeed = ({ currentUser }) => {
         <motion.div
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-14 bg-white/60 backdrop-blur-sm rounded-3xl border border-white/40 shadow-sm"
+          className="text-center py-14 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-3xl border border-white/40 dark:border-slate-700/40 shadow-sm"
         >
-          <Megaphone className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+          <Megaphone className="w-12 h-12 text-gray-200 dark:text-slate-700 mx-auto mb-4" />
           {hasActiveFilters || searchQuery ? (
             <>
-              <p className="text-gray-600 font-bold mb-1">No results found</p>
-              <p className="text-gray-400 text-sm mb-4">
+              <p className="text-gray-600 dark:text-slate-300 font-bold mb-1">No results found</p>
+              <p className="text-gray-400 dark:text-slate-500 text-sm mb-4">
                 Try adjusting your search or filter.
               </p>
               <button
                 onClick={clearFilters}
-                className="px-4 py-2 text-xs font-bold text-[#002147] bg-[#002147]/5 hover:bg-[#002147]/10 rounded-xl transition-all"
+                className="px-4 py-2 text-xs font-bold text-[#002147] dark:text-white bg-[#002147]/5 dark:bg-white/5 hover:bg-[#002147]/10 dark:hover:bg-white/10 rounded-xl transition-all"
               >
                 Clear filters
               </button>
             </>
           ) : (
             <>
-              <p className="text-gray-600 font-bold mb-1">
+              <p className="text-gray-600 dark:text-slate-300 font-bold mb-1">
                 No announcements yet
               </p>
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 dark:text-slate-500 text-sm">
                 Check back later for updates from your institution.
               </p>
             </>
@@ -277,11 +277,11 @@ const NoticesFeed = ({ currentUser }) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ delay: index * 0.04, duration: 0.2 }}
-                className={`bg-white/70 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border transition-all duration-300 group ${isExpired
-                  ? "opacity-60 border-gray-100"
+                className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border transition-all duration-300 group ${isExpired
+                  ? "opacity-60 border-gray-100 dark:border-slate-800"
                   : ann.isPinned
-                    ? "border-amber-200 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
-                    : "border-white/40 hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
+                    ? "border-amber-200 dark:border-amber-900/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
+                    : "border-white/40 dark:border-slate-700/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
                   }`}
               >
                 {/* Subtle indicator for pinned */}
@@ -302,8 +302,8 @@ const NoticesFeed = ({ currentUser }) => {
                   )}
                   <span
                     className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider ${ann.createdByRole === "admin"
-                      ? "bg-[#002147]/10 text-[#002147] border border-[#002147]/5"
-                      : "bg-blue-50 text-blue-700 border border-blue-100"
+                      ? "bg-[#002147]/10 dark:bg-blue-900/30 text-[#002147] dark:text-blue-400 border border-[#002147]/5 dark:border-blue-800/30"
+                      : "bg-blue-50 dark:bg-slate-700 text-blue-700 dark:text-slate-300 border border-blue-100 dark:border-slate-600"
                       }`}
                   >
                     {ann.createdByRole === "admin" ? (
@@ -327,12 +327,12 @@ const NoticesFeed = ({ currentUser }) => {
                 </div>
 
                 {/* ── Title ─────────────────────────────────────────────── */}
-                <h3 className="text-[#002147] text-lg font-extrabold mb-2 tracking-tight">
+                <h3 className="text-[#002147] dark:text-white text-lg font-extrabold mb-2 tracking-tight">
                   {ann.title}
                 </h3>
 
                 {/* ── Description ───────────────────────────────────────── */}
-                <p className="text-gray-600 text-sm leading-relaxed font-medium whitespace-pre-line mb-6">
+                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed font-medium whitespace-pre-line mb-6">
                   {ann.description}
                 </p>
 
@@ -343,7 +343,7 @@ const NoticesFeed = ({ currentUser }) => {
                       href={ann.attachmentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-gray-50 hover:bg-[#002147] text-[#002147] hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 hover:border-[#002147] shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
+                      className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-gray-50 dark:bg-slate-700 hover:bg-[#002147] dark:hover:bg-blue-600 text-[#002147] dark:text-white hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 dark:border-slate-600 hover:border-[#002147] dark:hover:border-blue-600 shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
                     >
                       {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> :
                         ann.attachmentType === 'image' ? <ImageIcon className="w-4 h-4" /> :
@@ -373,8 +373,8 @@ const NoticesFeed = ({ currentUser }) => {
                             key={emoji}
                             onClick={() => handleReact(ann._id, emoji)}
                             className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold transition-all ${hasReacted
-                              ? "bg-blue-100 text-blue-700 border border-blue-200"
-                              : "bg-gray-100 text-gray-600 border border-transparent hover:bg-gray-200"
+                              ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
+                              : "bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 border border-transparent hover:bg-gray-200 dark:hover:bg-slate-600"
                               }`}
                           >
                             <span>{emoji}</span>
@@ -396,11 +396,11 @@ const NoticesFeed = ({ currentUser }) => {
                               e.stopPropagation();
                               setActivePicker(activePicker === ann._id ? null : ann._id);
                             }}
-                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 ${activePicker === ann._id ? "bg-gray-100 scale-110" : ""
+                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 dark:hover:bg-slate-700 ${activePicker === ann._id ? "bg-gray-100 dark:bg-slate-700 scale-110" : ""
                               }`}
                             title="React"
                           >
-                            <Heart className="w-5 h-5 cursor-pointer text-black hover:text-red-500" />
+                            <Heart className="w-5 h-5 cursor-pointer text-black dark:text-white hover:text-red-500" />
                           </button>
                         );
                       })()}
@@ -412,7 +412,7 @@ const NoticesFeed = ({ currentUser }) => {
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            className="absolute bottom-full left-0 mb-3 p-1.5 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 flex items-center gap-1 z-20"
+                            className="absolute bottom-full left-0 mb-3 p-1.5 bg-white dark:bg-slate-800 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-slate-700 flex items-center gap-1 z-20"
                           >
                             {["👍", "❤️", "🔥", "😂", "🙌"].map((emoji) => (
                               <button
@@ -422,7 +422,7 @@ const NoticesFeed = ({ currentUser }) => {
                                   handleReact(ann._id, emoji);
                                   setActivePicker(null);
                                 }}
-                                className="w-9 h-9 flex items-center justify-center hover:bg-gray-50 rounded-full transition-colors text-xl hover:scale-125 duration-200"
+                                className="w-9 h-9 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-700 rounded-full transition-colors text-xl hover:scale-125 duration-200"
                               >
                                 {emoji}
                               </button>
@@ -433,15 +433,15 @@ const NoticesFeed = ({ currentUser }) => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-[#002147]/10 flex items-center justify-center text-[10px] font-bold text-[#002147] flex-shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-[#002147]/10 dark:bg-blue-900/20 flex items-center justify-center text-[10px] font-bold text-[#002147] dark:text-blue-300 flex-shrink-0">
                       {(ann.createdById?.fullName || "A")
                         .charAt(0)
                         .toUpperCase()}
                     </div>
-                    <span className="text-gray-500 font-semibold">
+                    <span className="text-gray-500 dark:text-slate-300 font-semibold">
                       {ann.createdById?.fullName || "Admin"}
                     </span>
-                    <span className="text-gray-300">•</span>
+                    <span className="text-gray-300 dark:text-slate-700">•</span>
                     <span>{timeAgo(ann.createdAt)}</span>
                     {ann.expiryDate && (
                       <>
