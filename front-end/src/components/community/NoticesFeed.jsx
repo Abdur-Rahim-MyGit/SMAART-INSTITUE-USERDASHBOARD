@@ -301,9 +301,9 @@ const NoticesFeed = ({ currentUser }) => {
                     </span>
                   )}
                   <span
-                    className={`px-2.5 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${ann.createdByRole === "admin"
-                      ? "bg-[#002147]/10 text-[#002147]"
-                      : "bg-blue-50 text-blue-700"
+                    className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider ${ann.createdByRole === "admin"
+                      ? "bg-[#002147]/10 text-[#002147] border border-[#002147]/5"
+                      : "bg-blue-50 text-blue-700 border border-blue-100"
                       }`}
                   >
                     {ann.createdByRole === "admin" ? (
@@ -345,9 +345,9 @@ const NoticesFeed = ({ currentUser }) => {
                       rel="noopener noreferrer"
                       className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-gray-50 hover:bg-[#002147] text-[#002147] hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 hover:border-[#002147] shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
                     >
-                      {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> : 
-                       ann.attachmentType === 'image' ? <ImageIcon className="w-4 h-4" /> : 
-                       <LinkIcon className="w-4 h-4" />}
+                      {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> :
+                        ann.attachmentType === 'image' ? <ImageIcon className="w-4 h-4" /> :
+                          <LinkIcon className="w-4 h-4" />}
                       View Attachment
                       <ArrowUpRight className="w-3.5 h-3.5 opacity-50 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all" />
                     </a>
@@ -388,26 +388,19 @@ const NoticesFeed = ({ currentUser }) => {
                     <div className="relative">
                       {(() => {
                         const hasReacted = ann.reactions?.some(r => r.userId?.toString() === currentUser?._id?.toString());
-                        const userReaction = ann.reactions?.find(r => r.userId?.toString() === currentUser?._id?.toString());
-                        
+                        if (hasReacted) return null;
+
                         return (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               setActivePicker(activePicker === ann._id ? null : ann._id);
                             }}
-                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 ${
-                              activePicker === ann._id ? "bg-gray-100 scale-110" : ""
-                            }`}
+                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 ${activePicker === ann._id ? "bg-gray-100 scale-110" : ""
+                              }`}
                             title="React"
                           >
-                            {hasReacted ? (
-                              <span className="text-xl filter drop-shadow-sm">
-                                {userReaction.emoji}
-                              </span>
-                            ) : (
-                              <Heart className="w-5 h-5 text-gray-400" />
-                            )}
+                            <Heart className="w-5 h-5 cursor-pointer text-black hover:text-red-500" />
                           </button>
                         );
                       })()}
