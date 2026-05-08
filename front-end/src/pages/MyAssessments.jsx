@@ -8,15 +8,8 @@ import AssessmentBanner from "@/components/AssessmentBanner";
 import { assessmentApi } from "@/services/assessmentApi";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import useUser from "@/hooks/useUser";
-import spImage from "@/assets/sp.jpeg";
+import SkillsPassportModal from "@/components/SkillsPassportModal";
 import { AssessmentsSkeleton } from "@/components/SkeletonPatterns";
-
-// Theme colors
-const THEME = {
-  navy: '#002147',
-  teal: '#1a3884',
-  white: '#FFFFFF'
-};
 
 // Assessment configuration
 const assessmentConfig = [
@@ -32,275 +25,6 @@ const assessmentConfig = [
     duration: '~45 mins'
   }
 ];
-
-// Quotients list
-const QUOTIENTS = [
-  { id: 'CRQ', label: 'CRQ', desc: 'Cognitive Reasoning Quotient', color: '#a78bfa' },
-  { id: 'SRQ', label: 'SRQ', desc: 'Self-Regulation Quotient', color: '#60a5fa' },
-  { id: 'LQ', label: 'LQ', desc: 'Learning Quotient (Learning Agility Quotient)', color: '#34d399' },
-  { id: 'SIQ', label: 'SIQ', desc: 'Social Intelligence Quotient', color: '#f472b6' },
-  { id: 'PEQ', label: 'PEQ', desc: 'Professional Execution Quotient', color: '#fb923c' },
-  { id: 'DAQ', label: 'DAQ', desc: 'Digital & AI Quotient', color: '#38bdf8' },
-  { id: 'SEQ', label: 'SEQ', desc: 'Sustainability & Ethics Quotient', color: '#4ade80' },
-];
-
-// ----- Skills Passport Card (full modal) -----
-const SkillsPassportModal = ({ onClose, currentUser, baselineResult }) => {
-  const userName = currentUser?.fullName || "SMAART Minds";
-  const identityRef = (currentUser?._id || currentUser?.id || "6933C176").toString().slice(-8).toUpperCase();
-  const joinYear = currentUser?.createdAt
-    ? new Date(currentUser.createdAt).getFullYear()
-    : new Date().getFullYear();
-  const stageBand = baselineResult?.stageBand || null;
-  const verifiedDate = baselineResult
-    ? new Date(baselineResult.createdAt || Date.now()).toLocaleDateString('en-GB').replace(/\//g, '/')
-    : new Date().toLocaleDateString('en-GB').replace(/\//g, '/');
-
-  // Build skill proficiency score ring
-  const score = baselineResult?.baselineScore || 0;
-  const circumference = 2 * Math.PI * 54;
-  const dashOffset = circumference - (score / 100) * circumference;
-
-  // Skill tags derived from quotients
-  const skills = [
-    "Lead Generation",
-    "CRM Management (HubSpot / Zoho)",
-    "Sales Negotiation",
-    "Market Research & Competitor Analysis",
-    "Client Relationship Management",
-    "Communication & Presentation",
-    "Proposal & Pitch Deck Creation",
-    "Sales Pipeline Tracking",
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto"
-      style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(6px)' }}
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 60, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 40, scale: 0.96 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 24 }}
-        onClick={e => e.stopPropagation()}
-        className="relative w-full max-w-2xl mx-4 my-8 rounded-3xl overflow-hidden shadow-[0_0_80px_rgba(56,189,248,0.18)]"
-        style={{ background: 'linear-gradient(160deg, #0d1b3e 0%, #060e22 60%, #0a1628 100%)', border: '1.5px solid rgba(56,189,248,0.18)' }}
-      >
-        {/* Subtle glowing top accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, #38bdf8, #818cf8, transparent)' }} />
-
-        {/* Header */}
-        <div className="relative px-8 pt-10 pb-6 text-center">
-          <button
-            onClick={onClose}
-            className="absolute top-5 left-5 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
-            style={{ color: '#94a3b8', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Dashboard
-          </button>
-          <button
-            onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-full transition-all hover:bg-white/10"
-            style={{ color: '#64748b' }}
-          >
-            <X className="w-4 h-4" />
-          </button>
-
-          <h1 className="text-3xl font-black tracking-tight mb-1" style={{ color: '#f1f5f9' }}>
-            Digital Skills Passport
-          </h1>
-          <p className="text-sm" style={{ color: '#64748b' }}>Verified Career Identity &amp; Competency Credential</p>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-center gap-3 mt-5 flex-wrap">
-            <button
-              onClick={() => baselineResult && generateAssessmentReport(currentUser, baselineResult)}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold transition-all hover:opacity-90 hover:-translate-y-0.5"
-              style={{ background: 'linear-gradient(135deg, #4f46e5, #818cf8)', color: '#fff', boxShadow: '0 4px 20px rgba(99,102,241,0.35)' }}
-            >
-              <Download className="w-4 h-4" />
-              Export Credential
-            </button>
-            <button
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}
-            >
-              <BarChart2 className="w-4 h-4" />
-              View Reports
-            </button>
-            <button
-              className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.12)' }}
-            >
-              <Share2 className="w-4 h-4" />
-              Share Profile
-            </button>
-          </div>
-        </div>
-
-        {/* Identity Card */}
-        <div className="mx-6 mb-4 rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div className="flex items-center justify-between px-5 py-4">
-            <div className="flex items-center gap-3">
-              {/* Logo icon */}
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(56,189,248,0.12)', border: '1.5px solid rgba(56,189,248,0.3)' }}>
-                <svg viewBox="0 0 24 24" className="w-7 h-7" fill="none">
-                  <rect x="3" y="3" width="18" height="18" rx="4" stroke="#38bdf8" strokeWidth="1.5" />
-                  <path d="M8 12h8M12 8v8" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-bold text-base" style={{ color: '#f1f5f9' }}>{userName}</p>
-                <span className="flex items-center gap-1 text-xs font-bold mt-0.5" style={{ color: '#10b981' }}>
-                  <CheckCircle className="w-3 h-3" />
-                  VERIFIED
-                </span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: '#38bdf8', opacity: 0.7 }}>Identity Ref</p>
-              <p className="text-lg font-black tracking-widest mt-0.5" style={{ color: '#38bdf8' }}>{identityRef}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Body: Two columns */}
-        <div className="mx-6 mb-4 rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <div className="flex flex-col md:flex-row">
-            {/* Left: Robot + Info + Ring */}
-            <div className="md:w-[45%] flex flex-col items-center px-5 py-6 border-b md:border-b-0 md:border-r" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
-              {/* Robot Image */}
-              <div className="relative w-36 h-36 mb-4">
-                <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle, rgba(56,189,248,0.15) 0%, transparent 75%)' }} />
-                <img
-                  src={spImage}
-                  alt="SMAART AI"
-                  className="w-full h-full object-cover rounded-2xl"
-                  style={{ border: '2px solid rgba(56,189,248,0.25)' }}
-                  loading="lazy"
-                />
-              </div>
-
-              {/* Info rows */}
-              <div className="w-full space-y-2 mb-5">
-                {stageBand && (
-                  <div className="flex items-center gap-2">
-                    <Award className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} />
-                    <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Rank</span>
-                    <span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{stageBand.toUpperCase()}</span>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} />
-                  <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Loc</span>
-                  <span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>Remote, Earth</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} />
-                  <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Exp</span>
-                  <span className="ml-auto text-xs font-bold truncate max-w-[100px]" style={{ color: '#e2e8f0' }}>SMAART Institute</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: '#818cf8' }} />
-                  <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#64748b' }}>Join</span>
-                  <span className="ml-auto text-xs font-bold" style={{ color: '#e2e8f0' }}>{joinYear}</span>
-                </div>
-              </div>
-
-              {/* Global Readiness Ring */}
-              <div className="flex flex-col items-center mt-2">
-                <svg width="120" height="120" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(56,189,248,0.1)" strokeWidth="10" />
-                  <motion.circle
-                    cx="60" cy="60" r="54"
-                    fill="none"
-                    stroke="url(#ringGrad)"
-                    strokeWidth="10"
-                    strokeLinecap="round"
-                    strokeDasharray={circumference}
-                    initial={{ strokeDashoffset: circumference }}
-                    animate={{ strokeDashoffset: dashOffset }}
-                    transition={{ duration: 1.5, ease: 'easeOut' }}
-                    transform="rotate(-90 60 60)"
-                  />
-                  <defs>
-                    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#38bdf8" />
-                      <stop offset="100%" stopColor="#818cf8" />
-                    </linearGradient>
-                  </defs>
-                  <text x="60" y="55" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#38bdf8">{score}%</text>
-                  <text x="60" y="72" textAnchor="middle" fontSize="8" fill="#64748b">SCORE</text>
-                </svg>
-                <p className="text-xs font-bold tracking-widest uppercase mt-1" style={{ color: '#38bdf8' }}>Global Readiness</p>
-              </div>
-            </div>
-
-            {/* Right: Skill Proficiency + Tags */}
-            <div className="md:w-[55%] px-5 py-6">
-              <div className="flex items-center gap-2 mb-5">
-                <Target className="w-4 h-4" style={{ color: '#38bdf8' }} />
-                <h3 className="text-sm font-bold uppercase tracking-widest" style={{ color: '#e2e8f0' }}>Skill Proficiency</h3>
-              </div>
-
-              {/* Skill tags */}
-              <div className="flex flex-col gap-2">
-                {skills.map((skill, i) => (
-                  <motion.div
-                    key={skill}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 * i, duration: 0.35 }}
-                    className="flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-semibold"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: '#cbd5e1' }}
-                  >
-                    <span>{skill}</span>
-                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#38bdf8', boxShadow: '0 0 6px #38bdf8' }} />
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Quotients */}
-              <div className="mt-5">
-                <p className="text-[10px] uppercase tracking-widest font-bold mb-3" style={{ color: '#64748b' }}>Assessment Quotients</p>
-                <div className="grid grid-cols-1 gap-1.5">
-                  {QUOTIENTS.map(q => (
-                    <div key={q.id} className="flex items-center gap-2">
-                      <span className="text-xs font-black w-10 flex-shrink-0" style={{ color: q.color }}>{q.id}</span>
-                      <span className="text-xs" style={{ color: '#94a3b8' }}>– {q.desc}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mx-6 mb-6 rounded-2xl flex items-center justify-between px-5 py-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase tracking-widest font-bold" style={{ color: '#475569' }}>Issued by</span>
-            <span className="text-sm font-bold" style={{ color: '#94a3b8' }}>SMAART Minds AI</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#38bdf8' }} />
-            <span className="text-xs font-bold" style={{ color: '#38bdf8' }}>AI Verified</span>
-            <span className="text-xs" style={{ color: '#475569' }}>• {verifiedDate}</span>
-          </div>
-        </div>
-
-        {/* Bottom glow */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, rgba(56,189,248,0.3), transparent)' }} />
-      </motion.div>
-    </motion.div>
-  );
-};
 
 // ----- Main MyAssessments Component -----
 const MyAssessments = () => {
@@ -417,60 +141,62 @@ const MyAssessments = () => {
         transition={{ delay: index * 0.1, duration: 0.5 }}
         className="relative flex items-center"
       >
-        <div className="flex-shrink-0 flex flex-col items-center mr-4">
+        <div className="mr-4 flex flex-shrink-0 flex-col items-center">
           <div
-            className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-xs sm:text-sm font-bold shadow-md"
-            style={{
-              backgroundColor: isCompleted ? THEME.teal : isCurrent ? THEME.navy : '#374151',
-              color: THEME.white,
-              border: `2px solid ${isCompleted ? THEME.teal : isCurrent ? THEME.teal : '#4B5563'}`
-            }}
+            className={`flex h-12 w-12 items-center justify-center rounded-xl text-xs font-bold shadow-md sm:h-14 sm:w-14 sm:text-sm ${
+              isCompleted
+                ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white shadow-lg shadow-blue-500/20"
+                : isCurrent
+                  ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white"
+                  : "border-2 border-slate-100 bg-slate-50 text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500"
+            }`}
           >
             Step {index + 1}
           </div>
         </div>
 
-        <div className="relative flex-1 max-w-lg">
+        <div className="relative max-w-lg flex-1">
           <motion.div
             whileHover={!isLocked && !isTimerActive ? { scale: 1.02 } : {}}
-            className="relative overflow-hidden rounded-2xl shadow-lg transition-all duration-300"
-            style={{
-              backgroundColor: THEME.navy,
-              border: `2px solid ${isCompleted ? THEME.teal : isCurrent && !isTimerActive ? THEME.teal : '#374151'}`,
-              opacity: isLocked || isTimerActive ? 0.7 : 1
-            }}
+            className={`relative overflow-hidden rounded-[24px] border shadow-[0_18px_40px_-30px_rgba(15,23,42,0.12)] transition-all duration-300 dark:shadow-none ${
+              isCompleted || (isCurrent && !isTimerActive)
+                ? "border-blue-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#fbfdff_100%)] dark:border-blue-500/25 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,1)_0%,_rgba(30,41,59,1)_100%)]"
+                : "border-slate-200/80 bg-[linear-gradient(180deg,_#ffffff_0%,_#fbfdff_100%)] opacity-70 dark:border-slate-700/70 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,1)_0%,_rgba(30,41,59,1)_100%)]"
+            }`}
           >
-            <div className="absolute inset-0 opacity-5" style={{ background: `linear-gradient(135deg, ${THEME.teal}, ${THEME.navy})` }} />
-            <div className="relative z-10 p-4 sm:p-5">
-              <div className="flex items-start gap-3 sm:gap-4 mb-3">
+            <div className="relative z-10 p-5 sm:p-6">
+              <div className="mb-4 flex items-start gap-4">
                 <div
-                  className="relative flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-lg"
-                  style={{ backgroundColor: isCompleted ? THEME.teal : isCurrent && !isTimerActive ? THEME.teal : '#4B5563' }}
+                  className={`relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm sm:h-16 sm:w-16 ${
+                    isCompleted || (isCurrent && !isTimerActive)
+                      ? "bg-blue-50 text-[#1a3884] dark:bg-blue-500/10 dark:text-blue-400"
+                      : "bg-slate-50 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+                  }`}
                 >
                   {isCompleted ? (
-                    <CheckCircle2 className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: THEME.white }} />
+                    <CheckCircle2 className="h-7 w-7 sm:h-8 sm:w-8" />
                   ) : (
-                    <IconComponent className="w-7 h-7 sm:w-8 sm:h-8" style={{ color: THEME.white }} />
+                    <IconComponent className="h-7 w-7 sm:h-8 sm:w-8" />
                   )}
                   {isCurrent && !isTimerActive && !isCompleted && (
-                    <span className="absolute inset-0 rounded-full animate-ping" style={{ backgroundColor: `${THEME.teal}40` }} />
+                    <span className="absolute inset-0 animate-ping rounded-2xl bg-blue-400/20" />
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: isCompleted || isCurrent ? THEME.teal : '#9CA3AF' }}>
+                <div className="min-w-0 flex-1 pt-1">
+                  <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isCompleted || isCurrent ? "text-[#1a3884] dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}`}>
                     {assessment.category}
                   </span>
-                  <h3 className="text-lg sm:text-xl font-bold truncate" style={{ color: isLocked || isTimerActive ? '#9CA3AF' : THEME.white }}>
+                  <h3 className={`truncate text-lg font-black sm:text-xl ${isLocked || isTimerActive ? "text-slate-500 dark:text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>
                     {assessment.title}
                   </h3>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    <span className="text-xs" style={{ color: '#D1D5DB' }}>{assessment.questions}</span>
-                    <span className="text-xs" style={{ color: '#9CA3AF' }}>•</span>
-                    <span className="text-xs" style={{ color: '#D1D5DB' }}>{assessment.duration}</span>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{assessment.questions}</span>
+                    <span className="text-xs font-medium text-slate-400 dark:text-slate-600">•</span>
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{assessment.duration}</span>
                   </div>
                 </div>
               </div>
-              <div className="mt-4">
+              <div className="mt-5">
                 {isCompleted ? (
                   <button
                     onClick={() => setSelectedAssessment({
@@ -480,17 +206,15 @@ const MyAssessments = () => {
                       data: results[assessment.key],
                       description: `View your ${assessment.title} results.`
                     })}
-                    className="w-full py-2.5 px-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 hover:opacity-90"
-                    style={{ backgroundColor: `${THEME.teal}20`, color: THEME.teal, border: `1px solid ${THEME.teal}50` }}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-600 shadow-sm transition-all hover:border-[#1a3884] hover:bg-[#1a3884] hover:text-white dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-600"
                   >
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 className="h-4 w-4" />
                     View Results
                   </button>
                 ) : (
                   <a
                     href={assessment.path}
-                    className="w-full py-2.5 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all hover:shadow-lg hover:-translate-y-0.5"
-                    style={{ backgroundColor: THEME.teal, color: THEME.white, border: `2px solid ${THEME.white}30` }}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#1a3884] via-[#2b57c4] to-[#3b6de3] py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/15 transition-all hover:shadow-xl"
                   >
                     Start Assessment
                   </a>
@@ -505,23 +229,24 @@ const MyAssessments = () => {
 
   return (
     <div className="min-h-screen">
-      <main className="p-4 sm:p-6">
+      <main className="px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
         {loading ? (
           <AssessmentsSkeleton />
         ) : (
           <>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <motion.div className="mx-auto max-w-7xl" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             {isFirstLogin && (
               <motion.div initial={{ opacity: 0, y: -20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.5 }} className="mb-6 sm:mb-8">
-                <div className="relative overflow-hidden rounded-2xl p-6 sm:p-8" style={{ background: `linear-gradient(135deg, ${THEME.teal}20, ${THEME.navy})`, border: `2px solid ${THEME.teal}` }}>
+                <div className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.16),_transparent_30%),linear-gradient(135deg,_#ffffff_0%,_#f8fbff_52%,_#eef4ff_100%)] p-6 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.24)] dark:border-slate-700/70 dark:bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_32%),linear-gradient(135deg,_rgba(15,23,42,1)_0%,_rgba(15,23,42,0.98)_48%,_rgba(30,41,59,1)_100%)] sm:p-8">
+                  <div className="pointer-events-none absolute -right-10 top-0 h-32 w-32 rounded-full bg-blue-200/40 blur-3xl dark:bg-blue-500/10" />
                   <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-xl" style={{ backgroundColor: `${THEME.teal}30` }}>
-                        <Award className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: THEME.teal }} />
+                    <div className="mb-3 flex items-center gap-4">
+                      <div className="rounded-2xl bg-blue-50 p-3 text-[#1a3884] dark:bg-blue-500/10 dark:text-blue-300">
+                        <Award className="h-6 w-6 sm:h-8 sm:w-8" />
                       </div>
-                      <h2 className="text-xl sm:text-2xl font-bold" style={{ color: THEME.white }}>Welcome back, {userName || "Student"}! 🎉</h2>
+                      <h2 className="text-xl font-black text-slate-900 dark:text-slate-50 sm:text-2xl">Welcome back, {userName || "Student"}! 🎉</h2>
                     </div>
-                    <p className="text-sm sm:text-base mb-4" style={{ color: '#D1D5DB' }}>Complete your base line assessment to unlock personalized insights.</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300 sm:text-base">Complete your base line assessment to unlock personalized insights.</p>
                   </div>
                 </div>
               </motion.div>
@@ -532,27 +257,21 @@ const MyAssessments = () => {
             </div>
 
             {/* Skills Passport Button */}
-            <div className="mb-6 flex items-center gap-3">
+            <div className="mb-8 flex items-center gap-3">
               <motion.button
-                whileHover={{ scale: 1.04, boxShadow: '0 8px 32px rgba(56,189,248,0.25)' }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setShowPassport(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all"
-                style={{
-                  background: 'linear-gradient(135deg, #1e3a78, #0f2861)',
-                  color: '#38bdf8',
-                  border: '1.5px solid rgba(56,189,248,0.35)',
-                  boxShadow: '0 4px 16px rgba(56,189,248,0.12)'
-                }}
+                className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-700/80"
               >
-                <Shield className="w-4 h-4" />
+                <Shield className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
                 Skills Passport
               </motion.button>
             </div>
 
-            <div className="relative max-w-3xl mx-auto pl-4 sm:pl-8">
-              <div className="absolute left-0 sm:left-2 top-12 bottom-12 w-1 rounded-full" style={{ backgroundColor: `${THEME.teal}50` }} />
-              <div className="relative space-y-6 sm:space-y-8 py-4">
+            <div className="relative mx-auto max-w-3xl pl-4 sm:pl-8">
+              <div className="absolute bottom-12 left-0 top-12 w-1 rounded-full bg-blue-100 dark:bg-blue-900/50 sm:left-2" />
+              <div className="relative space-y-6 py-4 sm:space-y-8">
                 {assessmentConfig.map((assessment, index) => renderPathNode(assessment, index))}
               </div>
             </div>
@@ -563,47 +282,47 @@ const MyAssessments = () => {
             {selectedAssessment && (
               <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md"
                 onClick={() => setSelectedAssessment(null)}
               >
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
                   onClick={(e) => e.stopPropagation()}
-                  className="bg-[#001730] border-2 border-cyan-500/50 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(6,182,212,0.15)]"
+                  className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-[32px] border border-slate-200/70 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.16),_transparent_30%),linear-gradient(135deg,_#ffffff_0%,_#f8fbff_52%,_#eef4ff_100%)] shadow-[0_24px_60px_-36px_rgba(15,23,42,0.24)] dark:border-slate-700/70 dark:bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_32%),linear-gradient(135deg,_rgba(15,23,42,1)_0%,_rgba(15,23,42,0.98)_48%,_rgba(30,41,59,1)_100%)]"
                 >
-                  <div className="p-6 border-b border-white/10 flex items-center justify-between bg-[#001e3c]">
+                  <div className="flex items-center justify-between border-b border-slate-200/80 px-6 py-5 dark:border-slate-700/80">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-lg border border-cyan-400/50 text-cyan-400 bg-transparent">
-                        <selectedAssessment.icon className="w-6 h-6" />
+                      <div className="rounded-xl bg-blue-50 p-2.5 text-[#1a3884] dark:bg-blue-500/10 dark:text-blue-400">
+                        <selectedAssessment.icon className="h-6 w-6" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-bold text-white">{selectedAssessment.title}</h2>
-                        <p className="text-cyan-400/70 text-sm">Detailed Results</p>
+                        <h2 className="text-xl font-black text-slate-900 dark:text-slate-50">{selectedAssessment.title}</h2>
+                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Detailed Results</p>
                       </div>
                     </div>
-                    <button onClick={() => setSelectedAssessment(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
-                      <X className="w-6 h-6" />
+                    <button onClick={() => setSelectedAssessment(null)} className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300">
+                      <X className="h-5 w-5" />
                     </button>
                   </div>
-                  <div className="p-6 overflow-y-auto custom-scrollbar text-gray-300">
+                  <div className="custom-scrollbar overflow-y-auto p-6 text-slate-600 dark:text-slate-300">
                     {selectedAssessment.id === 'baseline' && selectedAssessment.data && (
                       <div className="space-y-6">
-                        <div className="p-8 rounded-xl bg-gradient-to-b from-[#002845] to-[#001730] border border-cyan-500/30 text-center">
-                          <h3 className="text-cyan-400/80 uppercase tracking-wider text-sm font-bold mb-4">Readiness Profile</h3>
-                          <div className="inline-block px-8 py-3 rounded-full bg-cyan-500/10 text-cyan-400 font-bold text-lg border border-cyan-500/30 backdrop-blur-md uppercase tracking-widest">
+                        <div className="rounded-2xl border border-slate-200/80 bg-white/60 p-8 text-center backdrop-blur-md dark:border-slate-700/80 dark:bg-slate-900/60">
+                          <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Readiness Profile</h3>
+                          <div className="inline-block rounded-full border border-blue-200 bg-blue-50 px-8 py-3 text-lg font-black uppercase tracking-widest text-[#1a3884] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-400">
                             Current Band: {selectedAssessment.data.stageBand || 'Emerging'}
                           </div>
                         </div>
                         <button
                           onClick={() => generateAssessmentReport(currentUser, selectedAssessment.data)}
-                          className="w-full py-4 mt-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:translate-y-[-2px] hover:shadow-lg bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/30"
+                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-4 font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:-translate-y-0.5 hover:shadow-xl"
                         >
-                          <Download className="w-5 h-5" />
+                          <Download className="h-5 w-5" />
                           Download Detailed PDF Report
                         </button>
-                        <div className="bg-[#001e3c] p-6 rounded-xl border border-white/10">
-                          <h4 className="text-lg font-bold text-white mb-3">Assessment Summary</h4>
-                          <p className="text-gray-300">You have completed the Base Line Test - T1. This assessment measures your fundamental understanding and provides a baseline for your growth journey.</p>
+                        <div className="rounded-2xl border border-slate-200/80 bg-white/60 p-6 backdrop-blur-md dark:border-slate-700/80 dark:bg-slate-900/60">
+                          <h4 className="mb-3 text-lg font-black text-slate-900 dark:text-slate-50">Assessment Summary</h4>
+                          <p className="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">You have completed the Base Line Test - T1. This assessment measures your fundamental understanding and provides a baseline for your growth journey.</p>
                         </div>
                       </div>
                     )}

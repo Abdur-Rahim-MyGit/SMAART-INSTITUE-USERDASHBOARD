@@ -90,7 +90,7 @@ router.post('/', protect, async (req, res) => {
 
     if (user.role === 'college_admin') {
       resolvedTarget = 'college';
-      resolvedCollegeIds = [user.college];
+      resolvedCollegeIds = [user.college?._id || user.college];
     }
 
     const announcement = await Announcement.create({
