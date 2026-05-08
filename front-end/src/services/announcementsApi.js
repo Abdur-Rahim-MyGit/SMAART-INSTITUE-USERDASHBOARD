@@ -39,5 +39,13 @@ export const announcementsAPI = {
     return apiCall(`/announcements/${id}/pin`, {
       method: 'PATCH'
     });
+  },
+  
+  // Toggle/Update reaction (any user)
+  react: async (id, emoji) => {
+    return apiCall(`/announcements/${id}/react`, {
+      method: 'PATCH',
+      body: JSON.stringify({ emoji })
+    });
   }
 };
