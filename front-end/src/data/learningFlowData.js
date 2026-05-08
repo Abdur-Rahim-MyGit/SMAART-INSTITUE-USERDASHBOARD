@@ -107,15 +107,84 @@ export const LEARNING_FLOW_DATA = {
       'G': { step: 'G', title: 'Case Study', subtitle: 'Real-world Analysis', duration: '12 min', type: 'Analysis', contentType: 'case-study', content: 'Basecamp\'s 4-day workweeks: By implementing focused time and reducing meeting overload, Basecamp maintained productivity while improving work-life balance. The key was protecting deep work time and eliminating unnecessary coordination.' },
       'H': { step: 'H', title: 'Notes', subtitle: 'Personal Takeaways', duration: '5 min', type: 'Documentation', contentType: 'notes', content: 'Your ideal week plan. Map out your Q2 activities and commit to protecting your focused time.' }
     }
+  },
+  'PIQ01': {
+    id: 'PIQ01',
+    title: 'Growth Mindset',
+    overview: 'Embrace challenges and transform your approach to learning and failure.',
+    steps: {
+      '1': { step: '1', title: 'Why', subtitle: 'Purpose & Relevance', duration: '4 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'A growth mindset is the belief that abilities can be developed through dedication and hard work.' },
+      '2': { step: '2', title: 'Story', subtitle: 'Real-world Context', duration: '6 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'How Michael Jordan used failure as fuel to become the greatest basketball player of all time.' },
+      '3': { step: '3', title: 'Framework', subtitle: 'Concept Explanation', duration: '7 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'Fixed vs. Growth Mindset: The power of "Yet".' },
+      '4': { step: '4', title: 'Practice', subtitle: 'Basic Application', duration: '8 min', contentType: 'mcq', questions: [{ question: 'What is a core trait of a growth mindset?', options: ['Avoiding challenges', 'Seeing effort as useless', 'Learning from criticism', 'Feeling threatened by others success'], correctAnswer: 2 }] },
+      '5': { step: '5', title: 'Critique/Reflection', subtitle: 'Deep analysis', duration: '5 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'Identify a "fixed mindset" trigger in your professional life. How can you reframe it?' },
+      '6': { step: '6', title: 'Game/Flashcards', subtitle: 'Quick Revision', duration: '4 min', contentType: 'flashcard', cards: [{ front: 'Neuroplasticity', back: 'The brain\'s ability to form new neural connections throughout life.' }] },
+      '7': { step: '7', title: 'Advanced Practice', subtitle: 'Complex Application', duration: '10 min', contentType: 'advanced-mcq', questions: [{ question: 'A project failed. What is the growth mindset response?', options: ['Blame external factors', 'Give up on that skill', 'Analyze the failure for lessons', 'Hide the result'], correctAnswer: 2 }] },
+      '8': { step: '8', title: 'Case Study', subtitle: 'Real-world Analysis', duration: '12 min', contentType: 'case-study', content: 'Carol Dweck\'s research on students and the impact of praise on mindset.' },
+      '9': { step: '9', title: 'Notes', subtitle: 'Personal Takeaways', duration: '5 min', contentType: 'notes', content: 'Commit to one growth mindset action this week.' }
+    }
+  },
+  'AIQ01': {
+    id: 'AIQ01',
+    title: 'AI Tools & Applications',
+    overview: 'Master the essential AI tools that are reshaping the professional landscape.',
+    steps: {
+      '1': { step: '1', title: 'Why', subtitle: 'Purpose & Relevance', duration: '4 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'AI is not a replacement for human intelligence, but an enhancer of it.' },
+      '2': { step: '2', title: 'Story', subtitle: 'Real-world Context', duration: '6 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'How a small marketing team tripled their output using Generative AI tools.' },
+      '3': { step: '3', title: 'Framework', subtitle: 'Concept Explanation', duration: '7 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'The AI Stack: LLMs, Image Generation, and Specialized Agents.' },
+      '4': { step: '4', title: 'Practice', subtitle: 'Basic Application', duration: '8 min', contentType: 'mcq', questions: [{ question: 'What does LLM stand for?', options: ['Large Language Model', 'Linear Logic Map', 'Learned Language Machine', 'Logic Level Module'], correctAnswer: 0 }] },
+      '5': { step: '5', title: 'Critique/Reflection', subtitle: 'Deep analysis', duration: '5 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'Reflect on a repetitive task in your daily routine. How could AI automate or assist it?' },
+      '6': { step: '6', title: 'Game/Flashcards', subtitle: 'Quick Revision', duration: '4 min', contentType: 'flashcard', cards: [{ front: 'Generative AI', back: 'AI that can create new content like text, images, or code.' }] },
+      '7': { step: '7', title: 'Advanced Practice', subtitle: 'Complex Application', duration: '10 min', contentType: 'advanced-mcq', questions: [{ question: 'When using AI for research, what is critical?', options: ['Trusting every output', 'Fact-checking and verification', 'Copy-pasting directly', 'Using the shortest prompt possible'], correctAnswer: 1 }] },
+      '8': { step: '8', title: 'Case Study', subtitle: 'Real-world Analysis', duration: '12 min', contentType: 'case-study', content: 'Github Copilot\'s impact on developer productivity and code quality.' },
+      '9': { step: '9', title: 'Notes', subtitle: 'Personal Takeaways', duration: '5 min', contentType: 'notes', content: 'List three AI tools you will experiment with today.' }
+    }
+  },
+  'SQ01': {
+    id: 'SQ01',
+    title: 'Sustainability Fundamentals',
+    overview: 'Understand the intersection of business, society, and the environment.',
+    steps: {
+      '1': { step: '1', title: 'Why', subtitle: 'Purpose & Relevance', duration: '4 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'Sustainability is no longer optional; it is a core business imperative for the 21st century.' },
+      '2': { step: '2', title: 'Story', subtitle: 'Real-world Context', duration: '6 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'The journey of Patagonia: From a climbing gear company to a leader in corporate activism.' },
+      '3': { step: '3', title: 'Framework', subtitle: 'Concept Explanation', duration: '7 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'The Triple Bottom Line: People, Planet, Profit.' },
+      '4': { step: '4', title: 'Practice', subtitle: 'Basic Application', duration: '8 min', contentType: 'mcq', questions: [{ question: 'What are the three pillars of sustainability?', options: ['Economic, Social, Environmental', 'Financial, Legal, Political', 'Local, National, Global', 'Past, Present, Future'], correctAnswer: 0 }] },
+      '5': { step: '5', title: 'Critique/Reflection', subtitle: 'Deep analysis', duration: '5 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'How does your current consumption pattern affect the environment? What is one change you can make?' },
+      '6': { step: '6', title: 'Game/Flashcards', subtitle: 'Quick Revision', duration: '4 min', contentType: 'flashcard', cards: [{ front: 'Circular Economy', back: 'An economic system aimed at eliminating waste and the continual use of resources.' }] },
+      '7': { step: '7', title: 'Advanced Practice', subtitle: 'Complex Application', duration: '10 min', contentType: 'advanced-mcq', questions: [{ question: 'What is "Greenwashing"?', options: ['Cleaning solar panels', 'Misleading marketing about environmental benefits', 'Recycling plastic bottles', 'Planting trees'], correctAnswer: 1 }] },
+      '8': { step: '8', title: 'Case Study', subtitle: 'Real-world Analysis', duration: '12 min', contentType: 'case-study', content: 'The UN Sustainable Development Goals (SDGs) and their role in global development.' },
+      '9': { step: '9', title: 'Notes', subtitle: 'Personal Takeaways', duration: '5 min', contentType: 'notes', content: 'Draft your personal sustainability manifesto.' }
+    }
   }
 };
 
 export const getLearningFlowData = (courseId) => {
-  return LEARNING_FLOW_DATA[courseId] || null;
+  // If we have specific data, return it
+  if (LEARNING_FLOW_DATA[courseId]) {
+    return LEARNING_FLOW_DATA[courseId];
+  }
+
+  // Fallback: Generate generic sample data so the player is never empty
+  return {
+    id: courseId,
+    title: `Mastering ${courseId}`,
+    overview: `A comprehensive guide to mastering the concepts within ${courseId}.`,
+    steps: {
+      '1': { step: '1', title: 'Why', subtitle: 'Purpose & Relevance', duration: '5 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: `Understanding the "Why" behind ${courseId} is critical for long-term retention and application.` },
+      '2': { step: '2', title: 'Story', subtitle: 'Real-world Context', duration: '7 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'Let\'s look at a real-world scenario where these principles solved a major challenge.' },
+      '3': { step: '3', title: 'Framework', subtitle: 'Concept Explanation', duration: '8 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'The core framework for this module involves three main pillars of expertise.' },
+      '4': { step: '4', title: 'Practice', subtitle: 'Basic Application', duration: '10 min', contentType: 'mcq', questions: [{ question: 'What is the primary focus of this module?', options: ['Theory', 'Practice', 'Both', 'None'], correctAnswer: 2 }] },
+      '5': { step: '5', title: 'Critique/Reflection', subtitle: 'Deep analysis', duration: '6 min', contentType: 'video-text', videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', content: 'Reflect on how you can apply these learnings in your current role.' },
+      '6': { step: '6', title: 'Game/Flashcards', subtitle: 'Quick Revision', duration: '5 min', contentType: 'flashcard', cards: [{ front: 'Core Concept', back: 'The most important takeaway from this lesson.' }] },
+      '7': { step: '7', title: 'Advanced Practice', subtitle: 'Complex Application', duration: '12 min', contentType: 'advanced-mcq', questions: [{ question: 'Which advanced strategy works best?', options: ['Strategy A', 'Strategy B', 'Strategy C', 'Strategy D'], correctAnswer: 1 }] },
+      '8': { step: '8', title: 'Case Study', subtitle: 'Real-world Analysis', duration: '15 min', contentType: 'case-study', content: 'Analysis of a successful implementation in a Fortune 500 company.' },
+      '9': { step: '9', title: 'Notes', subtitle: 'Personal Takeaways', duration: '5 min', contentType: 'notes', content: 'Record your final thoughts and action items.' }
+    }
+  };
 };
 
 export const getStepData = (courseId, stepId) => {
-  const courseData = LEARNING_FLOW_DATA[courseId];
+  const courseData = getLearningFlowData(courseId);
   if (!courseData) return null;
   return courseData.steps[stepId] || null;
 };

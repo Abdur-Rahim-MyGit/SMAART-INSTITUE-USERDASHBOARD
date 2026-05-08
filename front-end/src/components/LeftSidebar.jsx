@@ -73,7 +73,7 @@ const menuGroups = [
     title: "sidebar.group_skills",
     items: [
       { icon: Award, label: "Skills Vault", path: "/dashboard/skills-vault", badge: null },
-      { icon: Compass, label: "Career Direction", path: "/dashboard/career-direction", badge: null },
+      { icon: Compass, label: "Career Directions", path: "/dashboard/career-direction", badge: null },
       { icon: ShieldCheck, label: "Skills Passport", path: "/dashboard/skills-passport", badge: null },
       { icon: Lightbulb, label: "Vision Board", path: "/dashboard/vision-boards", badge: null },
     ]
