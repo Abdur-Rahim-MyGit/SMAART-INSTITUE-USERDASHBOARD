@@ -66,7 +66,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
         onClick={onClick}
         disabled={!isUnlocked}
         onMouseMove={handleMouseMove}
-        className={`w-full text-left p-8 rounded-[24px] transition-all duration-500 group relative overflow-hidden ${
+        className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden ${
           isUnlocked
             ? "bg-white dark:bg-[#001835] hover:-translate-y-2"
             : "bg-gray-50 dark:bg-[#001835]/40 cursor-not-allowed opacity-60"
@@ -91,12 +91,12 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
         <div className="relative z-10">
           <div className="flex items-start gap-6">
             {/* Icon Box - Matching LoginCard style */}
-            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${
               isUnlocked 
                 ? "bg-white border-gray-100 group-hover:scale-110 group-hover:shadow-md" 
                 : "bg-gray-100 border-gray-200"
             }`}>
-              <Icon className={`w-8 h-8 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />
+              <Icon className={`w-7 h-7 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />
             </div>
             
             <div className="flex-1 min-w-0">
@@ -109,14 +109,14 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
                 {!isUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
               </div>
               
-              <h3 className={`text-2xl font-extrabold tracking-tight mb-2 ${
+              <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${
                 isUnlocked
                   ? "text-[#112b6b]"
                   : "text-gray-400"
               }`} style={{ letterSpacing: "-0.02em" }}>
                 {stage.name}
               </h3>
-              <p className="text-[13px] text-gray-500 mb-6 line-clamp-2 leading-relaxed font-medium">
+              <p className="text-[13px] text-gray-500 mb-4 line-clamp-2 leading-relaxed font-medium">
                 {stage.description}
               </p>
               
@@ -160,6 +160,22 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
 const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
   const total = track.totalCourses;
   const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const spotlightBackground = useMotionTemplate`
+    radial-gradient(
+      600px circle at ${mouseX}px ${mouseY}px,
+      rgba(26, 56, 132, 0.05),
+      transparent 80%
+    )
+  `;
+
+  function handleMouseMove({ currentTarget, clientX, clientY }) {
+    let { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
   
   return (
     <motion.div
@@ -170,62 +186,92 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
       <button
         onClick={onClick}
         disabled={!isUnlocked}
+        onMouseMove={handleMouseMove}
         className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden ${
           isUnlocked
-            ? "bg-white dark:bg-[#0b1627] hover:-translate-y-1"
-            : "bg-gray-50 dark:bg-[#0b1627]/40 cursor-not-allowed opacity-60"
+            ? "bg-white dark:bg-[#001835] hover:-translate-y-2"
+            : "bg-gray-50 dark:bg-[#001835]/40 cursor-not-allowed opacity-60"
         }`}
         style={{
           border: "1px solid rgba(0, 0, 0, 0.05)",
           boxShadow: isUnlocked 
-            ? "0 10px 30px rgba(0,0,0,0.04)" 
+            ? "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)" 
             : "none"
         }}
       >
+        {/* Spotlight Effect */}
+        {isUnlocked && (
+          <motion.div
+            className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100"
+            style={{
+              background: spotlightBackground,
+            }}
+          />
+        )}
+
         <div className="relative z-10">
-          <div className="flex items-center gap-4 mb-4">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm border transition-all duration-300 ${
-              isUnlocked ? "bg-white border-gray-100 group-hover:shadow-md group-hover:scale-105" : "bg-gray-100 border-gray-200"
+          <div className="flex items-start gap-6">
+            {/* Icon Box */}
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${
+              isUnlocked 
+                ? "bg-white border-gray-100 group-hover:scale-110 group-hover:shadow-md" 
+                : "bg-gray-100 border-gray-200"
             }`}>
-              {track.id === 'PIQ' && <Brain className={`w-6 h-6 ${isUnlocked ? "text-purple-500" : "text-gray-400"}`} />}
-              {track.id === 'AIQ' && <Bot className={`w-6 h-6 ${isUnlocked ? "text-blue-500" : "text-gray-400"}`} />}
-              {track.id === 'SQ' && <Leaf className={`w-6 h-6 ${isUnlocked ? "text-emerald-500" : "text-gray-400"}`} />}
+              {track.id === 'PIQ' && <Brain className={`w-7 h-7 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />}
+              {track.id === 'AIQ' && <Bot className={`w-7 h-7 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />}
+              {track.id === 'SQ' && <Leaf className={`w-7 h-7 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />}
             </div>
-            <div>
-              <span className={`text-[9px] font-bold uppercase tracking-[0.2em] ${
-                isUnlocked ? "text-[#1a3884]" : "text-gray-400"
-              }`}>
-                Specialization Track
-              </span>
-              <h3 className={`text-lg font-bold ${
-                isUnlocked ? "text-[#112b6b] dark:text-white" : "text-gray-400"
-              }`}>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-3">
+                <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${
+                  isUnlocked ? "text-[#1a3884]" : "text-gray-400"
+                }`}>
+                  Specialization Track
+                </span>
+                {!isUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
+              </div>
+              
+              <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${
+                isUnlocked
+                  ? "text-[#112b6b]"
+                  : "text-gray-400"
+              }`} style={{ letterSpacing: "-0.02em" }}>
                 {track.shortName}
               </h3>
-            </div>
-          </div>
-          
-          <p className="text-[12px] text-gray-500 mb-4 line-clamp-2 font-medium">
-            {track.description}
-          </p>
-          
-          <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-1000"
-              style={{
-                width: `${pct}%`,
-                backgroundColor: isUnlocked ? track.color : "#e2e8f0"
-              }}
-            />
-          </div>
-          <div className="flex justify-between mt-2">
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{pct}% Completed</span>
-            {!isUnlocked && (
-              <div className="flex items-center gap-1">
-                <Lock className="w-3 h-3 text-gray-400" />
-                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Locked</span>
+              <p className="text-[13px] text-gray-500 mb-4 line-clamp-2 leading-relaxed font-medium">
+                {track.description}
+              </p>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                    isUnlocked ? "text-gray-700" : "text-gray-400"
+                  }`}>
+                    Progression
+                  </span>
+                  <span className={`text-[11px] font-bold ${
+                    isUnlocked ? "text-[#1a3884]" : "text-gray-400"
+                  }`}>
+                    {completedCount}/{total} Courses
+                  </span>
+                </div>
+                
+                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct}%` }}
+                    transition={{ duration: 1, delay: delay + 0.3 }}
+                    className="h-full rounded-full"
+                    style={{
+                      background: isUnlocked 
+                        ? `linear-gradient(90deg, ${track.color} 0%, #1a3884 100%)` 
+                        : "#e2e8f0"
+                    }}
+                  />
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </button>
@@ -241,7 +287,7 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
       onClick={onClick}
-      className={`relative rounded-2xl p-5 cursor-pointer transition-all duration-300 group overflow-hidden ${
+      className={`relative rounded-2xl p-4 cursor-pointer transition-all duration-300 group overflow-hidden ${
         isCompleted
           ? "bg-green-50/50"
           : isCurrent
@@ -260,7 +306,7 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
       }}
     >
       <div className="flex items-start gap-4">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 border ${
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 border ${
           isCompleted
             ? "bg-green-500 border-green-600 text-white shadow-sm"
             : isCurrent
@@ -486,42 +532,52 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
 
       {/* Page header - Vision Board Inspired Style - Hidden when stage selected */}
       {!selectedStageId && (
-        <div className="relative z-10 px-6 md:px-12 py-8">
+        <div className="relative z-10 px-6 md:px-12 py-6">
           <div className="max-w-7xl mx-auto">
-            <section className="rounded-[28px] border border-slate-200 bg-white px-6 py-8 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-10 md:py-10 transition-all duration-300">
-              <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-10">
-                <div className="max-w-3xl">
-                  <div className="mb-4 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300 shadow-sm">
-                    <GraduationCap className="w-3.5 h-3.5 mr-2" />
-                    Core Programme
+            <motion.section
+              initial={{ opacity: 0, y: 22, scale: 0.99 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -2 }}
+              className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.16),_transparent_30%),linear-gradient(135deg,_#ffffff_0%,_#f8fbff_52%,_#eef4ff_100%)] p-5 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.24)] dark:border-slate-700/70 dark:bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_32%),linear-gradient(135deg,_rgba(15,23,42,1)_0%,_rgba(15,23,42,0.98)_48%,_rgba(30,41,59,1)_100%)] sm:p-6 md:p-8"
+            >
+              <div className="pointer-events-none absolute -right-10 top-0 h-32 w-32 rounded-full bg-blue-200/40 blur-3xl dark:bg-blue-500/10" />
+              <div className="pointer-events-none absolute bottom-0 left-8 h-24 w-24 rounded-full bg-cyan-100/50 blur-3xl dark:bg-cyan-400/10" />
+
+                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 relative z-10">
+                <div className="max-w-2xl space-y-5">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-[#1a3884] shadow-sm dark:border-blue-400/20 dark:bg-slate-900/65 dark:text-blue-300">
+                    <span className="h-2 w-2 rounded-full bg-gradient-to-r from-[#1a3884] to-[#4f7cf3]" />
+                    Learning Journey
                   </div>
                   
-                  <h1 className="text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white md:text-5xl leading-[1.1]" style={{ letterSpacing: "-0.04em" }}>
-                    Your Learning Journey
-                  </h1>
-                  
-                  <p className="mt-4 text-[16px] text-slate-500 dark:text-slate-400 font-medium max-w-xl leading-relaxed">
-                    Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence.
-                  </p>
+                  <div className="space-y-4">
+                    <h1 className="text-[1.75rem] font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-[2rem] lg:text-[2.25rem] lg:leading-[1.1]">
+                      SMAART <span className="text-[#1a3884] dark:text-blue-300">Programme</span>
+                    </h1>
+                    <p className="max-w-xl text-[13px] font-medium leading-6 text-slate-600 dark:text-slate-300 sm:text-sm">
+                      Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence.
+                    </p>
+                  </div>
                 </div>
 
-                {/* Overall progress card - Refined for attractiveness */}
+                {/* Overall progress card - Matching the assessment center metrics style */}
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-10 group-hover:opacity-20 transition duration-1000"></div>
-                  <div className="relative flex items-center gap-8 bg-white dark:bg-[#001835] border border-slate-100 dark:border-white/5 rounded-[22px] px-8 py-7 shadow-xl shadow-gray-200/40 dark:shadow-black/20 overflow-hidden">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-5 group-hover:opacity-10 transition duration-1000"></div>
+                  <div className="relative flex items-center gap-6 bg-white/80 dark:bg-slate-900/60 border border-white/80 dark:border-slate-700/70 rounded-[24px] px-6 py-5 shadow-[0_16px_34px_-28px_rgba(15,23,42,0.24)] backdrop-blur overflow-hidden">
                     <div className="text-center relative z-10">
-                      <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">Overall Completion</div>
-                      <div className="text-4xl font-black text-[#1a3884] dark:text-blue-400 leading-none tabular-nums">{overallPct}%</div>
+                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.24em] mb-2">Completion</div>
+                      <div className="text-4xl font-black text-[#1a3884] dark:text-blue-300 leading-none tabular-nums">{overallPct}%</div>
                     </div>
-                    <div className="h-12 w-px bg-slate-100 dark:bg-white/10" />
-                    <div className="space-y-2 relative z-10">
+                    <div className="h-12 w-px bg-slate-200 dark:bg-slate-700" />
+                    <div className="space-y-3 relative z-10">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/30" />
-                        <span className="text-[13px] font-bold text-[#112b6b] dark:text-slate-200">{totalCompleted} Modules Mastered</span>
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]" />
+                        <span className="text-[13px] font-black text-slate-900 dark:text-slate-100">{totalCompleted} Mastered</span>
                       </div>
                       <div className="flex items-center gap-2.5">
-                        <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700" />
-                        <span className="text-[13px] font-bold text-slate-400 dark:text-slate-500">{totalCourses - totalCompleted} Steps Ahead</span>
+                        <div className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700" />
+                        <span className="text-[13px] font-black text-slate-400 dark:text-slate-500">{totalCourses - totalCompleted} Remaining</span>
                       </div>
                     </div>
                     
@@ -532,20 +588,20 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
                   </div>
                 </div>
               </div>
-            </section>
+            </motion.section>
           </div>
         </div>
       )}
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 relative z-10">
         <AnimatePresence mode="wait">
           {!selectedStageId ? (
             /* Category cards view */
             <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="space-y-12">
               <div>
                 <h2 className="text-xl font-bold text-[#112b6b] mb-6 px-1 flex items-center gap-3">
-                   Core Learning Stages
+                    Human Intelligence Courses
                    <div className="h-px flex-1 bg-slate-100" />
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -573,7 +629,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
 
               <div>
                 <h2 className="text-xl font-bold text-[#112b6b] mb-6 px-1 flex items-center gap-3">
-                   Parallel Specialization Tracks
+                   Readiness Tracks
                    <div className="h-px flex-1 bg-slate-100" />
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

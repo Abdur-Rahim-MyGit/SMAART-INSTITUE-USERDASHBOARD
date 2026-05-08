@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Announcement = require('../models/Announcement');
-const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -22,34 +21,27 @@ const buildVisibilityFilter = (user) => {
     return baseFilter;
   }
 
-  if (user.role === 'college_admin') {
-    // College admin sees: all-target + their own college
+  const collegeId = user.college?._id || user.college;
+
+  if (user.role === 'college_admin' || user.role === 'student') {
     return {
       ...baseFilter,
       $or: [
         { targetType: 'all' },
-        { targetType: 'college', targetCollegeIds: user.college }
+        { targetType: 'college', targetCollegeIds: collegeId }
       ]
     };
   }
 
-  // Student sees: all-target + announcements for their college
-  return {
-    ...baseFilter,
-    $or: [
-      { targetType: 'all' },
-      { targetType: 'college', targetCollegeIds: user.college }
-    ]
-  };
+  // Fallback (shouldn't really be reached for valid users)
+  return baseFilter;
 };
 
 // ─── GET /api/announcements ──────────────────────────────────────────────────
 // Returns announcements visible to the current user, sorted pinned-first
 router.get('/', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
-    if (!user) return res.status(401).json({ success: false, error: 'User not found' });
-
+    const user = req.user;
     const filter = buildVisibilityFilter(user);
     const { dateFilter } = req.query; // 'today' | 'week' | undefined
 
@@ -65,7 +57,7 @@ router.get('/', protect, async (req, res) => {
 
     const announcements = await Announcement.find(filter)
       .populate('createdById', 'fullName role college')
-      .populate('targetCollegeIds', 'name')
+      .populate('targetCollegeIds', 'collegeName')
       .sort({ isPinned: -1, createdAt: -1 })
       .limit(50)
       .lean();
@@ -81,7 +73,7 @@ router.get('/', protect, async (req, res) => {
 // Create a new announcement (admin / college_admin only)
 router.post('/', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user || !canPost(user.role)) {
       return res.status(403).json({ success: false, error: 'Not authorised to post announcements' });
     }
@@ -129,7 +121,7 @@ router.post('/', protect, async (req, res) => {
 // Edit an announcement — admin edits any, college_admin edits only their own
 router.put('/:id', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user || !canPost(user.role)) {
       return res.status(403).json({ success: false, error: 'Not authorised' });
     }
@@ -165,7 +157,7 @@ router.put('/:id', protect, async (req, res) => {
 // ─── DELETE /api/announcements/:id ──────────────────────────────────────────
 router.delete('/:id', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user || !canPost(user.role)) {
       return res.status(403).json({ success: false, error: 'Not authorised' });
     }
@@ -189,7 +181,7 @@ router.delete('/:id', protect, async (req, res) => {
 // Toggle pin — SMAART admin only
 router.patch('/:id/pin', protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).lean();
+    const user = req.user;
     if (!user || !isAdmin(user.role)) {
       return res.status(403).json({ success: false, error: 'Only SMAART Admin can pin announcements' });
     }
