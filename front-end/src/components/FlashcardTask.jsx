@@ -46,8 +46,12 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
 
 
   return (
-    <div className="w-full h-full bg-white dark:bg-slate-900 p-4 md:p-6 overflow-y-auto">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="w-full h-full bg-[#fbfcfd] dark:bg-[#020617] p-4 md:p-6 overflow-y-auto relative overflow-hidden">
+      {/* Subtle Background Glows */}
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-50/30 dark:bg-blue-900/5 rounded-full blur-[100px] -mr-48 -mt-48 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-50/30 dark:bg-indigo-900/5 rounded-full blur-[100px] -ml-48 -mb-48 pointer-events-none" />
+      
+      <div className="max-w-4xl mx-auto space-y-6 relative z-10">
         {/* Header */}
         <div className="border-b border-slate-200 dark:border-slate-700 pb-4">
           <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-2">
@@ -62,54 +66,78 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
 
         {/* Flashcard */}
         <div className="flex flex-col items-center gap-6">
-          <div 
+          <motion.div 
             onClick={handleFlip}
-            className="relative w-full max-w-2xl aspect-[3/2] cursor-pointer perspective-1000"
+            whileHover={{ scale: 1.02, y: -8 }}
+            whileTap={{ scale: 0.98 }}
+            className="relative w-full max-w-2xl aspect-[3/2] cursor-pointer perspective-1000 group transition-all duration-500"
           >
             <motion.div
-              className="relative w-full h-full"
+              className="relative w-full h-full shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] rounded-3xl"
               initial={false}
               animate={{ rotateY: isFlipped ? 180 : 0 }}
-              transition={{ duration: 0.6, type: 'spring' }}
+              transition={{ duration: 0.7, type: 'spring', stiffness: 200, damping: 15 }}
               style={{ transformStyle: 'preserve-3d' }}
             >
-              {/* Front */}
-              <div
-                className="absolute inset-0 bg-gradient-to-br from-[#0891b2] to-[#0a7a8f] dark:from-[#1a3884] dark:to-[#2a7d88] rounded-2xl shadow-2xl flex items-center justify-center p-8"
-                style={{ backfaceVisibility: 'hidden' }}
-              >
-                <div className="text-center space-y-4">
-                  <p className="text-sm font-bold text-white/70 uppercase tracking-wider">
-                    Question
-                  </p>
-                  <p className="text-lg md:text-2xl font-bold text-white leading-relaxed px-4">
-                    {currentCard?.front}
-                  </p>
-                  <p className="text-[10px] md:text-xs text-white/60 mt-4">
-                    Click to reveal answer
-                  </p>
-                </div>
-              </div>
-
-              {/* Back */}
-              <div
-                className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 dark:from-slate-800 dark:to-slate-950 rounded-2xl shadow-2xl flex items-center justify-center p-8"
+              {/* Front - Force Solid Background and Visibility */}
+              <motion.div
+                className="absolute inset-0 bg-slate-900 dark:bg-slate-950 rounded-3xl flex items-center justify-center p-10 border border-white/10 overflow-hidden"
                 style={{ 
                   backfaceVisibility: 'hidden',
-                  transform: 'rotateY(180deg)'
+                  WebkitBackfaceVisibility: 'hidden',
+                  transform: 'translateZ(1px)',
+                  zIndex: isFlipped ? 0 : 10
                 }}
+                animate={{ opacity: isFlipped ? 0 : 1 }}
+                transition={{ duration: 0.2 }}
               >
-                <div className="text-center space-y-4">
-                  <p className="text-sm font-bold text-white/70 uppercase tracking-wider">
-                    Answer
-                  </p>
-                  <p className="text-xl text-white leading-relaxed">
+                {/* Rich Gradient Overlay - 100% Opaque */}
+                <div className="absolute inset-0 bg-[#1e3a8a] opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#1e40af] via-[#1e3a8a] to-[#172554] opacity-100" />
+                
+                <div className="text-center space-y-6 relative z-10">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 mb-4">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                    <span className="text-[9px] font-black text-white uppercase tracking-[0.25em]">Flashcard Phase</span>
+                  </div>
+                  <h3 className="text-2xl md:text-4xl font-black text-white leading-tight px-4 tracking-tight">
+                    {currentCard?.front}
+                  </h3>
+                  <div className="pt-10 flex flex-col items-center gap-4 opacity-60">
+                    <div className="h-px w-12 bg-white/40" />
+                    <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">
+                      Tap to Flip
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Back - Force Solid Background and Visibility */}
+              <motion.div
+                className="absolute inset-0 bg-white dark:bg-[#0f172a] rounded-3xl flex items-center justify-center p-10 border border-slate-200 dark:border-slate-800"
+                style={{ 
+                  backfaceVisibility: 'hidden',
+                  WebkitBackfaceVisibility: 'hidden',
+                  transform: 'rotateY(180deg) translateZ(1px)',
+                  zIndex: isFlipped ? 10 : 0
+                }}
+                animate={{ opacity: isFlipped ? 1 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="text-center space-y-6">
+                  <span className="text-[10px] font-black text-[#1a3884] dark:text-blue-500 uppercase tracking-[0.4em] mb-4 block">
+                    THE SOLUTION
+                  </span>
+                  <p className="text-xl md:text-3xl font-bold text-slate-900 dark:text-white leading-relaxed tracking-tight px-6">
                     {currentCard?.back}
                   </p>
+                  <div className="pt-8 opacity-20">
+                     <RotateCcw size={16} className="mx-auto text-slate-900 dark:text-white" />
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
-          </div>
+          </motion.div>
 
           {/* Navigation */}
           <div className="flex items-center gap-4">
@@ -138,7 +166,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
           {!hasMarkedComplete ? (
             <button
               onClick={handleMarkComplete}
-              className="w-full max-w-md px-6 py-3 bg-[#0891b2] dark:bg-[#1a3884] hover:bg-[#0a7a8f] dark:hover:bg-[#2a7d88] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+              className="w-full max-w-md px-6 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
             >
               <CheckCircle2 size={20} />
               Mark as Complete
