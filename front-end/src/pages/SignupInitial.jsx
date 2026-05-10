@@ -5,9 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { apiCall } from "@/services/api";
 import { UserPlus, Mail, User, ArrowRight, Loader2 } from "lucide-react";
 import blueLogo from "@/assets/blue.png";
+import { useTheme } from "@/contexts/ThemeContext";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 
 const SignupInitial = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -61,6 +64,13 @@ const SignupInitial = () => {
   };
 
   return (
+    <div className="min-h-screen relative overflow-x-hidden transition-colors duration-300 bg-[#f4f7fa] dark:bg-[#002147] flex items-center justify-center px-4 py-10">
+      <NeuralBackground theme={theme} />
+      {/* Background glow blobs — same as login page */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100/50 opacity-40 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-100/40 opacity-50 blur-[100px]" />
+      </div>
 
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 16 }}
@@ -269,6 +279,7 @@ const SignupInitial = () => {
           </div>
         </div>
       </motion.div>
+    </div>
   );
 };
 

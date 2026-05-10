@@ -7,9 +7,12 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ShieldCheck, MailOpen } from "lucide-react";
 import { apiCall } from "@/services/api";
+import { useTheme } from "@/contexts/ThemeContext";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
@@ -135,7 +138,8 @@ const VerifyOTP = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-4 bg-[#f4f7fa] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-4 bg-[#f4f7fa] dark:bg-[#002147] relative overflow-hidden transition-colors duration-300">
+      <NeuralBackground theme={theme} />
       {/* Background Glows */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100/50 opacity-40 blur-[120px]" />
