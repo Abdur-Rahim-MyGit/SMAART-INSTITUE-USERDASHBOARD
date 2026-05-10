@@ -528,6 +528,18 @@ Access your personalized learning and career dashboard
                 </>
               )}
             </button>
+
+            {/* Registration Link */}
+            <div className="mt-6 text-center">
+              <span className="text-sm font-medium text-slate-500">Don't have an account? </span>
+              <button
+                type="button"
+                onClick={() => navigate("/signup-initial")}
+                className="text-sm font-bold text-[#1a3884] hover:text-[#2d5dc7] transition-colors underline decoration-[#1a3884]/30 hover:decoration-[#1a3884]"
+              >
+                Sign Up
+              </button>
+            </div>
           </form>
         </div>
       </motion.div>

@@ -2,15 +2,23 @@ import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useTheme } from "@/contexts/ThemeContext";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 
 const SignupSuccess = () => {
+  const { theme } = useTheme();
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-[#f4f7fa] dark:bg-[#002147] flex items-center justify-center px-4 py-8 relative overflow-hidden transition-colors duration-300">
+      <NeuralBackground theme={theme} />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100/50 opacity-40 blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-100/40 opacity-50 blur-[100px]" />
+      </div>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
-        className="glass-effect-glow rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-12 w-full max-w-md shadow-[var(--shadow-purple)] text-center"
+        className="bg-white rounded-3xl border border-gray-100 p-6 sm:p-8 md:p-12 w-full max-w-md shadow-[0_20px_40px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] text-center relative z-10"
       >
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
@@ -19,12 +27,12 @@ const SignupSuccess = () => {
           className="flex justify-center mb-6 sm:mb-8"
         >
           <div className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
-            <CheckCircle className="w-full h-full text-sidebar-primary" strokeWidth={1.5} />
+            <CheckCircle className="w-full h-full text-[#1a3884]" strokeWidth={1.5} />
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="absolute inset-0 rounded-full border-2 border-sidebar-primary opacity-30"
+              className="absolute inset-0 rounded-full border-2 border-[#1a3884] opacity-30"
             />
           </div>
         </motion.div>
