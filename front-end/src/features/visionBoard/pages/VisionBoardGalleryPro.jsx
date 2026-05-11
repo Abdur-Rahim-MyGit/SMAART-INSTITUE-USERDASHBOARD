@@ -789,18 +789,24 @@ const VisionBoardGalleryPro = () => {
   return (
     <main className="min-h-screen w-full bg-[#f3f6fb] px-4 py-5 transition-colors duration-300 dark:bg-[#06101d] md:px-8">
       <div className="mx-auto max-w-[1600px] pb-6">
-        <section className="rounded-[28px] border border-slate-200 bg-white px-6 py-6 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-8 md:py-8">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+        <section className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-white px-6 py-6 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-8 md:py-8">
+          {/* Decorative background gradient to match image style */}
+          <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-blue-50/50 blur-3xl dark:bg-blue-900/10" />
+          <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-indigo-50/30 blur-3xl dark:bg-indigo-900/5" />
+          
+          <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
-              <div className="mb-3 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300">
-                Vision Board Library
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#1a3884] shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+                <div className="h-2 w-2 rounded-full bg-[#1a3884] shadow-[0_0_8px_rgba(26,56,132,0.4)]" />
+                Vision Journey
               </div>
-              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white md:text-4xl">
-                Build a cleaner, clearer picture of where you want to go.
+              <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-5xl">
+                Vision Board <span className="text-[#1a3884]">- Library</span>
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400 md:text-base">
-                Create focused visual boards for different goals, keep one active on the dashboard,
-                and return anytime to refine your direction without losing clarity.
+              <p className="mt-4 max-w-2xl text-base font-medium leading-relaxed text-slate-500 dark:text-slate-400 md:text-lg">
+                Experience a focused visual journey. Create detailed boards for your goals, 
+                track your aspirations with clarity, and keep your primary vision active 
+                on your dashboard to stay inspired.
               </p>
             </div>
 

@@ -124,7 +124,7 @@ const LoginCard = () => {
       } else {
         localStorage.removeItem("rememberedEmail");
       }
-      
+
       toast.success("Login successful!");
 
       if (data.user.hasRegistration) {
@@ -159,9 +159,9 @@ const LoginCard = () => {
     // If institution is passed (from InstitutionSelector), use it. 
     // Otherwise fallback to sessionStorage (legacy/initial load)
     const targetInstitution = institution || (
-      sessionStorage.getItem("selectedInstitution") ? 
-      JSON.parse(sessionStorage.getItem("selectedInstitution")) : 
-      null
+      sessionStorage.getItem("selectedInstitution") ?
+        JSON.parse(sessionStorage.getItem("selectedInstitution")) :
+        null
     );
 
     if (targetInstitution) {
@@ -195,7 +195,7 @@ const LoginCard = () => {
     }
 
     login(data.user, data.token);
-    
+
     // Store session expiry for client-side 3-hour countdown
     if (data.sessionExpiresAt) {
       sessionStorage.setItem("sessionExpiresAt", data.sessionExpiresAt);
@@ -297,9 +297,9 @@ const LoginCard = () => {
         }}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center shrink-0">
-              <Building2 className="w-5 h-5 text-[#1a3884]" />
-            </div>
+          <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center shrink-0">
+            <Building2 className="w-5 h-5 text-[#1a3884]" />
+          </div>
           <div className="min-w-0 flex-1">
             <p className="font-bold text-gray-900 text-sm truncate leading-tight">
               {selectedInstitution?.name}
@@ -358,7 +358,7 @@ const LoginCard = () => {
               Welcome Back
             </h2>
             <p className="text-gray-500 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
-Access your personalized learning and career dashboard
+              Access your personalized learning and career dashboard
             </p>
           </div>
 
@@ -421,7 +421,7 @@ Access your personalized learning and career dashboard
                   htmlFor="login-password"
                   className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500"
                 >
-                 Password
+                  Password
                 </label>
                 <button
                   type="button"
@@ -530,7 +530,7 @@ Access your personalized learning and career dashboard
             </button>
 
             {/* Registration Link */}
-            <div className="mt-6 text-center">
+            {/* <div className="mt-6 text-center">
               <span className="text-sm font-medium text-slate-500">Don't have an account? </span>
               <button
                 type="button"
@@ -539,7 +539,7 @@ Access your personalized learning and career dashboard
               >
                 Sign Up
               </button>
-            </div>
+            </div> */}
           </form>
         </div>
       </motion.div>
