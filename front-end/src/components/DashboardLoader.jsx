@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-const DashboardLoader = ({ onComplete }) => {
+const DashboardLoader = ({ onComplete, title = "DashBoard" }) => {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
@@ -153,7 +153,7 @@ const DashboardLoader = ({ onComplete }) => {
                         transition={{ delay: 0.8 }}
                     >
 
-                        <span className="text-xs text-slate-400 uppercase tracking-[0.2em]">DashBoard</span>
+                        <span className="text-xs text-slate-400 uppercase tracking-[0.2em]">{title}</span>
                     </motion.div>
                 </div>
 
