@@ -128,34 +128,34 @@ const SMAArtToolkit = () => {
               <div className="absolute inset-px rounded-[27px] border border-white/70 dark:border-white/5" />
               <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
               <div className="relative z-10">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
-                <div className="flex h-4 w-4 items-center justify-center rounded-full border border-[#4f46e5]/20 bg-[#4f46e5]/10">
-                  <Sparkles className="h-2.5 w-2.5" />
-                </div>
-                Intelligence Suite
-              </div>
-              <div className="space-y-4">
-                <h1 className="max-w-3xl text-[2rem] font-black tracking-tight text-[#0f172a] sm:text-[2.35rem] lg:text-[2.5rem] lg:leading-[1.04] dark:text-white">
-                  SMAART - <span className="text-[#1a3884]">Toolkit</span>
-                </h1>
-                <p className="max-w-xl text-base font-medium tracking-[0.01em] text-[#3654a1] dark:text-[#d7def0] sm:text-lg">
-                  Premium learning utilities with cleaner navigation and faster action.
-                </p>
-                <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-                  Explore our curated repository of career intelligence, wellness resources, and learning tools designed for your growth.
-                </p>
-              </div>
-              <div className="mt-6 grid max-w-2xl grid-cols-3 gap-3">
-                {toolkitHighlights.map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-900/40"
-                  >
-                    <p className="text-lg font-semibold tracking-[-0.03em] text-slate-900 dark:text-white">{item.value}</p>
-                    <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
+                  <div className="flex h-4 w-4 items-center justify-center rounded-full border border-[#4f46e5]/20 bg-[#4f46e5]/10">
+                    <Sparkles className="h-2.5 w-2.5" />
                   </div>
-                ))}
-              </div>
+                  Intelligence Suite
+                </div>
+                <div className="space-y-4">
+                  <h1 className="max-w-3xl text-[2rem] font-black tracking-tight text-[#0f172a] sm:text-[2.35rem] lg:text-[2.5rem] lg:leading-[1.04] dark:text-white">
+                    SMAART - <span className="text-[#1a3884]">Toolkit</span>
+                  </h1>
+                  <p className="max-w-xl text-base font-medium tracking-[0.01em] text-[#3654a1] dark:text-[#d7def0] sm:text-lg">
+                    Premium learning utilities with cleaner navigation and faster action.
+                  </p>
+                  <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+                    Explore our curated repository of career intelligence, wellness resources, and learning tools designed for your growth.
+                  </p>
+                </div>
+                <div className="mt-6 grid max-w-2xl grid-cols-3 gap-3">
+                  {toolkitHighlights.map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-900/40"
+                    >
+                      <p className="text-lg font-semibold tracking-[-0.03em] text-slate-900 dark:text-white">{item.value}</p>
+                      <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

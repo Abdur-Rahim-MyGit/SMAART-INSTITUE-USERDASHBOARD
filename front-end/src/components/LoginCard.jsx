@@ -256,8 +256,16 @@ const LoginCard = () => {
           {/* Header */}
           <div className="bg-gray-50 px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
             {/* Icon badge */}
-            <div className="w-14 h-14 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100">
-              <Building2 className="w-6 h-6 text-[#1a3884]" />
+            <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              {selectedInstitution?.logo ? (
+                <img 
+                  src={selectedInstitution.logo} 
+                  alt={selectedInstitution.name} 
+                  className="w-full h-full object-contain p-2"
+                />
+              ) : (
+                <Building2 className="w-7 h-7 text-[#1a3884]" />
+              )}
             </div>
 
             <h2
@@ -297,8 +305,16 @@ const LoginCard = () => {
         }}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center shrink-0">
-            <Building2 className="w-5 h-5 text-[#1a3884]" />
+          <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+            {selectedInstitution?.logo ? (
+              <img 
+                src={selectedInstitution.logo} 
+                alt={selectedInstitution.name} 
+                className="w-full h-full object-contain p-1.5"
+              />
+            ) : (
+              <Building2 className="w-5 h-5 text-[#1a3884]" />
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-bold text-gray-900 text-sm truncate leading-tight">
@@ -348,7 +364,15 @@ const LoginCard = () => {
                 boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
               }}
             >
-              <Lock className="w-7 h-7 text-[#1a3884]" />
+              {selectedInstitution?.logo ? (
+                <img 
+                  src={selectedInstitution.logo} 
+                  alt={selectedInstitution.name} 
+                  className="w-full h-full object-contain p-2"
+                />
+              ) : (
+                <Lock className="w-7 h-7 text-[#1a3884]" />
+              )}
             </motion.div>
 
             <h2

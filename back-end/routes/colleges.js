@@ -31,7 +31,7 @@ router.get('/', searchLimiter, async (req, res) => {
           { collegeCode: prefixRegex }
         ]
       })
-        .select('collegeName collegeCode address institutionType affiliation status')
+        .select('collegeName collegeCode address institutionType affiliation status logo')
         .sort({ collegeName: 1 })
         .limit(parseInt(limit));
 
@@ -49,7 +49,7 @@ router.get('/', searchLimiter, async (req, res) => {
             { collegeName: searchRegex }
           ]
         })
-          .select('collegeName collegeCode address institutionType affiliation status')
+          .select('collegeName collegeCode address institutionType affiliation status logo')
           .sort({ collegeName: 1 })
           .limit(remainingLimit);
 
@@ -58,7 +58,7 @@ router.get('/', searchLimiter, async (req, res) => {
     } else {
       // Default: regular fetch
       colleges = await College.find(query)
-        .select('collegeName collegeCode address institutionType affiliation status')
+        .select('collegeName collegeCode address institutionType affiliation status logo')
         .sort({ collegeName: 1 })
         .limit(parseInt(limit));
     }

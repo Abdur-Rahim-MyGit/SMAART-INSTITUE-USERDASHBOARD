@@ -1,8 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Building2 } from "lucide-react";
 import InstitutionSelector from "@/components/InstitutionSelector";
+import { useState } from "react";
 
 const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
+  const [previewInstitution, setPreviewInstitution] = useState(null);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -52,9 +55,30 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
               </button>
 
               {/* Icon badge */}
-              <div className="relative z-10 w-16 h-16 flex items-center justify-center mb-5 bg-white rounded-2xl shadow-md border border-gray-100"
-                   style={{ boxShadow: "0 8px 20px rgba(26,56,132,0.08)" }}>
-                <Building2 className="w-7 h-7 text-[#1a3884]" />
+              <div className="relative z-10 w-20 h-20 flex items-center justify-center mb-5 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden group-hover:scale-105 transition-transform duration-500"
+                   style={{ boxShadow: "0 12px 30px rgba(26,56,132,0.12)" }}>
+                <AnimatePresence mode="wait">
+                  {previewInstitution?.logo ? (
+                    <motion.img
+                      key={previewInstitution.logo}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      src={previewInstitution.logo}
+                      alt="Institution Logo"
+                      className="w-full h-full object-contain p-2"
+                    />
+                  ) : (
+                    <motion.div
+                      key="default-icon"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <Building2 className="w-8 h-8 text-[#1a3884]" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <h2
@@ -70,7 +94,10 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
 
             {/* ── Body ── */}
             <div className="px-6 py-8 sm:px-10 sm:py-10 bg-white">
-              <InstitutionSelector onSelect={onInstitutionSelected} />
+              <InstitutionSelector 
+                onSelect={onInstitutionSelected} 
+                onPreviewChange={setPreviewInstitution}
+              />
             </div>
           </motion.div>
 
