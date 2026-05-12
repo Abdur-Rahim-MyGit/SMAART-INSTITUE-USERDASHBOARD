@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 
 import { apiCall } from "@/services/api";
 
-const InstitutionSelector = ({ onSelect }) => {
+const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
   const [selectedInstitution, setSelectedInstitution] = useState(null);
   const [colleges, setColleges] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -62,6 +62,17 @@ const InstitutionSelector = ({ onSelect }) => {
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
+
+  // Update preview when focus or results change
+  useEffect(() => {
+    if (onPreviewChange) {
+      if (focusedIndex >= 0 && focusedIndex < colleges.length) {
+        onPreviewChange(colleges[focusedIndex]);
+      } else if (searchTerm === "" || colleges.length === 0) {
+        onPreviewChange(null);
+      }
+    }
+  }, [focusedIndex, colleges, searchTerm, onPreviewChange]);
 
   // Handle input change
   const handleSearchChange = (e) => {
@@ -239,12 +250,13 @@ const InstitutionSelector = ({ onSelect }) => {
                                 onError={(e) => {
                                   e.target.onerror = null;
                                   e.target.style.display = 'none';
-                                  e.target.parentElement.innerHTML = `<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3"></path><path d="M19 21v-4a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v4"></path><path d="M9 7V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3"></path></svg>`;
+                                  // Find the sibling fallback icon and show it
+                                  const fallback = e.target.parentElement.querySelector('.fallback-icon');
+                                  if (fallback) fallback.style.display = 'block';
                                 }}
                               />
-                            ) : (
-                              <Building2 className={`h-5 w-5 transition-transform duration-300 ${index === focusedIndex ? "scale-110" : "group-hover:scale-110"}`} />
-                            )}
+                            ) : null}
+                            <Building2 className={`h-5 w-5 transition-transform duration-300 fallback-icon ${college.logo ? 'hidden' : ''} ${index === focusedIndex ? "scale-110" : "group-hover:scale-110"}`} />
                           </div>
                           <div className="flex-1 min-w-0 relative z-10">
                             <div className={`font-bold truncate transition-colors text-sm sm:text-base ${

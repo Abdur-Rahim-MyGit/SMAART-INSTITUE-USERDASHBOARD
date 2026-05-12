@@ -793,7 +793,7 @@ const VisionBoardGalleryPro = () => {
           {/* Decorative background gradient to match image style */}
           <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-blue-50/50 blur-3xl dark:bg-blue-900/10" />
           <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-indigo-50/30 blur-3xl dark:bg-indigo-900/5" />
-          
+
           <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#1a3884] shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
@@ -804,8 +804,8 @@ const VisionBoardGalleryPro = () => {
                 Vision Board <span className="text-[#1a3884]">- Library</span>
               </h1>
               <p className="mt-4 max-w-2xl text-base font-medium leading-relaxed text-slate-500 dark:text-slate-400 md:text-lg">
-                Experience a focused visual journey. Create detailed boards for your goals, 
-                track your aspirations with clarity, and keep your primary vision active 
+                Experience a focused visual journey. Create detailed boards for your goals,
+                track your aspirations with clarity, and keep your primary vision active
                 on your dashboard to stay inspired.
               </p>
             </div>
@@ -829,7 +829,7 @@ const VisionBoardGalleryPro = () => {
             </div>
           </div>
 
-          {boards.length > 0 && (
+          {/* {boards.length > 0 && (
             <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/40 lg:flex-row lg:items-center lg:justify-between">
               <div className="relative w-full max-w-md">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -890,7 +890,7 @@ const VisionBoardGalleryPro = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
         </section>
 
         <div className="mt-6">
@@ -945,106 +945,106 @@ const VisionBoardGalleryPro = () => {
         </div>
       </div>
 
-        {/* Delete Confirmation Modal */}
-        <DeleteModal
-          isOpen={!!deleteBoard}
-          board={deleteBoard}
-          onConfirm={handleDelete}
-          onCancel={() => setDeleteBoard(null)}
-          isDeleting={isDeleting}
-        />
+      {/* Delete Confirmation Modal */}
+      <DeleteModal
+        isOpen={!!deleteBoard}
+        board={deleteBoard}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteBoard(null)}
+        isDeleting={isDeleting}
+      />
 
-        {/* View Modal */}
-        <ViewModal
-          isOpen={!!viewBoard}
-          board={viewBoard}
-          onClose={() => setViewBoard(null)}
-          currentVisionId={currentVisionId}
-          onVisionChange={setCurrentVisionId}
-        />
+      {/* View Modal */}
+      <ViewModal
+        isOpen={!!viewBoard}
+        board={viewBoard}
+        onClose={() => setViewBoard(null)}
+        currentVisionId={currentVisionId}
+        onVisionChange={setCurrentVisionId}
+      />
 
-        {/* Create New Modal */}
-        <AnimatePresence>
-          {showCreateModal && (
+      {/* Create New Modal */}
+      <AnimatePresence>
+        {showCreateModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+            onClick={() => setShowCreateModal(false)}
+          >
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
-              onClick={() => setShowCreateModal(false)}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white dark:bg-[#0f172a] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200 dark:border-slate-700"
+              onClick={(e) => e.stopPropagation()}
             >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white dark:bg-[#0f172a] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200 dark:border-slate-700"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">What's your Vision ?</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Give your vision a name and a brief description to start manifesting your goals.
-</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">What's your Vision ?</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Give your vision a name and a brief description to start manifesting your goals.
+              </p>
 
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
-                      <label className="font-semibold">Title</label>
-                      <span className={`font-medium ${newTitle.length >= TITLE_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
-                        {newTitle.length}/{TITLE_CHAR_LIMIT}
-                      </span>
-                    </div>
-                    <Input
-                      value={newTitle}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setNewTitle(val);
-                        handleInstantCheck(val, "title");
-                      }}
-                      placeholder="e.g., My 2026 Goals..."
-                      maxLength={TITLE_CHAR_LIMIT}
-                      className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20"
-                    />
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                    <label className="font-semibold">Title</label>
+                    <span className={`font-medium ${newTitle.length >= TITLE_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
+                      {newTitle.length}/{TITLE_CHAR_LIMIT}
+                    </span>
                   </div>
-                  <div>
-                    <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
-                      <label className="font-semibold">Description</label>
-                      <span className={`font-medium ${newDescription.length >= DESCRIPTION_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
-                        {newDescription.length}/{DESCRIPTION_CHAR_LIMIT}
-                      </span>
-                    </div>
-                    <textarea
-                      value={newDescription}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setNewDescription(val);
-                        handleInstantCheck(val, "description");
-                      }}
-                      rows={3}
-                      placeholder="Describe what you want to achieve and why it matters to you…"
-                      maxLength={DESCRIPTION_CHAR_LIMIT}
-                      className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
-                    />
-                  </div>
+                  <Input
+                    value={newTitle}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewTitle(val);
+                      handleInstantCheck(val, "title");
+                    }}
+                    placeholder="e.g., My 2026 Goals..."
+                    maxLength={TITLE_CHAR_LIMIT}
+                    className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20"
+                  />
                 </div>
+                <div>
+                  <div className="flex items-center justify-between text-xs text-slate-500 mb-1.5">
+                    <label className="font-semibold">Description</label>
+                    <span className={`font-medium ${newDescription.length >= DESCRIPTION_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
+                      {newDescription.length}/{DESCRIPTION_CHAR_LIMIT}
+                    </span>
+                  </div>
+                  <textarea
+                    value={newDescription}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewDescription(val);
+                      handleInstantCheck(val, "description");
+                    }}
+                    rows={3}
+                    placeholder="Describe what you want to achieve and why it matters to you…"
+                    maxLength={DESCRIPTION_CHAR_LIMIT}
+                    className="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+                  />
+                </div>
+              </div>
 
-                <div className="flex justify-end gap-3 mt-8">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowCreateModal(false)}
-                    className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleConfirmCreate}
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/20"
-                  >
-                    Start Creating <ArrowRight className="w-4 h-4 ml-1.5" />
-                  </Button>
-                </div>
-              </motion.div>
+              <div className="flex justify-end gap-3 mt-8">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowCreateModal(false)}
+                  className="border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleConfirmCreate}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/20"
+                >
+                  Start Creating <ArrowRight className="w-4 h-4 ml-1.5" />
+                </Button>
+              </div>
             </motion.div>
-          )}
-        </AnimatePresence>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 };
