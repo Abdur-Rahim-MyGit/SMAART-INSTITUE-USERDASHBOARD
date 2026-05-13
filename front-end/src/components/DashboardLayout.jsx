@@ -314,7 +314,6 @@ const DashboardLayout = () => {
   const [showLanguages, setShowLanguages] = useState(false);
   const languageRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [showCollegeLogo, setShowCollegeLogo] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   const hoverTimeoutRef = useRef(null);
@@ -405,17 +404,6 @@ const DashboardLayout = () => {
 
     fetchProfilePhoto();
   }, [user?.email, user?.profilePicture]);
-
-  // Toggle college logo every 5 seconds if user has a college logo
-  useEffect(() => {
-    if (!user?.college?.logo) return;
-
-    const interval = setInterval(() => {
-      setShowCollegeLogo(prev => !prev);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [user?.college?.logo]);
 
   // Update time every second
   useEffect(() => {
@@ -849,14 +837,7 @@ const DashboardLayout = () => {
                   <div className="relative shrink-0">
                     <div className="absolute -inset-0.5 bg-[#1a3884] rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
                     <div className="relative p-[2px] bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 rounded-full">
-                      {showCollegeLogo && user?.college?.logo ? (
-                        <img
-                          src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
-                          alt="College"
-                          className="w-9 h-9 rounded-full object-contain bg-white p-1"
-                          onError={() => setShowCollegeLogo(false)}
-                        />
-                      ) : (profilePhoto || user?.profileImage || user?.profilePicture) ? (
+                      {(profilePhoto || user?.profileImage || user?.profilePicture) ? (
                         <img
                           src={profilePhoto || (user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${getBackendUrl()}/${user.profileImage}` : user?.profilePicture))}
                           alt="Avatar"

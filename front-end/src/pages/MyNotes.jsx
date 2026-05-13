@@ -9,7 +9,10 @@ import {
     X,
     Calendar,
     StickyNote,
-    Clock
+    Clock,
+    Sparkles,
+    Hash,
+    Cloud
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -179,27 +182,43 @@ const MyNotes = () => {
                 <div className="max-w-7xl mx-auto pb-12">
 
                     {/* Header */}
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-                        <div>
-                            <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2 flex items-center gap-3">
-                                <StickyNote className="w-8 h-8 text-blue-600" /> My Notes
-                            </h1>
-                            <p className="text-slate-500 dark:text-slate-400">Capture your thoughts, ideas, and reminders.</p>
-                        </div>
+                    {/* Hero Section */}
+                    <div className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-8 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.3)] dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 mb-8">
+                        <div className="absolute inset-px rounded-[31px] border border-white/60 dark:border-white/5 pointer-events-none" />
+                        <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-blue-500/5 blur-3xl" />
 
-                        <div className="flex gap-4 w-full md:w-auto">
-                            <div className="relative group w-full md:w-64">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                                <Input
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search notes..."
-                                    className="pl-10 bg-white dark:bg-[#1e293b] border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/20"
-                                />
+                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                            <div className="space-y-4">
+                                <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50 dark:text-blue-400">
+                                    <Sparkles className="h-3 w-3" />
+                                    Personal Productivity
+                                </div>
+                                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+                                    My <span className="text-[#1a3884] dark:text-blue-500">Notes</span>
+                                </h1>
+                                <p className="max-w-xl text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
+                                    Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.
+                                </p>
                             </div>
-                            <Button onClick={openNewNote} className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20">
-                                <Plus className="w-5 h-5 mr-2" /> New Note
-                            </Button>
+
+                            <div className="flex flex-col sm:flex-row items-center gap-4">
+                                <div className="relative w-full sm:w-64 group">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                    <Input
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Search your library..."
+                                        className="pl-12 h-12 bg-white/80 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-700/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
+                                    />
+                                </div>
+                                <Button
+                                    onClick={openNewNote}
+                                    className="h-12 px-6 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-2xl shadow-lg shadow-blue-500/20 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95"
+                                >
+                                    <Plus className="w-5 h-5" />
+                                    <span className="font-bold">New Note</span>
+                                </Button>
+                            </div>
                         </div>
                     </div>
 
