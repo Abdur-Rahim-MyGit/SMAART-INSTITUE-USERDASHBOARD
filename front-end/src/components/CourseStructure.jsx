@@ -403,7 +403,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
               </div>
               
               <div className="mb-3 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300 shadow-sm">
-                {stage.totalCourses} Specialized Modules
+                {stage.totalCourses} Specialized Courses
               </div>
               
               <h1 className="text-2xl font-extrabold tracking-tight text-[#112b6b] dark:text-white md:text-3xl leading-[1.2]" style={{ letterSpacing: "-0.02em" }}>
@@ -546,7 +546,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
 
                 <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 relative z-10">
                 <div className="max-w-2xl space-y-5">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-[#1a3884] shadow-sm dark:border-blue-400/20 dark:bg-slate-900/65 dark:text-blue-300">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/60 backdrop-blur-md px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-[#1a3884] shadow-sm dark:border-blue-400/20 dark:bg-slate-900/60 dark:text-blue-300">
                     <span className="h-2 w-2 rounded-full bg-gradient-to-r from-[#1a3884] to-[#4f7cf3]" />
                     Learning Journey
                   </div>

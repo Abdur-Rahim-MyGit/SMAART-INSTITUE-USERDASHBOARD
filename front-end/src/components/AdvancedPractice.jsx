@@ -61,7 +61,7 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
           </h2>
           <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+              className="h-full bg-[#1a3884] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5 }}
@@ -76,10 +76,10 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800"
+            className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl rounded-3xl p-8 border border-white/20 dark:border-white/5 shadow-2xl shadow-blue-500/5"
           >
             <div className="mb-6">
-              <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 mb-2 block">
+              <span className="text-xs font-black text-[#1a3884] dark:text-blue-400 mb-2 block uppercase tracking-widest">
                 {currentQuestion.type === 'scenario-mcq' ? 'Scenario Analysis' : 'Reflection'} - Question {currentQuestionIndex + 1} of {questions?.length}
               </span>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -106,10 +106,10 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
                             ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                             : isSelected && !isCorrectAnswer
                             ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                            : 'border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20 opacity-50'
+                            : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/20 opacity-50'
                           : isSelected
-                          ? 'border-purple-500 bg-purple-100 dark:bg-purple-900/30'
-                          : 'border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 hover:border-purple-300 dark:hover:border-purple-700'
+                          ? 'border-[#1a3884] bg-blue-50 dark:bg-[#1a3884]/20'
+                          : 'border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 hover:border-[#1a3884]/50 dark:hover:border-blue-500/50'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -119,10 +119,10 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
                               ? 'border-green-500 bg-green-500'
                               : isSelected && !isCorrectAnswer
                               ? 'border-red-500 bg-red-500'
-                              : 'border-purple-300 dark:border-purple-700'
+                              : 'border-slate-300 dark:border-slate-700'
                             : isSelected
-                            ? 'border-purple-500 bg-purple-500'
-                            : 'border-purple-300 dark:border-purple-700'
+                            ? 'border-[#1a3884] bg-[#1a3884]'
+                            : 'border-slate-300 dark:border-slate-700'
                         }`}>
                           {showResult ? (
                             isCorrectAnswer || (isSelected && !isCorrectAnswer) ? (
@@ -161,7 +161,7 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
               <div className="mb-6">
                 <textarea
                   placeholder="Share your reflection..."
-                  className="w-full p-4 rounded-xl border-2 border-purple-200 dark:border-purple-800 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-purple-500 focus:outline-none min-h-[120px]"
+                  className="w-full p-4 rounded-xl border-2 border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 text-slate-900 dark:text-white focus:border-[#1a3884] focus:outline-none min-h-[120px] transition-all"
                   onChange={(e) => handleAnswerSelect(currentQuestionIndex, e.target.value)}
                   disabled={showExplanation[currentQuestionIndex]}
                 />
@@ -175,11 +175,11 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-purple-100 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-700 rounded-xl p-4 mb-6"
+                  className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6"
                 >
                   <div className="flex items-start gap-2">
-                    <Lightbulb className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-purple-800 dark:text-purple-200">
+                    <Lightbulb className="w-5 h-5 text-[#1a3884] dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-[#1a3884] dark:text-blue-200 font-medium leading-relaxed">
                       {currentQuestion.explanation}
                     </p>
                   </div>
@@ -188,18 +188,18 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
             </AnimatePresence>
 
             {/* Navigation */}
-            <div className="flex items-center justify-between pt-4 border-t border-purple-200 dark:border-purple-800">
+            <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-white/10">
               <button
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-purple-100 dark:hover:bg-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
               <button
                 onClick={handleNext}
                 disabled={!showExplanation[currentQuestionIndex]}
-                className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
               >
                 {isLastQuestion ? (allAnswered ? 'Completed' : 'Complete') : 'Next'}
               </button>

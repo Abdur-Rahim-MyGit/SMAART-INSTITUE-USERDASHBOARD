@@ -13,7 +13,7 @@ import SkillsPassportSkeleton from "@/components/skeletons/SkillsPassportSkeleto
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import { toast as sonnerToast } from "sonner";
 import { useTheme } from "@/contexts/ThemeContext";
-import { QRCodeSVG } from "qrcode.react";
+
 import { getBackendUrl } from "@/services/api";
 import { useTranslation } from "react-i18next";
 import spImage from "@/assets/sp.jpeg";
@@ -22,6 +22,17 @@ import spImage from "@/assets/sp.jpeg";
 const PremiumStyles = () => (
     <style dangerouslySetInnerHTML={{
         __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        :root {
+            --brand-primary: #1a3884;
+            --brand-secondary: #d94b4b;
+        }
+
+        .premium-font {
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+
         @keyframes mesh {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -35,20 +46,35 @@ const PremiumStyles = () => (
             0%, 100% { opacity: 0.5; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.05); }
         }
+        @keyframes soft-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
         .mesh-bg {
-            background: linear-gradient(-45deg, #6366f1, #a855f7, #06b6d4, #10b981);
+            background: linear-gradient(-45deg, #1a3884, #4f46e5, #0ea5e9, #6366f1);
             background-size: 400% 400%;
             animation: mesh 15s ease infinite;
         }
+        
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
         }
+
         .dark .glass-card {
-            background: rgba(15, 23, 42, 0.3);
+            background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
+
+        .premium-gradient-text {
+            background: linear-gradient(to right, #1a3884, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .holographic {
             position: relative;
             overflow: hidden;
@@ -61,19 +87,22 @@ const PremiumStyles = () => (
                 45deg,
                 transparent 0%,
                 rgba(255, 255, 255, 0) 45%,
-                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0.15) 50%,
                 rgba(255, 255, 255, 0) 55%,
                 transparent 100%
             );
             animation: shimmer 6s infinite linear;
             pointer-events: none;
         }
-        .perspective-2000 {
-            perspective: 2000px;
+        
+        .soft-float {
+            animation: soft-float 4s ease-in-out infinite;
         }
+
         .passport-hex {
             clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%);
         }
+
         @keyframes goldPulse {
             0%, 100% { transform: scale(1); opacity: 0.88; }
             50% { transform: scale(1.08); opacity: 1; }
@@ -81,20 +110,20 @@ const PremiumStyles = () => (
         .gold-star {
             animation: goldPulse 1.8s ease-in-out infinite;
         }
+
+        .text-glow {
+            text-shadow: 0 0 15px rgba(26, 56, 132, 0.3);
+        }
+
+        .dark .text-glow {
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
     `}} />
 );
 
 // --- Constants & Metadata ---
 
-const QUOTIENTS = [
-    { id: 'CRQ', icon: Brain },
-    { id: 'SRQ', icon: Heart },
-    { id: 'LQ', icon: BookOpen },
-    { id: 'SIQ', icon: Users },
-    { id: 'PEQ', icon: Briefcase },
-    { id: 'DAQ', icon: Monitor },
-    { id: 'SEQ', icon: Leaf },
-];
+
 
 const PROFESSIONAL_STANDARDS = [
     { title: "UNDERSTAND", description: "Comprehends context, intent, and priorities clearly." },
@@ -290,20 +319,22 @@ const getBadgeStyle = (value) => {
 
 const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => (
     <motion.div
-        whileHover={{ y: -8, scale: 1.01 }}
-        transition={{ type: "spring", stiffness: 220, damping: 20 }}
-        className="group relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/88 p-6 shadow-[0_16px_45px_-28px_rgba(15,23,42,0.28)] backdrop-blur-xl hover:border-[#163a86]/20 hover:shadow-[0_28px_65px_-24px_rgba(22,58,134,0.22)]"
+        whileHover={{ y: -12, scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        className="group relative overflow-hidden rounded-[40px] border border-slate-200/60 bg-white/60 backdrop-blur-2xl p-8 shadow-[0_20px_50px_-20px_rgba(15,23,42,0.12)] transition-all duration-500 hover:shadow-[0_40px_80px_-30px_rgba(15,23,42,0.18)] dark:border-slate-800/60 dark:bg-slate-950/60"
     >
-        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#163a86]/25 to-transparent" />
-        <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#163a86]/8 text-[#163a86]">
-                        <AccentIcon className="h-4 w-4" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1a3884]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-x-12 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#1a3884]/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+        
+        <div className="flex items-start justify-between gap-5 relative z-10">
+            <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-white/5 group-hover:scale-110 group-hover:bg-[#1a3884] group-hover:text-white transition-all duration-500">
+                        <AccentIcon className="h-5 w-5" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-black leading-tight text-[#163a86]">{item.title}</h3>
-                        <p className="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
+                        <h3 className="text-xl font-black leading-tight text-slate-900 dark:text-white group-hover:text-[#1a3884] transition-colors duration-300">{item.title}</h3>
+                        <p className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-500 transition-colors">
                             {item.platform}
                         </p>
                     </div>
@@ -311,60 +342,34 @@ const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => (
             </div>
             <div className="flex shrink-0 flex-col items-end gap-2">
                 <span
-                    className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${getBadgeClass(item.level, "BEGINNER")}`}
+                    className={`rounded-xl px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] shadow-sm ${getBadgeClass(item.level, "BEGINNER")}`}
                     style={getBadgeStyle(item.level)}
                 >
                     {item.level}
                 </span>
-                <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${getBadgeClass(item.verificationStatus)}`}>
-                    {item.verificationStatus}
+                <span className={`rounded-xl px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 shadow-sm`}>
+                    Verified
                 </span>
             </div>
         </div>
 
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
-            <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Skills Acquired</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                    {item.skillsAcquired.map((skill) => (
-                        <span
-                            key={skill}
-                            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600"
-                        >
-                            {skill}
-                        </span>
-                    ))}
-                </div>
-            </div>
-            <div className="space-y-4">
-                <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Learning Platform</p>
-                    <p className="mt-2 text-sm font-semibold text-slate-700">{item.provider}</p>
-                </div>
-                {item.completionDate && (
-                    <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-                        <Calendar className="h-3.5 w-3.5" />
-                        {formatDateLabel(item.completionDate)}
+        <div className="mt-6 flex items-center justify-between gap-4 pt-6 border-t border-slate-100 dark:border-white/5 relative z-10">
+            <div className="flex -space-x-2">
+                {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-6 w-6 rounded-full border-2 border-white dark:border-slate-800 bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                        <div className="h-full w-full bg-gradient-to-br from-slate-400 to-slate-500 opacity-20" />
                     </div>
-                )}
-                {item.meta && (
-                    <p className="text-xs font-semibold text-slate-500">{item.meta}</p>
-                )}
-                {item.supportingInfo && (
-                    <p className="text-xs font-semibold text-slate-500">{item.supportingInfo}</p>
-                )}
+                ))}
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                <ShieldCheck className="w-3 h-3" />
+                <span>SMAART Verified Record</span>
             </div>
         </div>
     </motion.div>
 );
 
-const EmptyPassportState = ({ icon: Icon = BookOpen, title, message }) => (
-    <div className="text-center py-20 opacity-60">
-        <Icon className="w-16 h-16 mx-auto mb-4 text-slate-400" />
-        <p className="text-lg font-black text-slate-700">{title}</p>
-        <p className="mt-2 text-sm font-semibold text-slate-500">{message}</p>
-    </div>
-);
+
 
 // --- Sub-components ---
 
@@ -382,29 +387,7 @@ const IconBox = ({ children, className = "" }) => (
     </div>
 );
 
-const StatCard = ({ icon: Icon, label, value, sub, colorClass = "text-slate-800 dark:text-white" }) => (
-    <motion.div
-        whileHover={{ y: -10, scale: 1.02 }}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="rounded-[32px] border border-slate-200/60 dark:border-white/5 bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl p-7 group transition-all shadow-[0_20px_50px_-20px_rgba(0,0,0,0.1)] hover:shadow-[0_30px_60px_-15px_rgba(99,102,241,0.2)]"
-    >
-        <div className="flex flex-col gap-5">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 bg-slate-50 dark:bg-slate-800/50 group-hover:scale-110 ${colorClass.replace('text-', 'bg-').replace('-500', '-500/10')} ${colorClass}`}>
-                <Icon className="w-6 h-6" />
-            </div>
-            <div>
-                <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1">{label}</p>
-                <h3 className={`text-3xl font-black tracking-tighter ${colorClass}`}>{value}</h3>
-                <p className="text-[10px] mt-2 text-slate-400 dark:text-slate-500 font-bold flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${colorClass.replace('text-', 'bg-')}`} />
-                    {sub}
-                </p>
-            </div>
-        </div>
-    </motion.div>
-);
+
 
 const SkillBadge = ({ skill, verified = false }) => (
     <motion.div
@@ -418,110 +401,7 @@ const SkillBadge = ({ skill, verified = false }) => (
     </motion.div>
 );
 
-const RadarChart = ({ data, theme }) => {
-    const isDark = theme === 'dark';
-    const size = 300;
-    const center = size / 2;
-    const radius = 100;
-    const totalAxes = 7;
 
-    const getPoint = (value, index, maxRadius) => {
-        const angle = (Math.PI * 2 * index) / totalAxes - Math.PI / 2;
-        const dist = (value / 100) * maxRadius;
-        return {
-            x: center + dist * Math.cos(angle),
-            y: center + dist * Math.sin(angle)
-        };
-    };
-
-    const getPath = (values, maxRadius) => {
-        return values.map((v, i) => {
-            const point = getPoint(v, i, maxRadius);
-            return `${i === 0 ? 'M' : 'L'} ${point.x} ${point.y}`;
-        }).join(' ') + ' Z';
-    };
-
-    return (
-        <svg viewBox={`0 0 ${size} ${size}`} className="w-full h-full drop-shadow-2xl">
-            <defs>
-                <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#6366f1" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.4" />
-                </linearGradient>
-            </defs>
-            {[100, 75, 50, 25].map((pct, i) => (
-                <path
-                    key={i}
-                    d={getPath(Array(totalAxes).fill(pct), radius)}
-                    fill="none"
-                    stroke={isDark ? "rgba(255,255,255,0.08)" : "#e2e8f0"}
-                    strokeWidth="1"
-                    strokeDasharray={i === 0 ? "none" : "4 4"}
-                />
-            ))}
-            {Array.from({ length: totalAxes }).map((_, i) => {
-                const point = getPoint(100, i, radius);
-                return (
-                    <line
-                        key={i}
-                        x1={center}
-                        y1={center}
-                        x2={point.x}
-                        y2={point.y}
-                        stroke={isDark ? "rgba(255,255,255,0.08)" : "#e2e8f0"}
-                        strokeWidth="1"
-                    />
-                );
-            })}
-            <motion.path
-                initial={{ pathLength: 0, opacity: 0, scale: 0.8 }}
-                animate={{ pathLength: 1, opacity: 1, scale: 1 }}
-                transition={{ duration: 2, ease: "easeOut" }}
-                d={getPath(data.map(d => d.value), radius)}
-                fill="url(#radarGrad)"
-                stroke="#6366f1"
-                strokeWidth="3"
-            />
-            {data.map((d, i) => {
-                const point = getPoint(d.value, i, radius);
-                return (
-                    <motion.circle
-                        key={i}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 1 + i * 0.1 }}
-                        cx={point.x}
-                        cy={point.y}
-                        r="5"
-                        fill="#6366f1"
-                        stroke="white"
-                        strokeWidth="2.5"
-                    >
-                        <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
-                    </motion.circle>
-                );
-            })}
-            {data.map((d, i) => {
-                const point = getPoint(125, i, radius);
-                return (
-                    <text
-                        key={i}
-                        x={point.x}
-                        y={point.y}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                        fontSize="11"
-                        fontWeight="900"
-                        fill={isDark ? "#94a3b8" : "#64748b"}
-                        className="uppercase tracking-tighter"
-                    >
-                        {d.id}
-                    </text>
-                );
-            })}
-        </svg>
-    );
-};
 
 // --- Main Page Component ---
 
@@ -1012,8 +892,8 @@ const SkillsPassport = () => {
                                             </div>
                                         </div>
 
-                                        <div className="space-y-5">
-                                            <h1 className="text-3xl sm:text-4xl md:text-[3.2rem] font-black leading-none tracking-tight text-[#163a86] dark:text-white">
+                                        <div className="space-y-4">
+                                            <h1 className="text-3xl sm:text-4xl md:text-[3.5rem] font-black leading-none tracking-tighter text-[#1a3884] dark:text-white text-glow">
                                                 {userName}
                                             </h1>
 
@@ -1108,52 +988,48 @@ const SkillsPassport = () => {
                                     </h2>
                                 </div>
 
-                                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                                     {standardRatings.map((standard, index) => (
                                         <motion.div
                                             key={standard.title}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: 0.03 * index }}
-                                            whileHover={{ y: -4 }}
-                                            className="rounded-[20px] border border-slate-200/70 dark:border-white/10 bg-slate-50/80 dark:bg-slate-800/30 p-4"
+                                            initial={{ opacity: 0, scale: 0.95 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            transition={{ delay: 0.05 * index }}
+                                            whileHover={{ y: -8, backgroundColor: "rgba(255,255,255,1)" }}
+                                            className="group relative rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/50 dark:bg-slate-800/20 p-5 shadow-sm transition-all duration-300"
                                         >
-                                            <p className="min-h-[38px] text-sm font-black leading-snug tracking-tight text-slate-900 dark:text-white">
+                                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                                                <Sparkles className="w-12 h-12" />
+                                            </div>
+                                            <p className="text-xs font-black leading-snug tracking-[0.1em] text-[#1a3884] dark:text-indigo-400 uppercase mb-3">
                                                 {standard.title}
                                             </p>
-                                            <p className="mt-3 min-h-[48px] text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                            <p className="min-h-[44px] text-[11px] leading-relaxed font-bold text-slate-500 dark:text-slate-400">
                                                 {standard.description}
                                             </p>
-                                            <div className="mt-4 flex items-center gap-1.5">
-                                                {Array.from({ length: 5 }).map((_, starIndex) => {
-                                                    const active = starIndex < standard.stars;
-                                                    return (
-                                                        <motion.span
-                                                            key={`${standard.title}-${starIndex}`}
-                                                            animate={{ scale: active ? [1, 1.08, 1] : 1 }}
-                                                            transition={{ duration: 1.8, repeat: Infinity, delay: starIndex * 0.12 }}
-                                                        >
+                                            <div className="mt-5 flex items-center justify-between">
+                                                <div className="flex items-center gap-1">
+                                                    {Array.from({ length: 5 }).map((_, starIndex) => {
+                                                        const active = starIndex < standard.stars;
+                                                        return (
                                                             <Star
-                                                                className={`gold-star h-4 w-4 ${active ? "" : "text-slate-300 dark:text-slate-600"}`}
-                                                                style={active
-                                                                    ? { fill: "#d4a017", color: "#d4a017", stroke: "#d4a017" }
-                                                                    : { fill: "transparent" }
-                                                                }
+                                                                key={`${standard.title}-${starIndex}`}
+                                                                className={`h-3 w-3 ${active ? "text-amber-400 fill-amber-400" : "text-slate-200 dark:text-slate-700"}`}
                                                             />
-                                                        </motion.span>
-                                                    );
-                                                })}
+                                                        );
+                                                    })}
+                                                </div>
+                                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                                    Rating: {standard.stars}.0
+                                                </p>
                                             </div>
-                                            <p className="mt-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                                {standard.stars}/5 Rating
-                                            </p>
                                         </motion.div>
                                     ))}
                                 </div>
                             </motion.div>
 
                             <div className="max-w-5xl mx-auto px-2 sm:px-4">
-                                <div className="flex sm:flex-wrap justify-start sm:justify-center gap-0 bg-white/65 dark:bg-slate-900/45 backdrop-blur-xl rounded-[20px] border border-slate-200 dark:border-slate-800 shadow-sm overflow-x-auto no-scrollbar">
+                                <div className="flex sm:flex-wrap justify-start sm:justify-center gap-2 p-2 bg-slate-100/50 dark:bg-slate-900/50 backdrop-blur-xl rounded-[28px] border border-slate-200 dark:border-slate-800 shadow-inner overflow-x-auto no-scrollbar premium-font">
                                     {[
                                         { id: 'smart', label: 'SMAART Courses', icon: Sparkles },
                                         { id: 'other', label: 'Technical Skills', icon: Briefcase },
@@ -1163,15 +1039,20 @@ const SkillsPassport = () => {
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
-                                            className={`flex-1 min-w-[150px] flex items-center justify-center gap-2 px-4 md:px-6 py-4 font-black text-[11px] uppercase tracking-[0.18em] transition-all relative overflow-hidden ${activeTab === tab.id
-                                                ? "bg-slate-50 dark:bg-slate-800/50 text-[#d94b4b]"
-                                                : "text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-white"
+                                            className={`flex-1 min-w-[160px] flex items-center justify-center gap-3 px-6 py-4 font-black text-[10px] uppercase tracking-[0.2em] transition-all duration-300 rounded-[22px] relative overflow-hidden ${activeTab === tab.id
+                                                ? "bg-white dark:bg-slate-800 text-[#1a3884] shadow-[0_12px_24px_-8px_rgba(26,56,132,0.2)]"
+                                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white"
                                                 }`}
                                         >
-                                            <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-[#d94b4b]" : ""}`} />
+                                            <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-[#1a3884] animate-pulse" : ""}`} />
                                             {tab.label}
                                             {activeTab === tab.id && (
-                                                <span className="absolute inset-x-0 bottom-0 h-[2px] bg-[#d94b4b]" />
+                                                <motion.div
+                                                    layoutId="tab-indicator"
+                                                    className="absolute inset-0 border-2 border-[#1a3884]/20 rounded-[22px]"
+                                                    initial={false}
+                                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                                />
                                             )}
                                         </button>
                                     ))}
@@ -1185,21 +1066,25 @@ const SkillsPassport = () => {
                                 transition={{ duration: 0.35 }}
                                 className="mx-auto w-full max-w-5xl space-y-6"
                             >
-                                <div className="rounded-[32px] border border-slate-200/70 bg-white/72 p-6 md:p-10 shadow-sm backdrop-blur-xl">
-                                    <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-                                        <div>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
-                                                Dynamic Skills Registry
-                                            </p>
-                                            <h2 className="mt-3 text-3xl md:text-4xl font-black text-slate-900">
+                                <div className="rounded-[40px] border border-slate-200/60 dark:border-white/5 bg-white/60 dark:bg-slate-900/40 p-8 md:p-12 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)] backdrop-blur-2xl premium-font">
+                                    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-1.5 w-10 rounded-full bg-[#1a3884]" />
+                                                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+                                                    Institutional Registry
+                                                </p>
+                                            </div>
+                                            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tighter">
                                                 {tabCollections[activeTab].title}
                                             </h2>
-                                            <p className="mt-3 max-w-2xl text-sm font-medium text-slate-500">
+                                            <p className="max-w-2xl text-base font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
                                                 {tabCollections[activeTab].description}
                                             </p>
                                         </div>
-                                        <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-500">
-                                            {tabCollections[activeTab].items.length} Records
+                                        <div className="flex flex-col items-center justify-center rounded-[32px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-white/5 px-8 py-6 shadow-sm">
+                                            <span className="text-4xl font-black text-[#1a3884] dark:text-indigo-400">{tabCollections[activeTab].items.length}</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">Verified Records</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1214,331 +1099,21 @@ const SkillsPassport = () => {
                                     ))}
                                 </div>
 
-                                <div className="flex items-end justify-between gap-6 rounded-[24px] border border-slate-200/70 dark:border-white/10 bg-white/88 dark:bg-slate-900/55 px-5 py-5 sm:px-7 backdrop-blur-xl shadow-[0_18px_42px_-24px_rgba(15,23,42,0.16)]">
-                                    <div>
-                                        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">Digital Trust Protocol</p>
-                                        <p className="mt-3 flex items-center gap-2 text-sm font-bold text-emerald-600">
-                                            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                                            Secure & Live
-                                        </p>
-                                        <p className="mt-2 text-xs font-medium text-slate-400">
-                                            Scan to share or view this skills passport
-                                        </p>
-                                    </div>
-                                    <div className="rounded-[18px] bg-white p-3 shadow-[0_18px_34px_-20px_rgba(15,23,42,0.22)]">
-                                        <QRCodeSVG
-                                            value={`${window.location.origin}/verify/${passportId}`}
-                                            size={72}
-                                            fgColor="#0f172a"
-                                            bgColor="#ffffff"
-                                        />
-                                    </div>
-                                </div>
+
                             </motion.div>
                         </div>
                     </div>
 
                 </div>
 
-                <div className="rounded-[32px] md:rounded-[48px] overflow-hidden shadow-2xl border border-slate-200/50 dark:border-white/5 bg-white/40 dark:bg-slate-900/40 backdrop-blur-3xl transition-all">
-                    <div className="p-4 sm:p-8 md:p-16 space-y-12 md:space-y-20 relative">
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={activeTab}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -20 }}
-                                className="space-y-10"
-                            >
-                                {activeTab === 'smart' && (
-                                    <div className="space-y-16 pt-4">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                                            <StatCard
-                                                icon={TrendingUp}
-                                                label={t("skills_passport.stats.growth_delta")}
-                                                value={`+${growth}%`}
-                                                sub={t("common.verified_progression") || "Verified Progression"}
-                                                colorClass="text-emerald-500"
-                                            />
-                                            <StatCard
-                                                icon={Zap}
-                                                label={t("skills_passport.stats.momentum")}
-                                                value={t("common.high") || "High"}
-                                                sub={t("common.skill_acquisition_rate") || "Skill Acquisition Rate"}
-                                                colorClass="text-orange-500"
-                                            />
-                                            <StatCard
-                                                icon={BadgeCheck}
-                                                label={t("skills_passport.stats.badges")}
-                                                value="14"
-                                                sub={t("common.competency_aligned") || "Competency Aligned"}
-                                                colorClass="text-blue-500"
-                                            />
-                                            <StatCard
-                                                icon={ShieldCheck}
-                                                label={t("skills_passport.stats.trust")}
-                                                value="99.2"
-                                                sub={t("common.integrity_verified") || "Integrity Verified"}
-                                                colorClass="text-indigo-500"
-                                            />
-                                        </div>
 
-                                        <motion.div
-                                            whileInView={{ opacity: 1, scale: 1 }}
-                                            initial={{ opacity: 0, scale: 0.98 }}
-                                            className="rounded-[32px] md:rounded-[48px] border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl p-6 sm:p-10 md:p-14 shadow-sm relative overflow-hidden"
-                                        >
-                                            <div className="absolute top-0 right-0 p-10 opacity-5 pointer-events-none">
-                                                <Brain className="w-64 h-64" />
-                                            </div>
-                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-12 mb-16 relative z-10">
-                                                <div className="space-y-4 text-center md:text-left">
-                                                    <div className="flex items-center gap-4 justify-center md:justify-start">
-                                                        <IconBox className="bg-indigo-600 text-white">
-                                                            <Sparkles className="w-6 h-6" />
-                                                        </IconBox>
-                                                        <h2 className="text-4xl font-black text-slate-800 dark:text-white">{t("skills_passport.dna.title")}</h2>
-                                                    </div>
-                                                    <p className="text-slate-500 dark:text-slate-400 font-medium text-lg max-w-md mx-auto md:mx-0">
-                                                        {t("skills_passport.dna.desc")}
-                                                    </p>
-                                                </div>
-                                                <div className="w-64 h-64 flex-shrink-0 mx-auto md:mx-0">
-                                                    <RadarChart
-                                                        data={QUOTIENTS.map(q => ({ id: q.id, value: currentScores[q.id] || 0 }))}
-                                                        theme={theme}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="grid md:grid-cols-2 gap-x-16 gap-y-10 relative z-10">
-                                                {QUOTIENTS.map(q => {
-                                                    const score = currentScores[q.id] || 0;
-                                                    const isHovered = hoveredQuotient === q.id;
-                                                    return (
-                                                        <div
-                                                            key={q.id}
-                                                            className="space-y-4 cursor-help group"
-                                                            onMouseEnter={() => setHoveredQuotient(q.id)}
-                                                            onMouseLeave={() => setHoveredQuotient(null)}
-                                                        >
-                                                            <div className="flex justify-between items-end">
-                                                                <span className="text-sm font-black flex items-center gap-3">
-                                                                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                                                        <q.icon className="w-4 h-4" />
-                                                                    </div>
-                                                                    {t(`quotients.${q.id}.name`)}
-                                                                </span>
-                                                                <span className="text-sm font-black text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-lg">
-                                                                    {score}%
-                                                                </span>
-                                                            </div>
-                                                            <div className="h-4 w-full bg-slate-100 dark:bg-slate-800/50 rounded-full overflow-hidden p-1">
-                                                                <motion.div
-                                                                    initial={{ width: 0 }}
-                                                                    whileInView={{ width: `${score}%` }}
-                                                                    className="h-full bg-gradient-to-r from-indigo-600 to-cyan-500 rounded-full"
-                                                                />
-                                                            </div>
-                                                            <AnimatePresence>
-                                                                {isHovered && (
-                                                                    <motion.p
-                                                                        initial={{ opacity: 0, height: 0 }}
-                                                                        animate={{ opacity: 1, height: 'auto' }}
-                                                                        exit={{ opacity: 0, height: 0 }}
-                                                                        className="text-xs text-slate-500 font-bold p-3 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border"
-                                                                    >
-                                                                        {t(`quotients.${q.id}.desc`)}
-                                                                    </motion.p>
-                                                                )}
-                                                            </AnimatePresence>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </motion.div>
-
-                                        <div className="rounded-[48px] border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl p-10 md:p-14 shadow-sm">
-                                            <div className="flex items-center gap-5 mb-12">
-                                                <IconBox className="bg-emerald-600 text-white">
-                                                    <Award className="w-6 h-6" />
-                                                </IconBox>
-                                                <h2 className="text-4xl font-black text-slate-800 dark:text-white">{t("skills_passport.proficiency.title")}</h2>
-                                            </div>
-                                            <div className="space-y-14">
-                                                <div>
-                                                    <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-8">{t("skills_passport.proficiency.gold_standard")}</h4>
-                                                    <div className="flex flex-wrap gap-4">
-                                                        {verifiedSkills.map(skill => <SkillBadge key={skill} skill={skill} verified={true} />)}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="rounded-[48px] border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl p-10 shadow-sm">
-                                            <div className="flex items-center gap-5 mb-10">
-                                                <IconBox className="bg-cyan-600 text-white">
-                                                    <BarChart3 className="w-6 h-6" />
-                                                </IconBox>
-                                                <h2 className="text-3xl font-black text-slate-800 dark:text-white">{t("skills_passport.timeline.title")}</h2>
-                                            </div>
-                                            <div className="space-y-6 relative">
-                                                <div className="absolute left-10 top-10 bottom-10 w-[2px] bg-slate-200 dark:bg-slate-800" />
-                                                {['baseline', 'T2', 'T3', 'T4'].map((stage, idx) => {
-                                                    const isBaseline = stage === 'baseline';
-                                                    const result = isBaseline ? baselineResult : stageResults[stage];
-                                                    const score = isBaseline ? baselineResult?.baselineScore : (result?.stageScore || 0);
-                                                    const isCompleted = !!result;
-                                                    return (
-                                                        <motion.div key={stage} className={`relative rounded-3xl p-6 border pl-16 ${isCompleted ? "bg-white dark:bg-slate-800/80 border-slate-200" : "bg-slate-50/50 opacity-60 border-dashed"}`}>
-                                                            <div className={`absolute left-8 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-4 ${isCompleted ? "bg-indigo-600 border-indigo-200" : "bg-slate-300 border-slate-100"}`} />
-                                                            <div className="flex justify-between items-center">
-                                                                <div>
-                                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("skills_passport.timeline.assessment")} {idx + 1}</p>
-                                                                    <h4 className="text-xl font-black">{isBaseline ? t("skills_passport.timeline.baseline") : `${t("skills_passport.timeline.assessment")} ${stage}`}</h4>
-                                                                </div>
-                                                                <div className="text-right">
-                                                                    <p className="text-2xl font-black text-indigo-600">{isCompleted ? `${score}%` : t("common.pending") || "Pending"}</p>
-                                                                </div>
-                                                            </div>
-                                                        </motion.div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'other' && (
-                                    <div className="pt-4">
-                                        <div className="rounded-[48px] border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl p-10 md:p-14 shadow-sm">
-                                            <div className="flex items-center gap-5 mb-10">
-                                                <IconBox className="bg-[#163a86] text-white">
-                                                    <Briefcase className="w-6 h-6" />
-                                                </IconBox>
-                                                <h2 className="text-3xl font-black text-slate-800 dark:text-white">Technical Skills Detail</h2>
-                                            </div>
-                                            {technicalSkills.length > 0 ? (
-                                                <div className="grid md:grid-cols-2 gap-8">
-                                                    {technicalSkills.map((skill, idx) => (
-                                                        <div key={skill.id || idx} className="p-8 rounded-[32px] bg-white dark:bg-slate-800/50 border border-slate-200 shadow-sm">
-                                                            <h3 className="text-xl font-black mb-2 text-slate-900">{skill.title}</h3>
-                                                            <p className="text-indigo-600 font-bold mb-4">{skill.level}</p>
-                                                            <div className="space-y-3 text-sm text-slate-500">
-                                                                <p><span className="font-black text-slate-700">Projects:</span> {skill.meta || "Applied experience"}</p>
-                                                                <p><span className="font-black text-slate-700">Certifications:</span> {skill.supportingInfo || "Not specified"}</p>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <EmptyPassportState
-                                                    icon={Briefcase}
-                                                    title="No technical skills found"
-                                                    message="Technical skills will appear here when projects, tools, and certifications are available."
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'certificates' && (
-                                    <div className="pt-4">
-                                        <div className="rounded-[48px] border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl p-10 md:p-14 shadow-sm">
-                                            <div className="flex items-center gap-5 mb-10">
-                                                <IconBox className="bg-emerald-600 text-white">
-                                                    <Monitor className="w-6 h-6" />
-                                                </IconBox>
-                                                <h2 className="text-3xl font-black text-slate-800 dark:text-white">AI Skills Detail</h2>
-                                            </div>
-                                            {aiSkills.length > 0 ? (
-                                                <div className="grid md:grid-cols-2 gap-8">
-                                                    {aiSkills.map((skill, idx) => (
-                                                        <div key={skill.id || idx} className="group relative rounded-3xl overflow-hidden border border-slate-200 bg-white dark:bg-slate-800 shadow-sm p-8">
-                                                            <h3 className="font-black text-lg mb-2 text-slate-900">{skill.title}</h3>
-                                                            <p className="text-sm text-slate-500 font-bold mb-4">{skill.supportingInfo || "AI capability"}</p>
-                                                            <p className="text-sm text-slate-600">{skill.meta}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <EmptyPassportState
-                                                    icon={Monitor}
-                                                    title="No AI skills found"
-                                                    message="AI tools, proficiency, and verification details will appear here when available."
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {activeTab === 'projects' && (
-                                    <div className="pt-4">
-                                        <div className="rounded-[48px] border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl p-10 md:p-14 shadow-sm">
-                                            <div className="flex items-center gap-5 mb-10">
-                                                <IconBox className="bg-purple-600 text-white">
-                                                    <Layout className="w-6 h-6" />
-                                                </IconBox>
-                                                <h2 className="text-3xl font-black text-slate-800 dark:text-white">Domain Skills Detail</h2>
-                                            </div>
-                                            {domainSkills.length > 0 ? (
-                                                <div className="space-y-8">
-                                                    {domainSkills.map((skill, idx) => (
-                                                        <div key={skill.id || idx} className="p-10 rounded-[40px] bg-white dark:bg-slate-800 border border-slate-200 shadow-sm group">
-                                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
-                                                                <h3 className="text-2xl font-black group-hover:text-indigo-600">{skill.title}</h3>
-                                                                <div className="px-4 py-1.5 rounded-full bg-slate-100 text-[10px] font-black uppercase tracking-widest">{skill.verificationStatus}</div>
-                                                            </div>
-                                                            <p className="text-slate-600 dark:text-slate-400 font-medium leading-relaxed text-lg mb-4">
-                                                                {skill.meta}
-                                                            </p>
-                                                            <p className="text-sm font-semibold text-slate-500">{skill.supportingInfo || "Domain profile"}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <EmptyPassportState
-                                                    icon={Layout}
-                                                    title="No domain skills found"
-                                                    message="Domain expertise and verification status will appear here when available."
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </motion.div>
-                        </AnimatePresence>
-                    </div>
-
-                </div>
 
                 <div className="text-center pb-20">
-                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.5em]">
-                        SMAART Minds AI Verification Protocol • Institutional Grade Trust • {new Date().getFullYear()}
-                    </p>
+                    
                 </div>
             </motion.div>
             {/* Footer Promo */}
-            <motion.div
-                whileInView={{ scale: 1 }}
-                initial={{ scale: 0.95 }}
-                className="rounded-[40px] md:rounded-[60px] p-8 sm:p-12 md:p-20 bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white flex flex-col md:flex-row items-center justify-between gap-12 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-white/5 relative overflow-hidden group transition-colors"
-            >
-                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full translate-x-1/3 -translate-y-1/3 blur-3xl" />
-                <div className="space-y-6 text-center md:text-left relative z-10">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[0.98] text-slate-900 dark:text-white">Ready for the <br className="hidden md:block" /> Next Level?</h2>
-                    <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 font-bold max-w-xl leading-relaxed">
-                        Your Skills Passport is a living document. Continue your assessments to unlock advanced certifications.
-                    </p>
-                </div>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => navigate('/dashboard/assessments')}
-                    className="bg-indigo-600 text-white px-10 py-5 rounded-3xl font-black text-xl hover:bg-indigo-700 transition-all shadow-[0_20px_40px_rgba(99,102,241,0.2)]"
-                >
-                    Continue Journey
-                </motion.button>
-            </motion.div>
+           
         </div>
     );
 };

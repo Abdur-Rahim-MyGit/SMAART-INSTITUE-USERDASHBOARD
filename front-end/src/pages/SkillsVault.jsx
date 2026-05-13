@@ -617,17 +617,26 @@ const FlashcardItem = ({ card, index }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.08 }}
             onClick={() => setFlipped(!flipped)}
+            whileHover={{ scale: 1.02, y: -5 }}
+            whileTap={{ scale: 0.98 }}
             className="cursor-pointer group perspective"
             style={{ perspective: "1000px" }}
         >
             <div
-                className={`relative h-48 transition-transform duration-500 preserve-3d ${flipped ? "rotate-y-180" : ""}`}
+                className={`relative h-48 transition-transform duration-700 preserve-3d ${flipped ? "rotate-y-180" : ""}`}
                 style={{ transformStyle: "preserve-3d", transform: flipped ? "rotateY(180deg)" : "rotateY(0)" }}
             >
-                {/* Front */}
-                <div
-                    className="absolute inset-0 bg-white dark:bg-slate-900/40 rounded-[28px] border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between backface-hidden hover:shadow-2xl hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)]"
-                    style={{ backfaceVisibility: "hidden" }}
+                {/* Front - Solid Background with Opacity Control */}
+                <motion.div
+                    className="absolute inset-0 bg-white dark:bg-slate-900 rounded-[28px] border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] group-hover:shadow-2xl group-hover:border-[#1a3884]/30 transition-all duration-500"
+                    style={{ 
+                        backfaceVisibility: "hidden",
+                        WebkitBackfaceVisibility: "hidden",
+                        transform: "translateZ(1px)",
+                        zIndex: flipped ? 0 : 10
+                    }}
+                    animate={{ opacity: flipped ? 0 : 1 }}
+                    transition={{ duration: 0.2 }}
                 >
                     <div className="flex justify-center">
                         <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400 border border-blue-100 dark:border-blue-500/20">
@@ -635,31 +644,42 @@ const FlashcardItem = ({ card, index }) => {
                         </span>
                     </div>
                     <div className="flex-1 flex items-center justify-center px-2">
-                        <h4 className="text-lg font-black text-slate-950 dark:text-white text-center leading-snug">
+                        <h4 className="text-xl font-black text-[#002147] dark:text-white text-center leading-tight tracking-tight">
                             {card.term}
                         </h4>
                     </div>
-                    <div className="flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                        <Zap className="w-3 h-3" />
+                    <div className="flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-[#1a3884] transition-colors">
+                        <Zap className="w-3 h-3 group-hover:animate-pulse" />
                         Tap to reveal
                     </div>
-                </div>
+                </motion.div>
 
-                {/* Back */}
-                <div
-                    className="absolute inset-0 bg-gradient-to-br from-[#1a3884] to-[#002147] rounded-[28px] p-8 flex flex-col justify-center text-white shadow-2xl"
-                    style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                {/* Back - Solid Background with Opacity Control */}
+                <motion.div
+                    className="absolute inset-0 bg-slate-900 rounded-[28px] p-8 flex flex-col justify-center text-white shadow-2xl overflow-hidden"
+                    style={{ 
+                        backfaceVisibility: "hidden", 
+                        WebkitBackfaceVisibility: "hidden",
+                        transform: "rotateY(180deg) translateZ(1px)",
+                        zIndex: flipped ? 10 : 0
+                    }}
+                    animate={{ opacity: flipped ? 1 : 0 }}
+                    transition={{ duration: 0.2 }}
                 >
+                    {/* Solid Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#1a3884] via-[#112b6b] to-[#002147] opacity-100" />
+                    
+                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
                     <div className="absolute top-4 left-4 opacity-20">
                         <Zap className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-[15px] font-medium leading-relaxed text-center text-blue-50">
+                    <p className="text-[15px] font-bold leading-relaxed text-center text-blue-50 relative z-10">
                         {card.definition}
                     </p>
-                    <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-blue-200/50">
-                        Tap to flip back
+                    <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-blue-200/50 relative z-10">
+                        Flip Back
                     </div>
-                </div>
+                </motion.div>
             </div>
         </motion.div>
     );
