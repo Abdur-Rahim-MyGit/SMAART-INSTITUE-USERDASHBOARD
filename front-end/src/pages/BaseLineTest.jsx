@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { assessmentApi } from "@/services/assessmentApi";
-import { Eye, Target, AlertTriangle, CheckCircle2, Lock, XCircle, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase } from "lucide-react";
+import { Eye, Target, AlertTriangle, CheckCircle2, Lock, XCircle, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
@@ -697,15 +697,19 @@ const BaseLineTest = () => {
               <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0B1120] relative z-10">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
-                  <div className="text-right">
-                    <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Time Left:{" "}
-                      <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#1a3884]"}`}>
+                  <div className="flex flex-col items-end">
+                    <div className={`flex items-center gap-2 px-4 py-2 rounded-full border shadow-sm transition-colors duration-300 ${
+                      isLastFiveMinutes 
+                        ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 animate-pulse'
+                        : 'bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
+                    }`}>
+                      <Clock className={`w-4 h-4 ${isLastFiveMinutes ? 'text-red-500' : 'text-[#1a3884] dark:text-blue-400'}`} />
+                      <span className="font-mono font-bold text-lg md:text-xl tracking-wider">
                         {formatCountdown(remainingSeconds)}
                       </span>
                     </div>
                     {isLastFiveMinutes && (
-                      <p className="mt-1 text-[11px] md:text-xs font-bold uppercase tracking-wider text-red-500">
+                      <p className="mt-2 text-[10px] md:text-xs font-bold uppercase tracking-wider text-red-500">
                         Time Almost Up!
                       </p>
                     )}
