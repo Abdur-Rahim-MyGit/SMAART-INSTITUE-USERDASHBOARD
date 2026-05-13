@@ -139,7 +139,7 @@ const AssessmentsDashboard = () => {
                                 </div>
 
                                 <div className="mt-5 max-w-2xl space-y-3">
-                                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl lg:text-[2.5rem] lg:leading-[1.1]">
+                                    <h1 className="text-2xl font-bold tracking-tight text-[#1a3884] dark:text-blue-300 sm:text-3xl">
                                         Assessments Centre
                                     </h1>
                                     <p className="max-w-2xl text-sm font-medium leading-7 text-slate-600 dark:text-slate-300 sm:text-base">
