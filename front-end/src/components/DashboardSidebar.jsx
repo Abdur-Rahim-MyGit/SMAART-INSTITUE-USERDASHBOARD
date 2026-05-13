@@ -105,7 +105,7 @@ const DashboardSidebar = () => {
 
   const wsStatusColor = wsStatus === 'connected' ? '#22c55e'
     : wsStatus === 'connecting' ? '#f59e0b'
-    : '#ef4444';
+      : '#ef4444';
 
   const generateTestNotification = async () => {
     try {
@@ -220,7 +220,7 @@ const DashboardSidebar = () => {
               { label: 'Assessments', path: '/dashboard/assessment-centre' },
               { label: 'Vision Boards', path: '/dashboard/vision-boards' },
               { label: 'Toolkit', path: '/dashboard/smaart-toolkit' },
-{ label: 'Skills Vault', path: '/dashboard/skills-vault' },
+              { label: 'Skills Vault', path: '/dashboard/skills-vault' },
               { label: 'Wallet', path: '/dashboard/smaart-wallet' },
               { label: 'Help', path: null, isHelp: true },
             ].map((item) => {

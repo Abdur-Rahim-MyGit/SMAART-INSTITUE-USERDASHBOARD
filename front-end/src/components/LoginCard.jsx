@@ -124,7 +124,7 @@ const LoginCard = () => {
       } else {
         localStorage.removeItem("rememberedEmail");
       }
-      
+
       toast.success("Login successful!");
 
       if (data.user.hasRegistration) {
@@ -159,9 +159,9 @@ const LoginCard = () => {
     // If institution is passed (from InstitutionSelector), use it. 
     // Otherwise fallback to sessionStorage (legacy/initial load)
     const targetInstitution = institution || (
-      sessionStorage.getItem("selectedInstitution") ? 
-      JSON.parse(sessionStorage.getItem("selectedInstitution")) : 
-      null
+      sessionStorage.getItem("selectedInstitution") ?
+        JSON.parse(sessionStorage.getItem("selectedInstitution")) :
+        null
     );
 
     if (targetInstitution) {
@@ -195,7 +195,7 @@ const LoginCard = () => {
     }
 
     login(data.user, data.token);
-    
+
     // Store session expiry for client-side 3-hour countdown
     if (data.sessionExpiresAt) {
       sessionStorage.setItem("sessionExpiresAt", data.sessionExpiresAt);
@@ -256,8 +256,16 @@ const LoginCard = () => {
           {/* Header */}
           <div className="bg-gray-50 px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
             {/* Icon badge */}
-            <div className="w-14 h-14 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100">
-              <Building2 className="w-6 h-6 text-[#1a3884]" />
+            <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              {selectedInstitution?.logo ? (
+                <img 
+                  src={selectedInstitution.logo} 
+                  alt={selectedInstitution.name} 
+                  className="w-full h-full object-contain p-2"
+                />
+              ) : (
+                <Building2 className="w-7 h-7 text-[#1a3884]" />
+              )}
             </div>
 
             <h2
@@ -297,9 +305,17 @@ const LoginCard = () => {
         }}
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 shadow-sm flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+            {selectedInstitution?.logo ? (
+              <img 
+                src={selectedInstitution.logo} 
+                alt={selectedInstitution.name} 
+                className="w-full h-full object-contain p-1.5"
+              />
+            ) : (
               <Building2 className="w-5 h-5 text-[#1a3884]" />
-            </div>
+            )}
+          </div>
           <div className="min-w-0 flex-1">
             <p className="font-bold text-gray-900 text-sm truncate leading-tight">
               {selectedInstitution?.name}
@@ -348,7 +364,15 @@ const LoginCard = () => {
                 boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
               }}
             >
-              <Lock className="w-7 h-7 text-[#1a3884]" />
+              {selectedInstitution?.logo ? (
+                <img 
+                  src={selectedInstitution.logo} 
+                  alt={selectedInstitution.name} 
+                  className="w-full h-full object-contain p-2"
+                />
+              ) : (
+                <Lock className="w-7 h-7 text-[#1a3884]" />
+              )}
             </motion.div>
 
             <h2
@@ -358,7 +382,7 @@ const LoginCard = () => {
               Welcome Back
             </h2>
             <p className="text-gray-500 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
-Access your personalized learning and career dashboard
+              Access your personalized learning and career dashboard
             </p>
           </div>
 
@@ -421,7 +445,7 @@ Access your personalized learning and career dashboard
                   htmlFor="login-password"
                   className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-gray-500"
                 >
-                 Password
+                  Password
                 </label>
                 <button
                   type="button"
@@ -528,6 +552,18 @@ Access your personalized learning and career dashboard
                 </>
               )}
             </button>
+
+            {/* Registration Link */}
+            {/* <div className="mt-6 text-center">
+              <span className="text-sm font-medium text-slate-500">Don't have an account? </span>
+              <button
+                type="button"
+                onClick={() => navigate("/signup-initial")}
+                className="text-sm font-bold text-[#1a3884] hover:text-[#2d5dc7] transition-colors underline decoration-[#1a3884]/30 hover:decoration-[#1a3884]"
+              >
+                Sign Up
+              </button>
+            </div> */}
           </form>
         </div>
       </motion.div>

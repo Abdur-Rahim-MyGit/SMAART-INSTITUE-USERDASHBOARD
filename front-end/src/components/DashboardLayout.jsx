@@ -1,17 +1,54 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink } from "lucide-react";
+import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import useUser from "@/hooks/useUser";
+import useAvatar from "@/hooks/useAvatar";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { formatDistanceToNow } from 'date-fns';
 import { API_BASE_URL, getBackendUrl } from "@/services/api";
 import useSessionGuard from "@/hooks/useSessionGuard";
 import SessionExpiryWarning from "@/components/SessionExpiryWarning";
+
+// Import Video Assets for Avatar Card
+import ToddlerBoyIdle from "@/assets/Animations/ToddlerBoyIdle.mp4";
+import ToddlerBoyGrowing from "@/assets/Animations/ToddlerBoyGrowing.mp4";
+import PreteenBoyIdle from "@/assets/Animations/PreteenBoyIdle.mp4";
+import PreteenBoyGrowing from "@/assets/Animations/PreteenBoyGrowing.mp4";
+import TeenBoyIdle from "@/assets/Animations/TeenBoyIdle.mp4";
+import TeenBoyGrowing from "@/assets/Animations/TeenBoyGrowing.mp4";
+import ManIdle from "@/assets/Animations/ManIdle.mp4";
+import ToddlerGirlIdle from "@/assets/Animations/ToddlerGirlIdle.mp4";
+import ToddlerGirlGrowing from "@/assets/Animations/ToddlerGirlGrowing.mp4";
+import PreteenGirlIdle from "@/assets/Animations/PreeteenGirlIdle.mp4";
+import PreteenGirlGrowing from "@/assets/Animations/PreteenGirlGrowing.mp4";
+import TeenGirlIdle from "@/assets/Animations/TeenGirlIdle.mp4";
+import TeenGirlGrowing from "@/assets/Animations/TeenGirlGrowing.mp4";
+import WomanIdle from "@/assets/Animations/WomanIdle.mp4";
+
+const MALE_SEQUENCE = [
+  ToddlerBoyIdle,
+  ToddlerBoyGrowing,
+  PreteenBoyIdle,
+  PreteenBoyGrowing,
+  TeenBoyIdle,
+  TeenBoyGrowing,
+  ManIdle
+];
+
+const FEMALE_SEQUENCE = [
+  ToddlerGirlIdle,
+  ToddlerGirlGrowing,
+  PreteenGirlIdle,
+  PreteenGirlGrowing,
+  TeenGirlIdle,
+  TeenGirlGrowing,
+  WomanIdle
+];
 
 // Page title mapping
 const pageTitles = {
@@ -86,15 +123,29 @@ const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isCollapsed } = useSidebar();
+  const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
   const { theme, setTheme } = useTheme();
   const { user, loading: userLoading, logout } = useUser();
+  const { avatarData } = useAvatar();
   const { notifications, unreadCount, markRead } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showCollegeLogo, setShowCollegeLogo] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
+  const hoverTimeoutRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setIsProfileHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsProfileHovered(false);
+    }, 150); // Small delay to allow moving to the modal
+  };
 
   // === AUTH PROTECTION ===
   useEffect(() => {
@@ -126,6 +177,16 @@ const DashboardLayout = () => {
   // Toggle Theme
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/', { replace: true });
+    } catch (err) {
+      console.error('Logout error:', err);
+      navigate('/', { replace: true });
+    }
   };
 
   // Fetch profile photo from Registration API
@@ -243,39 +304,49 @@ const DashboardLayout = () => {
 
       {/* Main Content Area */}
       <main
-        className={`transition-all duration-300 min-h-screen ${
-          isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]'
-        }`}
+        className={`transition-all duration-300 min-h-screen ${isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]'
+          }`}
       >
         {/* Top Header Bar - Premium AI SaaS Style */}
-        <header className="sticky top-0 z-40 pt-4 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300">
-          <div className="flex items-center justify-between px-6 md:px-8 h-[80px] max-w-[1600px] mx-auto">
-            
-            {/* LEFT SECTION: Page Title & Breadcrumb */}
-            <div className="flex flex-col shrink-0">
-              {/* Subtle Breadcrumb */}
-              <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 opacity-60">
-                {(location.pathname === '/dashboard' || location.pathname === '/dashboard/') && (
-                  <>
-                    <span>SMAART</span>
-                    <ChevronRight className="w-2.5 h-2.5" />
-                  </>
-                )}
-                <span>Dashboard</span>
-              </div>
-              
-              <div className="flex items-center gap-3.5">
-                {/* Primary Accent Bar */}
-                <div className="w-1.5 h-7 bg-[#1a3884] dark:bg-blue-500 rounded-full shadow-[0_0_8px_rgba(26,56,132,0.15)]" />
-                <motion.h1 
-                  key={pageTitle}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight"
-                  style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em' }}
-                >
-                  {pageTitle}
-                </motion.h1>
+        <header className="sticky top-0 z-40 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-none sm:border-b border-slate-200/10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300">
+          <div className="flex items-center justify-between px-4 md:px-8 h-[70px] max-w-[1600px] mx-auto">
+
+            {/* LEFT SECTION: Menu Toggle (Mobile) + Page Title & Breadcrumb */}
+            <div className="flex items-center gap-4">
+              {/* Mobile Menu Toggle */}
+              <button
+                onClick={() => setIsMobileOpen(true)}
+                className="lg:hidden p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-[#1a3884] transition-all"
+                aria-label="Open menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+
+              <div className="flex flex-col shrink-0">
+                {/* Subtle Breadcrumb */}
+                <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 opacity-60">
+                  {(location.pathname === '/dashboard' || location.pathname === '/dashboard/') && (
+                    <>
+                      <span>SMAART</span>
+                      <ChevronRight className="w-2.5 h-2.5" />
+                    </>
+                  )}
+                  <span>Dashboard</span>
+                </div>
+
+                <div className="flex items-center gap-3.5">
+                  {/* Primary Accent Bar */}
+                  <div className="w-1.5 h-7 bg-[#1a3884] dark:bg-blue-500 rounded-full shadow-[0_0_8px_rgba(26,56,132,0.15)]" />
+                  <motion.h1
+                    key={pageTitle}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight"
+                    style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em' }}
+                  >
+                    {pageTitle}
+                  </motion.h1>
+                </div>
               </div>
             </div>
 
@@ -301,7 +372,7 @@ const DashboardLayout = () => {
 
             {/* RIGHT SECTION: Grouped Actions */}
             <div className="flex items-center gap-5">
-              
+
               {/* 1. Live Time Widget */}
               <div className="hidden xl:flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-800/20 border border-slate-100 dark:border-slate-700/50 rounded-full shadow-sm">
                 <div className="relative">
@@ -314,7 +385,7 @@ const DashboardLayout = () => {
               </div>
 
               {/* 2. Icon Group Container */}
-              <div className="flex items-center gap-1 p-1 bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/30 dark:border-slate-700/30 rounded-2xl">
+              <div className="hidden sm:flex items-center gap-1 p-1 bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/30 dark:border-slate-700/30 rounded-2xl">
                 {/* Theme Toggle */}
                 <button
                   onClick={toggleTheme}
@@ -328,9 +399,8 @@ const DashboardLayout = () => {
                 <div className="relative" ref={notificationRef}>
                   <button
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className={`relative p-2 rounded-xl transition-all hover:scale-105 active:scale-95 group ${
-                      showNotifications ? 'bg-white dark:bg-slate-700 text-[#1a3884]' : 'text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-slate-700'
-                    }`}
+                    className={`relative p-2 rounded-xl transition-all hover:scale-105 active:scale-95 group ${showNotifications ? 'bg-white dark:bg-slate-700 text-[#1a3884]' : 'text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-slate-700'
+                      }`}
                     aria-label="Notifications"
                   >
                     <Bell className="w-4.5 h-4.5 group-hover:animate-[bounce_1s_infinite]" />
@@ -366,8 +436,8 @@ const DashboardLayout = () => {
                           {notifications.length > 0 ? (
                             <div className="divide-y divide-slate-100 dark:divide-slate-800">
                               {notifications.slice(0, 5).map((n) => (
-                                <div 
-                                  key={n._id} 
+                                <div
+                                  key={n._id}
                                   onClick={() => {
                                     markRead(n._id);
                                     if (n.link) navigate(n.link);
@@ -376,11 +446,10 @@ const DashboardLayout = () => {
                                   className={`px-5 py-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}`}
                                 >
                                   <div className="flex gap-3">
-                                    <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                      n.type === 'course' ? 'bg-blue-100 text-blue-600' : 
+                                    <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-blue-100 text-blue-600' :
                                       n.type === 'assessment' ? 'bg-purple-100 text-purple-600' :
-                                      'bg-slate-100 text-slate-600'
-                                    }`}>
+                                        'b  g-slate-100 text-slate-600'
+                                      }`}>
                                       {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -424,7 +493,7 @@ const DashboardLayout = () => {
                 {/* Settings */}
                 <button
                   onClick={() => navigate('/dashboard/settings')}
-                  className="p-2 rounded-xl text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-slate-700 transition-all hover:scale-105 active:scale-95"
+                  className="hidden sm:flex p-2 rounded-xl text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-slate-700 transition-all hover:scale-105 active:scale-95"
                   aria-label="Settings"
                 >
                   <Settings className="w-4.5 h-4.5" />
@@ -432,11 +501,16 @@ const DashboardLayout = () => {
               </div>
 
               {/* 3. User Profile Card */}
-              <motion.div 
-                whileHover={{ y: -2, shadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
-                className="flex items-center gap-3 pl-2 pr-4 py-1.5 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm cursor-pointer group transition-all"
-                onClick={() => navigate('/profile')}
+              <div 
+                className="relative"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
+                <motion.div
+                  whileHover={{ y: -2, shadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
+                  className="flex items-center gap-3 pl-2 sm:pr-4 py-1.5 bg-white/50 sm:bg-white dark:bg-slate-800/50 dark:sm:bg-slate-800 border-none sm:border border-slate-100 dark:border-slate-700 rounded-2xl shadow-none sm:shadow-sm cursor-pointer group transition-all"
+                  onClick={() => navigate('/profile')}
+                >
                 <div className="relative shrink-0">
                   <div className="absolute -inset-0.5 bg-[#1a3884] rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
                   <div className="relative p-[2px] bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 rounded-full">
@@ -461,7 +535,7 @@ const DashboardLayout = () => {
                   </div>
                 </div>
 
-                <div className="hidden sm:block">
+                <div className="hidden sm:block text-left">
                   <p className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500 leading-none mb-1">
                     {getGreeting()}
                   </p>
@@ -469,11 +543,28 @@ const DashboardLayout = () => {
                     <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#1a3884] transition-colors">
                       {user?.firstName || user?.fullName?.split(' ')[0] || 'User'}
                     </p>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-colors" />
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-all duration-300 ${isProfileHovered ? 'rotate-180' : ''}`} />
                   </div>
                 </div>
               </motion.div>
 
+              {/* Hover Profile Card Modal */}
+              <AnimatePresence>
+                {isProfileHovered && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute top-full right-0 mt-2 z-[100] w-72 pointer-events-auto"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <ProfileHoverCard user={user} avatarData={avatarData} onLogout={handleLogout} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              </div>
             </div>
           </div>
         </header>
@@ -491,6 +582,144 @@ const DashboardLayout = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+// Profile Hover Card Component
+const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
+  const navigate = useNavigate();
+  const videoRefs = useRef([]);
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [visibleVideoIndex, setVisibleVideoIndex] = useState(0);
+
+  const userGender = user?.gender || avatarData?.user?.gender;
+  const normalizedGender = userGender?.toLowerCase()?.trim();
+  const isFemale = ['female', 'girl', 'woman'].includes(normalizedGender);
+  const ANIMATION_SEQUENCE = isFemale ? FEMALE_SEQUENCE : MALE_SEQUENCE;
+
+  const levelProgress = avatarData?.levelProgress ||
+    Math.min(100, Math.round(((avatarData?.xp || 0) / (avatarData?.xpToNextLevel || 100)) * 100));
+
+  const handleVideoEnded = (index) => {
+    if (index < ANIMATION_SEQUENCE.length - 1) {
+      setCurrentVideoIndex(index + 1);
+    }
+  };
+
+  useEffect(() => {
+    const video = videoRefs.current[currentVideoIndex];
+    if (video) {
+      video.currentTime = 0;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log("Autoplay prevented:", error);
+        });
+      }
+    }
+    videoRefs.current.forEach((video, index) => {
+      if (video && index !== currentVideoIndex) {
+        video.pause();
+      }
+    });
+  }, [currentVideoIndex, isFemale]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0f172a] shadow-2xl"
+      style={{
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+      }}
+    >
+      {/* Background Ambience */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/40 via-[#0f172a] to-[#0f172a]" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-50" />
+
+      {/* Animation Section */}
+      <div className="relative z-10 pt-4 px-4 pb-2">
+        <div className="relative aspect-[4/5] w-full mx-auto rounded-xl overflow-hidden ring-1 ring-white/10 shadow-2xl flex items-center justify-center bg-black/40 backdrop-blur-sm group max-h-[180px]">
+          {/* Inner Glow Border */}
+          <div className="absolute inset-0 rounded-xl border border-white/5 z-20 pointer-events-none group-hover:border-white/10 transition-colors" />
+
+          {/* Video Playback */}
+          {ANIMATION_SEQUENCE.map((src, index) => (
+            <video
+              key={`${isFemale ? 'female' : 'male'}-${index}`}
+              ref={el => videoRefs.current[index] = el}
+              src={src}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${index <= visibleVideoIndex ? 'opacity-100' : 'opacity-0'
+                } ${index === visibleVideoIndex ? 'z-10' : 'z-0'}`}
+              muted
+              playsInline
+              preload="auto"
+              loop={index === ANIMATION_SEQUENCE.length - 1}
+              onEnded={() => handleVideoEnded(index)}
+              onPlaying={() => {
+                if (index === currentVideoIndex) {
+                  setVisibleVideoIndex(index);
+                }
+              }}
+            />
+          ))}
+
+          {/* Floating Level Badge */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="absolute bottom-2 inset-x-2 h-8 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 flex items-center justify-between px-2 z-30"
+          >
+            <div className="flex items-center gap-1.5">
+              <div className="w-5 h-5 rounded-md bg-gradient-to-br from-amber-300 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <Star className="w-3 h-3 text-white fill-white" />
+              </div>
+              <span className="text-white font-bold text-xs tracking-wide">Lvl {avatarData?.level || 1}</span>
+            </div>
+            <div className="w-12 h-1 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-amber-300 to-amber-500 rounded-full" style={{ width: `${levelProgress}%` }} />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Profile Info & Actions */}
+      <div className="relative z-10 p-4 space-y-3">
+        <div className="text-center space-y-0.5">
+          <h3 className="text-lg font-bold text-white tracking-tight">{user?.fullName || 'Student'}</h3>
+          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{user?.role || 'Student'}</p>
+        </div>
+
+        <div className="space-y-2">
+          {/* Skills Passport Button */}
+          <button
+            onClick={() => navigate('/dashboard/skills-passport')}
+            className="group relative w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 active:scale-[0.98] overflow-hidden flex items-center justify-center gap-2"
+          >
+            <Trophy className="w-4 h-4" />
+            <span className="text-xs font-bold uppercase tracking-wide">Skills Passport</span>
+            <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+
+          {/* View Profile & Logout */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate('/dashboard/profile')}
+              className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-white transition-all duration-300 text-xs font-medium"
+            >
+              View Profile
+            </button>
+            <button
+              onClick={onLogout}
+              className="px-3 py-2 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-xs font-medium"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

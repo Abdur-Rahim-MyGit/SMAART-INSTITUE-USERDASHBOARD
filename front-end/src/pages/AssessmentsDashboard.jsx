@@ -130,21 +130,17 @@ const AssessmentsDashboard = () => {
                             initial={{ opacity: 0, y: 22, scale: 0.99 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            whileHover={{ y: -2 }}
-                            className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.16),_transparent_30%),linear-gradient(135deg,_#ffffff_0%,_#f8fbff_52%,_#eef4ff_100%)] p-6 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.24)] dark:border-slate-700/70 dark:bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_32%),linear-gradient(135deg,_rgba(15,23,42,1)_0%,_rgba(15,23,42,0.98)_48%,_rgba(30,41,59,1)_100%)] sm:p-7"
+                            className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900 sm:p-7"
                         >
-                            <div className="pointer-events-none absolute -right-10 top-0 h-32 w-32 rounded-full bg-blue-200/40 blur-3xl dark:bg-blue-500/10" />
-                            <div className="pointer-events-none absolute bottom-0 left-8 h-24 w-24 rounded-full bg-cyan-100/50 blur-3xl dark:bg-cyan-400/10" />
-
                             <div className="relative">
-                                <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-[#1a3884] shadow-sm dark:border-blue-400/20 dark:bg-slate-900/65 dark:text-blue-300">
-                                    <span className="h-2 w-2 rounded-full bg-gradient-to-r from-[#1a3884] to-[#4f7cf3]" />
+                                <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-[#1a3884] dark:border-slate-700 dark:bg-slate-800 dark:text-blue-300">
+                                    <span className="h-2 w-2 rounded-full bg-[#1a3884]" />
                                     Assessment Journey
                                 </div>
 
                                 <div className="mt-5 max-w-2xl space-y-3">
-                                    <h1 className="text-[2rem] font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-[2.35rem] lg:text-[2.5rem] lg:leading-[1.04]">
-                                        Assessments - <span className="text-[#1a3884] dark:text-blue-300">Centre</span>
+                                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-50 sm:text-4xl lg:text-[2.5rem] lg:leading-[1.1]">
+                                        Assessments Centre
                                     </h1>
                                     <p className="max-w-2xl text-sm font-medium leading-7 text-slate-600 dark:text-slate-300 sm:text-base">
                                         Experience a structured pathway to mastery. Track your progress, complete each
@@ -301,22 +297,15 @@ const AssessmentsDashboard = () => {
 const GuidelinesSection = () => (
     <motion.div
         {...fadeUp}
-        whileHover={{ y: -2 }}
-        className="group relative overflow-hidden rounded-[32px] border border-slate-200/80 bg-[linear-gradient(180deg,_#ffffff_0%,_#f9fbff_100%)] shadow-[0_15px_40px_-24px_rgba(15,23,42,0.12)] dark:border-slate-700/70 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,1)_0%,_rgba(30,41,59,1)_100%)]"
+        className="group relative overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm dark:border-slate-700/70 dark:bg-slate-900"
     >
-        <div className="absolute -bottom-10 -right-10 opacity-[0.03] transition-transform duration-1000 group-hover:scale-110">
-            <div className="flex h-80 w-80 items-center justify-center rounded-full border-[40px] border-[#1a3884]">
-                <div className="h-40 w-12 rounded-full bg-[#1a3884]" />
-            </div>
-        </div>
-
         <div className="relative z-10 flex flex-col items-start gap-8 p-6 sm:p-8 lg:flex-row lg:gap-10 lg:p-9">
-            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[22px] border border-blue-100 bg-[linear-gradient(180deg,_#eef2ff_0%,_#f8fbff_100%)] text-[#4f46e5] shadow-sm dark:border-blue-400/20 dark:bg-[linear-gradient(180deg,_rgba(59,130,246,0.12)_0%,_rgba(30,41,59,0.8)_100%)] dark:text-blue-300">
+            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[22px] border border-slate-100 bg-slate-50 text-[#1a3884] shadow-sm dark:border-slate-800 dark:bg-slate-800/50 dark:text-blue-300">
                 <Info className="h-8 w-8" />
             </div>
 
             <div className="flex-1 space-y-6">
-                <h4 className="text-xl font-black tracking-tight text-slate-950 dark:text-slate-100 sm:text-2xl">
+                <h4 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
                     Assessment Protocol & Guidelines
                 </h4>
 
@@ -348,9 +337,9 @@ const GuidelinesSection = () => (
                             whileHover={{ x: 2 }}
                             className="flex gap-4"
                         >
-                            <div className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#4f46e5]" />
+                            <div className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#1a3884]" />
                             <div className="space-y-1.5">
-                                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-950 dark:text-slate-100">
+                                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-700 dark:text-slate-300">
                                     {item.title}
                                 </p>
                                 <p className="text-sm font-medium leading-6 text-slate-500 dark:text-slate-300">{item.desc}</p>
@@ -371,36 +360,35 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ y: -5, scale: 1.01 }}
             className="group"
         >
             <div
                 onClick={onAction}
-                className={`relative cursor-pointer overflow-hidden rounded-[30px] border bg-[linear-gradient(180deg,_#ffffff_0%,_#fbfdff_100%)] transition-all duration-300 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,1)_0%,_rgba(30,41,59,1)_100%)] ${
+                className={`relative cursor-pointer overflow-hidden rounded-[30px] border bg-white transition-all duration-300 dark:bg-slate-900 ${
                     completed
-                        ? "border-[#1a3884]/20 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.14)] hover:shadow-[0_24px_48px_-28px_rgba(26,56,132,0.22)] dark:border-blue-500/25"
-                        : "border-slate-200/80 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.12)] hover:border-slate-300/70 hover:shadow-[0_22px_44px_-30px_rgba(15,23,42,0.16)] dark:border-slate-700/70 dark:hover:border-slate-600"
+                        ? "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:hover:border-slate-600"
+                        : "border-slate-200 shadow-sm hover:border-[#1a3884]/30 hover:shadow-md dark:border-slate-700 dark:hover:border-slate-600"
                 }`}
             >
-                <div className={`h-1 ${completed ? "bg-gradient-to-r from-[#1a3884] to-[#5d8dff]" : "bg-slate-100 dark:bg-slate-700"}`} />
+                <div className={`h-1 ${completed ? "bg-[#1a3884]" : "bg-slate-100 dark:bg-slate-800"}`} />
 
                 <div className="p-6 sm:p-7">
                     <div className="mb-5 flex items-start gap-4 sm:gap-5">
                         <div
-                            className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-base font-black ${
+                            className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-base font-bold ${
                                 completed
-                                    ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white shadow-lg shadow-blue-500/20"
-                                    : "border border-slate-100 bg-white text-slate-400 shadow-sm dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-500"
+                                    ? "bg-[#1a3884] text-white shadow-sm"
+                                    : "border border-slate-200 bg-slate-50 text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
                             }`}
                         >
                             {completed ? <CheckCircle2 className="h-6 w-6" /> : `0${index + 1}`}
                         </div>
 
                         <div className="min-w-0 flex-1 pt-0.5">
-                            <h3 className="text-lg font-black leading-tight tracking-tight text-slate-950 dark:text-slate-100 sm:text-xl">
+                            <h3 className="text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-100 sm:text-xl">
                                 {stage.title}
                             </h3>
-                            <p className="mt-1.5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                            <p className="mt-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                                 {stage.subtitle}
                             </p>
                         </div>
@@ -418,26 +406,25 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                     <div className="mb-6 flex flex-wrap items-center gap-2.5">
                         <InfoChip icon={FileText} label={`${stage.totalQuestions} Qs`} />
                         <InfoChip icon={Clock} label={stage.duration} />
-                        <InfoChip icon={Layers} label="6 Quotients" />
                     </div>
 
                     {completed && score !== undefined && (
-                        <div className="mb-6 rounded-2xl border border-slate-100 bg-[linear-gradient(180deg,_#ffffff_0%,_#f8fbff_100%)] p-4 shadow-sm dark:border-slate-700 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,0.9)_0%,_rgba(30,41,59,0.9)_100%)]">
+                        <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
                             <div className="mb-3 flex items-center justify-between">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                                     Your Performance
                                 </span>
-                                <span className="text-xl font-black text-[#1a3884] dark:text-blue-300 sm:text-2xl">
+                                <span className="text-xl font-bold text-[#1a3884] dark:text-white sm:text-2xl">
                                     {score}
-                                    <span className="ml-1 text-sm font-bold text-slate-400 dark:text-slate-500">%</span>
+                                    <span className="ml-1 text-sm text-slate-500 dark:text-slate-400">%</span>
                                 </span>
                             </div>
-                            <div className="h-2 rounded-full bg-slate-100 p-0.5 dark:bg-slate-700/80">
+                            <div className="h-2 rounded-full bg-slate-200 p-0.5 dark:bg-slate-700">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${score}%` }}
                                     transition={{ duration: 1, ease: "easeOut", delay: 0.4 + index * 0.08 }}
-                                    className="h-full rounded-full bg-gradient-to-r from-[#1a3884] to-[#5d8dff]"
+                                    className="h-full rounded-full bg-[#1a3884]"
                                 />
                             </div>
                         </div>
@@ -448,25 +435,23 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                             event.stopPropagation();
                             onAction();
                         }}
-                        whileHover={completed ? { y: -1, scale: 1.01 } : { y: -2, scale: 1.015 }}
-                        whileTap={{ scale: 0.985 }}
-                        className={`flex w-full items-center justify-center gap-3 rounded-2xl px-6 py-4 text-sm font-black transition-all duration-300 ${
+                        className={`flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 text-sm font-bold transition-all duration-300 ${
                             completed
-                                ? "border border-slate-200 bg-white text-slate-600 shadow-sm hover:border-[#1a3884] hover:bg-[#1a3884] hover:text-white dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-600"
-                                : "bg-gradient-to-r from-[#1a3884] via-[#2b57c4] to-[#3b6de3] text-white shadow-xl shadow-blue-500/15 hover:shadow-2xl"
+                                ? "border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                                : "bg-[#1a3884] text-white shadow-md hover:bg-[#002147] hover:shadow-lg hover:-translate-y-0.5"
                         }`}
                     >
                         {completed ? (
                             <>
                                 <Eye className="h-5 w-5" />
                                 View Performance Report
-                                <ChevronRight className="ml-auto h-5 w-5 opacity-30" />
+                                <ChevronRight className="ml-auto h-5 w-5 opacity-40" />
                             </>
                         ) : (
                             <>
                                 <Play className="h-5 w-5 fill-white" />
                                 Start Stage Assessment
-                                <ArrowRight className="ml-auto h-5 w-5 opacity-60 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="ml-auto h-5 w-5 opacity-80 transition-transform group-hover:translate-x-1" />
                             </>
                         )}
                     </motion.button>

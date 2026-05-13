@@ -24,8 +24,9 @@ const AssessmentFlowGuard = ({ children }) => {
 
   // === PROCTORING: Active only on assessment routes ===
   const isAssessmentRoute =
-    location.pathname.startsWith("/assessment/") ||
-    location.pathname.startsWith("/dashboard/assessments/");
+    (location.pathname.startsWith("/assessment/") ||
+    location.pathname.startsWith("/dashboard/assessments/")) &&
+    !location.pathname.endsWith("/report");
 
   const handleAutoSubmit = useCallback(() => {
     // Navigate back to dashboard with a flag indicating auto-submission
@@ -245,7 +246,7 @@ const AssessmentFlowGuard = ({ children }) => {
     } else {
       // All required assessments are done.
       // Now block access to completed assessment paths if the user tries to go back manually.
-      const isVisitingCompletedAssessment = assessmentOrder.some(a => 
+      const isVisitingCompletedAssessment = assessmentOrder.some(a =>
         location.pathname.startsWith(a.path) && assessmentData[a.key]?.status === true
       );
 
@@ -257,7 +258,7 @@ const AssessmentFlowGuard = ({ children }) => {
     }
 
     // setNextPath(requiredPath); // Removed blocking redirection
-    setNextPath(null); 
+    setNextPath(null);
 
   }, [location.pathname, assessmentData]);
 
@@ -274,9 +275,37 @@ const AssessmentFlowGuard = ({ children }) => {
 
   // Combine initial loading state with splash screen duration
   if (loading || !splashComplete) {
+    // Determine title based on path
+    const getLoaderTitle = () => {
+      const path = location.pathname;
+      if (path.includes('/courses')) return "Courses";
+      if (path.includes('/assessments') || path.includes('/assessment-centre')) return "Assessments";
+      if (path.includes('/resume-builder')) return "Resume Builder";
+      if (path.includes('/dictionary')) return "Dictionary";
+      if (path.includes('/library')) return "Library";
+      if (path.includes('/complete-registration')) return "Registration";
+      if (path.includes('/vision-board')) return "Vision Board";
+      if (path.includes('/community') || path.includes('/groups')) return "Community";
+      if (path.includes('/settings')) return "Settings";
+      if (path.includes('/profile')) return "Profile";
+      if (path.includes('/smaart-toolkit')) return "Toolkit";
+      if (path.includes('/skills-passport')) return "Skills Passport";
+      if (path.includes('/skills-vault')) return "Skills Vault";
+      if (path.includes('/mind-care') || path.includes('/mindcare')) return "Mind Care";
+      if (path.includes('/notifications')) return "Notifications";
+      if (path.includes('/help')) return "Help";
+      if (path.includes('/support') || path.includes('/tickets')) return "Support";
+      return "DashBoard";
+    };
+
     return (
       <>
-        {!splashComplete && <DashboardLoader onComplete={() => setSplashComplete(true)} />}
+        {!splashComplete && (
+          <DashboardLoader
+            title={getLoaderTitle()}
+            onComplete={() => setSplashComplete(true)}
+          />
+        )}
 
         {/* Fallback loader if splash finishes but data is still fetching */}
         {splashComplete && loading && (
@@ -301,10 +330,10 @@ const AssessmentFlowGuard = ({ children }) => {
   }
 
   // If there's a required assessment path
-    // Removed auto-redirect to required assessment to allow free navigation
-    // if (location.pathname !== nextPath) {
-    //   return <Navigate to={nextPath} replace />;
-    // }
+  // Removed auto-redirect to required assessment to allow free navigation
+  // if (location.pathname !== nextPath) {
+  //   return <Navigate to={nextPath} replace />;
+  // }
 
   // If NOT authenticated (logged out user pressing back button), redirect to login
   if (!isAuthenticated) {

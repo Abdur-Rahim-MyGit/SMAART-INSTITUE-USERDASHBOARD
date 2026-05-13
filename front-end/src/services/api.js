@@ -148,7 +148,15 @@ export const apiCall = async (endpoint, options = {}) => {
 
         // Use window.location to force redirect and UI reset
         // FIXED: Only redirect if NOT on a public route where 401 is expected/allowed
-        const publicRoutes = ['/verify-certificate', '/verify-badge'];
+        const publicRoutes = [
+          '/verify-certificate',
+          '/verify-badge',
+          '/signup-initial',
+          '/verify-otp',
+          '/signup',
+          '/complete-registration',
+          '/signup-success',
+        ];
         const isPublicRoute = publicRoutes.some(route =>
           window.location.pathname === route || window.location.pathname.startsWith(`${route}/`)
         );

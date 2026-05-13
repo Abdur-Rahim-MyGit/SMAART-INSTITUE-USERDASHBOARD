@@ -22,9 +22,9 @@ const Community = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F1F5F9] pb-24 selection:bg-[#002147]/20">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
-        
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 pb-24 selection:bg-[#002147]/20">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+ 
         {/* ── Header Section ────────────────────────────────────────────── */}
         <div className="mb-10">
           <div className="flex items-center gap-4 mb-4">
@@ -41,7 +41,7 @@ const Community = () => {
               <motion.h1
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="text-4xl font-extrabold text-[#002147] tracking-tight"
+                className="text-4xl font-extrabold text-[#002147] dark:text-white tracking-tight"
               >
                 Community Feed
               </motion.h1>
@@ -52,21 +52,24 @@ const Community = () => {
                 className="flex items-center gap-2 mt-1"
               >
                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                <p className="text-gray-500 font-semibold text-sm">
+                <p className="text-gray-500 dark:text-slate-400 font-semibold text-sm">
                   Official SMAART & College Announcements
                 </p>
               </motion.div>
             </div>
           </div>
         </div>
-
+ 
         {/* ── Main Noticeboard ────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-white rounded-[2rem] p-6 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 relative"
+          className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 sm:p-10 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 dark:border-slate-800 relative"
         >
+          {/* Decorative background glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+
           <div className="relative z-10">
             <NoticesFeed currentUser={currentUser} />
           </div>
