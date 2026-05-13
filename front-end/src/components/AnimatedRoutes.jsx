@@ -193,7 +193,7 @@ const AnimatedRoutes = () => {
                         {/* Career Data Fetcher */}
                         <Route path="/dashboard/career-data-fetcher" element={<CareerDataFetcher />} />
                     </Route>
-                    <Route path="/assessment/:stage" element={<BaseLineTest />} />
+                    <Route path="/assessment/:stage" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
                     <Route path="/assessment/:stage/report" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
                     <Route path="/analysis" element={<AssessmentFlowGuard><Analysis /></AssessmentFlowGuard>} />
                     <Route path="/motivational" element={<AssessmentFlowGuard><Motivational /></AssessmentFlowGuard>} />
