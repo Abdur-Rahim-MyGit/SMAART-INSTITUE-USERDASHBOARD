@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { assessmentApi } from "@/services/assessmentApi";
-import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase } from "lucide-react";
+import { Eye, Target, AlertTriangle, CheckCircle2, Lock, XCircle, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
@@ -114,6 +114,16 @@ const BaseLineTest = () => {
   const stageDurationSeconds = stageConfig.durationMinutes * 60;
   const timerStartStorageKey = `${stageKey}_startTime`;
   const timerWarningStorageKey = `${stageKey}_oneMinuteWarningShown`;
+  const isReportMode = window.location.pathname.endsWith('/report');
+
+  const [agreedToDisclaimer, setAgreedToDisclaimer] = useState(() => {
+    return isReportMode || sessionStorage.getItem(`${stageKey}_disclaimerAgreed`) === 'true';
+  });
+
+  const handleAgreeDisclaimer = () => {
+    sessionStorage.setItem(`${stageKey}_disclaimerAgreed`, 'true');
+    setAgreedToDisclaimer(true);
+  };
 
   // State management
   const [user, setUser] = useState(null);
@@ -214,7 +224,6 @@ const BaseLineTest = () => {
   // Check authentication and fetch assessment on mount
   useEffect(() => {
     const initializeAssessment = async () => {
-      const isReportMode = window.location.pathname.endsWith('/report');
       console.log(`Initializing ${stageConfig.title} (${stageKey}) - Report Mode: ${isReportMode}...`);
       
       try {
@@ -457,7 +466,7 @@ const BaseLineTest = () => {
   }, [allQuestionsAnswered, clearTimerPersistence, finalizeUnansweredQuestions, navigate, resultId, stageKey, submitted, submitting, user]);
 
   useEffect(() => {
-    if (loading || submitted || !resultId) return;
+    if (loading || submitted || !resultId || !agreedToDisclaimer) return;
 
     let persistedStartTime = Number(localStorage.getItem(timerStartStorageKey));
     if (!Number.isFinite(persistedStartTime) || persistedStartTime <= 0 || persistedStartTime > Date.now()) {
@@ -508,6 +517,7 @@ const BaseLineTest = () => {
     submit,
     timerStartStorageKey,
     timerWarningStorageKey,
+    agreedToDisclaimer,
   ]);
 
   // Proctoring Logic - Anti-Cheat
@@ -515,7 +525,7 @@ const BaseLineTest = () => {
   const MAX_WARNINGS = 3;
 
   useEffect(() => {
-    if (submitted || loading) return;
+    if (submitted || loading || isReportMode || !agreedToDisclaimer) return;
 
     // 1. Prevent Right Click
     const handleContextMenu = (e) => {
@@ -524,48 +534,44 @@ const BaseLineTest = () => {
     };
 
     // 2. Prevent Copy/Cut/Paste
-    const handleCopyCutPaste = (e) => {
+    const preventCopyPaste = (e) => {
       e.preventDefault();
       toast.warning("Copying or pasting is not allowed.");
     };
 
-    // 3. Detect PrintScreen / Special Keys
-    const handleKeyDown = (e) => {
-      if (e.key === "PrintScreen" || (e.ctrlKey && e.key === "p") || (e.metaKey && e.shiftKey && e.key === "3") || (e.metaKey && e.shiftKey && e.key === "4")) {
-        e.preventDefault();
-        handleViolation("Screenshot attempt detected!");
-      }
-    };
-
-    // 4. Detect Focus Loss (Alt-Tab / Switching Windows)
+    // 4. Detect Focus Loss
     const handleVisibilityChange = () => {
       if (document.hidden) {
         handleViolation("You navigated away from the test window.");
       }
     };
 
+    const handleBlur = () => {
+      setTimeout(() => {
+        if (document.hidden) return; 
+        handleViolation("You clicked outside the test window.");
+      }, 100);
+    };
+
     // Violation Handler
-    const handleViolation = (message) => {
-      setWarnings(prev => {
-        const newCount = prev + 1;
-        if (newCount >= MAX_WARNINGS) {
-          // Force Submit
+    const handleViolation = (reason) => {
+      setWarnings((prev) => {
+        const newWarnings = prev + 1;
+        if (newWarnings >= MAX_WARNINGS) {
+          toast.error("Assessment submitted due to multiple violations.");
           submit({ reason: "violation", redirectAfterSubmit: true });
-          toast.error("Test terminated due to multiple violations.");
-          return newCount;
+        } else {
+          toast.error(`Warning ${newWarnings}/${MAX_WARNINGS}: ${reason}`);
         }
-        toast.error(`Warning ${newCount}/${MAX_WARNINGS}: ${message}`);
-        return newCount;
+        return newWarnings;
       });
     };
 
     document.addEventListener("contextmenu", handleContextMenu);
-    document.addEventListener("copy", handleCopyCutPaste);
-    document.addEventListener("cut", handleCopyCutPaste);
-    document.addEventListener("paste", handleCopyCutPaste);
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("copy", preventCopyPaste);
+    document.addEventListener("paste", preventCopyPaste);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    // Blur window detection is too aggressive sometimes, sticking to visibilitychange for now
+    window.addEventListener("blur", handleBlur);
 
     // Block Exit
     const beforeUnload = (e) => { e.preventDefault(); e.returnValue = ""; };
@@ -573,22 +579,20 @@ const BaseLineTest = () => {
     const onPopState = () => {
       window.history.pushState(null, "", window.location.href);
       setShowExitWarning(true);
-      toast.warning("Back navigation is disabled during the assessment.");
     };
     window.history.pushState(null, "", window.location.href);
     window.addEventListener("popstate", onPopState);
 
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
-      document.removeEventListener("copy", handleCopyCutPaste);
-      document.removeEventListener("cut", handleCopyCutPaste);
-      document.removeEventListener("paste", handleCopyCutPaste);
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("copy", preventCopyPaste);
+      document.removeEventListener("paste", preventCopyPaste);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleBlur);
       window.removeEventListener("beforeunload", beforeUnload);
       window.removeEventListener("popstate", onPopState);
     };
-  }, [submitted, loading, submit]); // Added submit to dependencies if stable (or remove if causes loop, submit uses refs or is stable)
+  }, [submitted, loading, isReportMode, agreedToDisclaimer, submit]);
 
 
   if (loading) return (
@@ -615,20 +619,75 @@ const BaseLineTest = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#001229] text-slate-900 dark:text-white transition-colors duration-300 flex flex-col">
-      {/* Top Bar with Cancel Button */}
-      {!submitted && (
-        <div className="w-full p-4 flex justify-end max-w-[1440px] mx-auto">
+      {/* Top Bar */}
+      <div className="w-full p-4 px-6 flex justify-between items-center max-w-[1440px] mx-auto">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#1a3884] text-white flex items-center justify-center font-bold text-lg shadow-md">
+            {user?.name?.charAt(0) || 'S'}
+          </div>
+          <div>
+            <div className="text-slate-900 dark:text-white font-bold">{user?.name || 'Student Name'}</div>
+            <div className="text-xs text-slate-500 font-medium">
+              ID: {user?.studentId || 'N/A'} <span className="mx-1">•</span> {user?.collegeName || 'SMAART Institute'}
+            </div>
+          </div>
+        </div>
+        {!submitted && !isReportMode && (
           <button
             onClick={() => setShowExitWarning(true)}
             className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-800 rounded-lg text-slate-600 dark:text-slate-400 hover:text-red-600 hover:border-red-200 dark:hover:border-red-900/50 transition-colors shadow-sm"
           >
             <XCircle className="w-4 h-4" />
-            <span className="text-sm font-bold">Cancel Assessment</span>
+            <span className="text-sm font-bold hidden sm:inline">Cancel Assessment</span>
           </button>
-        </div>
-      )}
+        )}
+      </div>
       <main className="p-4 md:p-6 lg:p-8 w-full max-w-[1440px] mx-auto flex-1 flex flex-col justify-center">
-        {!submitted ? (
+        {!submitted && !agreedToDisclaimer ? (
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl p-8 lg:p-12 w-full max-w-3xl mx-auto">
+            <div className="text-center mb-8 border-b border-slate-100 dark:border-slate-800 pb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 mb-5 shadow-sm">
+                <AlertTriangle className="w-8 h-8" />
+              </div>
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Assessment Guidelines</h2>
+              <p className="text-slate-500 dark:text-slate-400">Please read carefully before starting the {stageConfig.title}.</p>
+            </div>
+            
+            <div className="space-y-6 mb-10 text-slate-600 dark:text-slate-300">
+              <div className="flex gap-4 items-start">
+                <div className="w-8 h-8 rounded-full bg-[#1a3884]/10 text-[#1a3884] flex items-center justify-center flex-shrink-0 mt-0.5"><CheckCircle2 className="w-5 h-5" /></div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100">Time Limit & Format</h4>
+                  <p className="text-sm mt-1">This assessment contains {questions.length} questions and has a strict time limit of {stageConfig.durationMinutes} minutes. The timer cannot be paused once started.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 flex items-center justify-center flex-shrink-0 mt-0.5"><Eye className="w-5 h-5" /></div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100">Strict Proctoring is Active</h4>
+                  <p className="text-sm mt-1">Do not switch tabs, minimize the browser, or attempt to copy-paste. The system actively monitors window focus. <b className="text-red-600 dark:text-red-400">3 violations will result in automatic submission</b> and failure.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-8 h-8 rounded-full bg-[#1a3884]/10 text-[#1a3884] flex items-center justify-center flex-shrink-0 mt-0.5"><Target className="w-5 h-5" /></div>
+                <div>
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100">Completion</h4>
+                  <p className="text-sm mt-1">Answer all questions to the best of your ability. Once submitted, your answers cannot be changed. Ensure you have a stable internet connection.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={handleAgreeDisclaimer}
+                className="px-8 py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#002147] transition-all flex items-center gap-3 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1 w-full sm:w-auto justify-center"
+              >
+                I Understand & Start Assessment
+                <CheckCircle2 className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        ) : !submitted ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8 xl:gap-12 items-stretch">
             {/* Main Question Area */}
             <div className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-[#0B1120] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden relative">
@@ -638,15 +697,19 @@ const BaseLineTest = () => {
               <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0B1120] relative z-10">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
-                  <div className="text-right">
-                    <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Time Left:{" "}
-                      <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#1a3884]"}`}>
+                  <div className="flex flex-col items-end">
+                    <div className={`flex items-center gap-2 px-4 py-2 rounded-full border shadow-sm transition-colors duration-300 ${
+                      isLastFiveMinutes 
+                        ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 animate-pulse'
+                        : 'bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'
+                    }`}>
+                      <Clock className={`w-4 h-4 ${isLastFiveMinutes ? 'text-red-500' : 'text-[#1a3884] dark:text-blue-400'}`} />
+                      <span className="font-mono font-bold text-lg md:text-xl tracking-wider">
                         {formatCountdown(remainingSeconds)}
                       </span>
                     </div>
                     {isLastFiveMinutes && (
-                      <p className="mt-1 text-[11px] md:text-xs font-bold uppercase tracking-wider text-red-500">
+                      <p className="mt-2 text-[10px] md:text-xs font-bold uppercase tracking-wider text-red-500">
                         Time Almost Up!
                       </p>
                     )}
@@ -774,8 +837,6 @@ const BaseLineTest = () => {
                   </AnimatePresence>
                 </div>
               </div>
-
-              {/* Footer Controls removed per design update */}
             </div>
 
             {/* Navigation Sidebar */}
@@ -788,7 +849,6 @@ const BaseLineTest = () => {
                   {questions.map((q, idx) => (
                     <button
                       key={q._id}
-                      onClick={() => { /* Optional: Allow navigating back to answered questions? For now kept disabled/visual only based on original code 'prevQ' disabled */ }}
                       className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all cursor-default relative group
                         ${index === idx
                           ? 'bg-[#1a3884] text-white shadow-md scale-105 border-2 border-[#1a5f66]'
@@ -798,7 +858,6 @@ const BaseLineTest = () => {
                         }`}
                     >
                       {idx + 1}
-                      {/* Tooltip on hover */}
                       <span className="hidden md:block absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-20">
                         Q{idx + 1}
                       </span>
@@ -861,18 +920,19 @@ const BaseLineTest = () => {
             className="w-full max-w-[1440px] mx-auto py-8 px-4 flex-1 flex flex-col justify-center"
           >
             {/* Main Results Card */}
-            {/* Main Results Card - Minimal Configuration */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl p-8 lg:p-12 w-full max-w-6xl mx-auto relative overflow-hidden">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl p-8 lg:p-12 w-full max-w-4xl mx-auto relative overflow-hidden">
               {/* Header Section */}
               <div className="text-center mb-10 border-b border-slate-100 dark:border-slate-800 pb-8">
-
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#1a3884]/10 dark:bg-[#1a3884]/20 text-[#1a3884] dark:text-blue-400 mb-5 shadow-sm">
+                  <Trophy className="w-8 h-8" />
+                </div>
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">
                   {stageKey === 'T1' ? 'Baseline Established' : `${stageConfig.name} Assessment Complete`}
                 </h2>
-                <div className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
-                  <span>Result ID: {stageKey}-{user?.studentId || 'REF'}</span>
-                  <span>|</span>
-                  <span>S_{stageConfig.name.toLowerCase()}</span>
+                <div className="flex items-center justify-center gap-3 text-slate-500 dark:text-slate-400 text-sm font-bold">
+                  <span className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-3 py-1 rounded-full">ID: {stageKey}-{user?.studentId || 'REF'}</span>
+                  <span className="text-slate-300 dark:text-slate-600">•</span>
+                  <span className="bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300 px-3 py-1 rounded-full border border-[#1a3884]/20">S_{stageConfig.name.toLowerCase()}</span>
                 </div>
               </div>
 

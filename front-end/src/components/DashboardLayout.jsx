@@ -616,9 +616,9 @@ const DashboardLayout = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.98 }}
                       transition={{ duration: 0.18 }}
-                      className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-200/70 dark:border-slate-700/60 bg-white/95 dark:bg-slate-900/95 shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] backdrop-blur-xl"
+                      className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-300/90 dark:border-slate-700/80 bg-white dark:bg-slate-900 shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] backdrop-blur-xl"
                     >
-                      <div className="border-b border-slate-100 dark:border-slate-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                      <div className="border-b border-slate-200 dark:border-slate-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                         {searchQuery.trim() ? "Search results" : "Quick links"}
                       </div>
 
@@ -632,24 +632,24 @@ const DashboardLayout = () => {
                               onClick={() => handleSearchNavigation(item)}
                               className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors ${
                                 index === activeSearchIndex
-                                  ? "bg-[#1a3884]/6 dark:bg-blue-500/10"
-                                  : "hover:bg-slate-50 dark:hover:bg-slate-800/70"
-                              }`}
+                                  ? "bg-[#1a3884]/8 dark:bg-blue-500/12"
+                                  : "hover:bg-slate-100 dark:hover:bg-slate-800/85"
+                               }`}
                             >
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                                     {item.title}
                                   </span>
-                                  <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                  <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
                                     {item.type}
                                   </span>
                                 </div>
-                                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
                                   {item.subtitle}
                                 </p>
                               </div>
-                              <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-slate-300 dark:text-slate-600" />
+                              <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
                             </button>
                           ))}
                         </div>

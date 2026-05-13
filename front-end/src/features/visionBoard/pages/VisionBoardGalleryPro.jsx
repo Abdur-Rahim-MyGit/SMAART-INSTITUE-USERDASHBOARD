@@ -789,41 +789,41 @@ const VisionBoardGalleryPro = () => {
   return (
     <main className="min-h-screen w-full bg-[#f3f6fb] px-4 py-5 transition-colors duration-300 dark:bg-[#06101d] md:px-8">
       <div className="mx-auto max-w-[1600px] pb-6">
-        <section className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-white px-6 py-6 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-8 md:py-8">
+        <section className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-white px-6 py-5 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-8 md:py-6">
           {/* Decorative background gradient to match image style */}
           <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-blue-50/50 blur-3xl dark:bg-blue-900/10" />
           <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-indigo-50/30 blur-3xl dark:bg-indigo-900/5" />
 
-          <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+          <div className="relative flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#1a3884] shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#1a3884] shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
                 <div className="h-2 w-2 rounded-full bg-[#1a3884] shadow-[0_0_8px_rgba(26,56,132,0.4)]" />
                 Vision Journey
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-5xl">
                 Vision Board <span className="text-[#1a3884]">- Library</span>
               </h1>
-              <p className="mt-4 max-w-2xl text-base font-medium leading-relaxed text-slate-500 dark:text-slate-400 md:text-lg">
+              <p className="mt-3 max-w-2xl text-[17px] font-medium leading-8 text-slate-500 dark:text-slate-400 md:text-[19px]">
                 Experience a focused visual journey. Create detailed boards for your goals,
                 track your aspirations with clarity, and keep your primary vision active
                 on your dashboard to stay inspired.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
+            <div className="flex flex-wrap items-center gap-3 xl:pb-1">
+              <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
                 <Grid3X3 className="h-3.5 w-3.5" />
                 {boards.length} of {maxAllowed} boards
               </div>
               <Button
                 onClick={handleCreateNew}
                 disabled={!canCreateMore}
-                className={`h-11 rounded-2xl px-6 font-semibold ${canCreateMore
+                className={`h-10 rounded-2xl px-5 text-sm font-semibold ${canCreateMore
                   ? "bg-[#1a3884] text-white hover:bg-[#132c6b]"
                   : "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-slate-800"
                   }`}
               >
-                <Plus className="mr-2 h-4.5 w-4.5" />
+                <Plus className="mr-2 h-4 w-4" />
                 Create New Board
               </Button>
             </div>
@@ -893,7 +893,7 @@ const VisionBoardGalleryPro = () => {
           )} */}
         </section>
 
-        <div className="mt-6">
+        <div className="mt-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-32 space-y-4">
               <Loader2 className="h-12 w-12 animate-spin text-[#1a3884]" />
@@ -921,7 +921,7 @@ const VisionBoardGalleryPro = () => {
             </div>
           ) : (
             <div className={viewMode === "grid"
-              ? "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               : "grid grid-cols-1 gap-4"
             }>
               <AnimatePresence>

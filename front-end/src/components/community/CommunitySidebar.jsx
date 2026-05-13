@@ -1,10 +1,11 @@
 import { useState } from "react";
 import {
   BellRing,
+  Building2,
   GraduationCap,
+  Pin,
   Search,
-  UserRound,
-  Users,
+  ShieldCheck,
   X,
 } from "lucide-react";
 import Timestamp from "@/components/community/Timestamp";
@@ -39,6 +40,28 @@ function getAnnouncementAuthorName(announcement) {
 }
 
 /**
+ * Resolves the issuer badge shown for an announcement.
+ *
+ * @param {Record<string, unknown>} announcement - Notice payload.
+ * @returns {{label: string, icon: typeof ShieldCheck, className: string}} Issuer metadata.
+ */
+function getAnnouncementIssuer(announcement) {
+  if (announcement?.createdByRole === "admin") {
+    return {
+      label: "SMAART Admin",
+      icon: ShieldCheck,
+      className: "border-violet-200 bg-violet-50 text-violet-800",
+    };
+  }
+
+  return {
+    label: "College Admin",
+    icon: Building2,
+    className: "border-sky-200 bg-sky-50 text-sky-800",
+  };
+}
+
+/**
  * Resolves the audience tag shown on a notice card.
  *
  * @param {Record<string, unknown>} announcement - Notice payload.
@@ -68,6 +91,7 @@ function getNoticeStyle(announcement) {
       accent: "border-l-amber-400",
       badge: "border border-amber-200 bg-amber-50 text-amber-800",
       label: "Pinned",
+      icon: Pin,
     };
   }
 
@@ -76,6 +100,7 @@ function getNoticeStyle(announcement) {
       accent: "border-l-red-400",
       badge: "border border-red-200 bg-red-50 text-red-800",
       label: "Official",
+      icon: ShieldCheck,
     };
   }
 
@@ -83,6 +108,7 @@ function getNoticeStyle(announcement) {
     accent: "border-l-blue-400",
     badge: "border border-blue-200 bg-blue-50 text-blue-800",
     label: "Notice",
+    icon: BellRing,
   };
 }
 
@@ -211,9 +237,6 @@ const CommunitySidebar = ({
             <h3 className="text-[18px] font-semibold text-[hsl(var(--lms-primary))]">
               Official notices
             </h3>
-            <p className="mt-1 text-[15px] leading-[1.6] text-[hsl(var(--lms-text-muted))]">
-              Key institution updates with full timestamps for easier context.
-            </p>
           </div>
         </div>
 
@@ -232,6 +255,9 @@ const CommunitySidebar = ({
           ) : (
             announcements.slice(0, 3).map((announcement) => {
               const style = getNoticeStyle(announcement);
+              const issuer = getAnnouncementIssuer(announcement);
+              const NoticeIcon = style.icon;
+              const IssuerIcon = issuer.icon;
               const noticeId =
                 announcement._id?.toString?.() ||
                 announcement.id?.toString?.() ||
@@ -245,12 +271,12 @@ const CommunitySidebar = ({
                 >
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <span className={`inline-flex items-center gap-1 rounded-full px-[10px] py-[3px] text-[11px] font-medium ${style.badge}`}>
-                      <Users className="h-3 w-3" />
+                      <NoticeIcon className="h-3 w-3" />
                       {style.label}
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-[10px] py-[3px] text-[11px] font-medium text-blue-800">
-                      <UserRound className="h-3 w-3" />
-                      {getAnnouncementAuthorName(announcement)}
+                    <span className={`inline-flex items-center gap-1 rounded-full border px-[10px] py-[3px] text-[11px] font-medium ${issuer.className}`}>
+                      <IssuerIcon className="h-3 w-3" />
+                      {issuer.label}
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-[10px] py-[3px] text-[11px] font-medium text-emerald-800">
                       <GraduationCap className="h-3 w-3" />
