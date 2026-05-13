@@ -14,6 +14,7 @@ import {
   EyeOff,
   LogOut
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useAvatar from '@/hooks/useAvatar';
 import useUser from "@/hooks/useUser";
@@ -57,6 +58,7 @@ const FEMALE_SEQUENCE = [
 ];
 
 const AvatarProfileCard = ({ user = {}, className = "" }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const videoRefs = useRef([]);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -140,7 +142,7 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-500/15 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent" />
       </div>
-      
+
       {/* Top Glow Line */}
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-purple-500/80 to-transparent opacity-70" />
       <div className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent opacity-50" />
@@ -190,7 +192,7 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
 
             {/* Mini Progress Bar */}
             <div className="w-20 h-2 bg-white/10 rounded-full overflow-hidden">
-              <motion.div 
+              <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${levelProgress}%` }}
                 transition={{ duration: 1, ease: "easeOut" }}
@@ -205,7 +207,7 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
       <div className="relative z-10 p-5 space-y-4">
         <div className="text-center space-y-1.5">
           <h3 className="text-2xl font-bold text-white tracking-tight">{user.fullName || 'Student'}</h3>
-          <p className="text-purple-300 text-sm font-semibold uppercase tracking-wider">{user.role || 'Student'}</p>
+          <p className="text-purple-300 text-sm font-semibold uppercase tracking-wider">{t(`common.${(user.role || 'student').toLowerCase()}`)}</p>
         </div>
 
         <div className="space-y-3">
@@ -225,30 +227,37 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
           </motion.button>
 
           {/* Primary Action: View Profile */}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => navigate('/dashboard/profile')}
-            className="group relative w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden"
-          >
-            <span className="text-sm font-medium relative z-10">View Profile</span>
-            <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all relative z-10" />
-          </motion.button>
+          <div className="flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/dashboard/profile')}
+              className="group px-6 py-2.5 rounded-xl flex items-center gap-3 bg-white/5 hover:bg-white/10 transition-all duration-300"
+            >
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
+                <User className="w-4 h-4 text-indigo-400" />
+              </div>
+              <span className="text-sm font-bold text-white tracking-tight">{t('sidebar.profile')}</span>
+            </motion.button>
+          </div>
 
-          {/* Secondary Action: Logout */}
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={async () => {
-              // Use UserContext logout to properly clear backend session
-              await logout();
-              navigate('/', { replace: true });
-            }}
-            className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors text-sm font-medium group"
-          >
-            <LogOut className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-            Sign Out
-          </motion.button>
+          {/* Premium Logout Button */}
+          <div className="pt-1 border-t border-white/5 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={async () => {
+                await logout();
+                navigate('/', { replace: true });
+              }}
+              className="group px-6 py-2.5 rounded-xl flex items-center gap-3 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all duration-300"
+            >
+              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-rose-500/20 transition-colors">
+                <LogOut className="w-4 h-4" />
+              </div>
+              <span className="text-sm font-bold tracking-tight">{t('sidebar.logout')}</span>
+            </motion.button>
+          </div>
         </div>
       </div>
     </motion.div>

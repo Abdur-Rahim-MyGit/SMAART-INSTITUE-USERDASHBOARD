@@ -44,18 +44,57 @@ const FloatingDictionary = () => {
         setError(null);
 
         try {
+            // Lowercase word for case-sensitive API
             const res = await fetch(
-                `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`,
+                `https://freedictionaryapi.com/api/v1/entries/en/${word.toLowerCase()}`,
                 { signal: abortRef.current.signal }
             );
             if (!res.ok) throw new Error("not found");
             const data = await res.json();
-            setResult(data[0]);
+
+            if (!data.entries || data.entries.length === 0) {
+                throw new Error("not found");
+            }
+
+            // Transform API structure for UI compatibility
+            const transformedData = {
+                word: data.word,
+                phonetic: data.entries?.[0]?.pronunciations?.[0]?.text || "",
+                phonetics: data.entries?.[0]?.pronunciations?.map(p => ({
+                    text: p.text,
+                    audio: p.audio
+                })) || [],
+                meanings: data.entries?.map(entry => {
+                    const allDefinitions = [];
+                    entry.senses?.forEach(sense => {
+                        if (sense.definition) {
+                            allDefinitions.push({
+                                definition: sense.definition,
+                                example: sense.examples?.[0]
+                            });
+                        }
+                        sense.subsenses?.forEach(sub => {
+                            if (sub.definition) {
+                                allDefinitions.push({
+                                    definition: sub.definition,
+                                    example: sub.examples?.[0]
+                                });
+                            }
+                        });
+                    });
+                    return {
+                        partOfSpeech: entry.partOfSpeech,
+                        definitions: allDefinitions
+                    };
+                }) || []
+            };
+
+            setResult(transformedData);
             setError(null);
         } catch (err) {
             if (err.name === "AbortError") return; // Ignore aborted fetches
             setResult(null);
-            setError("Word not found. Try another word.");
+            setError("not found");
         } finally {
             setLoading(false);
         }
@@ -204,9 +243,21 @@ const FloatingDictionary = () => {
                         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-[120px]">
 
                             {error && !loading && (
-                                <div className="text-center py-6">
-                                    <p className="text-sm text-slate-400 dark:text-slate-500">{error}</p>
-                                </div>
+                                <motion.div 
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="text-center py-8 space-y-3"
+                                >
+                                    <div className="w-12 h-12 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center mx-auto">
+                                        <Search className="w-6 h-6 text-rose-500" />
+                                    </div>
+                                    <div className="space-y-1 px-4">
+                                        <p className="text-sm font-bold text-slate-800 dark:text-white">Word Not Found</p>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                            We couldn't find a definition for <span className="font-semibold text-slate-700 dark:text-slate-200">"{query}"</span>. Please check the spelling.
+                                        </p>
+                                    </div>
+                                </motion.div>
                             )}
 
                             {!loading && !error && !result && (

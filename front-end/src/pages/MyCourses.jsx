@@ -1,5 +1,6 @@
 import CourseStructure from "@/components/CourseStructure";
 import FloatingDictionary from "@/components/FloatingDictionary";
+import FloatingNotes from "@/components/FloatingNotes";
 import { useNavigate } from "react-router-dom";
 import useUser from "@/hooks/useUser";
 
@@ -27,6 +28,7 @@ const MyCourses = () => {
         user={user}
       />
       <FloatingDictionary />
+      <FloatingNotes />
     </>
   );
 };

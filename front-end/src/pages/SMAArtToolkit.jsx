@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { BookOpen, BookText, ArrowRight, FileText, Sparkles, Info } from "lucide-react";
+import { BookOpen, BookText, ArrowRight, FileText, Sparkles, Info, StickyNote } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const toolkitHighlights = [
-  { label: "Curated tools", value: "03" },
+  { label: "Curated tools", value: "04" },
   { label: "AI-supported", value: "02" },
   { label: "Instant access", value: "24/7" },
 ];
@@ -47,6 +47,19 @@ const toolkitSections = [
     cta: "Explore Library",
     meta: "Books + articles",
     detail: "Access curated reading for learning and career growth",
+  },
+  {
+    id: 7,
+    title: "My Notes",
+    description:
+      "Capture, organize, and sync your thoughts. Keep track of course insights and personal breakthroughs in one secure, cloud-synced space.",
+    icon: StickyNote,
+    path: "/dashboard/notes",
+    color: "#1a3884",
+    badge: "Productivity",
+    cta: "Open My Notes",
+    meta: "Cloud Sync + Editor",
+    detail: "Rich text notes with categorization and search",
   },
 ];
 

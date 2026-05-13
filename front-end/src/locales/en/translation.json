@@ -10,6 +10,7 @@
     "skills_vault": "Skills Vault",
     "skills_passport": "Skills Passport",
     "vision_board": "Vision Board",
+    "career_directions": "Career Directions",
     "community": "Community",
     "help": "Help & Support",
     "logout": "Logout",
@@ -33,7 +34,11 @@
     "language_region": "Language & Region"
   },
   "dashboard": {
+    "good_morning": "Good Morning",
+    "good_afternoon": "Good Afternoon",
+    "good_evening": "Good Evening",
     "welcome": "Welcome back",
+    "search_placeholder": "Search courses, skills, insights...",
     "ready_message": "Ready to take the next step in your career journey? Let's keep moving forward.",
     "overview": "Overview",
     "recent_activity": "Recent Activity",
@@ -246,6 +251,7 @@
     }
   },
   "common": {
+    "student": "Student",
     "save": "Save",
     "cancel": "Cancel",
     "back": "Back",

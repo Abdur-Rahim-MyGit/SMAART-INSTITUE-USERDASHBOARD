@@ -14,6 +14,7 @@ import ReflectionTask from "@/components/ReflectionTask";
 import FlashcardTask from "@/components/FlashcardTask";
 import ModulePathway from "@/components/ModulePathway";
 import FloatingDictionary from "@/components/FloatingDictionary";
+import FloatingNotes from "@/components/FloatingNotes";
 import FiveModuleRoadmap from "@/components/FiveModuleRoadmap";
 import ModernVideoPlayer from "@/components/ModernVideoPlayer";
 import LearningFlowPlayer from "@/components/LearningFlowPlayer";
@@ -934,6 +935,7 @@ const ModuleViewPage = () => {
       </div>
 
       <FloatingDictionary />
+      <FloatingNotes />
     </div>
   );
 };

@@ -160,7 +160,15 @@ export const UserProvider = ({ children }) => {
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error('useUser must be used within a UserProvider');
+    console.warn('⚠️ useUser was called outside UserProvider (or Vite HMR split the context). Returning fallback to avoid crash.');
+    return {
+      user: null,
+      loading: false,
+      login: () => {},
+      logout: () => {},
+      updateUser: () => {},
+      refreshUser: () => {}
+    };
   }
   return context;
 };

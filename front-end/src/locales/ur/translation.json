@@ -10,6 +10,7 @@
     "skills_vault": "مہارتوں کا مجموعہ",
     "skills_passport": "مہارت کا پاسپورٹ",
     "vision_board": "وژن بورڈ",
+    "career_directions": "کیریئر کی سمتیں",
     "community": "کمیونٹی",
     "help": "مدد اور تعاون",
     "logout": "لاگ آؤٹ",
@@ -31,7 +32,11 @@
     "language_region": "زبان اور علاقہ"
   },
   "dashboard": {
+    "good_morning": "صبح بخیر",
+    "good_afternoon": "سہ پہر بخیر",
+    "good_evening": "شام بخیر",
     "welcome": "واپسی پر خوش آمدید",
+    "search_placeholder": "کورسز، مہارتیں، بصیرتیں تلاش کریں...",
     "ready_message": "اپنے کیریئر کے سفر میں اگلا قدم اٹھانے کے لیے تیار ہیں؟ آئیے آگے بڑھتے رہیں۔",
     "overview": "جائزہ",
     "recent_activity": "حالیہ سرگرمی",
@@ -244,6 +249,7 @@
     }
   },
   "common": {
+    "student": "طالب علم",
     "save": "محفوظ کریں",
     "cancel": "منسوخ کریں",
     "back": "پیچھے",

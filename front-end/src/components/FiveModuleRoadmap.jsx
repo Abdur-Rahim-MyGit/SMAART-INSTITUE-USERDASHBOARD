@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { ClipboardList, Lock, CheckCircle2, ArrowLeft } from "lucide-react";
 import FloatingDictionary from "@/components/FloatingDictionary";
+import FloatingNotes from "@/components/FloatingNotes";
 import blueLogo from "@/assets/blue.png";
 import { Link } from "react-router-dom";
 
@@ -521,6 +522,7 @@ const FiveModuleRoadmap = ({ courseData, onModuleSelect }) => {
       `}</style>
       
       <FloatingDictionary />
+      <FloatingNotes />
     </div>
   );
 };
