@@ -45,10 +45,10 @@ const LearningFlowPlayer = ({
   const steps = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   const stepMetadata = {
     A: { icon: Video, title: "Why", color: "bg-blue-500" },
-    B: { icon: Video, title: "Story", color: "bg-indigo-500" },
-    C: { icon: Video, title: "Framework", color: "bg-purple-500" },
+    B: { icon: Video, title: "Story", color: "bg-blue-600" },
+    C: { icon: Video, title: "Framework", color: "bg-[#1a3884]" },
     D: { icon: Lightbulb, title: "Practice", color: "bg-amber-500" },
-    E: { icon: RotateCcw, title: "Flash Cards", color: "bg-orange-500" },
+    E: { icon: RotateCcw, title: "Flash Cards", color: "bg-[#1a3884]" },
     F: { icon: Target, title: "Advanced", color: "bg-rose-500" },
     G: { icon: BookOpen, title: "Case Study", color: "bg-emerald-500" },
     H: { icon: FileText, title: "Notes", color: "bg-slate-500" }

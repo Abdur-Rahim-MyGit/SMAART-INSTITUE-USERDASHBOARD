@@ -186,8 +186,8 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
                   className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6"
                 >
                   <div className="flex items-start gap-2">
-                    <Lightbulb className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <Lightbulb className="w-5 h-5 text-[#1a3884] dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-[#1a3884] dark:text-blue-200 font-medium leading-relaxed">
                       {currentQuestion.explanation}
                     </p>
                   </div>

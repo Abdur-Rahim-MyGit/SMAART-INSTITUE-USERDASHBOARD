@@ -1,5 +1,4 @@
 import CourseStructure from "@/components/CourseStructure";
-import FloatingDictionary from "@/components/FloatingDictionary";
 import { useNavigate } from "react-router-dom";
 import useUser from "@/hooks/useUser";
 
@@ -26,7 +25,6 @@ const MyCourses = () => {
         userProgress={userProgress}
         user={user}
       />
-      <FloatingDictionary />
     </>
   );
 };

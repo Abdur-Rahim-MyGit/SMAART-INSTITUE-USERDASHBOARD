@@ -48,7 +48,7 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-blue-200 dark:border-blue-800"
+          className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl rounded-3xl p-8 border border-white/20 dark:border-white/5 shadow-2xl shadow-blue-500/5"
         >
           <div className="prose prose-sm dark:prose-invert max-w-none">
             <p className="text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed">
@@ -89,7 +89,7 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
             {!hasMarkedComplete ? (
               <button
                 onClick={handleComplete}
-                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-lg font-bold transition-all flex items-center gap-2"
+                className="px-6 py-2 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-lg font-bold transition-all flex items-center gap-2 shadow-md hover:shadow-lg"
               >
                 Mark as Complete
               </button>

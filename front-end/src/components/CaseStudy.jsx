@@ -44,7 +44,7 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-6 border border-amber-200 dark:border-amber-800"
+          className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl rounded-3xl p-8 border border-white/20 dark:border-white/5 shadow-2xl shadow-blue-500/5"
         >
           <div className="prose prose-sm dark:prose-invert max-w-none">
             <p className="text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed">
@@ -62,7 +62,7 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
             className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700"
           >
             <div className="mb-6">
-              <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-2 block">
+              <span className="text-xs font-black text-[#1a3884] dark:text-blue-400 mb-2 block uppercase tracking-widest">
                 Analysis Question
               </span>
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -89,8 +89,8 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
                           ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
                           : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 opacity-50'
                         : isSelected
-                        ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
-                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-amber-300 dark:hover:border-amber-700'
+                        ? 'border-[#1a3884] bg-blue-50 dark:bg-[#1a3884]/20'
+                        : 'border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 hover:border-[#1a3884]/50 dark:hover:border-blue-500/50'
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -102,8 +102,8 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
                             ? 'border-red-500 bg-red-500'
                             : 'border-slate-300 dark:border-slate-600'
                           : isSelected
-                          ? 'border-amber-500 bg-amber-500'
-                          : 'border-slate-300 dark:border-slate-600'
+                          ? 'border-[#1a3884] bg-[#1a3884]'
+                          : 'border-slate-300 dark:border-slate-700'
                       }`}>
                         {showExplanation ? (
                           isCorrectAnswer || (isSelected && !isCorrectAnswer) ? (
@@ -143,11 +143,11 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mb-6"
+                  className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-6"
                 >
                   <div className="flex items-start gap-2">
-                    <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-amber-800 dark:text-amber-200">
+                    <Lightbulb className="w-5 h-5 text-[#1a3884] dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-[#1a3884] dark:text-blue-200 font-medium leading-relaxed">
                       {mcq.explanation}
                     </p>
                   </div>
@@ -159,7 +159,7 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
             <button
               onClick={handleComplete}
               disabled={!showExplanation}
-              className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="w-full px-6 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
             >
               {completed ? 'Analysis Completed' : 'Complete Case Study'}
             </button>

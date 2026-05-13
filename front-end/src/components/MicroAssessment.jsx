@@ -197,7 +197,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
             </p>
             <button
               onClick={handleStart}
-              className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#25737d] text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#1a3884]/30"
+              className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#1a3884]/30"
             >
               Start Assessment
             </button>
@@ -290,7 +290,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
                        <button
                          onClick={handleNextQuestion}
-                          className="mt-4 flex w-full sm:w-auto justify-center items-center gap-2 bg-slate-900 text-white px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors ml-auto"
+                         className="mt-4 flex w-full sm:w-auto justify-center items-center gap-2 bg-[#1a3884] text-white px-6 py-2 rounded-lg hover:bg-[#112b6b] transition-colors ml-auto shadow-md"
                        >
                          {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Finish Assessment'}
                          <ArrowRight size={16} />
@@ -369,7 +369,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                     <button
                         onClick={() => setCurrentQuestionIndex(prev => Math.min(shuffledQuestions.length - 1, prev + 1))}
                         disabled={currentQuestionIndex === shuffledQuestions.length - 1}
-                        className="flex-1 px-4 py-2 bg-slate-900 text-white rounded-lg text-sm font-bold disabled:opacity-30"
+                        className="flex-1 px-4 py-2 bg-[#1a3884] text-white rounded-lg text-sm font-bold hover:bg-[#112b6b] disabled:opacity-30 transition-colors"
                     >
                         Next
                     </button>
@@ -420,7 +420,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                   </button>
                   <button
                     onClick={() => onComplete(score)}
-                    className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#25737d] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
+                    className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all"
                   >
                     Continue to Next Step
                   </button>
