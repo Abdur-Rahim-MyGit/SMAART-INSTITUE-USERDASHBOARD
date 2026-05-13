@@ -2,12 +2,6 @@ import { motion } from "framer-motion";
 import { BookOpen, BookText, ArrowRight, FileText, Sparkles, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const toolkitHighlights = [
-  { label: "Curated tools", value: "03" },
-  { label: "AI-supported", value: "02" },
-  { label: "Instant access", value: "24/7" },
-];
-
 const toolkitSections = [
   {
     id: 3,
@@ -123,11 +117,11 @@ const SMAArtToolkit = () => {
     <div className="space-y-6">
       <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="mx-auto max-w-7xl space-y-8">
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-            <div className="relative overflow-hidden rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] sm:p-8 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40">
+          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="relative self-start overflow-hidden rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] sm:p-8 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40">
               <div className="absolute inset-px rounded-[27px] border border-white/70 dark:border-white/5" />
               <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
-              <div className="relative z-10">
+              <div className="relative z-10 space-y-6">
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
                   <div className="flex h-4 w-4 items-center justify-center rounded-full border border-[#4f46e5]/20 bg-[#4f46e5]/10">
                     <Sparkles className="h-2.5 w-2.5" />
@@ -145,25 +139,17 @@ const SMAArtToolkit = () => {
                     Explore our curated repository of career intelligence, wellness resources, and learning tools designed for your growth.
                   </p>
                 </div>
-                <div className="mt-6 grid max-w-2xl grid-cols-3 gap-3">
-                  {toolkitHighlights.map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-900/40"
-                    >
-                      <p className="text-lg font-semibold tracking-[-0.03em] text-slate-900 dark:text-white">{item.value}</p>
-                      <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400">{item.label}</p>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
 
-            <div className="relative overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.28)] dark:border-slate-700/40 dark:bg-slate-900/80">
+            <div className="relative self-start overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.28)] dark:border-slate-700/40 dark:bg-slate-900/80">
               <div className="absolute inset-px rounded-[23px] border border-white/70 dark:border-white/5" />
-              <div className="relative z-10 space-y-1">
+              <div className="relative z-10 space-y-1.5">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Inside the toolkit</p>
                 <h2 className="text-lg font-semibold tracking-[-0.03em] text-slate-900 dark:text-white">Focused tools, cleaner access</h2>
+                <p className="max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">
+                  Everything here is organized for quick launch, low friction, and a cleaner working flow.
+                </p>
               </div>
               <div className="relative z-10 mt-6 space-y-3">
                 <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/90 px-4 py-3 dark:border-slate-700/50 dark:bg-slate-800/70">

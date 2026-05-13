@@ -124,14 +124,14 @@ const SkillsVault = () => {
             </div>
 
             <main className="w-full relative z-10 py-6 px-4 sm:px-6 lg:px-8 lg:py-8">
-                <div className="max-w-7xl mx-auto space-y-8">
+                <div className="max-w-7xl mx-auto space-y-5 lg:space-y-6">
                     
                     {/* ── Premium Header (Toolkit Style) ── */}
-                    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+                    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.3)] sm:p-8 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40"
+                            className="relative self-start overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.3)] sm:p-8 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40"
                         >
                             <div className="absolute inset-px rounded-[31px] border border-white/70 dark:border-white/5" />
                             <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
@@ -155,23 +155,6 @@ const SkillsVault = () => {
                                         Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault.
                                     </p>
                                 </div>
-
-                                <div className="mt-8 grid max-w-2xl grid-cols-2 sm:grid-cols-4 gap-3">
-                                    {[
-                                        { label: "Certificates", value: certificateTypes.length, icon: Award },
-                                        { label: "Badges", value: badges.length, icon: Trophy },
-                                        { label: "Courses", value: courses.length, icon: BookOpen },
-                                        { label: "Assessment", value: `${completedAssessments}/4`, icon: Brain },
-                                    ].map((item) => (
-                                        <div
-                                            key={item.label}
-                                            className="rounded-2xl border border-slate-200/80 bg-white/70 p-4 backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-900/40 group hover:border-[#1a3884]/30 transition-colors"
-                                        >
-                                            <p className="text-xl font-black tracking-tight text-slate-950 dark:text-white">{item.value}</p>
-                                            <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-[#1a3884] transition-colors">{item.label}</p>
-                                        </div>
-                                    ))}
-                                </div>
                             </div>
                         </motion.div>
 
@@ -179,14 +162,17 @@ const SkillsVault = () => {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="relative overflow-hidden rounded-[32px] border border-slate-200/80 bg-white p-6 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.25)] dark:border-slate-700/40 dark:bg-slate-900/80"
+                            className="relative self-start overflow-hidden rounded-[32px] border border-slate-200/80 bg-white p-6 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.25)] dark:border-slate-700/40 dark:bg-slate-900/80"
                         >
                             <div className="absolute inset-px rounded-[31px] border border-white/70 dark:border-white/5" />
-                            <div className="relative z-10 space-y-2">
+                            <div className="relative z-10 space-y-2.5">
                                 <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Vault Intelligence</p>
                                 <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-white leading-tight">Verified & Shareable</h2>
+                                <p className="max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">
+                                    Your vault stays focused on trusted credentials, clean sharing workflows, and polished presentation.
+                                </p>
                             </div>
-                            <div className="relative z-10 mt-8 space-y-4">
+                            <div className="relative z-10 mt-7 space-y-4">
                                 {[
                                     { icon: Shield, text: "Blockchain Verified", color: "bg-emerald-500" },
                                     { icon: Share2, text: "Instant Shareable Links", color: "bg-blue-500" },

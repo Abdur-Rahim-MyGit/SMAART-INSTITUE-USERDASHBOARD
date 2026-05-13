@@ -41,10 +41,16 @@ export const communityAPI = {
     return apiCall(`/community/discussions/${id}`);
   },
 
+  // Record a feed/card view
+  recordDiscussionView: async (id) => {
+    return apiCall(`/community/discussions/${id}/view`, {
+      method: 'POST'
+    });
+  },
+
   // Create discussion
   createDiscussion: async (data) => {
     const isFormData = data instanceof FormData;
-    console.log('[API CALL] sending', data);
     return apiCall('/community/discussions', {
       method: 'POST',
       body: isFormData ? data : JSON.stringify(data),
@@ -74,6 +80,13 @@ export const communityAPI = {
     return apiCall(`/community/discussions/${discussionId}/bookmark`, {
       method: 'POST',
       body: JSON.stringify({ userId })
+    });
+  },
+
+  // Pin/Unpin discussion
+  togglePin: async (discussionId) => {
+    return apiCall(`/community/discussions/${discussionId}/pin`, {
+      method: 'PATCH'
     });
   },
 
