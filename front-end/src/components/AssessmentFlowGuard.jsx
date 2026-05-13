@@ -288,6 +288,7 @@ const AssessmentFlowGuard = ({ children }) => {
       if (path.includes('/community') || path.includes('/groups')) return "Community";
       if (path.includes('/settings')) return "Settings";
       if (path.includes('/profile')) return "Profile";
+      if (path.includes('/notes')) return "My Notes";
       if (path.includes('/smaart-toolkit')) return "Toolkit";
       if (path.includes('/skills-passport')) return "Skills Passport";
       if (path.includes('/skills-vault')) return "Skills Vault";

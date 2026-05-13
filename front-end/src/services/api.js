@@ -10,7 +10,7 @@ const getApiBaseUrl = () => {
   return `http://${hostname}:5000/api`;
 };
 
-let API_BASE_URL = getApiBaseUrl();
+export let API_BASE_URL = getApiBaseUrl();
 let workingBaseUrl = sessionStorage.getItem("workingApiPort"); // Cache for the discovered working port
 
 // Export for use in other files
@@ -21,8 +21,6 @@ export const getBackendUrl = () => {
   }
   return `http://${hostname}:5000`;
 };
-
-export { API_BASE_URL };
 
 // Helper to get auth header
 const getAuthHeaders = () => {
@@ -344,6 +342,34 @@ export const courseEnrollmentAPI = {
     return apiCall('/courseEnrollments/task-result', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  },
+};
+
+// Notes API Functions
+export const notesAPI = {
+  // Get all notes for the current user
+  getAll: async () => {
+    return apiCall('/notes');
+  },
+
+  // Get notes for a course
+  getByCourse: async (courseId) => {
+    return apiCall(`/notes/${courseId}`);
+  },
+
+  // Upsert notes for a course or personal note
+  upsert: async (courseId, content, title = "") => {
+    return apiCall('/notes', {
+      method: 'POST',
+      body: JSON.stringify({ courseId, content, title }),
+    });
+  },
+
+  // Delete a note
+  delete: async (courseId) => {
+    return apiCall(`/notes/${courseId}`, {
+      method: 'DELETE',
     });
   },
 };

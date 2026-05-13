@@ -74,10 +74,10 @@ const menuGroups = [
   {
     title: "sidebar.group_skills",
     items: [
-      { icon: Award, label: "Skills Vault", path: "/dashboard/skills-vault", badge: null },
-      { icon: Compass, label: "Career Directions", path: "/dashboard/career-direction", badge: null },
-      { icon: ShieldCheck, label: "Skills Passport", path: "/dashboard/skills-passport", badge: null },
-      { icon: Lightbulb, label: "Vision Board", path: "/dashboard/vision-boards", badge: null },
+      { icon: Award, label: "sidebar.skills_vault", path: "/dashboard/skills-vault", badge: null },
+      { icon: Compass, label: "sidebar.career_directions", path: "/dashboard/career-direction", badge: null },
+      { icon: ShieldCheck, label: "sidebar.skills_passport", path: "/dashboard/skills-passport", badge: null },
+      { icon: Lightbulb, label: "sidebar.vision_board", path: "/dashboard/vision-boards", badge: null },
     ]
   },
   {
@@ -577,7 +577,7 @@ const LeftSidebar = () => {
                   {user?.college?.collegeName || 'College'}
                 </p>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
-                  {user?.role || 'student'}
+                  {t(`common.${(user?.role || 'student').toLowerCase()}`)}
                 </p>
               </div>
             )}

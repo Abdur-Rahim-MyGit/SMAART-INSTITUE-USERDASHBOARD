@@ -258,9 +258,9 @@ const LoginCard = () => {
             {/* Icon badge */}
             <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               {selectedInstitution?.logo ? (
-                <img 
-                  src={selectedInstitution.logo} 
-                  alt={selectedInstitution.name} 
+                <img
+                  src={selectedInstitution.logo}
+                  alt={selectedInstitution.name}
                   className="w-full h-full object-contain p-2"
                 />
               ) : (
@@ -307,9 +307,9 @@ const LoginCard = () => {
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
             {selectedInstitution?.logo ? (
-              <img 
-                src={selectedInstitution.logo} 
-                alt={selectedInstitution.name} 
+              <img
+                src={selectedInstitution.logo}
+                alt={selectedInstitution.name}
                 className="w-full h-full object-contain p-1.5"
               />
             ) : (
@@ -365,9 +365,9 @@ const LoginCard = () => {
               }}
             >
               {selectedInstitution?.logo ? (
-                <img 
-                  src={selectedInstitution.logo} 
-                  alt={selectedInstitution.name} 
+                <img
+                  src={selectedInstitution.logo}
+                  alt={selectedInstitution.name}
                   className="w-full h-full object-contain p-2"
                 />
               ) : (

@@ -9,6 +9,7 @@ import AdvancedPractice from "@/components/AdvancedPractice";
 import CaseStudy from "@/components/CaseStudy";
 import Notes from "@/components/Notes";
 import FloatingDictionary from "@/components/FloatingDictionary";
+import FloatingNotes from "@/components/FloatingNotes";
 import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK } from "@/data/courseStructureData";
 import { getLearningFlowData } from "@/data/learningFlowData";
 import { Badge } from "@/components/ui/badge";
@@ -919,6 +920,7 @@ const CoursePlayer = () => {
       </AnimatePresence>
       </div>
       <FloatingDictionary />
+      <FloatingNotes />
     </div>
   );
 };

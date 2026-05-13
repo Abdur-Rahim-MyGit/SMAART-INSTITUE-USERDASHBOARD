@@ -10,6 +10,7 @@
     "skills_vault": "कौशल तिजोरी",
     "skills_passport": "कौशल पासपोर्ट",
     "vision_board": "विज़न बोर्ड",
+    "career_directions": "करियर की दिशा",
     "community": "समुदाय",
     "help": "सहायता और समर्थन",
     "logout": "लॉग आउट",
@@ -31,7 +32,11 @@
     "language_region": "भाषा और क्षेत्र"
   },
   "dashboard": {
+    "good_morning": "शुभ प्रभात",
+    "good_afternoon": "शुभ दोपहर",
+    "good_evening": "शुभ संध्या",
     "welcome": "वापसी पर स्वागत है",
+    "search_placeholder": "पाठ्यक्रम, कौशल, अंतर्दृष्टि खोजें...",
     "ready_message": "अपने करियर की यात्रा में अगला कदम उठाने के लिए तैयार हैं? चलिए आगे बढ़ते रहें।",
     "overview": "अवलोकन",
     "recent_activity": "हाल की गतिविधि",
@@ -244,6 +249,7 @@
     }
   },
   "common": {
+    "student": "छात्र",
     "save": "सहेजें",
     "cancel": "रद्द करें",
     "back": "पीछे",

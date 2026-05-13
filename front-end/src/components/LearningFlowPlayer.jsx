@@ -17,7 +17,7 @@ import {
   Trophy,
   Award
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import MCQPractice from "@/components/MCQPractice";
 import FlashcardTask from "@/components/FlashcardTask";
@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import FloatingDictionary from "@/components/FloatingDictionary";
+import FloatingNotes from "@/components/FloatingNotes";
 
 const LearningFlowPlayer = ({ 
   courseData, 
@@ -39,6 +40,7 @@ const LearningFlowPlayer = ({
   onVideoProgressUpdate
 }) => {
   const navigate = useNavigate();
+  const { courseId: urlCourseId } = useParams();
   const [activeStep, setActiveStep] = useState('A');
   const [completedSteps, setCompletedSteps] = useState({});
 
@@ -175,7 +177,7 @@ const LearningFlowPlayer = ({
             placeholder={currentStepData.placeholder}
             onComplete={() => handleStepComplete('H')}
             isCompleted={completedSteps['H']}
-            courseId={selectedModule}
+            courseId={urlCourseId || "general"}
           />
         );
       default:
@@ -437,6 +439,7 @@ const LearningFlowPlayer = ({
         </div>
       </div>
       <FloatingDictionary />
+      <FloatingNotes />
     </div>
   );
 };

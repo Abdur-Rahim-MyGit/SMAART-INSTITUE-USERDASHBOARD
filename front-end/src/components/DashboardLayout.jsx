@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User } from "lucide-react";
+import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Languages } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -303,7 +303,7 @@ const getSearchResults = (query) => {
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
   const { theme, setTheme } = useTheme();
   const { user, loading: userLoading, logout } = useUser();
@@ -311,6 +311,8 @@ const DashboardLayout = () => {
   const { notifications, unreadCount, markRead } = useNotifications();
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
+  const [showLanguages, setShowLanguages] = useState(false);
+  const languageRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showCollegeLogo, setShowCollegeLogo] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState(null);
@@ -350,14 +352,14 @@ const DashboardLayout = () => {
   };
   const { showWarning, secondsLeft, dismissWarning } = useSessionGuard(handleSessionExpired);
 
-  // Close notifications on click outside
+  // Close notifications and language switcher on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
-        setShowSearchResults(false);
+      if (languageRef.current && !languageRef.current.contains(event.target)) {
+        setShowLanguages(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -589,12 +591,7 @@ const DashboardLayout = () => {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search courses, skills, insights..."
-                  ref={searchInputRef}
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  onFocus={() => setShowSearchResults(true)}
-                  onKeyDown={handleSearchKeyDown}
+                  placeholder={t('dashboard.search_placeholder')}
                   className="block w-full pl-11 pr-14 py-2.5 bg-[#F1F5F9] dark:bg-slate-800/40 border border-transparent focus:border-[#1a3884]/30 rounded-full text-sm placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/5 transition-all shadow-inner"
                   aria-label="Search dashboard content"
                   aria-expanded={showSearchResults}
@@ -789,18 +786,57 @@ const DashboardLayout = () => {
                   </AnimatePresence>
                 </div>
 
-                {/* Settings */}
-                <button
-                  onClick={() => navigate('/dashboard/settings')}
-                  className="hidden sm:flex p-2 rounded-xl text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-slate-700 transition-all hover:scale-105 active:scale-95"
-                  aria-label="Settings"
-                >
-                  <Settings className="w-4.5 h-4.5" />
-                </button>
+                {/* Language Switcher */}
+                <div className="relative" ref={languageRef}>
+                  <button
+                    onClick={() => setShowLanguages(!showLanguages)}
+                    className={`relative p-2 rounded-xl transition-all hover:scale-105 active:scale-95 group ${showLanguages ? 'bg-white dark:bg-slate-700 text-[#1a3884]' : 'text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-slate-700'
+                      }`}
+                    aria-label="Change Language"
+                  >
+                    <Languages className="w-4.5 h-4.5" />
+                  </button>
+
+                  <AnimatePresence>
+                    {showLanguages && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-50"
+                      >
+                        <div className="p-2 space-y-1">
+                          {[
+                            { code: 'en', name: 'English', native: 'English' },
+                            { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
+                            { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
+                            { code: 'ur', name: 'Urdu', native: 'اردو' }
+                          ].map((lang) => (
+                            <button
+                              key={lang.code}
+                              onClick={() => {
+                                i18n.changeLanguage(lang.code);
+                                setShowLanguages(false);
+                              }}
+                              className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${i18n.language === lang.code
+                                ? 'bg-[#1a3884] text-white'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                }`}
+                            >
+                              <span>{lang.name}</span>
+                              <span className="text-[10px] opacity-60 font-bold">{lang.native}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
 
               {/* 3. User Profile Card */}
-              <div 
+              <div
                 className="relative"
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
@@ -810,59 +846,59 @@ const DashboardLayout = () => {
                   className="flex items-center gap-3 pl-2 sm:pr-4 py-1.5 bg-white/50 sm:bg-white dark:bg-slate-800/50 dark:sm:bg-slate-800 border-none sm:border border-slate-100 dark:border-slate-700 rounded-2xl shadow-none sm:shadow-sm cursor-pointer group transition-all"
                   onClick={() => navigate('/profile')}
                 >
-                <div className="relative shrink-0">
-                  <div className="absolute -inset-0.5 bg-[#1a3884] rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
-                  <div className="relative p-[2px] bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 rounded-full">
-                    {showCollegeLogo && user?.college?.logo ? (
-                      <img
-                        src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
-                        alt="College"
-                        className="w-9 h-9 rounded-full object-contain bg-white p-1"
-                        onError={() => setShowCollegeLogo(false)}
-                      />
-                    ) : (profilePhoto || user?.profileImage || user?.profilePicture) ? (
-                      <img
-                        src={profilePhoto || (user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${getBackendUrl()}/${user.profileImage}` : user?.profilePicture))}
-                        alt="Avatar"
-                        className="w-9 h-9 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a3884] to-[#112b6b] flex items-center justify-center text-white text-xs font-bold">
-                        {(user?.firstName?.[0] || user?.fullName?.[0] || 'U').toUpperCase()}
-                      </div>
-                    )}
+                  <div className="relative shrink-0">
+                    <div className="absolute -inset-0.5 bg-[#1a3884] rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
+                    <div className="relative p-[2px] bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 rounded-full">
+                      {showCollegeLogo && user?.college?.logo ? (
+                        <img
+                          src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
+                          alt="College"
+                          className="w-9 h-9 rounded-full object-contain bg-white p-1"
+                          onError={() => setShowCollegeLogo(false)}
+                        />
+                      ) : (profilePhoto || user?.profileImage || user?.profilePicture) ? (
+                        <img
+                          src={profilePhoto || (user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${getBackendUrl()}/${user.profileImage}` : user?.profilePicture))}
+                          alt="Avatar"
+                          className="w-9 h-9 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a3884] to-[#112b6b] flex items-center justify-center text-white text-xs font-bold">
+                          {(user?.firstName?.[0] || user?.fullName?.[0] || 'U').toUpperCase()}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="hidden sm:block text-left">
-                  <p className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500 leading-none mb-1">
-                    {getGreeting()}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#1a3884] transition-colors">
-                      {user?.firstName || user?.fullName?.split(' ')[0] || 'User'}
+                  <div className="hidden sm:block text-left">
+                    <p className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500 leading-none mb-1">
+                      {t(`dashboard.${getGreeting().toLowerCase().replace(' ', '_')}`)}
                     </p>
-                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-all duration-300 ${isProfileHovered ? 'rotate-180' : ''}`} />
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#1a3884] transition-colors">
+                        {user?.firstName || user?.fullName?.split(' ')[0] || 'User'}
+                      </p>
+                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-all duration-300 ${isProfileHovered ? 'rotate-180' : ''}`} />
+                    </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
 
-              {/* Hover Profile Card Modal */}
-              <AnimatePresence>
-                {isProfileHovered && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full right-0 mt-2 z-[100] w-72 pointer-events-auto"
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <ProfileHoverCard user={user} avatarData={avatarData} onLogout={handleLogout} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                {/* Hover Profile Card Modal */}
+                <AnimatePresence>
+                  {isProfileHovered && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute top-full right-0 mt-2 z-[100] w-72 pointer-events-auto"
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <ProfileHoverCard user={user} avatarData={avatarData} onLogout={handleLogout} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -886,6 +922,7 @@ const DashboardLayout = () => {
 
 // Profile Hover Card Component
 const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const videoRefs = useRef([]);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
@@ -927,20 +964,20 @@ const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
     <motion.div
       initial={{ opacity: 0, y: 15, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0f172a] shadow-2xl"
+      className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f172a] shadow-2xl"
       style={{
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)'
       }}
     >
       {/* Background Ambience */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/40 via-[#0f172a] to-[#0f172a]" />
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-50" />
+      <div className="absolute inset-0 z-0 bg-slate-50 dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-blue-900/40 dark:via-[#0f172a] dark:to-[#0f172a]" />
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-30 dark:opacity-50" />
 
       {/* Animation Section */}
       <div className="relative z-10 pt-4 px-4 pb-2">
-        <div className="relative aspect-[4/5] w-full mx-auto rounded-xl overflow-hidden ring-1 ring-white/10 shadow-2xl flex items-center justify-center bg-black/40 backdrop-blur-sm group max-h-[180px]">
+        <div className="relative aspect-[4/5] w-full mx-auto rounded-xl overflow-hidden ring-1 ring-slate-200 dark:ring-white/10 shadow-2xl flex items-center justify-center bg-slate-100 dark:bg-black/40 backdrop-blur-sm group max-h-[250px]">
           {/* Inner Glow Border */}
-          <div className="absolute inset-0 rounded-xl border border-white/5 z-20 pointer-events-none group-hover:border-white/10 transition-colors" />
+          <div className="absolute inset-0 rounded-xl border border-slate-200/50 dark:border-white/5 z-20 pointer-events-none group-hover:border-[#1a3884]/10 dark:group-hover:border-white/10 transition-colors" />
 
           {/* Video Playback */}
           {ANIMATION_SEQUENCE.map((src, index) => (
@@ -968,15 +1005,15 @@ const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="absolute bottom-2 inset-x-2 h-8 bg-black/40 backdrop-blur-md rounded-lg border border-white/10 flex items-center justify-between px-2 z-30"
+            className="absolute bottom-2 inset-x-2 h-8 bg-white/90 dark:bg-black/40 backdrop-blur-md rounded-lg border border-slate-200 dark:border-white/10 flex items-center justify-between px-2 z-30"
           >
             <div className="flex items-center gap-1.5">
               <div className="w-5 h-5 rounded-md bg-gradient-to-br from-amber-300 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
                 <Star className="w-3 h-3 text-white fill-white" />
               </div>
-              <span className="text-white font-bold text-xs tracking-wide">Lvl {avatarData?.level || 1}</span>
+              <span className="text-slate-800 dark:text-white font-bold text-xs tracking-wide">Lvl {avatarData?.level || 1}</span>
             </div>
-            <div className="w-12 h-1 bg-white/10 rounded-full overflow-hidden">
+            <div className="w-12 h-1 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-amber-300 to-amber-500 rounded-full" style={{ width: `${levelProgress}%` }} />
             </div>
           </motion.div>
@@ -986,34 +1023,43 @@ const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
       {/* Profile Info & Actions */}
       <div className="relative z-10 p-4 space-y-3">
         <div className="text-center space-y-0.5">
-          <h3 className="text-lg font-bold text-white tracking-tight">{user?.fullName || 'Student'}</h3>
-          <p className="text-slate-400 text-xs font-medium uppercase tracking-wider">{user?.role || 'Student'}</p>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{user?.fullName || 'Student'}</h3>
+          <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">{t(`common.${(user?.role || 'student').toLowerCase()}`)}</p>
         </div>
 
         <div className="space-y-2">
           {/* Skills Passport Button */}
-          <button
+          {/* <button
             onClick={() => navigate('/dashboard/skills-passport')}
             className="group relative w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all duration-300 active:scale-[0.98] overflow-hidden flex items-center justify-center gap-2"
           >
             <Trophy className="w-4 h-4" />
             <span className="text-xs font-bold uppercase tracking-wide">Skills Passport</span>
             <ChevronRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
-          </button>
+          </button> */}
 
-          {/* View Profile & Logout */}
-          <div className="flex gap-2">
+          <div className="pt-2 flex justify-center">
             <button
               onClick={() => navigate('/dashboard/profile')}
-              className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-white transition-all duration-300 text-xs font-medium"
+              className="group w-full h-11 px-6 py-2.5 rounded-xl flex justify-center items-center text-[#112b6b] bg-slate-100 dark:bg-white/5 hover:bg-[#112b6b] dark:hover:bg-blue-600 border border-slate-200 dark:border-white/5 transition-all duration-300 active:scale-95"
             >
-              View Profile
+              <div className="w-8 h-8 flex items-center justify-center transition-colors">
+                <User className="w-4 h-4 text-[#112b6b] font-bold dark:text-white  group-hover:text-white" />
+              </div>
+              <span className="text-sm font-bold text-[#112b6b] dark:text-white group-hover:text-white tracking-tight">{t('sidebar.profile')}</span>
             </button>
+          </div>
+
+          {/* Premium Logout Button */}
+          <div className="pt-1 border-t border-slate-100 dark:border-white/5 flex justify-center">
             <button
               onClick={onLogout}
-              className="px-3 py-2 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-xs font-medium"
+              className="group w-full h-11 px-6 py-2.5 rounded-xl flex justify-center items-center text-rose-500 hover:bg-rose-500/10 transition-all duration-300 active:scale-95"
             >
-              <LogOut className="w-4 h-4" />
+              <div className="w-8 h-8 flex items-center justify-center transition-colors">
+                <LogOut className="w-4 h-4" />
+              </div>
+              <span className="text-sm font-bold tracking-tight">{t('sidebar.logout')}</span>
             </button>
           </div>
         </div>
