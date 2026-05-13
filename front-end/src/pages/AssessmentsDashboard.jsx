@@ -418,7 +418,6 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                     <div className="mb-6 flex flex-wrap items-center gap-2.5">
                         <InfoChip icon={FileText} label={`${stage.totalQuestions} Qs`} />
                         <InfoChip icon={Clock} label={stage.duration} />
-                        <InfoChip icon={Layers} label="6 Quotients" />
                     </div>
 
                     {completed && score !== undefined && (
