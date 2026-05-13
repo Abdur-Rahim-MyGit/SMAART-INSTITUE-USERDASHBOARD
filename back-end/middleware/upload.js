@@ -252,7 +252,7 @@ const communityStorage = new CloudinaryStorage({
 
     return {
       folder: folder,
-      allowed_formats: ["jpg", "png", "jpeg", "gif", "webp", "mp4", "mov", "avi", "mkv"],
+      allowed_formats: ["jpg", "png", "jpeg", "gif", "webp", "mp4", "mov", "avi", "mkv", "pdf"],
       resource_type: "auto", // Automatically detect if it's an image or video
       transformation: [{ width: 1200, height: 1200, crop: "limit" }],
       public_id: `post_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,

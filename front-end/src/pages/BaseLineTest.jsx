@@ -216,7 +216,7 @@ const BaseLineTest = () => {
     const initializeAssessment = async () => {
       const isReportMode = window.location.pathname.endsWith('/report');
       console.log(`Initializing ${stageConfig.title} (${stageKey}) - Report Mode: ${isReportMode}...`);
-      
+
       try {
         const userData = sessionStorage.getItem("user");
         if (!userData) {
@@ -237,7 +237,7 @@ const BaseLineTest = () => {
         // CRITICAL - If in report mode or if stage already completed, fetch results
         console.log(`Checking for existing ${stageKey} results...`);
         const stageCheck = await assessmentApi.getStageResult(userId, stageKey).catch(() => ({ success: false }));
-        
+
         if (stageCheck.success && stageCheck.data) {
           clearTimerPersistence();
           if (isReportMode) {
@@ -729,11 +729,10 @@ const BaseLineTest = () => {
                 <button
                   onClick={() => submit()}
                   disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered}
-                  className={`px-6 md:px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-sm md:text-base ${
-                    allQuestionsAnswered
+                  className={`px-6 md:px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-sm md:text-base ${allQuestionsAnswered
                       ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-lg shadow-amber-500/20 hover:-translate-y-0.5"
                       : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
-                  }`}
+                    }`}
                 >
                   {submitting ? (
                     <>
@@ -839,9 +838,17 @@ const BaseLineTest = () => {
           >
             {/* Main Results Card */}
             {/* Main Results Card - Minimal Configuration */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-8 max-w-4xl mx-auto">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-8 max-w-4xl mx-auto relative">
+              
+              {/* Top Left User Info */}
+              <div className="absolute top-8 left-8 hidden sm:block text-left">
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{user?.fullName}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{user?.studentId}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{user?.college?.collegeName || user?.collegeName || 'Student'}</p>
+              </div>
+
               {/* Header Section */}
-              <div className="text-center mb-10 border-b border-slate-100 dark:border-slate-800 pb-8">
+              <div className="text-center mb-10 border-b border-slate-100 dark:border-slate-800 pb-8 sm:mt-2">
 
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                   {stageKey === 'T1' ? 'Baseline Established' : `${stageConfig.name} Assessment Complete`}
@@ -979,7 +986,7 @@ const BaseLineTest = () => {
               >
                 <button
                   onClick={() => downloadReport(user, testResults)}
-                  className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 shadow-sm"
+                  className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
                 >
                   <Download className="w-4 h-4" />
                   Download Report
@@ -992,15 +999,22 @@ const BaseLineTest = () => {
                     else if (stageKey === 'T3') navigate("/dashboard/courses/S20/player"); // Start Leadership
                     else navigate("/dashboard/skills-passport");
                   }}
-                  className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1"
+                  className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1 w-full sm:w-auto"
                 >
                   <TrendingUp className="w-4 h-4" />
                   Continue My Journey
                 </button>
 
                 <button
+                  onClick={() => navigate("/dashboard")}
+                  className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+                >
+                  Go to Dashboard
+                </button>
+
+                <button
                   onClick={() => navigate("/dashboard/assessment-centre")}
-                  className="px-6 py-3 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-medium transition-colors"
+                  className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
                 >
                   All Assessments
                 </button>

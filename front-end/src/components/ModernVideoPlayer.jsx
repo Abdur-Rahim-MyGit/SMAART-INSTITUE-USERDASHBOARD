@@ -32,6 +32,7 @@ const ModernVideoPlayer = ({
 }) => {
   const [expandedModules, setExpandedModules] = useState({});
   const [activeLesson, setActiveLesson] = useState(null);
+  const [activeTab, setActiveTab] = useState('preview');
 
   // Initialize expanded modules
   useEffect(() => {
@@ -145,6 +146,86 @@ const ModernVideoPlayer = ({
               }}
             />
           </div>
+
+          {/* Transcription Section */}
+          <Card className="bg-white rounded-2xl shadow-sm mb-6">
+            <CardContent className="p-6">
+              {/* Tab Buttons */}
+              <div className="flex gap-2 mb-6">
+                <button
+                  onClick={() => setActiveTab('preview')}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                    activeTab === 'preview'
+                      ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/30'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Preview
+                </button>
+                <button
+                  onClick={() => setActiveTab('transcription')}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                    activeTab === 'transcription'
+                      ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/30'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Transcription
+                </button>
+              </div>
+
+              {/* Tab Content */}
+              <AnimatePresence mode="wait">
+                {activeTab === 'preview' && (
+                  <motion.div
+                    key="preview"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="min-h-[200px]"
+                  >
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <h4 className="font-semibold text-gray-900 mb-3">Lesson Preview</h4>
+                      <p className="text-gray-600 leading-relaxed">
+                        {currentDay?.description || 'Watch this lesson to continue your learning journey.'}
+                      </p>
+                      <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          <span>{formatDuration(videoDurationMap[`${selectedModule}-${selectedDay}`]) || '10:00'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Play className="w-4 h-4" />
+                          <span>Video Lesson</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                {activeTab === 'transcription' && (
+                  <motion.div
+                    key="transcription"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="min-h-[200px]"
+                  >
+                    <div className="bg-gray-50 rounded-xl p-6">
+                      <h4 className="font-semibold text-gray-900 mb-3">Video Transcription</h4>
+                      <p className="text-gray-600 leading-relaxed italic">
+                        Transcription will be available here once the video content is processed.
+                      </p>
+                      <p className="text-gray-500 text-sm mt-4">
+                        This feature allows you to read along with the video content, making it easier to follow along and review key points.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </CardContent>
+          </Card>
 
           {/* Lesson Info Card */}
           <Card className="bg-white rounded-2xl shadow-sm">

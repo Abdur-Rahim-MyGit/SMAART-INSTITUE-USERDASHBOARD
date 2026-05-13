@@ -101,6 +101,123 @@ const getEntityId = (value) => {
 const getDisplayName = (record) =>
   record?.fullName || record?.name || record?.email || "Unknown";
 
+const escapeRegex = (value = "") =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const buildDiscussionSearchClause = async (rawSearch) => {
+  const term = (rawSearch || "").toString().trim();
+  if (!term) return null;
+
+  const searchRegex = new RegExp(escapeRegex(term), "i");
+  const [users, students, teachers, registrations] = await Promise.all([
+    User.find({
+      $or: [{ fullName: searchRegex }, { email: searchRegex }],
+    })
+      .select("_id")
+      .limit(25)
+      .lean(),
+    Student.find({
+      $or: [{ fullName: searchRegex }, { email: searchRegex }],
+    })
+      .select("_id")
+      .limit(25)
+      .lean(),
+    Teacher.find({
+      $or: [{ fullName: searchRegex }, { email: searchRegex }],
+    })
+      .select("_id")
+      .limit(25)
+      .lean(),
+    Registration.find({
+      $or: [{ fullName: searchRegex }, { email: searchRegex }],
+    })
+      .select("_id")
+      .limit(25)
+      .lean(),
+  ]);
+
+  const authorIds = [...users, ...students, ...teachers, ...registrations].map(
+    (record) => record._id,
+  );
+
+  const orClauses = [{ $text: { $search: term } }, { category: searchRegex }, { "replies.content": searchRegex }];
+
+  if (authorIds.length) {
+    orClauses.push({ author: { $in: authorIds } });
+  }
+
+  return { $or: orClauses };
+};
+
+/**
+ * Builds a createdAt range filter from the UI date-range control.
+ *
+ * @param {string|undefined} value - Raw date range query value.
+ * @returns {{ createdAt: { $gte: Date } }|null} Mongo date filter or null.
+ */
+const buildDateRangeFilter = (value) => {
+  const normalizedValue = (value || "").toString().trim().toLowerCase();
+  if (!normalizedValue || normalizedValue === "all") {
+    return null;
+  }
+
+  const start = new Date();
+
+  if (normalizedValue === "today") {
+    start.setHours(0, 0, 0, 0);
+    return { createdAt: { $gte: start } };
+  }
+
+  if (normalizedValue === "week") {
+    start.setDate(start.getDate() - 7);
+    return { createdAt: { $gte: start } };
+  }
+
+  if (normalizedValue === "month") {
+    start.setMonth(start.getMonth() - 1);
+    return { createdAt: { $gte: start } };
+  }
+
+  return null;
+};
+
+/**
+ * Parses a comma-separated tag filter value into normalized tag tokens.
+ *
+ * @param {string|string[]|undefined} rawTags - Raw tags query payload.
+ * @returns {string[]} Normalized tag values.
+ */
+const parseTagFilters = (rawTags) => {
+  if (!rawTags) {
+    return [];
+  }
+
+  const tagValues = Array.isArray(rawTags) ? rawTags : rawTags.toString().split(",");
+
+  return tagValues
+    .map((tag) => tag.toString().trim())
+    .filter(Boolean);
+};
+
+/**
+ * Appends an additional Mongo clause without clobbering existing query operators.
+ *
+ * @param {Record<string, unknown>} query - Mutable Mongo query object.
+ * @param {Record<string, unknown>|null} clause - Additional clause to append.
+ * @returns {void} Mutates the query in place.
+ */
+const appendQueryClause = (query, clause) => {
+  if (!clause) {
+    return;
+  }
+
+  if (!query.$and) {
+    query.$and = [];
+  }
+
+  query.$and.push(clause);
+};
+
 const buildEntityLookup = async (ids) => {
   if (!ids.length) return new Map();
 
@@ -503,13 +620,14 @@ router.get(
 // Get all discussions with pagination
 router.get("/discussions", async (req, res) => {
   try {
-    console.log("[GET discussions] query params:", req.query);
     const {
       page = 1,
       limit = 10,
       category,
       search,
       sortBy = "createdAt",
+      dateRange,
+      tags,
       channelType,
     } = req.query;
     const collegeId = getCollegeFilter(req.query.collegeId);
@@ -545,8 +663,19 @@ router.get("/discussions", async (req, res) => {
       query.category = category;
     }
 
-    if (search) {
-      query.$text = { $search: search };
+    const dateRangeFilter = buildDateRangeFilter(dateRange);
+    if (dateRangeFilter) {
+      Object.assign(query, dateRangeFilter);
+    }
+
+    const tagFilters = parseTagFilters(tags);
+    if (tagFilters.length) {
+      query.tags = { $all: tagFilters };
+    }
+
+    const searchClause = await buildDiscussionSearchClause(search);
+    if (searchClause) {
+      appendQueryClause(query, searchClause);
     }
 
     let discussions;
@@ -613,12 +742,18 @@ router.get("/discussions", async (req, res) => {
 router.get("/discussions/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page = 1, limit = 10, search, sortBy = "createdAt" } = req.query;
+    const { page = 1, limit = 10, search, sortBy = "createdAt", category, dateRange, tags } = req.query;
     const collegeId = getCollegeFilter(req.query.collegeId);
 
     const query = { author: userId, status: "active" };
     if (collegeId) query.college = collegeId;
-    if (search) query.$text = { $search: search };
+    if (category && category !== "all") query.category = category;
+    const userDateRangeFilter = buildDateRangeFilter(dateRange);
+    if (userDateRangeFilter) Object.assign(query, userDateRangeFilter);
+    const userTagFilters = parseTagFilters(tags);
+    if (userTagFilters.length) query.tags = { $all: userTagFilters };
+    const searchClause = await buildDiscussionSearchClause(search);
+    if (searchClause) appendQueryClause(query, searchClause);
 
     const discussions = await CommunityPost.find(query)
       .sort({ [sortBy]: -1 })
@@ -652,12 +787,18 @@ router.get("/discussions/user/:userId", async (req, res) => {
 router.get("/discussions/bookmarks/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    const { page = 1, limit = 10, search, sortBy = "createdAt" } = req.query;
+    const { page = 1, limit = 10, search, sortBy = "createdAt", category, dateRange, tags } = req.query;
     const collegeId = getCollegeFilter(req.query.collegeId);
 
     const query = { isBookmarkedBy: userId, status: "active" };
     if (collegeId) query.college = collegeId;
-    if (search) query.$text = { $search: search };
+    if (category && category !== "all") query.category = category;
+    const bookmarkedDateRangeFilter = buildDateRangeFilter(dateRange);
+    if (bookmarkedDateRangeFilter) Object.assign(query, bookmarkedDateRangeFilter);
+    const bookmarkedTagFilters = parseTagFilters(tags);
+    if (bookmarkedTagFilters.length) query.tags = { $all: bookmarkedTagFilters };
+    const searchClause = await buildDiscussionSearchClause(search);
+    if (searchClause) appendQueryClause(query, searchClause);
 
     const discussions = await CommunityPost.find(query)
       .sort({ [sortBy]: -1 })
@@ -820,7 +961,9 @@ router.post("/discussions", uploadCommunity.any(), async (req, res) => {
     if (file) {
       const resourceType = file.mimetype?.startsWith("video/")
         ? "video"
-        : "image";
+        : file.mimetype?.startsWith("image/")
+          ? "image"
+          : "file";
 
       if (resourceType === "image") {
         const nsfwResult = await scanImage(file.path || file.originalname);
@@ -944,6 +1087,29 @@ router.get("/discussions/:id", async (req, res) => {
     res
       .status(500)
       .json({ success: false, error: "Failed to fetch discussion" });
+  }
+});
+
+// Record a feed/card view without requiring the full discussion payload round-trip
+router.post("/discussions/:id/view", async (req, res) => {
+  try {
+    const discussion = await CommunityPost.findById(req.params.id);
+
+    if (!discussion) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Discussion not found" });
+    }
+
+    discussion.views = (discussion.views || 0) + 1;
+    await discussion.save();
+
+    res.json({ success: true, data: { views: discussion.views } });
+  } catch (error) {
+    console.error("Error recording discussion view:", error);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to record discussion view" });
   }
 });
 
@@ -1265,7 +1431,7 @@ router.post("/discussions/:id/react", async (req, res) => {
     if (reactionIndex === -1) {
       // New reaction
       if (!discussion.reactions) discussion.reactions = [];
-      discussion.reactions.push({ user: actorId, type });
+      discussion.reactions.push({ user: actorId, type, createdAt: new Date() });
     } else {
       // User already reacted
       if (discussion.reactions[reactionIndex].type === type) {
@@ -1274,6 +1440,7 @@ router.post("/discussions/:id/react", async (req, res) => {
       } else {
         // Change type if different
         discussion.reactions[reactionIndex].type = type;
+        discussion.reactions[reactionIndex].createdAt = new Date();
       }
     }
 
@@ -1303,8 +1470,9 @@ router.post("/discussions/:id/react", async (req, res) => {
         reactions: discussion.reactions,
         counts,
         currentUserReaction:
-          (discussion.reactions || []).find((r) => r.user.toString() === userId)
-            ?.type || null,
+          (discussion.reactions || []).find(
+            (r) => r.user.toString() === actorId,
+          )?.type || null,
       },
     });
   } catch (error) {

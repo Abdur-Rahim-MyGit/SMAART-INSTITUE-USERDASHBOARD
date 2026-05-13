@@ -1,5 +1,22 @@
 const mongoose = require('mongoose');
 
+const reactionSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  type: {
+    type: String,
+    enum: ['like', 'heart', 'insightful', 'support'],
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const replySchema = new mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
@@ -83,18 +100,7 @@ const communityPostSchema = new mongoose.Schema({
       required: true
     }
   }],
-  reactions: [{
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true
-    },
-    type: {
-      type: String,
-      enum: ['like', 'heart', 'insightful', 'support'],
-      required: true
-    }
-  }],
+  reactions: [reactionSchema],
   mentions: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
@@ -126,7 +132,7 @@ const communityPostSchema = new mongoose.Schema({
     publicId: String,
     resourceType: {
       type: String,
-      enum: ['image', 'video'],
+      enum: ['image', 'video', 'file'],
       default: 'image'
     }
   },
@@ -193,5 +199,65 @@ communityPostSchema.index({ createdAt: -1 });
 communityPostSchema.index({ category: 1 });
 communityPostSchema.index({ channelType: 1, createdAt: -1 });
 communityPostSchema.index({ flaggedAt: -1 });
+
+/**
+ * Removes duplicate ObjectId values from a raw object id array.
+ *
+ * @param {Array<mongoose.Types.ObjectId|string>} values - Raw object id values.
+ * @returns {Array<mongoose.Types.ObjectId|string>} Deduplicated ids.
+ */
+function dedupeObjectIds(values) {
+  const seen = new Set();
+
+  return (values || []).filter((value) => {
+    const key = value?.toString?.();
+    if (!key || seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+}
+
+/**
+ * Removes duplicate reactions and backfills missing reaction timestamps.
+ *
+ * @param {Array<{user: mongoose.Types.ObjectId|string, type: string, createdAt?: Date}>} reactions - Embedded reaction records.
+ * @returns {Array<{user: mongoose.Types.ObjectId|string, type: string, createdAt: Date}>} Sanitized reactions.
+ */
+function normalizeReactions(reactions) {
+  const seen = new Set();
+
+  return (reactions || []).filter(Boolean).reduce((normalized, reaction) => {
+    const userId = reaction?.user?.toString?.();
+    const type = reaction?.type;
+
+    if (!userId || !type) {
+      return normalized;
+    }
+
+    const key = `${userId}:${type}`;
+    if (seen.has(key)) {
+      return normalized;
+    }
+
+    seen.add(key);
+    const normalizedReaction = reaction.toObject ? reaction.toObject() : reaction;
+    normalized.push({
+      ...normalizedReaction,
+      createdAt: reaction.createdAt || new Date()
+    });
+
+    return normalized;
+  }, []);
+}
+
+communityPostSchema.pre('save', function sanitizeCommunityPost(next) {
+  this.likes = dedupeObjectIds(this.likes);
+  this.isBookmarkedBy = dedupeObjectIds(this.isBookmarkedBy);
+  this.reactions = normalizeReactions(this.reactions);
+  next();
+});
 
 module.exports = mongoose.model('CommunityPost', communityPostSchema);

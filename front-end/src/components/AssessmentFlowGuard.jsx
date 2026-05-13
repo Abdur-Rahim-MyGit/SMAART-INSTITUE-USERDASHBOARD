@@ -24,8 +24,9 @@ const AssessmentFlowGuard = ({ children }) => {
 
   // === PROCTORING: Active only on assessment routes ===
   const isAssessmentRoute =
-    location.pathname.startsWith("/assessment/") ||
-    location.pathname.startsWith("/dashboard/assessments/");
+    (location.pathname.startsWith("/assessment/") ||
+    location.pathname.startsWith("/dashboard/assessments/")) &&
+    !location.pathname.endsWith("/report");
 
   const handleAutoSubmit = useCallback(() => {
     // Navigate back to dashboard with a flag indicating auto-submission

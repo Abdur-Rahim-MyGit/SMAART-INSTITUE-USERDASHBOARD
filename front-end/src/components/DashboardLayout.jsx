@@ -13,6 +13,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { API_BASE_URL, getBackendUrl } from "@/services/api";
 import useSessionGuard from "@/hooks/useSessionGuard";
 import SessionExpiryWarning from "@/components/SessionExpiryWarning";
+import { STAGES, TRACKS, ASSESSMENT_GATES } from "@/data/courseStructureData";
 
 // Import Video Assets for Avatar Card
 import ToddlerBoyIdle from "@/assets/Animations/ToddlerBoyIdle.mp4";
@@ -118,6 +119,186 @@ const breadcrumbMap = {
   'profile': { label: 'Profile', path: '/profile' },
 };
 
+const STATIC_SEARCH_ITEMS = [
+  {
+    id: "page-home",
+    title: "Home",
+    subtitle: "Dashboard overview and progress",
+    path: "/dashboard",
+    type: "Page",
+    keywords: ["dashboard", "home", "overview", "progress"]
+  },
+  {
+    id: "page-courses",
+    title: "My Courses",
+    subtitle: "Browse all learning modules and course paths",
+    path: "/dashboard/courses",
+    type: "Page",
+    keywords: ["courses", "learning", "modules", "player", "curriculum"]
+  },
+  {
+    id: "page-assessments",
+    title: "Assessment Centre",
+    subtitle: "View tests, stages, and assessments",
+    path: "/dashboard/assessment-centre",
+    type: "Page",
+    keywords: ["assessment", "test", "exam", "quiz", "baseline"]
+  },
+  {
+    id: "page-skills-vault",
+    title: "Skills Vault",
+    subtitle: "Track capability growth and achievements",
+    path: "/dashboard/skills-vault",
+    type: "Page",
+    keywords: ["skills", "vault", "growth", "achievements"]
+  },
+  {
+    id: "page-skills-passport",
+    title: "Skills Passport",
+    subtitle: "Your verified skills and development record",
+    path: "/dashboard/skills-passport",
+    type: "Page",
+    keywords: ["skills passport", "passport", "verified skills", "profile"]
+  },
+  {
+    id: "page-vision-board",
+    title: "Vision Board",
+    subtitle: "Review and manage personal goals",
+    path: "/dashboard/vision-boards",
+    type: "Page",
+    keywords: ["vision", "goals", "board", "future"]
+  },
+  {
+    id: "page-toolkit",
+    title: "SMAART Toolkit",
+    subtitle: "Open tools, dictionary, and utility features",
+    path: "/dashboard/smaart-toolkit",
+    type: "Page",
+    keywords: ["toolkit", "tools", "utility", "career", "resources"]
+  },
+  {
+    id: "page-community",
+    title: "Community",
+    subtitle: "Explore discussions and people",
+    path: "/dashboard/community",
+    type: "Page",
+    keywords: ["community", "discussion", "people", "network"]
+  },
+  {
+    id: "page-notes",
+    title: "My Notes",
+    subtitle: "Search and manage your personal notes",
+    path: "/dashboard/notes",
+    type: "Page",
+    keywords: ["notes", "personal notes", "writing"]
+  },
+  {
+    id: "page-library",
+    title: "Library",
+    subtitle: "Search books and learning resources",
+    path: "/dashboard/library",
+    type: "Page",
+    keywords: ["library", "books", "resources", "reading"]
+  },
+  {
+    id: "page-dictionary",
+    title: "Dictionary",
+    subtitle: "Look up terms and meanings",
+    path: "/dashboard/dictionary",
+    type: "Page",
+    keywords: ["dictionary", "meaning", "word", "definition"]
+  },
+  {
+    id: "page-settings",
+    title: "Settings",
+    subtitle: "Manage dashboard preferences",
+    path: "/dashboard/settings",
+    type: "Page",
+    keywords: ["settings", "preferences", "theme", "account"]
+  },
+  {
+    id: "page-support",
+    title: "Help & Support",
+    subtitle: "Open support and ticket help",
+    path: "/dashboard/support",
+    type: "Page",
+    keywords: ["help", "support", "ticket", "issue"]
+  },
+];
+
+const COURSE_SEARCH_ITEMS = STAGES.flatMap((stage) =>
+  stage.courses.map((course) => ({
+    id: `course-${course.id}`,
+    title: course.title,
+    subtitle: `${stage.name} course - ${course.subtitle}`,
+    path: `/dashboard/courses/${course.id}/player`,
+    type: "Course",
+    keywords: [course.id, stage.name, stage.subtitle, course.subtitle]
+  }))
+);
+
+const TRACK_SEARCH_ITEMS = TRACKS.map((track) => ({
+  id: `track-${track.id}`,
+  title: track.name,
+  subtitle: `${track.shortName} track - ${track.description}`,
+  path: "/dashboard/courses",
+  type: "Track",
+  keywords: [track.id, track.shortName, track.description, ...track.courses.map((course) => course.title)]
+}));
+
+const ASSESSMENT_SEARCH_ITEMS = ASSESSMENT_GATES.map((assessment) => ({
+  id: `assessment-${assessment.id}`,
+  title: assessment.name,
+  subtitle: `${assessment.id} - ${assessment.description}`,
+  path: "/dashboard/assessment-centre",
+  type: "Assessment",
+  keywords: [assessment.id, assessment.description]
+}));
+
+const DASHBOARD_SEARCH_ITEMS = [
+  ...STATIC_SEARCH_ITEMS,
+  ...COURSE_SEARCH_ITEMS,
+  ...TRACK_SEARCH_ITEMS,
+  ...ASSESSMENT_SEARCH_ITEMS,
+];
+
+const normalizeSearchValue = (value) => value.toLowerCase().trim();
+
+const getSearchScore = (item, normalizedQuery) => {
+  const title = normalizeSearchValue(item.title);
+  const subtitle = normalizeSearchValue(item.subtitle);
+  const keywords = item.keywords.map(normalizeSearchValue);
+
+  if (title === normalizedQuery) return 0;
+  if (title.startsWith(normalizedQuery)) return 1;
+  if (keywords.some((keyword) => keyword === normalizedQuery)) return 2;
+  if (title.includes(normalizedQuery)) return 3;
+  if (keywords.some((keyword) => keyword.startsWith(normalizedQuery))) return 4;
+  if (keywords.some((keyword) => keyword.includes(normalizedQuery))) return 5;
+  if (subtitle.includes(normalizedQuery)) return 6;
+  return 99;
+};
+
+const getSearchResults = (query) => {
+  const normalizedQuery = normalizeSearchValue(query);
+
+  if (!normalizedQuery) {
+    return DASHBOARD_SEARCH_ITEMS.slice(0, 8);
+  }
+
+  return DASHBOARD_SEARCH_ITEMS
+    .map((item) => ({
+      ...item,
+      score: getSearchScore(item, normalizedQuery)
+    }))
+    .filter((item) => item.score < 99)
+    .sort((a, b) => {
+      if (a.score !== b.score) return a.score - b.score;
+      return a.title.localeCompare(b.title);
+    })
+    .slice(0, 8);
+};
+
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -137,6 +318,12 @@ const DashboardLayout = () => {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   const hoverTimeoutRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [activeSearchIndex, setActiveSearchIndex] = useState(0);
+  const searchContainerRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const searchResults = getSearchResults(searchQuery);
 
   const handleMouseEnter = () => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
@@ -283,14 +470,55 @@ const DashboardLayout = () => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        // Could trigger global search here
-        console.log('Search shortcut triggered');
+        searchInputRef.current?.focus();
+        setShowSearchResults(true);
+      }
+
+      if (e.key === 'Escape') {
+        setShowSearchResults(false);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    setShowSearchResults(false);
+    setActiveSearchIndex(0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    setActiveSearchIndex(0);
+  }, [searchQuery]);
+
+  const handleSearchNavigation = (item) => {
+    if (!item?.path) return;
+    setSearchQuery(item.title);
+    setShowSearchResults(false);
+    navigate(item.path);
+  };
+
+  const handleSearchKeyDown = (event) => {
+    if (!searchResults.length) return;
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setShowSearchResults(true);
+      setActiveSearchIndex((prev) => (prev + 1) % searchResults.length);
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setShowSearchResults(true);
+      setActiveSearchIndex((prev) => (prev - 1 + searchResults.length) % searchResults.length);
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSearchNavigation(searchResults[activeSearchIndex] || searchResults[0]);
+    }
+  };
 
   const breadcrumbs = getBreadcrumbs();
   const pageTitle = getPageTitle();
@@ -357,7 +585,7 @@ const DashboardLayout = () => {
 
             {/* CENTER SECTION: Premium Search Bar */}
             <div className="hidden lg:flex flex-1 max-w-[480px] mx-10">
-              <div className="relative w-full group">
+              <div className="relative w-full group" ref={searchContainerRef}>
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Search className="h-4 w-4 text-slate-400 group-focus-within:text-[#1a3884] transition-colors" />
                 </div>
@@ -365,6 +593,10 @@ const DashboardLayout = () => {
                   type="text"
                   placeholder={t('dashboard.search_placeholder')}
                   className="block w-full pl-11 pr-14 py-2.5 bg-[#F1F5F9] dark:bg-slate-800/40 border border-transparent focus:border-[#1a3884]/30 rounded-full text-sm placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/5 transition-all shadow-inner"
+                  aria-label="Search dashboard content"
+                  aria-expanded={showSearchResults}
+                  aria-controls="dashboard-search-results"
+                  autoComplete="off"
                 />
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
                   <div className="flex items-center gap-1 px-1.5 py-1 text-[10px] font-bold text-slate-400 bg-white/80 dark:bg-slate-700/50 rounded-lg border border-slate-200/50 dark:border-slate-600/50 shadow-sm">
@@ -372,6 +604,65 @@ const DashboardLayout = () => {
                     <span>K</span>
                   </div>
                 </div>
+
+                <AnimatePresence>
+                  {showSearchResults && (
+                    <motion.div
+                      id="dashboard-search-results"
+                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                      transition={{ duration: 0.18 }}
+                      className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-300/90 dark:border-slate-700/80 bg-white dark:bg-slate-900 shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] backdrop-blur-xl"
+                    >
+                      <div className="border-b border-slate-200 dark:border-slate-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                        {searchQuery.trim() ? "Search results" : "Quick links"}
+                      </div>
+
+                      {searchResults.length > 0 ? (
+                        <div className="max-h-[360px] overflow-y-auto py-2">
+                          {searchResults.map((item, index) => (
+                            <button
+                              key={item.id}
+                              type="button"
+                              onMouseEnter={() => setActiveSearchIndex(index)}
+                              onClick={() => handleSearchNavigation(item)}
+                              className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors ${
+                                index === activeSearchIndex
+                                  ? "bg-[#1a3884]/8 dark:bg-blue-500/12"
+                                  : "hover:bg-slate-100 dark:hover:bg-slate-800/85"
+                               }`}
+                            >
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">
+                                    {item.title}
+                                  </span>
+                                  <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                                    {item.type}
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                                  {item.subtitle}
+                                </p>
+                              </div>
+                              <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="px-4 py-6 text-center">
+                          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                            No matching results found
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            Try a page name, course title, track, or assessment code.
+                          </p>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 
