@@ -532,10 +532,14 @@ const Profile = () => {
                                 <div className="flex flex-col gap-1 mb-2">
                                   <h5 className="font-bold text-gray-900 dark:text-white">{t("profile_page.higher_education")}</h5>
                                   <hr className="my-3 border-gray-200 dark:border-slate-700" />
-                                  <h6 className="font-semibold text-gray-900 dark:text-white">{edu.institutionName}</h6>
+                                  <h6 className="font-semibold text-gray-900 dark:text-white">
+                                    {edu.institutionName} {edu.location && <span className="text-gray-400 font-normal">| {edu.location}</span>}
+                                  </h6>
                                 </div>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">{edu.degreeFullName || edu.degree} • {edu.specialization}</p>
-                                <p className="text-xs text-gray-400 mt-1">Passing Year: {edu.yearOfPassing} • Score: {edu.cgpaPercentage}%</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  {edu.degreeFullName || edu.degree} {edu.specialization && <span>• {edu.specialization}</span>}
+                                </p>
+                                <p className="text-xs text-gray-400 mt-1">Passing Year: {edu.yearOfPassing} • Grade: {edu.cgpaPercentage}%</p>
                               </div>
                               <button
                                 onClick={() => handleOpenEditModal('higherEducation', formData.higherEducation)}
@@ -560,8 +564,9 @@ const Profile = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {formData.twelfthDetails && (
                             <div className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
-                              <div>
+                              <div className="flex-1">
                                 <h4 className="font-bold text-gray-900 dark:text-white">12th Standard</h4>
+                                <hr className="my-3 border-gray-200 dark:border-slate-700" />
                                 <p className="text-sm text-gray-500 dark:text-gray-400">{formData.twelfthDetails.schoolName}</p>
                                 <p className="text-xs text-gray-400 mt-1">{formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}</p>
                               </div>
@@ -575,8 +580,9 @@ const Profile = () => {
                           )}
                           {formData.tenthDetails && (
                             <div className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
-                              <div>
+                              <div className="flex-1">
                                 <h4 className="font-bold text-gray-900 dark:text-white">10th Standard</h4>
+                                <hr className="w-full my-3 border-gray-200 dark:border-slate-700" />
                                 <p className="text-sm text-gray-500 dark:text-gray-400">{formData.tenthDetails.schoolName}</p>
                                 <p className="text-xs text-gray-400 mt-1">{formData.tenthDetails.percentage}% • {formData.tenthDetails.yearOfPassing}</p>
                               </div>
@@ -615,8 +621,10 @@ const Profile = () => {
                         {formData.workExperience && formData.workExperience.length > 0 ? (
                           formData.workExperience.map((exp, idx) => (
                             <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
-                              <h4 className="font-bold text-gray-900 dark:text-white">{exp.role || exp.title}</h4>
-                              <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{exp.companyName || exp.organization}</p>
+                              <h4 className="font-bold text-gray-900 dark:text-white">
+                                {exp.companyName || exp.organization} {exp.location && <span className="text-gray-400 font-normal text-xs ml-1">| {exp.location}</span>}
+                              </h4>
+                              <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{exp.role || exp.title}</p>
                               <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                                 <Clock className="w-3 h-3" />
                                 <span>{exp.duration || "Duration not set"}</span>
@@ -944,7 +952,9 @@ const Profile = () => {
                                   {activeEditSection === 'higherEducation' && (
                                     <>
                                       <ModalInput label="Institution" value={item.institutionName} onChange={(v) => { const n = [...editFormData]; n[idx].institutionName = v; setEditFormData(n); }} />
+                                      <ModalInput label="Location" value={item.location} onChange={(v) => { const n = [...editFormData]; n[idx].location = v; setEditFormData(n); }} />
                                       <ModalInput label="Degree" value={item.degreeFullName} onChange={(v) => { const n = [...editFormData]; n[idx].degreeFullName = v; setEditFormData(n); }} />
+                                      <ModalInput label="Specialization" value={item.specialization} onChange={(v) => { const n = [...editFormData]; n[idx].specialization = v; setEditFormData(n); }} />
                                       <ModalInput label="Year" value={item.yearOfPassing} onChange={(v) => { const n = [...editFormData]; n[idx].yearOfPassing = v; setEditFormData(n); }} />
                                       <ModalInput label="CGPA or Score" value={item.cgpaPercentage} onChange={(v) => { const n = [...editFormData]; n[idx].cgpaPercentage = v; setEditFormData(n); }} />
                                     </>
@@ -953,6 +963,7 @@ const Profile = () => {
                                     <>
                                       <ModalInput label="Company" value={item.companyName || item.organization} onChange={(v) => { const n = [...editFormData]; n[idx].companyName = v; setEditFormData(n); }} />
                                       <ModalInput label="Role" value={item.role || item.title} onChange={(v) => { const n = [...editFormData]; n[idx].role = v; setEditFormData(n); }} />
+                                      <ModalInput label="Location" value={item.location} onChange={(v) => { const n = [...editFormData]; n[idx].location = v; setEditFormData(n); }} />
                                       <ModalInput label="Duration" value={item.duration} onChange={(v) => { const n = [...editFormData]; n[idx].duration = v; setEditFormData(n); }} />
                                       <div className="md:col-span-2"><ModalTextarea label="Description" value={item.description} onChange={(v) => { const n = [...editFormData]; n[idx].description = v; setEditFormData(n); }} /></div>
                                     </>

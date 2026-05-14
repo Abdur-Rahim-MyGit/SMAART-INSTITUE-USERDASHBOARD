@@ -153,10 +153,10 @@ const FloatingDictionary = () => {
                 onClick={() => setOpen(!open)}
                 className="fixed bottom-8 left-1/2 lg:left-auto lg:right-8 z-50 h-14 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-[#1a3884] dark:text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/20 dark:border-slate-700/50 flex items-center gap-4 px-5 cursor-pointer hover:shadow-blue-600/20 transition-all duration-300 group overflow-hidden"
                 initial={{ y: 100, x: "-50%", opacity: 0 }}
-                animate={{ 
-                    y: 0, 
+                animate={{
+                    y: 0,
                     x: typeof window !== 'undefined' && window.innerWidth < 1024 ? "-50%" : "0%",
-                    opacity: 1 
+                    opacity: 1
                 }}
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
@@ -174,7 +174,7 @@ const FloatingDictionary = () => {
                         )}
                     </AnimatePresence>
                 </div>
-                
+
                 {!open && (
                     <motion.div
                         initial={{ opacity: 0, x: -10 }}
@@ -202,7 +202,7 @@ const FloatingDictionary = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                        className="fixed bottom-24 right-6 z-50 w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden"
+                        className="fixed bottom-24 right-6 z-[60] w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden"
                     >
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/80">
@@ -243,7 +243,7 @@ const FloatingDictionary = () => {
                         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-[120px]">
 
                             {error && !loading && (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="text-center py-8 space-y-3"

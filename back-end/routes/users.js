@@ -188,6 +188,7 @@ router.post('/register-details', upload.fields([
         specialization: he.specialization || '',
         institutionName: he.institutionName || '',
         university: he.university || '',
+        location: he.location || '',
         yearOfPassing: he.yearOfPassing || '',
         cgpaPercentage: he.cgpaPercentage || '',
         degreeStatus: he.degreeStatus || '',
@@ -281,9 +282,11 @@ router.post('/register-details', upload.fields([
       certificates: Array.isArray(parsedCertificates) ? parsedCertificates.map(c => ({
         id: c.id,
         title: c.title,
-        issuingOrg: c.issuingOrg,
+        issuingOrg: c.issuingOrg || c.issuer || '',
+        issuer: c.issuer || c.issuingOrg || '',
         certificateFile: c.certificateFile || '',
         yearOfCompletion: c.yearOfCompletion || '',
+        link: c.link || c.verificationUrl || '',
       })) : [],
 
       submissionDate: new Date(),
@@ -470,6 +473,14 @@ router.patch('/register-section', async (req, res) => {
           if (data.dateFormat) user.dateFormat = data.dateFormat;
           await user.save();
         }
+      },
+      'address': async () => {
+        registration.address = {
+          street: data.street || registration.address?.street || '',
+          city: data.city || registration.address?.city || '',
+          state: data.state || registration.address?.state || '',
+          country: data.country || registration.address?.country || '',
+        };
       },
       'tenthDetails': async () => {
         registration.tenthDetails = {

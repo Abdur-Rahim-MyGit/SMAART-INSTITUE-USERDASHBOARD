@@ -13,7 +13,7 @@ import { toast } from "sonner";
  */
 const FloatingNotes = ({ courseId: propCourseId }) => {
     const { courseId: urlCourseId } = useParams();
-    
+
     // Generate or retrieve a session ID for this specific course visit
     const [sessionId, setSessionId] = useState(() => {
         const sessionKey = `note_session_${urlCourseId || 'general'}`;
@@ -26,14 +26,14 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
     });
 
     const courseId = propCourseId || (urlCourseId ? `${urlCourseId}-session-${sessionId}` : `general-session-${sessionId}`);
-    
+
     const [open, setOpen] = useState(false);
     const [notes, setNotes] = useState("");
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [lastSaved, setLastSaved] = useState(null);
 
-    
+
     const textareaRef = useRef(null);
     const debounceRef = useRef(null);
 
@@ -88,8 +88,8 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                 // Backup to localStorage
                 localStorage.setItem(`course-notes-${courseId}`, content);
                 // Notify other components
-                window.dispatchEvent(new CustomEvent('notes-updated', { 
-                    detail: { courseId, content } 
+                window.dispatchEvent(new CustomEvent('notes-updated', {
+                    detail: { courseId, content }
                 }));
             }
         } catch (error) {
@@ -98,7 +98,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
             setSaving(false);
         }
     }, [courseId]);
-    
+
     const handleNewNote = () => {
         if (!notes.trim()) {
             toast.info("Notes are already empty.");
@@ -112,7 +112,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
         const newId = Date.now().toString();
         const sessionKey = `note_session_${urlCourseId || 'general'}`;
         sessionStorage.setItem(sessionKey, newId);
-        
+
         // This triggers a re-render and re-fetch of a fresh note
         setSessionId(newId);
         setNotes("");
@@ -126,7 +126,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
         setNotes(value);
 
         if (debounceRef.current) clearTimeout(debounceRef.current);
-        
+
         debounceRef.current = setTimeout(() => {
             saveNotes(value);
         }, 1000); // 1s debounce for auto-save
@@ -164,7 +164,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                         )}
                     </AnimatePresence>
                 </div>
-                
+
                 {!open && (
                     <motion.div
                         initial={{ opacity: 0, x: -10 }}
@@ -191,7 +191,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                        className="fixed bottom-[164px] right-6 z-50 w-[340px] flex flex-col rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden"
+                        className="fixed bottom-[164px] right-6 z-[60] w-[340px] flex flex-col rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden"
                     >
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900/80">

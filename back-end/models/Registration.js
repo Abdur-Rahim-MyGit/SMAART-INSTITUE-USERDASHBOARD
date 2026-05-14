@@ -71,6 +71,7 @@ const registrationSchema = new mongoose.Schema({
     specialization: String,
     institutionName: String,
     university: String,
+    location: String,
     yearOfPassing: String,
     cgpaPercentage: String,
     degreeStatus: String,
@@ -124,8 +125,12 @@ const registrationSchema = new mongoose.Schema({
     id: String,
     experienceType: String,
     organizationName: String,
+    companyName: String,
     jobTitle: String,
+    role: String,
+    duration: String,
     industry: String,
+    location: String,
     startDate: Date,
     endDate: Date,
     currentlyWorking: Boolean,
@@ -145,6 +150,7 @@ const registrationSchema = new mongoose.Schema({
     endDate: Date,
     description: String,
     projectUrl: String,
+    link: String,
   }],
 
   // Technical Certificates
@@ -153,7 +159,9 @@ const registrationSchema = new mongoose.Schema({
     id: String,
     title: String,
     issuingOrg: String,
+    issuer: String,
     certificateFile: String, // file path
+    link: String,
     yearOfCompletion: String,
   }],
 
