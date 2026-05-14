@@ -794,7 +794,7 @@ const VisionBoardGalleryPro = () => {
   return (
     <main className="min-h-screen w-full bg-[#F8FAFC] px-4 py-5 transition-colors duration-300 dark:bg-[#0B1120] md:px-8">
       <div className="mx-auto max-w-[1600px] pb-6">
-        <section className="relative overflow-hidden rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] sm:p-8 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40">
+        <section className="relative overflow-hidden rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] px-6 py-5 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] sm:px-8 sm:py-6 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40">
           {/* Decorative background gradient to match Toolkit style */}
           <div className="absolute inset-px rounded-[27px] border border-white/70 dark:border-white/5" />
           <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
@@ -802,20 +802,20 @@ const VisionBoardGalleryPro = () => {
 
           <div className="relative flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
-                <div className="flex h-4 w-4 items-center justify-center rounded-full border border-[#4f46e5]/20 bg-[#4f46e5]/10">
-                  <Sparkles className="h-2.5 w-2.5" />
+              <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
+                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#4f46e5]/20 bg-[#4f46e5]/10">
+                  <Sparkles className="h-2 w-2" />
                 </div>
                 Vision Journey
               </div>
-              <div className="space-y-4">
-                <h1 className="max-w-3xl text-[2rem] font-black tracking-tight text-[#0f172a] sm:text-[2.35rem] lg:text-[2.5rem] lg:leading-[1.04] dark:text-white">
+              <div className="space-y-2">
+                <h1 className="max-w-3xl text-[1.7rem] font-black tracking-tight text-[#0f172a] sm:text-[2.0rem] lg:text-[2.2rem] lg:leading-tight dark:text-white">
                   Vision Board - <span className="text-[#1a3884]">Gallery</span>
                 </h1>
-                <p className="max-w-xl text-base font-medium tracking-[0.01em] text-[#3654a1] dark:text-[#d7def0] sm:text-lg">
+                <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-[#3654a1] dark:text-[#d7def0] sm:text-[16px]">
                   Experience a focused visual journey with cleaner navigation and faster action.
                 </p>
-                <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
+                <p className="max-w-2xl text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">
                   Create detailed boards for your goals, track your aspirations with clarity, 
                   and keep your primary vision active on your dashboard to stay inspired.
                 </p>
