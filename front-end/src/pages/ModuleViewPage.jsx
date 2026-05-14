@@ -270,7 +270,7 @@ const ModuleViewPage = () => {
           } else {
             // Try matching by title
             const entries = Object.entries(LEARNING_FLOW_DATA);
-            const match = entries.find(([key, flow]) => 
+            const match = entries.find(([key, flow]) =>
               flow.title.toLowerCase() === courseData.title.toLowerCase()
             );
             if (match) flowKey = match[0];
@@ -677,9 +677,9 @@ const ModuleViewPage = () => {
   // --- NEW VINTAGE LAYOUT RENDER ---
   if (!selectedModule) {
     return (
-      <FiveModuleRoadmap 
-        courseData={courseData} 
-        onModuleSelect={(mod) => navigateToDay(mod.id, 1)} 
+      <FiveModuleRoadmap
+        courseData={courseData}
+        onModuleSelect={(mod) => navigateToDay(mod.id, 1)}
       />
     );
   }
@@ -729,45 +729,45 @@ const ModuleViewPage = () => {
         flexDirection: 'column',
       }}>
         <div style={{ padding: '0 30px', marginBottom: '40px' }}>
-            <button 
-              onClick={navigateToCourses}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '12px',
-                fontWeight: '600',
-                color: navyBlue,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                padding: 0,
-                marginBottom: '8px',
-                opacity: 0.8
-              }}
-            >
-              <ArrowLeft size={14} /> Back to My Courses
-            </button>
-            <button 
-              onClick={handleBackToRoadmap}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '11px',
-                fontStyle: 'italic',
-                color: '#666',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                padding: 0,
-                marginBottom: '20px'
-              }}
-            >
-              ← Back to Roadmap
-            </button>
+          <button
+            onClick={navigateToCourses}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              fontFamily: "'Inter', sans-serif",
+              fontSize: '12px',
+              fontWeight: '600',
+              color: navyBlue,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: 0,
+              marginBottom: '8px',
+              opacity: 0.8
+            }}
+          >
+            <ArrowLeft size={14} /> Back to My Courses
+          </button>
+          <button
+            onClick={handleBackToRoadmap}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              fontFamily: "'Inter', sans-serif",
+              fontSize: '11px',
+              fontStyle: 'italic',
+              color: '#666',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: 0,
+              marginBottom: '20px'
+            }}
+          >
+            ← Back to Roadmap
+          </button>
           <h2 style={{
             fontSize: isMobile ? '20px' : '24px',
             fontWeight: '700',
@@ -788,7 +788,7 @@ const ModuleViewPage = () => {
           }}>
             Table of Contents
           </h3>
-          
+
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {flatTasks.map((task, idx) => {
               const isActive = idx === activeTaskIndex;
@@ -842,10 +842,10 @@ const ModuleViewPage = () => {
           order: isMobile ? -1 : 0
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-             <span style={{ fontSize: '18px', fontWeight: '600' }}>Course Progress</span>
-             <div style={{ width: '120px', height: '4px', background: `${gold}44`, marginTop: '8px', position: 'relative' }}>
-               <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '10%', background: navyBlue }} />
-             </div>
+            <span style={{ fontSize: '18px', fontWeight: '600' }}>Course Progress</span>
+            <div style={{ width: '120px', height: '4px', background: `${gold}44`, marginTop: '8px', position: 'relative' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '10%', background: navyBlue }} />
+            </div>
           </div>
           <div style={{
             width: '60px',
@@ -865,77 +865,74 @@ const ModuleViewPage = () => {
 
         {/* Video Player Area */}
         {activeTask && (
-           <div style={{
-             width: '100%',
-             maxWidth: '900px',
-             margin: '0 auto',
-           }}>
-             {/* Header above video */}
-             <div style={{ marginBottom: '20px' }}>
-               <h1 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '700', marginBottom: '8px' }}>
-                 {activeTask.title || `Task ${activeTaskIndex + 1}`}
-               </h1>
-               <p style={{ fontSize: '14px', color: '#555', fontStyle: 'italic' }}>
-                 {activeTask.description || "Watch this video to understand the core concepts."}
-               </p>
-             </div>
+          <div style={{
+            width: '100%',
+            maxWidth: '900px',
+            margin: '0 auto',
+          }}>
+            {/* Header above video */}
+            <div style={{ marginBottom: '20px' }}>
+              <h1 style={{ fontSize: isMobile ? '24px' : '32px', fontWeight: '700', marginBottom: '8px' }}>
+                {activeTask.title || `Task ${activeTaskIndex + 1}`}
+              </h1>
+              <p style={{ fontSize: '14px', color: '#555', fontStyle: 'italic' }}>
+                {activeTask.description || "Watch this video to understand the core concepts."}
+              </p>
+            </div>
 
-             {/* Video Container */}
-             <div style={{
-               width: '100%',
-               aspectRatio: '16/9',
-               background: '#000',
-               border: `3px solid ${navyBlue}`,
-               boxShadow: `8px 8px 0px ${gold}44`,
-               marginBottom: '40px',
-               position: 'relative'
-             }}>
-               {activeTask.videoUrl ? (
-                 <video 
-                   src={activeTask.videoUrl} 
-                   controls 
-                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                 />
-               ) : (
-                 <div style={{ color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontFamily: "sans-serif" }}>
-                    Video Content will load here.
-                 </div>
-               )}
-             </div>
+            {/* Video Container */}
+            <div style={{
+              width: '100%',
+              aspectRatio: '16/9',
+              background: '#000',
+              border: `3px solid ${navyBlue}`,
+              boxShadow: `8px 8px 0px ${gold}44`,
+              marginBottom: '40px',
+              position: 'relative'
+            }}>
+              {activeTask.videoUrl ? (
+                <video
+                  src={activeTask.videoUrl}
+                  controls
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div style={{ color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontFamily: "sans-serif" }}>
+                  Video Content will load here.
+                </div>
+              )}
+            </div>
 
-             {/* Content Below Video */}
-             <div style={{ 
-               display: 'grid', 
-               gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
-               gap: '40px',
-               borderTop: `1px solid ${gold}44`,
-               paddingTop: '30px'
-             }}>
-                <div>
-                  <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '16px', color: navyBlue }}>
-                    Overview
-                  </h3>
-                  <p style={{ fontSize: '15px', lineHeight: '1.6', color: '#444' }}>
-                    {activeTask.videoDescription || activeTask.description || "No overview available for this task. Please complete the video lesson."}
-                  </p>
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '16px', color: navyBlue }}>
-                    Key Takeaways
-                  </h3>
-                  <ul style={{ paddingLeft: '20px', fontSize: '15px', lineHeight: '1.6', color: '#444' }}>
-                    <li>Understand the foundational principles</li>
-                    <li>Apply techniques in practical scenarios</li>
-                    <li>Review mastery materials</li>
-                  </ul>
-                </div>
-             </div>
-           </div>
+            {/* Content Below Video */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+              gap: '40px',
+              borderTop: `1px solid ${gold}44`,
+              paddingTop: '30px'
+            }}>
+              <div>
+                <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '16px', color: navyBlue }}>
+                  Overview
+                </h3>
+                <p style={{ fontSize: '15px', lineHeight: '1.6', color: '#444' }}>
+                  {activeTask.videoDescription || activeTask.description || "No overview available for this task. Please complete the video lesson."}
+                </p>
+              </div>
+              <div>
+                <h3 style={{ fontSize: '20px', fontWeight: '700', marginBottom: '16px', color: navyBlue }}>
+                  Key Takeaways
+                </h3>
+                <ul style={{ paddingLeft: '20px', fontSize: '15px', lineHeight: '1.6', color: '#444' }}>
+                  <li>Understand the foundational principles</li>
+                  <li>Apply techniques in practical scenarios</li>
+                  <li>Review mastery materials</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         )}
       </div>
-
-      <FloatingDictionary />
-      <FloatingNotes />
     </div>
   );
 };

@@ -27,8 +27,6 @@ const MyCourses = () => {
         userProgress={userProgress}
         user={user}
       />
-      <FloatingDictionary />
-      <FloatingNotes />
     </>
   );
 };

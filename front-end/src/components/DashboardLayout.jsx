@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Languages } from "lucide-react";
+import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Languages, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -223,6 +223,54 @@ const STATIC_SEARCH_ITEMS = [
     path: "/dashboard/support",
     type: "Page",
     keywords: ["help", "support", "ticket", "issue"]
+  },
+  {
+    id: "page-profile",
+    title: "Profile",
+    subtitle: "Manage your account and profile information",
+    path: "/dashboard/profile",
+    type: "Page",
+    keywords: ["profile", "account", "user", "details", "photo"]
+  },
+  {
+    id: "page-resume-builder",
+    title: "Resume Builder",
+    subtitle: "Create a professional ATS-friendly resume",
+    path: "/dashboard/resume-builder",
+    type: "Page",
+    keywords: ["resume", "cv", "builder", "ats", "career", "jobs"]
+  },
+  {
+    id: "page-profile-analysis",
+    title: "AI Profile Analysis",
+    subtitle: "Analyze your career profile using AI",
+    path: "/dashboard/profile-analysis",
+    type: "Page",
+    keywords: ["ai", "analysis", "profile", "career", "insights"]
+  },
+  {
+    id: "page-certificates",
+    title: "Certificates",
+    subtitle: "View and download your earned certificates",
+    path: "/dashboard/certificate",
+    type: "Page",
+    keywords: ["certificate", "award", "earned", "completion"]
+  },
+  {
+    id: "page-mindcare",
+    title: "MindCare Sessions",
+    subtitle: "Wellness and mental health support",
+    path: "/dashboard/mindcare-sessions",
+    type: "Page",
+    keywords: ["mindcare", "mental health", "wellness", "sessions", "support"]
+  },
+  {
+    id: "page-quotients",
+    title: "Quotients Grid",
+    subtitle: "View your intelligence and skill quotients",
+    path: "/dashboard/quotients-grid",
+    type: "Page",
+    keywords: ["quotients", "skills", "grid", "iq", "eq", "sq"]
   },
 ];
 
@@ -598,7 +646,18 @@ const DashboardLayout = () => {
                   autoComplete="off"
                   spellCheck={false}
                 />
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2">
+                  {searchQuery && (
+                    <button 
+                      onClick={() => {
+                        setSearchQuery("");
+                        searchInputRef.current?.focus();
+                      }}
+                      className="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5 text-slate-400" />
+                    </button>
+                  )}
                   <div className="flex items-center gap-1 px-1.5 py-1 text-[10px] font-bold text-slate-400 bg-white/80 dark:bg-slate-700/50 rounded-lg border border-slate-200/50 dark:border-slate-600/50 shadow-sm">
                     <Command className="w-2.5 h-2.5" />
                     <span>K</span>
@@ -620,7 +679,7 @@ const DashboardLayout = () => {
                 </div>
 
                 <AnimatePresence>
-                  {showSearchResults && (
+                  {showSearchResults && searchQuery.trim() && (
                     <motion.div
                       id="dashboard-search-results"
                       initial={{ opacity: 0, y: 8, scale: 0.98 }}
@@ -630,7 +689,7 @@ const DashboardLayout = () => {
                       className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-300/90 dark:border-slate-700/80 bg-white dark:bg-slate-900 shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] backdrop-blur-xl"
                     >
                       <div className="border-b border-slate-200 dark:border-slate-800 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                        {searchQuery.trim() ? "Search results" : "Quick links"}
+                        Search results
                       </div>
 
                       {searchResults.length > 0 ? (
