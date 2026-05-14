@@ -9,7 +9,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
   const { theme } = useTheme();
 
   return (
-    <section className="relative min-h-screen flex items-center pt-32 pb-32 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:bg-none dark:bg-[#002147] text-gray-900 dark:text-white transition-colors duration-500">
+    <section className="relative min-h-screen flex items-center pt-32 pb-32 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:bg-none dark:bg-dark-card text-gray-900 dark:text-white transition-colors duration-500">
       {/* Dynamic Background */}
       <NeuralBackground theme={theme} />
 
@@ -134,7 +134,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
             {/* Abstract Glow behind image */}
             <div className="absolute -inset-4 bg-gradient-to-r from-[#1a3884] to-[#C0C0C0] opacity-30 dark:opacity-20 blur-xl rounded-2xl -z-10 animate-pulse-slow" />
 
-            <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#002147]/5 backdrop-blur-sm dark:bg-[#002147]/40">
+            <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-[#002147]/5 backdrop-blur-sm dark:bg-dark-card/40">
               <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none z-10" />
               <img
                 src={heroImage}
@@ -147,7 +147,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -bottom-8 -left-8 bg-[#ffff]/90 dark:bg-[#00152e]/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block"
+              className="absolute -bottom-8 -left-8 bg-[#ffff]/90 dark:bg-dark-bg/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#1a3884]/20 flex items-center justify-center text-[#1a3884] dark:text-[#67e8f5]">
@@ -163,7 +163,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
             <motion.div
               animate={{ y: [0, 10, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute -top-6 -right-6 bg-[#ffff]/90 dark:bg-[#00152e]/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block"
+              className="absolute -top-6 -right-6 bg-[#ffff]/90 dark:bg-dark-bg/80 backdrop-blur-md border border-gray-100 dark:border-white/10 p-4 rounded-xl shadow-xl hidden md:block"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#C0C0C0]/20 flex items-center justify-center text-[#C0C0C0]">

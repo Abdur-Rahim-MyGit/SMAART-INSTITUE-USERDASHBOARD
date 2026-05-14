@@ -218,7 +218,7 @@ const Certificate = () => {
     // --- RENDER SELECTION SCREEN ---
     if (!selectedType) {
         return (
-            <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+            <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
                 <main className="w-full relative py-12 px-4 md:px-6">
                         {/* Header */}
                         <div className="text-center mb-8">
@@ -263,7 +263,7 @@ const Certificate = () => {
                                         <button
                                             key={cert.id}
                                             onClick={() => setSelectedType(cert)}
-                                            className="group relative w-full p-6 rounded-2xl bg-white dark:bg-[#1e293b] border border-gray-200 dark:border-slate-700 hover:border-[#1a3884] dark:hover:border-[#1a3884] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
+                                            className="group relative w-full p-6 rounded-2xl bg-white dark:bg-dark-card border border-gray-200 dark:border-slate-700 hover:border-[#1a3884] dark:hover:border-[#1a3884] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-[#1a3884]/10 text-[#1a3884] transition-colors">
@@ -331,11 +331,11 @@ const Certificate = () => {
     const verificationUrl = qrCodeDataUrl ? `${window.location.origin}/verify-certificate/${certId}` : '';
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
             <main className="w-full relative py-8 px-4 flex flex-col items-center">
 
                 {/* Controls */}
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-4 no-print bg-white/80 dark:bg-[#1e293b]/80 backdrop-blur-md p-2 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg">
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-4 no-print bg-white/80 dark:bg-dark-card/80 backdrop-blur-md p-2 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg">
                     <button
                         onClick={() => setSelectedType(null)}
                         className="flex items-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl transition-all font-medium text-sm"

@@ -792,7 +792,7 @@ const VisionBoardGalleryPro = () => {
 
 
   return (
-    <main className="min-h-screen w-full bg-[#F8FAFC] px-4 py-5 transition-colors duration-300 dark:bg-[#0B1120] md:px-8">
+    <main className="min-h-screen w-full bg-[#F8FAFC] px-4 py-5 transition-colors duration-300 dark:bg-dark-card md:px-8">
       <div className="mx-auto max-w-[1600px] pb-6">
         <section className="relative overflow-hidden rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] px-6 py-5 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] sm:px-8 sm:py-6 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40">
           {/* Decorative background gradient to match Toolkit style */}

@@ -104,7 +104,7 @@ const HomeRootPage = () => {
   };
 
   return (
-    <PageTransition className="min-h-screen bg-white dark:bg-[#002147] text-gray-900 dark:text-white selection:bg-[#1a3884] selection:text-white transition-colors duration-300">
+    <PageTransition className="min-h-screen bg-white dark:bg-dark-card text-gray-900 dark:text-white selection:bg-[#1a3884] selection:text-white transition-colors duration-300">
       <Helmet>
         <title>SMAART Institute | AI-Powered Student Career Analyser</title>
         <meta name="description" content="Unlock your future with SMAART Institute. The first AI Career Coach integrating EQ, Cognitive Skills, and Academic Performance to guide students to success." />

@@ -67,9 +67,8 @@ const DashboardHeader = () => {
             <motion.h1 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight"
+              className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight font-sans transition-colors duration-300"
               style={{
-                fontFamily: "'Outfit', sans-serif",
                 letterSpacing: '-0.02em',
               }}
             >

@@ -173,7 +173,7 @@ const Notifications = () => {
   const hasMore = (pagination?.page || 1) < (pagination?.pages || 1);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] text-slate-900 font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-[#F8F9FC] dark:bg-dark-bg text-slate-900 font-sans transition-colors duration-300">
       <main className="container mx-auto max-w-6xl px-3 py-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -11,6 +11,9 @@ export default {
   theme: {
     extend: {
       colors: {
+        'dark-bg': '#00152e',
+        'dark-card': '#002147',
+        'dark-elevated': '#002a5c',
         // Corporate Palette
         navy: {
           DEFAULT: '#002147',

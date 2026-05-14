@@ -245,7 +245,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                         else btnClass += "border-gray-200 dark:border-slate-800 opacity-50";
                      } else {
                         btnClass += isSelected 
-                          ? "border-[#1a3884] bg-[#1a3884]/10 text-[#0e5c65] dark:text-[#1a3884] dark:bg-[#1a3884]/20" 
+                          ? "border-[#1a3884] bg-[#1a3884]/10 text-[#0e5c65] dark:text-blue-300 dark:bg-[#1a3884]/20" 
                           : "border-gray-200 dark:border-slate-700 hover:border-[#1a3884]/50 hover:bg-slate-50 dark:hover:bg-slate-800";
                      }
 

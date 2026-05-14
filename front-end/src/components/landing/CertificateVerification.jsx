@@ -189,7 +189,7 @@ const CertificateVerification = () => {
                                 <div className="bg-white dark:bg-[#001835]/90 border border-gray-100 dark:border-white/10 rounded-none p-1 shadow-2xl relative overflow-hidden h-full flex flex-col backdrop-blur-xl group">
 
                                     {/* Inner Container */}
-                                    <div className="bg-white/50 dark:bg-[#001229]/50 rounded-none flex flex-col h-full overflow-hidden relative border border-gray-50 dark:border-white/5">
+                                    <div className="bg-white/50 dark:bg-dark-bg/50 rounded-none flex flex-col h-full overflow-hidden relative border border-gray-50 dark:border-white/5">
 
                                         {/* Top Decoration */}
                                         <div className="h-32 bg-gradient-to-r from-[#1a3884] to-[#0d1f4d] relative overflow-hidden flex-shrink-0">

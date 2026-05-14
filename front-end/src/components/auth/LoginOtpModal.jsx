@@ -224,9 +224,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-[420px] bg-white overflow-hidden shadow-2xl z-10 flex flex-col"
+            className="relative w-full max-w-[420px] bg-white dark:bg-dark-card overflow-hidden shadow-2xl z-10 flex flex-col border border-black/5 dark:border-white/10"
             style={{
-              border: "1px solid rgba(0, 0, 0, 0.04)",
               borderRadius: "24px",
             }}
           >
@@ -234,22 +233,22 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
             {!showForceLogout ? (
               <div className="flex flex-col">
                 {/* Header */}
-                <div className="bg-gray-50 p-8 flex flex-col items-center justify-center border-b border-gray-100 relative">
+                <div className="bg-gray-50 dark:bg-dark-bg/50 p-8 flex flex-col items-center justify-center border-b border-gray-100 dark:border-white/5 relative">
                   <button
                     onClick={onClose}
-                    className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"
+                    className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors z-30"
                   >
                     <X className="w-5 h-5" />
                   </button>
-                  <div className="relative mb-3 z-10 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 w-14 h-14 flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-[#1a3884]" />
+                  <div className="relative mb-3 z-10 p-3 bg-white dark:bg-dark-elevated rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 w-14 h-14 flex items-center justify-center">
+                    <Mail className="w-6 h-6 text-[#1a3884] dark:text-[#00a3e0]" />
                   </div>
-                  <h2 className="text-gray-900 text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
+                  <h2 className="text-gray-900 dark:text-white text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
                     Verify Your Email
                   </h2>
-                  <p className="text-[13px] text-gray-500 mt-2 text-center px-8">
+                  <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-2 text-center px-8">
                     We've sent a security code to <br />
-                    <span className="text-[#112b6b] font-bold">{email}</span>
+                    <span className="text-[#112b6b] dark:text-white font-bold">{email}</span>
                   </p>
                 </div>
 
@@ -279,7 +278,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                           value={digit}
                           onChange={(e) => handleChange(index, e.target.value)}
                           onKeyDown={(e) => handleKeyDown(index, e)}
-                          className="w-12 h-16 text-center text-2xl font-bold bg-[#f8fafc] border border-[#e2e8f0] rounded-xl focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 focus:bg-white outline-none transition-all shadow-sm text-[#112b6b]"
+                          className="w-12 h-16 text-center text-2xl font-bold bg-[#f8fafc] dark:bg-dark-bg/50 border border-[#e2e8f0] dark:border-white/10 rounded-xl focus:border-[#1a3884] dark:focus:border-[#00a3e0] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:ring-[#00a3e0]/20 focus:bg-white dark:focus:bg-[#001c3d] outline-none transition-all shadow-sm text-[#112b6b] dark:text-white"
                         />
                       ))}
                     </div>
@@ -312,14 +311,14 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     </Button>
                   </form>
 
-                  <div className="mt-8 text-center pt-6 border-t border-gray-50">
-                    <p className="text-gray-400 text-[12px] font-medium mb-3">
+                  <div className="mt-8 text-center pt-6 border-t border-gray-50 dark:border-white/5">
+                    <p className="text-gray-400 dark:text-gray-500 text-[12px] font-medium mb-3">
                       Didn't receive the code?
                     </p>
                     <button
                       onClick={handleResend}
                       disabled={resendCooldown > 0 || isResending}
-                      className="inline-flex items-center gap-2 text-[#1a3884] hover:text-[#112b6b] transition-all disabled:opacity-50 disabled:cursor-not-allowed font-bold text-[13px] hover:-translate-y-0.5"
+                      className="inline-flex items-center gap-2 text-[#1a3884] dark:text-[#00a3e0] hover:text-[#112b6b] dark:hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed font-bold text-[13px] hover:-translate-y-0.5"
                     >
                       {isResending ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -335,10 +334,10 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
               </div>
             ) : (
               // Force Logout Confirmation View
-              <div className="p-8 text-center bg-white">
+              <div className="p-8 text-center bg-white dark:bg-dark-card">
                 <button
                   onClick={onClose}
-                  className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"
+                  className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors z-30"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -348,8 +347,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                   <AlertTriangle className="w-10 h-10 text-red-500 relative z-10" />
                 </div>
 
-                <h3 className="text-[20px] font-extrabold text-gray-900 mb-2">Active Session</h3>
-                <p className="text-[13px] text-gray-500 mb-8 max-w-[280px] mx-auto leading-relaxed">
+                <h3 className="text-[20px] font-extrabold text-gray-900 dark:text-white mb-2">Active Session</h3>
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 mb-8 max-w-[280px] mx-auto leading-relaxed">
                   {forceLogoutMessage || "You are already logged in on another device."}
                 </p>
 
@@ -368,7 +367,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     onClick={handleForceLogoutCancel}
                     variant="ghost"
                     disabled={isLoading}
-                    className="w-full h-11 text-gray-500 hover:text-gray-900 font-bold text-[13px] transition-colors"
+                    className="w-full h-11 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-bold text-[13px] transition-colors"
                   >
                     Cancel
                   </Button>

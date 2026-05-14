@@ -26,7 +26,7 @@ const AICareerRecommendations = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229]">
+        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg">
             <main className="w-full relative py-8 px-4 md:px-0">
                     <div className="max-w-4xl mx-auto pb-12">
                         <div className="mb-6 px-4">

@@ -244,9 +244,8 @@ const LoginCard = () => {
       >
         {/* ── Card wrapper — matches the LoginCard Soft-UI style exactly ── */}
         <div
-          className="overflow-hidden bg-white rounded-3xl"
+          className="overflow-hidden bg-white dark:bg-[#002A5C] rounded-3xl border border-black/5 dark:border-white/10"
           style={{
-            border: "1px solid rgba(0, 0, 0, 0.05)",
             boxShadow: "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)",
           }}
         >
@@ -254,9 +253,9 @@ const LoginCard = () => {
           <div className="h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
 
           {/* Header */}
-          <div className="bg-gray-50 px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
+          <div className="bg-gray-50 dark:bg-[#00152E] px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100 dark:border-white/10">
             {/* Icon badge */}
-            <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white dark:bg-[#002147] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden">
               {selectedInstitution?.logo ? (
                 <img
                   src={selectedInstitution.logo}
@@ -269,12 +268,12 @@ const LoginCard = () => {
             </div>
 
             <h2
-              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] text-center"
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white text-center"
               style={{ letterSpacing: "-0.02em" }}
             >
               Select Your Institution
             </h2>
-            <p className="text-[13px] text-gray-500 mt-2 text-center max-w-[260px] leading-relaxed">
+            <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-2 text-center max-w-[260px] leading-relaxed">
               Find your college to access your personalised career dashboard.
             </p>
           </div>
@@ -297,15 +296,10 @@ const LoginCard = () => {
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="flex items-center justify-between gap-3 px-4 py-2 bg-white"
-        style={{
-          border: "1px solid rgba(0, 0, 0, 0.05)",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
-          borderRadius: "16px",
-        }}
+        className="flex items-center justify-between gap-3 px-4 py-2 bg-white dark:bg-[#002A5C] border border-black/5 dark:border-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-2xl"
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#00152E] border border-slate-100 dark:border-white/10 shadow-sm flex items-center justify-center shrink-0 overflow-hidden">
             {selectedInstitution?.logo ? (
               <img
                 src={selectedInstitution.logo}
@@ -313,15 +307,15 @@ const LoginCard = () => {
                 className="w-full h-full object-contain p-1.5"
               />
             ) : (
-              <Building2 className="w-5 h-5 text-[#1a3884]" />
+              <Building2 className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-bold text-gray-900 text-sm truncate leading-tight">
+            <p className="font-bold text-gray-900 dark:text-white text-sm truncate leading-tight">
               {selectedInstitution?.name}
             </p>
             {selectedInstitution?.location?.city && (
-              <p className="text-[11px] text-gray-500 font-medium truncate mt-0.5">
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium truncate mt-0.5">
                 {selectedInstitution.location.city}
                 {selectedInstitution?.location?.state && (
                   <span className="opacity-70">, {selectedInstitution.location.state}</span>
@@ -332,7 +326,7 @@ const LoginCard = () => {
         </div>
         <button
           onClick={handleChangeInstitution}
-          className="text-[11px] font-bold uppercase tracking-widest text-[#002147] hover:text-[#00152e] transition-colors shrink-0 px-1"
+          className="text-[11px] font-bold uppercase tracking-widest text-[#002147] dark:text-blue-400 hover:text-[#00152e] dark:hover:text-blue-300 transition-colors shrink-0 px-1"
         >
           Change
         </button>
@@ -343,12 +337,7 @@ const LoginCard = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.45, ease: "easeOut" }}
-        className="overflow-hidden bg-white relative"
-        style={{
-          border: "1px solid rgba(0, 0, 0, 0.04)",
-          boxShadow: "0 20px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02)",
-          borderRadius: "24px",
-        }}
+        className="overflow-hidden bg-white dark:bg-[#002A5C] relative rounded-[24px] border border-black/5 dark:border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.04)]"
       >
         <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
         <div className="px-5 pt-7 pb-6 sm:px-8 sm:pt-8 sm:pb-8 relative z-10">
@@ -359,7 +348,7 @@ const LoginCard = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="w-16 h-16 flex items-center justify-center mb-4 bg-white rounded-2xl shadow-lg border border-[#1a3884]/5 relative overflow-hidden"
+              className="w-16 h-16 flex items-center justify-center mb-4 bg-white dark:bg-[#00152E] rounded-2xl shadow-lg border border-[#1a3884]/5 dark:border-white/10 relative overflow-hidden"
               style={{
                 boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
               }}
@@ -376,12 +365,12 @@ const LoginCard = () => {
             </motion.div>
 
             <h2
-              className="text-xl sm:text-2xl font-extrabold tracking-tight mb-1 text-[#112b6b]"
+              className="text-xl sm:text-2xl font-extrabold tracking-tight mb-1 text-[#112b6b] dark:text-white"
               style={{ letterSpacing: "-0.02em" }}
             >
               Welcome Back
             </h2>
-            <p className="text-gray-500 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
+            <p className="text-gray-500 dark:text-gray-400 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
               Access your personalized learning and career dashboard
             </p>
           </div>
@@ -405,24 +394,10 @@ const LoginCard = () => {
                 Email or Student ID
               </label>
               <div
-                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden"
-                style={{
-                  background: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                }}
-                onFocusCapture={(e) => {
-                  e.currentTarget.style.border = "1.5px solid #1a3884";
-                  e.currentTarget.style.background = "#fff";
-                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
-                }}
-                onBlurCapture={(e) => {
-                  e.currentTarget.style.border = "1px solid #e2e8f0";
-                  e.currentTarget.style.background = "#f8fafc";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#00152E] focus-within:border-[#1a3884] dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-[#003366] focus-within:ring-4 focus-within:ring-[#1a3884]/10 dark:focus-within:ring-blue-400/20"
               >
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
-                  <Mail className="w-3.5 h-3.5 shrink-0 text-[#1a3884] group-focus-within:scale-110 transition-transform" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-[#002147] shadow-sm border border-gray-100 dark:border-white/10 group-focus-within:border-[#1a3884]/30 dark:group-focus-within:border-blue-400/30 transition-all">
+                  <Mail className="w-3.5 h-3.5 shrink-0 text-[#1a3884] dark:text-blue-400 group-focus-within:scale-110 transition-transform" />
                 </div>
                 <input
                   id="login-email"
@@ -433,7 +408,7 @@ const LoginCard = () => {
                   aria-required="true"
                   autoComplete="username"
                   required
-                  className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
+                  className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b] dark:text-white"
                 />
               </div>
             </div>
@@ -450,30 +425,16 @@ const LoginCard = () => {
                 <button
                   type="button"
                   onClick={() => setShowForgotPassword(true)}
-                  className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-colors text-[#002147] hover:text-[#00152e]"
+                  className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest transition-colors text-[#002147] dark:text-blue-400 hover:text-[#00152e] dark:hover:text-blue-300"
                 >
                   Forgot?
                 </button>
               </div>
               <div
-                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden"
-                style={{
-                  background: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                }}
-                onFocusCapture={(e) => {
-                  e.currentTarget.style.border = "1.5px solid #1a3884";
-                  e.currentTarget.style.background = "#fff";
-                  e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
-                }}
-                onBlurCapture={(e) => {
-                  e.currentTarget.style.border = "1px solid #e2e8f0";
-                  e.currentTarget.style.background = "#f8fafc";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
+                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#00152E] focus-within:border-[#1a3884] dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-[#003366] focus-within:ring-4 focus-within:ring-[#1a3884]/10 dark:focus-within:ring-blue-400/20"
               >
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
-                  <Lock className="w-3.5 h-3.5 shrink-0 text-[#1a3884] group-focus-within:scale-110 transition-transform" />
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-[#002147] shadow-sm border border-gray-100 dark:border-white/10 group-focus-within:border-[#1a3884]/30 dark:group-focus-within:border-blue-400/30 transition-all">
+                  <Lock className="w-3.5 h-3.5 shrink-0 text-[#1a3884] dark:text-blue-400 group-focus-within:scale-110 transition-transform" />
                 </div>
                 <input
                   id="login-password"
@@ -484,7 +445,7 @@ const LoginCard = () => {
                   aria-required="true"
                   autoComplete="current-password"
                   required
-                  className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
+                  className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b] dark:text-white"
                 />
                 <button
                   type="button"
@@ -517,7 +478,7 @@ const LoginCard = () => {
                     </svg>
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider group-hover:text-gray-700 transition-colors">
+                <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                   Remember Me
                 </span>
               </label>

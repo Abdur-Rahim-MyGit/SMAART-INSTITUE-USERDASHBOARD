@@ -368,7 +368,7 @@ const Profile = () => {
   return (
     <>
       <PageTransition>
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] pb-12 transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-dark-bg pb-12 transition-colors duration-300">
           {loading ? (
             <ProfileSkeleton />
           ) : (

@@ -206,7 +206,7 @@ const MyAssessments = () => {
                       data: results[assessment.key],
                       description: `View your ${assessment.title} results.`
                     })}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-600 shadow-sm transition-all hover:border-[#1a3884] hover:bg-[#1a3884] hover:text-white dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-600"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-600 shadow-sm transition-all hover:border-[#1a3884] hover:bg-[#1a3884] hover:text-white dark:border-slate-700 dark:bg-dark-card dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-600"
                   >
                     <CheckCircle2 className="h-4 w-4" />
                     View Results
@@ -262,7 +262,7 @@ const MyAssessments = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowPassport(true)}
-                className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-slate-700/80"
+                className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:bg-slate-50 dark:bg-dark-card dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-[#002A5C]"
               >
                 <Shield className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
                 Skills Passport
