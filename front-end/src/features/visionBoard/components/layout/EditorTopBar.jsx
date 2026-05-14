@@ -7,7 +7,6 @@ import {
   Eye,
   Save,
   Loader2,
-  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -86,12 +85,9 @@ const EditorTopBar = ({
       </div>
 
       <div className="mx-1 min-w-0 flex-1 md:block">
-         <div className="group relative flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/90 px-3 py-2 dark:border-slate-700 dark:bg-slate-900/70">
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300">
-              <Sparkles className="h-4 w-4" />
-            </div>
+         <div className="group relative flex min-h-[72px] items-center rounded-xl border border-slate-200 bg-slate-50/90 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/70">
             <div className="min-w-0 flex-1">
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+              <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Vision Board Studio
               </p>
             <Input
@@ -100,11 +96,11 @@ const EditorTopBar = ({
                 setTitle(e.target.value);
                 if (handleInstantCheck) handleInstantCheck(e.target.value);
               }}
-                className="h-7 border-0 bg-transparent px-0 text-left text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 dark:text-white dark:placeholder:text-slate-500"
+                className="h-8 border-0 bg-transparent px-0 text-left text-[18px] font-bold text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 dark:text-white dark:placeholder:text-slate-500"
               placeholder="Untitled vision board"
             />
             </div>
-            <div className="hidden flex-shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400 xl:flex">
+            <div className="hidden flex-shrink-0 items-center gap-2 self-start rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400 xl:flex">
               {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <span className="h-2 w-2 rounded-full bg-emerald-500" />}
               {statusLabel}
             </div>
@@ -127,7 +123,7 @@ const EditorTopBar = ({
         </Button>
 
         <Button 
-            className="h-10 gap-2 bg-[#1a3884] px-3 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#132c6b] sm:px-4"
+            className="h-10 gap-2 bg-primary px-3 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-primary/90 sm:px-4"
             onClick={onPreview}
         >
             <Eye className="h-4 w-4" />

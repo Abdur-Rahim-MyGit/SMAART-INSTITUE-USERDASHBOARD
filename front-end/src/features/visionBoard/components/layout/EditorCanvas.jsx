@@ -52,9 +52,9 @@ const EditorCanvas = ({
   ];
 
   return (
-    <div className="custom-scrollbar relative flex flex-1 items-center justify-center overflow-auto bg-[radial-gradient(circle_at_top,#eff6ff_0%,#f8fafc_36%,#eef2f7_100%)] p-4 pb-28 dark:bg-[radial-gradient(circle_at_top,#172554_0%,#0b1220_28%,#040814_100%)] sm:p-5 lg:p-8 lg:pb-8">
+    <div className="custom-scrollbar relative flex flex-1 items-center justify-center overflow-auto bg-[radial-gradient(circle_at_top,#eff6ff_0%,#f8fafc_36%,#eef2f7_100%)] p-4 pb-36 dark:bg-[radial-gradient(circle_at_top,#172554_0%,#0b1220_28%,#040814_100%)] sm:p-5 sm:pb-36 lg:p-8 lg:pb-10">
       <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:linear-gradient(to_right,rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.12)_1px,transparent_1px)] [background-size:32px_32px] dark:opacity-20" />
-      <div className="absolute left-5 top-5 hidden rounded-full border border-white/60 bg-white/70 px-3 py-1 text-[11px] font-medium text-slate-500 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-slate-400 xl:block">
+      <div className="absolute left-4 top-4 hidden rounded-full border border-white/60 bg-white/70 px-3 py-1 text-[11px] font-medium text-slate-500 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-slate-400 lg:block xl:left-5 xl:top-5">
         Studio Preview
       </div>
 

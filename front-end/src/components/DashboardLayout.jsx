@@ -360,6 +360,9 @@ const DashboardLayout = () => {
       if (languageRef.current && !languageRef.current.contains(event.target)) {
         setShowLanguages(false);
       }
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -482,7 +485,7 @@ const DashboardLayout = () => {
 
   const handleSearchNavigation = (item) => {
     if (!item?.path) return;
-    setSearchQuery(item.title);
+    setSearchQuery("");
     setShowSearchResults(false);
     navigate(item.path);
   };
@@ -578,19 +581,42 @@ const DashboardLayout = () => {
                   <Search className="h-4 w-4 text-slate-400 group-focus-within:text-[#1a3884] transition-colors" />
                 </div>
                 <input
+                  ref={searchInputRef}
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSearchResults(true);
+                  }}
+                  onFocus={() => setShowSearchResults(true)}
+                  onKeyDown={handleSearchKeyDown}
                   placeholder={t('dashboard.search_placeholder')}
-                  className="block w-full pl-11 pr-14 py-2.5 bg-[#F1F5F9] dark:bg-slate-800/40 border border-transparent focus:border-[#1a3884]/30 rounded-full text-sm placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/5 transition-all shadow-inner"
+                  className="block w-full pl-11 pr-14 py-2.5 bg-[#F1F5F9] dark:bg-slate-800/40 border border-transparent focus:border-[#1a3884]/30 rounded-full text-sm placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/5 transition-all shadow-inner dark:text-white"
                   aria-label="Search dashboard content"
                   aria-expanded={showSearchResults}
                   aria-controls="dashboard-search-results"
                   autoComplete="off"
+                  spellCheck={false}
                 />
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
                   <div className="flex items-center gap-1 px-1.5 py-1 text-[10px] font-bold text-slate-400 bg-white/80 dark:bg-slate-700/50 rounded-lg border border-slate-200/50 dark:border-slate-600/50 shadow-sm">
                     <Command className="w-2.5 h-2.5" />
                     <span>K</span>
                   </div>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                      setShowSearchResults(false);
+                      searchInputRef.current?.focus();
+                    }}
+                    className="absolute inset-y-0 right-10 flex items-center pr-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-700 text-[10px] font-bold">✕</span>
+                  </button>
+                )}
                 </div>
 
                 <AnimatePresence>
@@ -617,7 +643,7 @@ const DashboardLayout = () => {
                               onClick={() => handleSearchNavigation(item)}
                               className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors ${
                                 index === activeSearchIndex
-                                  ? "bg-[#1a3884]/8 dark:bg-blue-500/12"
+                                  ? "bg-blue-50 dark:bg-blue-900/20"
                                   : "hover:bg-slate-100 dark:hover:bg-slate-800/85"
                                }`}
                             >

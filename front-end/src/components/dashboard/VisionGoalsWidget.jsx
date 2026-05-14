@@ -27,9 +27,9 @@ const VisionGoalsWidget = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-64 bg-slate-100 dark:bg-slate-800/50 rounded-3xl animate-pulse flex flex-col items-center justify-center border border-slate-200 dark:border-slate-700/50">
-        <Loader2 className="w-10 h-10 text-[#1a3884] dark:text-blue-400 animate-spin mb-4" />
-        <p className="text-slate-400 font-medium">Loading your vision...</p>
+      <div className="w-full h-64 bg-slate-50 dark:bg-slate-900/40 rounded-[32px] animate-pulse flex flex-col items-center justify-center border border-slate-100 dark:border-slate-800">
+        <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+        <p className="text-slate-400 font-bold tracking-wide uppercase text-xs">Syncing your vision...</p>
       </div>
     );
   }
@@ -39,9 +39,9 @@ const VisionGoalsWidget = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#1a3884] via-[#002147] to-[#00152E] shadow-2xl p-8 md:p-12 border border-white/10 group"
+        className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-navy via-navy-light to-[#00152E] shadow-2xl p-8 md:p-14 border border-white/5 group"
       >
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 mix-blend-overlay"></div>
         
         {/* Animated Glow Effects */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4 group-hover:bg-blue-400/30 transition-colors duration-700"></div>
@@ -49,24 +49,24 @@ const VisionGoalsWidget = () => {
 
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex-1 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6">
-              <Sparkles className="w-4 h-4 text-amber-300" />
-              <span className="text-amber-300 font-bold uppercase tracking-widest text-xs">Set Your Intentions</span>
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 mb-8">
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <span className="text-amber-400 font-black uppercase tracking-[0.2em] text-[10px]">Set Your Intentions</span>
             </div>
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 leading-tight">
-              What is your <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">grand vision?</span>
+            <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-4 leading-tight tracking-tight">
+              What is your <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 animate-pulse">grand vision?</span>
             </h3>
-            <p className="text-slate-300/90 max-w-xl text-lg font-medium leading-relaxed mx-auto md:mx-0">
+            <p className="text-slate-300/90 max-w-xl text-sm md:text-base font-medium leading-relaxed mx-auto md:mx-0">
               Create your Vision Board Pro to manifest your goals and keep them front and center every day.
             </p>
           </div>
           <button 
             onClick={() => navigate('/vision-board-pro/gallery')}
-            className="group/btn relative overflow-hidden px-8 py-4 bg-white text-[#002147] font-bold rounded-full shadow-[0_0_40px_rgba(255,255,255,0.2)] transition-all hover:scale-105 hover:shadow-[0_0_60px_rgba(255,255,255,0.4)] flex items-center gap-3 shrink-0"
+            className="group/btn relative overflow-hidden px-10 py-5 bg-white text-navy font-black rounded-2xl shadow-2xl transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-4 shrink-0"
           >
-            <span className="relative z-10">Create Vision Board</span>
-            <ArrowRight className="w-5 h-5 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
-            <div className="absolute inset-0 bg-gradient-to-r from-white to-slate-100 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+            <span className="relative z-10 uppercase tracking-widest text-xs">Create Vision Board</span>
+            <ArrowRight className="w-5 h-5 relative z-10 group-hover/btn:translate-x-1.5 transition-transform" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white to-slate-50 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
           </button>
         </div>
       </motion.div>
@@ -94,7 +94,7 @@ const VisionGoalsWidget = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-white to-slate-50 dark:from-[#0f172a] dark:to-[#020617] shadow-xl border border-slate-200 dark:border-slate-800 p-8 md:p-10"
+      className="relative overflow-hidden rounded-[32px] bg-white dark:bg-[#0f172a] shadow-2xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-800 p-8 md:p-12"
     >
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-blue-100/50 to-transparent dark:from-blue-900/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
@@ -103,27 +103,27 @@ const VisionGoalsWidget = () => {
       <div className="relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1a3884]/10 dark:bg-blue-500/10 border border-[#1a3884]/20 dark:border-blue-500/20 mb-4">
-              <Star className="w-4 h-4 text-[#1a3884] dark:text-blue-400 fill-[#1a3884] dark:fill-blue-400" />
-              <span className="text-[#1a3884] dark:text-blue-400 font-bold uppercase tracking-widest text-[11px]">Active Vision</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 dark:bg-blue-500/10 border border-primary/10 dark:border-blue-500/20 mb-6">
+              <Star className="w-3.5 h-3.5 text-primary dark:text-blue-400 fill-primary dark:fill-blue-400" />
+              <span className="text-primary dark:text-blue-400 font-black uppercase tracking-[0.2em] text-[10px]">Active Vision</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-3 leading-tight">
               {visionData.title}
             </h2>
-            <p className="text-slate-500 dark:text-slate-400 font-medium">Keep your eyes on the prize. Here's what you're working towards.</p>
+            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm md:text-base">Keep your eyes on the prize. Here's what you're working towards.</p>
           </div>
-          <div className="flex gap-3 flex-wrap justify-end">
+          <div className="flex gap-4 flex-wrap justify-end">
             <button 
               onClick={handleEdit}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-blue-600/10 dark:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30 rounded-full text-sm font-bold text-blue-700 dark:text-blue-400 hover:bg-blue-600/20 dark:hover:bg-blue-500/30 transition-all shadow-sm"
+              className="group flex items-center gap-2.5 px-6 py-3 bg-primary/10 dark:bg-blue-500/10 border border-primary/20 dark:border-blue-500/20 rounded-2xl text-xs font-black uppercase tracking-widest text-primary dark:text-blue-400 hover:bg-primary/20 dark:hover:bg-blue-500/20 transition-all active:scale-95 shadow-sm"
             >
-              Edit Goals
+              Edit My Vision
             </button>
             <button 
               onClick={() => navigate('/vision-board-pro/gallery')}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all shadow-sm hover:shadow-md"
+              className="group flex items-center gap-2.5 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all active:scale-95 shadow-sm hover:shadow-lg"
             >
-              Open Gallery <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              Gallery <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
             </button>
           </div>
         </div>
@@ -170,13 +170,13 @@ const VisionGoalsWidget = () => {
           <div className="group relative overflow-hidden bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] transition-shadow">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-500 opacity-80"></div>
             
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center shadow-inner">
-                <Target className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-center gap-5 mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner ring-1 ring-primary/10">
+                <Target className="w-7 h-7 text-primary" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Short Term</h3>
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">1-6 Months</p>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Short Term</h3>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Focus: 1-6 Months</p>
               </div>
             </div>
 
@@ -208,13 +208,13 @@ const VisionGoalsWidget = () => {
           <div className="group relative overflow-hidden bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-slate-200/60 dark:border-slate-700/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] transition-shadow">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-80"></div>
             
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shadow-inner">
-                <Flag className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+            <div className="flex items-center gap-5 mb-8">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center shadow-inner ring-1 ring-emerald-500/10">
+                <Flag className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Long Term</h3>
-                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">1-5 Years</p>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Long Term</h3>
+                <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Legacy: 1-5 Years</p>
               </div>
             </div>
 

@@ -176,7 +176,7 @@ const EditorDrawer = ({
       <div className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50/95 px-5 py-4 backdrop-blur dark:border-slate-800 dark:bg-[#0d1626]/95">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-300">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-blue-400/20 dark:text-blue-300">
               <HeaderIcon className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
@@ -201,7 +201,7 @@ const EditorDrawer = ({
       <div className="custom-scrollbar flex-1 overflow-y-auto px-4 pb-8 pt-4 sm:px-5 lg:pb-28">
         {activePanel === "templates" && (
           <div className="space-y-4">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
               Template Library
             </p>
             <TemplateSelector
@@ -271,7 +271,7 @@ const EditorDrawer = ({
         {activePanel === "settings" && (
           <div className="space-y-6">
             <div>
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
                 Aspect Ratio
               </h3>
               <div className="grid grid-cols-2 gap-2">
@@ -282,8 +282,8 @@ const EditorDrawer = ({
                     onClick={() => setAspectRatio(key)}
                     className={`rounded-2xl border px-3 py-3 text-left text-xs transition-all ${
                       aspectRatio === key
-                        ? "border-[#1a3884] bg-[#1a3884]/8 text-[#1a3884] dark:bg-[#1a3884]/15 dark:text-blue-300"
-                        : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:bg-slate-900 dark:hover:text-white"
+                        ? "border-[#1a3884] bg-[#1a3884]/10 text-[#1a3884] dark:border-blue-400 dark:bg-blue-400/20 dark:text-blue-300"
+                        : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
                     }`}
                   >
                     <div className="mb-0.5 font-semibold">{key}</div>
@@ -310,7 +310,7 @@ const EditorDrawer = ({
               goals={shortTermGoals}
               setGoals={setShortTermGoals}
               placeholder="Enter short-term goal..."
-              accentClass="bg-[#1a3884]/6 text-[#1a3884] hover:bg-[#1a3884]/10 dark:bg-blue-400/10 dark:text-blue-300"
+              accentClass="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-blue-400/10 dark:text-blue-300"
             />
 
             <GoalList
