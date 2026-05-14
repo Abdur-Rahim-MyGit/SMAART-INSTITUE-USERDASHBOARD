@@ -44,8 +44,8 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
         "border-t border-slate-200 bg-white",
         "lg:border-r lg:border-t-0 lg:border-slate-200",
         // dark mode colours — fill with global navy
-        "dark:border-[#1a3884]/40 dark:bg-[#002147]",
-        "lg:dark:border-[#1a3884]/40 lg:dark:bg-[#002147]",
+        "dark:border-[#1a3884]/40 dark:bg-[#0d1626]",
+        "lg:dark:border-[#1a3884]/40 lg:dark:bg-[#0d1626]",
       ].join(" ")}
     >
       {tabs.map((tab) => {

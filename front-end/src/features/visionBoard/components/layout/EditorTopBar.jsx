@@ -37,7 +37,7 @@ const EditorTopBar = ({
       : "Ready";
 
   return (
-    <div className="flex h-16 items-center justify-between gap-2 border-b border-slate-200 bg-white/95 px-2 text-slate-900 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-[#081120]/95 dark:text-white sm:px-3">
+    <div className="flex h-16 items-center justify-between gap-2 border-b border-slate-200/50 bg-white/70 px-2 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md dark:border-slate-800/50 dark:bg-[#0d1626]/70 dark:text-white sm:px-3">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <Link
           to="/vision-board-pro/gallery"
