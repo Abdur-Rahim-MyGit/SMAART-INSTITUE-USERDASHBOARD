@@ -116,7 +116,7 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
         {/* Header */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2 text-sm font-bold text-[#0891b2] dark:text-[#1a3884] uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-sm font-bold text-[#0891b2] dark:text-blue-300 uppercase tracking-wider">
               <Award size={18} />
               <span>Vocational Competence Assessment</span>
             </div>
@@ -161,7 +161,7 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
               onClick={() => setSelectedScenario(scenario.id)}
               className={`px-4 py-2 rounded-lg font-bold text-sm transition-all flex items-center gap-2 ${
                 selectedScenario === scenario.id
-                  ? 'bg-white dark:bg-slate-700 text-[#0891b2] dark:text-[#1a3884] shadow-sm'
+                  ? 'bg-white dark:bg-slate-700 text-[#0891b2] dark:text-blue-300 shadow-sm'
                   : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
@@ -184,7 +184,7 @@ const SubmissionTask = ({ content, onComplete, isCompleted, initialResult }) => 
               {/* Scenario Description */}
               <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border-l-4 border-l-[#0891b2] dark:border-l-[#1a3884]">
                 <h3 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                  <FileText className="text-[#0891b2] dark:text-[#1a3884]" size={20} />
+                  <FileText className="text-[#0891b2] dark:text-blue-300" size={20} />
                   Operational Scenario
                 </h3>
                 <p className="text-slate-700 dark:text-slate-300 leading-relaxed italic">

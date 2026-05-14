@@ -102,7 +102,7 @@ const StudentGroups = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0F4F8] dark:bg-[#0B1120] font-sans pb-20 transition-all duration-300 relative overflow-hidden">
+    <div className="min-h-screen bg-[#F0F4F8] dark:bg-dark-bg font-sans pb-20 transition-all duration-300 relative overflow-hidden">
       {/* Background Blobs */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 mix-blend-multiply opacity-70 animate-blob" />

@@ -177,7 +177,7 @@ const MyNotes = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
             <main className="w-full relative py-8 px-4 md:px-6">
                 <div className="max-w-7xl mx-auto pb-12">
 

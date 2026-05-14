@@ -28,9 +28,8 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
             exit={{ opacity: 0, scale: 0.96, y: 20 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-2xl z-10 overflow-hidden rounded-[2rem] bg-white shadow-2xl"
+            className="relative w-full max-w-2xl z-10 overflow-hidden rounded-[2rem] bg-white dark:bg-dark-card shadow-2xl dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-black/5 dark:border-white/10"
             style={{ 
-              border: "1px solid rgba(0, 0, 0, 0.06)",
               boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.03)"
             }}
           >
@@ -38,7 +37,7 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
             <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80 z-20" />
 
             {/* ── Header ── */}
-            <div className="relative bg-[#f8fafc] px-8 pt-10 pb-8 flex flex-col items-center border-b border-gray-100 overflow-hidden">
+            <div className="relative bg-[#f8fafc] dark:bg-dark-bg/50 px-8 pt-10 pb-8 flex flex-col items-center border-b border-gray-100 dark:border-white/5 overflow-hidden">
               {/* Subtle background decoration */}
               <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
                    style={{ backgroundImage: 'radial-gradient(#1a3884 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
@@ -48,14 +47,14 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white shadow-sm border border-gray-200 text-gray-500 hover:bg-[#1a3884] hover:text-white hover:border-[#1a3884] transition-all duration-300 group z-20"
+                className="absolute top-6 right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-dark-elevated shadow-sm border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:bg-[#1a3884] dark:hover:bg-blue-600 hover:text-white hover:border-[#1a3884] dark:hover:border-blue-600 transition-all duration-300 group z-20"
                 aria-label="Close modal"
               >
                 <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
               </button>
 
               {/* Icon badge */}
-              <div className="relative z-10 w-20 h-20 flex items-center justify-center mb-5 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden group-hover:scale-105 transition-transform duration-500"
+              <div className="relative z-10 w-20 h-20 flex items-center justify-center mb-5 bg-white dark:bg-dark-elevated rounded-2xl shadow-lg border border-gray-100 dark:border-white/10 overflow-hidden group-hover:scale-105 transition-transform duration-500"
                    style={{ boxShadow: "0 12px 30px rgba(26,56,132,0.12)" }}>
                 <AnimatePresence mode="wait">
                   {previewInstitution?.logo ? (
@@ -82,18 +81,18 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
               </div>
 
               <h2
-                className="relative z-10 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] text-center"
+                className="relative z-10 text-2xl sm:text-3xl font-extrabold tracking-tight text-[#112b6b] dark:text-white text-center"
                 style={{ letterSpacing: "-0.02em" }}
               >
                 Select Your Institution
               </h2>
-              <p className="relative z-10 text-gray-500 text-[12px] sm:text-[13px] font-medium mt-1.5 text-center max-w-[280px] leading-relaxed">
+              <p className="relative z-10 text-gray-500 dark:text-gray-400 text-[12px] sm:text-[13px] font-medium mt-1.5 text-center max-w-[280px] leading-relaxed">
                 Find your college to access your personalized learning and career dashboard.
               </p>
             </div>
 
             {/* ── Body ── */}
-            <div className="px-6 py-8 sm:px-10 sm:py-10 bg-white">
+            <div className="px-6 py-8 sm:px-10 sm:py-10 bg-white dark:bg-dark-card">
               <InstitutionSelector 
                 onSelect={onInstitutionSelected} 
                 onPreviewChange={setPreviewInstitution}

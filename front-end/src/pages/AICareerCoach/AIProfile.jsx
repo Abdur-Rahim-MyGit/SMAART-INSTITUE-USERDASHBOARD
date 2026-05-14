@@ -119,14 +119,14 @@ const AIProfile = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] flex items-center justify-center">
+            <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
             <main className="w-full relative py-8 px-4 md:px-0">
                     <div className="max-w-4xl mx-auto pb-12">
 

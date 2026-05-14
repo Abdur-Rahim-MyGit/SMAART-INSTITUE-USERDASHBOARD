@@ -82,7 +82,7 @@ const NotificationBell = () => {
       {/* Notification Bell */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 ${
+        className={`relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#001A36] transition-all duration-200 ${
           isLoading ? 'opacity-50 pointer-events-none' : ''
         }`}
         title={`Notifications (${unreadCount} unread) - ${wsStatus}`}
@@ -110,9 +110,9 @@ const NotificationBell = () => {
 
       {/* Notification Dropdown */}
       {isOpen && (
-        <div className="notification-dropdown absolute right-0 top-12 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+        <div className="notification-dropdown absolute right-0 top-12 w-80 bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 rounded-lg shadow-lg z-50">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-white/10">
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <span className="font-semibold text-gray-900 dark:text-white">Notifications</span>
@@ -123,9 +123,9 @@ const NotificationBell = () => {
               </span>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                className="p-1 hover:bg-gray-100 dark:hover:bg-[#001A36] rounded"
               >
-                <X className="w-3 h-3 text-gray-500" />
+                <X className="w-3 h-3 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
           </div>
@@ -143,7 +143,7 @@ const NotificationBell = () => {
                   key={notification._id}
                   type="button"
                   onClick={() => handleNotificationClick(notification)}
-                  className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 transition-colors"
+                  className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-[#001A36] border-b border-gray-100 dark:border-white/5 transition-colors group"
                 >
                   <div className="flex items-start gap-3">
                     {/* Icon */}
@@ -161,7 +161,7 @@ const NotificationBell = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                          <p className="font-semibold text-gray-900 dark:text-white group-hover:dark:text-blue-300 text-sm transition-colors">
                             {notification.title}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">
@@ -188,13 +188,13 @@ const NotificationBell = () => {
           </div>
 
           {/* Footer */}
-          <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-3 border-t border-gray-200 dark:border-white/10">
             <button
               onClick={() => {
                 navigate('/notifications');
                 setIsOpen(false);
               }}
-              className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium py-2"
+              className="w-full text-center text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium py-2 transition-colors"
             >
               View all notifications
             </button>

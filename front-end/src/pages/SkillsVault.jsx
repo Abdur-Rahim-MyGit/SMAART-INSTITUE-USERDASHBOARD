@@ -109,14 +109,14 @@ const SkillsVault = () => {
 
     if (userLoading) {
         return (
-            <div className="min-h-screen bg-[#f8fafc] dark:bg-[#000b18] flex items-center justify-center">
+            <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg flex items-center justify-center">
                 <div className="w-12 h-12 border-4 border-slate-200 border-t-[#1a3884] rounded-full animate-spin shadow-lg" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#000b18] transition-colors duration-500 relative overflow-hidden">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg transition-colors duration-500 relative overflow-hidden">
             {/* Background Decorative Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />

@@ -19,7 +19,7 @@ const PassportPreview = () => {
   }
 
   return (
-    <section className="py-16 sm:py-24 bg-white dark:bg-[#002147] transition-colors duration-300 relative overflow-hidden">
+    <section className="py-16 sm:py-24 bg-white dark:bg-dark-card transition-colors duration-300 relative overflow-hidden">
       {/* Background Orbs */}
       <div className="absolute top-1/4 -left-20 w-96 h-96 bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-[#C0C0C0]/5 dark:bg-[#C0C0C0]/10 rounded-full blur-[100px] pointer-events-none" />
@@ -52,7 +52,7 @@ const PassportPreview = () => {
                 {/* Header */}
                 <div className="p-5 flex items-center justify-between bg-gray-50/50 dark:bg-white/5 border-b border-gray-100 dark:border-white/10 relative z-10">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white dark:bg-[#002147] rounded-xl flex items-center justify-center p-1.5 border border-gray-100 dark:border-white/10 shadow-lg">
+                    <div className="w-12 h-12 bg-white dark:bg-dark-card rounded-xl flex items-center justify-center p-1.5 border border-gray-100 dark:border-white/10 shadow-lg">
                       <div className="w-full h-full bg-gradient-to-br from-[#1a3884] to-[#132c6b] rounded-lg flex items-center justify-center">
                         <img src={whiteLogo} alt="Logo" className="w-8 h-8 object-contain" />
                       </div>

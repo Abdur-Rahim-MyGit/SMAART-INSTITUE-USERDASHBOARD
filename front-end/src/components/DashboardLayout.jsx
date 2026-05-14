@@ -90,7 +90,6 @@ const pageTitles = {
   '/dashboard/performance': 'Performance',
   '/dashboard/certificate': 'Certificates',
   '/certificate': 'Certificates',
-  '/dashboard/skills-vault': 'Skills Vault',
   '/skills-vault': 'Skills Vault',
   '/dashboard/add-details': 'Add Details',
   '/add-details': 'Add Details',
@@ -515,7 +514,7 @@ const DashboardLayout = () => {
   const pageTitle = getPageTitle();
 
   return (
-    <div className={`min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] transition-colors duration-300`}>
+    <div className={`min-h-screen bg-[#F8FAFC] dark:bg-dark-card transition-colors duration-300`}>
       {/* Session Expiry Warning Modal */}
       <SessionExpiryWarning
         isVisible={showWarning}
@@ -565,8 +564,8 @@ const DashboardLayout = () => {
                     key={pageTitle}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight"
-                    style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em' }}
+                    className="text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight font-sans transition-colors duration-300"
+                    style={{ letterSpacing: '-0.02em' }}
                   >
                     {pageTitle}
                   </motion.h1>

@@ -39,6 +39,13 @@
 
     --radius: 0.5rem;
 
+    /* ─── SMAART Brand Dark Tokens (for direct use with dark: prefix) ── */
+    --smaart-page-bg: #00152E;      /* darkest — page background     */
+    --smaart-card-bg: #002147;      /* mid — card & panel background  */
+    --smaart-elevated-bg: #002A5C;  /* lighter — inputs, hover items  */
+    --smaart-border: rgba(255,255,255,0.08);
+    --smaart-border-hover: rgba(255,255,255,0.18);
+
     /* LMS Professional Theme */
     --lms-bg: 184 65% 96%;
     /* #EAF6F6 */
@@ -53,6 +60,8 @@
     --lms-accent: 223 67% 31%;
     /* #1a3884 */
   }
+
+
 }
 
 @layer components {
@@ -251,6 +260,76 @@
 
   .hover-lift {
     @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  /* ─── SMAART Global Design System Utilities ─────────────────────────── */
+
+  /* Page background — use on root layout wrappers */
+  .page-bg {
+    @apply bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300;
+  }
+
+  /* Standard card — white in light, navy in dark */
+  .dark-card {
+    @apply bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 rounded-2xl transition-colors duration-200;
+  }
+
+  /* Card with hover lift + border highlight */
+  .hover-card {
+    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+    @apply hover:border-blue-200 dark:hover:border-blue-800/60;
+  }
+
+  /* Primary action button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl;
+    @apply bg-[#1a3884] hover:bg-[#112558] active:scale-95;
+    @apply text-white font-semibold text-sm;
+    @apply transition-all duration-200 shadow-sm hover:shadow-md;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+  }
+
+  /* Secondary outlined button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl;
+    @apply border border-[#1a3884] text-[#1a3884] dark:border-blue-400 dark:text-blue-400;
+    @apply hover:bg-[#1a3884]/10 dark:hover:bg-blue-400/10 active:scale-95;
+    @apply font-semibold text-sm transition-all duration-200;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Ghost button — no border, subtle hover */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl;
+    @apply text-slate-600 dark:text-slate-400;
+    @apply hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white;
+    @apply font-medium text-sm transition-all duration-200 active:scale-95;
+  }
+
+  /* Standard form input — consistent across light and dark */
+  .form-input {
+    @apply w-full px-4 py-3 rounded-xl text-sm;
+    @apply bg-gray-50 dark:bg-[#002A5C];
+    @apply border border-gray-200 dark:border-white/10;
+    @apply text-gray-900 dark:text-white;
+    @apply placeholder-gray-400 dark:placeholder-gray-500;
+    @apply focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400;
+    @apply focus:ring-2 focus:ring-[#1a3884]/20 dark:focus:ring-blue-400/20;
+    @apply transition-colors duration-200;
+  }
+
+  /* Disabled / read-only input variant */
+  .form-input-disabled {
+    @apply form-input opacity-60 cursor-not-allowed;
+    @apply bg-gray-100 dark:bg-[#001A36];
+  }
+
+  /* Settings/panel card interior section */
+  .settings-section {
+    @apply p-4 rounded-xl;
+    @apply bg-gray-50 dark:bg-[#002A5C]/60;
+    @apply border border-gray-200 dark:border-white/10;
+    @apply transition-colors duration-200;
   }
 
   .scrollbar-hide {

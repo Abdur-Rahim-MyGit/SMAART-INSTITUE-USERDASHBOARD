@@ -76,7 +76,7 @@ const SupportTicketsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#001229] transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg transition-colors duration-300">
       <div className="pt-4">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
@@ -153,7 +153,7 @@ const SupportTicketsPage = () => {
 
                 {/* Chat Conversation Preview */}
                 {conversationData?.messages && (
-                  <div className="mb-6 p-4 rounded-xl bg-[#1a3884]/5 dark:bg-[#1a3884]/10 border border-[#1a3884]/20 dark:border-[#1a3884]/30 shadow-sm">
+                  <div className="mb-6 p-4 rounded-xl bg-[#1a3884]/5 dark:bg-[#1a3884]/10 border border-[#1a3884]/20 dark:border-white/10 shadow-sm">
                     <div className="flex items-center gap-2 mb-2">
                       <MessageSquare className="w-4 h-4 text-[#1a3884]" />
                       <span className="text-sm font-semibold text-[#1a3884]">
@@ -166,7 +166,7 @@ const SupportTicketsPage = () => {
                   </div>
                 )}
 
-                <div className="bg-white dark:bg-[#002147]/50 rounded-2xl border border-slate-200 dark:border-[#1a3884]/30 p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-none">
+                <div className="bg-white dark:bg-dark-card/50 rounded-2xl border border-slate-200 dark:border-white/10 p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-none">
                   <TicketForm
                     onSuccess={handleSuccess}
                     onCancel={() => navigate(-1)}
@@ -225,7 +225,7 @@ const SupportTicketsPage = () => {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 shadow-sm dark:shadow-none">
+                      <div className="p-4 rounded-xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
                         <div className="flex flex-wrap gap-2">
                           <span className="text-sm text-gray-400 mr-2">Status:</span>
                           {['', 'open', 'in-progress', 'resolved', 'closed'].map((status) => (
@@ -235,7 +235,7 @@ const SupportTicketsPage = () => {
                               className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                                 statusFilter === status
                                   ? "bg-[#1a3884] text-white"
-                                  : "bg-gray-100 dark:bg-[#001229] text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                  : "bg-gray-100 dark:bg-dark-card text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                               }`}
                             >
                               {status || 'All'}
