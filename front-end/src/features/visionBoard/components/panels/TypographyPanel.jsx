@@ -84,7 +84,7 @@ const TypographyPanel = ({
 
   return (
     <div className="space-y-4">
-      <div className={sectionClass}>
+      {/* <div className={sectionClass}>
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#7aa2ff]/15 dark:text-[#9cb9ff]">
             <Type className="h-5 w-5" />
@@ -105,7 +105,7 @@ const TypographyPanel = ({
           <Plus className="h-4 w-4" />
           Add Text Layer
         </button>
-      </div>
+      </div> */}
 
       <div className={sectionClass}>
         <div className="mb-3 flex items-center gap-2">
@@ -120,12 +120,12 @@ const TypographyPanel = ({
               key={preset.id}
               type="button"
               onClick={() => applyPreset(preset)}
-              className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-left transition hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
+              className="rounded-2xl border border-slate-200/80 bg-slate-50/50 px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
             >
-              <div className="text-sm font-semibold text-slate-900 dark:text-white">
+              <div className="text-sm font-bold text-slate-900 dark:text-white">
                 {preset.name}
               </div>
-              <div className="mt-1 text-[11px] text-slate-500 dark:text-white/45">
+              <div className="mt-1 text-[11px] font-medium text-slate-500 dark:text-white/45">
                 {preset.text}
               </div>
             </button>
@@ -146,7 +146,7 @@ const TypographyPanel = ({
             </div>
             <button
               onClick={() => onDeleteText(selectedTextId)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-red-200 text-red-600 transition hover:bg-red-50 dark:border-red-500/20 dark:text-red-300 dark:hover:bg-red-500/10"
+              className="flex h-9 w-9 items-center justify-center rounded-2xl border border-red-200 text-red-600 shadow-sm transition-all hover:bg-red-50 hover:shadow-md dark:border-red-500/20 dark:text-red-300 dark:hover:bg-red-500/10"
               title="Delete text"
             >
               <Trash2 className="h-4 w-4" />
@@ -160,7 +160,7 @@ const TypographyPanel = ({
                 value={selectedOverlay.text}
                 onChange={(e) => onUpdateText(selectedTextId, { text: e.target.value })}
                 rows={3}
-                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-[#1a3884]/40 focus:bg-white dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
+                className="w-full resize-none rounded-2xl border border-slate-200/80 bg-slate-50/50 px-3 py-3 text-sm font-medium text-slate-900 outline-none transition-all focus:border-[#1a3884]/40 focus:bg-white focus:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
                 placeholder="Enter your text"
               />
             </div>
@@ -276,7 +276,7 @@ const TypographyPanel = ({
 
             <div>
               <label className={labelClass}>Alignment</label>
-              <div className="flex rounded-xl border border-slate-200 bg-slate-50 p-1 dark:border-white/10 dark:bg-white/[0.04]">
+              <div className="flex rounded-2xl border border-slate-200 bg-slate-50/50 p-1 dark:border-white/10 dark:bg-white/[0.04]">
                 {[
                   { value: "left", icon: AlignLeft },
                   { value: "center", icon: AlignCenter },
@@ -288,11 +288,10 @@ const TypographyPanel = ({
                     <button
                       key={value}
                       onClick={() => onUpdateText(selectedTextId, { align: value })}
-                      className={`flex-1 rounded-lg p-2 transition ${
-                        active
-                          ? "bg-white text-[#1a3884] shadow-sm dark:bg-[#1a3884]/20 dark:text-[#9cb9ff]"
+                      className={`flex-1 rounded-xl p-2 transition-all duration-200 ${active
+                          ? "bg-white text-[#1a3884] shadow-md dark:bg-[#1a3884]/20 dark:text-[#9cb9ff]"
                           : "text-slate-500 hover:text-slate-900 dark:text-white/45 dark:hover:text-white"
-                      }`}
+                        }`}
                     >
                       <Icon className="mx-auto h-4 w-4" />
                     </button>
@@ -311,11 +310,10 @@ const TypographyPanel = ({
                     <button
                       key={color}
                       onClick={() => onUpdateText(selectedTextId, { color })}
-                      className={`h-8 w-8 rounded-lg border transition ${
-                        active
+                      className={`h-8 w-8 rounded-lg border transition ${active
                           ? "scale-110 border-slate-900 ring-2 ring-slate-300 dark:border-white dark:ring-white/25"
                           : "border-slate-200 hover:scale-105 dark:border-white/10"
-                      }`}
+                        }`}
                       style={{ backgroundColor: color }}
                     />
                   );
@@ -342,11 +340,10 @@ const TypographyPanel = ({
                       key={option.id}
                       type="button"
                       onClick={() => onUpdateText(selectedTextId, { backgroundStyle: option.id })}
-                      className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${
-                        active
+                      className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${active
                           ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] text-[#1a3884] dark:text-[#9cb9ff]"
                           : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/55"
-                      }`}
+                        }`}
                     >
                       {option.label}
                     </button>
@@ -386,11 +383,10 @@ const TypographyPanel = ({
                     <button
                       key={effect.id}
                       onClick={() => onUpdateText(selectedTextId, { effect: effect.id })}
-                      className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${
-                        active
+                      className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${active
                           ? "border-[#1a3884]/60 bg-[#1a3884] text-white"
                           : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.04] dark:text-white/65 dark:hover:border-white/20"
-                      }`}
+                        }`}
                     >
                       {effect.name}
                     </button>
@@ -516,11 +512,10 @@ const TypographyPanel = ({
                 <div
                   key={id}
                   onClick={() => onSelectText(id)}
-                  className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition ${
-                    active
+                  className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition ${active
                       ? "border-[#1a3884]/60 bg-[#1a3884]/[0.07]"
                       : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
-                  }`}
+                    }`}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {

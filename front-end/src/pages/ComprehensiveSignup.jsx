@@ -485,7 +485,7 @@ const ComprehensiveSignup = () => {
 
   if (isSuccess) {
     return (
-      <div className="fixed inset-0 z-50 bg-white dark:bg-[#001229] flex items-center justify-center flex-col">
+      <div className="fixed inset-0 z-50 bg-white dark:bg-dark-bg flex items-center justify-center flex-col">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 10 }} className="w-24 h-24 bg-[#1a3884] rounded-full flex items-center justify-center shadow-2xl">
           <CheckCircle2 className="w-12 h-12 text-white" />
         </motion.div>
@@ -501,7 +501,7 @@ const ComprehensiveSignup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#001229] text-slate-900 font-sans selection:bg-[#1a3884]/20">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg text-slate-900 font-sans selection:bg-[#1a3884]/20">
       {/* Premium Registration Navbar */}
       <header className="bg-gradient-to-r from-[#001a3a] via-[#002147] to-[#001a3a] text-white sticky top-0 z-[100] shadow-lg border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">

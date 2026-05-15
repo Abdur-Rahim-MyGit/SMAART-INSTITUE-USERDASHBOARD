@@ -28,8 +28,8 @@ class ErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#001229] p-4">
-                    <div className="max-w-md w-full bg-white dark:bg-[#002147] rounded-2xl p-8 text-center shadow-xl border border-gray-200 dark:border-white/10">
+                <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg p-4">
+                    <div className="max-w-md w-full bg-white dark:bg-dark-card rounded-2xl p-8 text-center shadow-xl border border-gray-200 dark:border-white/10">
                         {/* Error Icon */}
                         <div className="w-20 h-20 bg-red-100 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                             <AlertTriangle className="w-10 h-10 text-red-500" />

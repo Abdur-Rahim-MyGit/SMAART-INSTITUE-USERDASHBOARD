@@ -20,7 +20,7 @@ const ServiceCard = ({ service, index }) => {
       transition={{ delay: index * 0.2, duration: 0.5 }}
       onMouseMove={handleMouseMove}
       className="group relative rounded-2xl p-8 overflow-hidden flex flex-col transition-all duration-300
-                 bg-white/80 dark:bg-[#002147]/30 backdrop-blur-md border border-gray-100 dark:border-white/5 
+                 bg-white/80 dark:bg-dark-card/30 backdrop-blur-md border border-gray-100 dark:border-white/5 
                  hover:border-[#C0C0C0]/50 dark:hover:border-[#C0C0C0]/50 hover:shadow-2xl hover:-translate-y-2
                  hover:bg-white dark:hover:bg-[#002147]/60"
     >

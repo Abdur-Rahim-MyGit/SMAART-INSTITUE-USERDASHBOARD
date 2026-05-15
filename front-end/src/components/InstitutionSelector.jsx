@@ -151,7 +151,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
         <div className="relative group z-20">
           <div className="relative flex items-center">
             <div className="absolute left-5 z-20 pointer-events-none">
-              <Search className={`h-5 w-5 transition-colors duration-300 ${open || searchTerm ? 'text-[#1a3884]' : 'text-slate-400'}`} />
+              <Search className={`h-5 w-5 transition-colors duration-300 ${open || searchTerm ? 'text-[#1a3884] dark:text-[#00a3e0]' : 'text-slate-400 dark:text-slate-500'}`} />
             </div>
 
             <Input
@@ -162,7 +162,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
               onKeyDown={handleKeyDown}
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 300)}
-              className="w-full h-11 sm:h-12 pl-11 pr-10 text-[13px] sm:text-sm bg-[#f8fafc] border border-slate-200 text-[#112b6b] placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-white focus-visible:border-[#1a3884] rounded-xl font-medium transition-all duration-300"
+              className="w-full h-11 sm:h-12 pl-11 pr-10 text-[13px] sm:text-sm bg-[#f8fafc] dark:bg-[#001c3d] border border-slate-200 dark:border-white/10 text-[#112b6b] dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:bg-white dark:focus-visible:bg-[#00152E] focus-visible:border-[#1a3884] dark:focus-visible:border-[#00a3e0] rounded-xl font-medium transition-all duration-300"
             />
 
             {loading && (
@@ -177,7 +177,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                 className="absolute right-4 text-slate-400 hover:text-slate-600 transition-colors"
                 title="Clear search"
               >
-                <div className="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100">
+                <div className="w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 dark:bg-white/10">
                   <span className="text-[10px]">&times;</span>
                 </div>
               </button>
@@ -194,11 +194,11 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                 animate={{ opacity: 1, height: 'auto', y: 0 }}
                 exit={{ opacity: 0, height: 0, y: -5 }}
                 transition={{ duration: 0.2 }}
-                className="mt-3 z-[100] bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden max-h-[320px] overflow-y-auto custom-scrollbar"
+                className="mt-3 z-[100] bg-white dark:bg-[#001c3d] border border-slate-200 dark:border-white/10 rounded-2xl shadow-xl overflow-hidden max-h-[320px] overflow-y-auto custom-scrollbar"
               >
                 {colleges.length > 0 ? (
                   <div className="p-2 sm:p-3">
-                    <p className="px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest border-b border-gray-100 mb-2">
+                    <p className="px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-white/10 mb-2">
                       Matching Institutions
                     </p>
                     <div className="space-y-1">
@@ -219,8 +219,8 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                             selectingId === college.collegeCode 
                               ? "bg-[#1a3884]/10 border-[#1a3884]/30 shadow-sm"
                               : index === focusedIndex
-                                ? "bg-[#1a3884]/5 border-[#1a3884]/20 shadow-sm"
-                                : "border-transparent hover:bg-gray-50 hover:border-gray-100"
+                                ? "bg-[#1a3884]/5 dark:bg-white/5 border-[#1a3884]/20 dark:border-white/10 shadow-sm"
+                                : "border-transparent hover:bg-gray-50 dark:hover:bg-white/5 hover:border-gray-100 dark:hover:border-white/10"
                           }`}
                         >
                           {/* Success background sweep animation */}
@@ -238,7 +238,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                               ? "bg-[#1a3884] text-white border-[#1a3884] scale-105 shadow-md"
                               : index === focusedIndex 
                                 ? "bg-[#1a3884] text-white border-[#1a3884]" 
-                                : "bg-white text-[#1a3884] border-[#1a3884]/10 group-hover:border-[#1a3884]/30"
+                                : "bg-white dark:bg-dark-bg text-[#1a3884] dark:text-[#00a3e0] border-[#1a3884]/10 dark:border-white/10 group-hover:border-[#1a3884]/30 dark:group-hover:border-white/20"
                           }`}>
                             {college.logo ? (
                               <motion.img 
@@ -260,13 +260,13 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                           </div>
                           <div className="flex-1 min-w-0 relative z-10">
                             <div className={`font-bold truncate transition-colors text-sm sm:text-base ${
-                              selectingId === college.collegeCode ? "text-[#112b6b]" : "text-[#112b6b] group-hover:text-[#1a3884]"
+                              selectingId === college.collegeCode ? "text-[#112b6b] dark:text-white" : "text-[#112b6b] dark:text-gray-200 group-hover:text-[#1a3884] dark:group-hover:text-white"
                             }`}>
                               {college.collegeName}
                             </div>
                             {college.address && (
                               <div className={`text-[10px] sm:text-[11px] mt-0.5 truncate flex items-center gap-1.5 font-medium transition-colors ${
-                                selectingId === college.collegeCode ? "text-[#112b6b]/70" : "text-gray-500"
+                                selectingId === college.collegeCode ? "text-[#112b6b]/70 dark:text-gray-300" : "text-gray-500 dark:text-gray-400"
                               }`}>
                                 <span className={`w-1.5 h-1.5 rounded-full transition-colors ${
                                   selectingId === college.collegeCode ? "bg-[#1a3884]" : "bg-[#00a3e0]/30 group-hover:bg-[#00a3e0]"

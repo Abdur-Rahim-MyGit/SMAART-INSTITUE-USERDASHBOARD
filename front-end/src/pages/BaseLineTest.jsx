@@ -20,7 +20,7 @@ const getBandColor = (level) => {
   // Uniform professional styling with Brand Colors
   const style = {
     bg: 'bg-[#1a3884]/5 dark:bg-[#1a3884]/10',
-    text: 'text-[#1a3884] dark:text-[#1a3884]',
+    text: 'text-[#1a3884] dark:text-blue-300',
     badge: 'bg-[#1a3884]/10 text-[#1a3884] border-[#1a3884]/20',
     bar: 'bg-[#1a3884]', // Brand Teal
     glow: 'shadow-sm inner-shadow'
@@ -592,7 +592,7 @@ const BaseLineTest = () => {
 
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#001229] flex items-center justify-center transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1a3884] mx-auto mb-4"></div>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">Loading {stageConfig.title}...</p>
@@ -601,8 +601,8 @@ const BaseLineTest = () => {
   );
 
   if (error) return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#001229] flex items-center justify-center p-4 transition-colors duration-300">
-      <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#0B1120] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex items-center justify-center p-4 transition-colors duration-300">
+      <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-dark-card rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
         <div className="text-red-500 text-5xl mb-4">⚠</div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Error</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
@@ -614,16 +614,16 @@ const BaseLineTest = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#001229] text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-white transition-colors duration-300">
       <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
         {!submitted ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8">
             {/* Main Question Area */}
-            <div className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-[#0B1120] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden relative">
+            <div className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-dark-card rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden relative">
               {/* Background gradient effect */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3884]/5 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-[#0B1120] relative z-10">
+              <div className="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-dark-elevated/30 relative z-10">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
                   <div className="text-right">
@@ -725,7 +725,7 @@ const BaseLineTest = () => {
               </div>
 
               {/* Footer Controls */}
-              <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-[#0B1120] flex justify-end items-center backdrop-blur-sm">
+              <div className="p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50/80 dark:bg-dark-elevated/20 flex justify-end items-center backdrop-blur-sm">
                 <button
                   onClick={() => submit()}
                   disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered}
@@ -755,7 +755,7 @@ const BaseLineTest = () => {
             </div>
 
             {/* Navigation Sidebar */}
-            <div className="lg:w-80 bg-white dark:bg-[#0B1120] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
+            <div className="lg:w-80 bg-white dark:bg-dark-card rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
               <div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                   <Target className="text-[#1a3884]" size={20} /> Question Map
@@ -1030,7 +1030,7 @@ const BaseLineTest = () => {
       {
         showExitWarning && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-[#0B1120] p-8 rounded-3xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-800">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-dark-card p-8 rounded-3xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-700">
               <div className="w-20 h-20 bg-amber-50 dark:bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <XCircle className="w-10 h-10 text-amber-500" />
               </div>

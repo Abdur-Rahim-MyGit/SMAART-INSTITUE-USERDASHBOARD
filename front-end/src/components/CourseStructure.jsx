@@ -66,13 +66,12 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
         onClick={onClick}
         disabled={!isUnlocked}
         onMouseMove={handleMouseMove}
-        className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden ${
+        className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden border border-black/5 dark:border-white/5 ${
           isUnlocked
-            ? "bg-white dark:bg-[#001835] hover:-translate-y-2"
-            : "bg-gray-50 dark:bg-[#001835]/40 cursor-not-allowed opacity-60"
+            ? "bg-white dark:bg-dark-card hover:-translate-y-2"
+            : "bg-gray-50 dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
         }`}
         style={{
-          border: "1px solid rgba(0, 0, 0, 0.05)",
           boxShadow: isUnlocked 
             ? "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)" 
             : "none"
@@ -111,8 +110,8 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
               
               <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${
                 isUnlocked
-                  ? "text-[#112b6b]"
-                  : "text-gray-400"
+                  ? "text-[#112b6b] dark:text-white"
+                  : "text-gray-400 dark:text-gray-500"
               }`} style={{ letterSpacing: "-0.02em" }}>
                 {stage.name}
               </h3>
@@ -187,13 +186,12 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
         onClick={onClick}
         disabled={!isUnlocked}
         onMouseMove={handleMouseMove}
-        className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden ${
+        className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden border border-black/5 dark:border-white/5 ${
           isUnlocked
-            ? "bg-white dark:bg-[#001835] hover:-translate-y-2"
-            : "bg-gray-50 dark:bg-[#001835]/40 cursor-not-allowed opacity-60"
+            ? "bg-white dark:bg-dark-card hover:-translate-y-2"
+            : "bg-gray-50 dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
         }`}
         style={{
-          border: "1px solid rgba(0, 0, 0, 0.05)",
           boxShadow: isUnlocked 
             ? "0 20px 40px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.03)" 
             : "none"
@@ -234,8 +232,8 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
               
               <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${
                 isUnlocked
-                  ? "text-[#112b6b]"
-                  : "text-gray-400"
+                  ? "text-[#112b6b] dark:text-white"
+                  : "text-gray-400 dark:text-gray-500"
               }`} style={{ letterSpacing: "-0.02em" }}>
                 {track.shortName}
               </h3>
@@ -287,19 +285,17 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
       onClick={onClick}
-      className={`relative rounded-2xl p-4 cursor-pointer transition-all duration-300 group overflow-hidden ${
+      className={`relative rounded-2xl p-4 cursor-pointer transition-all duration-300 group overflow-hidden border ${
         isCompleted
-          ? "bg-green-50/50"
+          ? "bg-green-50/50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30"
           : isCurrent
-          ? "bg-white shadow-lg"
+          ? "bg-white dark:bg-dark-card shadow-lg border-[#1a3884] dark:border-[#4c6ef5]"
           : isUnlocked
-          ? "bg-white hover:shadow-md hover:-translate-y-1"
-          : "bg-gray-50/50 cursor-not-allowed opacity-60"
+          ? "bg-white dark:bg-dark-card hover:shadow-md hover:-translate-y-1 border-black/5 dark:border-white/5"
+          : "bg-gray-50/50 dark:bg-dark-bg/50 cursor-not-allowed opacity-60 border-black/5 dark:border-white/5"
       }`}
       style={{
-        border: isCurrent 
-          ? "1.5px solid #1a3884" 
-          : "1px solid rgba(0, 0, 0, 0.05)",
+        borderWidth: isCurrent ? "1.5px" : "1px",
         boxShadow: isCurrent 
           ? "0 10px 25px rgba(26, 56, 132, 0.1)" 
           : isUnlocked && !isCompleted ? "0 4px 12px rgba(0,0,0,0.03)" : "none"
@@ -338,7 +334,7 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
           </span>
           
           <h4 className={`font-bold text-[15px] mb-1 leading-tight ${
-            isUnlocked ? "text-[#112b6b]" : "text-gray-400"
+            isUnlocked ? "text-[#112b6b] dark:text-white" : "text-gray-400 dark:text-gray-500"
           }`}>
             {course.title}
           </h4>
@@ -523,7 +519,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] transition-colors duration-500 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg transition-colors duration-500 relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
@@ -600,9 +596,9 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
             /* Category cards view */
             <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="space-y-12">
               <div>
-                <h2 className="text-xl font-bold text-[#112b6b] mb-6 px-1 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
                     Human Intelligence Courses
-                   <div className="h-px flex-1 bg-slate-100" />
+                   <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {STAGES.map((stage, i) => {
@@ -628,9 +624,9 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
               </div>
 
               <div>
-                <h2 className="text-xl font-bold text-[#112b6b] mb-6 px-1 flex items-center gap-3">
+                <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
                    Readiness Tracks
-                   <div className="h-px flex-1 bg-slate-100" />
+                   <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   {TRACKS.map((track, i) => {

@@ -989,7 +989,7 @@ const AddDetails = () => {
                             {currentStep < steps.length - 1 ? (
                                 <Button
                                     onClick={handleNextStep}
-                                    className="bg-[#1a3884] hover:bg-[#002147] text-white px-10 py-6 rounded-none font-bold font-sans text-lg transition-all group"
+                                    className="bg-[#1a3884] hover:bg-[#002147] text-white px-10 py-6 rounded-xl font-bold font-sans text-lg transition-all group"
                                 >
                                     Next Section
                                     <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -998,7 +998,7 @@ const AddDetails = () => {
                                 <Button
                                     onClick={handleSubmit}
                                     disabled={isLoading}
-                                    className="bg-[#C0C0C0] hover:bg-[#A8A8A8] text-white px-12 py-6 rounded-none font-bold font-sans text-lg shadow-xl shadow-[#C0C0C0]/20 disabled:opacity-70"
+                                    className="bg-[#C0C0C0] hover:bg-[#A8A8A8] text-white px-12 py-6 rounded-xl font-bold font-sans text-lg shadow-xl shadow-[#C0C0C0]/20 disabled:opacity-70"
                                 >
                                     {isLoading ? (
                                         <div className="flex items-center gap-3">

@@ -6,7 +6,7 @@ import { lazy, Suspense } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 
 // Lazy load pages for better performance
-const Landing = lazy(() => import('@/pages/Landing'));
+const Landing = lazy(() => import('@/pages/LandingPage'));
 const Institution = lazy(() => import('@/pages/Institution'));
 const NotFound = lazy(() => import('@/pages/NotFound'));
 const ComprehensiveSignup = lazy(() => import('@/pages/ComprehensiveSignup'));
@@ -32,7 +32,6 @@ const Community = lazy(() => import('@/pages/Community'));
 const StudentGroups = lazy(() => import('@/pages/StudentGroups'));
 const GroupChat = lazy(() => import('@/pages/GroupChat'));
 const Library = lazy(() => import('@/pages/Library'));
-const TestPage = lazy(() => import('@/pages/TestPage'));
 const SignupInitial = lazy(() => import('@/pages/SignupInitial'));
 const VerifyOTP = lazy(() => import('@/pages/VerifyOTP'));
 const SignupSuccess = lazy(() => import('@/pages/SignupSuccess'));
@@ -43,7 +42,6 @@ const Motivational = lazy(() => import('@/pages/Motivational'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Notifications = lazy(() => import('@/pages/Notifications'));
 const Help = lazy(() => import('@/pages/Help'));
-const AdminTickets = lazy(() => import('@/pages/AdminTickets'));
 const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
@@ -92,7 +90,6 @@ const AnimatedRoutes = () => {
                 <Routes location={location} key={location.pathname}>
                     {/* Public Routes */}
                     <Route path="/" element={<Landing />} />
-                    <Route path="/test" element={<TestPage />} />
                     <Route path="/institution/:id" element={<Institution />} />
                     <Route path="/login" element={<Institution />} />
                     <Route path="/verify-certificate" element={<VerifyCertificate />} />
@@ -184,7 +181,6 @@ const AnimatedRoutes = () => {
                         <Route path="/certificate" element={<Certificate />} />
                         <Route path="/dashboard/certificate" element={<Certificate />} />
                         <Route path="/dashboard/performance" element={<Performance />} />
-                        <Route path="/admin/tickets" element={<AdminTickets />} />
 
                         {/* AI Career Coach Routes */}
                         <Route path="/dashboard/profile-analysis" element={<ProfileAnalysis />} />

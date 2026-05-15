@@ -420,7 +420,7 @@ const VerifyBadge = () => {
     // Logged-in users get the dashboard layout
     if (isLoggedIn) {
         return (
-            <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+            <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
                 <DashboardSidebar />
                 <PageTransition>
                     <div className="min-h-screen pb-20 lg:pb-0">
@@ -433,7 +433,7 @@ const VerifyBadge = () => {
 
     // Guests get the public Navbar layout
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
             <Navbar showLinks={true} />
             {pageContent}
         </div>

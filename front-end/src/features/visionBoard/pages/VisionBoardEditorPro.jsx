@@ -85,54 +85,64 @@ const VisionBoardEditorPro = () => {
   const [selectedLayers, setSelectedLayers] = useState([]);
   const [snapEnabled, setSnapEnabled] = useState(true);
   const [guideState, setGuideState] = useState({ vertical: false, horizontal: false });
-  
+
   // New State for Canvas Layout
-  const [zoomLevel, setZoomLevel] = useState(45); 
-  const [activePanel, setActivePanel] = useState("templates"); // Default open panel
+  const [zoomLevel, setZoomLevel] = useState(50); 
+  const [activePanel, setActivePanel] = useState("templates"); 
+  const isFirstRender = useRef(true);
 
   // Auto-fit function
   const fitCanvas = () => {
     if (!canvasRef.current) return;
-    
+
     const containerWidth = window.innerWidth;
     const containerHeight = window.innerHeight;
     const isMobile = containerWidth < 1024;
-    
+
     // Leave enough breathing room for the tool chrome so the board reads like a preview surface.
-    const targetWidth = isMobile ? containerWidth - 64 : containerWidth - 600;
-    const targetHeight = isMobile ? containerHeight - 260 : containerHeight - 230;
+    // Dynamic width based on panel state: Sidebar (80px) + Drawer (380px)
+    const sidebarWidth = isMobile ? 0 : 80;
+    const drawerWidth = (isMobile || !activePanel) ? 0 : 380;
+    const uiWidth = sidebarWidth + drawerWidth;
     
+    const targetWidth = containerWidth - uiWidth - (isMobile ? 32 : 80); // Reduced margin
+    const targetHeight = containerHeight - (isMobile ? 220 : 160); // Reduced height margin (TopBar + BottomBar)
+
     const currentRatio = ASPECT_RATIOS[aspectRatio];
     if (!currentRatio) return;
 
     const scaleX = targetWidth / currentRatio.width;
     const scaleY = targetHeight / currentRatio.height;
-    
+
     const scale = Math.min(scaleX, scaleY);
-    
-    const maxZoom = isMobile ? 58 : 72;
-    const paddingBuffer = isMobile ? 16 : 18;
+
+    const maxZoom = isMobile ? 85 : 150;
+    const paddingBuffer = isMobile ? 5 : 2; // Much tighter fit
     const newZoom = Math.min(
       Math.max(Math.floor(scale * 100) - paddingBuffer, 10),
       maxZoom
     );
-    
+
     setZoomLevel(newZoom);
   };
 
   // Auto-fit on mount and when ratio changes
   useEffect(() => {
-    // Small delay to ensure DOM is ready
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     const timer = setTimeout(() => {
-        fitCanvas();
+      fitCanvas();
     }, 100);
-    
+
     window.addEventListener('resize', fitCanvas);
     return () => {
-        window.removeEventListener('resize', fitCanvas);
-        clearTimeout(timer);
+      window.removeEventListener('resize', fitCanvas);
+      clearTimeout(timer);
     };
-  }, [aspectRatio, templateId]); // Re-run when board shape changes
+  }, [aspectRatio, templateId, activePanel]); // Re-run when board shape or UI layout changes
 
   // Handle background image upload with NSFW detection
   const handleBackgroundUpload = async (e) => {
@@ -330,9 +340,9 @@ const VisionBoardEditorPro = () => {
     ? { id: selectedTextId, type: "text" }
     : selectedAssetId
       ? { id: selectedAssetId, type: "asset" }
-    : selectedSlot !== null
-      ? { id: selectedSlot, type: "image" }
-      : null;
+      : selectedSlot !== null
+        ? { id: selectedSlot, type: "image" }
+        : null;
 
   const selectedImage = selectedSlot !== null ? images[selectedSlot] : null;
   const selectedText = selectedTextId ? textOverlays[selectedTextId] : null;
@@ -581,31 +591,31 @@ const VisionBoardEditorPro = () => {
   const handleUserUpload = async (e) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            const imageData = event.target.result;
-            // Optional: Check NSFW
-            const nsfwResult = await checkBase64ImageNSFW(imageData);
-            if (!nsfwResult.isSafe) {
-                 toast({
-                    title: "Explicit Content",
-                    description: nsfwResult.reason || "Explicit content detected.",
-                    variant: "destructive",
-                });
-                return;
-            }
-            setUserUploads((prev) => [
-              {
-                id: `upload-${Date.now()}`,
-                name: file.name.replace(/\.[^.]+$/, ""),
-                src: imageData,
-                width: 180,
-                height: 180,
-              },
-              ...prev,
-            ]);
-        };
-        reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const imageData = event.target.result;
+        // Optional: Check NSFW
+        const nsfwResult = await checkBase64ImageNSFW(imageData);
+        if (!nsfwResult.isSafe) {
+          toast({
+            title: "Explicit Content",
+            description: nsfwResult.reason || "Explicit content detected.",
+            variant: "destructive",
+          });
+          return;
+        }
+        setUserUploads((prev) => [
+          {
+            id: `upload-${Date.now()}`,
+            name: file.name.replace(/\.[^.]+$/, ""),
+            src: imageData,
+            width: 180,
+            height: 180,
+          },
+          ...prev,
+        ]);
+      };
+      reader.readAsDataURL(file);
     }
     e.target.value = "";
   };
@@ -701,6 +711,17 @@ const VisionBoardEditorPro = () => {
     });
     syncPrimarySelection(
       selectedLayers.filter((entry) => !(entry.type === "text" && entry.id === textId))
+    );
+  };
+
+  const handleDeleteAsset = (assetId) => {
+    setAssetOverlays((prev) => {
+      const next = { ...prev };
+      delete next[assetId];
+      return next;
+    });
+    syncPrimarySelection(
+      selectedLayers.filter((entry) => !(entry.type === "asset" && entry.id === assetId))
     );
   };
 
@@ -1267,8 +1288,8 @@ const VisionBoardEditorPro = () => {
       // Check all text overlays synchronously first
       for (const overlay of Object.values(textOverlays)) {
         if (overlay.text && handleInstantCheck(overlay.text)) {
-            setIsSaving(false);
-            return;
+          setIsSaving(false);
+          return;
         }
       }
 
@@ -1290,9 +1311,9 @@ const VisionBoardEditorPro = () => {
       const descCheck = await moderateTextAsync(trimmedDescription);
       if (!descCheck.isClean) {
         toast({
-            title: "Inappropriate Content",
-            description: "Your vision board description contains inappropriate language. Please revise.",
-            variant: "destructive",
+          title: "Inappropriate Content",
+          description: "Your vision board description contains inappropriate language. Please revise.",
+          variant: "destructive",
         });
         setIsSaving(false);
         return;
@@ -1325,7 +1346,7 @@ const VisionBoardEditorPro = () => {
 
           // Clone the canvas node
           const clone = originalCanvas.cloneNode(true);
-          
+
           // Force exact pixel dimensions and reset transforms on the clone
           clone.style.transform = "none";
           clone.style.width = `${currentRatio.width}px`;
@@ -1338,7 +1359,7 @@ const VisionBoardEditorPro = () => {
           clone.style.margin = "0";
           // Ensure background is captured if set
           if (!backgroundColor || backgroundColor === 'transparent') {
-             clone.style.backgroundColor = '#ffffff'; 
+            clone.style.backgroundColor = '#ffffff';
           }
 
           document.body.appendChild(clone);
@@ -1384,13 +1405,13 @@ const VisionBoardEditorPro = () => {
           width: currentRatio.width,
           height: currentRatio.height,
           backgroundColor,
-          backgroundImage, 
+          backgroundImage,
           borderRadius,
           gap,
         },
-        collageImage: collageBase64, 
-        slotImages: images, 
-        textOverlays: textOverlays, 
+        collageImage: collageBase64,
+        slotImages: images,
+        textOverlays: textOverlays,
         assetOverlays,
         userUploads,
         shortTermGoals,
@@ -1414,7 +1435,7 @@ const VisionBoardEditorPro = () => {
       }
 
       localStorage.removeItem(getDraftKey());
-      
+
       // Redirect to gallery after saving
       navigate("/vision-board-pro/gallery");
     } catch (error) {
@@ -1441,14 +1462,14 @@ const VisionBoardEditorPro = () => {
   };
 
   const handleFitToScreen = () => {
-     fitCanvas();
+    fitCanvas();
   };
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-[#eef3f9] dark:bg-[#040814]">
-      
+
       {/* Top Bar */}
-      <EditorTopBar 
+      <EditorTopBar
         title={title}
         setTitle={setTitle}
         onSave={handleSave}
@@ -1464,114 +1485,117 @@ const VisionBoardEditorPro = () => {
 
       {/* Main Workspace */}
       <div className="relative flex flex-1 overflow-hidden">
-        
+
         {/* Left Icon Sidebar */}
-        <EditorSidebar 
-            activePanel={activePanel} 
-            setActivePanel={setActivePanel} 
+        <EditorSidebar
+          activePanel={activePanel}
+          setActivePanel={setActivePanel}
         />
 
         {/* Slide-out Drawer Panel */}
         {activePanel && (
-            <EditorDrawer 
-                activePanel={activePanel}
-                setActivePanel={setActivePanel}
-                // Props passed down to panels
-                templateId={templateId}
-                handleTemplateChange={handleTemplateChange}
-                textOverlays={textOverlays}
-                handleAddText={handleAddText}
-                handleUpdateText={handleUpdateText}
-                handleDeleteText={handleDeleteText}
-                selectedTextId={selectedTextId}
-                handleSelectText={handleSelectText}
-                backgroundColor={backgroundColor}
-                setBackgroundColor={setBackgroundColor}
-                borderRadius={borderRadius}
-                setBorderRadius={setBorderRadius}
-                gap={gap}
-                setGap={setGap}
-                backgroundImage={backgroundImage}
-                setBackgroundImage={setBackgroundImage}
-                handleBackgroundUpload={handleBackgroundUpload}
-                layers={layers}
-                selectedLayer={selectedLayer}
-                selectedLayers={selectedLayers}
-                handleSelectLayer={handleSelectLayer}
-                handleRenameLayer={handleRenameLayer}
-                handleToggleLayerVisibility={handleToggleLayerVisibility}
-                handleToggleLayerLock={handleToggleLayerLock}
-                handleMoveLayerForward={handleMoveLayerForward}
-                handleMoveLayerBackward={handleMoveLayerBackward}
-                snapEnabled={snapEnabled}
-                setSnapEnabled={setSnapEnabled}
-                handleApplyAlignment={handleApplyAlignment}
-                selectedImage={selectedImage}
-                handleUpdateSelectedImage={handleUpdateSelectedImage}
-                handleDuplicateImage={handleDuplicateImage}
-                handleDuplicateAsset={handleDuplicateAsset}
-                handleResetSelectedImage={handleResetSelectedImage}
-                userUploads={userUploads}
-                handleUserUpload={handleUserUpload}
-                handleAddAssetToCanvas={handleAddAssetToCanvas}
-                handleAddUploadToCanvas={handleAddUploadToCanvas}
-                selectedText={selectedText}
-                aspectRatio={aspectRatio}
-                setAspectRatio={setAspectRatio}
-                currentRatio={currentRatio}
-                shortTermGoals={shortTermGoals}
-                setShortTermGoals={setShortTermGoals}
-                longTermGoals={longTermGoals}
-                setLongTermGoals={setLongTermGoals}
-            />
+          <EditorDrawer
+            activePanel={activePanel}
+            setActivePanel={setActivePanel}
+            // Props passed down to panels
+            templateId={templateId}
+            handleTemplateChange={handleTemplateChange}
+            textOverlays={textOverlays}
+            handleAddText={handleAddText}
+            handleUpdateText={handleUpdateText}
+            handleDeleteText={handleDeleteText}
+            selectedTextId={selectedTextId}
+            handleSelectText={handleSelectText}
+            backgroundColor={backgroundColor}
+            setBackgroundColor={setBackgroundColor}
+            borderRadius={borderRadius}
+            setBorderRadius={setBorderRadius}
+            gap={gap}
+            setGap={setGap}
+            backgroundImage={backgroundImage}
+            setBackgroundImage={setBackgroundImage}
+            handleBackgroundUpload={handleBackgroundUpload}
+            layers={layers}
+            selectedLayer={selectedLayer}
+            selectedLayers={selectedLayers}
+            handleSelectLayer={handleSelectLayer}
+            handleRenameLayer={handleRenameLayer}
+            handleToggleLayerVisibility={handleToggleLayerVisibility}
+            handleToggleLayerLock={handleToggleLayerLock}
+            handleMoveLayerForward={handleMoveLayerForward}
+            handleMoveLayerBackward={handleMoveLayerBackward}
+            snapEnabled={snapEnabled}
+            setSnapEnabled={setSnapEnabled}
+            handleApplyAlignment={handleApplyAlignment}
+            selectedImage={selectedImage}
+            handleUpdateSelectedImage={handleUpdateSelectedImage}
+            handleDuplicateImage={handleDuplicateImage}
+            handleDuplicateAsset={handleDuplicateAsset}
+            handleResetSelectedImage={handleResetSelectedImage}
+            userUploads={userUploads}
+            handleUserUpload={handleUserUpload}
+            handleAddAssetToCanvas={handleAddAssetToCanvas}
+            handleAddUploadToCanvas={handleAddUploadToCanvas}
+            selectedText={selectedText}
+            aspectRatio={aspectRatio}
+            setAspectRatio={setAspectRatio}
+            currentRatio={currentRatio}
+            shortTermGoals={shortTermGoals}
+            setShortTermGoals={setShortTermGoals}
+            longTermGoals={longTermGoals}
+            setLongTermGoals={setLongTermGoals}
+            handleDeleteAsset={handleDeleteAsset}
+          />
         )}
 
         {/* Main Canvas Area */}
-        <EditorCanvas 
-            canvasRef={canvasRef}
-            displayWidth={currentRatio.width}
-            displayHeight={currentRatio.height}
-            backgroundColor={backgroundColor}
-            backgroundImage={backgroundImage}
-            borderRadius={borderRadius}
-            gap={gap}
-            currentTemplate={currentTemplate}
-            images={images}
-            handleImageUpload={handleImageUpload}
-            handleImageUpdate={handleImageUpdate}
-            handleImageRemove={handleImageRemove}
-            clearSelection={() => syncPrimarySelection([])}
-            selectedLayers={selectedLayers}
-            setSelectedLayers={setSelectedLayers}
-            handleSelectLayer={handleSelectLayer}
-            textOverlays={textOverlays}
-            assetOverlays={assetOverlays}
-            selectedTextId={selectedTextId}
-            setSelectedTextId={setSelectedTextId}
-            handleSelectText={handleSelectText}
-            handleSelectAsset={handleSelectAsset}
-            handleUpdateText={handleUpdateText}
-            handleUpdateAsset={handleUpdateAsset}
-            zoomLevel={zoomLevel}
-            snapEnabled={snapEnabled}
-            guideState={guideState}
-            setGuideState={setGuideState}
+        <EditorCanvas
+          canvasRef={canvasRef}
+          displayWidth={currentRatio.width}
+          displayHeight={currentRatio.height}
+          backgroundColor={backgroundColor}
+          backgroundImage={backgroundImage}
+          borderRadius={borderRadius}
+          gap={gap}
+          currentTemplate={currentTemplate}
+          images={images}
+          handleImageUpload={handleImageUpload}
+          handleImageUpdate={handleImageUpdate}
+          handleImageRemove={handleImageRemove}
+          clearSelection={() => syncPrimarySelection([])}
+          selectedLayers={selectedLayers}
+          setSelectedLayers={setSelectedLayers}
+          handleSelectLayer={handleSelectLayer}
+          textOverlays={textOverlays}
+          assetOverlays={assetOverlays}
+          selectedTextId={selectedTextId}
+          setSelectedTextId={setSelectedTextId}
+          handleSelectText={handleSelectText}
+          handleSelectAsset={handleSelectAsset}
+          handleUpdateText={handleUpdateText}
+          handleUpdateAsset={handleUpdateAsset}
+          zoomLevel={zoomLevel}
+          snapEnabled={snapEnabled}
+          guideState={guideState}
+          setGuideState={setGuideState}
+          handleDeleteText={handleDeleteText}
+          handleDeleteAsset={handleDeleteAsset}
         />
       </div>
 
       {/* Bottom Bar */}
-      <EditorBottomBar 
-        zoomLevel={zoomLevel} 
-        setZoomLevel={setZoomLevel} 
-        onFitToScreen={handleFitToScreen} 
+      <EditorBottomBar
+        zoomLevel={zoomLevel}
+        setZoomLevel={setZoomLevel}
+        onFitToScreen={handleFitToScreen}
       />
 
       {/* Modals */}
-      <PreviewModal 
-        isOpen={showPreview} 
-        onClose={() => setShowPreview(false)} 
-        canvasRef={canvasRef} 
-        title={title} 
+      <PreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        canvasRef={canvasRef}
+        title={title}
       />
 
 

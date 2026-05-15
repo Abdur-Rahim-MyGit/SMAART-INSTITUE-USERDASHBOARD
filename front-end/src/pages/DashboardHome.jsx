@@ -66,13 +66,13 @@ const DashboardHome = () => {
       <div className="min-h-screen p-4 sm:p-8 space-y-8 bg-[#f8fafc] dark:bg-slate-950 animate-pulse">
         {/* Skeleton Hero */}
         <div className="w-full h-32 sm:h-40 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
-        
+
         {/* Skeleton Banners */}
         <div className="w-full h-48 sm:h-64 lg:h-80 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
-        
+
         {/* Skeleton Progress */}
         <div className="w-full h-40 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
-        
+
         {/* Skeleton Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="w-full h-24 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
@@ -94,13 +94,13 @@ const DashboardHome = () => {
           We're having trouble loading your dashboard. This could be due to a slow connection or an expired session.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] text-white rounded-full font-semibold shadow-md hover:shadow-lg transition-all"
           >
             Try Again
           </button>
-          <button 
+          <button
             onClick={() => {
               sessionStorage.clear();
               localStorage.clear();
@@ -118,40 +118,40 @@ const DashboardHome = () => {
   return (
     <ErrorBoundary>
       <PageTransition>
-      {/* Vision Board Splash Overlay - Temporarily Hidden */}
-      {/* 
+        {/* Vision Board Splash Overlay - Temporarily Hidden */}
+        {/* 
       {showVisionSplash && (
         <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
       )} 
       */}
-      
-      {/* Student Onboarding */}
-      {!showVisionSplash && user && (
-        <StudentOnboarding user={user} />
-      )}
 
-      {/* Main Dashboard Layout with increased spacing */}
-      <div className="space-y-8 pb-10">
-        {/* Hero Section */}
-        <HeroSection 
-          userName={user?.firstName || user?.fullName?.split(' ')[0] || "User"} 
-        />
+        {/* Student Onboarding */}
+        {!showVisionSplash && user && (
+          <StudentOnboarding user={user} />
+        )}
 
-        {/* Vision Goals Widget - Temporarily Hidden per request */}
-        {/* <VisionGoalsWidget /> */}
+        {/* Main Dashboard Layout with increased spacing */}
+        <div className="space-y-8 pb-10">
+          {/* Hero Section */}
+          <HeroSection
+            userName={user?.firstName || user?.fullName || "User"}
+          />
 
-        {/* College Banners */}
-        <CollegeBanners />
+          {/* Vision Goals Widget - Temporarily Hidden per request */}
+          {/* <VisionGoalsWidget /> */}
 
-        {/* Learning Progress Section */}
-        <LearningProgress 
-          paths={paths} 
-          loading={pathsLoading} 
-          error={pathsError} 
-        />
+          {/* College Banners */}
+          <CollegeBanners />
 
-      </div>
-    </PageTransition>
+          {/* Learning Progress Section */}
+          <LearningProgress
+            paths={paths}
+            loading={pathsLoading}
+            error={pathsError}
+          />
+
+        </div>
+      </PageTransition>
     </ErrorBoundary>
   );
 };

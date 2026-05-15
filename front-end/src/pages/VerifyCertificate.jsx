@@ -314,8 +314,8 @@ const VerifyCertificate = () => {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     className={`relative rounded-3xl overflow-hidden border shadow-2xl transition-all duration-500 ${verificationResult.verified
-                                        ? 'bg-white dark:bg-[#001835]/90 border-[#C0C0C0]/30 shadow-[#C0C0C0]/10'
-                                        : 'bg-white dark:bg-[#001835]/90 border-yellow-500/30'
+                                        ? 'bg-white dark:bg-dark-card/95 border-[#C0C0C0]/30 shadow-[#C0C0C0]/10'
+                                        : 'bg-white dark:bg-dark-card/95 border-yellow-500/30'
                                         }`}
                                 >
                                     {/* Ornamental Header */}
@@ -370,7 +370,7 @@ const VerifyCertificate = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="bg-gray-50 dark:bg-[#000F24]/50 rounded-2xl p-6 border border-gray-100 dark:border-white/5">
+                                                <div className="bg-gray-50 dark:bg-dark-elevated/30 rounded-2xl p-6 border border-gray-100 dark:border-white/5">
                                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                                         <div>
                                                             <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
@@ -417,7 +417,7 @@ const VerifyCertificate = () => {
                                                         <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest font-semibold mb-3 block">Validated Competencies</label>
                                                         <div className="flex flex-wrap gap-2">
                                                             {verificationResult.certificate.validatedSkills.map((skill, index) => (
-                                                                <span key={index} className="px-3 py-1.5 rounded-lg bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border border-[#1a3884]/10 dark:border-[#1a3884]/30 text-[#1a3884] dark:text-[#7ba0ff] text-xs font-bold flex items-center gap-1.5">
+                                                                <span key={index} className="px-3 py-1.5 rounded-lg bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border border-[#1a3884]/10 dark:border-white/10 text-[#1a3884] dark:text-[#7ba0ff] text-xs font-bold flex items-center gap-1.5">
                                                                     <CheckCircle2 className="w-3 h-3" />
                                                                     {skill.label || skill}
                                                                 </span>
@@ -441,7 +441,7 @@ const VerifyCertificate = () => {
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="bg-white dark:bg-[#001835]/80 backdrop-blur-xl rounded-3xl p-10 border border-gray-200 dark:border-white/10 shadow-xl h-full flex flex-col justify-center items-center text-center text-gray-500 dark:text-gray-400"
+                                    className="bg-white dark:bg-dark-card/80 backdrop-blur-xl rounded-3xl p-10 border border-gray-200 dark:border-white/10 shadow-xl h-full flex flex-col justify-center items-center text-center text-gray-500 dark:text-gray-400"
                                 >
                                     <div className="w-24 h-24 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
                                         <Search className="w-10 h-10 opacity-30" />
@@ -462,7 +462,7 @@ const VerifyCertificate = () => {
     // Logged-in users get the dashboard layout
     if (isLoggedIn) {
         return (
-            <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] transition-colors duration-300 font-sans relative overflow-x-hidden">
+            <div className="min-h-screen bg-[#F8F9FC] dark:bg-dark-bg transition-colors duration-300 font-sans relative overflow-x-hidden">
                 <PageTransition>
                     <div className="min-h-screen pb-20 lg:pb-0">
                         {pageContent}
@@ -474,7 +474,7 @@ const VerifyCertificate = () => {
 
     // Guests get the public layout (with landing Navbar)
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-[#000F24] transition-colors duration-500 font-sans relative overflow-x-hidden">
+        <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-500 font-sans relative overflow-x-hidden">
             <Navbar showLinks={true} />
             {pageContent}
         </div>

@@ -416,14 +416,14 @@ const ResumeBuilder = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] flex items-center justify-center">
+            <div className="min-h-screen bg-[#F8FAFC] dark:bg-dark-card flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-[#1a3884]" />
             </div>
         );
     }
 
     return (
-        <div className="flex-1 flex flex-col print-wrapper h-[calc(100vh-80px)] overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120]">
+        <div className="flex-1 flex flex-col print-wrapper h-[calc(100vh-80px)] overflow-hidden bg-[#F8FAFC] dark:bg-dark-card">
             {/* --- PRINT ONLY CSS --- */}
             <style dangerouslySetInnerHTML={{
                 __html: `

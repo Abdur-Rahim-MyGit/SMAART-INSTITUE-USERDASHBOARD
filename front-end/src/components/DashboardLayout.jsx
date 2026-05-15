@@ -90,7 +90,6 @@ const pageTitles = {
   '/dashboard/performance': 'Performance',
   '/dashboard/certificate': 'Certificates',
   '/certificate': 'Certificates',
-  '/dashboard/skills-vault': 'Skills Vault',
   '/skills-vault': 'Skills Vault',
   '/dashboard/add-details': 'Add Details',
   '/add-details': 'Add Details',
@@ -563,7 +562,7 @@ const DashboardLayout = () => {
   const pageTitle = getPageTitle();
 
   return (
-    <div className={`min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120] transition-colors duration-300`}>
+    <div className={`min-h-screen bg-[#F8FAFC] dark:bg-dark-card transition-colors duration-300`}>
       {/* Session Expiry Warning Modal */}
       <SessionExpiryWarning
         isVisible={showWarning}
@@ -613,8 +612,8 @@ const DashboardLayout = () => {
                     key={pageTitle}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight"
-                    style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.02em' }}
+                    className="text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight font-sans transition-colors duration-300"
+                    style={{ letterSpacing: '-0.02em' }}
                   >
                     {pageTitle}
                   </motion.h1>
@@ -648,7 +647,7 @@ const DashboardLayout = () => {
                 />
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2">
                   {searchQuery && (
-                    <button 
+                    <button
                       onClick={() => {
                         setSearchQuery("");
                         searchInputRef.current?.focus();
@@ -662,20 +661,20 @@ const DashboardLayout = () => {
                     <Command className="w-2.5 h-2.5" />
                     <span>K</span>
                   </div>
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchQuery("");
-                      setShowSearchResults(false);
-                      searchInputRef.current?.focus();
-                    }}
-                    className="absolute inset-y-0 right-10 flex items-center pr-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                    aria-label="Clear search"
-                  >
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-700 text-[10px] font-bold">✕</span>
-                  </button>
-                )}
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery("");
+                        setShowSearchResults(false);
+                        searchInputRef.current?.focus();
+                      }}
+                      className="absolute inset-y-0 right-10 flex items-center pr-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                      aria-label="Clear search"
+                    >
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-700 text-[10px] font-bold">✕</span>
+                    </button>
+                  )}
                 </div>
 
                 <AnimatePresence>
@@ -700,11 +699,10 @@ const DashboardLayout = () => {
                               type="button"
                               onMouseEnter={() => setActiveSearchIndex(index)}
                               onClick={() => handleSearchNavigation(item)}
-                              className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors ${
-                                index === activeSearchIndex
-                                  ? "bg-blue-50 dark:bg-blue-900/20"
-                                  : "hover:bg-slate-100 dark:hover:bg-slate-800/85"
-                               }`}
+                              className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors ${index === activeSearchIndex
+                                ? "bg-blue-50 dark:bg-blue-900/20"
+                                : "hover:bg-slate-100 dark:hover:bg-slate-800/85"
+                                }`}
                             >
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">
@@ -884,7 +882,8 @@ const DashboardLayout = () => {
                             { code: 'en', name: 'English', native: 'English' },
                             { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
                             { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
-                            { code: 'ur', name: 'Urdu', native: 'اردو' }
+                            { code: 'ur', name: 'Urdu', native: 'اردو' },
+                            { code: 'fr', name: 'French', native: 'Français' }
                           ].map((lang) => (
                             <button
                               key={lang.code}
@@ -930,7 +929,7 @@ const DashboardLayout = () => {
                         />
                       ) : (
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a3884] to-[#112b6b] flex items-center justify-center text-white text-xs font-bold">
-                          {(user?.firstName?.[0] || user?.fullName?.[0] || 'U').toUpperCase()}
+                          {(user?.fullName || 'U').toUpperCase()}
                         </div>
                       )}
                     </div>
@@ -942,7 +941,7 @@ const DashboardLayout = () => {
                     </p>
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#1a3884] transition-colors">
-                        {user?.firstName || user?.fullName?.split(' ')[0] || 'User'}
+                        {user?.nickname || user?.fullName || 'User'}
                       </p>
                       <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-all duration-300 ${isProfileHovered ? 'rotate-180' : ''}`} />
                     </div>

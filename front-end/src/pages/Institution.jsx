@@ -135,33 +135,26 @@ const Institution = () => {
               transition={{ delay: 0.15, duration: 0.6, ease: "easeOut" }}
               className="flex flex-col gap-0"
             >
-              {/* Outer Card — Soft Light UI */}
+              {/* Outer Card — Theme Aware */}
               <div
-                className="rounded-3xl overflow-hidden bg-white"
+                className="rounded-3xl overflow-hidden bg-card text-card-foreground shadow-2xl"
                 style={{
-                  border: "1px solid rgba(0, 0, 0, 0.04)",
-                  boxShadow: "0 20px 40px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.02)",
+                  border: "1px solid var(--border)",
                 }}
               >
                 {/* Frame around the video */}
                 <div
-                  className="relative rounded-t-3xl"
+                  className="relative rounded-t-3xl bg-muted/30"
                   style={{
-                    background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
                     padding: "16px",
                   }}
                 >
                   {/* Founder's Message Badge */}
                   <div
-                    className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 rounded-full shadow-sm"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.9)",
-                      backdropFilter: "blur(8px)",
-                      border: "1px solid rgba(0,0,0,0.05)",
-                    }}
+                    className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 rounded-full shadow-sm border border-border bg-card/90 backdrop-blur-md"
                   >
-                    <span className="w-2 h-2 rounded-full bg-[#002147] animate-pulse shadow-[0_0_8px_rgba(0,33,71,0.4)]" />
-                    <span className="text-[10px] sm:text-[11px] font-bold text-gray-700 tracking-widest uppercase">
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.4)]" />
+                    <span className="text-[10px] sm:text-[11px] font-bold text-card-foreground tracking-widest uppercase">
                       Leadership Message
                     </span>
                   </div>
@@ -187,16 +180,16 @@ const Institution = () => {
 
                 {/* Welcome text below */}
                 <div
-                  className="px-6 py-6 sm:px-8 sm:py-7 flex items-center justify-between gap-4 rounded-b-3xl relative overflow-hidden bg-white"
+                  className="px-6 py-6 sm:px-8 sm:py-7 flex items-center justify-between gap-4 rounded-b-3xl relative overflow-hidden bg-card"
                 >
                   <div className="relative z-10">
-                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1.5 tracking-tight leading-snug">
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1.5 tracking-tight leading-snug">
                       A Message from {" "}
-                      <span className="font-extrabold text-[#002147]">
+                      <span className="font-extrabold text-primary">
                         Your Institution
                       </span>
                     </h2>
-                    <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
+                    <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
                       Hear from your institution’s leadership as they introduce this platform and share their best wishes for your learning journey and future success.
 
                     </p>

@@ -123,7 +123,7 @@ const Performance = () => {
 
     if (loading || userLoading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#F8F9FC] dark:bg-[#0B1120]">
+            <div className="flex h-screen items-center justify-center bg-[#F8F9FC] dark:bg-dark-bg">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
@@ -199,7 +199,7 @@ const Performance = () => {
     const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
     return (
-        <div className="min-h-screen bg-[#F8F9FC] dark:bg-[#0B1120] font-sans transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8F9FC] dark:bg-dark-bg font-sans transition-colors duration-300">
             <main className="p-4 md:p-8 overflow-y-auto">
                 <div className="max-w-7xl mx-auto space-y-8">
 

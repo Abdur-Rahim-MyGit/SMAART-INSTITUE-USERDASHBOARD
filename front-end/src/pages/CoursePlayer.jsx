@@ -415,7 +415,7 @@ const CoursePlayer = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#002147] flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-dark-bg flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a3884]"></div>
       </div>
     );
@@ -423,7 +423,7 @@ const CoursePlayer = () => {
 
   if (!course) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#002147] flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-dark-bg flex items-center justify-center">
         <div className="text-center p-8">
           <Lock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-[#112b6b] dark:text-white mb-2">Course Not Found</h2>
@@ -440,7 +440,7 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 transition-colors duration-500 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg transition-colors duration-500 relative overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-50/50 dark:bg-blue-900/5 rounded-full blur-[120px] -mr-64 -mt-64 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-50/50 dark:bg-indigo-900/5 rounded-full blur-[120px] -ml-64 -mb-64 pointer-events-none" />

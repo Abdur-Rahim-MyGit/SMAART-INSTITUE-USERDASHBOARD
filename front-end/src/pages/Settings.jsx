@@ -191,7 +191,7 @@ const Settings = () => {
                     value={profileFormData.name}
                     onChange={handleProfileChange}
                     placeholder="Enter your display name"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors"
                   />
                 </div>
                 <div>
@@ -202,7 +202,7 @@ const Settings = () => {
                     value={profileFormData.email}
                     disabled
                     placeholder="Enter your email"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-[#002147]/50 border border-gray-200 dark:border-[#1a3884]/30 text-gray-500 dark:text-gray-400 cursor-not-allowed focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-[#001A36] border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-500 cursor-not-allowed focus:outline-none transition-colors"
                   />
                   <p className="mt-1 text-xs text-gray-500">Email address cannot be changed.</p>
                 </div>
@@ -214,7 +214,7 @@ const Settings = () => {
                     value={profileFormData.phone}
                     onChange={handleProfileChange}
                     placeholder="Enter your phone number"
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors"
                   />
                 </div>
                 <div>
@@ -225,7 +225,7 @@ const Settings = () => {
                     onChange={handleProfileChange}
                     placeholder="Tell us about yourself"
                     rows={4}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none"
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors resize-none"
                   />
                 </div>
               </>
@@ -244,7 +244,7 @@ const Settings = () => {
               { label: "Coach Session Reminders", description: "Reminders for scheduled coaching sessions" },
               { label: "Community Activity", description: "Updates from community discussions" },
             ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+              <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">
                 <div>
                   <h4 className="text-gray-900 dark:text-white font-medium">{item.label}</h4>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">{item.description}</p>
@@ -261,20 +261,20 @@ const Settings = () => {
       case "privacy":
         return (
           <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h4 className="text-gray-900 dark:text-white font-medium">Profile Visibility</h4>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">Control who can see your profile</p>
                 </div>
-                <select className="px-3 py-2 rounded-lg bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#1a3884]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884]">
+                <select className="px-3 py-2 rounded-lg bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400 transition-colors">
                   <option>Everyone</option>
                   <option>Only Me</option>
                   <option>Connections</option>
                 </select>
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-gray-900 dark:text-white font-medium">Two-Factor Authentication</h4>
@@ -285,7 +285,7 @@ const Settings = () => {
                 </button>
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-gray-900 dark:text-white font-medium">Change Password</h4>
@@ -305,16 +305,16 @@ const Settings = () => {
       case "appearance":
         return (
           <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">
               <h4 className="text-gray-900 dark:text-white font-medium mb-4">Theme</h4>
               <div className="grid grid-cols-2 gap-3">
                 {["Light", "Dark"].map((themeOption) => (
                   <button
                     key={themeOption}
                     onClick={() => setTheme(themeOption.toLowerCase())}
-                    className={`p-4 rounded-xl border-2 transition-all ${currentTheme === themeOption.toLowerCase()
-                        ? "border-[#1a3884] bg-[#1a3884]/10"
-                        : "border-gray-200 dark:border-[#1a3884]/30 hover:border-[#1a3884]/50"
+                    className={`p-4 rounded-xl border-2 transition-all hover:scale-[1.02] ${currentTheme === themeOption.toLowerCase()
+                        ? "border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20"
+                        : "border-gray-200 dark:border-white/10 hover:border-[#1a3884]/50 dark:hover:border-[#1a3884]/60"
                       }`}
                   >
                     <span className="text-gray-900 dark:text-white font-medium">{themeOption}</span>
@@ -328,26 +328,27 @@ const Settings = () => {
       case "language":
         return (
           <div className="space-y-6">
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">
               <label className="block text-gray-900 dark:text-white font-medium mb-3">{t("settings.language")}</label>
               <select
                 value={i18n.language}
                 onChange={(e) => i18n.changeLanguage(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#1a3884]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884]"
+                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400 transition-colors"
               >
                 <option value="en">English</option>
                 <option value="hi">Hindi (हिन्दी)</option>
                 <option value="ta">Tamil (தமிழ்)</option>
                 <option value="ur">Urdu (اردو)</option>
+                <option value="fr">French (Français)</option>
               </select>
             </div>
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">
               <label className="block text-gray-900 dark:text-white font-medium mb-3">Timezone</label>
               <select
                 name="timezone"
                 value={languageFormData.timezone}
                 onChange={handleLanguageChange}
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#1a3884]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884]"
+                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400 transition-colors"
               >
                 <option value="Asia/Kolkata">Asia/Kolkata (GMT+5:30)</option>
                 <option value="America/New_York">America/New_York (GMT-5)</option>
@@ -355,13 +356,13 @@ const Settings = () => {
                 <option value="Asia/Tokyo">Asia/Tokyo (GMT+9)</option>
               </select>
             </div>
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30">
+            <div className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">
               <label className="block text-gray-900 dark:text-white font-medium mb-3">Date Format</label>
               <select
                 name="dateFormat"
                 value={languageFormData.dateFormat}
                 onChange={handleLanguageChange}
-                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#001229] border border-gray-200 dark:border-[#1a3884]/30 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884]"
+                className="w-full px-4 py-3 rounded-xl bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400 transition-colors"
               >
                 <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                 <option value="MM/DD/YYYY">MM/DD/YYYY</option>
@@ -401,7 +402,7 @@ const Settings = () => {
               {faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30"
+                  className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10"
                 >
                   <button
                     onClick={() => setActiveFAQIndex(activeFAQIndex === index ? null : index)}
@@ -418,7 +419,7 @@ const Settings = () => {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <p className="mt-3 text-gray-500 dark:text-gray-400 text-sm leading-relaxed border-t border-gray-200 dark:border-[#1a3884]/20 pt-3">
+                        <p className="mt-3 text-gray-500 dark:text-gray-400 text-sm leading-relaxed border-t border-gray-200 dark:border-white/10 pt-3">
                           {faq.answer}
                         </p>
                       </motion.div>
@@ -441,7 +442,7 @@ const Settings = () => {
               </button>
 
               <div className="prose dark:prose-invert max-w-none">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-[#1a3884]/30 pb-2">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-white/10 pb-2">
                   User Documentation
                 </h3>
 
@@ -455,13 +456,13 @@ const Settings = () => {
                 <section className="mb-8">
                   <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">Core Frameworks</h4>
                   <div className="space-y-4">
-                    <div className="p-4 bg-gray-50 dark:bg-[#1a3884]/10 rounded-xl border border-gray-100 dark:border-[#1a3884]/20">
+                    <div className="p-4 bg-gray-50 dark:bg-[#1a3884]/10 rounded-xl border border-gray-100 dark:border-white/10">
                       <h5 className="font-bold text-gray-800 dark:text-gray-200 mb-1">Career Architecture Map™</h5>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         A multi-stage model for lifelong career development, moving beyond traditional linear career paths.
                       </p>
                     </div>
-                    <div className="p-4 bg-gray-50 dark:bg-[#1a3884]/10 rounded-xl border border-gray-100 dark:border-[#1a3884]/20">
+                    <div className="p-4 bg-gray-50 dark:bg-[#1a3884]/10 rounded-xl border border-gray-100 dark:border-white/10">
                       <h5 className="font-bold text-gray-800 dark:text-gray-200 mb-1">Capability Framework™</h5>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Balances technical skills with judgement and adaptability to build comprehensive professional capability.
@@ -498,21 +499,21 @@ const Settings = () => {
                 setShowFAQ(true);
                 setShowDocs(false);
               }}
-              className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 hover:border-[#1a3884] transition-colors cursor-pointer"
+              className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
             >
               <h4 className="text-gray-900 dark:text-white font-medium">FAQ</h4>
               <p className="text-gray-400 text-sm">Find answers to common questions</p>
             </div>
             <div
               onClick={() => navigate("/dashboard/support")}
-              className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 hover:border-[#1a3884] transition-colors cursor-pointer"
+              className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
             >
               <h4 className="text-gray-900 dark:text-white font-medium">Contact Support</h4>
               <p className="text-gray-400 text-sm">Get in touch with our support team</p>
             </div>
             <div
               onClick={() => navigate("/dashboard/support")}
-              className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 hover:border-[#1a3884] transition-colors cursor-pointer"
+              className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
             >
               <h4 className="text-gray-900 dark:text-white font-medium">Report a Bug</h4>
               <p className="text-gray-400 text-sm">Help us improve by reporting issues</p>
@@ -522,7 +523,7 @@ const Settings = () => {
                 setShowDocs(true);
                 setShowFAQ(false);
               }}
-              className="p-4 rounded-xl bg-gray-50 dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 hover:border-[#1a3884] transition-colors cursor-pointer"
+              className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
             >
               <h4 className="text-gray-900 dark:text-white font-medium">Documentation</h4>
               <p className="text-gray-400 text-sm">Read our user guides and tutorials</p>
@@ -546,7 +547,7 @@ const Settings = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar Navigation */}
         <div className="lg:col-span-1">
-          <div className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 p-4 space-y-2 shadow-sm dark:shadow-none">
+          <div className="rounded-2xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 p-4 space-y-2 shadow-sm dark:shadow-none">
             {settingsTabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -573,7 +574,7 @@ const Settings = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
-            className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/30 p-6 shadow-sm dark:shadow-none"
+            className="rounded-2xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 p-6 shadow-sm dark:shadow-none"
           >
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               {settingsTabs.find((tab) => tab.id === activeTab)?.label}

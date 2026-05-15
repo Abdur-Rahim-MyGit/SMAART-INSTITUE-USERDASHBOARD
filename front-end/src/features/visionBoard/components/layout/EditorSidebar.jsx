@@ -15,13 +15,13 @@ import {
 
 const EditorSidebar = ({ activePanel, setActivePanel }) => {
   const tabs = [
-    { id: "templates", icon: LayoutTemplate, label: "Design"  },
-    { id: "assets",    icon: Sticker,        label: "Assets"  },
-    { id: "text",      icon: Type,           label: "Text"    },
-    { id: "style",     icon: Palette,        label: "Style"   },
-    { id: "layers",    icon: Layers3,        label: "Layers"  },
-    { id: "settings",  icon: Settings2,      label: "Canvas"  },
-    { id: "goals",     icon: Target,         label: "Goals"   },
+    { id: "templates", icon: LayoutTemplate, label: "Design" },
+    { id: "assets", icon: Sticker, label: "Assets" },
+    { id: "text", icon: Type, label: "Text" },
+    { id: "style", icon: Palette, label: "Style" },
+    { id: "layers", icon: Layers3, label: "Layers" },
+    { id: "settings", icon: Settings2, label: "Canvas" },
+    // { id: "goals",     icon: Target,         label: "Goals"   },
   ];
 
   return (
@@ -64,26 +64,26 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
               "items-center justify-center gap-1",
               "transition-all duration-200",
               // desktop shape
-              "lg:h-auto lg:w-full lg:flex-none lg:rounded-xl lg:px-1 lg:py-2.5",
+              "lg:h-auto lg:w-full lg:flex-none lg:rounded-[20px] lg:px-1 lg:py-2.5",
               // ── active state ──────────────────────────────────────────────
               isActive
                 ? [
-                    // light — primary blue fill, white text
-                    "text-[#1a3884]",
-                    "lg:bg-[#1a3884] lg:text-white lg:shadow-md",
-                    // dark  — primary blue fill, white text (same pill colour)
-                    "dark:text-white",
-                    "lg:dark:bg-[#1a3884] lg:dark:text-white lg:dark:shadow-[0_4px_14px_rgba(26,56,132,0.45)]",
-                  ].join(" ")
+                  // light — primary blue fill, white text
+                  "text-[#1a3884]",
+                  "lg:bg-[#1a3884] lg:text-white lg:shadow-[0_10px_20px_-5px_rgba(26,56,132,0.3)]",
+                  // dark  — primary blue fill, white text (same pill colour)
+                  "dark:text-white",
+                  "lg:dark:bg-[#1a3884] lg:dark:text-white lg:dark:shadow-[0_10px_25px_-5px_rgba(26,56,132,0.5)]",
+                ].join(" ")
                 // ── idle state ────────────────────────────────────────────
                 : [
-                    // light
-                    "text-slate-400 lg:text-slate-500",
-                    "lg:hover:bg-slate-100 lg:hover:text-[#1a3884]",
-                    // dark — slate-300 so labels are readable on #002147
-                    "dark:text-slate-300",
-                    "lg:dark:hover:bg-[#1a3884]/20 lg:dark:hover:text-white",
-                  ].join(" "),
+                  // light
+                  "text-slate-400 lg:text-slate-500",
+                  "lg:hover:bg-slate-100 lg:hover:text-[#1a3884]",
+                  // dark — slate-300 so labels are readable on #002147
+                  "dark:text-slate-300",
+                  "lg:dark:hover:bg-[#1a3884]/20 lg:dark:hover:text-white",
+                ].join(" "),
             ].join(" ")}
           >
             {/* ── Mobile active indicator (top bar) ─────────────────────── */}
@@ -97,9 +97,9 @@ const EditorSidebar = ({ activePanel, setActivePanel }) => {
                 "rounded-lg p-1.5 transition-all duration-200",
                 isActive
                   ? // active: icon sits on the filled pill directly
-                    "text-[#1a3884] lg:text-white lg:dark:text-white"
+                  "text-[#1a3884] lg:text-white lg:dark:text-white"
                   : // idle: inherit button colour
-                    "lg:group-hover:text-[#1a3884] dark:lg:group-hover:text-white",
+                  "lg:group-hover:text-[#1a3884] dark:lg:group-hover:text-white",
               ].join(" ")}
             >
               <tab.icon

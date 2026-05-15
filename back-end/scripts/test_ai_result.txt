@@ -1,5 +1,0 @@
-Model: nvidia/nemotron-3-nano-30b-a3b:free
-Key: SET
-STATUS: SUCCESS
-RESPONSE: 
-USAGE: {"prompt_tokens":37,"completion_tokens":100,"total_tokens":137,"cost":0,"is_byok":false,"prompt_tokens_details":{"cached_tokens":0,"audio_tokens":0},"cost_details":{"upstream_inference_cost":0,"upstream_inference_prompt_cost":0,"upstream_inference_completions_cost":0},"completion_tokens_details":{"reasoning_tokens":110,"audio_tokens":0}}
