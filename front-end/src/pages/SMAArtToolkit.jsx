@@ -136,18 +136,18 @@ const SMAArtToolkit = () => {
     <div className="space-y-6">
       <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="mx-auto max-w-7xl space-y-8">
-          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="items-start gap-6">
             <div className="relative self-start overflow-hidden rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] sm:p-8 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40">
               <div className="absolute inset-px rounded-[27px] border border-white/70 dark:border-white/5" />
               <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
-              <div className="relative z-10 space-y-6">
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
+              <div className="relative z-10 space-y-4">
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
                   <div className="flex h-4 w-4 items-center justify-center rounded-full border border-[#4f46e5]/20 bg-[#4f46e5]/10">
                     <Sparkles className="h-2.5 w-2.5" />
                   </div>
                   Intelligence Suite
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <h1 className="max-w-3xl text-[2rem] font-black tracking-tight text-[#0f172a] sm:text-[2.35rem] lg:text-[2.5rem] lg:leading-[1.04] dark:text-white">
                     SMAART - <span className="text-[#1a3884]">Toolkit</span>
                   </h1>
@@ -161,7 +161,7 @@ const SMAArtToolkit = () => {
               </div>
             </div>
 
-            <div className="relative self-start overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.28)] dark:border-slate-700/40 dark:bg-slate-900/80">
+            {/* <div className="relative self-start overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.28)] dark:border-slate-700/40 dark:bg-slate-900/80">
               <div className="absolute inset-px rounded-[23px] border border-white/70 dark:border-white/5" />
               <div className="relative z-10 space-y-1.5">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Inside the toolkit</p>
@@ -184,7 +184,7 @@ const SMAArtToolkit = () => {
                   <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Quick launch actions</span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">

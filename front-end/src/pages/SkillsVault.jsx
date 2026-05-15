@@ -125,9 +125,9 @@ const SkillsVault = () => {
 
             <main className="w-full relative z-10 py-6 px-4 sm:px-6 lg:px-8 lg:py-8">
                 <div className="max-w-7xl mx-auto space-y-5 lg:space-y-6">
-                    
+
                     {/* ── Premium Header (Toolkit Style) ── */}
-                    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+                    <div className="items-start gap-6">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -135,7 +135,7 @@ const SkillsVault = () => {
                         >
                             <div className="absolute inset-px rounded-[31px] border border-white/70 dark:border-white/5" />
                             <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
-                            
+
                             <div className="relative z-10">
                                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50 dark:text-blue-300">
                                     <div className="flex h-4 w-4 items-center justify-center rounded-full border border-[#1a3884]/20 bg-[#1a3884]/10 dark:bg-blue-500/20">
@@ -143,8 +143,8 @@ const SkillsVault = () => {
                                     </div>
                                     Secure Professional Vault
                                 </div>
-                                
-                                <div className="space-y-4">
+
+                                <div className="space-y-2">
                                     <h1 className="max-w-3xl text-[2.25rem] font-black tracking-tight text-[#0f172a] sm:text-[2.5rem] lg:text-[2.75rem] lg:leading-[1.04] dark:text-white">
                                         Skills - <span className="text-[#1a3884] dark:text-blue-400">Vault</span>
                                     </h1>
@@ -158,7 +158,7 @@ const SkillsVault = () => {
                             </div>
                         </motion.div>
 
-                        <motion.div
+                        {/* <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.1 }}
@@ -184,7 +184,7 @@ const SkillsVault = () => {
                                     </div>
                                 ))}
                             </div>
-                        </motion.div>
+                        </motion.div> */}
                     </div>
 
                     {/* ── Glassmorphic Tab Navigation ── */}
@@ -198,8 +198,8 @@ const SkillsVault = () => {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`flex items-center gap-2.5 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isActive
-                                                ? "bg-[#1a3884] text-white shadow-lg shadow-blue-900/20 scale-105"
-                                                : "text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
+                                            ? "bg-[#1a3884] text-white shadow-lg shadow-blue-900/20 scale-105"
+                                            : "text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
                                             }`}
                                     >
                                         <Icon className={`w-4 h-4 ${isActive ? 'scale-110' : ''}`} />
@@ -220,366 +220,366 @@ const SkillsVault = () => {
                             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                         >
 
-                                {/* ════════ OVERVIEW TAB ════════ */}
-                                {activeTab === "overview" && (
-                                    <div className="space-y-6">
-                                        {/* Quick Stats */}
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {/* ════════ OVERVIEW TAB ════════ */}
+                            {activeTab === "overview" && (
+                                <div className="space-y-6">
+                                    {/* Quick Stats */}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        {[
+                                            { label: "Certificates", value: certificateTypes.length, icon: Award, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
+                                            { label: "Badges Earned", value: badges.length, icon: Trophy, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
+                                            { label: "Courses", value: courses.length, icon: BookOpen, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
+                                            { label: "Assessments", value: `${completedAssessments}/4`, icon: Brain, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-900/20" },
+                                        ].map((stat, i) => (
+                                            <motion.div
+                                                key={i}
+                                                initial={{ opacity: 0, y: 16 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: i * 0.08 }}
+                                                className="bg-white dark:bg-slate-900/40 rounded-[24px] p-6 border border-slate-100 dark:border-slate-800 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all group"
+                                            >
+                                                <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
+                                                    <stat.icon className="w-6 h-6" />
+                                                </div>
+                                                <h3 className="text-3xl font-black text-slate-950 dark:text-white leading-none">{stat.value}</h3>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{stat.label}</p>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+
+                                    {/* What's in your wallet */}
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="mb-8">
+                                            <h3 className="text-xl font-black text-slate-950 dark:text-white mb-2">What's in your Skills Vault?</h3>
+                                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
+                                                Your Skills Vault is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources.
+                                            </p>
+                                        </div>
+                                        <div className="grid sm:grid-cols-2 gap-5">
                                             {[
-                                                { label: "Certificates", value: certificateTypes.length, icon: Award, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
-                                                { label: "Badges Earned", value: badges.length, icon: Trophy, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
-                                                { label: "Courses", value: courses.length, icon: BookOpen, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
-                                                { label: "Assessments", value: `${completedAssessments}/4`, icon: Brain, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-900/20" },
-                                            ].map((stat, i) => (
-                                                <motion.div
-                                                    key={i}
-                                                    initial={{ opacity: 0, y: 16 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: i * 0.08 }}
-                                                    className="bg-white dark:bg-slate-900/40 rounded-[24px] p-6 border border-slate-100 dark:border-slate-800 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all group"
-                                                >
-                                                    <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
-                                                        <stat.icon className="w-6 h-6" />
+                                                { icon: Award, title: "Certificates", desc: "Verified professional credentials issued upon completing programme milestones — Capacity, Capability, Leadership, and the Master Diploma." },
+                                                { icon: Trophy, title: "Badges & Achievements", desc: "Micro-credentials earned through course activities, assessments, and engagement — each one verifiable and shareable." },
+                                                { icon: BookOpen, title: "Course Overview", desc: "A dashboard view of all your enrolled courses, modules completed, and overall progress across the SMAART curriculum." },
+                                                { icon: Zap, title: "Flashcards & Key Terms", desc: "Quick-reference cards for the six core quotients and other essential professional terminology from your learning journey." },
+                                            ].map((item, i) => (
+                                                <div key={i} className="flex gap-5 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 hover:border-[#1a3884]/20 transition-all group">
+                                                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                                        <item.icon className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
                                                     </div>
-                                                    <h3 className="text-3xl font-black text-slate-950 dark:text-white leading-none">{stat.value}</h3>
-                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{stat.label}</p>
-                                                </motion.div>
+                                                    <div>
+                                                        <h4 className="text-[15px] font-black text-slate-900 dark:text-white mb-1">{item.title}</h4>
+                                                        <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+                                                    </div>
+                                                </div>
                                             ))}
                                         </div>
-
-                                        {/* What's in your wallet */}
-                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                            <div className="mb-8">
-                                                <h3 className="text-xl font-black text-slate-950 dark:text-white mb-2">What's in your Skills Vault?</h3>
-                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
-                                                    Your Skills Vault is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources.
-                                                </p>
-                                            </div>
-                                            <div className="grid sm:grid-cols-2 gap-5">
-                                                {[
-                                                    { icon: Award, title: "Certificates", desc: "Verified professional credentials issued upon completing programme milestones — Capacity, Capability, Leadership, and the Master Diploma." },
-                                                    { icon: Trophy, title: "Badges & Achievements", desc: "Micro-credentials earned through course activities, assessments, and engagement — each one verifiable and shareable." },
-                                                    { icon: BookOpen, title: "Course Overview", desc: "A dashboard view of all your enrolled courses, modules completed, and overall progress across the SMAART curriculum." },
-                                                    { icon: Zap, title: "Flashcards & Key Terms", desc: "Quick-reference cards for the six core quotients and other essential professional terminology from your learning journey." },
-                                                ].map((item, i) => (
-                                                    <div key={i} className="flex gap-5 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 hover:border-[#1a3884]/20 transition-all group">
-                                                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                                                            <item.icon className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="text-[15px] font-black text-slate-900 dark:text-white mb-1">{item.title}</h4>
-                                                            <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
                                     </div>
-                                )}
+                                </div>
+                            )}
 
-                                {/* ════════ CERTIFICATES TAB ════════ */}
-                                {activeTab === "certificates" && (
-                                    <div className="space-y-8">
-                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
-                                                <div>
-                                                    <div className="flex items-center gap-3 mb-1">
-                                                        <Award className="w-6 h-6 text-amber-500" />
-                                                        <h3 className="text-xl font-black text-slate-950 dark:text-white">Professional Credentials</h3>
-                                                    </div>
-                                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Your verified SMAART Institute certifications</p>
-                                                </div>
-                                                <button
-                                                    onClick={() => navigate("/dashboard/certificate")}
-                                                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] active:scale-95 transition-all"
-                                                >
-                                                    <Download className="w-4 h-4" /> Download Centre
-                                                </button>
-                                            </div>
-
-                                            <div className="grid sm:grid-cols-2 gap-5">
-                                                {certificateTypes.map((cert, i) => (
-                                                    <motion.div
-                                                        key={cert.id}
-                                                        initial={{ opacity: 0, y: 16 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: i * 0.08 }}
-                                                        onClick={() => navigate("/dashboard/certificate")}
-                                                        className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800/80 p-6 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-xl hover:bg-white dark:hover:bg-slate-900 transition-all group"
-                                                    >
-                                                        <div className="flex items-start gap-5">
-                                                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                                                                <Award className="w-7 h-7 text-white" />
-                                                            </div>
-                                                            <div className="flex-1 min-w-0">
-                                                                <h4 className="text-[15px] font-black text-slate-900 dark:text-white leading-snug mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
-                                                                    {cert.title}
-                                                                </h4>
-                                                                <div className="flex items-center gap-2 mt-3">
-                                                                    <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-slate-700">
-                                                                        {cert.code}
-                                                                    </span>
-                                                                    <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400 border border-blue-100 dark:border-blue-500/20">
-                                                                        {cert.level}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <ChevronRight className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
-                                                            </div>
-                                                        </div>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* User Uploaded Certificates */}
-                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
-                                                <div>
-                                                    <div className="flex items-center gap-3 mb-1">
-                                                        <Shield className="w-6 h-6 text-blue-500" />
-                                                        <h3 className="text-xl font-black text-slate-950 dark:text-white">Your Uploaded Credentials</h3>
-                                                    </div>
-                                                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">External certifications you've added to your vault</p>
-                                                </div>
-                                                <button
-                                                    onClick={() => setIsUploadModalOpen(true)}
-                                                    className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-blue-600 text-white text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 transform hover:scale-[1.02] active:scale-95"
-                                                >
-                                                    <Upload className="w-4 h-4" /> Upload Certificate
-                                                </button>
-                                            </div>
-
-                                            {userCertificates.length > 0 ? (
-                                                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                    {userCertificates.map((cert, i) => (
-                                                        <motion.div
-                                                            key={cert._id}
-                                                            initial={{ opacity: 0, scale: 0.95 }}
-                                                            animate={{ opacity: 1, scale: 1 }}
-                                                            transition={{ delay: i * 0.05 }}
-                                                            className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800 p-6 relative group hover:bg-white dark:hover:bg-slate-900 transition-all shadow-sm hover:shadow-xl"
-                                                        >
-                                                            <div className="flex items-start gap-4 mb-5">
-                                                                <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/40 border border-blue-100 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
-                                                                    <FileText className="w-6 h-6" />
-                                                                </div>
-                                                                <div className="min-w-0 flex-1 pt-1">
-                                                                    <h4 className="text-[15px] font-black text-slate-950 dark:text-white leading-tight mb-1 truncate">
-                                                                        {cert.title}
-                                                                    </h4>
-                                                                    <p className="text-[11px] text-slate-400 font-black uppercase tracking-wider truncate">{cert.issuer}</p>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="space-y-2 mb-4">
-                                                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                                                    <Calendar className="w-3 h-3 text-slate-400" />
-                                                                    Issued: {new Date(cert.issueDate).toLocaleDateString()}
-                                                                </div>
-                                                                {cert.verificationUrl && (
-                                                                    <a 
-                                                                        href={cert.verificationUrl} 
-                                                                        target="_blank" 
-                                                                        rel="noopener noreferrer"
-                                                                        className="flex items-center gap-2 text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wider"
-                                                                    >
-                                                                        <LinkIcon className="w-3 h-3" />
-                                                                        Verify Credential
-                                                                    </a>
-                                                                )}
-                                                                {cert.qrCodeIdentifier && (
-                                                                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                                                        <QrCode className="w-3 h-3" />
-                                                                        ID: {cert.qrCodeIdentifier}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-
-                                                            <div className="flex items-center gap-2">
-                                                                <button
-                                                                    onClick={() => { setSelectedShareCert(cert); setIsShareModalOpen(true); }}
-                                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all shadow-sm active:scale-95"
-                                                                >
-                                                                    <Share2 className="w-3.5 h-3.5" /> Share
-                                                                </button>
-                                                                <a 
-                                                                    href={cert.certificateUrl} 
-                                                                    target="_blank" 
-                                                                    rel="noopener noreferrer"
-                                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95"
-                                                                >
-                                                                    <Download className="w-3.5 h-3.5" /> View
-                                                                </a>
-                                                                <button 
-                                                                    onClick={() => handleDeleteUserCert(cert._id)}
-                                                                    className="p-2.5 rounded-xl border border-red-100 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all active:scale-90"
-                                                                >
-                                                                    <X className="w-4 h-4" />
-                                                                </button>
-                                                            </div>
-                                                        </motion.div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="text-center py-16 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px] bg-slate-50/30">
-                                                    <div className="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-center mx-auto mb-4">
-                                                        <Award className="w-8 h-8 text-slate-300 dark:text-slate-600" />
-                                                    </div>
-                                                    <p className="text-[15px] font-black text-slate-400 uppercase tracking-widest">No external certificates</p>
-                                                    <button
-                                                        onClick={() => setIsUploadModalOpen(true)}
-                                                        className="mt-4 text-xs font-black text-[#1a3884] dark:text-blue-400 hover:underline uppercase tracking-widest"
-                                                    >
-                                                        Add your first credential
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Verification Section */}
-                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                            <div className="p-8 border-b border-slate-50 dark:border-slate-800">
-                                                <h3 className="text-xl font-black text-slate-950 dark:text-white flex items-center gap-3">
-                                                    <Shield className="w-6 h-6 text-emerald-500" />
-                                                    Credential Verification
-                                                </h3>
-                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Verify any SMAART certificate using its unique ID or QR code.</p>
-                                            </div>
-                                            <div className="p-2">
-                                                <CertificateVerification />
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* ════════ BADGES TAB ════════ */}
-                                {activeTab === "badges" && (
+                            {/* ════════ CERTIFICATES TAB ════════ */}
+                            {activeTab === "certificates" && (
+                                <div className="space-y-8">
                                     <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <BadgeGallery badges={badges} userName={user?.fullName || "Student"} />
-                                    </div>
-                                )}
-
-                                {/* ════════ COURSES TAB ════════ */}
-                                {activeTab === "courses" && (
-                                    <div className="space-y-5">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Course Overview</h3>
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+                                            <div>
+                                                <div className="flex items-center gap-3 mb-1">
+                                                    <Award className="w-6 h-6 text-amber-500" />
+                                                    <h3 className="text-xl font-black text-slate-950 dark:text-white">Professional Credentials</h3>
+                                                </div>
+                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Your verified SMAART Institute certifications</p>
+                                            </div>
                                             <button
-                                                onClick={() => navigate("/dashboard/courses")}
-                                                className="text-sm font-semibold text-[#1a3884] dark:text-blue-400 hover:underline flex items-center gap-1"
+                                                onClick={() => navigate("/dashboard/certificate")}
+                                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] active:scale-95 transition-all"
                                             >
-                                                Go to Courses <ChevronRight className="w-4 h-4" />
+                                                <Download className="w-4 h-4" /> Download Centre
                                             </button>
                                         </div>
 
-                                        {courses.length > 0 ? (
-                                            <div className="grid sm:grid-cols-2 gap-4">
-                                                {courses.map((course, i) => (
-                                                    <motion.div
-                                                        key={course._id || i}
-                                                        initial={{ opacity: 0, y: 16 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: i * 0.08 }}
-                                                        onClick={() => navigate(`/dashboard/courses/${course._id}/modules`)}
-                                                        className="bg-white dark:bg-slate-900/40 rounded-[30px] border border-slate-100 dark:border-slate-800 overflow-hidden cursor-pointer hover:shadow-2xl hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all group"
-                                                    >
-                                                        {/* Thumbnail */}
-                                                        <div className="h-40 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] relative overflow-hidden">
-                                                            {course.thumbnail && (
-                                                                <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                                            )}
-                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                                                            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                                                                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white/20 backdrop-blur-md text-white border border-white/10">
-                                                                    {course.courseCode || "Course"}
+                                        <div className="grid sm:grid-cols-2 gap-5">
+                                            {certificateTypes.map((cert, i) => (
+                                                <motion.div
+                                                    key={cert.id}
+                                                    initial={{ opacity: 0, y: 16 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: i * 0.08 }}
+                                                    onClick={() => navigate("/dashboard/certificate")}
+                                                    className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800/80 p-6 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-xl hover:bg-white dark:hover:bg-slate-900 transition-all group"
+                                                >
+                                                    <div className="flex items-start gap-5">
+                                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                                                            <Award className="w-7 h-7 text-white" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className="text-[15px] font-black text-slate-900 dark:text-white leading-snug mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
+                                                                {cert.title}
+                                                            </h4>
+                                                            <div className="flex items-center gap-2 mt-3">
+                                                                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-slate-700">
+                                                                    {cert.code}
                                                                 </span>
-                                                                <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                    <Play className="w-3 h-3 text-white fill-white" />
-                                                                </div>
+                                                                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400 border border-blue-100 dark:border-blue-500/20">
+                                                                    {cert.level}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <ChevronRight className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* User Uploaded Certificates */}
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+                                            <div>
+                                                <div className="flex items-center gap-3 mb-1">
+                                                    <Shield className="w-6 h-6 text-blue-500" />
+                                                    <h3 className="text-xl font-black text-slate-950 dark:text-white">Your Uploaded Credentials</h3>
+                                                </div>
+                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">External certifications you've added to your vault</p>
+                                            </div>
+                                            <button
+                                                onClick={() => setIsUploadModalOpen(true)}
+                                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-blue-600 text-white text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 transform hover:scale-[1.02] active:scale-95"
+                                            >
+                                                <Upload className="w-4 h-4" /> Upload Certificate
+                                            </button>
+                                        </div>
+
+                                        {userCertificates.length > 0 ? (
+                                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                {userCertificates.map((cert, i) => (
+                                                    <motion.div
+                                                        key={cert._id}
+                                                        initial={{ opacity: 0, scale: 0.95 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        transition={{ delay: i * 0.05 }}
+                                                        className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800 p-6 relative group hover:bg-white dark:hover:bg-slate-900 transition-all shadow-sm hover:shadow-xl"
+                                                    >
+                                                        <div className="flex items-start gap-4 mb-5">
+                                                            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/40 border border-blue-100 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
+                                                                <FileText className="w-6 h-6" />
+                                                            </div>
+                                                            <div className="min-w-0 flex-1 pt-1">
+                                                                <h4 className="text-[15px] font-black text-slate-950 dark:text-white leading-tight mb-1 truncate">
+                                                                    {cert.title}
+                                                                </h4>
+                                                                <p className="text-[11px] text-slate-400 font-black uppercase tracking-wider truncate">{cert.issuer}</p>
                                                             </div>
                                                         </div>
 
-                                                        <div className="p-6">
-                                                            <h4 className="text-[17px] font-black text-slate-950 dark:text-white mb-2 line-clamp-1 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
-                                                                {course.title}
-                                                            </h4>
-                                                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2 mb-5 leading-relaxed">
-                                                                {course.description || "Professional development course"}
-                                                            </p>
-                                                            <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-slate-400">
-                                                                <span className="flex items-center gap-1.5">
-                                                                    <BookOpen className="w-3.5 h-3.5" />
-                                                                    {course.modules?.length || 0} Modules
-                                                                </span>
-                                                                <span className="flex items-center gap-1.5">
-                                                                    <Clock className="w-3.5 h-3.5" />
-                                                                    {course.duration || "Self-paced"}
-                                                                </span>
+                                                        <div className="space-y-2 mb-4">
+                                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                                                <Calendar className="w-3 h-3 text-slate-400" />
+                                                                Issued: {new Date(cert.issueDate).toLocaleDateString()}
                                                             </div>
+                                                            {cert.verificationUrl && (
+                                                                <a
+                                                                    href={cert.verificationUrl}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-2 text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wider"
+                                                                >
+                                                                    <LinkIcon className="w-3 h-3" />
+                                                                    Verify Credential
+                                                                </a>
+                                                            )}
+                                                            {cert.qrCodeIdentifier && (
+                                                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                                                    <QrCode className="w-3 h-3" />
+                                                                    ID: {cert.qrCodeIdentifier}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => { setSelectedShareCert(cert); setIsShareModalOpen(true); }}
+                                                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all shadow-sm active:scale-95"
+                                                            >
+                                                                <Share2 className="w-3.5 h-3.5" /> Share
+                                                            </button>
+                                                            <a
+                                                                href={cert.certificateUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95"
+                                                            >
+                                                                <Download className="w-3.5 h-3.5" /> View
+                                                            </a>
+                                                            <button
+                                                                onClick={() => handleDeleteUserCert(cert._id)}
+                                                                className="p-2.5 rounded-xl border border-red-100 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all active:scale-90"
+                                                            >
+                                                                <X className="w-4 h-4" />
+                                                            </button>
                                                         </div>
                                                     </motion.div>
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-12 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                                <div className="w-20 h-20 mx-auto mb-6 rounded-[24px] bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center shadow-sm">
-                                                    <BookOpen className="w-10 h-10 text-slate-300 dark:text-slate-600" />
+                                            <div className="text-center py-16 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px] bg-slate-50/30">
+                                                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-center mx-auto mb-4">
+                                                    <Award className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                                 </div>
-                                                <h4 className="text-xl font-black text-slate-950 dark:text-white mb-2">No Enrolled Courses</h4>
-                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
-                                                    You haven't enrolled in any courses. Visit the core programme to get started on your journey.
-                                                </p>
+                                                <p className="text-[15px] font-black text-slate-400 uppercase tracking-widest">No external certificates</p>
                                                 <button
-                                                    onClick={() => navigate("/dashboard/courses")}
-                                                    className="mt-8 inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] transition-all"
+                                                    onClick={() => setIsUploadModalOpen(true)}
+                                                    className="mt-4 text-xs font-black text-[#1a3884] dark:text-blue-400 hover:underline uppercase tracking-widest"
                                                 >
-                                                    Browse Core Programme
+                                                    Add your first credential
                                                 </button>
                                             </div>
                                         )}
                                     </div>
-                                )}
 
-                                {/* ════════ FLASHCARDS TAB ════════ */}
-                                {activeTab === "flashcards" && (
-                                    <div className="space-y-5">
-                                        <div className="mb-2">
-                                            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Key Flashcards</h3>
-                                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                                                Quick-reference cards covering the six core SMAART quotients and essential professional terminology.
-                                            </p>
+                                    {/* Verification Section */}
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="p-8 border-b border-slate-50 dark:border-slate-800">
+                                            <h3 className="text-xl font-black text-slate-950 dark:text-white flex items-center gap-3">
+                                                <Shield className="w-6 h-6 text-emerald-500" />
+                                                Credential Verification
+                                            </h3>
+                                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Verify any SMAART certificate using its unique ID or QR code.</p>
                                         </div>
+                                        <div className="p-2">
+                                            <CertificateVerification />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
-                                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            {defaultFlashcards.map((card, i) => (
-                                                <FlashcardItem key={i} card={card} index={i} />
+                            {/* ════════ BADGES TAB ════════ */}
+                            {activeTab === "badges" && (
+                                <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                    <BadgeGallery badges={badges} userName={user?.fullName || "Student"} />
+                                </div>
+                            )}
+
+                            {/* ════════ COURSES TAB ════════ */}
+                            {activeTab === "courses" && (
+                                <div className="space-y-5">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Course Overview</h3>
+                                        <button
+                                            onClick={() => navigate("/dashboard/courses")}
+                                            className="text-sm font-semibold text-[#1a3884] dark:text-blue-400 hover:underline flex items-center gap-1"
+                                        >
+                                            Go to Courses <ChevronRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
+
+                                    {courses.length > 0 ? (
+                                        <div className="grid sm:grid-cols-2 gap-4">
+                                            {courses.map((course, i) => (
+                                                <motion.div
+                                                    key={course._id || i}
+                                                    initial={{ opacity: 0, y: 16 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: i * 0.08 }}
+                                                    onClick={() => navigate(`/dashboard/courses/${course._id}/modules`)}
+                                                    className="bg-white dark:bg-slate-900/40 rounded-[30px] border border-slate-100 dark:border-slate-800 overflow-hidden cursor-pointer hover:shadow-2xl hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all group"
+                                                >
+                                                    {/* Thumbnail */}
+                                                    <div className="h-40 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] relative overflow-hidden">
+                                                        {course.thumbnail && (
+                                                            <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                        )}
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                                                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                                                            <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white/20 backdrop-blur-md text-white border border-white/10">
+                                                                {course.courseCode || "Course"}
+                                                            </span>
+                                                            <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <Play className="w-3 h-3 text-white fill-white" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-6">
+                                                        <h4 className="text-[17px] font-black text-slate-950 dark:text-white mb-2 line-clamp-1 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
+                                                            {course.title}
+                                                        </h4>
+                                                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2 mb-5 leading-relaxed">
+                                                            {course.description || "Professional development course"}
+                                                        </p>
+                                                        <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                                            <span className="flex items-center gap-1.5">
+                                                                <BookOpen className="w-3.5 h-3.5" />
+                                                                {course.modules?.length || 0} Modules
+                                                            </span>
+                                                            <span className="flex items-center gap-1.5">
+                                                                <Clock className="w-3.5 h-3.5" />
+                                                                {course.duration || "Self-paced"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
                                             ))}
                                         </div>
-
-                                        <div className="bg-slate-50/50 dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 text-center">
-                                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">
-                                                More flashcards are available within each course module to help you master professional terminology.
+                                    ) : (
+                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-12 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                            <div className="w-20 h-20 mx-auto mb-6 rounded-[24px] bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center shadow-sm">
+                                                <BookOpen className="w-10 h-10 text-slate-300 dark:text-slate-600" />
+                                            </div>
+                                            <h4 className="text-xl font-black text-slate-950 dark:text-white mb-2">No Enrolled Courses</h4>
+                                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+                                                You haven't enrolled in any courses. Visit the core programme to get started on your journey.
                                             </p>
                                             <button
                                                 onClick={() => navigate("/dashboard/courses")}
-                                                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl border-2 border-[#1a3884] dark:border-blue-500 text-[#1a3884] dark:text-blue-400 text-xs font-black uppercase tracking-widest hover:bg-[#1a3884] hover:text-white dark:hover:bg-blue-500 dark:hover:text-white transition-all transform hover:scale-[1.02]"
+                                                className="mt-8 inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] transition-all"
                                             >
-                                                <BookOpen className="w-4 h-4" /> Explore Course Flashcards
+                                                Browse Core Programme
                                             </button>
                                         </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* ════════ FLASHCARDS TAB ════════ */}
+                            {activeTab === "flashcards" && (
+                                <div className="space-y-5">
+                                    <div className="mb-2">
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Key Flashcards</h3>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                                            Quick-reference cards covering the six core SMAART quotients and essential professional terminology.
+                                        </p>
                                     </div>
-                                )}
 
-                            </motion.div>
-                        </AnimatePresence>
+                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {defaultFlashcards.map((card, i) => (
+                                            <FlashcardItem key={i} card={card} index={i} />
+                                        ))}
+                                    </div>
 
-                    </div>
-                </main>
+                                    <div className="bg-slate-50/50 dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 text-center">
+                                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">
+                                            More flashcards are available within each course module to help you master professional terminology.
+                                        </p>
+                                        <button
+                                            onClick={() => navigate("/dashboard/courses")}
+                                            className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl border-2 border-[#1a3884] dark:border-blue-500 text-[#1a3884] dark:text-blue-400 text-xs font-black uppercase tracking-widest hover:bg-[#1a3884] hover:text-white dark:hover:bg-blue-500 dark:hover:text-white transition-all transform hover:scale-[1.02]"
+                                        >
+                                            <BookOpen className="w-4 h-4" /> Explore Course Flashcards
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
-            <UserCertificateUploadModal 
-                isOpen={isUploadModalOpen} 
+                        </motion.div>
+                    </AnimatePresence>
+
+                </div>
+            </main>
+
+            <UserCertificateUploadModal
+                isOpen={isUploadModalOpen}
                 onClose={() => setIsUploadModalOpen(false)}
                 onUploadSuccess={(newCert) => setUserCertificates(prev => [newCert, ...prev])}
             />
@@ -615,7 +615,7 @@ const FlashcardItem = ({ card, index }) => {
                 {/* Front - Solid Background with Opacity Control */}
                 <motion.div
                     className="absolute inset-0 bg-white dark:bg-slate-900 rounded-[28px] border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] group-hover:shadow-2xl group-hover:border-[#1a3884]/30 transition-all duration-500"
-                    style={{ 
+                    style={{
                         backfaceVisibility: "hidden",
                         WebkitBackfaceVisibility: "hidden",
                         transform: "translateZ(1px)",
@@ -643,8 +643,8 @@ const FlashcardItem = ({ card, index }) => {
                 {/* Back - Solid Background with Opacity Control */}
                 <motion.div
                     className="absolute inset-0 bg-slate-900 rounded-[28px] p-8 flex flex-col justify-center text-white shadow-2xl overflow-hidden"
-                    style={{ 
-                        backfaceVisibility: "hidden", 
+                    style={{
+                        backfaceVisibility: "hidden",
                         WebkitBackfaceVisibility: "hidden",
                         transform: "rotateY(180deg) translateZ(1px)",
                         zIndex: flipped ? 10 : 0
@@ -654,7 +654,7 @@ const FlashcardItem = ({ card, index }) => {
                 >
                     {/* Solid Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#1a3884] via-[#112b6b] to-[#002147] opacity-100" />
-                    
+
                     <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
                     <div className="absolute top-4 left-4 opacity-20">
                         <Zap className="w-6 h-6 text-white" />

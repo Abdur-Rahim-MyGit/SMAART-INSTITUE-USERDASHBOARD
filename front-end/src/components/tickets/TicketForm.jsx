@@ -19,11 +19,11 @@ const CATEGORIES = [
   { value: 'other', label: 'Other', description: 'General inquiries' }
 ];
 
-const PRIORITIES = [
-  { value: 'low', label: 'Low', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-  { value: 'medium', label: 'Medium', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
-  { value: 'high', label: 'High', color: 'bg-red-500/20 text-red-400 border-red-500/30' }
-];
+// const PRIORITIES = [
+//   { value: 'low', label: 'Low', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
+//   { value: 'medium', label: 'Medium', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' },
+//   { value: 'high', label: 'High', color: 'bg-red-500/20 text-red-400 border-red-500/30' }
+// ];
 
 const TicketForm = ({ onSuccess, onCancel, initialData }) => {
   const [formData, setFormData] = useState({
@@ -190,8 +190,8 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
                 if (errors.category) setErrors(prev => ({ ...prev, category: null }));
               }}
               className={`p-3 rounded-xl border text-left transition-all ${formData.category === cat.value
-                  ? 'border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20'
-                  : 'bg-white dark:bg-white/5 border-slate-200 dark:border-[#1a3884]/30 hover:border-[#1a3884]/50'
+                ? 'border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20'
+                : 'bg-white dark:bg-white/5 border-slate-200 dark:border-[#1a3884]/30 hover:border-[#1a3884]/50'
                 }`}
             >
               <span className={`font-medium text-sm ${formData.category === cat.value ? 'text-[#1a3884]' : 'text-slate-900 dark:text-white'}`}>{cat.label}</span>
@@ -205,7 +205,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
       </div>
 
       {/* Priority */}
-      <div>
+      {/* <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
           Priority
         </label>
@@ -224,7 +224,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
             </button>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Description */}
       <div>
