@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { assessmentApi } from "@/services/assessmentApi";
-import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase } from "lucide-react";
+import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
@@ -134,10 +134,45 @@ const BaseLineTest = () => {
   const [remainingSeconds, setRemainingSeconds] = useState(stageDurationSeconds);
   const [interactionLocked, setInteractionLocked] = useState(false);
   const [timeExpired, setTimeExpired] = useState(false);
+  const [assessmentToken, setAssessmentToken] = useState(null); // Dedicated session JWT
 
   const timerStartRef = useRef(null);
   const timeoutSubmitTriggeredRef = useRef(false);
   const oneMinuteAlertShownRef = useRef(false);
+  const initRef = useRef(false);
+
+  // Manual navigation guard for standard BrowserRouter
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (!submitted && !loading && !!resultId) {
+        const msg = "Are you sure you want to leave? Your assessment progress will be lost.";
+        e.preventDefault();
+        e.returnValue = msg;
+        return msg;
+      }
+    };
+
+    const handlePopState = (e) => {
+      if (!submitted && !loading && !!resultId) {
+        // Prevent back navigation by pushing current state back
+        window.history.pushState(null, "", window.location.pathname);
+        setShowExitWarning(true);
+      }
+    };
+
+    if (!submitted && !loading && !!resultId) {
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      window.addEventListener("popstate", handlePopState);
+      
+      // Push an extra entry to the history stack so we can intercept the first 'back' click
+      window.history.pushState(null, "", window.location.pathname);
+    }
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [submitted, loading, resultId]);
 
   // Badge notification state
   const [earnedBadge, setEarnedBadge] = useState(null);
@@ -214,6 +249,10 @@ const BaseLineTest = () => {
   // Check authentication and fetch assessment on mount
   useEffect(() => {
     const initializeAssessment = async () => {
+      if (initRef.current) return;
+      initRef.current = true;
+
+      setError(null);
       const isReportMode = window.location.pathname.endsWith('/report');
       console.log(`Initializing ${stageConfig.title} (${stageKey}) - Report Mode: ${isReportMode}...`);
 
@@ -279,12 +318,7 @@ const BaseLineTest = () => {
         console.log(`📡 Starting assessment session for ID: ${assessmentId}`);
 
         // Set a timeout for the start request to prevent hanging
-        const startPromise = assessmentApi.startAssessment(assessmentId, userId);
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Request timed out starting assessment")), 30000)
-        );
-
-        const startResponse = await Promise.race([startPromise, timeoutPromise]);
+        const startResponse = await assessmentApi.startAssessment(assessmentId);
 
         if (!startResponse.success) {
           throw new Error(startResponse.error || "Failed to start assessment session");
@@ -292,6 +326,7 @@ const BaseLineTest = () => {
 
         console.log("✅ Assessment session started, Result ID:", startResponse.data.resultId);
         setResultId(startResponse.data.resultId);
+        setAssessmentToken(startResponse.data.assessmentToken); // Save JWT
 
         // Ensure questions are in order (defensive check)
         const fetchedQuestions = startResponse.data.questions || [];
@@ -364,7 +399,8 @@ const BaseLineTest = () => {
         resultId,
         currentQuestionId,
         optionValue,
-        current.questionText
+        current.questionText,
+        assessmentToken // Pass JWT
       );
 
       if (!response.success) {
@@ -407,7 +443,7 @@ const BaseLineTest = () => {
         await finalizeUnansweredQuestions();
       }
 
-      const response = await assessmentApi.submitAssessment(resultId);
+      const response = await assessmentApi.submitAssessment(resultId, assessmentToken);
 
       if (response.success) {
         submitSucceeded = true;
@@ -454,7 +490,23 @@ const BaseLineTest = () => {
         setInteractionLocked(false);
       }
     }
-  }, [allQuestionsAnswered, clearTimerPersistence, finalizeUnansweredQuestions, navigate, resultId, stageKey, submitted, submitting, user]);
+  }, [allQuestionsAnswered, clearTimerPersistence, finalizeUnansweredQuestions, navigate, resultId, stageKey, submitted, submitting, user, assessmentToken]);
+
+  const handleRestart = async () => {
+    if (!resultId) return;
+    if (window.confirm("Are you sure you want to cancel and restart this assessment? Your current progress will be lost.")) {
+      try {
+        setLoading(true);
+        await assessmentApi.resetAssessment(resultId);
+        clearTimerPersistence();
+        // For development, we reload to start clean
+        window.location.reload();
+      } catch (err) {
+        toast.error("Failed to reset assessment");
+        setLoading(false);
+      }
+    }
+  };
 
   useEffect(() => {
     if (loading || submitted || !resultId) return;
@@ -810,7 +862,7 @@ const BaseLineTest = () => {
                         const batch = unanswered.slice(i, i + batchSize);
                         await Promise.all(batch.map(q => {
                           const val = ['A', 'B', 'C', 'D'][Math.floor(Math.random() * 4)];
-                          return assessmentApi.saveAnswer(resultId, q._id, val, q.questionText);
+                          return assessmentApi.saveAnswer(resultId, q._id, val, q.questionText, assessmentToken);
                         }));
                         const newAnswers = {};
                         batch.forEach(q => { newAnswers[q._id] = 'RANDOM'; });
@@ -1037,7 +1089,20 @@ const BaseLineTest = () => {
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">Don't Leave Yet!</h3>
               <p className="text-slate-500 dark:text-slate-400 text-center mb-8">Back navigation is disabled during the assessment. Use the submit button when you are ready to leave.</p>
               <div className="flex flex-col gap-3">
-                <button onClick={() => setShowExitWarning(false)} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Continue Assessment</button>
+                <button onClick={() => {
+                  setShowExitWarning(false);
+                }} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Continue Assessment</button>
+                
+                {/* Development Only: Restart Button */}
+                <button 
+                  onClick={() => {
+                    handleRestart();
+                  }}
+                  className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl font-semibold hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Restart Assessment (Dev Mode)
+                </button>
               </div>
             </motion.div>
           </div>

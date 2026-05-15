@@ -2,6 +2,7 @@ const express = require('express');
 const Result = require('../models/Result');
 const Assessment = require('../models/Assessment');
 const { protect } = require('../middleware/auth');
+const { signAssessmentToken, verifyAssessmentToken } = require('../middleware/assessmentAuth');
 const { shuffleArrayDeterministic, selectQuestionsForUser, selectStratifiedQuestions, selectStratifiedQuestionsForStage } = require('../utils/questionShuffler');
 const { notifyAssessmentComplete } = require('../services/notificationService');
 const { getStageByCode, STAGE_DISTRIBUTIONS } = require('../config/stage_distributions');
@@ -41,12 +42,14 @@ const determineLevel = (pct) => {
 router.get('/assessment/:assessmentId/start', async (req, res) => {
     try {
         const { assessmentId } = req.params;
-        const { userId } = req.query;
+        // Robust User ID extraction (handles Mongoose docs, POJOs, and different ID naming conventions)
+        const userId = req.user?._id || req.user?.id || (req.user?._doc ? req.user._doc._id : null);
 
         if (!userId) {
-            return res.status(400).json({
+            console.error('❌ User identification failed. req.user keys:', req.user ? Object.keys(req.user) : 'null');
+            return res.status(401).json({
                 success: false,
-                error: 'User ID is required'
+                error: 'User ID is required. Please re-login.'
             });
         }
 
@@ -156,6 +159,13 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
 
             console.log(`📤 [DEBUG] Final question count to send: ${questions.length}`);
 
+            // Sign assessment token for existing result
+            const assessmentToken = signAssessmentToken({
+                resultId: existingResult._id,
+                userId: req.user._id || req.user.id,
+                assessmentId
+            });
+
             return res.json({
                 success: true,
                 message: 'Resuming existing attempt',
@@ -163,7 +173,8 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
                     resultId: existingResult._id,
                     questions,
                     answeredCount: existingResult.answeredQuestions || 0,
-                    responses: existingResult.responses || []
+                    responses: existingResult.responses || [],
+                    assessmentToken
                 }
             });
         }
@@ -241,13 +252,21 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
 
         console.log(`✅ Assessment started successfully with ${shuffledQuestions.length} questions`);
 
+        // Sign assessment token for new result
+            const assessmentToken = signAssessmentToken({
+                resultId: result._id,
+                userId: userId,
+                assessmentId: assessment._id
+            });
+
         res.status(201).json({
             success: true,
             message: 'Assessment started successfully',
             data: {
                 resultId: result._id,
                 questions: shuffledQuestions,
-                totalQuestions: totalQuestions
+                totalQuestions: totalQuestions,
+                assessmentToken
             }
         });
     } catch (err) {
@@ -261,7 +280,7 @@ router.get('/assessment/:assessmentId/start', async (req, res) => {
 });
 
 // Save individual answer (real-time)
-router.post('/:resultId/answer', async (req, res) => {
+router.post('/:resultId/answer', verifyAssessmentToken, async (req, res) => {
     try {
         const { resultId } = req.params;
         const { questionId, selectedValue, questionText } = req.body;
@@ -351,7 +370,7 @@ router.post('/:resultId/answer', async (req, res) => {
 });
 
 // Submit completed assessment
-router.post('/:resultId/submit', async (req, res) => {
+router.post('/:resultId/submit', verifyAssessmentToken, async (req, res) => {
     try {
         const { resultId } = req.params;
 
@@ -715,6 +734,42 @@ router.get('/:resultId', async (req, res) => {
             success: false,
             error: 'Failed to fetch result',
             message: err.message
+        });
+    }
+});
+
+// Reset assessment (Development Only)
+router.post('/:resultId/reset', async (req, res) => {
+    try {
+        const { resultId } = req.params;
+        const userId = req.user._id || req.user.id;
+        if (!userId) {
+            return res.status(401).json({ success: false, error: 'User session invalid' });
+        }
+
+        const result = await Result.findOne({ _id: resultId, userId });
+
+        if (!result) {
+            return res.status(404).json({
+                success: false,
+                error: 'Result not found or unauthorized'
+            });
+        }
+
+        // Delete the result to allow a clean restart
+        await Result.deleteOne({ _id: resultId });
+
+        console.log(`♻️ Assessment ${resultId} reset for user ${userId}`);
+
+        res.json({
+            success: true,
+            message: 'Assessment reset successfully. You can now start fresh.'
+        });
+    } catch (err) {
+        console.error('Error resetting assessment:', err);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to reset assessment'
         });
     }
 });

@@ -31,24 +31,37 @@ export const assessmentApi = {
     /**
      * Start a new assessment attempt
      * @param {string} assessmentId - Assessment ID
-     * @param {string} userId - User ID
-     * @returns {Promise} Shuffled questions and result ID
+     * @returns {Promise} Shuffled questions, result ID, and session token
      */
-    startAssessment: async (assessmentId, userId) => {
-        return apiCall(`/results/assessment/${assessmentId}/start?userId=${userId}`);
+    startAssessment: async (assessmentId) => {
+        return apiCall(`/results/assessment/${assessmentId}/start`);
+    },
+
+    /**
+     * Reset an assessment attempt (Development only)
+     * @param {string} resultId - Result ID to reset
+     * @returns {Promise} Confirmation
+     */
+    resetAssessment: async (resultId) => {
+        return apiCall(`/results/${resultId}/reset`, {
+            method: 'POST'
+        });
     },
 
     /**
      * Save individual answer (real-time)
      * @param {string} resultId - Result document ID
      * @param {string} questionId - Question ID
-     * @param {number} selectedValue - Selected value (1-5)
+     * @param {string} selectedValue - Selected value
      * @param {string} questionText - Question text (optional)
+     * @param {string} token - Assessment session token
      * @returns {Promise} Save confirmation
      */
-    saveAnswer: async (resultId, questionId, selectedValue, questionText = '') => {
+    saveAnswer: async (resultId, questionId, selectedValue, questionText = '', token = null) => {
+        const headers = token ? { 'x-assessment-token': token } : {};
         return apiCall(`/results/${resultId}/answer`, {
             method: 'POST',
+            headers,
             body: JSON.stringify({
                 questionId,
                 selectedValue,
@@ -60,11 +73,14 @@ export const assessmentApi = {
     /**
      * Submit completed assessment
      * @param {string} resultId - Result document ID
+     * @param {string} token - Assessment session token
      * @returns {Promise} Final results with scores
      */
-    submitAssessment: async (resultId) => {
+    submitAssessment: async (resultId, token = null) => {
+        const headers = token ? { 'x-assessment-token': token } : {};
         return apiCall(`/results/${resultId}/submit`, {
             method: 'POST',
+            headers
         });
     },
 
