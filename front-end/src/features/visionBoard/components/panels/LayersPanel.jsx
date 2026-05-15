@@ -15,6 +15,7 @@ import {
   Layers3,
   Lock,
   ScanLine,
+  Trash2,
   Type,
   Unlock,
 } from "lucide-react";
@@ -69,12 +70,14 @@ const LayersPanel = ({
   onDuplicateAsset,
   onResetImage,
   selectedText,
+  onDeleteAsset,
+  onDeleteText,
 }) => {
   const orderedLayers = [...layers].sort((a, b) => b.zIndex - a.zIndex);
 
   return (
     <div className="space-y-4">
-      <div className={sectionClass}>
+      {/* <div className={sectionClass}>
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#7aa2ff]/15 dark:text-[#9cb9ff]">
             <Layers3 className="h-5 w-5" />
@@ -88,9 +91,9 @@ const LayersPanel = ({
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
 
-      <div className={sectionClass}>
+      {/* <div className={sectionClass}>
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <div className="text-sm font-semibold text-slate-900 dark:text-white">
@@ -130,7 +133,7 @@ const LayersPanel = ({
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-[11px] text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/55">
           Shift-click layers or canvas items to build a multi-selection. Arrow keys nudge the active selection.
         </div>
-      </div>
+      </div> */}
 
       {selectedImage && (
         <div className={sectionClass}>
@@ -158,11 +161,10 @@ const LayersPanel = ({
                       onClick={() =>
                         onUpdateImage({ fitMode: mode.id, cropMode: mode.id === "crop" })
                       }
-                      className={`rounded-xl border px-3 py-2 text-xs font-medium transition ${
-                        active
-                          ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] text-[#1a3884] dark:text-[#9cb9ff]"
-                          : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/55"
-                      }`}
+                      className={`rounded-2xl border px-3 py-2 text-xs font-bold transition-all duration-200 ${active
+                          ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] text-[#1a3884] shadow-sm dark:text-[#9cb9ff]"
+                          : "border-slate-200 bg-slate-50 text-slate-600 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white/55"
+                        }`}
                     >
                       {mode.label}
                     </button>
@@ -309,13 +311,12 @@ const LayersPanel = ({
                     key={preset.id}
                     type="button"
                     onClick={() => onUpdateImage({ ...preset.values, filterPreset: preset.id })}
-                    className={`rounded-xl border px-3 py-3 text-left transition ${
-                      (selectedImage.filterPreset || "clean") === preset.id
-                        ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08]"
-                        : "border-slate-200 bg-slate-50 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04]"
-                    }`}
+                    className={`rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${(selectedImage.filterPreset || "clean") === preset.id
+                        ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] shadow-sm"
+                        : "border-slate-200 bg-slate-50 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]"
+                      }`}
                   >
-                    <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                    <div className="text-sm font-bold text-slate-900 dark:text-white">
                       {preset.name}
                     </div>
                   </button>
@@ -333,11 +334,10 @@ const LayersPanel = ({
                       key={tint}
                       type="button"
                       onClick={() => onUpdateImage({ tint })}
-                      className={`h-8 w-8 rounded-full border transition ${
-                        active
+                      className={`h-8 w-8 rounded-full border transition ${active
                           ? "scale-110 border-slate-900 ring-2 ring-slate-300 dark:border-white dark:ring-white/25"
                           : "border-slate-200 dark:border-white/10"
-                      }`}
+                        }`}
                       style={{ backgroundColor: tint === "rgba(0,0,0,0)" ? "#ffffff" : tint }}
                     />
                   );
@@ -349,14 +349,14 @@ const LayersPanel = ({
               <button
                 type="button"
                 onClick={onResetImage}
-                className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+                className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
               >
                 Reset Transform
               </button>
               <button
                 type="button"
                 onClick={onDuplicateImage}
-                className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+                className="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-bold uppercase tracking-wider text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
               >
                 Duplicate Image
               </button>
@@ -438,11 +438,10 @@ const LayersPanel = ({
             return (
               <div
                 key={`${layer.type}-${layer.id}`}
-                className={`rounded-xl border px-3 py-3 transition ${
-                  isSelected
-                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.07]"
-                    : "border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/[0.03]"
-                }`}
+                className={`rounded-2xl border px-3 py-3 transition-all duration-200 ${isSelected
+                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.07] shadow-inner"
+                    : "border-slate-200 bg-slate-50/50 dark:border-white/10 dark:bg-white/[0.03]"
+                  }`}
               >
                 <div className="flex items-start gap-3">
                   <button
@@ -450,7 +449,7 @@ const LayersPanel = ({
                     onClick={(event) =>
                       onSelectLayer(layer.id, layer.type, event.shiftKey || event.metaKey || event.ctrlKey)
                     }
-                    className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm dark:bg-white/10 dark:text-white/55"
+                    className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-[14px] bg-white text-[#1a3884] shadow-sm transition-transform hover:scale-105 dark:bg-white/10 dark:text-blue-300"
                   >
                     <Icon className="h-4 w-4" />
                   </button>
@@ -524,6 +523,23 @@ const LayersPanel = ({
                       Duplicate
                     </button>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (layer.type === "image") {
+                        // For image slots, we just clear the image data
+                        onResetImage(); 
+                      } else if (layer.type === "asset") {
+                        onDeleteAsset(layer.id);
+                      } else {
+                        onDeleteText(layer.id);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 rounded-full border border-red-200 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-red-500 shadow-sm transition-all hover:bg-red-50 hover:shadow-md dark:border-red-500/20 dark:bg-white/[0.04] dark:text-red-400"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    Delete
+                  </button>
                 </div>
               </div>
             );

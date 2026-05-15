@@ -1,0 +1,271 @@
+{
+  "sidebar": {
+    "dashboard": "Tableau de bord",
+    "profile": "Mon profil",
+    "settings": "Paramètres",
+    "courses": "Mes cours",
+    "results": "Résultats",
+    "assessments": "Évaluations",
+    "toolkit": "Boîte à outils",
+    "skills_vault": "Coffre-fort de compétences",
+    "skills_passport": "Passeport de compétences",
+    "vision_board": "Tableau de vision",
+    "career_directions": "Directions de carrière",
+    "community": "Communauté",
+    "help": "Aide et support",
+    "logout": "Déconnexion",
+    "theme": "Mode thème",
+    "notifications": "Notifications",
+    "group_main": "Menu principal",
+    "group_skills": "Compétences et croissance",
+    "group_community": "Communauté",
+    "group_system": "Système"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "profile_settings": "Paramètres du profil",
+    "notifications": "Notifications",
+    "privacy": "Confidentialité et sécurité",
+    "appearance": "Apparence",
+    "language": "Langue et région",
+    "help": "Aide et support",
+    "save_changes": "Enregistrer les modifications",
+    "cancel": "Annuler",
+    "language_region": "Langue et région"
+  },
+  "dashboard": {
+    "good_morning": "Bonjour",
+    "good_afternoon": "Bon après-midi",
+    "good_evening": "Bonsoir",
+    "welcome": "Bienvenue à nouveau",
+    "search_placeholder": "Rechercher des cours, des compétences, des idées...",
+    "ready_message": "Prêt à passer à la prochaine étape de votre carrière ? Continuons d'avancer.",
+    "overview": "Aperçu",
+    "recent_activity": "Activité récente",
+    "my_courses": "Mes cours",
+    "upcoming_tasks": "Tâches à venir",
+    "view_all": "Voir tout",
+    "unable_to_connect": "Impossible de se connecter",
+    "connection_error": "Nous n'avons pas pu nous connecter au serveur. Veuillez vérifier votre connexion ou réessayer.",
+    "reload": "Recharger le tableau de bord",
+    "continue_learning": "Continuer l'apprentissage",
+    "capability_program": "Programme de capacité",
+    "complete": "Terminer",
+    "retry": "Réessayer",
+    "no_paths": "Pas encore de parcours d'apprentissage",
+    "browse_courses": "Parcourir les cours",
+    "unable_to_load_paths": "Impossible de charger les parcours"
+  },
+  "profile_page": {
+    "personal_information": "Informations personnelles",
+    "contact_information": "Informations de contact",
+    "educational_history": "Historique éducatif",
+    "higher_education": "Enseignement supérieur",
+    "work_experience": "Expérience professionnelle",
+    "professional_experience": "Expérience professionnelle",
+    "vision_goals": "Vision et objectifs",
+    "edit_profile": "Modifier le profil",
+    "save": "Enregistrer",
+    "full_name": "Nom complet",
+    "phone": "Téléphone",
+    "institution": "Institution",
+    "department": "Département"
+  },
+  "profile": {
+    "display_name": "Nom d'affichage",
+    "email": "Adresse e-mail",
+    "phone": "Numéro de téléphone",
+    "bio": "Biographie"
+  },
+  "skills_passport": {
+    "title": "Passeport de compétences numériques",
+    "verifiable": "Vérifiable par l'employeur",
+    "hero_title": "L'avenir du talent vérifié.",
+    "hero_desc": "Votre titre de capacité sécurisé et vérifié par l'IA. Conçu pour les employeurs exigeants et les professionnels en quête de croissance.",
+    "get_pdf": "Obtenir le PDF du passeport",
+    "share": "Partager l'identité",
+    "global_readiness": "Préparation mondiale",
+    "plvi_band": "Bande PLVI",
+    "secure_protocol": "Protocole de confiance sécurisé",
+    "verification_live": "La vérification publique est en direct",
+    "tabs": {
+      "smart": "Cours Smart",
+      "other": "Autre cours",
+      "certificates": "Certificats",
+      "projects": "Projets"
+    },
+    "stats": {
+      "growth_delta": "Delta de croissance",
+      "momentum": "Score d'élan",
+      "badges": "Badges de compétences",
+      "trust": "Note de confiance"
+    },
+    "dna": {
+      "title": "ADN de compétences",
+      "desc": "Une analyse multidimensionnelle de vos forces cognitives et professionnelles vérifiées."
+    },
+    "proficiency": {
+      "title": "Compétence vérifiée",
+      "gold_standard": "Vérifié conforme au standard d'or"
+    },
+    "timeline": {
+      "title": "Ligne de temps",
+      "baseline": "Base",
+      "assessment": "Évaluation"
+    },
+    "other_courses": {
+      "title": "Autres cours de l'institut",
+      "none": "Aucun cours externe trouvé."
+    },
+    "certificates": {
+      "title": "Certificats obtenus",
+      "none": "Aucun certificat obtenu pour le moment."
+    },
+    "projects": {
+      "title": "Vitrine de projets",
+      "none": "Aucun projet présenté pour le moment."
+    }
+  },
+  "quotients": {
+    "CRQ": {
+      "name": "Raisonnement cognitif",
+      "desc": "Résolution de problèmes, pensée critique et reconnaissance de formes."
+    },
+    "SRQ": {
+      "name": "Autorégulation",
+      "desc": "Intelligence émotionnelle, discipline et gestion du stress."
+    },
+    "LQ": {
+      "name": "Agilité d'apprentissage",
+      "desc": "Capacité à apprendre rapidement et à s'adapter à de nouvelles situations."
+    },
+    "SIQ": {
+      "name": "Intelligence sociale",
+      "desc": "Compétences interpersonnelles, empathie et esprit de collaboration."
+    },
+    "PEQ": {
+      "name": "Exécution professionnelle",
+      "desc": "Capacité de livraison, fiabilité et compétence technique."
+    },
+    "DAQ": {
+      "name": "Numérique et IA",
+      "desc": "Maîtrise des outils numériques et des flux de travail pilotés par l'IA."
+    },
+    "SEQ": {
+      "name": "Durabilité et éthique",
+      "desc": "Engagement envers des pratiques éthiques et sensibilisation à l'environnement."
+    }
+  },
+  "community": {
+    "title": "Communauté",
+    "tabs": {
+      "discussions": "Discussions",
+      "my_posts": "Mes publications",
+      "bookmarks": "Signets"
+    },
+    "stats": {
+      "members": "Total des membres",
+      "discussions": "Discussions",
+      "groups": "Groupes d'étudiants",
+      "active": "Actif aujourd'hui"
+    },
+    "badges": {
+      "official": "OFFICIEL",
+      "best_answer": "MEILLEURE RÉPONSE",
+      "pinned": "ÉPINGLÉ"
+    },
+    "time": {
+      "just_now": "À l'instant",
+      "ago": "il y a",
+      "min_short": "m",
+      "hour_short": "h",
+      "day_short": "j"
+    },
+    "channels": {
+      "discussion": "Discussion",
+      "mentor": "Mentor",
+      "support": "Support"
+    },
+    "new_post": "Nouvelle publication",
+    "new_post_button": "Commencer une discussion",
+    "search": "Rechercher des discussions...",
+    "sort_by": "Trier par",
+    "sort": {
+      "newest": "PLUS RÉCENT",
+      "popular": "POPULAIRE",
+      "quality": "HAUTE QUALITÉ"
+    },
+    "load_more": "Charger plus",
+    "loading": "Chargement...",
+    "no_discussions": "Aucune discussion trouvée.",
+    "comments": "Commentaires",
+    "share_to_group": "Partager dans le groupe",
+    "report_discussion": "Signaler la discussion",
+    "my_groups": "Mes groupes",
+    "no_groups": "Aucun groupe disponible",
+    "view_my_groups": "Voir mes groupes",
+    "create_group": "Créer un groupe",
+    "top_contributors": "Meilleurs contributeurs",
+    "new_discussion_title": "Nouvelle discussion",
+    "post_title": "Titre du message",
+    "category": "Catégorie",
+    "channel": "Canal",
+    "post_content_placeholder": "Allez-y, partagez votre histoire ou posez une question...",
+    "create_poll": "Créer un sondage",
+    "media_attachment": "Pièce jointe média",
+    "publish_discussion": "Publier la discussion",
+    "report_content": "Signaler le contenu",
+    "share_to_groups_title": "Partager dans les groupes",
+    "reactions": {
+      "like": "J'aime",
+      "heart": "J'adore",
+      "insight": "Pertinent",
+      "care": "Soutien",
+      "celebrate": "Brillant"
+    },
+    "tips": {
+      "guidelines": {
+        "title": "Conseil communautaire",
+        "text": "Participez aux discussions et aidez les autres pour gagner des points et des badges. Les meilleurs contributeurs sont mis en avant sur le classement !"
+      },
+      "quality": {
+        "title": "Score de qualité",
+        "text": "Votre score de qualité (QS) augmente avec les votes, les cœurs et les commentaires. Publiez de manière réfléchie pour grimper dans le flux populaire !"
+      },
+      "mentor": {
+        "title": "Canal Mentor",
+        "text": "Vous avez une question sur votre carrière ou vos études ? Publiez dans le canal Mentor — votre question va directement à vos mentors et coachs assignés."
+      },
+      "support": {
+        "title": "Canal Support",
+        "text": "Vous vous sentez dépassé ? Le canal Support vous connecte à l'IA Coach Émotion — un espace sûr et sans jugement juste pour vous."
+      },
+      "groups": {
+        "title": "Groupes d'étudiants",
+        "text": "Créez ou rejoignez un groupe d'étude pour collaborer avec vos pairs, partager des ressources et discuter en temps réel dans l'espace privé de votre groupe."
+      },
+      "pinned": {
+        "title": "Messages épinglés",
+        "text": "Les messages épinglés restent en haut du flux de discussion quel que soit l'ordre de tri. Recherchez le badge ÉPINGLÉ sur les annonces importantes !"
+      }
+    }
+  },
+  "common": {
+    "student": "Étudiant",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "back": "Retour",
+    "loading": "Chargement...",
+    "processing": "Traitement...",
+    "verified": "Vérifié",
+    "pending": "En attente",
+    "retry": "Réessayer",
+    "high": "Haut",
+    "verified_progression": "Progression vérifiée",
+    "skill_acquisition_rate": "Taux d'acquisition de compétences",
+    "competency_aligned": "Aligné sur les compétences",
+    "integrity_verified": "Intégrité vérifiée",
+    "success_export": "Exportation réussie !",
+    "error_export": "L'exportation a échoué. Veuillez réessayer."
+  }
+}

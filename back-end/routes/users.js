@@ -403,12 +403,13 @@ router.patch('/register-section', async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Find or create user
+    // Find or create user (and also find student)
     const emailQuery = { email: { $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, 'i') } };
     let user = await User.findOne(emailQuery);
+    let student = await Student.findOne(emailQuery);
 
-    if (!user) {
-      // Create a minimal user record
+    if (!user && !student) {
+      // Create a minimal user record if neither exists
       user = new User({
         fullName: data.fullName || 'User',
         email: normalizedEmail,
@@ -417,16 +418,27 @@ router.patch('/register-section', async (req, res) => {
       await user.save();
     }
 
-    // Find or create registration
-    let registration = await Registration.findOne({ userId: user._id });
+    // Find or create registration (using both userId and email to prevent duplicates)
+    let registration = await Registration.findOne({
+      $or: [
+        { userId: user?._id },
+        { userId: student?._id },
+        { email: normalizedEmail }
+      ]
+    }).sort({ updatedAt: -1 });
 
     if (!registration) {
       registration = new Registration({
-        userId: user._id,
+        userId: user?._id || student?._id,
         email: normalizedEmail,
-        fullName: user.fullName,
-        mobileNumber: data.mobileNumber || '',
+        fullName: data.fullName || user?.fullName || student?.fullName || 'User',
+        mobileNumber: data.mobileNumber || user?.mobile || student?.mobile || '',
       });
+    } else {
+      // Ensure registration is linked to current user/student ID if missing
+      if (!registration.userId) {
+        registration.userId = user?._id || student?._id;
+      }
     }
 
     // Update the specific section
@@ -464,7 +476,7 @@ router.patch('/register-section', async (req, res) => {
           };
         }
 
-        // Sync critical fields to User model
+        // Sync critical fields to User and Student models
         if (user) {
           if (data.fullName) user.fullName = data.fullName;
           if (data.mobileNumber) user.mobile = data.mobileNumber;
@@ -472,6 +484,14 @@ router.patch('/register-section', async (req, res) => {
           if (data.timezone) user.timezone = data.timezone;
           if (data.dateFormat) user.dateFormat = data.dateFormat;
           await user.save();
+        }
+        if (student) {
+          if (data.fullName) student.fullName = data.fullName;
+          if (data.mobileNumber) student.mobile = data.mobileNumber;
+          if (data.bio) student.bio = data.bio;
+          if (data.dob) student.dateOfBirth = data.dob;
+          if (data.gender) student.gender = data.gender.toLowerCase();
+          await student.save();
         }
       },
       'address': async () => {
@@ -740,7 +760,7 @@ router.get('/register-details/:email', async (req, res) => {
         { userId: user._id },
         { email: normalizedEmail }
       ]
-    });
+    }).sort({ updatedAt: -1 });
 
     // Aggregated badges
     let aggregatedBadges = [];

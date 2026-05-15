@@ -31,6 +31,8 @@ const EditorCanvas = ({
   snapEnabled,
   guideState,
   setGuideState,
+  handleDeleteText,
+  handleDeleteAsset,
 }) => {
   const overlayPeers = [
     ...Object.entries(textOverlays || {})
@@ -54,7 +56,7 @@ const EditorCanvas = ({
   return (
     <div className="custom-scrollbar relative flex flex-1 items-center justify-center overflow-auto bg-[radial-gradient(circle_at_top,#eff6ff_0%,#f8fafc_36%,#eef2f7_100%)] p-4 pb-36 dark:bg-[radial-gradient(circle_at_top,#172554_0%,#0b1220_28%,#040814_100%)] sm:p-5 sm:pb-36 lg:p-8 lg:pb-10">
       <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:linear-gradient(to_right,rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,0.12)_1px,transparent_1px)] [background-size:32px_32px] dark:opacity-20" />
-      <div className="absolute left-4 top-4 hidden rounded-full border border-white/60 bg-white/70 px-3 py-1 text-[11px] font-medium text-slate-500 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-slate-400 lg:block xl:left-5 xl:top-5">
+      <div className="absolute left-4 top-4 hidden rounded-xl border border-white/60 bg-white/70 px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-600 shadow-md backdrop-blur-xl dark:border-white/10 dark:bg-white/5 dark:text-slate-300 lg:block xl:left-6 xl:top-6">
         Studio Preview
       </div>
 
@@ -132,6 +134,7 @@ const EditorCanvas = ({
                         overlayType="text"
                         overlayId={id}
                         onGuideChange={setGuideState}
+                        onDelete={() => handleDeleteText(id)}
                     />
                 ))}
 
@@ -150,6 +153,7 @@ const EditorCanvas = ({
                         overlayType="asset"
                         overlayId={id}
                         onGuideChange={setGuideState}
+                        onDelete={() => handleDeleteAsset(id)}
                     />
                 ))}
 
@@ -164,12 +168,12 @@ const EditorCanvas = ({
                     {(guideState.spacingX || guideState.spacingY) && (
                       <div className="absolute right-3 top-3 flex flex-col gap-1">
                         {guideState.spacingX ? (
-                          <div className="rounded-full bg-slate-900/82 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-lg backdrop-blur-md">
+                          <div className="rounded-xl bg-[#0f172a]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
                             X Gap {guideState.spacingX}px
                           </div>
                         ) : null}
                         {guideState.spacingY ? (
-                          <div className="rounded-full bg-slate-900/82 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-lg backdrop-blur-md">
+                          <div className="rounded-xl bg-[#0f172a]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
                             Y Gap {guideState.spacingY}px
                           </div>
                         ) : null}
