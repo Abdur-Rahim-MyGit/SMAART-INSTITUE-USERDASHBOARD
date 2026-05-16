@@ -1507,10 +1507,27 @@ router.post('/logout', protect, async (req, res) => {
 
 // Check Session (for frontend to validate cookie)
 router.get('/me', protect, async (req, res) => {
-  res.status(200).json({
-    success: true,
-    user: req.user
-  });
+  try {
+    const Registration = require('../models/Registration');
+    const registration = await Registration.findOne({
+      $or: [
+        { userId: req.user._id },
+        { email: req.user.email }
+      ]
+    }).lean();
+
+    res.status(200).json({
+      success: true,
+      user: req.user,
+      registration: registration || null
+    });
+  } catch (err) {
+    res.status(200).json({
+      success: true,
+      user: req.user,
+      registration: null
+    });
+  }
 });
 
 // === UTILITY: Clear stale session by email (for debugging) ===

@@ -656,7 +656,11 @@ router.get("/discussions", async (req, res) => {
     }
 
     if (collegeId) {
-      query.college = collegeId;
+      query.$or = [
+        { college: collegeId },
+        { college: { $exists: false } },
+        { college: null }
+      ];
     }
 
     if (category && category !== "all") {
