@@ -103,14 +103,14 @@ const GeneralDictionary = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen page-bg">
       <main className="container mx-auto px-4 md:px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-sans font-bold text-slate-800 dark:text-white mb-2">
+          <h1 className="text-4xl font-sans font-bold mb-2">
             General Dictionary
           </h1>
           <p className="text-slate-600 dark:text-slate-400">Master professional terminology with our interactive reference tool.</p>
@@ -130,13 +130,13 @@ const GeneralDictionary = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search for a word..."
-                className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-purple-500 shadow-sm text-lg"
+                className="form-input !pl-16 pr-32 py-4 text-lg"
               />
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6 pointer-events-none" />
               <button
                 type="submit"
                 disabled={loading || !searchTerm}
-                className="absolute right-2 top-1/2 -translate-y-1/2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#1a3884] hover:bg-[#112558] text-white px-6 py-2 rounded-lg font-medium transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2 shadow-lg"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {loading ? "Searching..." : "Search"}
@@ -148,13 +148,13 @@ const GeneralDictionary = () => {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="p-8 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center space-y-4 shadow-sm"
+                className="p-8 dark-card text-center space-y-4 shadow-sm"
               >
                 <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center mx-auto">
                   <Search className="w-8 h-8 text-rose-500" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Definition Not Found</h3>
+                  <h3 className="text-xl font-bold">Definition Not Found</h3>
                   <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
                     We couldn't find a definition for <span className="font-semibold text-slate-700 dark:text-slate-200">"{searchTerm}"</span>. 
                     Please check the spelling or try a different word.
@@ -162,7 +162,7 @@ const GeneralDictionary = () => {
                 </div>
                 <button 
                   onClick={() => setSearchTerm("")}
-                  className="text-purple-600 dark:text-purple-400 text-sm font-semibold hover:underline"
+                  className="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline"
                 >
                   Clear Search
                 </button>
@@ -180,18 +180,18 @@ const GeneralDictionary = () => {
                   className="space-y-6"
                 >
                   {/* Main Card */}
-                  <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8">
+                  <div className="dark-card p-6 sm:p-8">
                     <div className="flex justify-between items-start mb-6">
                       <div>
-                        <h2 className="text-4xl font-bold capitalize text-slate-900 dark:text-white mb-2">
+                        <h2 className="text-4xl font-bold capitalize mb-2">
                           {definition.word}
                         </h2>
-                        <div className="flex items-center gap-3 text-purple-600 dark:text-purple-400 font-mono text-lg">
+                        <div className="flex items-center gap-3 text-[#1a3884] dark:text-blue-400 font-mono text-lg">
                           <span>{definition.phonetic}</span>
                           {definition.phonetics.find(p => p.audio) && (
                             <button
                               onClick={() => playAudio(definition.phonetics.find(p => p.audio).audio)}
-                              className="p-2 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-full transition-colors"
+                              className="p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full transition-colors"
                             >
                               <Volume2 className="w-5 h-5" />
                             </button>
@@ -207,7 +207,7 @@ const GeneralDictionary = () => {
                       {definition.meanings.map((meaning, index) => (
                         <div key={index} className="border-b border-slate-100 dark:border-slate-700 last:border-0 pb-6 last:pb-0">
                           <div className="flex items-center gap-3 mb-3">
-                            <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-sm font-semibold rounded-full italic">
+                            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-semibold rounded-full italic">
                               {meaning.partOfSpeech}
                             </span>
                             <div className="h-px flex-1 bg-slate-100 dark:bg-slate-700" />
@@ -216,7 +216,7 @@ const GeneralDictionary = () => {
                           <ul className="space-y-3">
                             {meaning.definitions.slice(0, 3).map((def, idx) => (
                               <li key={idx} className="text-slate-700 dark:text-slate-300 flex gap-2">
-                                <span className="text-purple-400 mt-1.5 min-w-[6px]">•</span>
+                                <span className="text-blue-400 mt-1.5 min-w-[6px]">•</span>
                                 <span>
                                   {def.definition}
                                   {def.example && (
@@ -235,8 +235,8 @@ const GeneralDictionary = () => {
 
                   {/* Synonyms Card */}
                   {synonyms.length > 0 && (
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-                      <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                    <div className="dark-card p-6">
+                      <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                         <Sparkles className="w-5 h-5 text-yellow-500" /> Synonyms & Related Words
                       </h3>
                       <div className="flex flex-wrap gap-2">
@@ -247,7 +247,7 @@ const GeneralDictionary = () => {
                               setSearchTerm(syn);
                               fetchData(syn);
                             }}
-                            className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-purple-100 hover:text-purple-700 dark:hover:bg-purple-900/40 dark:hover:text-purple-300 rounded-lg text-sm text-slate-700 dark:text-slate-300 transition-colors capitalize"
+                            className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-blue-900/40 dark:hover:text-blue-300 rounded-lg text-sm text-slate-700 dark:text-slate-300 transition-colors capitalize"
                           >
                             {syn}
                           </button>
@@ -266,16 +266,16 @@ const GeneralDictionary = () => {
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-6 text-white shadow-lg overflow-hidden relative"
+                className="bg-gradient-to-br from-[#002147] to-[#1a3884] rounded-2xl p-6 text-white shadow-lg overflow-hidden relative border border-white/10"
               >
                 <div className="absolute top-0 right-0 p-32 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
 
-                <div className="flex items-center gap-2 mb-4 text-purple-200 text-sm font-semibold tracking-wider uppercase">
+                <div className="flex items-center gap-2 mb-4 text-blue-200 text-sm font-semibold tracking-wider uppercase">
                   <Star className="w-4 h-4" /> Word of the Day
                 </div>
 
                 <h3 className="text-3xl font-bold mb-2 capitalize">{wordOfDay.word}</h3>
-                <p className="text-purple-100 mb-6 italic font-sans">
+                <p className="text-blue-100 mb-6 italic font-sans">
                   {wordOfDay.phonetic}
                 </p>
 
@@ -300,8 +300,8 @@ const GeneralDictionary = () => {
             )}
 
             {/* Quick Links */}
-            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6">
-              <h3 className="font-semibold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+            <div className="dark-card p-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
                 <Book className="w-4 h-4" /> Trending Words
               </h3>
               <div className="space-y-2">

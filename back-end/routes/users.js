@@ -454,7 +454,7 @@ router.patch('/register-section', async (req, res) => {
         registration.timezone = data.timezone || registration.timezone;
         registration.dateFormat = data.dateFormat || registration.dateFormat;
         registration.notificationPrefs = data.notificationPrefs || registration.notificationPrefs;
-        
+
         if (data.address) {
           registration.address = {
             street: data.address.street || registration.address?.street || '',

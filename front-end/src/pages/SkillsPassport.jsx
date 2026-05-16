@@ -208,7 +208,7 @@ const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => (
     <motion.div
         whileHover={{ y: -12, scale: 1.02 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        className="group relative overflow-hidden rounded-[40px] border border-slate-200/60 bg-white dark:bg-dark-card p-8 shadow-lg transition-all duration-500 hover:shadow-xl dark:border-white/10"
+        className="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white dark:bg-dark-card p-6 shadow-lg transition-all duration-500 hover:shadow-xl dark:border-white/10"
     >
         <div className="absolute inset-0 bg-gradient-to-br from-teal/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="absolute inset-x-12 top-0 h-[2px] bg-gradient-to-r from-transparent via-teal/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
@@ -706,14 +706,14 @@ const SkillsPassport = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="max-w-7xl mx-auto space-y-8 md:space-y-12"
+                className="max-w-6xl mx-auto space-y-8 md:space-y-10"
                 ref={containerRef}
             >
                 <motion.div
                     initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.55 }}
-                    className="rounded-[32px] md:rounded-[40px] border border-slate-200/60 bg-white dark:bg-dark-card px-7 py-8 md:px-12 md:py-10 shadow-lg dark:border-white/10"
+                    className="rounded-3xl border border-slate-200/60 bg-white dark:bg-dark-card px-7 py-8 md:px-10 md:py-8 shadow-lg dark:border-white/10"
                 >
                     <div className="max-w-3xl">
                         <div className="flex flex-wrap items-center gap-3">
@@ -728,11 +728,11 @@ const SkillsPassport = () => {
                             </div>
                         </div>
 
-                        <h1 className="mt-7 max-w-3xl text-[2.15rem] font-bold leading-[0.98] tracking-tight text-slate-900 dark:text-white sm:text-[2.7rem] md:text-[3.5rem]">
+                        <h1 className="mt-6 max-w-3xl text-2xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white sm:text-3xl md:text-4xl">
                             The future of verified talent.
                         </h1>
 
-                        <p className="mt-5 max-w-3xl text-base font-bold leading-relaxed text-slate-600 dark:text-slate-400 md:text-[1.28rem] md:leading-[1.55]">
+                        <p className="mt-4 max-w-3xl text-base font-medium leading-relaxed text-slate-600 dark:text-slate-400 md:text-lg">
                             Your secure, AI-verified credential of capability. Designed for employers who demand proof, and professionals who seek growth.
                         </p>
 
@@ -742,7 +742,7 @@ const SkillsPassport = () => {
                                 whileTap={{ scale: 0.98 }}
                                 onClick={handleExport}
                                 disabled={isExporting}
-                                className="inline-flex h-12 items-center justify-center gap-2.5 rounded-[18px] px-5 text-sm font-bold text-white bg-teal hover:bg-teal-hover shadow-lg transition-all disabled:opacity-70"
+                                className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl px-5 text-sm font-bold text-white bg-teal hover:bg-teal-hover shadow-lg transition-all disabled:opacity-70"
                             >
                                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/20">
                                     <Download className="h-3.5 w-3.5 text-white" />
@@ -760,7 +760,7 @@ const SkillsPassport = () => {
                                         sonnerToast.error("Unable to copy passport link.");
                                     }
                                 }}
-                                className="inline-flex h-12 items-center justify-center gap-2.5 rounded-[18px] border border-slate-200 dark:border-white/10 bg-white dark:bg-dark-elevated px-5 text-sm font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-slate-300 dark:hover:border-white/20"
+                                className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-dark-elevated px-5 text-sm font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-slate-300 dark:hover:border-white/20"
                                 >
                                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-white/5 ring-1 ring-slate-200 dark:ring-white/10">
                                     <Share2 className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
@@ -773,7 +773,7 @@ const SkillsPassport = () => {
 
                 <div
                     ref={passportExportRef}
-                    className="rounded-[32px] md:rounded-[48px] overflow-hidden shadow-2xl border border-slate-200/50 dark:border-white/10 bg-white dark:bg-dark-card transition-all"
+                    className="rounded-3xl overflow-hidden shadow-2xl border border-slate-200/50 dark:border-white/10 bg-white dark:bg-dark-card transition-all"
                 >
                     <div className="bg-slate-50 dark:bg-dark-card p-6 sm:p-10 md:p-14 text-slate-900 dark:text-white relative transition-colors">
                         <div className="absolute top-0 right-10 h-52 w-52 rounded-full bg-teal/10 blur-3xl pointer-events-none" />
@@ -784,7 +784,7 @@ const SkillsPassport = () => {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.55 }}
-                                className="relative mx-auto w-full max-w-4xl rounded-[24px] border border-slate-200/70 dark:border-white/10 bg-white dark:bg-dark-elevated px-5 py-6 sm:px-7 md:px-8 shadow-xl"
+                                className="relative mx-auto w-full max-w-4xl rounded-2xl border border-slate-200/70 dark:border-white/10 bg-white dark:bg-dark-elevated px-5 py-6 sm:px-7 md:px-8 shadow-xl"
                             >
                                 <div className="space-y-5 lg:pr-[180px]">
                                         <div className="flex items-center justify-between gap-4">
@@ -799,7 +799,7 @@ const SkillsPassport = () => {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <h1 className="text-3xl sm:text-4xl md:text-[3.5rem] font-bold leading-none tracking-tighter text-teal dark:text-white">
+                                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight tracking-tight text-teal dark:text-white">
                                                 {userName}
                                             </h1>
 
@@ -889,7 +889,7 @@ const SkillsPassport = () => {
                             >
                                 <div className="mb-6">
                                     <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Ten Professional Standards</p>
-                                    <h2 className="mt-2 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                                    <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                                         Professional Standards Matrix
                                     </h2>
                                 </div>
@@ -901,8 +901,8 @@ const SkillsPassport = () => {
                                             initial={{ opacity: 0, scale: 0.95 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             transition={{ delay: 0.05 * index }}
-                                            whileHover={{ y: -8, backgroundColor: "rgba(255,255,255,1)" }}
-                                            className="group relative rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/50 dark:bg-slate-800/20 p-5 shadow-sm transition-all duration-300"
+                                            whileHover={{ y: -5 }}
+                                            className="group relative rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white/50 dark:bg-slate-800/20 p-5 shadow-sm transition-all duration-300 hover:bg-white dark:hover:bg-dark-elevated"
                                         >
                                             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                                 <Sparkles className="w-12 h-12" />
@@ -910,7 +910,7 @@ const SkillsPassport = () => {
                                             <p className="text-xs font-bold leading-snug tracking-[0.1em] text-teal dark:text-teal-light uppercase mb-3">
                                                 {standard.title}
                                             </p>
-                                            <p className="min-h-[44px] text-[11px] leading-relaxed font-bold text-slate-500 dark:text-slate-400">
+                                            <p className="min-h-[48px] text-[11px] leading-snug font-medium text-slate-500 dark:text-slate-400">
                                                 {standard.description}
                                             </p>
                                             <div className="mt-5 flex items-center justify-between">
@@ -947,7 +947,7 @@ const SkillsPassport = () => {
                                             onClick={() => setActiveTab(tab.id)}
                                             className={`flex-1 min-w-[160px] flex items-center justify-center gap-3 px-6 py-4 font-bold text-[10px] uppercase tracking-[0.2em] transition-all duration-300 rounded-[22px] relative overflow-hidden ${activeTab === tab.id
                                                 ? "bg-white dark:bg-dark-elevated text-teal shadow-md"
-                                                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                                                : "text-slate-500 dark:text-slate-300/70 hover:text-slate-700 dark:hover:text-white bg-transparent"
                                                 }`}
                                         >
                                             <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-teal animate-pulse" : ""}`} />
@@ -981,7 +981,7 @@ const SkillsPassport = () => {
                                                     Institutional Registry
                                                 </p>
                                             </div>
-                                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tighter">
+                                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
                                                 {tabCollections[activeTab].title}
                                             </h2>
                                             <p className="max-w-2xl text-base font-bold text-slate-500 dark:text-slate-400 leading-relaxed">
