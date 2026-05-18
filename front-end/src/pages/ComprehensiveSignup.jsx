@@ -473,9 +473,9 @@ const ComprehensiveSignup = () => {
     } catch (error) { console.error("Submission error:", error); toast.error(error.message || "Failed to submit"); setIsLoading(false); }
   };
 
-  const inputClass = "w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl px-3.5 h-11 text-[13px] font-semibold text-[#112b6b] placeholder:text-gray-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#1a3884]/10 focus-visible:ring-offset-0";
-  const selectClass = "w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl px-3.5 h-11 text-[13px] font-semibold text-[#112b6b] transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 appearance-none";
-  const textareaClass = "w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-[#112b6b] placeholder:text-gray-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 resize-none";
+  const inputClass = "w-full bg-[#002A5C] border border-white/10 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-white placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-[#003575] focus:border-[#1a3884] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#1a3884]/10 focus-visible:ring-offset-0";
+  const selectClass = "w-full bg-[#002A5C] border border-white/10 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-white transition-all duration-200 focus:bg-[#003575] focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 appearance-none";
+  const textareaClass = "w-full bg-[#002A5C] border border-white/10 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-white placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-[#003575] focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 resize-none";
   const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
   const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25-35 LPA", "35-50 LPA", "50+ LPA", "Negotiable"];
   // Use Excel data sectors if available, otherwise fallback to defaults
@@ -485,30 +485,29 @@ const ComprehensiveSignup = () => {
 
   if (isSuccess) {
     return (
-      <div className="fixed inset-0 z-50 bg-white dark:bg-dark-bg flex items-center justify-center flex-col">
+      <div className="fixed inset-0 z-50 bg-[#00152E] flex items-center justify-center flex-col">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 10 }} className="w-24 h-24 bg-[#1a3884] rounded-full flex items-center justify-center shadow-2xl">
           <CheckCircle2 className="w-12 h-12 text-white" />
         </motion.div>
-        <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-3xl font-bold text-slate-900 mt-8">
+        <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-3xl font-bold text-white mt-8">
           Profile 100% Completed!
         </motion.h2>
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-slate-600 mt-2">
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-slate-400 mt-2">
           Redirecting to assessment...
         </motion.p>
       </div>
     );
-
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg text-slate-900 font-sans selection:bg-[#1a3884]/20">
+    <div className="min-h-screen bg-[#00152E] text-white font-sans selection:bg-[#1a3884]/20">
       {/* Premium Registration Navbar */}
       <header className="bg-gradient-to-r from-[#001a3a] via-[#002147] to-[#001a3a] text-white sticky top-0 z-[100] shadow-lg border-b border-white/10">
         <div className="max-w-6xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
           
           {/* Left: Logo + Brand */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center bg-white/10 rounded-xl p-1.5 backdrop-blur-sm border border-white/20">
+            <div className="flex items-center justify-center bg-white/5 rounded-xl p-2 backdrop-blur-sm border border-white/10">
               <img src={logoWhite} alt="SMAART INSTITUTE" className="h-9 w-auto" />
             </div>
             <div className="hidden sm:flex flex-col leading-none">
@@ -543,11 +542,11 @@ const ComprehensiveSignup = () => {
       <div className="max-w-4xl mx-auto py-4 px-4 relative z-10">
         {/* Progress Bar */}
         <div className="mb-6 px-2">
-            <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
                 <span>Step {currentStep + 1} of {steps.length}</span>
                 <span>{Math.round(((currentStep + 1) / steps.length) * 100)}% Complete</span>
             </div>
-            <div className="h-1.5 w-full bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                 <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
@@ -563,13 +562,13 @@ const ComprehensiveSignup = () => {
           className="relative"
         >
           {/* Torn Paper Container */}
-          <div className="bg-white p-5 md:p-8 shadow-[0_20px_40px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] border border-gray-100 rounded-3xl relative">
+          <div className="bg-[#002147] p-5 md:p-8 shadow-2xl border border-white/10 rounded-3xl relative">
             
             <AnimatePresence mode="wait">
             {/* Step 0: Profile Photo */}
             {currentStep === 0 && (
               <motion.div key="profile" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Profile Photo</h2>
+                <h2 className="text-2xl font-bold text-white mb-6">Profile Photo</h2>
                 <div className="flex justify-center">
                   <FileUpload value={personalDetails.profilePhoto} onChange={(fid, fdata) => setPersonalDetails({ ...personalDetails, profilePhoto: fdata?.url || fid })} helperText="Upload a professional photo (Max 5MB)" />
                 </div>
@@ -581,29 +580,29 @@ const ComprehensiveSignup = () => {
               <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Full Name</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Full Name</Label>
                     <div className="relative group">
                       <Input value={personalDetails.fullName} disabled={preFilledFields.fullName} onChange={(e) => setPersonalDetails({ ...personalDetails, fullName: e.target.value })} className={inputClass} />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Nick Name *</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Nick Name *</Label>
                     <div className="relative">
                       <Input value={personalDetails.nickname} onChange={(e) => setPersonalDetails({ ...personalDetails, nickname: e.target.value })} className={inputClass} />
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-bold">+</div>
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white/20">+</div>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Date of Birth *</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Date of Birth *</Label>
                     <div className="relative">
                       <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} />
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                        <User className="w-5 h-5 text-gray-400" />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <User className="w-4 h-4 text-slate-400" />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Gender *</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Gender *</Label>
                     <div className="relative">
                       <select value={personalDetails.gender} onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })} className={selectClass}>
                         <option value="">Select</option>
@@ -611,7 +610,7 @@ const ComprehensiveSignup = () => {
                         <option value="female">Female</option>
                         <option value="other">Other</option>
                       </select>
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
                         <span className="text-blue-500">♂</span>
                         <span className="text-gray-300">/</span>
                         <span className="text-red-500">♀</span>
@@ -619,37 +618,37 @@ const ComprehensiveSignup = () => {
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Current Year of Study *</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Current Year of Study *</Label>
                     <select value={personalDetails.yearOfStudy} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Year of Passing (Expected) *</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Year of Passing (Expected) *</Label>
                     <select value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Mobile Number</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Mobile Number</Label>
                     <div className="relative">
                       <Input value={personalDetails.mobileNumber} disabled={preFilledFields.mobileNumber} onChange={(e) => setPersonalDetails({ ...personalDetails, mobileNumber: e.target.value })} className={inputClass} />
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                        <FileText className="w-4 h-4 text-gray-400" />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <FileText className="w-4 h-4 text-slate-400" />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Email</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Email</Label>
                     <Input value={personalDetails.email} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Institution</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Institution</Label>
                     <div className="relative">
                       <Input value={personalDetails.institution} disabled={preFilledFields.institution} onChange={(e) => setPersonalDetails({ ...personalDetails, institution: e.target.value })} className={inputClass} />
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                         <GraduationCap className="w-5 h-5 text-gray-400" />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                         <GraduationCap className="w-4 h-4 text-slate-400" />
                       </div>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Chosen Career Domain *</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Chosen Career Domain *</Label>
                     <div className="relative">
                       <select value={personalDetails.educationLevel} onChange={(e) => setPersonalDetails({ ...personalDetails, educationLevel: e.target.value, customDomain: '' })} className={selectClass}>
                         <option value="">Select Domain</option>
@@ -657,15 +656,15 @@ const ComprehensiveSignup = () => {
                           <option key={opt} value={opt}>{opt}</option>
                         ))}
                       </select>
-                      <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-sm text-gray-500 font-medium">Department *</Label>
+                    <Label className="text-sm text-slate-400 font-medium">Department *</Label>
                     <div className="relative">
                       <Input value={personalDetails.department} disabled={preFilledFields.department} onChange={(e) => setPersonalDetails({ ...personalDetails, department: e.target.value })} className={inputClass} />
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                         <Briefcase className="w-4 h-4 text-gray-400" />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                         <Briefcase className="w-4 h-4 text-slate-400" />
                       </div>
                     </div>
                   </div>
@@ -676,7 +675,7 @@ const ComprehensiveSignup = () => {
             {/* Step 2: 10th Details */}
             {currentStep === 2 && (
               <motion.div key="tenth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Secondary School Level (Grade 10)</h2>
+                <h2 className="text-2xl font-bold text-white mb-6">Secondary School Level (Grade 10)</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="md:col-span-2"><Label>School Name *</Label><Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} className={inputClass} /></div>
                   <div><Label>Year of Passing *</Label><select value={tenthDetails.yearOfPassing} onChange={(e) => setTenthDetails({ ...tenthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
@@ -689,7 +688,7 @@ const ComprehensiveSignup = () => {
             {/* Step 3: 12th Details */}
             {currentStep === 3 && (
               <motion.div key="twelfth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Higher Secondary Level (Grade 12)</h2>
+                <h2 className="text-2xl font-bold text-white mb-6">Higher Secondary Level (Grade 12)</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="md:col-span-2"><Label>School/College Name *</Label><Input value={twelfthDetails.schoolName} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, schoolName: e.target.value })} className={inputClass} /></div>
                   <div><Label>Group *</Label><select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value, customStream: '' })} className={selectClass}><option value="">Select</option><option value="Science">Science</option><option value="Commerce">Commerce</option><option value="Arts">Arts</option><option value="Others">Others</option></select></div>
@@ -708,10 +707,10 @@ const ComprehensiveSignup = () => {
               <motion.div key="higher" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold">Higher Education</h2>
-                  <Button onClick={addHigherEd} variant="outline" size="sm" className="gap-2 bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add Degree</Button>
+                  <Button onClick={addHigherEd} variant="outline" size="sm" className="gap-2 bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add Degree</Button>
                 </div>
                 {higherEducation.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
                     {higherEducation.length > 1 && <button onClick={() => removeHigherEd(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Degree #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -818,11 +817,11 @@ const ComprehensiveSignup = () => {
                   <h2 className="text-2xl font-bold">Significant Accomplishments & Extracurricular Activities</h2>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!extracurricular.isApplicable} onChange={(e) => setExtracurricular({ ...extracurricular, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>}
+                    {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
                   </div>
                 </div>
                 {extracurricular.isApplicable ? extracurricular.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
                     {extracurricular.items.length > 1 && <button onClick={() => removeExtracurricular(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Activity #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -844,10 +843,10 @@ const ComprehensiveSignup = () => {
               <motion.div key="jobpref" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold">Job Preferences</h2>
-                  <Button onClick={addJobPref} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>
+                  <Button onClick={addJobPref} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>
                 </div>
                 {jobPreferences.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
                     {jobPreferences.items.length > 1 && <button onClick={() => removeJobPref(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Pref #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -877,14 +876,14 @@ const ComprehensiveSignup = () => {
                           placeholder="Search or enter your preferred role"
                         />
                         {activeSearchIndex === index && roleSuggestions.length > 0 && (
-                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl max-h-60 overflow-y-auto no-scrollbar ring-1 ring-black/5">
-                            <div className="p-2 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-3">
+                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-[#002A5C] border border-white/10 rounded-2xl shadow-2xl max-h-60 overflow-y-auto no-scrollbar ring-1 ring-black/5">
+                            <div className="p-2 border-b border-white/5 bg-white/5 text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-3">
                               SMAART Role Suggestions
                             </div>
                             {roleSuggestions.map((suggestion, sIdx) => (
                               <button
                                 key={sIdx}
-                                className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 dark:hover:bg-white/5 border-b border-slate-50 dark:border-white/5 last:border-0 transition-colors"
+                                className="w-full text-left px-4 py-3 text-sm hover:bg-white/5 text-white border-b border-white/5 last:border-0 transition-colors"
                                 onClick={() => {
                                   const n = { ...jobPreferences, items: [...jobPreferences.items] };
                                   n.items[index].preferredRole = suggestion;
@@ -948,7 +947,7 @@ const ComprehensiveSignup = () => {
                             setSectorPreferences({ ...sectorPreferences, preferredSectors: [...sectorPreferences.preferredSectors, s] });
                           }
                         }}
-                        className={`px-4 py-2 rounded-full border transition-colors ${sectorPreferences.preferredSectors.includes(s) ? "bg-[#1a3884] text-white border-[#1a3884]" : "bg-white dark:bg-transparent border-slate-200 dark:border-white/10 text-slate-700 hover:border-[#1a3884]"}`}>
+                        className={`px-4 py-2 rounded-full border transition-colors ${sectorPreferences.preferredSectors.includes(s) ? "bg-[#1a3884] text-white border-[#1a3884]" : "bg-white/5 border-white/10 text-slate-400 hover:border-[#1a3884]"}`}>
                         {s}
                       </button>
                     ))}
@@ -969,21 +968,21 @@ const ComprehensiveSignup = () => {
                 <h2 className="text-2xl font-bold">Career Goals</h2>
                 <div>
                   <Label>Short-term Goal (0-1 year) *</Label>
-                  <p className="text-sm text-slate-500 mt-1 mb-2">Goals that can be achieved in the near future and focus on building basic skills, habits, or immediate improvements.</p>
+                  <p className="text-sm text-slate-400 mt-1 mb-2">Goals that can be achieved in the near future and focus on building basic skills, habits, or immediate improvements.</p>
                   <textarea value={careerGoals.shortTerm} onChange={(e) => setCareerGoals({ ...careerGoals, shortTerm: e.target.value })} className={textareaClass} placeholder="e.g. Gain hands-on experience through projects or internships, and secure an entry-level role." />
                 </div>
                 <div>
                   <Label>Medium-term Goal (1-5 years) *</Label>
-                  <p className="text-sm text-slate-500 mt-1 mb-2">Goals planned for the next phase of growth that focus on strengthening abilities, gaining experience, and progressing toward bigger responsibilities.</p>
+                  <p className="text-sm text-slate-400 mt-1 mb-2">Goals planned for the next phase of growth that focus on strengthening abilities, gaining experience, and progressing toward bigger responsibilities.</p>
                   <textarea value={careerGoals.mediumTerm} onChange={(e) => setCareerGoals({ ...careerGoals, mediumTerm: e.target.value })} className={textareaClass} placeholder="e.g. Build advanced role-specific skills, take ownership of key work responsibilities, and progress to a higher position or better organization." />
                 </div>
                 <div>
                   <Label>Long-term Goal (5+ years) *</Label>
-                  <p className="text-sm text-slate-500 mt-1 mb-2">Goals set for the future that focus on overall direction, long-lasting impact, leadership, and sustained personal and professional growth.</p>
+                  <p className="text-sm text-slate-400 mt-1 mb-2">Goals set for the future that focus on overall direction, long-lasting impact, leadership, and sustained personal and professional growth.</p>
                   <textarea value={careerGoals.longTerm} onChange={(e) => setCareerGoals({ ...careerGoals, longTerm: e.target.value })} className={textareaClass} placeholder="e.g. Move into leadership or specialist roles, continuously reskill with new technologies, and contribute to organizational and industry growth." />
                 </div>
 
-                <div className="pt-6 border-t border-slate-200 dark:border-white/10">
+                <div className="pt-6 border-t border-white/20 dark:border-white/10">
                   <h2 className="text-2xl font-bold">Personal Development Goals</h2>
                   <div className="space-y-6 mt-6">
                     <div>
@@ -1025,11 +1024,11 @@ const ComprehensiveSignup = () => {
                   <h2 className="text-2xl font-bold">Work Experience</h2>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!workExperience.isApplicable} onChange={(e) => setWorkExperience({ ...workExperience, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>}
+                    {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
                   </div>
                 </div>
                 {workExperience.isApplicable ? workExperience.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
                     {workExperience.items.length > 1 && <button onClick={() => removeWorkExperience(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Exp #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -1044,7 +1043,7 @@ const ComprehensiveSignup = () => {
                       <div className="md:col-span-2"><Label>Significant Accomplishments *</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder="Highlight major achievements, contributions, or impacts you made during your tenure." /></div>
                       <div className="md:col-span-2 space-y-4">
                         <Label>Document Type (Select all that apply) *</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl border border-white/20 dark:border-white/10 bg-white/5 dark:bg-white/5">
                           {[
                             { id: "offerLetter", label: "Offer Letter" },
                             { id: "appointmentLetter", label: "Appointment Letter" },
@@ -1067,7 +1066,7 @@ const ComprehensiveSignup = () => {
                                 }}
                                 className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]"
                               />
-                              <span className="text-sm font-medium text-slate-700 group-hover:text-[#1a3884] transition-colors">{doc.label}</span>
+                              <span className="text-sm font-medium text-slate-400 group-hover:text-[#1a3884] transition-colors">{doc.label}</span>
                             </label>
                           ))}
                         </div>
@@ -1075,7 +1074,7 @@ const ComprehensiveSignup = () => {
                         {item.selectedDocs.length > 0 && (
                           <div className="grid md:grid-cols-2 gap-6 pt-2">
                             {item.selectedDocs.map(docId => (
-                              <div key={docId} className="space-y-2 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
+                              <div key={docId} className="space-y-2 p-4 rounded-2xl border border-white/20 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
                                 <Label className="text-[#1a3884] dark:text-blue-400 font-semibold">
                                   Upload {docId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} *
                                 </Label>
@@ -1105,11 +1104,11 @@ const ComprehensiveSignup = () => {
                   <h2 className="text-2xl font-bold">Projects</h2>
                   <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!projects.isApplicable} onChange={(e) => setProjects({ ...projects, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:border-white/20 dark:hover:bg-white/10"><Plus size={16} /> Add</Button>}
+                    {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
                   </div>
                 </div>
                 {projects.isApplicable ? projects.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
                     {projects.items.length > 1 && <button onClick={() => removeProject(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
                     <h3 className="font-semibold mb-4">Project #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -1143,14 +1142,14 @@ const ComprehensiveSignup = () => {
                       <span className="text-sm">Not Applicable</span>
                     </label>
                     {certificates.isApplicable && (
-                      <Button onClick={addCertificate} variant="outline" size="sm" className="bg-white text-slate-900 border-slate-200 hover:bg-slate-100 dark:bg-transparent dark:border-white/20 dark:hover:bg-white/10">
+                      <Button onClick={addCertificate} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all">
                         <Plus size={16} /> Add
                       </Button>
                     )}
                   </div>
                 </div>
                 {certificates.isApplicable ? certificates.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 relative group">
+                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
                     {certificates.items.length > 1 && (
                       <button onClick={() => removeCertificate(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2">
                         <Trash2 size={18} />
@@ -1158,7 +1157,7 @@ const ComprehensiveSignup = () => {
                     )}
                     <h3 className="font-semibold mb-4 text-[#002147]">Cert #{index + 1}</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div className="md:col-span-2 p-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5">
+                      <div className="md:col-span-2 p-4 rounded-2xl border border-white/20 dark:border-white/10 bg-white/5/50 dark:bg-white/5">
                         <div className="grid md:grid-cols-2 gap-6 items-center">
                           <div>
                             <Label>Certificate Name / Title *</Label>
@@ -1207,12 +1206,12 @@ const ComprehensiveSignup = () => {
           </AnimatePresence>
 
           {/* Redesigned Footer - Inside the torn paper card */}
-              <div className="w-full flex justify-between items-center mt-8 pt-6 border-t border-gray-100">
+              <div className="w-full flex justify-between items-center mt-8 pt-6 border-t border-white/10">
                   <div className="flex items-center gap-4">
                     {currentStep > 0 && (
                       <button 
                         onClick={handlePrevStep}
-                        className="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all"
+                        className="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:bg-white/5 transition-all"
                       >
                         Previous
                       </button>

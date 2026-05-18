@@ -21,13 +21,11 @@ const generateOTP = () => {
 
 // Send OTP email
 const sendOTPEmail = async (email, otp, fullName = '', subject = '') => {
-  // Always log OTP to console for development/testing
-  console.log(`🔐 DEVELOPMENT MODE - OTP for ${email}: ${otp}`);
-  console.log(`📧 Email: ${email}`);
+  console.log(`📨 Attempting to send OTP email to ${email}...`);
   console.log(`🔢 OTP Code: ${otp}`);
   console.log(`👤 Name: ${fullName || 'N/A'}`);
   console.log(`📋 Subject: ${subject || 'Login Verification'}`);
-  console.log('=' .repeat(50));
+  console.log('-'.repeat(50));
 
   try {
     const transporter = createTransporter();
