@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Send, Users, ChevronLeft, MoreVertical, 
+import {
+  Send, Users, ChevronLeft, MoreVertical,
   UserPlus, LogOut, Search, Loader2, Info,
   MessageCircle, X, Paperclip, Image as ImageIcon,
   UserMinus, Shield, ShieldOff, ChevronRight,
@@ -26,15 +26,15 @@ const GroupChat = () => {
   const [messages, setMessages] = useState([]); // In MVP, messages are part of group object, but we'll separate for logic if needed
   const [messageInput, setMessageInput] = useState('');
   const [sending, setSending] = useState(false);
-  
+
   const [showMembers, setShowMembers] = useState(false);
   const [showAddMember, setShowAddMember] = useState(false);
-  
+
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
-  
+
   // Media Upload State
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null); // 'image' or 'video'
@@ -113,7 +113,7 @@ const GroupChat = () => {
   // Helper function to render message content with mentions
   const renderMessageContent = (content) => {
     if (!content) return null;
-    
+
     const mentionRegex = /@\[([^\]]+)\]\(([a-f0-9]{24})\)/g;
     const parts = [];
     let lastIndex = 0;
@@ -124,22 +124,22 @@ const GroupChat = () => {
       if (match.index > lastIndex) {
         parts.push(content.substring(lastIndex, match.index));
       }
-      
+
       // Add mention as highlighted span
       parts.push(
         <span key={match.index} className="text-blue-400 font-bold bg-blue-500/20 px-2 py-0.5 rounded">
           @{match[1]}
         </span>
       );
-      
+
       lastIndex = match.index + match[0].length;
     }
-    
+
     // Add remaining text
     if (lastIndex < content.length) {
       parts.push(content.substring(lastIndex));
     }
-    
+
     return parts.length > 0 ? parts : content;
   };
 
@@ -158,10 +158,10 @@ const GroupChat = () => {
     e.preventDefault();
     const pollToSend = (showPollEditor && pollData.question.trim() && pollData.options.filter(o => o.trim()).length >= 2)
       ? {
-          question: pollData.question,
-          options: pollData.options.filter(o => o.trim()).map(o => ({ text: o, voters: [] })),
-          expiresAt: pollData.expiresAt ? new Date(pollData.expiresAt) : null
-        }
+        question: pollData.question,
+        options: pollData.options.filter(o => o.trim()).map(o => ({ text: o, voters: [] })),
+        expiresAt: pollData.expiresAt ? new Date(pollData.expiresAt) : null
+      }
       : null;
 
     if (!messageInput.trim() && !selectedMedia && !pollToSend) return;
@@ -180,8 +180,8 @@ const GroupChat = () => {
     try {
       setSending(true);
       const res = await groupsAPI.sendMessage(
-        id, 
-        messageInput, 
+        id,
+        messageInput,
         mediaType === 'image' ? selectedMedia : null,
         mediaType === 'video' ? selectedMedia : null,
         pollToSend
@@ -226,7 +226,7 @@ const GroupChat = () => {
       setSearchResults([]);
       return;
     }
-    
+
     try {
       setSearching(true);
       const res = await groupsAPI.searchStudents(query);
@@ -264,7 +264,7 @@ const GroupChat = () => {
         alert(`File size too large. Please select an ${isVideo ? 'video' : 'image'} under ${limitMB}MB.`);
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedMedia(reader.result);
@@ -287,7 +287,7 @@ const GroupChat = () => {
     url: m.image || m.video,
     type: m.video ? 'video' : 'image'
   })) || [];
-  
+
   const handlePrevMedia = (e) => {
     e?.stopPropagation();
     const currentIndex = chatMedia.findIndex(m => m.url === viewerMedia?.url);
@@ -379,7 +379,7 @@ const GroupChat = () => {
         {/* Header */}
         <header className="flex items-center justify-between px-4 md:px-8 py-4 md:py-5 bg-white/80 backdrop-blur-xl sticky top-0 z-10 border-b border-gray-200/50 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.05)]">
           <div className="flex items-center gap-5">
-            <button 
+            <button
               onClick={() => navigate('/dashboard/groups')}
               className="p-3 bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
             >
@@ -462,14 +462,14 @@ const GroupChat = () => {
                   className="flex-1 bg-transparent border-none outline-none text-sm text-gray-800 placeholder:text-gray-400"
                 />
                 {msgSearchQuery && (
-                  <button 
+                  <button
                     onClick={() => setMsgSearchQuery('')}
                     className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
                   >
                     <X className="w-4 h-4 text-gray-400" />
                   </button>
                 )}
-                <button 
+                <button
                   onClick={() => {
                     setShowMsgSearch(false);
                     setMsgSearchQuery('');
@@ -485,7 +485,7 @@ const GroupChat = () => {
 
         {/* Pinned Messages Banner */}
         {group.pinnedMessages && group.pinnedMessages.length > 0 && (
-          <div 
+          <div
             onClick={() => scrollToMessage(group.pinnedMessages[0])}
             className="bg-yellow-50/80 backdrop-blur-sm border-b border-yellow-100 px-6 py-3 flex items-start gap-3 relative z-10 cursor-pointer hover:bg-yellow-50 transition-colors"
           >
@@ -510,8 +510,8 @@ const GroupChat = () => {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
           {(() => {
-            const filteredMessages = group.messages?.filter(msg => 
-              !msgSearchQuery || 
+            const filteredMessages = group.messages?.filter(msg =>
+              !msgSearchQuery ||
               (msg.content && msg.content.toLowerCase().includes(msgSearchQuery.toLowerCase())) ||
               (msg.senderName && msg.senderName.toLowerCase().includes(msgSearchQuery.toLowerCase()))
             ) || [];
@@ -527,8 +527,8 @@ const GroupChat = () => {
 
             return filteredMessages.map((msg, idx) => {
               const isMe = msg.sender === user?._id;
-              const isSequential = idx > 0 && group.messages[idx-1].sender === msg.sender;
-              
+              const isSequential = idx > 0 && group.messages[idx - 1].sender === msg.sender;
+
               return (
                 <div key={idx} id={`msg-${msg._id}`} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group/msg relative`}>
                   <div className={`max-w-[75%] ${isMe ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
@@ -537,12 +537,11 @@ const GroupChat = () => {
                         {msg.senderName}
                       </span>
                     )}
-                    <div 
-                      className={`relative px-6 py-3.5 shadow-sm break-words transition-all duration-300 select-none ${
-                        isMe 
-                          ? 'bg-[#002147] text-white rounded-[2rem] rounded-br-[0.5rem]' 
+                    <div
+                      className={`relative px-6 py-3.5 shadow-sm break-words transition-all duration-300 select-none ${isMe
+                          ? 'bg-[#002147] text-white rounded-[2rem] rounded-br-[0.5rem]'
                           : 'bg-white text-gray-800 border border-gray-100 rounded-[2rem] rounded-bl-[0.5rem]'
-                      }`}
+                        }`}
                       onMouseDown={() => {
                         longPressTimer.current = setTimeout(() => {
                           setLongPressMsgId(msg._id);
@@ -591,7 +590,7 @@ const GroupChat = () => {
                         )}
                       </div>
                       {msg.image && (
-                        <div 
+                        <div
                           className="mb-3 rounded-[1.5rem] overflow-hidden cursor-pointer hover:opacity-90 transition-all hover:scale-[1.02]"
                           onClick={() => setViewerMedia({ url: msg.image, type: 'image' })}
                         >
@@ -599,7 +598,7 @@ const GroupChat = () => {
                         </div>
                       )}
                       {msg.video && (
-                        <div 
+                        <div
                           className="mb-3 rounded-[1.5rem] overflow-hidden cursor-pointer group/vid hover:scale-[1.02] transition-all"
                           onClick={() => setViewerMedia({ url: msg.video, type: 'video' })}
                         >
@@ -614,13 +613,12 @@ const GroupChat = () => {
                         </div>
                       )}
                       {msg.content && <p className="text-[15px] leading-relaxed font-medium">{renderMessageContent(msg.content)}</p>}
-                      
+
                       {msg.poll && msg.poll.question && (
-                        <div className={`mt-3 p-5 rounded-[2.5rem] border ${
-                          isMe 
-                            ? 'bg-gradient-to-br from-white/20 to-white/5 border-white/20 backdrop-blur-sm shadow-inner' 
+                        <div className={`mt-3 p-5 rounded-[2.5rem] border ${isMe
+                            ? 'bg-gradient-to-br from-white/20 to-white/5 border-white/20 backdrop-blur-sm shadow-inner'
                             : 'bg-gradient-to-br from-blue-50/80 to-white border-blue-100 shadow-sm'
-                        }`}>
+                          }`}>
                           <div className="flex items-center gap-3 mb-4">
                             <div className={`p-2.5 rounded-2xl ${isMe ? 'bg-white/20' : 'bg-blue-100/50'}`}>
                               <TrendingUp className={`w-5 h-5 ${isMe ? 'text-blue-200' : 'text-blue-600'}`} />
@@ -629,7 +627,7 @@ const GroupChat = () => {
                               {msg.poll.question}
                             </h4>
                           </div>
-                          
+
                           <div className="space-y-2.5">
                             {msg.poll.options.map((option, idx) => {
                               const totalVotes = msg.poll.options.reduce((acc, opt) => acc + (opt.voters?.length || 0), 0);
@@ -644,15 +642,14 @@ const GroupChat = () => {
                                   key={idx}
                                   disabled={isExpired || hasVoted || votingId === msg._id}
                                   onClick={() => handleVote(msg._id, idx)}
-                                  className={`group/opt relative w-full text-left p-4 rounded-[1.25rem] border-2 transition-all duration-300 overflow-hidden ${
-                                    myVote 
-                                      ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.1)]' 
+                                  className={`group/opt relative w-full text-left p-4 rounded-[1.25rem] border-2 transition-all duration-300 overflow-hidden ${myVote
+                                      ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.1)]'
                                       : hasVoted || isExpired
                                         ? 'border-gray-100/50 bg-gray-50/20 cursor-default grayscale-[0.2]'
-                                        : isMe 
-                                          ? 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10' 
+                                        : isMe
+                                          ? 'border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10'
                                           : 'border-blue-50/50 bg-blue-50/30 hover:border-blue-200 hover:bg-white hover:shadow-lg hover:shadow-blue-500/5'
-                                  }`}
+                                    }`}
                                 >
                                   {/* Glassy Progress Bar */}
                                   {(hasVoted || isExpired) && (
@@ -663,7 +660,7 @@ const GroupChat = () => {
                                       className={`absolute inset-0 opacity-20 ${isMe ? 'bg-white' : 'bg-blue-600'}`}
                                     />
                                   )}
-                                  
+
                                   <div className="relative z-10 flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-3">
                                       <span className={`text-sm font-medium tracking-tight ${isMe ? 'text-white' : 'text-gray-800'}`}>
@@ -686,7 +683,7 @@ const GroupChat = () => {
                               );
                             })}
                           </div>
-                          
+
                           <div className={`mt-5 flex items-center justify-between text-[10px] font-medium uppercase tracking-wide ${isMe ? 'text-white/40' : 'text-gray-400'}`}>
                             <div className="flex items-center gap-2">
                               <Users className="w-3.5 h-3.5 opacity-60" />
@@ -706,11 +703,10 @@ const GroupChat = () => {
 
                       {/* Shared Post Display */}
                       {msg.sharedPost && (msg.sharedPost.title || msg.sharedPost.content || (msg.sharedPost.poll && msg.sharedPost.poll.question)) && (
-                        <div className={`mt-3 p-5 rounded-[2.5rem] border ${
-                          isMe 
-                            ? 'bg-gradient-to-br from-white/20 to-white/5 border-white/20 backdrop-blur-sm shadow-inner' 
+                        <div className={`mt-3 p-5 rounded-[2.5rem] border ${isMe
+                            ? 'bg-gradient-to-br from-white/20 to-white/5 border-white/20 backdrop-blur-sm shadow-inner'
                             : 'bg-gradient-to-br from-teal-50/80 to-white border-teal-100 shadow-sm'
-                        }`}>
+                          }`}>
                           <div className="flex items-center gap-3 mb-4">
                             <div className={`p-2.5 rounded-2xl ${isMe ? 'bg-white/20' : 'bg-teal-100/50'}`}>
                               <MessageCircle className={`w-5 h-5 ${isMe ? 'text-teal-200' : 'text-teal-600'}`} />
@@ -740,16 +736,16 @@ const GroupChat = () => {
                             {msg.sharedPost.media && msg.sharedPost.media.url && (
                               <div className="mb-3 rounded-xl overflow-hidden">
                                 {msg.sharedPost.media.type === 'video' ? (
-                                  <div 
+                                  <div
                                     className="relative w-full h-32 bg-black rounded-lg cursor-pointer group/vid overflow-hidden"
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setViewerMedia({ url: msg.sharedPost.media.url, type: 'video' });
                                     }}
                                   >
-                                    <video 
-                                      src={msg.sharedPost.media.url} 
-                                      className="w-full h-full object-cover opacity-80 group-hover/vid:opacity-60 transition-opacity" 
+                                    <video
+                                      src={msg.sharedPost.media.url}
+                                      className="w-full h-full object-cover opacity-80 group-hover/vid:opacity-60 transition-opacity"
                                     />
                                     <div className="absolute inset-0 flex items-center justify-center">
                                       <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 group-hover/vid:scale-110 transition-transform">
@@ -758,9 +754,9 @@ const GroupChat = () => {
                                     </div>
                                   </div>
                                 ) : (
-                                  <img 
-                                    src={msg.sharedPost.media.url} 
-                                    alt="Post media" 
+                                  <img
+                                    src={msg.sharedPost.media.url}
+                                    alt="Post media"
                                     className="w-full h-32 object-cover bg-gray-100"
                                     onError={(e) => e.target.style.display = 'none'}
                                   />
@@ -779,9 +775,8 @@ const GroupChat = () => {
                                 </div>
                                 <div className="space-y-1.5 pl-6">
                                   {msg.sharedPost.poll.options.slice(0, 3).map((opt, i) => (
-                                    <div key={i} className={`text-[10px] px-2 py-1 rounded-lg border ${
-                                      isMe ? 'border-white/20 text-white/70' : 'border-gray-200 text-gray-600'
-                                    }`}>
+                                    <div key={i} className={`text-[10px] px-2 py-1 rounded-lg border ${isMe ? 'border-white/20 text-white/70' : 'border-gray-200 text-gray-600'
+                                      }`}>
                                       {opt.text}
                                     </div>
                                   ))}
@@ -795,7 +790,7 @@ const GroupChat = () => {
                             )}
 
 
-                              
+
 
 
                             {/* Author Info */}
@@ -809,11 +804,10 @@ const GroupChat = () => {
                           {/* View in Community Button */}
                           <button
                             onClick={() => navigate(`/dashboard/community`)}
-                            className={`mt-4 w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide transition-all ${
-                              isMe
+                            className={`mt-4 w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wide transition-all ${isMe
                                 ? 'bg-white/20 text-white hover:bg-white/30'
                                 : 'bg-teal-600 text-white hover:bg-teal-700'
-                            }`}
+                              }`}
                           >
                             View in Community →
                           </button>
@@ -881,11 +875,10 @@ const GroupChat = () => {
                                 }
                                 fetchGroupDetails();
                               }}
-                              className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1 ${
-                                isMe 
-                                  ? 'bg-white/20 text-white' 
+                              className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium flex items-center gap-1 ${isMe
+                                  ? 'bg-white/20 text-white'
                                   : 'bg-white border border-gray-200 text-gray-700 shadow-sm'
-                              }`}
+                                }`}
                             >
                               <span>{emoji}</span>
                               <span>{count}</span>
@@ -909,7 +902,7 @@ const GroupChat = () => {
         <div className="p-6 bg-white border-t border-gray-100/50 shadow-[0_-8px_32px_-12px_rgba(0,0,0,0.05)]">
           {/* Moderation Warning */}
           {moderationWarning && (
-            <motion.div 
+            <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               className="mb-4 p-4 bg-red-50 border border-red-100 rounded-[1.5rem]"
@@ -917,9 +910,9 @@ const GroupChat = () => {
               <p className="text-xs text-red-600 font-medium uppercase tracking-wide leading-loose">{moderationWarning}</p>
             </motion.div>
           )}
-          
+
           {previewUrl && (
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="mb-4 relative w-fit group/preview"
@@ -931,7 +924,7 @@ const GroupChat = () => {
               ) : (
                 <img src={previewUrl} alt="Preview" className="h-24 w-auto rounded-2xl border-2 border-gray-100 shadow-lg object-cover" loading="lazy" />
               )}
-              <button 
+              <button
                 onClick={removeMedia}
                 className="absolute -top-3 -right-3 p-2 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-all hover:scale-110 active:scale-90"
               >
@@ -940,7 +933,7 @@ const GroupChat = () => {
             </motion.div>
           )}
           <form onSubmit={handleSendMessage} className="flex gap-4 items-center bg-gray-50/50 p-2 rounded-[2.5rem] border border-gray-100 focus-within:bg-white focus-within:border-blue-200 focus-within:shadow-[0_8px_32px_-12px_rgba(59,130,246,0.15)] transition-all">
-            <input 
+            <input
               type="file"
               ref={fileInputRef}
               accept="image/*,video/*"
@@ -1018,7 +1011,7 @@ const GroupChat = () => {
               {group.memberDetails?.map((member) => {
                 const isMemberAdmin = group.admins?.map(a => a.toString()).includes(member._id.toString());
                 const isLastAdmin = isMemberAdmin && group.admins?.length === 1;
-                
+
                 return (
                   <div key={member._id} className="flex items-center gap-3 group/member">
                     <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden font-bold text-xs text-gray-500">
@@ -1037,7 +1030,7 @@ const GroupChat = () => {
                     {isMemberAdmin && (
                       <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold">Admin</span>
                     )}
-                    
+
                     {/* Admin Controls */}
                     {group.isAdmin && member._id !== user?._id && (
                       <div className="relative">
@@ -1051,7 +1044,7 @@ const GroupChat = () => {
                           >
                             <UserMinus className="w-3.5 h-3.5" />
                           </button>
-                          
+
                           {/* Promote/Demote Admin */}
                           {isMemberAdmin ? (
                             <button
@@ -1154,7 +1147,7 @@ const GroupChat = () => {
                       <p className="text-sm font-medium text-gray-400 uppercase tracking-wide mt-1">Get group feedback</p>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowPollEditor(false)}
                     className="p-3 hover:bg-gray-100 rounded-2xl transition-all group"
                   >
@@ -1190,7 +1183,7 @@ const GroupChat = () => {
                           className="flex-1 px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-[#002147] font-medium placeholder:text-gray-300 focus:bg-white focus:border-blue-200 outline-none transition-all"
                         />
                         {pollData.options.length > 2 && (
-                          <button 
+                          <button
                             onClick={() => setPollData(prev => ({ ...prev, options: prev.options.filter((_, i) => i !== idx) }))}
                             className="p-4 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
                           >
@@ -1199,9 +1192,9 @@ const GroupChat = () => {
                         )}
                       </div>
                     ))}
-                    
+
                     {pollData.options.length < 5 && (
-                      <button 
+                      <button
                         onClick={() => setPollData(prev => ({ ...prev, options: [...prev.options, ''] }))}
                         className="w-full py-4 border-2 border-dashed border-gray-100 rounded-2xl text-sm font-medium text-gray-400 hover:border-blue-200 hover:text-blue-500 hover:bg-blue-50/30 transition-all flex items-center justify-center gap-2 group"
                       >
@@ -1228,7 +1221,7 @@ const GroupChat = () => {
                       <button
                         onClick={() => {
                           if (pollData.question.trim() && pollData.options.filter(o => o.trim()).length >= 2) {
-                            handleSendMessage({ preventDefault: () => {} });
+                            handleSendMessage({ preventDefault: () => { } });
                           } else {
                             alert('Please enter a question and at least 2 options.');
                           }
@@ -1314,7 +1307,7 @@ const GroupChat = () => {
           </>
         )}
       </AnimatePresence>
-      
+
       {/* Full Media Viewer Overlay */}
       <AnimatePresence>
         {viewerMedia && (

@@ -109,7 +109,7 @@ const ResumeBuilder = () => {
             } else if (profileRes.success) {
                 const data = profileRes.richProfile || {};
                 const reg = profileRes.registration || {};
-                
+
                 setResumeData(prev => ({
                     ...prev,
                     personalInfo: {
@@ -132,7 +132,7 @@ const ResumeBuilder = () => {
                                     score: edu.cgpaPercentage || ''
                                 });
                             });
-                        } 
+                        }
                         else if (reg.institution || data.college) {
                             eduList.push({
                                 degree: reg.educationLevel || data.department || 'Student',
@@ -141,7 +141,7 @@ const ResumeBuilder = () => {
                                 score: ''
                             });
                         }
-                        
+
                         if (reg.twelfthDetails && reg.twelfthDetails.schoolName) {
                             eduList.push({
                                 degree: `12th Standard (${reg.twelfthDetails.stream || 'N/A'})`,
@@ -273,7 +273,7 @@ const ResumeBuilder = () => {
                                     score: edu.cgpaPercentage || ''
                                 });
                             });
-                        } 
+                        }
                         else if (reg.institution || data.college) {
                             eduList.push({
                                 degree: reg.educationLevel || data.department || 'Student',
@@ -282,7 +282,7 @@ const ResumeBuilder = () => {
                                 score: ''
                             });
                         }
-                        
+
                         if (reg.twelfthDetails && reg.twelfthDetails.schoolName) {
                             eduList.push({
                                 degree: `12th Standard (${reg.twelfthDetails.stream || 'N/A'})`,
@@ -320,57 +320,57 @@ const ResumeBuilder = () => {
                         }
                         return prev.experience;
                     })(),
-                skills: {
-                    technical: data.skills?.join(', ') || prev.skills.technical || '',
-                    soft: prev.skills.soft || '',
-                    languages: prev.skills.languages || ''
-                },
-                projects: (() => {
-                    if (reg.projects && reg.projects.length > 0) {
-                        return reg.projects.map(p => ({
-                            title: p.title || '',
-                            description: p.description || '',
-                            link: p.link || p.projectUrl || ''
-                        }));
-                    }
-                    if (data.projects && data.projects !== 'None') {
-                        return [{
-                            title: 'Key Project',
-                            description: data.projects,
-                            link: ''
-                        }];
-                    }
-                    return prev.projects;
-                })(),
-                achievements: (() => {
-                    const list = [];
-                    if (reg.certificates && reg.certificates.length > 0) {
-                        reg.certificates.forEach(c => {
-                            list.push({
-                                title: c.title || '',
-                                description: `Issued by ${c.issuingOrg || c.issuer || 'N/A'}`,
-                                link: c.link || ''
+                    skills: {
+                        technical: data.skills?.join(', ') || prev.skills.technical || '',
+                        soft: prev.skills.soft || '',
+                        languages: prev.skills.languages || ''
+                    },
+                    projects: (() => {
+                        if (reg.projects && reg.projects.length > 0) {
+                            return reg.projects.map(p => ({
+                                title: p.title || '',
+                                description: p.description || '',
+                                link: p.link || p.projectUrl || ''
+                            }));
+                        }
+                        if (data.projects && data.projects !== 'None') {
+                            return [{
+                                title: 'Key Project',
+                                description: data.projects,
+                                link: ''
+                            }];
+                        }
+                        return prev.projects;
+                    })(),
+                    achievements: (() => {
+                        const list = [];
+                        if (reg.certificates && reg.certificates.length > 0) {
+                            reg.certificates.forEach(c => {
+                                list.push({
+                                    title: c.title || '',
+                                    description: `Issued by ${c.issuingOrg || c.issuer || 'N/A'}`,
+                                    link: c.link || ''
+                                });
                             });
-                        });
-                    }
-                    if (reg.extracurricular && reg.extracurricular.length > 0) {
-                        reg.extracurricular.forEach(e => {
+                        }
+                        if (reg.extracurricular && reg.extracurricular.length > 0) {
+                            reg.extracurricular.forEach(e => {
+                                list.push({
+                                    title: e.activityType || 'Extracurricular Activity',
+                                    description: `${e.description || ''} - ${e.achievements || ''}`,
+                                    link: ''
+                                });
+                            });
+                        }
+                        if (list.length === 0 && data.certificates && data.certificates !== 'None') {
                             list.push({
-                                title: e.activityType || 'Extracurricular Activity',
-                                description: `${e.description || ''} - ${e.achievements || ''}`,
+                                title: 'Certification',
+                                description: data.certificates,
                                 link: ''
                             });
-                        });
-                    }
-                    if (list.length === 0 && data.certificates && data.certificates !== 'None') {
-                        list.push({
-                            title: 'Certification',
-                            description: data.certificates,
-                            link: ''
-                        });
-                    }
-                    return list.length > 0 ? list : prev.achievements;
-                })(),
+                        }
+                        return list.length > 0 ? list : prev.achievements;
+                    })(),
                 }));
                 toast.success('Profile data synced successfully!');
             }
@@ -528,30 +528,30 @@ const ResumeBuilder = () => {
             <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0">
                 <div className="max-w-5xl mx-auto px-4 py-4 flex items-center overflow-x-auto no-scrollbar scroll-smooth">
                     <div className="flex items-center gap-6 px-4">
-                    {steps.map((step, idx) => {
-                        const Icon = step.icon;
-                        const isActive = idx === currentStep;
-                        const isCompleted = idx < currentStep;
+                        {steps.map((step, idx) => {
+                            const Icon = step.icon;
+                            const isActive = idx === currentStep;
+                            const isCompleted = idx < currentStep;
 
-                        return (
-                            <div key={step.id} className="flex items-center gap-2 md:gap-4 shrink-0">
-                                <button
-                                    onClick={() => setCurrentStep(idx)}
-                                    className={`flex flex-col items-center gap-2 group transition-all ${isActive ? 'scale-105' : ''}`}
-                                >
-                                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : isCompleted ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'}`}>
-                                        <Icon className="w-5 h-5" />
-                                    </div>
-                                    <span className={`text-[9px] font-bold uppercase tracking-widest ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
-                                        {step.label}
-                                    </span>
-                                </button>
-                                {idx < steps.length - 1 && (
-                                    <div className={`h-[2px] w-4 md:w-12 rounded-full ${isCompleted ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-800'}`}></div>
-                                )}
-                            </div>
-                        );
-                    })}
+                            return (
+                                <div key={step.id} className="flex items-center gap-2 md:gap-4 shrink-0">
+                                    <button
+                                        onClick={() => setCurrentStep(idx)}
+                                        className={`flex flex-col items-center gap-2 group transition-all ${isActive ? 'scale-105' : ''}`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : isCompleted ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'}`}>
+                                            <Icon className="w-5 h-5" />
+                                        </div>
+                                        <span className={`text-[9px] font-bold uppercase tracking-widest ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
+                                            {step.label}
+                                        </span>
+                                    </button>
+                                    {idx < steps.length - 1 && (
+                                        <div className={`h-[2px] w-4 md:w-12 rounded-full ${isCompleted ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-800'}`}></div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
@@ -567,296 +567,296 @@ const ResumeBuilder = () => {
                                     <span className="text-blue-500">.</span>
                                 </h2>
                                 {currentStep === 0 && (
-                                     <button onClick={handleSyncProfile} disabled={isSyncing} className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-2xl transition-all font-bold text-xs border border-blue-100 dark:border-blue-500/20">
+                                    <button onClick={handleSyncProfile} disabled={isSyncing} className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-2xl transition-all font-bold text-xs border border-blue-100 dark:border-blue-500/20">
                                         {isSyncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} Sync with Profile
                                     </button>
                                 )}
                             </div>
 
-                        <div className="min-h-[400px]">
-                            {steps[currentStep].id === 'personal' && (
-                                <div className="space-y-6 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                                    <div className="group">
-                                        <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Full Name</label>
-                                        <div className="relative">
-                                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                             <input type="text" value={resumeData.personalInfo.fullName} readOnly className="w-full pl-9 pr-3 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none cursor-not-allowed dark:text-slate-400 transition-all text-sm font-medium shadow-sm opacity-80" title="Full name is verified from your profile and cannot be changed here." />
-                                        </div>
-                                    </div>
-                                    <div className="group">
-                                        <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Target Role</label>
-                                        <div className="relative">
-                                            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                            <input type="text" placeholder="e.g. Senior Frontend Developer" value={resumeData.personalInfo.targetRole} onChange={(e) => handleNestedChange('personalInfo', 'targetRole', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                            <div className="min-h-[400px]">
+                                {steps[currentStep].id === 'personal' && (
+                                    <div className="space-y-6 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
                                         <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
+                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Full Name</label>
                                             <div className="relative">
-                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <input type="text" value={resumeData.personalInfo.fullName} readOnly className="w-full pl-9 pr-3 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none cursor-not-allowed dark:text-slate-400 transition-all text-sm font-medium shadow-sm opacity-80" title="Full name is verified from your profile and cannot be changed here." />
                                             </div>
                                         </div>
                                         <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Mobile Number</label>
+                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Target Role</label>
                                             <div className="relative">
-                                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.phone} onChange={(e) => handleNestedChange('personalInfo', 'phone', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <input type="text" placeholder="e.g. Senior Frontend Developer" value={resumeData.personalInfo.targetRole} onChange={(e) => handleNestedChange('personalInfo', 'targetRole', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="group">
-                                        <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Location</label>
-                                        <div className="relative">
-                                            <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                            <input type="text" placeholder="City, State, Country" value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
+                                                <div className="relative">
+                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                    <input type="email" placeholder="email@example.com" value={resumeData.personalInfo.email} onChange={(e) => handleNestedChange('personalInfo', 'email', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                </div>
+                                            </div>
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Mobile Number</label>
+                                                <div className="relative">
+                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                    <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.phone} onChange={(e) => handleNestedChange('personalInfo', 'phone', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
                                         <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">LinkedIn URL</label>
+                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Location</label>
                                             <div className="relative">
-                                                <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                <MapPinIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                <input type="text" placeholder="City, State, Country" value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                             </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">LinkedIn URL</label>
+                                                <div className="relative">
+                                                    <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                    <input type="text" placeholder="linkedin.com/in/username" value={resumeData.personalInfo.linkedinUrl} onChange={(e) => handleNestedChange('personalInfo', 'linkedinUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                </div>
+                                            </div>
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">GitHub URL</label>
+                                                <div className="relative">
+                                                    <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                                    <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Father's Name</label>
+                                                <input type="text" placeholder="Father's Name" value={resumeData.personalDetails?.fatherName} onChange={(e) => handleNestedChange('personalDetails', 'fatherName', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                            </div>
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Mother's Name</label>
+                                                <input type="text" placeholder="Mother's Name" value={resumeData.personalDetails?.motherName} onChange={(e) => handleNestedChange('personalDetails', 'motherName', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Date of Birth</label>
+                                                <input type="date" value={resumeData.personalDetails?.dob} onChange={(e) => handleNestedChange('personalDetails', 'dob', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                            </div>
+                                            <div className="group">
+                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Nationality</label>
+                                                <input type="text" placeholder="Nationality" value={resumeData.personalDetails?.nationality} onChange={(e) => handleNestedChange('personalDetails', 'nationality', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                            </div>
+                                        </div>
+
+                                        <div className="group">
+                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Professional Summary</label>
+                                            <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder="A brief overview of your professional background and key strengths..."></textarea>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {steps[currentStep].id === 'experience' && (
+                                    <div className="space-y-4">
+                                        <AnimatePresence>
+                                            {resumeData.experience.map((exp, idx) => (
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
+                                                            <Briefcase className="w-4 h-4 text-blue-500" />
+                                                            {exp.company || 'Work Experience'}
+                                                        </h4>
+                                                        <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <div className="p-6 space-y-4">
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Company</label>
+                                                                <input type="text" placeholder="Company Name" value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Job Role</label>
+                                                                <input type="text" placeholder="e.g. Project Associate" value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Duration</label>
+                                                                <input type="text" placeholder="e.g. 2021 - Present" value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Location</label>
+                                                                <input type="text" placeholder="City, State" value={exp.location} onChange={(e) => handleArrayChange('experience', idx, 'location', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
+                                                            <textarea placeholder="Key responsibilities and achievements..." value={exp.description} onChange={(e) => handleArrayChange('experience', idx, 'description', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[100px] resize-none" rows={4}></textarea>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                        <button onClick={() => addArrayItem('experience', { company: '', role: '', duration: '', location: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500 hover:text-blue-500 transition-all">
+                                            <Plus className="w-5 h-5" /> Add Experience
+                                        </button>
+                                    </div>
+                                )}
+
+                                {steps[currentStep].id === 'education' && (
+                                    <div className="space-y-4">
+                                        <AnimatePresence>
+                                            {resumeData.education.map((edu, idx) => (
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
+                                                            <GraduationCap className="w-4 h-4 text-emerald-500" />
+                                                            {edu.institution || 'Education Details'}
+                                                        </h4>
+                                                        <button onClick={() => removeArrayItem('education', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <div className="p-6 space-y-4">
+                                                        <div>
+                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Institution Name</label>
+                                                            <input type="text" placeholder="College / University Name" value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Degree</label>
+                                                                <input type="text" placeholder="e.g. MCA or B.Tech" value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Year of Passing</label>
+                                                                <input type="text" placeholder="e.g. 2025" value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Grade / CGPA</label>
+                                                                <input type="text" placeholder="e.g. 8.5 CGPA" value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Location</label>
+                                                                <input type="text" placeholder="City, State" value={edu.location} onChange={(e) => handleArrayChange('education', idx, 'location', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                        <button onClick={() => addArrayItem('education', { institution: '', degree: '', grade: '', year: '', location: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-emerald-500 hover:text-emerald-500 transition-all">
+                                            <Plus className="w-5 h-5" /> Add Education
+                                        </button>
+                                    </div>
+                                )}
+
+                                {steps[currentStep].id === 'projects' && (
+                                    <div className="space-y-4">
+                                        <AnimatePresence>
+                                            {resumeData.projects.map((proj, idx) => (
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
+                                                            <FileText className="w-4 h-4 text-indigo-500" />
+                                                            {proj.title || 'Project Details'}
+                                                        </h4>
+                                                        <button onClick={() => removeArrayItem('projects', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <div className="p-6 space-y-4">
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Title</label>
+                                                                <input type="text" placeholder="Project Name" value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Link</label>
+                                                                <input type="text" placeholder="URL or [Link]" value={proj.link} onChange={(e) => handleArrayChange('projects', idx, 'link', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
+                                                            <textarea placeholder="Describe the technology and your contribution..." value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[80px] resize-none" rows={3}></textarea>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                        <button onClick={() => addArrayItem('projects', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-500 hover:text-indigo-500 transition-all">
+                                            <Plus className="w-5 h-5" /> Add Project
+                                        </button>
+                                    </div>
+                                )}
+
+                                {steps[currentStep].id === 'skills' && (
+                                    <div className="space-y-6 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                        <div className="group">
+                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Technical Skills</label>
+                                            <textarea value={resumeData.skills.technical} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={4} className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none dark:text-white transition-all text-sm font-medium resize-none" placeholder="e.g. JavaScript, React, Node.js, Python, AWS..."></textarea>
                                         </div>
                                         <div className="group">
-                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">GitHub URL</label>
-                                            <div className="relative">
-                                                <Github className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                <input type="text" placeholder="github.com/username" value={resumeData.personalInfo.githubUrl} onChange={(e) => handleNestedChange('personalInfo', 'githubUrl', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                            </div>
+                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Soft Skills</label>
+                                            <textarea value={resumeData.skills.soft} onChange={(e) => handleNestedChange('skills', 'soft', e.target.value)} rows={3} className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none dark:text-white transition-all text-sm font-medium resize-none" placeholder="e.g. Team Leadership, Problem Solving, Public Speaking..."></textarea>
+                                        </div>
+                                        <div className="group">
+                                            <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Languages</label>
+                                            <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none dark:text-white transition-all text-sm font-medium resize-none" placeholder="e.g. English (Fluent), Urdu (Native), Tamil..."></textarea>
                                         </div>
                                     </div>
+                                )}
 
-                                     <div className="grid grid-cols-2 gap-4">
-                                         <div className="group">
-                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Father's Name</label>
-                                             <input type="text" placeholder="Father's Name" value={resumeData.personalDetails?.fatherName} onChange={(e) => handleNestedChange('personalDetails', 'fatherName', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                         </div>
-                                         <div className="group">
-                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Mother's Name</label>
-                                             <input type="text" placeholder="Mother's Name" value={resumeData.personalDetails?.motherName} onChange={(e) => handleNestedChange('personalDetails', 'motherName', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                         </div>
-                                     </div>
-
-                                     <div className="grid grid-cols-2 gap-4">
-                                         <div className="group">
-                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Date of Birth</label>
-                                             <input type="date" value={resumeData.personalDetails?.dob} onChange={(e) => handleNestedChange('personalDetails', 'dob', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                         </div>
-                                         <div className="group">
-                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Nationality</label>
-                                             <input type="text" placeholder="Nationality" value={resumeData.personalDetails?.nationality} onChange={(e) => handleNestedChange('personalDetails', 'nationality', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                         </div>
-                                     </div>
-
-                                    <div className="group">
-                                        <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Professional Summary</label>
-                                        <textarea value={resumeData.summary} onChange={(e) => setResumeData(prev => ({ ...prev, summary: e.target.value }))} rows={4} className="w-full p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm resize-none" placeholder="A brief overview of your professional background and key strengths..."></textarea>
+                                {steps[currentStep].id === 'achievements' && (
+                                    <div className="space-y-4">
+                                        <AnimatePresence>
+                                            {resumeData.achievements.map((ach, idx) => (
+                                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                                                    <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                                                        <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
+                                                            <Trophy className="w-4 h-4 text-amber-500" />
+                                                            {ach.title || 'Achievement Details'}
+                                                        </h4>
+                                                        <button onClick={() => removeArrayItem('achievements', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <div className="p-6 space-y-4">
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Achievement Title</label>
+                                                                <input type="text" placeholder="e.g. Best Student Award" value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Link</label>
+                                                                <input type="text" placeholder="URL or [Link]" value={ach.link} onChange={(e) => handleArrayChange('achievements', idx, 'link', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
+                                                            <textarea placeholder="Provide some context about this achievement..." value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                        <button onClick={() => addArrayItem('achievements', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-amber-500 hover:text-amber-500 transition-all">
+                                            <Plus className="w-5 h-5" /> Add Achievement
+                                        </button>
                                     </div>
-                                </div>
-                            )}
-
-                            {steps[currentStep].id === 'experience' && (
-                                <div className="space-y-4">
-                                    <AnimatePresence>
-                                        {resumeData.experience.map((exp, idx) => (
-                                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                                                <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                                                    <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                        <Briefcase className="w-4 h-4 text-blue-500" />
-                                                        {exp.company || 'Work Experience'}
-                                                    </h4>
-                                                     <button onClick={() => removeArrayItem('experience', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                                <div className="p-6 space-y-4">
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Company</label>
-                                                             <input type="text" placeholder="Company Name" value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Job Role</label>
-                                                             <input type="text" placeholder="e.g. Project Associate" value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Duration</label>
-                                                             <input type="text" placeholder="e.g. 2021 - Present" value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Location</label>
-                                                             <input type="text" placeholder="City, State" value={exp.location} onChange={(e) => handleArrayChange('experience', idx, 'location', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                                                         <textarea placeholder="Key responsibilities and achievements..." value={exp.description} onChange={(e) => handleArrayChange('experience', idx, 'description', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[100px] resize-none" rows={4}></textarea>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                    <button onClick={() => addArrayItem('experience', { company: '', role: '', duration: '', location: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-blue-500 hover:text-blue-500 transition-all">
-                                        <Plus className="w-5 h-5" /> Add Experience
-                                    </button>
-                                </div>
-                            )}
-
-                            {steps[currentStep].id === 'education' && (
-                                <div className="space-y-4">
-                                    <AnimatePresence>
-                                        {resumeData.education.map((edu, idx) => (
-                                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                                                <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                                                    <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                        <GraduationCap className="w-4 h-4 text-emerald-500" />
-                                                        {edu.institution || 'Education Details'}
-                                                    </h4>
-                                                    <button onClick={() => removeArrayItem('education', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                                <div className="p-6 space-y-4">
-                                                    <div>
-                                                         <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Institution Name</label>
-                                                         <input type="text" placeholder="College / University Name" value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                     </div>
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                         <div>
-                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Degree</label>
-                                                             <input type="text" placeholder="e.g. MCA or B.Tech" value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                         </div>
-                                                        <div>
-                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Year of Passing</label>
-                                                             <input type="text" placeholder="e.g. 2025" value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                         </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div>
-                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Grade / CGPA</label>
-                                                             <input type="text" placeholder="e.g. 8.5 CGPA" value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                         </div>
-                                                        <div>
-                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Location</label>
-                                                             <input type="text" placeholder="City, State" value={edu.location} onChange={(e) => handleArrayChange('education', idx, 'location', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                    <button onClick={() => addArrayItem('education', { institution: '', degree: '', grade: '', year: '', location: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-emerald-500 hover:text-emerald-500 transition-all">
-                                        <Plus className="w-5 h-5" /> Add Education
-                                    </button>
-                                </div>
-                            )}
-
-                            {steps[currentStep].id === 'projects' && (
-                                <div className="space-y-4">
-                                    <AnimatePresence>
-                                        {resumeData.projects.map((proj, idx) => (
-                                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                                                <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                                                    <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                        <FileText className="w-4 h-4 text-indigo-500" />
-                                                        {proj.title || 'Project Details'}
-                                                    </h4>
-                                                    <button onClick={() => removeArrayItem('projects', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                                <div className="p-6 space-y-4">
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div>
-                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Title</label>
-                                                             <input type="text" placeholder="Project Name" value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                         </div>
-                                                        <div>
-                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Link</label>
-                                                             <input type="text" placeholder="URL or [Link]" value={proj.link} onChange={(e) => handleArrayChange('projects', idx, 'link', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                         </div>
-                                                    </div>
-                                                    <div>
-                                                         <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                                                         <textarea placeholder="Describe the technology and your contribution..." value={proj.description} onChange={(e) => handleArrayChange('projects', idx, 'description', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[80px] resize-none" rows={3}></textarea>
-                                                     </div>
-                                                </div>
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                    <button onClick={() => addArrayItem('projects', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-500 hover:text-indigo-500 transition-all">
-                                        <Plus className="w-5 h-5" /> Add Project
-                                    </button>
-                                </div>
-                            )}
-
-                            {steps[currentStep].id === 'skills' && (
-                                <div className="space-y-6 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                                    <div className="group">
-                                         <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Technical Skills</label>
-                                         <textarea value={resumeData.skills.technical} onChange={(e) => handleNestedChange('skills', 'technical', e.target.value)} rows={4} className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none dark:text-white transition-all text-sm font-medium resize-none" placeholder="e.g. JavaScript, React, Node.js, Python, AWS..."></textarea>
-                                     </div>
-                                    <div className="group">
-                                         <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Soft Skills</label>
-                                         <textarea value={resumeData.skills.soft} onChange={(e) => handleNestedChange('skills', 'soft', e.target.value)} rows={3} className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none dark:text-white transition-all text-sm font-medium resize-none" placeholder="e.g. Team Leadership, Problem Solving, Public Speaking..."></textarea>
-                                     </div>
-                                    <div className="group">
-                                         <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Languages</label>
-                                         <textarea value={resumeData.skills.languages} onChange={(e) => handleNestedChange('skills', 'languages', e.target.value)} rows={2} className="w-full p-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none dark:text-white transition-all text-sm font-medium resize-none" placeholder="e.g. English (Fluent), Urdu (Native), Tamil..."></textarea>
-                                     </div>
-                                </div>
-                            )}
-
-                            {steps[currentStep].id === 'achievements' && (
-                                <div className="space-y-4">
-                                    <AnimatePresence>
-                                        {resumeData.achievements.map((ach, idx) => (
-                                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0 }} key={idx} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                                                <div className="bg-slate-50/50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                                                    <h4 className="font-black text-slate-800 dark:text-white text-sm flex items-center gap-2">
-                                                        <Trophy className="w-4 h-4 text-amber-500" />
-                                                        {ach.title || 'Achievement Details'}
-                                                    </h4>
-                                                    <button onClick={() => removeArrayItem('achievements', idx)} className="text-slate-400 hover:text-red-500 p-2 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                                <div className="p-6 space-y-4">
-                                                    <div className="grid grid-cols-2 gap-4">
-                                                        <div>
-                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Achievement Title</label>
-                                                             <input type="text" placeholder="e.g. Best Student Award" value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                         </div>
-                                                        <div>
-                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Link</label>
-                                                             <input type="text" placeholder="URL or [Link]" value={ach.link} onChange={(e) => handleArrayChange('achievements', idx, 'link', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
-                                                         </div>
-                                                    </div>
-                                                    <div>
-                                                         <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                                                         <textarea placeholder="Provide some context about this achievement..." value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
-                                                     </div>
-                                                </div>
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                    <button onClick={() => addArrayItem('achievements', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-amber-500 hover:text-amber-500 transition-all">
-                                        <Plus className="w-5 h-5" /> Add Achievement
-                                    </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Navigation Footer - Fixed at bottom of section */}
-                <div className="p-6 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                    {/* Navigation Footer - Fixed at bottom of section */}
+                    <div className="p-6 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
                         <button
                             onClick={prevStep}
                             disabled={currentStep === 0}
@@ -879,7 +879,7 @@ const ResumeBuilder = () => {
                 {/* Preview Canvas (Shows on last step) */}
                 <section className={`flex-1 overflow-auto relative p-8 md:p-12 custom-scrollbar shadow-inner bg-slate-100 dark:bg-slate-900 ${currentStep === steps.length - 1 ? 'block' : 'hidden'}`}>
                     <div id="resume-preview" className="mx-auto bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-                        
+
                         {/* Content Area */}
                         <div className="relative z-10">
                             {/* Header Section */}
@@ -888,7 +888,7 @@ const ResumeBuilder = () => {
                                     {resumeData.personalInfo.fullName || 'FIRST LAST'}
                                 </h1>
                                 <h2 className="text-lg font-semibold !text-gray-800 mt-1 uppercase tracking-widest">{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
-                                
+
                                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-3 text-[11px] !text-gray-700 max-w-[90%]">
                                     {resumeData.personalInfo.email && <span className="flex items-center">📧 {resumeData.personalInfo.email}</span>}
                                     {resumeData.personalInfo.phone && <span className="flex items-center">📱 {resumeData.personalInfo.phone}</span>}
@@ -899,13 +899,13 @@ const ResumeBuilder = () => {
                             <div className="space-y-6">
                                 {/* Summary */}
                                 {resumeData.summary && (
-                                     <section>
-                                         <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Professional Summary</h3>
-                                         <p className="!text-gray-800 text-[11px] leading-normal whitespace-pre-wrap">
-                                             {resumeData.summary}
-                                         </p>
-                                     </section>
-                                 )}
+                                    <section>
+                                        <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Professional Summary</h3>
+                                        <p className="!text-gray-800 text-[11px] leading-normal whitespace-pre-wrap">
+                                            {resumeData.summary}
+                                        </p>
+                                    </section>
+                                )}
 
                                 {/* Education */}
                                 {resumeData.education.length > 0 && (

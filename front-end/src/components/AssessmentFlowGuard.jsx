@@ -25,7 +25,7 @@ const AssessmentFlowGuard = ({ children }) => {
   // === PROCTORING: Active only on assessment routes ===
   const isAssessmentRoute =
     (location.pathname.startsWith("/assessment/") ||
-    location.pathname.startsWith("/dashboard/assessments/")) &&
+      location.pathname.startsWith("/dashboard/assessments/")) &&
     !location.pathname.endsWith("/report");
 
   const handleAutoSubmit = useCallback(() => {
@@ -176,16 +176,26 @@ const AssessmentFlowGuard = ({ children }) => {
 
         const userId = parsedUser.id || parsedUser._id;
 
-        // NEW: Check if registration is completed
-        // If user is a STUDENT and has NOT completed registration, force redirect
-        if (parsedUser.role === 'student' && !parsedUser.hasRegistration) {
+        // NEW: Check if registration is completed.
+        // A student is considered registered if ANY of these are true:
+        //   1. parsedUser.hasRegistration = true  (self-signup student with Registration record)
+        //   2. parsedUser.isRegistered = true      (admin-created student, marked registered in Student model)
+        //   3. parsedUser.userType === 'registration' (legacy self-signup flow)
+        //   4. parsedUser.college exists           (admin-assigned student — always has a college ObjectId)
+        const studentIsRegistered =
+          parsedUser.hasRegistration === true ||
+          parsedUser.isRegistered === true ||
+          parsedUser.userType === 'registration' ||
+          (parsedUser.college && parsedUser.college !== null); // Admin-provisioned students always have a college
+
+        if (parsedUser.role === 'student' && !studentIsRegistered) {
           // Allow access ONLY to registration pages
           const isRegistrationPage = location.pathname === '/complete-registration' ||
             location.pathname === '/signup' ||
             location.pathname === '/signup-initial';
 
           if (!isRegistrationPage) {
-            console.log("Redirecting to completion registration");
+            console.log('[AssessmentFlowGuard] Student not registered — redirecting to /complete-registration');
             navigate('/complete-registration', { replace: true });
             return;
           }

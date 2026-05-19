@@ -138,7 +138,7 @@ const Performance = () => {
                 const res = await apiCall('/avatar/streak-status');
                 if (res.success) {
                     const { cycleDay, isActive, lastStreakDate } = res.data;
-                    
+
                     // Generate last 7 days
                     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                     const today = new Date();
@@ -148,7 +148,7 @@ const Performance = () => {
                         const d = new Date();
                         d.setDate(today.getDate() - i);
                         const dayName = days[d.getDay()];
-                        
+
                         let hours = 0;
                         // Logic: If active streak covers this day
                         // active streak implies consecutive days ending Today (or yesterday if gap=1)
@@ -157,19 +157,19 @@ const Performance = () => {
                         // strict cycleDay count means: today is day cycleDay. yesterday is cycleDay-1.
                         // So if we are at index i (days ago), it corresponds to cycleDay - i.
                         // If cycleDay - i > 0, then it was part of the streak.
-                        
+
                         // Distance from today = i (where 0 is today in the loop? No loop is 6..0)
                         // Actually loop i=6 means 6 days ago.
                         // distance from today = i? No.
                         // Let's use 'daysAgo'
-                        const daysAgo = i; 
-                        
+                        const daysAgo = i;
+
                         // If isActive is true, the streak encompasses the last 'cycleDay' days including today.
                         // valid if daysAgo < cycleDay
                         if (isActive && daysAgo < cycleDay) {
-                             // Assign a "standard" activity amount for visualization, e.g. 2.5 hours
-                             // Or randomize slightly for realism? No, static 2h is fine to show "Activity"
-                             hours = 2.5;
+                            // Assign a "standard" activity amount for visualization, e.g. 2.5 hours
+                            // Or randomize slightly for realism? No, static 2h is fine to show "Activity"
+                            hours = 2.5;
                         }
 
                         chartData.push({
