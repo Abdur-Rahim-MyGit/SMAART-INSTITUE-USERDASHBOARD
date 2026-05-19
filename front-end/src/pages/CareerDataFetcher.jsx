@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
+import {
     Database, Brain, RefreshCw, Plus, Cpu, Loader2, Sparkles, Clock
 } from 'lucide-react';
 import careerIntelligenceApi from '@/services/careerIntelligenceApi';
@@ -125,7 +125,7 @@ const CareerDataFetcher = () => {
                 // Specialisation is required if the degree group has specialisations defined
                 // But since SPECIALISATIONS is in constants, we'd need to import it here too
                 // For now, I'll pass it down or import it.
-                return true; 
+                return true;
             case 1: return !!formData.yearOfStudy;
             case 2: return formData.jobRolePreferences.length >= 1;
             case 3: return true;
@@ -345,7 +345,7 @@ const CareerDataFetcher = () => {
 
                     {/* Content Area */}
                     {showForm ? (
-                        <CareerForm 
+                        <CareerForm
                             currentStep={currentStep}
                             setCurrentStep={setCurrentStep}
                             formData={formData}
@@ -360,7 +360,7 @@ const CareerDataFetcher = () => {
                         />
                     ) : (
                         <Suspense fallback={<ReportSkeleton />}>
-                            <CareerReport 
+                            <CareerReport
                                 report={report}
                                 reportRef={reportRef}
                                 startNew={startNew}
@@ -379,7 +379,7 @@ const CareerDataFetcher = () => {
                     <AnimatePresence>
                         {showSimPanel && (
                             <Suspense fallback={<Skeleton className="mt-8 h-[300px] w-full rounded-3xl" />}>
-                                <SimulationPanel 
+                                <SimulationPanel
                                     simCount={simCount}
                                     setSimCount={setSimCount}
                                     handleRunSimulation={handleRunSimulation}

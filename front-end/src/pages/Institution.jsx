@@ -29,7 +29,7 @@ const Institution = () => {
     const fetchCollegeData = async () => {
       try {
         setLoading(true);
-        
+
         let targetId = id;
         if (!targetId) {
           const stored = sessionStorage.getItem("selectedInstitution");
@@ -46,7 +46,7 @@ const Institution = () => {
         }
 
         const response = await apiCall(`/colleges/name/${encodeURIComponent(targetId)}`);
-        
+
         if (response && response.success) {
           setCollegeData(response.data);
         } else {
@@ -63,8 +63,8 @@ const Institution = () => {
   }, [id]);
 
   const baseVideoUrl = (collegeData && collegeData.chairmanVideo) ? collegeData.chairmanVideo : videoUrlFallback;
-  const currentVideoUrl = isPlaying 
-    ? (baseVideoUrl.includes("?") ? `${baseVideoUrl}&autoplay=1` : `${baseVideoUrl}?autoplay=1`) 
+  const currentVideoUrl = isPlaying
+    ? (baseVideoUrl.includes("?") ? `${baseVideoUrl}&autoplay=1` : `${baseVideoUrl}?autoplay=1`)
     : baseVideoUrl;
 
   return (

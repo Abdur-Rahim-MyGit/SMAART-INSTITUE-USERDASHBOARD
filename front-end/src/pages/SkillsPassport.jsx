@@ -212,7 +212,7 @@ const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => (
     >
         <div className="absolute inset-0 bg-gradient-to-br from-teal/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="absolute inset-x-12 top-0 h-[2px] bg-gradient-to-r from-transparent via-teal/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
-        
+
         <div className="flex items-start justify-between gap-5 relative z-10">
             <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-4">
@@ -761,7 +761,7 @@ const SkillsPassport = () => {
                                     }
                                 }}
                                 className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-dark-elevated px-5 text-sm font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-slate-300 dark:hover:border-white/20"
-                                >
+                            >
                                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-white/5 ring-1 ring-slate-200 dark:ring-white/10">
                                     <Share2 className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
                                 </span>
@@ -787,41 +787,41 @@ const SkillsPassport = () => {
                                 className="relative mx-auto w-full max-w-4xl rounded-2xl border border-slate-200/70 dark:border-white/10 bg-white dark:bg-dark-elevated px-5 py-6 sm:px-7 md:px-8 shadow-xl"
                             >
                                 <div className="space-y-5 lg:pr-[180px]">
-                                        <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal text-white shadow-lg">
+                                                <Sparkles className="w-4 h-4" />
+                                            </div>
+                                            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
+                                                Skills Passport
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight tracking-tight text-teal dark:text-white">
+                                            {userName}
+                                        </h1>
+
+                                        <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 text-sm text-slate-600 dark:text-slate-300">
                                             <div className="flex items-center gap-3">
-                                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal text-white shadow-lg">
-                                                    <Sparkles className="w-4 h-4" />
-                                                </div>
-                                                <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
-                                                    Skills Passport
-                                                </div>
+                                                <Mail className="w-4 h-4 text-slate-400" />
+                                                <span className="font-bold break-all">{passportEmail}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <Phone className="w-4 h-4 text-slate-400" />
+                                                <span className="font-bold">{passportPhone}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <ShieldCheck className="w-4 h-4 text-slate-400" />
+                                                <span className="font-bold">{passportId}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <GraduationCap className="w-4 h-4 text-slate-400" />
+                                                <span className="font-bold">{passportDegree}</span>
                                             </div>
                                         </div>
-
-                                        <div className="space-y-4">
-                                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight tracking-tight text-teal dark:text-white">
-                                                {userName}
-                                            </h1>
-
-                                            <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 text-sm text-slate-600 dark:text-slate-300">
-                                                <div className="flex items-center gap-3">
-                                                    <Mail className="w-4 h-4 text-slate-400" />
-                                                    <span className="font-bold break-all">{passportEmail}</span>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <Phone className="w-4 h-4 text-slate-400" />
-                                                    <span className="font-bold">{passportPhone}</span>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <ShieldCheck className="w-4 h-4 text-slate-400" />
-                                                    <span className="font-bold">{passportId}</span>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <GraduationCap className="w-4 h-4 text-slate-400" />
-                                                    <span className="font-bold">{passportDegree}</span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="mt-8 flex justify-center lg:hidden">
@@ -1015,11 +1015,11 @@ const SkillsPassport = () => {
 
 
                 <div className="text-center pb-20">
-                    
+
                 </div>
             </motion.div>
             {/* Footer Promo */}
-           
+
         </div>
     );
 };

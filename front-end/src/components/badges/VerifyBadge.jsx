@@ -292,11 +292,10 @@ const VerifyBadge = () => {
                                         {[...Array(3)].map((_, i) => (
                                             <FaStar
                                                 key={i}
-                                                className={`w-5 h-5 ${
-                                                    i < tier.stars
+                                                className={`w-5 h-5 ${i < tier.stars
                                                         ? tier.textColor
                                                         : 'text-gray-300'
-                                                }`}
+                                                    }`}
                                             />
                                         ))}
                                     </div>

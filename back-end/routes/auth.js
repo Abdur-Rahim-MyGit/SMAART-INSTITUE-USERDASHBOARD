@@ -697,6 +697,7 @@ router.post('/login',
         userResponse.college = user.college;
         userResponse.profileImage = user.profileImage; // Include profile picture
         userResponse.hasRegistration = hasRegistration;
+        userResponse.isRegistered = user.isRegistered === true; // Admin-created students: isRegistered flag from Student model
       } else if (userType === 'teacher') {
         userResponse.fullName = user.fullName;
         userResponse.teacherId = user.teacherId;

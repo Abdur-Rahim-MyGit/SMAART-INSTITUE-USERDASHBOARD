@@ -156,11 +156,11 @@ const GeneralDictionary = () => {
                 <div className="space-y-1">
                   <h3 className="text-xl font-bold">Definition Not Found</h3>
                   <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
-                    We couldn't find a definition for <span className="font-semibold text-slate-700 dark:text-slate-200">"{searchTerm}"</span>. 
+                    We couldn't find a definition for <span className="font-semibold text-slate-700 dark:text-slate-200">"{searchTerm}"</span>.
                     Please check the spelling or try a different word.
                   </p>
                 </div>
-                <button 
+                <button
                   onClick={() => setSearchTerm("")}
                   className="text-blue-600 dark:text-blue-400 text-sm font-semibold hover:underline"
                 >
