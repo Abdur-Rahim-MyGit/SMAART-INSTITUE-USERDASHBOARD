@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 
 // ── CareerAnalysis (analysis result storage) ──────────────────────────────────
 const careerAnalysisSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true }, // ← per-user link
   student_name: { type: String },
   student_email: { type: String, index: true },
   primary_role: { type: String },

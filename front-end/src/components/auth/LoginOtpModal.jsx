@@ -265,6 +265,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div
+                      role="group"
+                      aria-label="One-time password input"
                       className="flex justify-center gap-3"
                       onPaste={handlePaste}
                     >
@@ -276,6 +278,8 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                           inputMode="numeric"
                           maxLength={1}
                           value={digit}
+                          aria-label={`OTP digit ${index + 1} of 6`}
+                          autoComplete={index === 0 ? "one-time-code" : "off"}
                           onChange={(e) => handleChange(index, e.target.value)}
                           onKeyDown={(e) => handleKeyDown(index, e)}
                           className="w-12 h-16 text-center text-2xl font-bold bg-[#f8fafc] dark:bg-dark-bg/50 border border-[#e2e8f0] dark:border-white/10 rounded-xl focus:border-[#1a3884] dark:focus:border-[#00a3e0] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:ring-[#00a3e0]/20 focus:bg-white dark:focus:bg-[#001c3d] outline-none transition-all shadow-sm text-[#112b6b] dark:text-white"

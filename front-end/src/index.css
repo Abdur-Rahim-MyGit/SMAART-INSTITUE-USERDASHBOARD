@@ -160,8 +160,8 @@
 
   html,
   body {
-    max-width: 100vw;
-    overflow-x: hidden;
+    /* Removed max-width: 100vw — was masking real overflow bugs */
+    overflow-x: clip; /* clips without hiding scroll events — safer than hidden */
     margin: 0;
     padding: 0;
     touch-action: manipulation;
@@ -177,13 +177,15 @@
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
+    /* Removed global user-select:none, cursor:default, caret-color:transparent
+       — they break mobile text selection, form carets, and assistive tooling.
+       Selection is scoped to non-interactive elements below. */
+  }
+
+  /* Prevent accidental selection only on decorative/non-interactive UI chrome */
+  h1, h2, h3, h4, h5, h6, label {
     -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
-    -webkit-touch-callout: none;
-    cursor: default;
-    caret-color: transparent;
   }
 
   h1,

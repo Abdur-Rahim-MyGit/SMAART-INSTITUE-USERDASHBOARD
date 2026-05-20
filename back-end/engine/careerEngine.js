@@ -398,7 +398,13 @@ const generateRoleTab = (roleName, studentData, mongoRoleData = null) => {
  * 4. Falls back to static JSON if no DB match
  */
 const processCareerIntelligence = async (studentData) => {
-  const { preferences, skills } = studentData;
+  const { preferences } = studentData;
+
+  // ── Normalize skills: accept [{name,status,cert}] or plain strings ──
+  const rawSkills = studentData.skills || [];
+  const skills = rawSkills.map(s => (typeof s === 'string' ? s : s.name || '')).filter(Boolean);
+  // Mutate studentData.skills so all downstream helpers see normalized skills
+  studentData = { ...studentData, skills };
 
   // ── Resolve Primary ──
   const pDirId = preferences.primary?.careerDirectionId || '';

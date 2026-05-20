@@ -43,6 +43,7 @@ const Performance = () => {
     const [loading, setLoading] = useState(true);
     const [enrollments, setEnrollments] = useState([]);
     const [baseline, setBaseline] = useState(null);
+    const [activityData, setActivityData] = useState([]);
     const [stats, setStats] = useState({
         totalLearningHours: 0,
         coursesCompleted: 0,
@@ -121,6 +122,33 @@ const Performance = () => {
         fetchData();
     }, [user, userLoading]);
 
+    // Streak chart useEffect — moved above early return to satisfy Rules of Hooks
+    useEffect(() => {
+        const fetchStreakAndBuildChart = async () => {
+            try {
+                const res = await apiCall('/avatar/streak-status');
+                if (res.success) {
+                    const { cycleDay, isActive } = res.data;
+                    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    const today = new Date();
+                    const chartData = [];
+                    for (let i = 6; i >= 0; i--) {
+                        const d = new Date();
+                        d.setDate(today.getDate() - i);
+                        const dayName = days[d.getDay()];
+                        const daysAgo = i;
+                        const hours = (isActive && daysAgo < cycleDay) ? 2.5 : 0;
+                        chartData.push({ name: dayName, hours, date: d.toLocaleDateString() });
+                    }
+                    setActivityData(chartData);
+                }
+            } catch (error) {
+                console.error('Failed to fetch streak for chart', error);
+            }
+        };
+        fetchStreakAndBuildChart();
+    }, []);
+
     if (loading || userLoading) {
         return (
             <div className="flex h-screen items-center justify-center bg-[#F8F9FC] dark:bg-dark-bg">
@@ -128,66 +156,6 @@ const Performance = () => {
             </div>
         );
     }
-
-    // Real Activity Data (Calculated from Streak)
-    const [activityData, setActivityData] = useState([]);
-
-    useEffect(() => {
-        const fetchStreakAndBuildChart = async () => {
-            try {
-                const res = await apiCall('/avatar/streak-status');
-                if (res.success) {
-                    const { cycleDay, isActive, lastStreakDate } = res.data;
-
-                    // Generate last 7 days
-                    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                    const today = new Date();
-                    const chartData = [];
-
-                    for (let i = 6; i >= 0; i--) {
-                        const d = new Date();
-                        d.setDate(today.getDate() - i);
-                        const dayName = days[d.getDay()];
-
-                        let hours = 0;
-                        // Logic: If active streak covers this day
-                        // active streak implies consecutive days ending Today (or yesterday if gap=1)
-                        // simpler logic: if isActive and i < cycleDay, then it was active.
-                        // (i=0 is today, i=1 is yesterday... wait loop is i=6 (6 days ago) to i=0 (today))
-                        // strict cycleDay count means: today is day cycleDay. yesterday is cycleDay-1.
-                        // So if we are at index i (days ago), it corresponds to cycleDay - i.
-                        // If cycleDay - i > 0, then it was part of the streak.
-
-                        // Distance from today = i (where 0 is today in the loop? No loop is 6..0)
-                        // Actually loop i=6 means 6 days ago.
-                        // distance from today = i? No.
-                        // Let's use 'daysAgo'
-                        const daysAgo = i;
-
-                        // If isActive is true, the streak encompasses the last 'cycleDay' days including today.
-                        // valid if daysAgo < cycleDay
-                        if (isActive && daysAgo < cycleDay) {
-                            // Assign a "standard" activity amount for visualization, e.g. 2.5 hours
-                            // Or randomize slightly for realism? No, static 2h is fine to show "Activity"
-                            hours = 2.5;
-                        }
-
-                        chartData.push({
-                            name: dayName,
-                            hours: hours,
-                            date: d.toLocaleDateString() // helpful for tooltip
-                        });
-                    }
-                    setActivityData(chartData);
-                }
-            } catch (error) {
-                console.error("Failed to fetch streak for chart", error);
-                // Fallback to empty or mock
-            }
-        };
-
-        fetchStreakAndBuildChart();
-    }, []);
 
     // Prepare Course Progress Data for Bar Chart
     const courseProgressData = enrollments.map(c => ({

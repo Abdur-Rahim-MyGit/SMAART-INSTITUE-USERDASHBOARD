@@ -4,27 +4,24 @@
  */
 const rateLimit = require('express-rate-limit');
 
-// Login rate limiter - 15 attempts per 15 minutes per IP
+// Login rate limiter - 15 attempts per 15 minutes per IP+email
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 15, // Limit each IP to 15 login requests per windowMs
+  max: 15,
   message: {
     error: 'Too many login attempts. Please try again in 15 minutes.',
     retryAfter: 15
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Use X-Forwarded-For (set by proxy) when available, fall back to direct IP
   keyGenerator: (req) => {
-    // Use IP + email for more granular limiting
-    const ip = req.ip || req.connection.remoteAddress || 'unknown';
+    const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
+      || req.ip
+      || req.connection.remoteAddress
+      || 'unknown';
     const email = req.body?.email?.toLowerCase() || 'unknown';
     return `${ip}-${email}`;
-  },
-  validate: {
-    xForwardedForHeader: false,
-    trustProxy: false,
-    ip: false,
-    keyGeneratorIpFallback: false
   }
 });
 
