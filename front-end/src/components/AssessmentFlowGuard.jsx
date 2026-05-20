@@ -306,6 +306,8 @@ const AssessmentFlowGuard = ({ children }) => {
       if (path.includes('/notifications')) return "Notifications";
       if (path.includes('/help')) return "Help";
       if (path.includes('/support') || path.includes('/tickets')) return "Support";
+      if (path.includes('/reports')) return "Reports";
+      if (path.includes('/career-data-fetcher')) return "Career Directions";
       return "DashBoard";
     };
 

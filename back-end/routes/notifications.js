@@ -20,9 +20,17 @@ router.get('/', protect, async (req, res) => {
     const { page = 1, limit = 20, unreadOnly = false } = req.query;
     const userId = getAuthenticatedUserId(req);
 
-    const query = { userId };
+    const query = {
+      $or: [
+        { userId },
+        { recipient: userId }
+      ]
+    };
     if (unreadOnly === 'true') {
-      query.isRead = false;
+      query.$or = [
+        { userId, isRead: false },
+        { recipient: userId, read: false }
+      ];
     }
 
     const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
@@ -68,8 +76,11 @@ router.patch('/:id/read', protect, async (req, res) => {
   try {
     const userId = getAuthenticatedUserId(req);
     const notification = await Notification.findOneAndUpdate(
-      { _id: req.params.id, userId },
-      { $set: { isRead: true } },
+      {
+        _id: req.params.id,
+        $or: [{ userId }, { recipient: userId }]
+      },
+      { $set: { isRead: true, read: true } },
       { new: true }
     ).lean();
 
@@ -112,7 +123,9 @@ router.patch('/read-all', protect, async (req, res) => {
 router.delete('/clear-all', protect, async (req, res) => {
   try {
     const userId = getAuthenticatedUserId(req);
-    const result = await Notification.deleteMany({ userId });
+    const result = await Notification.deleteMany({
+      $or: [{ userId }, { recipient: userId }]
+    });
 
     emitNotificationsClearedToUser(userId);
     await sendUnreadCountUpdate(userId);
@@ -133,7 +146,7 @@ router.delete('/:id', protect, async (req, res) => {
     const userId = getAuthenticatedUserId(req);
     const notification = await Notification.findOneAndDelete({
       _id: req.params.id,
-      userId,
+      $or: [{ userId }, { recipient: userId }]
     }).lean();
 
     if (!notification) {
