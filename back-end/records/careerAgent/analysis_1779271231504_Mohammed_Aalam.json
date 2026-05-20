@@ -1,0 +1,235 @@
+{
+  "id": "1779271231504",
+  "timestamp": "2026-05-20T10:00:31.504Z",
+  "status": "pending_analysis",
+  "profile_hash": "07bd15ebb2cc44df5e97016d00f60e672e3b953a9e454d0617fd130d344d6142",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Mohammed Aalam",
+      "email": "aalam@gmail.com",
+      "phone": "0987654323",
+      "registrationNumber": "STU00033"
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Computer Science & IT",
+        "degreeGroup": "Bachelor of Computer Applications",
+        "specialisation": [
+          "AI & ML"
+        ],
+        "university": "",
+        "graduationYear": "",
+        "currentlyPursuing": false
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": {
+          "directionId": "CD-011005-S02",
+          "directionName": "Cloud & Infrastructure for AI",
+          "directionDescription": "Cloud infrastructure for AI involves managing the compute, storage, and networking resources that train and serve ML models. Cloud engineers provision GPU instances for training; platform engineers build ML infrastructure platforms; DevOps engineers automate model deployment workflows. BCA AI & ML graduates who add cloud platform certification alongside their ML training are competitive for these infrastructure-adjacent roles that support large-scale AI deployments.",
+          "directionOverview": "Cloud infrastructure for AI involves managing the compute, storage, and networking resources that train and serve ML models. Cloud engineers provision GPU instances for training; platform engineers build ML infrastructure platforms; DevOps engineers automate model deployment workflows. BCA AI & ML graduates who add cloud platform certification alongside their ML training are competitive for these infrastructure-adjacent roles that support large-scale AI deployments.",
+          "type": "Primary",
+          "uniqueId": "UG-011-005",
+          "roles": [
+            {
+              "role": "Cloud Engineer",
+              "id": "JF03-001"
+            },
+            {
+              "role": "DevOps Engineer",
+              "id": "JF03-003"
+            },
+            {
+              "role": "AWS Solutions Architect",
+              "id": "JF03-011"
+            },
+            {
+              "role": "Azure Administrator",
+              "id": "JF03-012"
+            },
+            {
+              "role": "GCP Engineer",
+              "id": "JF03-013"
+            },
+            {
+              "role": "Systems Administrator",
+              "id": "JF03-005"
+            },
+            {
+              "role": "Kubernetes Engineer",
+              "id": "JF03-014"
+            },
+            {
+              "role": "CI/CD Engineer",
+              "id": "JF03-015"
+            },
+            {
+              "role": "Linux Administrator",
+              "id": "JF03-009"
+            },
+            {
+              "role": "Platform Engineer",
+              "id": "JF03-010"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011005-S02",
+        "careerDirectionName": "Cloud & Infrastructure for AI",
+        "careerDirectionDescription": "Cloud infrastructure for AI involves managing the compute, storage, and networking resources that train and serve ML models. Cloud engineers provision GPU instances for training; platform engineers build ML infrastructure platforms; DevOps engineers automate model deployment workflows. BCA AI & ML graduates who add cloud platform certification alongside their ML training are competitive for these infrastructure-adjacent roles that support large-scale AI deployments.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Cloud & Infrastructure for AI",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      },
+      "secondary": {
+        "careerDirection": {
+          "directionId": "CD-011005-P04",
+          "directionName": "Computer Vision & Specialised AI",
+          "directionDescription": "Computer vision and specialised AI engineering involves building models that process and understand images, video, and sensor data. Computer vision engineers build object detection, image classification, and OCR systems; NLP engineers build text understanding and language generation systems. BCA AI & ML graduates who develop deep learning project experience (CNNs, transformers) and contribute to open-source projects can enter these specialised roles — though competition is high and most senior positions require postgraduate training.",
+          "directionOverview": "Computer vision and specialised AI engineering involves building models that process and understand images, video, and sensor data. Computer vision engineers build object detection, image classification, and OCR systems; NLP engineers build text understanding and language generation systems. BCA AI & ML graduates who develop deep learning project experience (CNNs, transformers) and contribute to open-source projects can enter these specialised roles — though competition is high and most senior positions require postgraduate training.",
+          "type": "Primary",
+          "uniqueId": "UG-011-005",
+          "roles": [
+            {
+              "role": "Computer Vision Engineer",
+              "id": "JF06-005"
+            },
+            {
+              "role": "NLP Engineer",
+              "id": "JF06-004"
+            },
+            {
+              "role": "Deep Learning Engineer",
+              "id": "JF06-008"
+            },
+            {
+              "role": "Machine Learning Engineer",
+              "id": "JF06-002"
+            },
+            {
+              "role": "AI Engineer",
+              "id": "JF06-007"
+            },
+            {
+              "role": "ML Research Engineer",
+              "id": "JF06-011"
+            },
+            {
+              "role": "MLOps Engineer",
+              "id": "JF06-006"
+            },
+            {
+              "role": "AI Research Scientist",
+              "id": "JF06-003"
+            },
+            {
+              "role": "Embedded AI Engineer",
+              "id": "JF49-014"
+            },
+            {
+              "role": "AI Robotics Researcher",
+              "id": "JF49-008"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011005-P04",
+        "careerDirectionName": "Computer Vision & Specialised AI",
+        "careerDirectionDescription": "Computer vision and specialised AI engineering involves building models that process and understand images, video, and sensor data. Computer vision engineers build object detection, image classification, and OCR systems; NLP engineers build text understanding and language generation systems. BCA AI & ML graduates who develop deep learning project experience (CNNs, transformers) and contribute to open-source projects can enter these specialised roles — though competition is high and most senior positions require postgraduate training.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Computer Vision & Specialised AI",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      },
+      "tertiary": {
+        "careerDirection": {
+          "directionId": "CD-011005-P03",
+          "directionName": "Data Science & Statistical Analysis",
+          "directionDescription": "Data science and statistical analysis involves applying mathematical and statistical methods to extract insights from structured and unstructured data. Data scientists build predictive models; quantitative analysts apply statistics to financial and operational problems; data engineers build the pipelines that prepare data for analysis. BCA AI & ML graduates with Python, statistics, and ML library training are competitive for entry-level data scientist and data analyst roles, particularly after completing applied project portfolios.",
+          "directionOverview": "Data science and statistical analysis involves applying mathematical and statistical methods to extract insights from structured and unstructured data. Data scientists build predictive models; quantitative analysts apply statistics to financial and operational problems; data engineers build the pipelines that prepare data for analysis. BCA AI & ML graduates with Python, statistics, and ML library training are competitive for entry-level data scientist and data analyst roles, particularly after completing applied project portfolios.",
+          "type": "Primary",
+          "uniqueId": "UG-011-005",
+          "roles": [
+            {
+              "role": "Data Scientist",
+              "id": "JF06-001"
+            },
+            {
+              "role": "Data Analyst",
+              "id": "JF05-001"
+            },
+            {
+              "role": "Quantitative Analyst",
+              "id": "JF05-006"
+            },
+            {
+              "role": "Data Engineer",
+              "id": "JF05-002"
+            },
+            {
+              "role": "ETL Developer",
+              "id": "JF05-012"
+            },
+            {
+              "role": "Analytics Engineer",
+              "id": "JF05-014"
+            },
+            {
+              "role": "Business Intelligence Analyst",
+              "id": "JF05-003"
+            },
+            {
+              "role": "Data Pipeline Analyst",
+              "id": "JF05-015"
+            },
+            {
+              "role": "Database Analyst",
+              "id": "JF05-008"
+            },
+            {
+              "role": "Data Quality Analyst",
+              "id": "JF05-011"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011005-P03",
+        "careerDirectionName": "Data Science & Statistical Analysis",
+        "careerDirectionDescription": "Data science and statistical analysis involves applying mathematical and statistical methods to extract insights from structured and unstructured data. Data scientists build predictive models; quantitative analysts apply statistics to financial and operational problems; data engineers build the pipelines that prepare data for analysis. BCA AI & ML graduates with Python, statistics, and ML library training are competitive for entry-level data scientist and data analyst roles, particularly after completing applied project portfolios.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Data Science & Statistical Analysis",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      }
+    }
+  },
+  "output_generated_report": null
+}

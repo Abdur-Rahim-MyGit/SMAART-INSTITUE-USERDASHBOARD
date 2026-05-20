@@ -1,5 +1,5 @@
 .career-agent-page {
-  /* Enforce Light Mode Variables for Career Agent components */
+  /* ── Light Mode (default) ── */
   --navy: #ffffff;
   --navy2: #f8fafc;
   --navy3: #f1f5f9;
@@ -23,6 +23,101 @@
   font-family: var(--font);
   color: var(--text);
 }
+
+/* ── Dark Mode overrides — matches SMAART dashboard dark theme ── */
+:is(.dark) .career-agent-page {
+  --navy: #00152E;
+  --navy2: #002147;
+  --navy3: #002A5C;
+  --navy4: #003580;
+  --accent: #4f8ef7;
+  --accent2: #60a5fa;
+  --accent3: #93c5fd;
+  --text: #f1f5f9;
+  --text1: #f1f5f9;
+  --text2: #cbd5e1;
+  --muted: #94a3b8;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.10);
+  --card: rgba(0,33,71,0.95);
+  --card2: rgba(0,42,92,0.8);
+}
+
+/* ── Form card dark ── */
+:is(.dark) .form-card {
+  background: #002147 !important;
+  border-color: rgba(255,255,255,0.07) !important;
+  box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5) !important;
+}
+
+/* ── Inputs & selects dark ── */
+:is(.dark) .career-agent-page .screen-onboard input,
+:is(.dark) .career-agent-page .screen-onboard select,
+:is(.dark) .career-agent-page .screen-onboard textarea {
+  background: #002A5C !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: #f1f5f9 !important;
+}
+:is(.dark) .career-agent-page .screen-onboard input:focus,
+:is(.dark) .career-agent-page .screen-onboard select:focus,
+:is(.dark) .career-agent-page .screen-onboard textarea:focus {
+  border-color: #4f8ef7 !important;
+  background: #002147 !important;
+  box-shadow: 0 0 0 4px rgba(79,142,247,0.12) !important;
+}
+
+/* ── Step tag dark ── */
+:is(.dark) .step-tag {
+  background: rgba(79,142,247,0.12) !important;
+  color: #93c5fd !important;
+  border-color: rgba(79,142,247,0.25) !important;
+}
+
+/* ── Nav buttons dark ── */
+:is(.dark) .btn-back {
+  background: #002A5C !important;
+  border-color: rgba(255,255,255,0.10) !important;
+  color: #94a3b8 !important;
+}
+:is(.dark) .btn-back:hover {
+  background: #003580 !important;
+  color: #f1f5f9 !important;
+}
+:is(.dark) .btn-reset {
+  background: rgba(239,68,68,0.08) !important;
+  border-color: rgba(239,68,68,0.15) !important;
+  color: #fca5a5 !important;
+}
+
+/* ── Pref dir cards dark ── */
+:is(.dark) .pref-dir-card {
+  background: #002A5C !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+:is(.dark) .pref-dir-card:hover {
+  background: #003580 !important;
+  border-color: rgba(79,142,247,0.3) !important;
+}
+
+/* ── Step progress indicator circles (inactive) dark ── */
+:is(.dark) .career-agent-page .screen-onboard [style*="background: #f1f5f9"] {
+  background: #002A5C !important;
+}
+:is(.dark) .career-agent-page .screen-onboard [style*="background: #e2e8f0"] {
+  background: rgba(255,255,255,0.12) !important;
+}
+
+/* ── Form nav dark ── */
+:is(.dark) .form-nav {
+  border-top-color: rgba(255,255,255,0.07) !important;
+}
+
+/* ── ri-card dark (used in review summaries) ── */
+:is(.dark) .career-agent-page .ri-card {
+  background: #002A5C !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+
 
 .career-agent-page .panel { padding: 1.6rem 0; }
 .career-agent-page .animate-fade-in { animation: ca-fadeIn .3s ease both; }

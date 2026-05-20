@@ -127,19 +127,36 @@ export const UserProvider = ({ children }) => {
   const logout = useCallback(async () => {
     console.log('[Logout] Starting logout process...');
 
-    // Clear storages
+    // Step 1: Invalidate server-side session (clear currentSessionId in DB)
+    try {
+      const token = sessionStorage.getItem('token');
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include', // sends HttpOnly cookie
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        }
+      });
+      console.log('[Logout] Server session cleared');
+    } catch (err) {
+      // Non-blocking — still clear local state even if server call fails
+      console.warn('[Logout] Server logout request failed (non-blocking):', err.message);
+    }
+
+    // Step 2: Clear all local storage
     sessionStorage.clear();
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
 
-    // Set flag for clean logout message
-    sessionStorage.setItem("logged_out_other_tab", "true");
+    // Step 3: Set flag for clean logout message
+    sessionStorage.setItem('logged_out_other_tab', 'true');
 
-    // Reset state
+    // Step 4: Reset state
     setUser(null);
 
-    // Redirect
-    window.location.replace("/");
+    // Step 5: Redirect
+    window.location.replace('/');
   }, []);
 
   const updateUser = useCallback((userData) => {

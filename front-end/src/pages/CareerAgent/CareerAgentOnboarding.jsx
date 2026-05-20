@@ -10,9 +10,9 @@ import jobRolesData from './data/jobRolesData.json';
 import indianCities from './data/indianCities.json';
 import useUser from '@/hooks/useUser';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SALARY_OPTIONS = [
-  '0–3 LPA', '3–5 LPA', '5–8 LPA', '8–12 LPA', '12–18 LPA', '18–25 LPA', '25+ LPA'
+  '0â€“3 LPA', '3â€“5 LPA', '5â€“8 LPA', '8â€“12 LPA', '12â€“18 LPA', '18â€“25 LPA', '25+ LPA'
 ];
 const JOB_TYPE_OPTIONS = [
   'Full-Time', 'Part-Time', 'Internship (Full-Time)', 'Internship (Part-Time)',
@@ -44,15 +44,16 @@ const getRoles = (sector, family) => {
 // All roles flattened for free-text search
 const ALL_ROLES = jobRolesData.roles.map(r => r.role);
 
-// Education cascading: Level → Domain → DegreeGroup → Specialisation
+// Education cascading: Level â†’ Domain â†’ DegreeGroup â†’ Specialisation
 // Education cascading dynamic helpers
 const getDomains = (eduData, level) => level && eduData[level] ? Object.keys(eduData[level] || {}) : [];
 const getDegreeGroups = (eduData, level, domain) => level && domain && eduData[level]?.[domain] ? Object.keys(eduData[level]?.[domain] || {}) : [];
 const getSpecialisations = (eduData, level, domain, degree) => level && domain && degree ? eduData[level]?.[domain]?.[degree] || [] : [];
 
-const STEPS = ['Personal Details', 'Education', 'Primary Preference', 'Secondary Preference', 'Tertiary Preference', 'Work Experience', 'Skills & Certs', 'Review'];
+const STEPS = ['Personal Details', 'Education', 'Primary Preference', 'Secondary Preference', 'Tertiary Preference', 'Review & Submit'];
 
-// ─── MultiSelect ─────────────────────────────────────────────────────────────
+
+// â”€â”€â”€ MultiSelect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function MultiSelect({ options, selected = [], onChange, max = 3, placeholder = 'Select...' }) {
 
   const toggle = (opt) => {
@@ -69,7 +70,7 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder = 
       <div className="tags" style={{ marginBottom: '0.6rem' }}>
         {selected.map(s => (
           <span key={s} className="tag">
-            {s} <button type="button" onClick={() => toggle(s)}>×</button>
+            {s} <button type="button" onClick={() => toggle(s)}>Ã—</button>
           </span>
         ))}
         {selected.length === 0 && <span style={{ color: 'var(--muted)', fontSize: '0.78rem' }}>{placeholder}</span>}
@@ -102,7 +103,7 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder = 
   );
 }
 
-// ─── RoleSearchInput ──────────────────────────────────────────────────────────
+// â”€â”€â”€ RoleSearchInput â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function RoleSearchInput({ value, onChange, sector, family, dbRoles = [] }) {
   const [show, setShow] = useState(false);
   const [query, setQuery] = useState(value);
@@ -150,7 +151,7 @@ function RoleSearchInput({ value, onChange, sector, family, dbRoles = [] }) {
   );
 }
 
-// ─── CitySearchInput ──────────────────────────────────────────────────────────
+// â”€â”€â”€ CitySearchInput â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function CitySearchInput({ selected = [], onChange, max = 3 }) {
   const [query, setQuery] = useState('');
   const cities = Array.isArray(indianCities) ? indianCities : (indianCities.cities || []);
@@ -170,7 +171,7 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
     <div>
       <div className="tags" style={{ marginBottom: '0.4rem' }}>
         {selected.map(c => (
-          <span key={c} className="tag">{c} <button type="button" onClick={() => remove(c)}>×</button></span>
+          <span key={c} className="tag">{c} <button type="button" onClick={() => remove(c)}>Ã—</button></span>
         ))}
       </div>
       <div style={{ position: 'relative' }}>
@@ -196,7 +197,7 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
   );
 }
 
-// ─── CareerDirectionSelector ─────────────────────────────────────────────────
+// â”€â”€â”€ CareerDirectionSelector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function CareerDirectionSelector({ directions = [], selected = null, onChange, loading = false, excludeRoles = [] }) {
   if (loading) {
     return (
@@ -385,7 +386,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
              <div className="fgrid">
                <div className="fg full">
                  <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(56,189,248,0.05)', borderRadius: '8px', border: '1px solid rgba(56,189,248,0.1)' }}>
-                   ℹ️ Career directions mapped to your profile have been selected in previous preferences. Please type a specific desired job role below.
+                   â„¹ï¸ Career directions mapped to your profile have been selected in previous preferences. Please type a specific desired job role below.
                  </div>
                  <label className="fl">Desired Job Role <span className="req">*</span></label>
                  <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
@@ -395,7 +396,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
             <div className="fgrid">
               <div className="fg full">
                 <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(245,158,11,0.05)', borderRadius: '8px', border: '1px solid rgba(245,158,11,0.1)' }}>
-                  ⚠️ Complete your Education details first to load directions, or type a role below.
+                  âš ï¸ Complete your Education details first to load directions, or type a role below.
                 </div>
                 <label className="fl">Desired Job Role <span className="req">*</span></label>
                 <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
@@ -451,7 +452,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
   );
 }
 
-// ─── TagInput (Simple) ────────────────────────────────────────────────────────
+// â”€â”€â”€ TagInput (Simple) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function TagInput({ tags = [], onChange, placeholder = "Type & press Enter..." }) {
   const [input, setInput] = useState('');
   const add = () => {
@@ -463,7 +464,7 @@ function TagInput({ tags = [], onChange, placeholder = "Type & press Enter..." }
     <div>
       <div className="tags" style={{ marginBottom: '0.5rem' }}>
         {tags.map(t => (
-          <span key={t} className="tag">{t} <button type="button" onClick={() => onChange(tags.filter(x => x !== t))}>×</button></span>
+          <span key={t} className="tag">{t} <button type="button" onClick={() => onChange(tags.filter(x => x !== t))}>Ã—</button></span>
         ))}
       </div>
       <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -478,7 +479,7 @@ function TagInput({ tags = [], onChange, placeholder = "Type & press Enter..." }
   );
 }
 
-// ─── SkillSection ────────────────────────────────────────────────────────────
+// â”€â”€â”€ SkillSection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function SkillSection({ skills, onChange }) {
   const [name, setName] = useState('');
   const [status, setStatus] = useState('Verified');
@@ -550,8 +551,8 @@ function SkillSection({ skills, onChange }) {
         {skills.map((s, idx) => (
           <span key={idx} className="tag" style={{ padding: '0.5rem 1rem', borderLeft: `5px solid ${s.status === 'Verified' ? 'var(--accent)' : 'var(--amber)'}`, background: 'rgba(255,255,255,0.04)' }}>
             <strong>{s.name}</strong>
-            <span style={{ fontSize: '0.65rem', opacity: 0.8, marginLeft: '0.5rem', color: s.status === 'Verified' ? 'var(--accent)' : 'var(--amber)' }}>● {s.status.toUpperCase()}</span>
-            <button type="button" onClick={() => onChange(skills.filter((_, i) => i !== idx))} style={{ marginLeft: '0.8rem', opacity: 0.6 }}>×</button>
+            <span style={{ fontSize: '0.65rem', opacity: 0.8, marginLeft: '0.5rem', color: s.status === 'Verified' ? 'var(--accent)' : 'var(--amber)' }}>â— {s.status.toUpperCase()}</span>
+            <button type="button" onClick={() => onChange(skills.filter((_, i) => i !== idx))} style={{ marginLeft: '0.8rem', opacity: 0.6 }}>Ã—</button>
           </span>
         ))}
         {skills.length === 0 && <p style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center', padding: '1rem' }}>No skills added yet. Add your verified and self-learnt skills above.</p>}
@@ -565,7 +566,7 @@ function SkillSection({ skills, onChange }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CareerAgentOnboarding = () => {
   const navigate = useNavigate();
   const { user } = useUser();
@@ -585,7 +586,7 @@ const CareerAgentOnboarding = () => {
       .catch(err => console.error('Failed to load career roles:', err));
   }, []);
 
-  // ─── AUTO-FILL PERSONAL DETAILS FROM PROFILE ───
+  // â”€â”€â”€ AUTO-FILL PERSONAL DETAILS FROM PROFILE â”€â”€â”€
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -737,9 +738,11 @@ const CareerAgentOnboarding = () => {
 
   const handleNext = async () => {
     if (step === 1) await savePersonalDetails();
+    // Steps 1-5 are sequential; step 6 is Review & Submit (skip old 6 & 7)
     setStep(s => s + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -750,9 +753,9 @@ const CareerAgentOnboarding = () => {
         ...formData,
         personalDetails: { ...formData.personalDetails, name: formData.personalDetails.name || 'Student' },
       };
-      const res = await axios.post('/api/career-agent/onboarding', payload);
+      const res = await axios.post('/api/career-agent/onboarding', payload, { withCredentials: true });
 
-      // ── Normalise both response shapes ──────────────────────────────────────
+      // â”€â”€ Normalise both response shapes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
       // Normal:   {status: 'success', analysis: {...} }
       // Cache hit: {success: true, cached: true, data: {output_generated_report: {...} } }
       let analysisData = res.data?.analysis
@@ -761,7 +764,7 @@ const CareerAgentOnboarding = () => {
         || (res.data?.data && typeof res.data.data === 'object' ? res.data.data : null);
 
       const analysisId = res.data?.id || res.data?.data?.id || Date.now().toString();
-      // ────────────────────────────────────────────────────────────────────────
+      // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
       if (analysisData) {
         localStorage.setItem('smaart_analysis', JSON.stringify(analysisData));
@@ -888,19 +891,52 @@ const CareerAgentOnboarding = () => {
   return (
     <PageTransition>
     <div className="career-agent-page screen-onboard">
-      {/* HEADER */}
-      <div className="onboard-header">
+      {/* â”€â”€ STEP PROGRESS INDICATOR â”€â”€ */}
+      <div style={{ maxWidth: '680px', margin: '0 auto 2.5rem', padding: '0 1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+          {STEPS.map((label, idx) => {
+            const sn = idx + 1;
+            const isDone = step > sn;
+            const isActive = step === sn;
+            return (
+              <React.Fragment key={sn}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', minWidth: '60px' }}>
+                  <div style={{
+                    width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '0.72rem', fontWeight: 800, transition: 'all 0.3s',
+                    background: isDone ? '#10b981' : isActive ? 'var(--accent)' : '#f1f5f9',
+                    color: isDone || isActive ? '#fff' : '#94a3b8',
+                    border: isActive ? '2px solid var(--accent)' : isDone ? '2px solid #10b981' : '2px solid #e2e8f0',
+                    boxShadow: isActive ? '0 0 0 4px rgba(37,99,235,0.12)' : 'none',
+                    transform: isActive ? 'scale(1.12)' : 'scale(1)',
+                  }}>
+                    {isDone ? 'âœ“' : sn}
+                  </div>
+                  <span style={{ fontSize: '0.52rem', fontWeight: 700, color: isActive ? 'var(--accent)' : isDone ? '#10b981' : '#94a3b8', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.03em', lineHeight: 1.2 }}>
+                    {label}
+                  </span>
+                </div>
+                {idx < STEPS.length - 1 && (
+                  <div style={{ flex: 1, height: '2px', background: step > sn ? '#10b981' : '#e2e8f0', borderRadius: '2px', marginBottom: '18px', transition: 'background 0.3s' }} />
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
       </div>
 
-
-
-
       <form onSubmit={handleSubmit}>
-        {/* ── STEP 1: PERSONAL DETAILS — CLEAN & SIMPLE ── */}
+        {/* â”€â”€ STEP 1: PERSONAL DETAILS â€” CLEAN & SIMPLE â”€â”€ */}
         {step === 1 && (
           <div className="form-card">
-            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><User size={24} style={{ color: 'var(--accent)', marginRight: '0.6rem' }} /> Personal Details <span className="step-tag" style={{ marginLeft: 'auto' }}>STEP 1 / 8</span></div>
-            <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginBottom: '1.5rem' }}>Your basic information to personalise your career report.</p>
+            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><User size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Personal Details</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: '0.1rem', fontWeight: 400 }}>Your basic information to personalise your career report.</div>
+              </div>
+              <span className="step-tag">STEP 1 / 6</span>
+            </div>
+
 
             {user && (
               <div style={{ background: 'rgba(26,56,132,0.05)', border: '1px solid rgba(26,56,132,0.1)', borderRadius: '16px', padding: '1rem 1.2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -961,11 +997,16 @@ const CareerAgentOnboarding = () => {
         )}
 
 
-        {/* ── STEP 2: EDUCATION — MULTIPLE SUPPORT ── */}
+        {/* â”€â”€ STEP 2: EDUCATION â€” MULTIPLE SUPPORT â”€â”€ */}
         {step === 2 && (
           <div className="form-card">
-            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><GraduationCap size={24} style={{ color: 'var(--accent)', marginRight: '0.6rem' }} /> Education <span className="step-tag" style={{ marginLeft: 'auto' }}>STEP 2 / 8</span></div>
-            <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginBottom: '1.5rem' }}>Your academic background — you can add up to 3 educational qualifications. At least one is required.</p>
+            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><GraduationCap size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Education</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: '0.1rem', fontWeight: 400 }}>Your academic background â€” you can add up to 3 qualifications.</div>
+              </div>
+              <span className="step-tag">STEP 2 / 6</span>
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               {formData.education.map((edu, i) => (
@@ -1059,256 +1100,150 @@ const CareerAgentOnboarding = () => {
           </div>
         )}
 
-        {/* ── STEP 3: PRIMARY PREFERENCE ── */}
+        {/* â”€â”€ STEP 3: PRIMARY PREFERENCE â”€â”€ */}
         {step === 3 && (
           <div className="form-card">
-            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(37,99,235,0.1)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', marginRight: '1rem', color: 'var(--accent)' }}>
-                <Trophy size={22} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(37,99,235,0.15), rgba(37,99,235,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(37,99,235,0.2)' }}>
+                <Trophy size={22} color="var(--accent)" />
               </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>Primary Preference <span className="step-tag">STEP 3 / 8</span></div>
-                <div style={{ color: 'var(--muted)', fontSize: '0.78rem', fontWeight: 400, marginTop: '0.2rem' }}>Your main career direction for deep intelligence analysis.</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Primary Preference</span>
+                  <span className="step-tag">STEP 3 / 6</span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your main career direction â€” used for your deepest intelligence analysis.</p>
               </div>
             </div>
-            <div style={{ height: '1.5rem' }}></div>
             <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} />
           </div>
         )}
 
-        {/* ── STEP 4: SECONDARY PREFERENCE ── */}
+        {/* â”€â”€ STEP 4: SECONDARY PREFERENCE â”€â”€ */}
         {step === 4 && (
           <div className="form-card">
-            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(34,211,238,0.08)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', marginRight: '1rem', color: 'var(--accent2)' }}>
-                <Compass size={22} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(34,211,238,0.15), rgba(34,211,238,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(34,211,238,0.2)' }}>
+                <Compass size={22} color="var(--accent2)" />
               </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>Secondary Preference <span className="step-tag">STEP 4 / 8</span></div>
-                <div style={{ color: 'var(--muted)', fontSize: '0.78rem', fontWeight: 400, marginTop: '0.2rem' }}>Your alternative path to help us calculate market zone overlap.</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Secondary Preference</span>
+                  <span className="step-tag">STEP 4 / 6</span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your alternative path â€” helps calculate market zone overlap.</p>
               </div>
             </div>
-            <div style={{ height: '1.5rem' }}></div>
             <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} />
           </div>
         )}
 
-        {/* ── STEP 5: TERTIARY PREFERENCE ── */}
+        {/* â”€â”€ STEP 5: TERTIARY PREFERENCE â”€â”€ */}
         {step === 5 && (
           <div className="form-card">
-            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(167,139,250,0.08)', display: 'flex', alignItems: 'center', justifySelf: 'center', justifyContent: 'center', marginRight: '1rem', color: '#a78bfa' }}>
-                <Sparkles size={22} />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(167,139,250,0.2)' }}>
+                <Sparkles size={22} color="#a78bfa" />
               </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>Tertiary Preference <span className="step-tag">STEP 5 / 8</span></div>
-                <div style={{ color: 'var(--muted)', fontSize: '0.78rem', fontWeight: 400, marginTop: '0.2rem' }}>Your backup or curiosity direction for a complete market view.</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Tertiary Preference</span>
+                  <span className="step-tag">STEP 5 / 6</span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your backup or curiosity direction â€” gives a complete market view.</p>
               </div>
             </div>
-            <div style={{ height: '1.5rem' }}></div>
             <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} />
           </div>
         )}
 
-        {/* ── STEP 6: WORK EXPERIENCE ── */}
+        {/* â”€â”€ STEP 6: REVIEW & SUBMIT â”€â”€ */}
         {step === 6 && (
           <div className="form-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-              <div className="step-title" style={{ marginBottom: 0, display: 'flex', alignItems: 'center' }}><Briefcase size={24} style={{ color: 'var(--accent)', marginRight: '0.6rem' }} /> Work Experience <span className="step-tag" style={{ marginLeft: 'auto' }}>STEP 6 / 8</span></div>
-              {isUG && (
-                <button type="button" className="btn-ghost" onClick={() => setStep(7)} style={{ color: 'var(--accent2)', fontWeight: 800, fontSize: '0.75rem', padding: '0.4rem 0.8rem', background: 'rgba(34,211,238,0.06)', borderRadius: '8px' }}>
-                  SKIP STEP →
-                </button>
-              )}
-            </div>
-            {isUG && (
-              <div style={{ background: 'rgba(79,142,247,0.05)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.78rem', color: 'var(--text2)', border: '1px solid rgba(79,142,247,0.1)' }}>
-                <Briefcase size={16} style={{ color: 'var(--accent)', marginBottom: '0.3rem' }} /> Work experience is optional. If you have no experience, you can skip this step.
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(16,185,129,0.2)' }}>
+                <CheckCircle size={22} color="#10b981" />
               </div>
-            )}
-            {formData.experience.map((exp, i) => (
-              <div key={i} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '1.8rem', marginBottom: '1.5rem', position: 'relative' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Experience #{i + 1}</span>
-                  {formData.experience.length > 1 && <button type="button" onClick={() => removeExp(i)} style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '6px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer', fontFamily: 'var(--font)' }}>Remove</button>}
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Review & Submit</span>
+                  <span className="step-tag">STEP 6 / 6</span>
                 </div>
-                <div className="fgrid">
-                  <div className="fg">
-                    <label className="fl">Organisation Name <span className="req">*</span></label>
-                    <input type="text" placeholder="e.g. TechCorp Pvt. Ltd." value={exp.orgName} onChange={e => updateExp(i, 'orgName', e.target.value)} />
-                  </div>
-                  <div className="fg">
-                    <label className="fl">Designation / Role <span className="req">*</span></label>
-                    <input type="text" placeholder="e.g. Software Engineer Intern" value={exp.designation} onChange={e => updateExp(i, 'designation', e.target.value)} />
-                  </div>
-                  <div className="fg">
-                    <label className="fl">Sector</label>
-                    <select value={exp.isCustomSector ? 'Other' : exp.sector}
-                      onChange={e => {
-                        if (e.target.value === 'Other') {
-                          updateExp(i, 'isCustomSector', true);
-                          updateExp(i, 'sector', '');
-                        } else {
-                          updateExp(i, 'isCustomSector', false);
-                          updateExp(i, 'sector', e.target.value);
-                        }
-                      }}
-                    >
-                      <option value="">Select Sector...</option>
-                      {ALL_SECTORS.filter(s => s !== 'Other / Custom').map(s => <option key={s}>{s}</option>)}
-                      <option value="Other">Other / Custom</option>
-                    </select>
-                    {exp.isCustomSector && (
-                      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ marginTop: '0.6rem' }}>
-                        <input type="text" placeholder="Type custom sector..." value={exp.sector} onChange={e => updateExp(i, 'sector', e.target.value)} style={{ border: '1px solid var(--accent)' }} />
-                        <button type="button" onClick={() => updateExp(i, 'isCustomSector', false)} style={{ fontSize: '0.6rem', color: 'var(--muted)', marginTop: '0.2rem', background: 'none', border: 'none', cursor: 'pointer' }}>↺ Back to list</button>
-                      </motion.div>
-                    )}
-                  </div>
-                  <div className="fg">
-                    <label className="fl">Experience Type</label>
-                    <select value={exp.type} onChange={e => updateExp(i, 'type', e.target.value)}>
-                      {EXP_TYPE_OPTIONS.map(t => <option key={t}>{t}</option>)}
-                    </select>
-                  </div>
-                  <div className="fg">
-                    <label className="fl">Start Date</label>
-                    <input type="date" value={exp.startDate} onChange={e => updateExp(i, 'startDate', e.target.value)} />
-                  </div>
-                  <div className="fg">
-                    <label className="fl">End Date</label>
-                    <input type="date" value={exp.endDate} onChange={e => updateExp(i, 'endDate', e.target.value)} disabled={exp.currentlyWorking} style={{ opacity: exp.currentlyWorking ? 0.4 : 1 }} />
-                  </div>
-                  <div className="fg full">
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text2)' }}>
-                      <input type="checkbox" checked={exp.currentlyWorking} onChange={e => updateExp(i, 'currentlyWorking', e.target.checked)} style={{ width: '16px', height: '16px' }} />
-                      Currently Working Here
-                    </label>
-                  </div>
-                </div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem' }}>Review your profile before submitting. SMAART will generate your personalised career intelligence report.</p>
               </div>
-            ))}
-            <button type="button" onClick={addExp} style={{ background: 'rgba(79,142,247,0.08)', border: '1px dashed rgba(79,142,247,0.3)', color: 'var(--accent)', borderRadius: '10px', padding: '0.7rem 1.2rem', cursor: 'pointer', fontSize: '0.82rem', fontFamily: 'var(--font)', fontWeight: 600, width: '100%' }}>
-              + Add Another Experience
-            </button>
-          </div>
-        )}
-
-        {/* ── STEP 7: SKILLS & VERIFICATION ── */}
-        {step === 7 && (
-          <div className="form-card">
-            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><ShieldCheck size={24} style={{ color: 'var(--accent)', marginRight: '0.6rem' }} /> Skills & Verification <span className="step-tag" style={{ marginLeft: 'auto' }}>STEP 7 / 8</span></div>
-            <p style={{ color: 'var(--muted)', fontSize: '0.8rem', marginBottom: '1.5rem' }}>List your technical skills. For verified skills, provide certification details to boost your profile strength.</p>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <SkillSection skills={formData.skills} onChange={v => setFormData(f => ({ ...f, skills: v }))} />
             </div>
-          </div>
-        )}
-
-        {/* ── STEP 8: REVIEW ── */}
-        {step === 8 && (
-          <div className="form-card">
-            <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><CheckCircle size={24} style={{ color: 'var(--accent)', marginRight: '0.6rem' }} /> Review & Submit <span className="step-tag" style={{ marginLeft: 'auto' }}>STEP 8 / 8</span></div>
-            <p style={{ color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>Review your profile before submitting. The SMAART engine will analyse your data and generate a personalised career intelligence report.</p>
 
             {/* Summary Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+
               {/* Education Summary */}
-              <div className="ri-card" style={{ gridColumn: 'span 2' }}>
-                <div className="ri-label"><GraduationCap size={14} style={{ marginRight: '0.3rem' }} /> Education History</div>
+              <div style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.04), rgba(37,99,235,0.01))', border: '1px solid rgba(37,99,235,0.12)', borderRadius: '16px', padding: '1.2rem 1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
+                  <GraduationCap size={15} color="var(--accent)" />
+                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Education History</span>
+                </div>
                 {formData.education.map((edu, idx) => (
-                  <div key={idx} style={{ marginBottom: idx < formData.education.length - 1 ? '0.8rem' : 0, paddingBottom: idx < formData.education.length - 1 ? '0.8rem' : 0, borderBottom: idx < formData.education.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text)', fontWeight: 600 }}>{edu.degreeGroup || 'Not set'} in {edu.specialisation?.join(', ') || 'General'}</p>
-                    {edu.graduationYear && <p style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>Class of {edu.graduationYear}</p>}
+                  <div key={idx} style={{ marginBottom: idx < formData.education.length - 1 ? '0.6rem' : 0 }}>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text1)', fontWeight: 700 }}>{edu.degreeGroup || 'Not set'} {edu.specialisation?.length > 0 ? `in ${edu.specialisation.join(', ')}` : ''}</p>
+                    {edu.graduationYear && <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.1rem' }}>Class of {edu.graduationYear}{edu.currentlyPursuing ? ' Â· Currently Pursuing' : ''}</p>}
                   </div>
                 ))}
               </div>
 
-              {/* Preferences Summary */}
-              <div className="ri-card">
-                <div className="ri-label"><Target size={14} style={{ marginRight: '0.3rem' }} /> Career Directions</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.3rem' }}>
-                  <div>
-                    <span style={{ fontSize: '0.58rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Primary</span>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text)', fontWeight: 600, marginTop: '0.1rem' }}>{formData.preferences.primary.careerDirectionName || formData.preferences.primary.role || 'Not set'}</p>
-                  </div>
-                  {(formData.preferences.secondary.careerDirectionName || formData.preferences.secondary.role) && (
-                    <div>
-                      <span style={{ fontSize: '0.58rem', fontWeight: 800, color: 'var(--accent2)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Secondary</span>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text2)', marginTop: '0.1rem' }}>{formData.preferences.secondary.careerDirectionName || formData.preferences.secondary.role}</p>
-                    </div>
-                  )}
-                  {(formData.preferences.tertiary.careerDirectionName || formData.preferences.tertiary.role) && (
-                    <div>
-                      <span style={{ fontSize: '0.58rem', fontWeight: 800, color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Tertiary</span>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text2)', marginTop: '0.1rem' }}>{formData.preferences.tertiary.careerDirectionName || formData.preferences.tertiary.role}</p>
-                    </div>
-                  )}
+              {/* Career Directions Summary */}
+              <div style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.04), rgba(245,158,11,0.01))', border: '1px solid rgba(245,158,11,0.15)', borderRadius: '16px', padding: '1.2rem 1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
+                  <Target size={15} color="#f59e0b" />
+                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Career Directions</span>
                 </div>
-                <p style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: '0.4rem' }}>{formData.preferences.primary.salary} · {formData.preferences.primary.locations?.[0]}</p>
-              </div>
-
-              <div className="ri-card">
-                <div className="ri-label"><ShieldCheck size={14} style={{ marginRight: '0.3rem' }} /> Top Skills</div>
-                <div className="tags" style={{ marginTop: '0.4rem', flexWrap: 'wrap' }}>
-                  {formData.skills.length > 0 ? (
-                    formData.skills.slice(0, 4).map((s, idx) => (
-                      <span key={idx} className="tag" style={{ fontSize: '0.65rem', padding: '0.15rem 0.5rem', borderLeft: `3px solid ${s.status === 'Verified' ? 'var(--accent)' : 'var(--amber)'}` }}>{s.name}</span>
-                    ))
-                  ) : (
-                    <span style={{ color: 'var(--muted)', fontSize: '0.78rem' }}>None added</span>
-                  )}
-                  {formData.skills.length > 4 && <span style={{ fontSize: '0.65rem', color: 'var(--muted)' }}>+{formData.skills.length - 4}</span>}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                  {[{label: 'Primary', color: 'var(--accent)', val: formData.preferences.primary}, {label: 'Secondary', color: 'var(--accent2)', val: formData.preferences.secondary}, {label: 'Tertiary', color: '#a78bfa', val: formData.preferences.tertiary}].map(({label, color, val}) => (
+                    (val?.careerDirectionName || val?.role) && (
+                      <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                        <span style={{ fontSize: '0.6rem', fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.06em', minWidth: '60px' }}>{label}</span>
+                        <span style={{ fontSize: '0.88rem', color: 'var(--text1)', fontWeight: 600 }}>{val?.careerDirectionName || val?.role}</span>
+                        {val?.role && val?.careerDirectionName && <span style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>â†’ {val.role}</span>}
+                      </div>
+                    )
+                  ))}
                 </div>
               </div>
 
-              {/* Experience Summary */}
-              <div className="ri-card" style={{ gridColumn: 'span 2' }}>
-                <div className="ri-label"><Briefcase size={14} style={{ marginRight: '0.3rem' }} /> Work Experience</div>
-                {formData.experience.length > 0 ? (
-                  formData.experience.map((exp, idx) => (
-                    <div key={idx} style={{ marginBottom: idx < formData.experience.length - 1 ? '0.6rem' : 0 }}>
-                      <p style={{ fontSize: '0.82rem', color: 'var(--text)', fontWeight: 600 }}>{exp.designation} @ {exp.orgName}</p>
-                      <p style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>{exp.type} · {exp.sector}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p style={{ fontSize: '0.78rem', color: 'var(--muted)' }}>No experience added (Student Profile)</p>
-                )}
-              </div>
             </div>
 
             {error && (
-              <div style={{ color: '#ff4d4d', background: 'rgba(255,77,77,0.1)', border: '1px solid rgba(255,77,77,0.2)', borderRadius: '10px', padding: '1rem', marginBottom: '1rem', fontSize: '0.85rem' }}>
-                ⚠️ {error}
+              <div style={{ color: '#ef4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                âš ï¸ {error}
               </div>
             )}
 
-            <div style={{ background: 'linear-gradient(135deg,rgba(79,142,247,0.08),rgba(34,211,238,0.05))', border: '1px solid rgba(79,142,247,0.2)', borderRadius: '12px', padding: '1.1rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text2)' }}>
-              Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This takes 2–5 seconds.
+            <div style={{ background: 'linear-gradient(135deg,rgba(37,99,235,0.06),rgba(34,211,238,0.03))', border: '1px solid rgba(37,99,235,0.15)', borderRadius: '14px', padding: '1rem 1.2rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+              <Sparkles size={16} color="var(--accent)" style={{ flexShrink: 0 }} />
+              Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This typically takes 15â€“30 seconds.
             </div>
 
-            <button type="submit" className="btn-primary" style={{ width: '100%', padding: '1.2rem', fontSize: '1rem', borderRadius: '14px' }} disabled={isSubmitting}>
+            <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #2563eb)', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(26,56,132,0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}>
+              <Sparkles size={18} />
               {isSubmitting ? 'Generating Report...' : 'Generate Career Intelligence Report'}
             </button>
           </div>
         )}
 
-        {/* ── NAVIGATION ── */}
+        {/* â”€â”€ NAVIGATION â”€â”€ */}
         <div className="form-nav">
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             {step > 1 && (
               <button type="button" className="btn-back" onClick={() => setStep(s => s - 1)}>
-                Back
+                â† Back
               </button>
             )}
             <button type="button" className="btn-reset" onClick={resetProfile}>
-              Reset Form
+              Reset
             </button>
           </div>
           <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--muted)' }}>Step {step} of {STEPS.length}</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--muted)' }}>Step {step} of {STEPS.length}</span>
             {step < STEPS.length && (
               <button type="button" className="btn-primary-onboard" onClick={handleNext}>
                 Save & Continue <Navigation size={16} />
@@ -1316,6 +1251,7 @@ const CareerAgentOnboarding = () => {
             )}
           </div>
         </div>
+
       </form>
     </div>
     </PageTransition>

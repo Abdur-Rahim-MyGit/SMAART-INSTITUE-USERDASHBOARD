@@ -43,18 +43,41 @@ const CareerAgentDashboard = () => {
     };
 
     useEffect(() => {
-        const cached = localStorage.getItem('smaart_analysis');
-        if (cached) {
+        const loadAnalysis = async () => {
             try {
-                setData(JSON.parse(cached));
-                setLoading(false);
+                // 1️⃣ Try to load from MongoDB (per-user, persists across devices)
+                const res = await fetch('/api/career-agent/my-analysis', { credentials: 'include' });
+                if (res.ok) {
+                    const payload = await res.json();
+                    if (payload.found && payload.analysis) {
+                        setData(payload.analysis);
+                        // Cache locally too so offline / fast-reload works
+                        localStorage.setItem('smaart_analysis', JSON.stringify(payload.analysis));
+                        setLoading(false);
+                        return;
+                    }
+                }
             } catch (e) {
-                console.error("Failed to parse analysis data:", e);
+                // Network / auth error — fall through to localStorage
+                console.warn('[Dashboard] DB fetch failed, trying localStorage:', e.message);
+            }
+
+            // 2️⃣ Fallback: localStorage (set after onboarding submit)
+            const cached = localStorage.getItem('smaart_analysis');
+            if (cached) {
+                try {
+                    setData(JSON.parse(cached));
+                    setLoading(false);
+                } catch (e) {
+                    console.error('Failed to parse cached analysis:', e);
+                    navigate('/dashboard/career-agent/onboarding');
+                }
+            } else {
                 navigate('/dashboard/career-agent/onboarding');
             }
-        } else {
-            navigate('/dashboard/career-agent/onboarding');
-        }
+        };
+
+        loadAnalysis();
     }, [navigate]);
 
     if (loading) {
@@ -92,6 +115,17 @@ const CareerAgentDashboard = () => {
     const prefPrimary = localStorage.getItem('smaart_pref_primary') || _dp.primary?.careerDirectionName || _dp.primary?.role || primary?.tab1?.role_name || 'Primary';
     const prefSecondary = localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
     const prefTertiary = localStorage.getItem('smaart_pref_tertiary') || _dp.tertiary?.careerDirectionName || _dp.tertiary?.role || tertiary?.tab1?.role_name || 'Tertiary';
+
+    // Build allDirections array for MarketIntelligence — includes roles from each direction
+    const buildDirRoles = (roleData) => {
+        const dir = roleData?.direction || {};
+        return (dir.roles || []).filter(r => r && (r.role || typeof r === 'string'));
+    };
+    const allDirections = [
+        { label: prefPrimary,   directionName: primary?.direction?.directionName   || prefPrimary,   roles: buildDirRoles(primary)   },
+        { label: prefSecondary, directionName: secondary?.direction?.directionName || prefSecondary, roles: buildDirRoles(secondary) },
+        { label: prefTertiary,  directionName: tertiary?.direction?.directionName  || prefTertiary,  roles: buildDirRoles(tertiary)  },
+    ];
 
 
     // Prioritize role-specific roadmap data if available, fall back to global
@@ -494,14 +528,26 @@ const CareerAgentDashboard = () => {
                     {/* Panel 2: Market Intel */}
                     {activePanel === 'market' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><BarChart3 size={22} color="var(--accent)" /> Market Intelligence</h2>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                <div>
+                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <BarChart3 size={22} color="var(--accent)" /> Market Intelligence
+                                    </h2>
+                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
+                                        Showing roles for <strong style={{ color: 'var(--text2)' }}>
+                                            {activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}
+                                        </strong> — select a role below to view its market data.
+                                    </p>
+                                </div>
+                            </div>
                             <MarketIntelligence
                                 roleName={roleName}
-                                mongoRoleData={currentData}
-                                fallback={currentData.tab1}
+                                allDirections={allDirections}
+                                activeTabIndex={activeRole - 1}
                             />
                         </div>
                     )}
+
 
                     {/* Panel 3: Skills */}
                     {activePanel === 'skills' && (
