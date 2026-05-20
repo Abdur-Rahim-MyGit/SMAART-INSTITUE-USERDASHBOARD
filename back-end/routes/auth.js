@@ -391,7 +391,7 @@ router.post('/login',
       console.log('isEmail:', isEmail);
       console.log('collegeId:', collegeId);
       console.log('institutionToCheck:', institutionToCheck);
-      
+
       user = await Student.findOne(studentQuery).populate('college', 'logo collegeName').select('+password');
       console.log('Student found:', !!user);
 
@@ -580,7 +580,7 @@ router.post('/login',
               mustChangePassword: true,
               isRegistered: false,
               isAssessmentCompleted: false,
-              college: user.college
+              college: user.college ? (user.college.toObject ? user.college.toObject() : user.college) : null
             },
           });
           await loginOtp.save();
@@ -692,15 +692,16 @@ router.post('/login',
         console.log(`Student login - Email: ${studentEmail}, College: ${collegeInfo?.collegeName || 'N/A'}, Registration found: ${hasRegistration}`);
 
         userResponse.fullName = user.fullName;
+        userResponse.nickname = registrationRecord ? registrationRecord.nickname : null;
         userResponse.studentId = user.studentId;
         userResponse.mobileNumber = user.mobile; // Student model uses 'mobile' field
-        userResponse.college = user.college;
+        userResponse.college = user.college ? (user.college.toObject ? user.college.toObject() : user.college) : null;
         userResponse.profileImage = user.profileImage; // Include profile picture
         userResponse.hasRegistration = hasRegistration;
       } else if (userType === 'teacher') {
         userResponse.fullName = user.fullName;
         userResponse.teacherId = user.teacherId;
-        userResponse.college = user.college;
+        userResponse.college = user.college ? (user.college.toObject ? user.college.toObject() : user.college) : null;
         userResponse.hasRegistration = true; // Teachers don't need registration flow
       } else if (userType === 'user') {
         userResponse.fullName = user.fullName;
@@ -1067,7 +1068,7 @@ router.post('/forgot-password', passwordResetLimiter, async (req, res) => {
         console.log(`[Forgot Password] Email ${normalizedEmail} not found in college ${collegeCode}`);
         return res.status(404).json({
           error: 'Email not found at this institution.',
-          wrongCollege: true 
+          wrongCollege: true
         });
       }
     } else {
@@ -1234,9 +1235,9 @@ router.post('/reset-password', async (req, res) => {
 
     // 📧 Security alert email (fire-and-forget)
     sendPasswordChangedEmail({
-      to:       resetOtp.email,
+      to: resetOtp.email,
       fullName: resetOtp.userData?.fullName || '',
-    }).catch(() => {});
+    }).catch(() => { });
 
     res.json({
       message: 'Password reset successful. You can now login with your new password.',
@@ -1376,9 +1377,9 @@ router.post('/first-login-change-password', async (req, res) => {
 
     // 📧 Security alert email (fire-and-forget)
     sendPasswordChangedEmail({
-      to:       student.email,
+      to: student.email,
       fullName: student.fullName,
-    }).catch(() => {});
+    }).catch(() => { });
 
     // Create JWT token with session ID
     const token = jwt.sign(
@@ -1402,6 +1403,7 @@ router.post('/first-login-change-password', async (req, res) => {
       id: student._id,
       _id: student._id,
       fullName: student.fullName,
+      nickname: registration ? registration.nickname : null,
       email: student.email,
       gender: student.gender,
       role: 'student',

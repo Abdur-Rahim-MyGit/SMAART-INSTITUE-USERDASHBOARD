@@ -12,6 +12,16 @@ const notificationSchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  recipient: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    index: true
+  },
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   type: {
     type: String,
     enum: [
@@ -26,7 +36,10 @@ const notificationSchema = new mongoose.Schema({
       'certificate',     // Certificate issued
       'warning',         // Moderator warning
       'suspension',      // Account suspension
-      'system'           // System announcements, maintenance
+      'system',          // System announcements, maintenance
+      'info',            // Compatibility with admin
+      'success',         // Compatibility with admin
+      'error'            // Compatibility with admin
     ],
     required: true,
     index: true
@@ -56,6 +69,11 @@ const notificationSchema = new mongoose.Schema({
     default: null // Route to navigate to when clicked
   },
   isRead: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
+  read: {
     type: Boolean,
     default: false,
     index: true
@@ -114,6 +132,11 @@ notificationSchema.set('toObject', { virtuals: true });
 
 // Static method to create notification
 notificationSchema.statics.createNotification = async function(data) {
+  if (data.userId && !data.recipient) data.recipient = data.userId;
+  if (!data.userId && data.recipient) data.userId = data.recipient;
+  if (data.isRead !== undefined && data.read === undefined) data.read = data.isRead;
+  if (data.read !== undefined && data.isRead === undefined) data.isRead = data.read;
+
   const notification = new this(data);
   await notification.save();
   // Fire real-time event for WebSocket layer
@@ -123,14 +146,24 @@ notificationSchema.statics.createNotification = async function(data) {
 
 // Static method to get unread count for a user
 notificationSchema.statics.getUnreadCount = async function(userId) {
-  return this.countDocuments({ userId, isRead: false });
+  return this.countDocuments({
+    $or: [
+      { userId, isRead: false },
+      { recipient: userId, read: false }
+    ]
+  });
 };
 
 // Static method to mark all as read for a user
 notificationSchema.statics.markAllAsRead = async function(userId) {
   return this.updateMany(
-    { userId, isRead: false },
-    { $set: { isRead: true } }
+    {
+      $or: [
+        { userId, isRead: false },
+        { recipient: userId, read: false }
+      ]
+    },
+    { $set: { isRead: true, read: true } }
   );
 };
 
