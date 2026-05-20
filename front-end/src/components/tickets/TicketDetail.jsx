@@ -207,7 +207,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
               </div>
               <span className="text-white text-sm font-medium">{categoryConfig.label}</span>
             </div>
-            <div className={`p-3 rounded-xl ${priorityConfig.bg} border border-[#1a3884]/20`}>
+            {/* <div className={`p-3 rounded-xl ${priorityConfig.bg} border border-[#1a3884]/20`}>
               <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                 <AlertTriangle className="w-3 h-3" />
                 Priority
@@ -215,7 +215,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
               <span className={`text-sm font-medium ${priorityConfig.color}`}>
                 {priorityConfig.label}
               </span>
-            </div>
+            </div> */}
             <div className="p-3 rounded-xl bg-[#002147] border border-[#1a3884]/20">
               <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                 <Clock className="w-3 h-3" />
@@ -290,27 +290,23 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className={`p-4 rounded-xl border ${
-                      isItsmMessage(response)
-                        ? 'bg-indigo-500/10 border-indigo-500/20'
-                        : isOwnMessage(response)
-                          ? 'bg-[#1a3884]/20 border-[#1a3884]/40'
-                          : 'bg-[#1a3884]/10 border-[#1a3884]/20'
-                    }`}
+                    className={`p-4 rounded-xl border ${isItsmMessage(response)
+                      ? 'bg-indigo-500/10 border-indigo-500/20'
+                      : isOwnMessage(response)
+                        ? 'bg-[#1a3884]/20 border-[#1a3884]/40'
+                        : 'bg-[#1a3884]/10 border-[#1a3884]/20'
+                      }`}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        isItsmMessage(response) ? 'bg-indigo-500/30' : 'bg-[#1a3884]/30'
-                      }`}>
-                        <span className={`text-[10px] font-medium ${
-                          isItsmMessage(response) ? 'text-indigo-400' : 'text-[#6b8de8]'
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isItsmMessage(response) ? 'bg-indigo-500/30' : 'bg-[#1a3884]/30'
                         }`}>
+                        <span className={`text-[10px] font-medium ${isItsmMessage(response) ? 'text-indigo-400' : 'text-[#6b8de8]'
+                          }`}>
                           {getSenderInitial(response)}
                         </span>
                       </div>
-                      <span className={`text-sm font-medium ${
-                        isItsmMessage(response) ? 'text-indigo-300' : 'text-white'
-                      }`}>
+                      <span className={`text-sm font-medium ${isItsmMessage(response) ? 'text-indigo-300' : 'text-white'
+                        }`}>
                         {getSenderName(response)}
                       </span>
                       {isItsmMessage(response) && (
@@ -381,11 +377,10 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
                     <button
                       key={key}
                       onClick={() => setSelectedStatus(key)}
-                      className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${
-                        selectedStatus === key
-                          ? config.color
-                          : 'border-[#1a3884]/30 text-gray-400 hover:border-[#1a3884]/50'
-                      }`}
+                      className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${selectedStatus === key
+                        ? config.color
+                        : 'border-[#1a3884]/30 text-gray-400 hover:border-[#1a3884]/50'
+                        }`}
                     >
                       {config.label}
                     </button>

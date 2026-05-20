@@ -49,11 +49,11 @@ const PANEL_META = {
     description: "Match the board ratio to phone, desktop, or presentation needs.",
     icon: Settings2,
   },
-  goals: {
-    title: "Goals",
-    description: "Keep short-term and long-term goals visible while you design.",
-    icon: Target,
-  },
+  // goals: {
+  //   title: "Goals",
+  //   description: "Keep short-term and long-term goals visible while you design.",
+  //   icon: Target,
+  // },
 };
 
 const GoalList = ({ title, description, goals, setGoals, placeholder, accentClass }) => (
@@ -155,6 +155,7 @@ const EditorDrawer = ({
   setShortTermGoals,
   longTermGoals = [],
   setLongTermGoals,
+  handleDeleteAsset,
 }) => {
   if (!activePanel) return null;
 
@@ -173,7 +174,7 @@ const EditorDrawer = ({
         <div className="h-1 w-10 rounded-full bg-slate-200 dark:bg-white/20" />
       </div>
 
-      <div className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50/95 px-5 py-4 backdrop-blur dark:border-slate-800 dark:bg-[#0d1626]/95">
+      {/* <div className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50/95 px-5 py-4 backdrop-blur dark:border-slate-800 dark:bg-[#0d1626]/95">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-blue-400/20 dark:text-blue-300">
@@ -196,7 +197,7 @@ const EditorDrawer = ({
             <X className="h-4 w-4" />
           </button>
         </div>
-      </div>
+      </div> */}
 
       <div className="custom-scrollbar flex-1 overflow-y-auto px-4 pb-8 pt-4 sm:px-5 lg:pb-28">
         {activePanel === "templates" && (
@@ -212,60 +213,82 @@ const EditorDrawer = ({
         )}
 
         {activePanel === "text" && (
-          <TypographyPanel
-            onAddText={handleAddText}
-            textOverlays={textOverlays}
-            onUpdateText={handleUpdateText}
-            onDeleteText={handleDeleteText}
-            selectedTextId={selectedTextId}
-            onSelectText={handleSelectText}
-          />
+          <div className="space-y-4">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
+              Typography
+            </p>
+            <TypographyPanel
+              onAddText={handleAddText}
+              textOverlays={textOverlays}
+              onUpdateText={handleUpdateText}
+              onDeleteText={handleDeleteText}
+              selectedTextId={selectedTextId}
+              onSelectText={handleSelectText}
+            />
+          </div>
         )}
 
         {activePanel === "assets" && (
-          <AssetsPanel
-            userUploads={userUploads}
-            onUploadAsset={handleUserUpload}
-            onAddAssetToCanvas={handleAddAssetToCanvas}
-            onAddUploadToCanvas={handleAddUploadToCanvas}
-          />
+          <div className="space-y-4">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
+              Assets
+            </p>
+            <AssetsPanel
+              userUploads={userUploads}
+              onUploadAsset={handleUserUpload}
+              onAddAssetToCanvas={handleAddAssetToCanvas}
+              onAddUploadToCanvas={handleAddUploadToCanvas}
+            />
+          </div>
         )}
 
         {activePanel === "style" && (
-          <StylePanel
-            backgroundColor={backgroundColor}
-            setBackgroundColor={setBackgroundColor}
-            borderRadius={borderRadius}
-            setBorderRadius={setBorderRadius}
-            gap={gap}
-            setGap={setGap}
-            backgroundImage={backgroundImage}
-            setBackgroundImage={setBackgroundImage}
-            handleBackgroundUpload={handleBackgroundUpload}
-          />
+          <div className="space-y-4">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
+              Style
+            </p>
+            <StylePanel
+              backgroundColor={backgroundColor}
+              setBackgroundColor={setBackgroundColor}
+              borderRadius={borderRadius}
+              setBorderRadius={setBorderRadius}
+              gap={gap}
+              setGap={setGap}
+              backgroundImage={backgroundImage}
+              setBackgroundImage={setBackgroundImage}
+              handleBackgroundUpload={handleBackgroundUpload}
+            />
+          </div>
         )}
 
         {activePanel === "layers" && (
-          <LayersPanel
-            layers={layers}
-            selectedLayer={selectedLayer}
-            selectedLayers={selectedLayers}
-            onSelectLayer={handleSelectLayer}
-            onRenameLayer={handleRenameLayer}
-            onToggleVisibility={handleToggleLayerVisibility}
-            onToggleLock={handleToggleLayerLock}
-            onMoveForward={handleMoveLayerForward}
-            onMoveBackward={handleMoveLayerBackward}
-            snapEnabled={snapEnabled}
-            setSnapEnabled={setSnapEnabled}
-            onApplyAlignment={handleApplyAlignment}
-            selectedImage={selectedImage}
-            onUpdateImage={handleUpdateSelectedImage}
-            onDuplicateImage={handleDuplicateImage}
-            onDuplicateAsset={handleDuplicateAsset}
-            onResetImage={handleResetSelectedImage}
-            selectedText={selectedText}
-          />
+          <div className="space-y-4">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
+              Layers
+            </p>
+            <LayersPanel
+              layers={layers}
+              selectedLayer={selectedLayer}
+              selectedLayers={selectedLayers}
+              onSelectLayer={handleSelectLayer}
+              onRenameLayer={handleRenameLayer}
+              onToggleVisibility={handleToggleLayerVisibility}
+              onToggleLock={handleToggleLayerLock}
+              onMoveForward={handleMoveLayerForward}
+              onMoveBackward={handleMoveLayerBackward}
+              snapEnabled={snapEnabled}
+              setSnapEnabled={setSnapEnabled}
+              onApplyAlignment={handleApplyAlignment}
+              selectedImage={selectedImage}
+              onUpdateImage={handleUpdateSelectedImage}
+              onDuplicateImage={handleDuplicateImage}
+              onDuplicateAsset={handleDuplicateAsset}
+              onResetImage={handleResetSelectedImage}
+              selectedText={selectedText}
+              onDeleteAsset={handleDeleteAsset}
+              onDeleteText={handleDeleteText}
+            />
+          </div>
         )}
 
         {activePanel === "settings" && (
@@ -280,11 +303,10 @@ const EditorDrawer = ({
                     key={key}
                     type="button"
                     onClick={() => setAspectRatio(key)}
-                    className={`rounded-2xl border px-3 py-3 text-left text-xs transition-all ${
-                      aspectRatio === key
-                        ? "border-[#1a3884] bg-[#1a3884]/10 text-[#1a3884] dark:border-blue-400 dark:bg-blue-400/20 dark:text-blue-300"
-                        : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
-                    }`}
+                    className={`rounded-2xl border px-3 py-3 text-left text-xs transition-all ${aspectRatio === key
+                      ? "border-[#1a3884] bg-[#1a3884]/10 text-[#1a3884] dark:border-blue-400 dark:bg-blue-400/20 dark:text-blue-300"
+                      : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+                      }`}
                   >
                     <div className="mb-0.5 font-semibold">{key}</div>
                     <div className="text-[10px] opacity-60">
@@ -302,7 +324,7 @@ const EditorDrawer = ({
           </div>
         )}
 
-        {activePanel === "goals" && (
+        {/* {activePanel === "goals" && (
           <div className="space-y-6">
             <GoalList
               title="Short Term Goals"
@@ -322,7 +344,7 @@ const EditorDrawer = ({
               accentClass="bg-emerald-500/8 text-emerald-700 hover:bg-emerald-500/12 dark:bg-emerald-500/10 dark:text-emerald-300"
             />
           </div>
-        )}
+        )} */}
       </div>
 
       <div

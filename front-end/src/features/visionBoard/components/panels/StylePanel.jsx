@@ -27,7 +27,7 @@ const StylePanel = ({
 
   return (
     <div className="space-y-4">
-      <div className={sectionClass}>
+      {/* <div className={sectionClass}>
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#7aa2ff]/15 dark:text-[#9cb9ff]">
             <PaintBucket className="h-5 w-5" />
@@ -41,7 +41,7 @@ const StylePanel = ({
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className={sectionClass}>
         <label className={panelLabel}>Background Color</label>
@@ -53,35 +53,34 @@ const StylePanel = ({
               <button
                 key={color}
                 onClick={() => setBackgroundColor(color)}
-                className={`h-9 w-9 rounded-xl border transition ${
-                  active
-                    ? "scale-110 border-slate-900 ring-2 ring-slate-300 dark:border-white dark:ring-white/25"
-                    : "border-slate-200 hover:scale-105 dark:border-white/10"
-                }`}
+                className={`h-9 w-9 rounded-2xl border transition-all duration-200 ${active
+                    ? "scale-110 border-slate-900 ring-2 ring-slate-200 shadow-lg dark:border-white dark:ring-white/10"
+                    : "border-slate-200 hover:scale-105 hover:shadow-md dark:border-white/10"
+                  }`}
                 style={{ backgroundColor: color }}
               />
             );
           })}
         </div>
 
-        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/[0.04]">
+        <div className="mt-4 rounded-2xl border border-slate-200/60 bg-slate-50/50 p-3 dark:border-white/10 dark:bg-white/[0.04]">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="text-xs font-semibold text-slate-700 dark:text-white/75">
+              <div className="text-xs font-bold text-slate-800 dark:text-white/80">
                 Custom Tone
               </div>
               <div className="mt-1 text-[11px] text-slate-500 dark:text-white/45">
                 Fine tune the base canvas color.
               </div>
             </div>
-            <div className="flex items-center gap-3 rounded-lg bg-white px-3 py-2 shadow-sm dark:bg-white/10">
+            <div className="flex items-center gap-3 rounded-2xl bg-white px-3 py-2 shadow-sm dark:bg-white/10">
               <input
                 type="color"
                 value={backgroundColor}
                 onChange={(e) => setBackgroundColor(e.target.value)}
-                className="h-6 w-6 cursor-pointer rounded border-0 bg-transparent p-0"
+                className="h-6 w-6 cursor-pointer rounded-lg border-0 bg-transparent p-0"
               />
-              <span className="text-xs font-medium text-slate-600 dark:text-white/60">
+              <span className="text-[11px] font-bold text-slate-600 dark:text-white/60">
                 {backgroundColor}
               </span>
             </div>
@@ -107,16 +106,15 @@ const StylePanel = ({
               <button
                 key={preset.value}
                 onClick={() => setBorderRadius(preset.value)}
-                className={`rounded-xl border px-3 py-3 text-left transition ${
-                  active
-                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08]"
-                    : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
-                }`}
+                className={`rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${active
+                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] shadow-sm"
+                    : "border-slate-200 bg-slate-50 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
+                  }`}
               >
-                <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                <div className="text-sm font-bold text-slate-900 dark:text-white">
                   {preset.label}
                 </div>
-                <div className="mt-1 text-[11px] text-slate-500 dark:text-white/45">
+                <div className="mt-1 text-[11px] font-medium text-slate-500 dark:text-white/45">
                   {preset.value === 9999 ? "Circular framing" : `${preset.value}px corners`}
                 </div>
               </button>
@@ -143,16 +141,15 @@ const StylePanel = ({
               <button
                 key={preset.value}
                 onClick={() => setGap(preset.value)}
-                className={`rounded-xl border px-3 py-3 text-left transition ${
-                  active
-                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08]"
-                    : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
-                }`}
+                className={`rounded-2xl border px-3 py-3 text-left transition-all duration-200 ${active
+                    ? "border-[#1a3884]/60 bg-[#1a3884]/[0.08] shadow-sm"
+                    : "border-slate-200 bg-slate-50 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-white/[0.03] dark:hover:border-white/20"
+                  }`}
               >
-                <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                <div className="text-sm font-bold text-slate-900 dark:text-white">
                   {preset.label}
                 </div>
-                <div className="mt-1 text-[11px] text-slate-500 dark:text-white/45">
+                <div className="mt-1 text-[11px] font-medium text-slate-500 dark:text-white/45">
                   {preset.value === 0 ? "Edge to edge collage" : `${preset.value}px breathing room`}
                 </div>
               </button>

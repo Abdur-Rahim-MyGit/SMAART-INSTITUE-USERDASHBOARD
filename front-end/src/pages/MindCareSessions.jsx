@@ -209,310 +209,310 @@ const MindCareSessions = () => {
   return (
     <div className="min-h-screen lms-dashboard-bg text-[#1A1A1A] font-sans">
       <main className="p-4 sm:p-6 lg:p-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Tab Navigation */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {tabs.map((tab) => {
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${activeTab === tab.id
-                        ? "bg-[#1a3884] text-white"
-                        : "bg-white text-gray-500 hover:text-[#002147] border border-gray-200"
-                        }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                      {tab.label}
-                      {tab.id === "sessions" && sessions.length > 0 && (
-                        <span className={`px-2 py-0.5 text-xs rounded-full ${activeTab === tab.id ? "bg-white/20" : "bg-[#1a3884]/10 text-[#1a3884]"}`}>
-                          {sessions.length}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Tab Navigation */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${activeTab === tab.id
+                    ? "bg-[#1a3884] text-white"
+                    : "bg-white text-gray-500 hover:text-[#002147] border border-gray-200"
+                    }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                  {tab.id === "sessions" && sessions.length > 0 && (
+                    <span className={`px-2 py-0.5 text-xs rounded-full ${activeTab === tab.id ? "bg-white/20" : "bg-[#1a3884]/10 text-[#1a3884]"}`}>
+                      {sessions.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-              {/* Tab Content */}
-              <AnimatePresence mode="wait">
-                {/* My Sessions Tab */}
-                {activeTab === "sessions" && (
-                  <motion.div
-                    key="sessions"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4"
+          {/* Tab Content */}
+          <AnimatePresence mode="wait">
+            {/* My Sessions Tab */}
+            {activeTab === "sessions" && (
+              <motion.div
+                key="sessions"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
+                {/* Actions Bar */}
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={fetchMySessions}
+                    disabled={isLoading}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-gray-500 hover:text-[#002147] hover:border-[#1a3884] transition-colors"
                   >
-                    {/* Actions Bar */}
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={fetchMySessions}
-                        disabled={isLoading}
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 text-gray-500 hover:text-[#002147] hover:border-[#1a3884] transition-colors"
-                      >
-                        <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
-                        Refresh
-                      </button>
-                      <button
-                        onClick={() => setActiveTab("request")}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/90 transition-colors"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Request Session
-                      </button>
-                    </div>
+                    <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+                    Refresh
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("request")}
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/90 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Request Session
+                  </button>
+                </div>
 
-                    {/* Sessions List */}
-                    {isLoading ? (
-                      <div className="flex flex-col items-center justify-center py-12">
-                        <Loader2 className="w-8 h-8 text-[#1a3884] animate-spin mb-3" />
-                        <p className="text-gray-500">Loading sessions...</p>
-                      </div>
-                    ) : sessions.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12 rounded-xl bg-white border border-gray-200">
-                        <Inbox className="w-12 h-12 text-gray-300 mb-3" />
-                        <h3 className="text-[#002147] font-medium mb-1">No sessions yet</h3>
-                        <p className="text-gray-500 text-sm mb-4">Request a coaching session to get started</p>
-                        <button
-                          onClick={() => setActiveTab("request")}
-                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white hover:bg-[#1a3884]/90 transition-colors"
+                {/* Sessions List */}
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 text-[#1a3884] animate-spin mb-3" />
+                    <p className="text-gray-500">Loading sessions...</p>
+                  </div>
+                ) : sessions.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 rounded-xl bg-white border border-gray-200">
+                    <Inbox className="w-12 h-12 text-gray-300 mb-3" />
+                    <h3 className="text-[#002147] font-medium mb-1">No sessions yet</h3>
+                    <p className="text-gray-500 text-sm mb-4">Request a coaching session to get started</p>
+                    <button
+                      onClick={() => setActiveTab("request")}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white hover:bg-[#1a3884]/90 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Request Session
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {sessions.map((session, index) => {
+                      const StatusIcon = STATUS_COLORS[session.status]?.icon || AlertCircle;
+                      const statusColor = STATUS_COLORS[session.status] || STATUS_COLORS.requested;
+
+                      return (
+                        <motion.div
+                          key={session._id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="p-4 rounded-xl bg-white border border-gray-200 hover:border-[#1a3884]/50 transition-colors cursor-pointer"
+                          onClick={() => setSelectedSession(session)}
                         >
-                          <Plus className="w-4 h-4" />
-                          Request Session
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {sessions.map((session, index) => {
-                          const StatusIcon = STATUS_COLORS[session.status]?.icon || AlertCircle;
-                          const statusColor = STATUS_COLORS[session.status] || STATUS_COLORS.requested;
+                          <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className={`px-2 py-1 text-xs rounded-lg font-medium capitalize ${statusColor.bg} ${statusColor.text}`}>
+                                  <StatusIcon className="w-3 h-3 inline mr-1" />
+                                  {session.status}
+                                </span>
+                                <span className="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-600 capitalize">
+                                  {session.domain?.replace("-", " ")}
+                                </span>
+                              </div>
+                              <p className="text-[#002147] font-medium truncate">
+                                {session.notes || "Session Request"}
+                              </p>
+                              <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-4 h-4" />
+                                  {formatDate(session.scheduledDate || session.requestDate)}
+                                </span>
+                                {session.coach && (
+                                  <span className="flex items-center gap-1">
+                                    <User className="w-4 h-4" />
+                                    {session.coach.name || "Assigned Coach"}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
 
+                            {/* Actions */}
+                            <div className="flex items-center gap-2">
+                              {session.status === "completed" && !session.studentFeedback?.rating && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedSession(session);
+                                    setShowFeedbackModal(true);
+                                  }}
+                                  className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-[#1a3884]/10 text-[#1a3884] hover:bg-[#1a3884]/20 transition-colors"
+                                >
+                                  <Star className="w-4 h-4" />
+                                  Give Feedback
+                                </button>
+                              )}
+                              {session.status === "scheduled" && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toast.info("Video integration coming soon!");
+                                  }}
+                                  className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors"
+                                >
+                                  <Video className="w-4 h-4" />
+                                  Join
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* Request Session Tab */}
+            {activeTab === "request" && (
+              <motion.div
+                key="request"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="rounded-2xl bg-white border border-gray-200 p-6">
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold text-[#002147] mb-1">Request a Coaching Session</h2>
+                    <p className="text-gray-500 text-sm">Select a domain and describe what you need help with</p>
+                  </div>
+
+                  <form onSubmit={handleSubmitRequest} className="space-y-6">
+                    {/* Domain Selection */}
+                    <div>
+                      <label className="block text-sm font-medium text-[#002147] mb-3">
+                        What area do you need help with? *
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {DOMAINS.map((domain) => {
+                          const Icon = domain.icon;
                           return (
-                            <motion.div
-                              key={session._id}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: index * 0.05 }}
-                              className="p-4 rounded-xl bg-white border border-gray-200 hover:border-[#1a3884]/50 transition-colors cursor-pointer"
-                              onClick={() => setSelectedSession(session)}
+                            <button
+                              key={domain.id}
+                              type="button"
+                              onClick={() => setSelectedDomain(domain.id)}
+                              className={`p-4 rounded-xl text-left transition-all ${selectedDomain === domain.id
+                                ? "bg-[#1a3884]/10 border-2 border-[#1a3884]"
+                                : "bg-gray-50 border-2 border-transparent hover:border-gray-200"
+                                }`}
                             >
-                              <div className="flex flex-wrap items-start justify-between gap-4">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span className={`px-2 py-1 text-xs rounded-lg font-medium capitalize ${statusColor.bg} ${statusColor.text}`}>
-                                      <StatusIcon className="w-3 h-3 inline mr-1" />
-                                      {session.status}
-                                    </span>
-                                    <span className="px-2 py-1 text-xs rounded-lg bg-gray-100 text-gray-600 capitalize">
-                                      {session.domain?.replace("-", " ")}
-                                    </span>
-                                  </div>
-                                  <p className="text-[#002147] font-medium truncate">
-                                    {session.notes || "Session Request"}
-                                  </p>
-                                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                                    <span className="flex items-center gap-1">
-                                      <Calendar className="w-4 h-4" />
-                                      {formatDate(session.scheduledDate || session.requestDate)}
-                                    </span>
-                                    {session.coach && (
-                                      <span className="flex items-center gap-1">
-                                        <User className="w-4 h-4" />
-                                        {session.coach.name || "Assigned Coach"}
-                                      </span>
-                                    )}
-                                  </div>
+                              <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg ${selectedDomain === domain.id ? "bg-[#1a3884]/20" : "bg-white"}`}>
+                                  <Icon className={`w-5 h-5 ${selectedDomain === domain.id ? "text-[#1a3884]" : "text-gray-400"}`} />
                                 </div>
-
-                                {/* Actions */}
-                                <div className="flex items-center gap-2">
-                                  {session.status === "completed" && !session.studentFeedback?.rating && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedSession(session);
-                                        setShowFeedbackModal(true);
-                                      }}
-                                      className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-[#1a3884]/10 text-[#1a3884] hover:bg-[#1a3884]/20 transition-colors"
-                                    >
-                                      <Star className="w-4 h-4" />
-                                      Give Feedback
-                                    </button>
-                                  )}
-                                  {session.status === "scheduled" && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        toast.info("Video integration coming soon!");
-                                      }}
-                                      className="flex items-center gap-1 px-3 py-1.5 text-sm rounded-lg bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors"
-                                    >
-                                      <Video className="w-4 h-4" />
-                                      Join
-                                    </button>
-                                  )}
+                                <div>
+                                  <p className={`font-medium ${selectedDomain === domain.id ? "text-[#1a3884]" : "text-[#002147]"}`}>
+                                    {domain.label}
+                                  </p>
+                                  <p className="text-xs text-gray-500">{domain.description}</p>
                                 </div>
                               </div>
-                            </motion.div>
+                            </button>
                           );
                         })}
                       </div>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* Request Session Tab */}
-                {activeTab === "request" && (
-                  <motion.div
-                    key="request"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="rounded-2xl bg-white border border-gray-200 p-6">
-                      <div className="mb-6">
-                        <h2 className="text-xl font-bold text-[#002147] mb-1">Request a Coaching Session</h2>
-                        <p className="text-gray-500 text-sm">Select a domain and describe what you need help with</p>
-                      </div>
-
-                      <form onSubmit={handleSubmitRequest} className="space-y-6">
-                        {/* Domain Selection */}
-                        <div>
-                          <label className="block text-sm font-medium text-[#002147] mb-3">
-                            What area do you need help with? *
-                          </label>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {DOMAINS.map((domain) => {
-                              const Icon = domain.icon;
-                              return (
-                                <button
-                                  key={domain.id}
-                                  type="button"
-                                  onClick={() => setSelectedDomain(domain.id)}
-                                  className={`p-4 rounded-xl text-left transition-all ${selectedDomain === domain.id
-                                    ? "bg-[#1a3884]/10 border-2 border-[#1a3884]"
-                                    : "bg-gray-50 border-2 border-transparent hover:border-gray-200"
-                                    }`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-lg ${selectedDomain === domain.id ? "bg-[#1a3884]/20" : "bg-white"}`}>
-                                      <Icon className={`w-5 h-5 ${selectedDomain === domain.id ? "text-[#1a3884]" : "text-gray-400"}`} />
-                                    </div>
-                                    <div>
-                                      <p className={`font-medium ${selectedDomain === domain.id ? "text-[#1a3884]" : "text-[#002147]"}`}>
-                                        {domain.label}
-                                      </p>
-                                      <p className="text-xs text-gray-500">{domain.description}</p>
-                                    </div>
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Issue Description */}
-                        <div>
-                          <label className="block text-sm font-medium text-[#002147] mb-2">
-                            Describe your issue or requirement *
-                          </label>
-                          <textarea
-                            value={issueDescription}
-                            onChange={(e) => setIssueDescription(e.target.value)}
-                            placeholder="Please describe what you'd like to discuss in the session..."
-                            rows={4}
-                            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none"
-                          />
-                        </div>
-
-                        {/* Coach Selection (Optional) */}
-                        {coaches.length > 0 && (
-                          <div>
-                            <label className="block text-sm font-medium text-[#002147] mb-2">
-                              Preferred Coach (Optional)
-                            </label>
-                            <select
-                              value={selectedCoach}
-                              onChange={(e) => setSelectedCoach(e.target.value)}
-                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
-                            >
-                              <option value="">Any available coach</option>
-                              {coaches.map((coach) => (
-                                <option key={coach._id} value={coach._id}>
-                                  {coach.name} - {coach.specialization}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Preferred Date/Time (Optional) */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-[#002147] mb-2">
-                              Preferred Date (Optional)
-                            </label>
-                            <input
-                              type="date"
-                              value={preferredDate}
-                              onChange={(e) => setPreferredDate(e.target.value)}
-                              min={new Date().toISOString().split("T")[0]}
-                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-[#002147] mb-2">
-                              Preferred Time (Optional)
-                            </label>
-                            <input
-                              type="time"
-                              value={preferredTime}
-                              onChange={(e) => setPreferredTime(e.target.value)}
-                              className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Submit Button */}
-                        <div className="flex items-center gap-3 pt-4">
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab("sessions")}
-                            className="px-6 py-3 rounded-xl border border-gray-200 text-gray-500 font-medium hover:bg-gray-50 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {isSubmitting ? (
-                              <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                              <>
-                                <Send className="w-5 h-5" />
-                                Submit Request
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </form>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </main>
+
+                    {/* Issue Description */}
+                    <div>
+                      <label className="block text-sm font-medium text-[#002147] mb-2">
+                        Describe your issue or requirement *
+                      </label>
+                      <textarea
+                        value={issueDescription}
+                        onChange={(e) => setIssueDescription(e.target.value)}
+                        placeholder="Please describe what you'd like to discuss in the session..."
+                        rows={4}
+                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none"
+                      />
+                    </div>
+
+                    {/* Coach Selection (Optional) */}
+                    {coaches.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-medium text-[#002147] mb-2">
+                          Preferred Coach (Optional)
+                        </label>
+                        <select
+                          value={selectedCoach}
+                          onChange={(e) => setSelectedCoach(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
+                        >
+                          <option value="">Any available coach</option>
+                          {coaches.map((coach) => (
+                            <option key={coach._id} value={coach._id}>
+                              {coach.name} - {coach.specialization}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Preferred Date/Time (Optional) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-[#002147] mb-2">
+                          Preferred Date (Optional)
+                        </label>
+                        <input
+                          type="date"
+                          value={preferredDate}
+                          onChange={(e) => setPreferredDate(e.target.value)}
+                          min={new Date().toISOString().split("T")[0]}
+                          className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-[#002147] mb-2">
+                          Preferred Time (Optional)
+                        </label>
+                        <input
+                          type="time"
+                          value={preferredTime}
+                          onChange={(e) => setPreferredTime(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="flex items-center gap-3 pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("sessions")}
+                        className="px-6 py-3 rounded-xl border border-gray-200 text-gray-500 font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <>
+                            <Send className="w-5 h-5" />
+                            Submit Request
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </main>
 
       {/* Feedback Modal */}
       <AnimatePresence>

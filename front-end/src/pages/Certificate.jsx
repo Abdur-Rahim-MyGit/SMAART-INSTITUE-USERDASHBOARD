@@ -220,111 +220,111 @@ const Certificate = () => {
         return (
             <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
                 <main className="w-full relative py-12 px-4 md:px-6">
-                        {/* Header */}
-                        <div className="text-center mb-8">
-                            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#C0C0C0] to-[#A8A8A8] flex items-center justify-center shadow-lg shadow-amber-500/20">
-                                <ShieldCheck className="w-10 h-10 text-[#002147]" />
-                            </div>
-                            <h1 className="text-3xl font-bold text-[#002147] dark:text-white mb-3 tracking-tight">Credentials & Achievements</h1>
-                            <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Access your verified SMAART Institute certifications and badges</p>
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#C0C0C0] to-[#A8A8A8] flex items-center justify-center shadow-lg shadow-amber-500/20">
+                            <ShieldCheck className="w-10 h-10 text-[#002147]" />
                         </div>
+                        <h1 className="text-3xl font-bold text-[#002147] dark:text-white mb-3 tracking-tight">Credentials & Achievements</h1>
+                        <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Access your verified SMAART Institute certifications and badges</p>
+                    </div>
 
-                        {/* Tab Navigation */}
-                        <div className="flex justify-center mb-8">
-                            <div className="inline-flex bg-white dark:bg-slate-800 rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-slate-700">
-                                <button
-                                    onClick={() => setActiveTab('certificates')}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'certificates'
-                                        ? 'bg-[#002147] text-white shadow-md'
-                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                                        }`}
-                                >
-                                    <Award className="w-5 h-5" />
-                                    Certificates
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('badges')}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'badges'
-                                        ? 'bg-[#002147] text-white shadow-md'
-                                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
-                                        }`}
-                                >
-                                    <Trophy className="w-5 h-5" />
-                                    Badges & Achievements
-                                </button>
-                            </div>
+                    {/* Tab Navigation */}
+                    <div className="flex justify-center mb-8">
+                        <div className="inline-flex bg-white dark:bg-slate-800 rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-slate-700">
+                            <button
+                                onClick={() => setActiveTab('certificates')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'certificates'
+                                    ? 'bg-[#002147] text-white shadow-md'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                    }`}
+                            >
+                                <Award className="w-5 h-5" />
+                                Certificates
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('badges')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'badges'
+                                    ? 'bg-[#002147] text-white shadow-md'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                    }`}
+                            >
+                                <Trophy className="w-5 h-5" />
+                                Badges & Achievements
+                            </button>
                         </div>
+                    </div>
 
-                        {/* Certificates Tab */}
-                        {activeTab === 'certificates' && (
-                            <div className="flex flex-col items-center">
-                                <div className="grid gap-4 w-full max-w-2xl">
-                                    {certificateTypes.map((cert) => (
-                                        <button
-                                            key={cert.id}
-                                            onClick={() => setSelectedType(cert)}
-                                            className="group relative w-full p-6 rounded-2xl bg-white dark:bg-dark-card border border-gray-200 dark:border-slate-700 hover:border-[#1a3884] dark:hover:border-[#1a3884] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-[#1a3884]/10 text-[#1a3884] transition-colors">
-                                                    <Award className="w-6 h-6" />
-                                                </div>
-                                                <div className="flex-1">
-                                                    <h3 className="text-lg font-bold text-[#002147] dark:text-white">
-                                                        {cert.title}
-                                                    </h3>
-                                                    <p className="text-slate-400 text-sm mt-0.5 flex items-center gap-1.5 font-medium">
-                                                        <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                                                        Verified Level 1 Credential
-                                                    </p>
-                                                </div>
-                                                <div className="text-[#1a3884] font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                                                    VIEW SECURE <span className="text-lg">→</span>
-                                                </div>
+                    {/* Certificates Tab */}
+                    {activeTab === 'certificates' && (
+                        <div className="flex flex-col items-center">
+                            <div className="grid gap-4 w-full max-w-2xl">
+                                {certificateTypes.map((cert) => (
+                                    <button
+                                        key={cert.id}
+                                        onClick={() => setSelectedType(cert)}
+                                        className="group relative w-full p-6 rounded-2xl bg-white dark:bg-dark-card border border-gray-200 dark:border-slate-700 hover:border-[#1a3884] dark:hover:border-[#1a3884] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-[#1a3884]/10 text-[#1a3884] transition-colors">
+                                                <Award className="w-6 h-6" />
                                             </div>
-                                        </button>
-                                    ))}
-                                </div>
-
-                                {/* Verify Certificate Link */}
-                                <div className="mt-8 text-center">
-                                    <a
-                                        href="/verify-certificate"
-                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#1a3884] text-white font-bold shadow-lg hover:shadow-xl transition-all"
-                                    >
-                                        <ShieldCheck className="w-5 h-5" />
-                                        Verify a Certificate
-                                    </a>
-                                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
-                                        Have a certificate ID? Verify its authenticity here
-                                    </p>
-                                </div>
+                                            <div className="flex-1">
+                                                <h3 className="text-lg font-bold text-[#002147] dark:text-white">
+                                                    {cert.title}
+                                                </h3>
+                                                <p className="text-slate-400 text-sm mt-0.5 flex items-center gap-1.5 font-medium">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                                                    Verified Level 1 Credential
+                                                </p>
+                                            </div>
+                                            <div className="text-[#1a3884] font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                                VIEW SECURE <span className="text-lg">→</span>
+                                            </div>
+                                        </div>
+                                    </button>
+                                ))}
                             </div>
-                        )}
 
-                        {/* Badges Tab */}
-                        {activeTab === 'badges' && (
-                            <div className="max-w-6xl mx-auto">
-                                <BadgeGallery userName={userData.fullName} badges={user?.badges || []} />
-
-                                {/* Verify Badge Link */}
-                                <div className="mt-8 text-center">
-                                    <a
-                                        href="/verify-badge"
-                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#1a3884] text-white font-bold shadow-lg hover:shadow-xl transition-all"
-                                    >
-                                        <Medal className="w-5 h-5" />
-                                        Verify a Badge
-                                    </a>
-                                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
-                                        Have a badge ID? Verify its authenticity here
-                                    </p>
-                                </div>
+                            {/* Verify Certificate Link */}
+                            <div className="mt-8 text-center">
+                                <a
+                                    href="/verify-certificate"
+                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#1a3884] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+                                >
+                                    <ShieldCheck className="w-5 h-5" />
+                                    Verify a Certificate
+                                </a>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
+                                    Have a certificate ID? Verify its authenticity here
+                                </p>
                             </div>
-                        )}
-                    </main>
-                </div>
-            );
+                        </div>
+                    )}
+
+                    {/* Badges Tab */}
+                    {activeTab === 'badges' && (
+                        <div className="max-w-6xl mx-auto">
+                            <BadgeGallery userName={userData.fullName} badges={user?.badges || []} />
+
+                            {/* Verify Badge Link */}
+                            <div className="mt-8 text-center">
+                                <a
+                                    href="/verify-badge"
+                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#1a3884] text-white font-bold shadow-lg hover:shadow-xl transition-all"
+                                >
+                                    <Medal className="w-5 h-5" />
+                                    Verify a Badge
+                                </a>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
+                                    Have a badge ID? Verify its authenticity here
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </main>
+            </div>
+        );
     }
 
     // --- RENDER CERTIFICATE VIEW ---
@@ -360,89 +360,89 @@ const Certificate = () => {
                         <div className={`cert-watermark-overlay ${selectedType.id === 'combined' ? 'combined-watermark' : ''}`}>{certId}</div>
 
                         <div className={`cert-content ${selectedType.id === 'combined' ? 'combined-content' : ''}`}>
-                                <header className="cert-header">
-                                    <div className="cert-logo-container">
-                                        <img src={blueLogo} alt="SMAART INSTITUTE Logo" className="cert-logo" />
-                                    </div>
-                                    <div className="cert-title-container">
-                                        <h1 className="cert-org-name">SMAART INSTITUTE</h1>
-                                        <div className="credential-label">PROFESSIONAL CREDENTIAL</div>
-                                    </div>
-                                </header>
-
-                                <div className="cert-body">
-                                    <section className="cert-main-title">
-                                        <h1 style={{ whiteSpace: 'pre-line' }} className={selectedType.id === 'combined' ? 'combined-title' : ''}>
-                                            {selectedType.shortTitle}
-                                        </h1>
-                                        <div className="subtitle">{selectedType.subtitle}</div>
-                                    </section>
-
-                                    <section className="recipient-block">
-                                        <div className="this-certifies">This certifies that</div>
-                                        <div className={`recipient-name ${selectedType.id === 'combined' ? 'combined-recipient' : ''}`}>
-                                            {userData.fullName.toUpperCase()}
-                                        </div>
-                                    </section>
-
-                                    {selectedType.id === 'combined' ? (
-                                        <div className="combined-cert-details">
-                                            <p className="cert-statement">
-                                                has successfully verified mastery across the complete spectrum of professional readiness,
-                                                demonstrating specific excellence in the following accredited domains:
-                                            </p>
-                                            <div className="included-certs-list">
-                                                <div className="included-cert-item red-theme">
-                                                    <div className="cert-bullet"></div>
-                                                    <span>Professional Certificate in Capacity & Work Readiness</span>
-                                                </div>
-                                                <div className="included-cert-item blue-theme">
-                                                    <div className="cert-bullet"></div>
-                                                    <span>Advanced Professional Certificate in Applied Capability</span>
-                                                </div>
-                                                <div className="included-cert-item gold-theme">
-                                                    <div className="cert-bullet"></div>
-                                                    <span>Professional Diploma in Employability & Leadership Readiness</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <p className="cert-statement">
-                                            has successfully completed the SMAART Institute professional learning and assessment programme demonstrating verified readiness across defined professional competencies.
-                                        </p>
-                                    )}
-
-                                    <section className="skills-panel">
-                                        <div className="skills-column">
-                                            <h2 className="panel-title">Validated Skill Quotients</h2>
-                                            <ul className="skills-list">
-                                                {skills.map((skill, i) => (
-                                                    <li key={i} className={skill.accent ? 'teal-accent' : ''}>
-                                                        <span>{skill.label}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-
-                                        <div className="readiness-column">
-                                            <h2 className="panel-title">Readiness Profile</h2>
-                                            <div className="readiness-content">
-                                                <div className="readiness-stat">
-                                                    <span className="stat-label">Readiness Band</span>
-                                                    <span className="stat-value band">Proficient</span>
-                                                </div>
-                                                <div className="readiness-stat">
-                                                    <span className="stat-label">Assessment Window</span>
-                                                    <span className="stat-value">TST-2025-003</span>
-                                                </div>
-                                                <div className="readiness-stat">
-                                                    <span className="stat-label">Issuing Authority</span>
-                                                    <span className="stat-value uppercase">SMAART UK</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </section>
+                            <header className="cert-header">
+                                <div className="cert-logo-container">
+                                    <img src={blueLogo} alt="SMAART INSTITUTE Logo" className="cert-logo" />
                                 </div>
+                                <div className="cert-title-container">
+                                    <h1 className="cert-org-name">SMAART INSTITUTE</h1>
+                                    <div className="credential-label">PROFESSIONAL CREDENTIAL</div>
+                                </div>
+                            </header>
+
+                            <div className="cert-body">
+                                <section className="cert-main-title">
+                                    <h1 style={{ whiteSpace: 'pre-line' }} className={selectedType.id === 'combined' ? 'combined-title' : ''}>
+                                        {selectedType.shortTitle}
+                                    </h1>
+                                    <div className="subtitle">{selectedType.subtitle}</div>
+                                </section>
+
+                                <section className="recipient-block">
+                                    <div className="this-certifies">This certifies that</div>
+                                    <div className={`recipient-name ${selectedType.id === 'combined' ? 'combined-recipient' : ''}`}>
+                                        {userData.fullName.toUpperCase()}
+                                    </div>
+                                </section>
+
+                                {selectedType.id === 'combined' ? (
+                                    <div className="combined-cert-details">
+                                        <p className="cert-statement">
+                                            has successfully verified mastery across the complete spectrum of professional readiness,
+                                            demonstrating specific excellence in the following accredited domains:
+                                        </p>
+                                        <div className="included-certs-list">
+                                            <div className="included-cert-item red-theme">
+                                                <div className="cert-bullet"></div>
+                                                <span>Professional Certificate in Capacity & Work Readiness</span>
+                                            </div>
+                                            <div className="included-cert-item blue-theme">
+                                                <div className="cert-bullet"></div>
+                                                <span>Advanced Professional Certificate in Applied Capability</span>
+                                            </div>
+                                            <div className="included-cert-item gold-theme">
+                                                <div className="cert-bullet"></div>
+                                                <span>Professional Diploma in Employability & Leadership Readiness</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="cert-statement">
+                                        has successfully completed the SMAART Institute professional learning and assessment programme demonstrating verified readiness across defined professional competencies.
+                                    </p>
+                                )}
+
+                                <section className="skills-panel">
+                                    <div className="skills-column">
+                                        <h2 className="panel-title">Validated Skill Quotients</h2>
+                                        <ul className="skills-list">
+                                            {skills.map((skill, i) => (
+                                                <li key={i} className={skill.accent ? 'teal-accent' : ''}>
+                                                    <span>{skill.label}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="readiness-column">
+                                        <h2 className="panel-title">Readiness Profile</h2>
+                                        <div className="readiness-content">
+                                            <div className="readiness-stat">
+                                                <span className="stat-label">Readiness Band</span>
+                                                <span className="stat-value band">Proficient</span>
+                                            </div>
+                                            <div className="readiness-stat">
+                                                <span className="stat-label">Assessment Window</span>
+                                                <span className="stat-value">TST-2025-003</span>
+                                            </div>
+                                            <div className="readiness-stat">
+                                                <span className="stat-label">Issuing Authority</span>
+                                                <span className="stat-value uppercase">SMAART UK</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
 
                             <footer className="cert-footer">
                                 <div className="signature-zone">
@@ -475,7 +475,7 @@ const Certificate = () => {
                         </div>
                     </div>
                 </div>
-                </main>
+            </main>
         </div>
     );
 };

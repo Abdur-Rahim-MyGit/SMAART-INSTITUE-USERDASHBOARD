@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'production') {
   console.info = (...args) => logger.info(args.join(' '));
   console.warn = (...args) => logger.warn(args.join(' '));
   console.error = (...args) => logger.error(args.join(' '));
-  console.debug = () => {}; // Mute debug logs entirely in production
+  console.debug = () => { }; // Mute debug logs entirely in production
 }
 
 // Critical Environment Variable Check

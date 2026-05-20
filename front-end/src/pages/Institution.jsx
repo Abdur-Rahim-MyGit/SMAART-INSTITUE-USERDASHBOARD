@@ -29,7 +29,7 @@ const Institution = () => {
     const fetchCollegeData = async () => {
       try {
         setLoading(true);
-        
+
         let targetId = id;
         if (!targetId) {
           const stored = sessionStorage.getItem("selectedInstitution");
@@ -46,7 +46,7 @@ const Institution = () => {
         }
 
         const response = await apiCall(`/colleges/name/${encodeURIComponent(targetId)}`);
-        
+
         if (response && response.success) {
           setCollegeData(response.data);
         } else {
@@ -63,8 +63,8 @@ const Institution = () => {
   }, [id]);
 
   const baseVideoUrl = (collegeData && collegeData.chairmanVideo) ? collegeData.chairmanVideo : videoUrlFallback;
-  const currentVideoUrl = isPlaying 
-    ? (baseVideoUrl.includes("?") ? `${baseVideoUrl}&autoplay=1` : `${baseVideoUrl}?autoplay=1`) 
+  const currentVideoUrl = isPlaying
+    ? (baseVideoUrl.includes("?") ? `${baseVideoUrl}&autoplay=1` : `${baseVideoUrl}?autoplay=1`)
     : baseVideoUrl;
 
   return (
@@ -97,18 +97,18 @@ const Institution = () => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-5 bg-white border border-blue-100 rounded-2xl flex flex-col sm:flex-row items-center gap-4 shadow-sm"
+              className="mb-6 p-5 bg-white dark:bg-[#002A5C] border border-blue-100 dark:border-white/10 rounded-2xl flex flex-col sm:flex-row items-center gap-4 shadow-sm"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#1a3884]/8 flex items-center justify-center shrink-0 border border-[#1a3884]/10">
-                <AlertCircle className="w-5 h-5 text-[#1a3884]" />
+              <div className="w-10 h-10 rounded-xl bg-[#1a3884]/8 dark:bg-blue-400/10 flex items-center justify-center shrink-0 border border-[#1a3884]/10 dark:border-blue-400/20">
+                <AlertCircle className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
               </div>
               <div className="flex-1 text-center sm:text-left">
-                <p className="text-sm font-bold text-gray-900 mb-0.5">No institution selected</p>
-                <p className="text-xs text-gray-500">Please go back and choose your college to access the login portal.</p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">No institution selected</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Please go back and choose your college to access the login portal.</p>
               </div>
               <button
                 onClick={() => navigate('/', { replace: true })}
-                className="flex items-center gap-1.5 text-xs font-bold text-[#1a3884] bg-[#1a3884]/5 hover:bg-[#1a3884]/10 px-4 py-2 rounded-xl transition-colors shrink-0 border border-[#1a3884]/15"
+                className="flex items-center gap-1.5 text-xs font-bold text-[#1a3884] dark:text-blue-400 bg-[#1a3884]/5 dark:bg-blue-400/10 hover:bg-[#1a3884]/10 dark:hover:bg-blue-400/20 px-4 py-2 rounded-xl transition-colors shrink-0 border border-[#1a3884]/15 dark:border-blue-400/20"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Go Back
@@ -118,7 +118,7 @@ const Institution = () => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-4 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 shadow-sm"
+              className="mb-4 p-4 bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/30 rounded-2xl flex items-center gap-3 text-red-600 dark:text-red-400 shadow-sm"
             >
               <AlertCircle className="w-5 h-5 shrink-0" />
               <p className="text-sm font-medium">{error}</p>
@@ -160,10 +160,10 @@ const Institution = () => {
                   </div>
 
                   {/* Video embed — inset inside the frame */}
-                  <div className="relative w-full rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)] bg-gray-100" style={{ paddingBottom: "56.25%" }}>
+                  <div className="relative w-full rounded-2xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)] bg-gray-100 dark:bg-[#00152E]" style={{ paddingBottom: "56.25%" }}>
                     {loading ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-2xl">
-                        <Loader2 className="w-8 h-8 text-[#002147] animate-spin" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#00152E] rounded-2xl">
+                        <Loader2 className="w-8 h-8 text-[#002147] dark:text-white animate-spin" />
                       </div>
                     ) : (
                       <iframe
@@ -185,7 +185,7 @@ const Institution = () => {
                   <div className="relative z-10">
                     <h2 className="text-xl sm:text-2xl font-bold text-[#002147] dark:text-foreground mb-1.5 tracking-tight leading-snug">
                       A Message from {" "}
-                      <span className="font-extrabold text-primary">
+                      <span className="font-extrabold text-[#1a3884] dark:text-blue-400">
                         Your Institution
                       </span>
                     </h2>
@@ -199,7 +199,7 @@ const Institution = () => {
                     onClick={() => setIsPlaying(true)}
                     className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0 hover:scale-105 transition-transform duration-200 cursor-pointer rounded-full relative z-10"
                     style={{
-                      background: "linear-gradient(135deg, #00152e 0%, #002147 100%)",
+                      background: "linear-gradient(135deg, #1a3884 0%, #002147 100%)",
                       boxShadow: "0 8px 24px rgba(0,33,71,0.25)",
                     }}
                   >

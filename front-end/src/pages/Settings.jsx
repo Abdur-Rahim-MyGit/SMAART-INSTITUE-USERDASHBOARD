@@ -339,6 +339,7 @@ const Settings = () => {
                 <option value="hi">Hindi (हिन्दी)</option>
                 <option value="ta">Tamil (தமிழ்)</option>
                 <option value="ur">Urdu (اردو)</option>
+                <option value="fr">French (Français)</option>
               </select>
             </div>
             <div className="p-4 rounded-xl bg-gray-50 dark:bg-dark-card border border-gray-200 dark:border-white/10">

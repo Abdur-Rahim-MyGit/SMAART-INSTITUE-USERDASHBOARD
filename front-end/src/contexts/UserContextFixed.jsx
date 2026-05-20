@@ -16,13 +16,13 @@ export const UserProvider = ({ children }) => {
 
   const fetchUserDetails = useCallback(async (email) => {
     if (!email) return;
-    
+
     const token = sessionStorage.getItem('token');
     if (!token) {
       console.log('[UserContext] No token found, skipping background fetch');
       return;
     }
-    
+
     try {
       const response = await fetch(`${API_BASE_URL}/users/register-details/${email}`, {
         headers: {
@@ -30,7 +30,7 @@ export const UserProvider = ({ children }) => {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setUser(prev => {
@@ -41,7 +41,7 @@ export const UserProvider = ({ children }) => {
 
           // Destructure to exclude document IDs from registration data
           const { _id, id, ...otherDetails } = data;
-          
+
           const updated = {
             ...prev,
             ...otherDetails,
@@ -90,15 +90,15 @@ export const UserProvider = ({ children }) => {
     const handleStorageChange = (e) => {
       if (e.key === "logout-event") {
         console.log("[UserContext] Cross-tab logout detected. Redirecting to login.");
-        
+
         // Clear storages safely
         sessionStorage.clear();
         localStorage.removeItem("user");
         localStorage.removeItem("token");
-        
+
         // Set a flag so the LandingPage can show a clean toast message
         sessionStorage.setItem("logged_out_other_tab", "true");
-        
+
         // Force navigation to the root explicitly using replace
         window.location.replace("/");
       }
@@ -126,18 +126,18 @@ export const UserProvider = ({ children }) => {
 
   const logout = useCallback(async () => {
     console.log('[Logout] Starting logout process...');
-    
+
     // Clear storages
     sessionStorage.clear();
     localStorage.removeItem("user");
     localStorage.removeItem("token");
-    
+
     // Set flag for clean logout message
     sessionStorage.setItem("logged_out_other_tab", "true");
-    
+
     // Reset state
     setUser(null);
-    
+
     // Redirect
     window.location.replace("/");
   }, []);
@@ -164,10 +164,10 @@ export const useUser = () => {
     return {
       user: null,
       loading: false,
-      login: () => {},
-      logout: () => {},
-      updateUser: () => {},
-      refreshUser: () => {}
+      login: () => { },
+      logout: () => { },
+      updateUser: () => { },
+      refreshUser: () => { }
     };
   }
   return context;

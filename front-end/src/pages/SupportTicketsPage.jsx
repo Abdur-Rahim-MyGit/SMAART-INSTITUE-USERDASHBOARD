@@ -103,7 +103,7 @@ const SupportTicketsPage = () => {
               </div>
 
               {/* Tabs */}
-              <div className="flex p-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
+              <div className="flex gap-1 p-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
                 <button
                   onClick={() => setActiveTab('create')}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'create'
@@ -187,11 +187,10 @@ const SupportTicketsPage = () => {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setShowFilters(!showFilters)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${
-                        showFilters || statusFilter
-                          ? "border-[#1a3884] text-[#1a3884]"
-                          : "border-[#1a3884]/30 text-gray-400"
-                      }`}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${showFilters || statusFilter
+                        ? "border-[#1a3884] text-[#1a3884]"
+                        : "border-[#1a3884]/30 text-gray-400"
+                        }`}
                     >
                       <Filter className="w-4 h-4" />
                       Filters
@@ -232,11 +231,10 @@ const SupportTicketsPage = () => {
                             <button
                               key={status}
                               onClick={() => setStatusFilter(status)}
-                              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
-                                statusFilter === status
+                              className={`px-3 py-1 text-sm rounded-lg transition-colors ${statusFilter === status
                                   ? "bg-[#1a3884] text-white"
                                   : "bg-gray-100 dark:bg-dark-card text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                              }`}
+                                }`}
                             >
                               {status || 'All'}
                             </button>
@@ -290,9 +288,9 @@ const SupportTicketsPage = () => {
                         <span className="flex items-center gap-1">
                           <Clock size={14} /> {new Date(ticket.createdAt).toLocaleDateString()}
                         </span>
-                        <span className="flex items-center gap-1 capitalize">
+                        {/* <span className="flex items-center gap-1 capitalize">
                           <AlertCircle size={14} /> {ticket.priority} Priority
-                        </span>
+                        </span> */}
                         {ticket.responses?.length > 0 && (
                           <span className="flex items-center gap-1 text-[#1a3884]">
                             <MessageSquare size={14} /> {ticket.responses.length} Responses
@@ -315,7 +313,7 @@ const SupportTicketsPage = () => {
             ticket={selectedTicket}
             onClose={() => setSelectedTicket(null)}
             onUpdate={(updatedTicket) => {
-              setTickets(prev => prev.map(t => 
+              setTickets(prev => prev.map(t =>
                 t._id === updatedTicket._id ? updatedTicket : t
               ));
               setSelectedTicket(updatedTicket);

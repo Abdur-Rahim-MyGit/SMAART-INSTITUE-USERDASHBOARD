@@ -285,10 +285,10 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                    className="relative w-full max-w-[420px] bg-white overflow-visible my-8"
+                    className="relative w-full max-w-[420px] bg-[#002147] overflow-visible my-8"
                     style={{
-                        border: "1px solid rgba(0, 0, 0, 0.04)",
-                        boxShadow: "0 30px 60px rgba(0,0,0,0.1)",
+                        border: "1px solid rgba(255, 255, 255, 0.08)",
+                        boxShadow: "0 30px 60px rgba(0,0,0,0.4)",
                         borderRadius: "24px",
                         overflow: "visible",
                     }}
@@ -297,17 +297,17 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                         {/* Close Button */}
                         <button
                             onClick={onClose}
-                            className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"
+                            className="absolute top-5 right-5 text-slate-400 hover:text-white transition-colors z-30"
                         >
                             <X className="w-5 h-5" />
                         </button>
 
                         {/* Header */}
-                        <div className="bg-gray-50 px-8 pt-8 pb-6 flex flex-col items-center justify-center border-b border-gray-100 relative rounded-t-[24px]">
-                            <div className="relative mb-3 z-10 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 w-14 h-14 flex items-center justify-center">
+                        <div className="bg-[#00152e]/40 px-8 pt-8 pb-6 flex flex-col items-center justify-center border-b border-white/5 relative rounded-t-[24px]">
+                            <div className="relative mb-3 z-10 p-3 bg-[#002A5C] rounded-2xl shadow-sm border border-white/10 w-14 h-14 flex items-center justify-center">
                                 <KeyRound className="w-6 h-6 text-[#1a3884]" />
                             </div>
-                            <h2 className="text-gray-900 text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
+                            <h2 className="text-white text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
                                 {step === 4 ? "Success!" : step === 3 ? "Reset Password" : step === 2 ? "Enter OTP" : "Forgot Password"}
                             </h2>
                             {/* Step progress dots */}
@@ -321,7 +321,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                 width: step === s ? "20px" : "6px",
                                                 height: "6px",
                                                 borderRadius: "999px",
-                                                background: step >= s ? "#1a3884" : "#e2e8f0",
+                                                background: step >= s ? "#1a3884" : "rgba(255,255,255,0.1)",
                                             }}
                                         />
                                     ))}
@@ -337,13 +337,13 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                     animate={{ opacity: 1, y: 0 }}
                                     className="space-y-4"
                                 >
-                                    <div className="bg-[#1a3884]/5 p-4 rounded-2xl flex items-start gap-3 border border-[#1a3884]/10 shadow-sm">
-                                        <div className="bg-white p-2 rounded-xl shadow-sm border border-[#1a3884]/10 flex-shrink-0">
-                                            <Mail className="w-4 h-4 text-[#1a3884]" />
+                                    <div className="bg-white/5 p-4 rounded-2xl flex items-start gap-3 border border-white/10 shadow-sm">
+                                        <div className="bg-white/5 p-2 rounded-xl shadow-sm border border-white/10 flex-shrink-0">
+                                            <Mail className="w-4 h-4 text-blue-400" />
                                         </div>
                                         <div className="flex flex-col gap-0.5">
-                                            <p className="text-[13px] text-[#112b6b] leading-tight font-bold">Verification Needed</p>
-                                            <p className="text-[11px] text-[#1a3884]/70 leading-normal font-medium">
+                                            <p className="text-[13px] text-blue-100 leading-tight font-bold">Verification Needed</p>
+                                            <p className="text-[11px] text-slate-400 leading-normal font-medium">
                                                 Enter your registered email address to receive a 6-digit verification code.
                                             </p>
                                         </div>
@@ -352,22 +352,22 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                     <div className="space-y-4 pt-2">
                                         {/* College Selection */}
                                         <div className="space-y-1.5 relative">
-                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Your Institution</label>
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Your Institution</label>
                                             <div 
-                                                className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
+                                                className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#002A5C] border border-white/10"
                                                 onFocusCapture={(e) => {
                                                     e.currentTarget.style.border = "1.5px solid #1a3884";
-                                                    e.currentTarget.style.background = "#fff";
-                                                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                                                    e.currentTarget.style.background = "#002A5C";
+                                                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.2)";
                                                 }}
                                                 onBlurCapture={(e) => {
-                                                    e.currentTarget.style.border = "1px solid #e2e8f0";
-                                                    e.currentTarget.style.background = "#f8fafc";
+                                                    e.currentTarget.style.border = "1px solid rgba(255,255,255,0.1)";
+                                                    e.currentTarget.style.background = "#002A5C";
                                                     e.currentTarget.style.boxShadow = "none";
                                                 }}
                                             >
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
-                                                    <Building2 className="w-3.5 h-3.5 text-[#1a3884]" />
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 shadow-sm border border-white/10 group-focus-within:border-[#1a3884]/30 transition-all">
+                                                    <Building2 className="w-3.5 h-3.5 text-blue-400" />
                                                 </div>
                                                 <input
                                                     type="text"
@@ -379,7 +379,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                         }
                                                     }}
                                                     placeholder="Search University/College..."
-                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
+                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-slate-500 text-white"
                                                 />
                                                 {isSearchingColleges && (
                                                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -390,7 +390,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
 
                                             {/* Dropdown for colleges */}
                                             {showCollegeDropdown && colleges.length > 0 && !selectedCollege && (
-                                                <div className="absolute top-full left-0 right-0 z-[100] bg-white border border-[#e2e8f0] shadow-2xl rounded-xl max-h-48 overflow-y-auto mt-1 custom-scrollbar overflow-hidden">
+                                                <div className="absolute top-full left-0 right-0 z-[100] bg-[#002A5C] border border-white/10 shadow-2xl rounded-xl max-h-48 overflow-y-auto mt-1 custom-scrollbar overflow-hidden">
                                                     {colleges.map((college, idx) => (
                                                         <div
                                                             key={idx}
@@ -402,12 +402,12 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                                 setCollegeSearch(college.collegeName);
                                                                 setShowCollegeDropdown(false);
                                                             }}
-                                                            className="p-3 text-sm hover:bg-[#1a3884]/5 cursor-pointer border-b border-gray-50 last:border-0 flex items-center gap-3 transition-colors"
+                                                            className="p-3 text-sm hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-0 flex items-center gap-3 transition-colors"
                                                         >
-                                                            <div className="w-7 h-7 rounded-lg bg-gray-50 flex items-center justify-center border border-gray-100 text-[#1a3884]">
+                                                            <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 text-blue-400">
                                                                 <Building2 className="w-3.5 h-3.5" />
                                                             </div>
-                                                            <span className="truncate font-semibold text-[#112b6b]">{college.collegeName}</span>
+                                                            <span className="truncate font-semibold text-white">{college.collegeName}</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -415,29 +415,29 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                         </div>
 
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Account Email</label>
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Account Email</label>
                                             <div 
-                                                className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
+                                                className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#002A5C] border border-white/10"
                                                 onFocusCapture={(e) => {
                                                     e.currentTarget.style.border = "1.5px solid #1a3884";
-                                                    e.currentTarget.style.background = "#fff";
-                                                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                                                    e.currentTarget.style.background = "#002A5C";
+                                                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.2)";
                                                 }}
                                                 onBlurCapture={(e) => {
-                                                    e.currentTarget.style.border = "1px solid #e2e8f0";
-                                                    e.currentTarget.style.background = "#f8fafc";
+                                                    e.currentTarget.style.border = "1px solid rgba(255,255,255,0.1)";
+                                                    e.currentTarget.style.background = "#002A5C";
                                                     e.currentTarget.style.boxShadow = "none";
                                                 }}
                                             >
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
-                                                    <Mail className="w-3.5 h-3.5 text-[#1a3884]" />
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 shadow-sm border border-white/10 group-focus-within:border-[#1a3884]/30 transition-all">
+                                                    <Mail className="w-3.5 h-3.5 text-blue-400" />
                                                 </div>
                                                 <input
                                                     type="email"
                                                     value={email}
                                                     onChange={(e) => setEmail(e.target.value)}
                                                     placeholder="your@email.com"
-                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
+                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-slate-500 text-white"
                                                 />
                                             </div>
                                         </div>
@@ -446,7 +446,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                     <Button
                                         onClick={handleRequestReset}
                                         disabled={isLoading || !email || !selectedCollege}
-                                        className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 mt-6 disabled:opacity-50 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
+                                        className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-black/20 mt-6 disabled:opacity-50 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
                                         style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
                                     >
                                         {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Send Reset Code"}
@@ -461,8 +461,8 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                     className="space-y-4"
                                 >
                                     <div className="text-center py-2">
-                                        <p className="text-[13px] text-gray-500 mb-6">
-                                            We've sent a code to <br/><span className="font-bold text-[#112b6b] text-[15px]">{email}</span>
+                                        <p className="text-[13px] text-slate-400 mb-6">
+                                            We've sent a code to <br/><span className="font-bold text-blue-100 text-[15px]">{email}</span>
                                         </p>
                                         <div className="flex justify-center gap-2.5" onPaste={handleOtpPaste}>
                                             {otp.map((digit, index) => (
@@ -475,18 +475,18 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                                     value={digit}
                                                     onChange={(e) => handleOtpChange(index, e.target.value)}
                                                     onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                                                    className="w-10 h-14 text-center text-xl font-bold bg-[#f8fafc] border border-[#e2e8f0] rounded-xl focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 focus:bg-white outline-none transition-all shadow-sm text-[#112b6b]"
+                                                    className="w-10 h-14 text-center text-xl font-bold bg-[#002A5C] border border-white/10 rounded-xl focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/10 focus:bg-[#002A5C] outline-none transition-all shadow-sm text-white"
                                                 />
                                             ))}
                                         </div>
                                         {/* Resend OTP */}
                                         <div className="mt-5 flex items-center justify-center gap-1.5">
-                                            <span className="text-[12px] text-gray-400">Didn't receive it?</span>
+                                            <span className="text-[12px] text-slate-500">Didn't receive it?</span>
                                             <button
                                                 type="button"
                                                 onClick={handleResendOtp}
                                                 disabled={resendCooldown > 0 || isLoading}
-                                                className="text-[12px] font-bold text-[#1a3884] disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
+                                                className="text-[12px] font-bold text-blue-400 disabled:text-slate-600 disabled:cursor-not-allowed transition-colors"
                                             >
                                                 {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend Code"}
                                             </button>
@@ -495,7 +495,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                     <Button
                                         onClick={handleVerifyOtp}
                                         disabled={otp.join("").length !== 6}
-                                        className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 mt-2 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
+                                        className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-black/20 mt-2 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
                                         style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
                                     >
                                         Verify & Continue
@@ -512,28 +512,28 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                 >
                                     <div className="space-y-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">New Password</label>
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">New Password</label>
                                             <div 
-                                                className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
+                                                className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#002A5C] border border-white/10"
                                                 onFocusCapture={(e) => {
                                                     e.currentTarget.style.border = "1.5px solid #1a3884";
-                                                    e.currentTarget.style.background = "#fff";
-                                                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                                                    e.currentTarget.style.background = "#002A5C";
+                                                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.2)";
                                                 }}
                                                 onBlurCapture={(e) => {
-                                                    e.currentTarget.style.border = "1px solid #e2e8f0";
-                                                    e.currentTarget.style.background = "#f8fafc";
+                                                    e.currentTarget.style.border = "1px solid rgba(255,255,255,0.1)";
+                                                    e.currentTarget.style.background = "#002A5C";
                                                     e.currentTarget.style.boxShadow = "none";
                                                 }}
                                             >
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
-                                                    <Lock className="w-3.5 h-3.5 text-[#1a3884]" />
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 shadow-sm border border-white/10 group-focus-within:border-[#1a3884]/30 transition-all">
+                                                    <Lock className="w-3.5 h-3.5 text-blue-400" />
                                                 </div>
                                                 <input
                                                     type={showPassword ? "text" : "password"}
                                                     value={newPassword}
                                                     onChange={(e) => setNewPassword(e.target.value)}
-                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
+                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-slate-500 text-white"
                                                     placeholder="Enter new password"
                                                 />
                                                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="shrink-0 transition-colors text-gray-400 hover:text-[#1a3884] p-1">
@@ -542,28 +542,28 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Confirm Password</label>
+                                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Confirm Password</label>
                                             <div 
-                                                className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#f8fafc] border border-[#e2e8f0]"
+                                                className="relative group flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all bg-[#002A5C] border border-white/10"
                                                 onFocusCapture={(e) => {
                                                     e.currentTarget.style.border = "1.5px solid #1a3884";
-                                                    e.currentTarget.style.background = "#fff";
-                                                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.1)";
+                                                    e.currentTarget.style.background = "#002A5C";
+                                                    e.currentTarget.style.boxShadow = "0 0 0 4px rgba(26,56,132,0.2)";
                                                 }}
                                                 onBlurCapture={(e) => {
-                                                    e.currentTarget.style.border = "1px solid #e2e8f0";
-                                                    e.currentTarget.style.background = "#f8fafc";
+                                                    e.currentTarget.style.border = "1px solid rgba(255,255,255,0.1)";
+                                                    e.currentTarget.style.background = "#002A5C";
                                                     e.currentTarget.style.boxShadow = "none";
                                                 }}
                                             >
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100 group-focus-within:border-[#1a3884]/30 transition-all">
-                                                    <Lock className="w-3.5 h-3.5 text-[#1a3884]" />
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white/5 shadow-sm border border-white/10 group-focus-within:border-[#1a3884]/30 transition-all">
+                                                    <Lock className="w-3.5 h-3.5 text-blue-400" />
                                                 </div>
                                                 <input
                                                     type={showConfirmPassword ? "text" : "password"}
                                                     value={confirmPassword}
                                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-gray-400 text-[#112b6b]"
+                                                    className="flex-1 bg-transparent outline-none text-[13px] sm:text-sm font-semibold placeholder:font-normal placeholder:text-slate-500 text-white"
                                                     placeholder="Confirm new password"
                                                 />
                                                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="shrink-0 transition-colors text-gray-400 hover:text-[#1a3884] p-1">
@@ -572,7 +572,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 py-4 border-y border-gray-100 mt-2">
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 py-4 border-y border-white/5 mt-2">
                                             <RequirementItem label="Min 8 characters" met={passwordChecks.length} />
                                             <RequirementItem label="At least 1 number" met={passwordChecks.number} />
                                             <RequirementItem label="Uppercase letter" met={passwordChecks.uppercase} />
@@ -582,7 +582,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                         <Button
                                             type="submit"
                                             disabled={isLoading || !Object.values(passwordChecks).every(Boolean)}
-                                            className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-[#112b6b]/20 mt-6 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
+                                            className="w-full h-12 rounded-xl text-sm font-bold shadow-lg shadow-black/20 mt-6 text-white transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden"
                                             style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
                                         >
                                             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Reset Password"}
@@ -597,17 +597,17 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="text-center py-4"
                                 >
-                                    <div className="w-20 h-20 bg-[#1a3884]/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#1a3884]/10 shadow-sm relative">
-                                        <div className="absolute inset-0 bg-[#1a3884]/10 rounded-full animate-ping opacity-20" />
-                                        <CheckCircle className="w-10 h-10 text-[#1a3884] relative z-10" />
+                                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10 shadow-sm relative">
+                                        <div className="absolute inset-0 bg-[#1a3884]/20 rounded-full animate-ping opacity-20" />
+                                        <CheckCircle className="w-10 h-10 text-blue-400 relative z-10" />
                                     </div>
-                                    <h3 className="text-[20px] font-extrabold text-[#112b6b] mb-2">Reset Successful</h3>
-                                    <p className="text-[13px] text-gray-500 mb-8 px-4 leading-relaxed">
+                                    <h3 className="text-[20px] font-extrabold text-white mb-2">Reset Successful</h3>
+                                    <p className="text-[13px] text-slate-400 mb-8 px-4 leading-relaxed">
                                         Your security credentials have been updated. You can now access your account with the new password.
                                     </p>
                                     <Button
                                         onClick={onClose}
-                                        className="w-full h-12 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[#112b6b]/20 text-white hover:-translate-y-1 active:translate-y-0"
+                                        className="w-full h-12 rounded-xl text-sm font-bold transition-all shadow-lg shadow-black/20 text-white hover:-translate-y-1 active:translate-y-0"
                                         style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
                                     >
                                         Return to Login
@@ -624,12 +624,11 @@ const ForgotPasswordModal = ({ isOpen, onClose }) => {
 
 const RequirementItem = ({ label, met }) => (
     <div className="flex items-center gap-1.5">
-      <div className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${met ? 'bg-[#002147]' : 'bg-gray-100 border border-gray-200'}`}>
-        <CheckCircle2 className={`w-3 h-3 ${met ? 'text-white' : 'text-gray-300'}`} />
+      <div className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${met ? 'bg-[#1a3884]' : 'bg-white/5 border border-white/10'}`}>
+        <CheckCircle2 className={`w-3 h-3 ${met ? 'text-white' : 'text-slate-500'}`} />
       </div>
-      <span className={`text-[11px] ${met ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>{label}</span>
+      <span className={`text-[11px] ${met ? 'text-white font-medium' : 'text-slate-400'}`}>{label}</span>
     </div>
   );
 
 export default ForgotPasswordModal;
-

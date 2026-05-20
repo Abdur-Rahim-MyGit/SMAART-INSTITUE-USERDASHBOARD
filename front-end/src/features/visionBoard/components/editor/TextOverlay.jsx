@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Move, RotateCw } from "lucide-react";
+import { Move, RotateCw, Trash2 } from "lucide-react";
 import { TEXT_EFFECTS } from "../../utils/constants";
 
 const TextOverlay = ({
@@ -13,6 +13,7 @@ const TextOverlay = ({
   overlayType,
   overlayId,
   onGuideChange,
+  onDelete,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -247,18 +248,29 @@ const TextOverlay = ({
       >
         {isSelected && (
           <>
-            <div className="absolute -top-8 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-slate-900/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white shadow-lg backdrop-blur-md">
+            <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-[#0f172a]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl border border-white/10">
               <Move className="h-3 w-3" />
               {overlay.locked ? "Locked Text" : "Drag Text"}
             </div>
             <button
               type="button"
-              className="absolute -bottom-3 -right-3 flex h-8 w-8 items-center justify-center rounded-full border border-white/70 bg-[#1a3884] text-white shadow-lg"
+              className="absolute -bottom-3 -right-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-[#1a3884] text-white shadow-xl transition-all hover:scale-110 active:scale-95"
               onMouseDown={handleTransformStart}
               onTouchStart={handleTransformStart}
               title="Resize and rotate"
             >
               <RotateCw className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              className="absolute -bottom-3 -left-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/20 bg-red-600 text-white shadow-xl transition-all hover:scale-110 active:scale-95"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.();
+              }}
+              title="Delete text"
+            >
+              <Trash2 className="h-4 w-4" />
             </button>
           </>
         )}

@@ -336,21 +336,38 @@ const NoticesFeed = ({ currentUser }) => {
                   {ann.description}
                 </p>
 
-                {/* ── Attachment link ───────────────────────────────────── */}
+                {/* ── Attachment link/preview ───────────────────────────────────── */}
                 {ann.attachmentUrl && (
                   <div className="flex mb-6">
-                    <a
-                      href={ann.attachmentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-gray-50 dark:bg-slate-700 hover:bg-[#002147] dark:hover:bg-blue-600 text-[#002147] dark:text-white hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 dark:border-slate-600 hover:border-[#002147] dark:hover:border-blue-600 shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
-                    >
-                      {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> :
-                        ann.attachmentType === 'image' ? <ImageIcon className="w-4 h-4" /> :
+                    {ann.attachmentType === 'video' || ann.attachmentUrl.match(/\.(mp4|webm|ogg)$/i) ? (
+                      <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-slate-700 w-full max-w-2xl bg-black">
+                        <video 
+                          src={ann.attachmentUrl} 
+                          controls
+                          className="w-full h-auto max-h-[400px]" 
+                        />
+                      </div>
+                    ) : ann.attachmentType === 'image' || ann.attachmentUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
+                      <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-slate-700 w-full max-w-2xl bg-gray-50 dark:bg-slate-800">
+                        <img 
+                          src={ann.attachmentUrl} 
+                          alt="Announcement Attachment" 
+                          className="w-full h-auto object-cover max-h-[400px]" 
+                        />
+                      </div>
+                    ) : (
+                      <a
+                        href={ann.attachmentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-gray-50 dark:bg-slate-700 hover:bg-[#002147] dark:hover:bg-blue-600 text-[#002147] dark:text-white hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 dark:border-slate-600 hover:border-[#002147] dark:hover:border-blue-600 shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
+                      >
+                        {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> :
                           <LinkIcon className="w-4 h-4" />}
-                      View Attachment
-                      <ArrowUpRight className="w-3.5 h-3.5 opacity-50 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all" />
-                    </a>
+                        View Attachment
+                        <ArrowUpRight className="w-3.5 h-3.5 opacity-50 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all" />
+                      </a>
+                    )}
                   </div>
                 )}
 
