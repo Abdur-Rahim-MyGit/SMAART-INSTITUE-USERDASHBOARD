@@ -50,6 +50,12 @@ const Performance = lazy(() => import('@/pages/Performance'));
 const SkillsVault = lazy(() => import('@/pages/SkillsVault'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
 
+// Career Agent (Integrated from Career-Agent standalone system)
+const CareerAgentEntry = lazy(() => import('@/pages/CareerAgent/CareerAgentEntry'));
+const CareerAgentOnboarding = lazy(() => import('@/pages/CareerAgent/CareerAgentOnboarding'));
+const CareerAgentDashboard = lazy(() => import('@/pages/CareerAgent/CareerAgentDashboard'));
+
+
 // AI Career Coach pages
 const ProfileAnalysis = lazy(() => import('@/pages/AICareerCoach/ProfileAnalysis'));
 const ResumeBuilder = lazy(() => import('@/pages/AICareerCoach/ResumeBuilder'));
@@ -188,6 +194,11 @@ const AnimatedRoutes = () => {
 
                         {/* Career Data Fetcher */}
                         <Route path="/dashboard/career-data-fetcher" element={<CareerDataFetcher />} />
+
+                        {/* Career Agent — Integrated from Career-Agent system */}
+                        <Route path="/dashboard/career-agent" element={<CareerAgentEntry />} />
+                        <Route path="/dashboard/career-agent/onboarding" element={<CareerAgentOnboarding />} />
+                        <Route path="/dashboard/career-agent/dashboard" element={<CareerAgentDashboard />} />
                     </Route>
                     <Route path="/assessment/:stage" element={<BaseLineTest />} />
                     <Route path="/assessment/:stage/report" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />

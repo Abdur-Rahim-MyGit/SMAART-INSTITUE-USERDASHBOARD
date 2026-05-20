@@ -876,7 +876,7 @@ const ComprehensiveSignup = () => {
                           placeholder="Search or enter your preferred role"
                         />
                         {activeSearchIndex === index && roleSuggestions.length > 0 && (
-                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-[#002A5C] border border-white/10 rounded-2xl shadow-2xl max-h-60 overflow-y-auto no-scrollbar ring-1 ring-black/5">
+                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-[#002A5C] border border-white/10 rounded-2xl shadow-2xl max-h-[50vh] overflow-y-auto overscroll-contain no-scrollbar ring-1 ring-black/5">
                             <div className="p-2 border-b border-white/5 bg-white/5 text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-3">
                               SMAART Role Suggestions
                             </div>

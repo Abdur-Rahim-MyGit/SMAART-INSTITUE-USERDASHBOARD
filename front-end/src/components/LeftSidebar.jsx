@@ -75,7 +75,7 @@ const menuGroups = [
     title: "sidebar.group_skills",
     items: [
       { icon: Award, label: "sidebar.skills_vault", path: "/dashboard/skills-vault", badge: null },
-      { icon: Compass, label: "sidebar.career_directions", path: "/dashboard/career-data-fetcher", badge: null },
+      { icon: Compass, label: "sidebar.career_directions", path: "/dashboard/career-agent", badge: null },
       { icon: ShieldCheck, label: "sidebar.skills_passport", path: "/dashboard/skills-passport", badge: null },
       { icon: Lightbulb, label: "sidebar.vision_board", path: "/dashboard/vision-boards", badge: null },
     ]
@@ -379,7 +379,9 @@ const LeftSidebar = () => {
                             </button>
                           ) : (
                             <Link
-                              to={item.path}
+                              to={item.path === '/dashboard/career-agent' 
+                                ? (localStorage.getItem('smaart_analysis_id') ? '/dashboard/career-agent/dashboard' : '/dashboard/career-agent/onboarding')
+                                : item.path}
                               onClick={() => setIsMobileOpen(false)}
                               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
                                 ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/25'
@@ -529,7 +531,9 @@ const LeftSidebar = () => {
                   ) : (
                     <Link
                       key={item.path}
-                      to={item.path}
+                      to={item.path === '/dashboard/career-agent' 
+                        ? (localStorage.getItem('smaart_analysis_id') ? '/dashboard/career-agent/dashboard' : '/dashboard/career-agent/onboarding')
+                        : item.path}
                       className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${active
                         ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/25'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'

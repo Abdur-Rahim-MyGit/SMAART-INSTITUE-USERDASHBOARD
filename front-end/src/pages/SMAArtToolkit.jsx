@@ -1,14 +1,29 @@
 import { motion } from "framer-motion";
-import { BookOpen, BookText, ArrowRight, FileText, Sparkles, Info, StickyNote } from "lucide-react";
+import { BookOpen, BookText, ArrowRight, FileText, Sparkles, Info, StickyNote, Compass, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+
 const toolkitHighlights = [
-  { label: "Curated tools", value: "04" },
-  { label: "AI-supported", value: "02" },
+  { label: "Curated tools", value: "05" },
+  { label: "AI-supported", value: "03" },
   { label: "Instant access", value: "24/7" },
 ];
 
+
 const toolkitSections = [
+  {
+    id: 8,
+    title: "Career Agent",
+    description:
+      "AI-powered career intelligence engine. Get matched to ideal career directions based on your degree, skills, and ambitions. Explore role analysis, market insights, skill gaps, certifications, and a personalized roadmap — all in one place.",
+    icon: Compass,
+    path: "/dashboard/career-agent",
+    color: "#1a3884",
+    badge: "AI Powered",
+    cta: "Launch Career Agent",
+    meta: "Career Intelligence",
+    detail: "Role analysis · skill gap · roadmap · certifications",
+  },
   {
     id: 3,
     title: "SMAART AI Resume Builder",
@@ -75,8 +90,15 @@ const ToolkitCard = ({ section, index }) => {
       whileHover={{ y: -4 }}
       className="group"
     >
-      <div
-        onClick={() => navigate(section.path)}
+    <div
+        onClick={() => {
+          if (section.path === '/dashboard/career-agent') {
+            const path = localStorage.getItem('smaart_analysis_id') ? '/dashboard/career-agent/dashboard' : '/dashboard/career-agent/onboarding';
+            navigate(path);
+          } else {
+            navigate(section.path);
+          }
+        }}
         className="relative h-full cursor-pointer overflow-hidden rounded-[24px] border border-slate-200/80 bg-white/95 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.24)] transition-all duration-300 hover:border-slate-300 hover:shadow-[0_24px_50px_-30px_rgba(26,56,132,0.22)] dark:border-slate-700/50 dark:bg-slate-800/60 dark:hover:border-slate-600"
       >
         <div className="h-1 bg-[#1a3884] dark:bg-blue-600" />

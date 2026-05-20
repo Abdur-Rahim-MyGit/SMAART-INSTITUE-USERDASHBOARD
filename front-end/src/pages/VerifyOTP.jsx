@@ -200,14 +200,23 @@ const VerifyOTP = () => {
             <Input
               id="otp"
               type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
               placeholder="000000"
               value={otp}
               onChange={(e) => {
                 const value = e.target.value.replace(/\D/g, "").slice(0, 6);
                 setOtp(value);
+                // Auto-submit when 6 digits entered
+                if (value.length === 6 && timeLeft > 0) {
+                  setTimeout(() => {
+                    document.getElementById('otp-submit-btn')?.click();
+                  }, 100);
+                }
               }}
               maxLength="6"
               className="bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 text-center text-xl sm:text-2xl tracking-[0.5em] font-mono h-14 sm:h-16 rounded-xl focus:border-[#002147] focus:ring-4 focus:ring-[#002147]/10 focus:bg-white outline-none transition-all shadow-sm"
+              aria-describedby="otp-timer otp-label"
               required
             />
           </motion.div>
@@ -233,6 +242,7 @@ const VerifyOTP = () => {
             transition={{ delay: 0.5 }}
           >
             <Button
+              id="otp-submit-btn"
               type="submit"
               disabled={isLoading || timeLeft === 0}
               className="w-full h-12 sm:h-14 rounded-xl text-sm sm:text-base font-bold shadow-[0_8px_24px_rgba(0,33,71,0.2)] mt-2 text-white transition-all hover:-translate-y-0.5 relative overflow-hidden group"

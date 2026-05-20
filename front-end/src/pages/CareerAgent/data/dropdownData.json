@@ -1,0 +1,1956 @@
+{
+  "education": {
+    "Undergraduate (UG)": {
+      "Arts & Humanities": {
+        "Bachelor of Arts": [
+          "English",
+          "Hindi",
+          "History",
+          "Philosophy",
+          "Political Science",
+          "Sociology",
+          "Psychology",
+          "Economics",
+          "Geography",
+          "Sanskrit",
+          "Urdu",
+          "Music",
+          "Drama"
+        ],
+        "Bachelor of Fine Arts": [
+          "Painting",
+          "Sculpture",
+          "Applied Arts",
+          "Printmaking",
+          "Photography",
+          "Animation"
+        ],
+        "Bachelor of Performing Arts": [
+          "Music",
+          "Dance",
+          "Theatre",
+          "Drama"
+        ]
+      },
+      "Science": {
+        "Bachelor of Science": [
+          "Physics",
+          "Chemistry",
+          "Biology",
+          "Mathematics",
+          "Statistics",
+          "Microbiology",
+          "Biotechnology",
+          "Biochemistry",
+          "Computer Science",
+          "Electronics",
+          "Environmental Science",
+          "Zoology",
+          "Botany",
+          "Forensic Science"
+        ]
+      },
+      "Commerce & Management": {
+        "Bachelor of Commerce": [
+          "General",
+          "Accounting & Finance",
+          "Banking & Insurance",
+          "Computer Applications",
+          "Taxation",
+          "E-Commerce"
+        ],
+        "Bachelor of Business Administration": [
+          "Marketing",
+          "Finance",
+          "HR",
+          "International Business",
+          "Retail",
+          "Operations",
+          "Entrepreneurship",
+          "Digital Business"
+        ]
+      },
+      "Engineering & Technology": {
+        "Bachelor of Technology": [
+          "Computer Science",
+          "IT",
+          "Electronics & Communication",
+          "Electrical",
+          "Mechanical",
+          "Civil",
+          "Chemical",
+          "Aerospace",
+          "Automobile",
+          "Biotechnology",
+          "Petroleum",
+          "Marine",
+          "Metallurgy",
+          "Mining",
+          "Industrial"
+        ],
+        "Bachelor of Engineering": [
+          "Computer Science",
+          "Electronics",
+          "Electrical",
+          "Mechanical",
+          "Civil",
+          "Chemical",
+          "Instrumentation",
+          "Production"
+        ],
+        "Diploma in Engineering (Polytechnic)": [
+          "Civil",
+          "Mechanical",
+          "Electrical",
+          "Electronics",
+          "Computer",
+          "Automobile",
+          "Chemical",
+          "Textile"
+        ]
+      },
+      "Computer Science & IT": {
+        "Bachelor of Computer Applications": [
+          "General",
+          "Data Science",
+          "Cyber Security",
+          "Cloud Computing",
+          "AI & ML"
+        ]
+      },
+      "Medicine & Health Sciences": {
+        "Bachelor of Medicine & Bachelor of Surgery": [
+          "General Medicine (specialisation at PG level)"
+        ],
+        "Bachelor of Dental Surgery": [
+          "General Dentistry (specialisation at PG level)"
+        ],
+        "Bachelor of Ayurvedic Medicine & Surgery": [
+          "Ayurveda",
+          "Panchakarma",
+          "Kaumarbhritya"
+        ],
+        "Bachelor of Homeopathic Medicine & Surgery": [
+          "Homeopathy"
+        ],
+        "Bachelor of Unani Medicine & Surgery": [
+          "Unani Medicine"
+        ],
+        "Bachelor of Siddha Medicine & Surgery": [
+          "Siddha Medicine"
+        ],
+        "Bachelor of Naturopathy & Yogic Sciences": [
+          "Naturopathy",
+          "Yoga Therapy"
+        ],
+        "Bachelor of Physiotherapy": [
+          "Orthopaedics",
+          "Neuro",
+          "Sports",
+          "Cardiopulmonary",
+          "Paediatrics"
+        ],
+        "Bachelor of Occupational Therapy": [
+          "Paediatrics",
+          "Neuro",
+          "Orthopaedics",
+          "Psychiatry"
+        ],
+        "B.Sc. Nursing": [
+          "General Nursing",
+          "Midwifery",
+          "Community Health",
+          "Paediatric Nursing"
+        ]
+      },
+      "Pharmacy": {
+        "Bachelor of Pharmacy": [
+          "General Pharmacy",
+          "Pharmaceutical Sciences",
+          "Industrial Pharmacy"
+        ]
+      },
+      "Law": {
+        "Bachelor of Laws": [
+          "General Law",
+          "Corporate Law",
+          "Criminal Law",
+          "Constitutional Law",
+          "IPR"
+        ]
+      },
+      "Education": {
+        "Bachelor of Education": [
+          "Primary Education",
+          "Secondary Education",
+          "Special Education",
+          "Languages",
+          "Science",
+          "Social Studies"
+        ],
+        "Bachelor of Physical Education": [
+          "Physical Education",
+          "Sports Science",
+          "Yoga"
+        ],
+        "Diploma in Elementary Education": [
+          "Primary & Elementary Teaching"
+        ]
+      },
+      "Architecture & Planning": {
+        "Bachelor of Architecture": [
+          "Architecture",
+          "Sustainable Design",
+          "Urban Design",
+          "Interior Architecture"
+        ]
+      },
+      "Design": {
+        "Bachelor of Design": [
+          "Product Design",
+          "Fashion Design",
+          "Graphic Design",
+          "UX/UI Design",
+          "Interior Design",
+          "Animation",
+          "Textile Design",
+          "Jewellery Design"
+        ]
+      },
+      "Agriculture & Allied Sciences": {
+        "Bachelor of Science in Agriculture": [
+          "Agronomy",
+          "Horticulture",
+          "Soil Science",
+          "Plant Pathology",
+          "Agricultural Economics",
+          "Plant Breeding"
+        ],
+        "Bachelor of Veterinary Science & AH": [
+          "Veterinary Medicine",
+          "Animal Husbandry",
+          "Livestock Production"
+        ],
+        "Bachelor of Fishery Science": [
+          "Aquaculture",
+          "Marine Fisheries",
+          "Fisheries Management"
+        ]
+      },
+      "Hotel Management & Tourism": {
+        "Bachelor of Hotel Management": [
+          "Food & Beverage",
+          "Front Office",
+          "Housekeeping",
+          "Culinary Arts",
+          "Event Management"
+        ],
+        "Bachelor of Science in Hospitality": [
+          "Hotel Operations",
+          "Food Service",
+          "Tourism Management"
+        ]
+      },
+      "Journalism & Mass Communication": {
+        "Bachelor of Journalism & Mass Communication": [
+          "Print Journalism",
+          "Broadcast",
+          "Digital Media",
+          "Advertising",
+          "Public Relations",
+          "Film Studies"
+        ]
+      },
+      "Social Work": {
+        "Bachelor of Social Work": [
+          "Community Development",
+          "Family & Child Welfare",
+          "Medical Social Work",
+          "Rural Development"
+        ]
+      },
+      "Library Science": {
+        "Bachelor of Library & Information Science": [
+          "Library Management",
+          "Information Services",
+          "Digital Library"
+        ]
+      },
+      "Vocational": {
+        "Bachelor of Vocation": [
+          "Software Development",
+          "Retail Management",
+          "Healthcare",
+          "Tourism",
+          "Media",
+          "Automotive Technology",
+          "Beauty & Wellness"
+        ]
+      }
+    },
+    "Postgraduate (PG)": {
+      "Arts & Humanities": {
+        "Master of Arts": [
+          "English",
+          "Hindi",
+          "History",
+          "Philosophy",
+          "Political Science",
+          "Sociology",
+          "Psychology",
+          "Economics",
+          "Geography",
+          "Sanskrit",
+          "Linguistics",
+          "Archaeology",
+          "Public Administration"
+        ],
+        "Master of Fine Arts": [
+          "Painting",
+          "Sculpture",
+          "Applied Arts",
+          "Digital Arts",
+          "Photography",
+          "Printmaking"
+        ]
+      },
+      "Science": {
+        "Master of Science": [
+          "Physics",
+          "Chemistry",
+          "Biology",
+          "Mathematics",
+          "Statistics",
+          "Microbiology",
+          "Biotechnology",
+          "Biochemistry",
+          "Environmental Science",
+          "Zoology",
+          "Botany",
+          "Forensic Science",
+          "Bioinformatics"
+        ]
+      },
+      "Commerce & Management": {
+        "Master of Commerce": [
+          "Accounting",
+          "Finance",
+          "Taxation",
+          "Business Studies",
+          "E-Commerce",
+          "Banking"
+        ],
+        "Master of Business Administration": [
+          "Marketing",
+          "Finance",
+          "HR",
+          "Operations",
+          "Strategy",
+          "International Business",
+          "Analytics",
+          "Healthcare Mgmt",
+          "IT",
+          "Agri-Business",
+          "Supply Chain",
+          "Entrepreneurship"
+        ],
+        "Post Graduate Diploma in Management": [
+          "Marketing",
+          "Finance",
+          "HR",
+          "Operations",
+          "Business Analytics",
+          "Rural Management"
+        ]
+      },
+      "Engineering & Technology": {
+        "Master of Technology": [
+          "VLSI",
+          "Embedded Systems",
+          "AI/ML",
+          "Structural Engineering",
+          "Power Systems",
+          "Thermal Engineering",
+          "CAD/CAM",
+          "Environmental Engg",
+          "Robotics",
+          "Nanotechnology"
+        ],
+        "Master of Engineering": [
+          "Computer Science",
+          "Electronics",
+          "Mechanical",
+          "Civil",
+          "Chemical",
+          "Industrial Engineering"
+        ]
+      },
+      "Computer Science & IT": {
+        "Master of Computer Applications": [
+          "Software Engineering",
+          "Networking",
+          "AI",
+          "Cyber Security",
+          "Data Science",
+          "Cloud Computing"
+        ],
+        "Master of Science (CS/IT)": [
+          "Artificial Intelligence",
+          "Data Science",
+          "Cyber Security",
+          "Software Engineering",
+          "Networking",
+          "IoT"
+        ]
+      },
+      "Medicine & Health Sciences": {
+        "Doctor of Medicine": [
+          "General Medicine",
+          "Paediatrics",
+          "Dermatology",
+          "Psychiatry",
+          "Radiology",
+          "Pathology",
+          "Microbiology",
+          "Pharmacology",
+          "Anaesthesia",
+          "Community Medicine"
+        ],
+        "Master of Surgery": [
+          "General Surgery",
+          "Orthopaedics",
+          "ENT",
+          "Ophthalmology",
+          "Obstetrics & Gynaecology"
+        ],
+        "Master of Dental Surgery": [
+          "Orthodontics",
+          "Oral Surgery",
+          "Prosthodontics",
+          "Periodontics",
+          "Endodontics",
+          "Oral Medicine"
+        ],
+        "Doctorate of Medicine — Super Specialty": [
+          "Cardiology",
+          "Neurology",
+          "Nephrology",
+          "Gastroenterology",
+          "Endocrinology",
+          "Oncology",
+          "Haematology"
+        ],
+        "Magister Chirurgiae — Super Specialty": [
+          "Neurosurgery",
+          "Plastic Surgery",
+          "Cardiothoracic Surgery",
+          "Urology",
+          "Paediatric Surgery",
+          "Surgical Oncology"
+        ],
+        "Master of Public Health": [
+          "Epidemiology",
+          "Health Policy",
+          "Biostatistics",
+          "Environmental Health",
+          "Global Health"
+        ],
+        "Master of Hospital Administration": [
+          "Hospital Management",
+          "Healthcare Administration",
+          "Health Informatics"
+        ],
+        "Master of Science in Nursing": [
+          "Medical-Surgical",
+          "Paediatrics",
+          "OBG",
+          "Community Health",
+          "Psychiatry"
+        ]
+      },
+      "Pharmacy": {
+        "Master of Pharmacy": [
+          "Pharmaceutics",
+          "Pharmacology",
+          "Pharmaceutical Chemistry",
+          "Quality Assurance",
+          "Drug Regulatory Affairs",
+          "Clinical Pharmacy"
+        ],
+        "Doctor of Pharmacy": [
+          "Clinical Pharmacy",
+          "Hospital Pharmacy",
+          "Community Pharmacy"
+        ]
+      },
+      "Law": {
+        "Master of Laws": [
+          "Corporate Law",
+          "Constitutional Law",
+          "International Law",
+          "Criminal Law",
+          "Human Rights",
+          "IPR",
+          "Taxation",
+          "Environmental Law"
+        ]
+      },
+      "Education": {
+        "Master of Education": [
+          "Educational Administration",
+          "Curriculum & Instruction",
+          "Special Education",
+          "Guidance & Counselling",
+          "Educational Psychology"
+        ],
+        "Master of Physical Education": [
+          "Sports Management",
+          "Coaching Science",
+          "Exercise Physiology",
+          "Sports Psychology"
+        ]
+      },
+      "Architecture & Planning": {
+        "Master of Architecture": [
+          "Urban Design",
+          "Landscape Architecture",
+          "Interior Architecture",
+          "Sustainable Architecture",
+          "Conservation"
+        ],
+        "Master of Urban & Regional Planning": [
+          "Urban Planning",
+          "Regional Planning",
+          "Town Planning",
+          "Transportation Planning"
+        ]
+      },
+      "Design": {
+        "Master of Design": [
+          "Industrial Design",
+          "Communication Design",
+          "Interaction Design",
+          "Fashion Design",
+          "Textile Design",
+          "Automotive Design"
+        ]
+      },
+      "Agriculture & Allied Sciences": {
+        "Master of Science in Agriculture": [
+          "Agronomy",
+          "Plant Breeding & Genetics",
+          "Soil Science",
+          "Agricultural Economics",
+          "Entomology",
+          "Plant Pathology"
+        ],
+        "Master of Veterinary Science": [
+          "Animal Medicine",
+          "Surgery",
+          "Pathology",
+          "Microbiology",
+          "Animal Genetics",
+          "Poultry Science"
+        ],
+        "Master of Fishery Science": [
+          "Aquaculture",
+          "Marine Fisheries",
+          "Fish Processing Technology",
+          "Fisheries Resource Management"
+        ]
+      },
+      "Hotel Management & Tourism": {
+        "Master of Tourism Administration": [
+          "Tourism Management",
+          "Eco-Tourism",
+          "Heritage Tourism",
+          "Hospitality Management"
+        ]
+      },
+      "Journalism & Mass Communication": {
+        "Master of Journalism & Mass Communication": [
+          "Broadcast Journalism",
+          "Digital Media",
+          "Advertising & PR",
+          "Corporate Communication",
+          "Documentary"
+        ]
+      },
+      "Social Work": {
+        "Master of Social Work": [
+          "Community Organisation",
+          "Medical Social Work",
+          "HR Management",
+          "Criminology & Correctional Administration",
+          "Family & Child Welfare"
+        ]
+      },
+      "Library Science": {
+        "Master of Library & Information Science": [
+          "Digital Libraries",
+          "Knowledge Management",
+          "Information Retrieval",
+          "Archival Studies"
+        ]
+      },
+      "Defence & Military Studies": {
+        "Master of Science in Defence Studies": [
+          "Defence & Strategic Studies",
+          "Military Science",
+          "National Security"
+        ]
+      }
+    },
+    "Doctoral (PhD-Research)": {
+      "Arts & Humanities": {
+        "Doctor of Philosophy": [
+          "English",
+          "Hindi",
+          "History",
+          "Philosophy",
+          "Political Science",
+          "Sociology",
+          "Psychology",
+          "Economics",
+          "Geography",
+          "Sanskrit",
+          "Linguistics",
+          "Music",
+          "Fine Arts",
+          "Theatre"
+        ],
+        "Doctor of Literature": [
+          "Languages",
+          "Literature",
+          "Humanities — awarded for published works of exceptional merit"
+        ]
+      },
+      "Science": {
+        "Doctor of Philosophy": [
+          "Physics",
+          "Chemistry",
+          "Biology",
+          "Mathematics",
+          "Statistics",
+          "Microbiology",
+          "Biotechnology",
+          "Biochemistry",
+          "Environmental Science",
+          "Zoology",
+          "Botany",
+          "Forensic Science"
+        ],
+        "Doctor of Science": [
+          "Physics",
+          "Chemistry",
+          "Biology",
+          "Mathematics — awarded for outstanding contribution to science"
+        ]
+      },
+      "Commerce & Management": {
+        "Doctor of Philosophy": [
+          "Management",
+          "Commerce",
+          "Business Administration",
+          "Finance",
+          "Marketing",
+          "HR",
+          "Operations"
+        ]
+      },
+      "Engineering & Technology": {
+        "Doctor of Philosophy": [
+          "Computer Science",
+          "Electronics",
+          "Electrical",
+          "Mechanical",
+          "Civil",
+          "Chemical",
+          "Aerospace",
+          "Biotechnology",
+          "Metallurgy",
+          "Mining",
+          "Environmental Engg"
+        ]
+      },
+      "Computer Science & IT": {
+        "Doctor of Philosophy": [
+          "Artificial Intelligence",
+          "Machine Learning",
+          "Data Science",
+          "Cyber Security",
+          "Computer Networks",
+          "Software Engineering",
+          "Human-Computer Interaction"
+        ]
+      },
+      "Medicine & Health Sciences": {
+        "Doctor of Philosophy": [
+          "Physiology",
+          "Biochemistry",
+          "Pharmacology",
+          "Anatomy",
+          "Microbiology",
+          "Pathology",
+          "Community Medicine",
+          "Biomedical Science"
+        ],
+        "Doctor of Medicine (Research)": [
+          "Basic Medical Sciences — awarded for original research contributions"
+        ]
+      },
+      "Pharmacy": {
+        "Doctor of Philosophy": [
+          "Pharmaceutical Sciences",
+          "Pharmacology",
+          "Pharmaceutics",
+          "Pharmaceutical Chemistry",
+          "Drug Design"
+        ]
+      },
+      "Law": {
+        "Doctor of Philosophy": [
+          "Constitutional Law",
+          "Criminal Law",
+          "International Law",
+          "Corporate Law",
+          "Human Rights",
+          "Environmental Law"
+        ],
+        "Doctor of Laws": [
+          "Jurisprudence",
+          "Law — awarded for outstanding scholarly contribution to legal field"
+        ]
+      },
+      "Education": {
+        "Doctor of Philosophy": [
+          "Educational Psychology",
+          "Curriculum Studies",
+          "Special Education",
+          "Educational Administration",
+          "Pedagogy"
+        ]
+      },
+      "Architecture & Planning": {
+        "Doctor of Philosophy": [
+          "Architecture",
+          "Urban Studies",
+          "Landscape Architecture",
+          "Built Environment",
+          "Conservation"
+        ]
+      },
+      "Design": {
+        "Doctor of Philosophy": [
+          "Design Studies",
+          "Applied Arts",
+          "Fashion",
+          "Product Design",
+          "Communication Design"
+        ]
+      },
+      "Agriculture & Allied Sciences": {
+        "Doctor of Philosophy": [
+          "Agronomy",
+          "Plant Breeding",
+          "Soil Science",
+          "Entomology",
+          "Agricultural Economics",
+          "Horticulture",
+          "Plant Pathology"
+        ],
+        "Doctor of Veterinary Medicine": [
+          "Veterinary Pathology",
+          "Pharmacology",
+          "Microbiology",
+          "Animal Genetics",
+          "Animal Reproduction"
+        ]
+      },
+      "Hotel Management & Tourism": {
+        "Doctor of Philosophy": [
+          "Tourism Management",
+          "Hospitality",
+          "Culinary Arts"
+        ]
+      },
+      "Journalism & Mass Communication": {
+        "Doctor of Philosophy": [
+          "Mass Communication",
+          "Media Studies",
+          "Journalism",
+          "Film Studies",
+          "Communication Research"
+        ]
+      },
+      "Social Work": {
+        "Doctor of Philosophy": [
+          "Social Work",
+          "Social Policy",
+          "Community Development",
+          "Social Welfare"
+        ]
+      },
+      "Library Science": {
+        "Doctor of Philosophy": [
+          "Library Science",
+          "Information Science",
+          "Knowledge Management",
+          "Digital Libraries"
+        ]
+      },
+      "Interdisciplinary / Others": {
+        "Doctor of Philosophy": [
+          "Gender Studies",
+          "Cultural Studies",
+          "Development Studies",
+          "Cognitive Science",
+          "Bioinformatics",
+          "Computational Biology",
+          "Defence Studies",
+          "Yoga & Naturopathy"
+        ]
+      }
+    },
+    "Professional-Integrated": {
+      "Commerce & Finance": {
+        "Chartered Accountancy": [
+          "Accounting",
+          "Auditing",
+          "Taxation",
+          "Financial Management",
+          "Corporate Finance"
+        ],
+        "Company Secretary": [
+          "Corporate Law",
+          "Governance",
+          "Compliance",
+          "Secretarial Practice"
+        ],
+        "Cost & Management Accountancy": [
+          "Cost Accounting",
+          "Financial Management",
+          "Management Accounting"
+        ]
+      },
+      "Engineering & Technology": {
+        "Integrated B.Tech + M.Tech": [
+          "Computer Science",
+          "Electronics",
+          "Mechanical",
+          "Chemical",
+          "Aerospace"
+        ]
+      },
+      "Science": {
+        "Integrated M.Sc.": [
+          "Physics",
+          "Chemistry",
+          "Mathematics",
+          "Biology",
+          "Economics",
+          "Statistics"
+        ]
+      },
+      "Law": {
+        "Integrated Law Degree": [
+          "Corporate Law",
+          "Constitutional Law",
+          "International Law",
+          "Criminal Law",
+          "IPR",
+          "Cyber Law"
+        ]
+      },
+      "Medicine": {
+        "Doctor of Pharmacy": [
+          "Clinical Pharmacy",
+          "Hospital Pharmacy",
+          "Community Pharmacy",
+          "Drug Information"
+        ],
+        "Bachelor of Veterinary Science": [
+          "Veterinary Medicine",
+          "Animal Husbandry",
+          "Poultry Science",
+          "Livestock Production"
+        ]
+      },
+      "Architecture": {
+        "Bachelor of Architecture": [
+          "Architecture",
+          "Urban Design",
+          "Interior Architecture",
+          "Sustainable Design"
+        ]
+      },
+      "Vocational": {
+        "Advanced Diploma Programs": [
+          "IT",
+          "Graphic Design",
+          "Event Management",
+          "Fashion & Styling",
+          "Beauty & Wellness",
+          "Film Production"
+        ],
+        "Post Graduate Diploma": [
+          "Computer Applications",
+          "Journalism",
+          "Business Management",
+          "Hospital Administration",
+          "Nutrition"
+        ]
+      },
+      "Defence": {
+        "National Defence Academy Programs": [
+          "Engineering",
+          "Sciences — Military specialisations post-commission"
+        ]
+      }
+    }
+  },
+  "jobs": {
+    "Information Technology": {
+      "Software Development": [
+        "Software Engineer",
+        "Frontend Developer",
+        "Backend Developer",
+        "Full Stack Developer",
+        "Mobile App Developer - Android",
+        "Mobile App Developer - iOS",
+        "React Native Developer",
+        "Flutter Developer",
+        "Embedded Systems Engineer",
+        "Game Developer",
+        "Blockchain Developer",
+        "AR/VR Developer",
+        "API Developer",
+        "Firmware Engineer"
+      ],
+      "Data & Analytics": [
+        "Data Analyst",
+        "Data Scientist",
+        "Data Engineer",
+        "Business Intelligence Analyst",
+        "Machine Learning Engineer",
+        "AI Research Scientist",
+        "NLP Engineer",
+        "Computer Vision Engineer",
+        "Big Data Engineer",
+        "Analytics Consultant",
+        "Quantitative Analyst",
+        "Data Architect"
+      ],
+      "Cloud & Infrastructure": [
+        "Cloud Engineer",
+        "Cloud Architect",
+        "DevOps Engineer",
+        "Site Reliability Engineer (SRE)",
+        "Systems Administrator",
+        "Network Engineer",
+        "Database Administrator (DBA)",
+        "Storage Engineer",
+        "Linux Administrator",
+        "Platform Engineer"
+      ],
+      "Cybersecurity": [
+        "Cybersecurity Analyst",
+        "Ethical Hacker / Penetration Tester",
+        "SOC Analyst",
+        "Information Security Manager",
+        "Cyber Forensics Analyst",
+        "Vulnerability Assessment Analyst",
+        "CISO - Chief Information Security Officer",
+        "GRC Analyst",
+        "Threat Intelligence Analyst"
+      ],
+      "Quality Assurance": [
+        "QA Engineer",
+        "Test Automation Engineer",
+        "Performance Test Engineer",
+        "Mobile QA Tester",
+        "QA Lead"
+      ],
+      "Product & Design": [
+        "Product Manager",
+        "UX Designer",
+        "UI Designer",
+        "UX Researcher",
+        "Interaction Designer",
+        "Product Analyst"
+      ],
+      "IT Management": [
+        "IT Project Manager",
+        "IT Manager",
+        "Chief Information Officer (CIO)",
+        "Chief Technology Officer (CTO)",
+        "Scrum Master",
+        "Agile Coach"
+      ],
+      "IT Support": [
+        "Technical Support Engineer",
+        "Help Desk Technician",
+        "IT Service Desk Analyst",
+        "Desktop Support Engineer"
+      ],
+      "IT Consulting": [
+        "IT Consultant",
+        "SAP Consultant",
+        "Salesforce Consultant",
+        "ERP Consultant",
+        "Business Analyst - IT"
+      ]
+    },
+    "BFSI": {
+      "Banking Operations": [
+        "Bank Clerk",
+        "Bank Probationary Officer (PO)",
+        "Branch Manager",
+        "Relationship Manager",
+        "Loan Officer",
+        "Credit Analyst",
+        "KYC Analyst",
+        "Trade Finance Officer",
+        "Cash Management Officer",
+        "NRI Relationship Manager"
+      ],
+      "Finance & Accounts": [
+        "Chartered Accountant (CA)",
+        "Financial Analyst",
+        "Investment Analyst",
+        "Portfolio Manager",
+        "Treasury Manager",
+        "Accounts Manager",
+        "Tax Consultant",
+        "Cost Accountant (CMA)",
+        "CFO - Chief Financial Officer",
+        "Finance Controller",
+        "Accounts Payable Executive",
+        "Accounts Receivable Executive",
+        "GST Consultant"
+      ],
+      "Capital Markets": [
+        "Equity Research Analyst",
+        "Stock Broker",
+        "Derivatives Trader",
+        "Investment Banker",
+        "Wealth Manager",
+        "Fund Manager",
+        "Mergers & Acquisitions Analyst",
+        "Private Equity Analyst",
+        "Venture Capital Analyst"
+      ],
+      "Insurance": [
+        "Insurance Agent",
+        "Underwriter",
+        "Actuary",
+        "Claims Adjuster",
+        "Insurance Sales Manager",
+        "Reinsurance Analyst",
+        "Loss Assessor"
+      ],
+      "Compliance & Risk": [
+        "Risk Analyst",
+        "Compliance Officer",
+        "AML Analyst",
+        "Internal Auditor",
+        "Credit Risk Manager",
+        "Operational Risk Analyst"
+      ],
+      "Fintech": [
+        "Fintech Product Manager",
+        "Payment Solutions Analyst",
+        "Lending Technology Analyst",
+        "Digital Banking Specialist",
+        "Blockchain Finance Analyst"
+      ]
+    },
+    "Healthcare & Pharma": {
+      "Medical Practice": [
+        "General Physician",
+        "Cardiologist",
+        "Neurologist",
+        "Oncologist",
+        "Dermatologist",
+        "Psychiatrist",
+        "Paediatrician",
+        "Gynaecologist",
+        "Orthopaedic Surgeon",
+        "Radiologist",
+        "Anaesthesiologist",
+        "Ophthalmologist",
+        "ENT Specialist",
+        "Endocrinologist",
+        "Nephrologist",
+        "Gastroenterologist",
+        "General Surgeon",
+        "Dentist",
+        "Orthodontist",
+        "Oral Surgeon",
+        "Ayurvedic Physician",
+        "Homeopathic Doctor",
+        "Unani Physician"
+      ],
+      "Nursing & Allied Health": [
+        "Registered Nurse",
+        "Physiotherapist",
+        "Occupational Therapist",
+        "Radiologist Technician",
+        "Lab Technician (DMLT)",
+        "Dietitian & Nutritionist",
+        "Speech Therapist",
+        "Optometrist",
+        "Audiologist",
+        "Medical Social Worker",
+        "Operation Theatre Technician",
+        "Dialysis Technician",
+        "ECG Technician"
+      ],
+      "Hospital Management": [
+        "Hospital Administrator",
+        "Medical Superintendent",
+        "Healthcare Quality Manager",
+        "Health Informatics Manager",
+        "Medical Records Manager",
+        "Patient Relations Manager"
+      ],
+      "Pharmaceuticals": [
+        "Pharmacist",
+        "Drug Regulatory Affairs Officer",
+        "Medical Representative (MR)",
+        "Pharmaceutical Research Scientist",
+        "Clinical Research Associate (CRA)",
+        "Quality Control Analyst - Pharma",
+        "Pharmacovigilance Analyst",
+        "Drug Safety Associate",
+        "Medical Writer"
+      ],
+      "Public Health": [
+        "Epidemiologist",
+        "Public Health Officer",
+        "Health Inspector",
+        "Community Health Worker",
+        "Biostatistician"
+      ],
+      "Mental Health": [
+        "Clinical Psychologist",
+        "Counselling Psychologist",
+        "Rehabilitation Specialist",
+        "Substance Abuse Counsellor"
+      ]
+    },
+    "Engineering & Manufacturing": {
+      "Mechanical Engineering": [
+        "Mechanical Engineer",
+        "Design Engineer",
+        "Production Engineer",
+        "Maintenance Engineer",
+        "Automobile Engineer",
+        "Thermal Engineer",
+        "HVAC Engineer",
+        "Tooling Engineer",
+        "Robotics Engineer"
+      ],
+      "Electrical Engineering": [
+        "Electrical Engineer",
+        "Power Systems Engineer",
+        "Instrumentation Engineer",
+        "Control Systems Engineer",
+        "PLC & SCADA Engineer",
+        "Protection Engineer"
+      ],
+      "Electronics Engineering": [
+        "Electronics Engineer",
+        "VLSI Design Engineer",
+        "Embedded Systems Engineer",
+        "PCB Design Engineer",
+        "Signal Processing Engineer"
+      ],
+      "Civil Engineering": [
+        "Civil Engineer",
+        "Structural Engineer",
+        "Site Engineer",
+        "Geotechnical Engineer",
+        "Transportation Engineer",
+        "Water Resources Engineer",
+        "Surveyor"
+      ],
+      "Chemical Engineering": [
+        "Chemical Engineer",
+        "Process Engineer",
+        "Petroleum Engineer",
+        "Polymer Engineer",
+        "Refinery Engineer"
+      ],
+      "Manufacturing & Quality": [
+        "Manufacturing Engineer",
+        "Quality Engineer",
+        "Industrial Engineer",
+        "Lean Manufacturing Specialist",
+        "Six Sigma Black Belt",
+        "EHS - Safety Officer",
+        "CNC Operator",
+        "Welding Engineer"
+      ],
+      "Aerospace & Defence Mfg": [
+        "Aerospace Engineer",
+        "Avionics Engineer",
+        "Defence Systems Engineer",
+        "Propulsion Engineer"
+      ],
+      "Metallurgy & Materials": [
+        "Metallurgical Engineer",
+        "Materials Scientist",
+        "Mining Engineer",
+        "Ceramic Engineer"
+      ]
+    },
+    "Education & Research": {
+      "School Education": [
+        "Primary School Teacher",
+        "Secondary School Teacher",
+        "PGT Teacher (Physics/Chemistry/Maths/Bio)",
+        "Special Educator",
+        "School Principal",
+        "Academic Coordinator",
+        "School Counsellor",
+        "Physical Education Teacher"
+      ],
+      "Higher Education": [
+        "Assistant Professor",
+        "Associate Professor",
+        "Professor",
+        "Dean of Faculty",
+        "Vice Chancellor",
+        "Registrar",
+        "Academic Director"
+      ],
+      "Research": [
+        "Research Scientist",
+        "Research Fellow",
+        "Postdoctoral Researcher",
+        "Lab Scientist",
+        "Principal Investigator",
+        "Research Associate"
+      ],
+      "EdTech": [
+        "Instructional Designer",
+        "E-Learning Developer",
+        "Curriculum Developer",
+        "Online Tutor",
+        "Learning Management System (LMS) Admin",
+        "EdTech Product Manager"
+      ],
+      "Training & Development": [
+        "Corporate Trainer",
+        "Soft Skills Trainer",
+        "Technical Trainer",
+        "L&D Manager"
+      ]
+    },
+    "Government & Public Sector": {
+      "All India Services": [
+        "IAS Officer - District Collector",
+        "IAS Officer - SDM",
+        "IAS Officer - Secretary",
+        "IPS Officer - SP",
+        "IPS Officer - DCP",
+        "IFS Officer - Diplomat",
+        "IFS Officer - Consul General"
+      ],
+      "Central Services": [
+        "IRS Officer - Income Tax",
+        "IRS Officer - Customs & GST",
+        "IRTS - Railway Traffic Officer",
+        "IRAS - Railway Accounts Officer",
+        "IDAS - Defence Accounts Officer",
+        "SSC CGL - Tax Inspector",
+        "SSC CGL - Auditor",
+        "SSC CGL - Statistical Investigator",
+        "Postal Officer"
+      ],
+      "State Services": [
+        "State PCS - Deputy Collector",
+        "State PCS - DSP",
+        "Tehsildar",
+        "Block Development Officer (BDO)",
+        "Naib Tehsildar",
+        "Tahsildar",
+        "Revenue Inspector"
+      ],
+      "PSU": [
+        "PSU Engineer - BHEL / NTPC / ONGC / GAIL",
+        "PSU Manager - Finance",
+        "PSU Manager - HR",
+        "PSU Manager - Operations",
+        "PSU Officer - Banking (SBI / RBI)",
+        "PSU Officer - Insurance (LIC / GIC)",
+        "ISRO Scientist",
+        "DRDO Scientist",
+        "BARC Scientist"
+      ],
+      "Defence Forces": [
+        "Indian Army Officer",
+        "Indian Navy Officer",
+        "Indian Air Force Officer",
+        "CRPF Officer",
+        "BSF Officer",
+        "CISF Officer",
+        "SSB Officer"
+      ],
+      "Judiciary": [
+        "Civil Judge",
+        "Additional Sessions Judge",
+        "High Court Judge",
+        "Public Prosecutor",
+        "Law Officer"
+      ],
+      "Municipal & Local Bodies": [
+        "Municipal Commissioner",
+        "Town Planner",
+        "Panchayat Development Officer"
+      ]
+    },
+    "Legal": {
+      "Legal Practice": [
+        "Advocate - District Court",
+        "Advocate - High Court",
+        "Advocate - Supreme Court",
+        "Senior Advocate",
+        "Criminal Lawyer",
+        "Civil Lawyer",
+        "Family Lawyer"
+      ],
+      "Corporate Legal": [
+        "Company Secretary (CS)",
+        "Legal Counsel",
+        "Corporate Lawyer",
+        "Contract Manager",
+        "Compliance Manager",
+        "In-house Counsel",
+        "M&A Lawyer"
+      ],
+      "Dispute Resolution": [
+        "Arbitrator",
+        "Mediator",
+        "Conciliator"
+      ],
+      "IP Law": [
+        "Patent Attorney",
+        "Trademark Analyst",
+        "IP Paralegal",
+        "Copyright Lawyer"
+      ],
+      "Taxation Law": [
+        "Tax Lawyer",
+        "GST Litigation Specialist"
+      ],
+      "Labour Law": [
+        "Labour Law Consultant",
+        "Industrial Relations Advisor"
+      ],
+      "Real Estate Law": [
+        "Property Lawyer",
+        "RERA Consultant"
+      ],
+      "Environmental Law": [
+        "Environmental Lawyer"
+      ],
+      "Cyber Law": [
+        "Cyber Law Attorney"
+      ]
+    },
+    "Media & Communication": {
+      "Journalism": [
+        "Reporter - Print",
+        "Reporter - TV",
+        "Reporter - Digital",
+        "Editor - News",
+        "News Anchor",
+        "Photojournalist",
+        "Investigative Journalist",
+        "Sports Journalist",
+        "Business Journalist"
+      ],
+      "Digital Media": [
+        "Content Writer",
+        "Content Strategist",
+        "Social Media Manager",
+        "Blogger / Vlogger",
+        "Podcast Producer",
+        "SEO Content Writer",
+        "YouTube Content Creator"
+      ],
+      "Advertising & PR": [
+        "Copywriter",
+        "Creative Director",
+        "Brand Manager",
+        "PR Manager",
+        "Media Planner",
+        "Account Manager - Ad Agency",
+        "Influencer Marketing Manager"
+      ],
+      "Film & Entertainment": [
+        "Film Director",
+        "Screenplay Writer",
+        "Film Editor",
+        "Cinematographer",
+        "Sound Designer",
+        "Production Designer",
+        "Casting Director",
+        "Music Director",
+        "Lyricist"
+      ],
+      "Animation & Gaming": [
+        "Animator - 2D",
+        "Animator - 3D",
+        "VFX Artist",
+        "Game Designer",
+        "3D Modeller",
+        "Game Developer - Unity",
+        "Motion Graphics Designer"
+      ],
+      "Publishing": [
+        "Editor - Publishing",
+        "Proofreader",
+        "Technical Writer",
+        "Ghost Writer"
+      ]
+    },
+    "Sales, Marketing & Retail": {
+      "Sales": [
+        "Sales Executive",
+        "Business Development Executive",
+        "Key Account Manager",
+        "Sales Manager",
+        "Zonal Sales Manager",
+        "National Sales Manager",
+        "Inside Sales Executive",
+        "Channel Sales Manager",
+        "Pre-Sales Consultant"
+      ],
+      "Marketing": [
+        "Marketing Executive",
+        "Digital Marketing Manager",
+        "SEO Specialist",
+        "Performance Marketing Analyst",
+        "Product Marketing Manager",
+        "Growth Hacker",
+        "Email Marketing Specialist",
+        "Marketing Analyst",
+        "CMO - Chief Marketing Officer"
+      ],
+      "Retail": [
+        "Store Manager",
+        "Visual Merchandiser",
+        "Retail Sales Associate",
+        "Category Manager",
+        "Retail Area Manager",
+        "Loss Prevention Officer"
+      ],
+      "E-Commerce": [
+        "E-Commerce Manager",
+        "Marketplace Analyst",
+        "Catalogue Manager",
+        "D2C Marketing Manager"
+      ],
+      "Customer Experience": [
+        "Customer Success Manager",
+        "Customer Support Executive",
+        "CRM Manager",
+        "Customer Insights Analyst"
+      ]
+    },
+    "Human Resources": {
+      "HR Operations": [
+        "HR Executive",
+        "HR Manager",
+        "HR Business Partner (HRBP)",
+        "HR Director",
+        "Chief People Officer (CPO)"
+      ],
+      "Talent Acquisition": [
+        "Recruiter - Non-Tech",
+        "Technical Recruiter",
+        "Talent Acquisition Specialist",
+        "Headhunter - Executive Search",
+        "Campus Recruiter",
+        "RPO Recruiter"
+      ],
+      "Learning & Development": [
+        "L&D Manager",
+        "Training Coordinator",
+        "Instructional Designer",
+        "Leadership Development Specialist"
+      ],
+      "Compensation & Benefits": [
+        "Compensation & Benefits Manager",
+        "Payroll Specialist",
+        "Rewards Analyst"
+      ],
+      "Employee Relations": [
+        "Employee Relations Manager",
+        "Industrial Relations Officer",
+        "POSH Compliance Officer"
+      ],
+      "HR Analytics": [
+        "HR Analyst",
+        "Workforce Planning Analyst",
+        "People Analytics Manager"
+      ]
+    },
+    "Supply Chain & Logistics": {
+      "Supply Chain": [
+        "Supply Chain Manager",
+        "Procurement Manager",
+        "Vendor Manager",
+        "Inventory Manager",
+        "Demand Planner",
+        "Category Buyer",
+        "Global Sourcing Manager"
+      ],
+      "Logistics": [
+        "Logistics Manager",
+        "Warehouse Manager",
+        "Freight & Shipping Manager",
+        "Fleet Manager",
+        "Last Mile Delivery Manager",
+        "Customs & Exim Executive",
+        "3PL Coordinator"
+      ],
+      "Operations": [
+        "Operations Manager",
+        "Process Excellence Manager",
+        "Business Analyst - Operations",
+        "Six Sigma Black Belt",
+        "Plant Manager"
+      ]
+    },
+    "Construction & Real Estate": {
+      "Construction": [
+        "Project Manager - Construction",
+        "Site Supervisor",
+        "Quantity Surveyor",
+        "Building Inspector",
+        "Construction Manager",
+        "Estimation Engineer",
+        "MEP Engineer"
+      ],
+      "Real Estate": [
+        "Real Estate Agent",
+        "Property Valuer",
+        "Real Estate Developer",
+        "RERA Compliance Officer",
+        "Leasing Manager",
+        "Property Manager"
+      ],
+      "Architecture & Design": [
+        "Architect",
+        "Interior Designer",
+        "Urban Planner",
+        "Landscape Architect",
+        "BIM Modeller"
+      ],
+      "Infrastructure": [
+        "Infrastructure Project Manager",
+        "Highway Engineer",
+        "Bridge Engineer",
+        "Water & Sewage Engineer"
+      ]
+    },
+    "Agriculture & Food": {
+      "Farming & Agri": [
+        "Agronomist",
+        "Horticulturist",
+        "Agricultural Extension Officer",
+        "Soil Scientist",
+        "Plant Pathologist",
+        "Entomologist",
+        "Irrigation Engineer"
+      ],
+      "Animal Science": [
+        "Animal Husbandry Officer",
+        "Veterinary Officer",
+        "Dairy Technologist",
+        "Poultry Farm Manager",
+        "Fisheries Officer"
+      ],
+      "Food Processing": [
+        "Food Technologist",
+        "Quality Control Manager - Food",
+        "Food Safety Auditor (FSSAI)",
+        "Food Microbiologist",
+        "Packaging Technologist"
+      ],
+      "Agri-Business": [
+        "Agri-Business Manager",
+        "Agricultural Loan Officer",
+        "Commodity Trader",
+        "Agri Input Sales Manager"
+      ],
+      "Agri-Tech": [
+        "Agri-Tech Product Manager",
+        "Precision Farming Specialist",
+        "Remote Sensing Analyst - Agri"
+      ]
+    },
+    "Hospitality & Tourism": {
+      "Hotel Operations": [
+        "Front Office Manager",
+        "Housekeeping Manager",
+        "Food & Beverage Manager",
+        "Hotel General Manager",
+        "Revenue Manager",
+        "Concierge",
+        "Reservations Manager",
+        "Guest Relations Officer"
+      ],
+      "Culinary": [
+        "Chef de Cuisine",
+        "Executive Chef",
+        "Sous Chef",
+        "Pastry Chef",
+        "Commis Chef",
+        "Restaurant Manager"
+      ],
+      "Tourism": [
+        "Tour Guide",
+        "Travel Agent",
+        "Tourism Officer",
+        "Destination Manager",
+        "Eco-Tourism Specialist",
+        "Heritage Site Manager"
+      ],
+      "Events": [
+        "Event Manager",
+        "Wedding Planner",
+        "Conference & Exhibition Manager",
+        "MICE Coordinator"
+      ],
+      "Spa & Wellness": [
+        "Spa Manager",
+        "Wellness Consultant",
+        "Yoga & Wellness Coach"
+      ]
+    },
+    "Energy & Environment": {
+      "Oil & Gas": [
+        "Petroleum Engineer",
+        "Drilling Engineer",
+        "Reservoir Engineer",
+        "Production Engineer - O&G",
+        "Refinery Engineer",
+        "Pipeline Engineer"
+      ],
+      "Renewable Energy": [
+        "Solar Energy Engineer",
+        "Wind Energy Engineer",
+        "Energy Auditor",
+        "EV (Electric Vehicle) Engineer",
+        "Battery Technology Engineer",
+        "Bioenergy Specialist"
+      ],
+      "Power Sector": [
+        "Power Plant Engineer",
+        "Transmission Engineer",
+        "Grid Management Engineer",
+        "Substation Engineer"
+      ],
+      "Environment": [
+        "Environmental Engineer",
+        "Environmental Consultant",
+        "EHS Manager",
+        "Climate Change Analyst",
+        "Carbon Credit Analyst",
+        "Waste Management Specialist",
+        "Water Resource Engineer"
+      ],
+      "Mining": [
+        "Mining Engineer",
+        "Geologist",
+        "Mine Safety Officer"
+      ]
+    },
+    "Design & Creative": {
+      "Graphic & Visual Design": [
+        "Graphic Designer",
+        "Brand Identity Designer",
+        "Motion Graphics Designer",
+        "Packaging Designer",
+        "Illustration Artist",
+        "Typography Designer"
+      ],
+      "Fashion & Textile": [
+        "Fashion Designer",
+        "Textile Designer",
+        "Fashion Stylist",
+        "Costume Designer",
+        "Apparel Merchandiser",
+        "Pattern Maker"
+      ],
+      "Product & Industrial Design": [
+        "Product Designer",
+        "Industrial Designer",
+        "Furniture Designer",
+        "Jewellery Designer"
+      ],
+      "Photography & Videography": [
+        "Photographer - Commercial",
+        "Photographer - Wedding",
+        "Videographer",
+        "Video Editor",
+        "Documentary Filmmaker"
+      ],
+      "Fine Arts & Craft": [
+        "Fine Artist - Painter",
+        "Sculptor",
+        "Ceramic Artist",
+        "Muralist"
+      ]
+    },
+    "Social Sector & NGO": {
+      "Social Work": [
+        "Social Worker",
+        "Community Development Officer",
+        "Child Welfare Officer",
+        "Women Empowerment Specialist"
+      ],
+      "NGO Management": [
+        "Program Manager - NGO",
+        "CSR Manager",
+        "Grant Writer",
+        "Fundraising Manager",
+        "NGO Director"
+      ],
+      "Development Sector": [
+        "Development Consultant",
+        "Policy Analyst",
+        "Gender & Inclusion Specialist",
+        "WASH Specialist",
+        "Livelihoods Specialist",
+        "M&E (Monitoring & Evaluation) Officer"
+      ],
+      "Microfinance": [
+        "Microfinance Officer",
+        "SHG Coordinator",
+        "Rural Finance Specialist"
+      ]
+    },
+    "Aviation & Aerospace": {
+      "Flight Operations": [
+        "Commercial Pilot - Captain",
+        "Commercial Pilot - First Officer",
+        "Flight Dispatcher",
+        "Flight Operations Officer"
+      ],
+      "Cabin Crew": [
+        "Senior Cabin Crew",
+        "Cabin Crew - Flight Attendant",
+        "In-flight Service Manager"
+      ],
+      "Airport Operations": [
+        "Airport Manager",
+        "Air Traffic Controller",
+        "Ground Handling Staff",
+        "Airport Security Officer",
+        "Baggage & Cargo Handler"
+      ],
+      "Aerospace Engineering": [
+        "Aerospace Engineer",
+        "Avionics Engineer",
+        "Space Research Scientist - ISRO",
+        "Satellite Systems Engineer",
+        "Propulsion Scientist",
+        "Aircraft Maintenance Engineer (AME)",
+        "Structural Analysis Engineer"
+      ]
+    },
+    "Telecom & Networking": {
+      "Network Engineering": [
+        "Network Engineer",
+        "Telecom Engineer",
+        "RF Engineer",
+        "Network Architect",
+        "5G Engineer",
+        "Optical Fibre Engineer"
+      ],
+      "Telecom Operations": [
+        "Telecom Manager",
+        "NOC Engineer",
+        "Field Service Engineer - Telecom",
+        "OSS/BSS Engineer"
+      ],
+      "Telecom Sales & Strategy": [
+        "Telecom Sales Manager",
+        "Telecom Product Manager",
+        "Spectrum Planning Analyst"
+      ]
+    },
+    "Sports & Fitness": {
+      "Sports": [
+        "Professional Athlete - Cricket",
+        "Professional Athlete - Football",
+        "Professional Athlete - Badminton",
+        "Professional Athlete - Hockey",
+        "Professional Athlete - Kabaddi",
+        "Sports Coach",
+        "Sports Physiotherapist",
+        "Sports Psychologist",
+        "Sports Analyst",
+        "Sports Scout"
+      ],
+      "Fitness & Wellness": [
+        "Personal Trainer",
+        "Yoga Instructor",
+        "Nutritionist - Sports",
+        "Gym Manager",
+        "Crossfit Coach"
+      ],
+      "Sports Management": [
+        "Sports Manager",
+        "Sports Marketing Manager",
+        "Event Manager - Sports",
+        "Sports Journalist",
+        "Esports Manager"
+      ]
+    },
+    "Textile & Apparel": {
+      "Textile Production": [
+        "Textile Engineer",
+        "Weaving Technician",
+        "Dyeing & Printing Technician",
+        "Spinning Engineer",
+        "Textile Quality Inspector"
+      ],
+      "Apparel Manufacturing": [
+        "Production Manager - Apparel",
+        "Garment Technologist",
+        "Pattern Grader",
+        "Merchandiser - Apparel Export"
+      ],
+      "Retail & Trade": [
+        "Buyer - Fashion Retail",
+        "Sourcing Manager - Apparel",
+        "Export Coordinator - Garments"
+      ]
+    },
+    "Chemicals & Plastics": {
+      "Chemical Production": [
+        "Chemical Engineer - Production",
+        "Plant Chemist",
+        "R&D Chemist",
+        "Analytical Chemist"
+      ],
+      "Plastics & Polymers": [
+        "Polymer Engineer",
+        "Plastics Technologist",
+        "Mould Design Engineer"
+      ],
+      "Paints & Coatings": [
+        "Paint Technologist",
+        "Coatings Application Specialist"
+      ],
+      "Quality & Compliance": [
+        "QA Manager - Chemicals",
+        "EHS Officer - Chemicals",
+        "Regulatory Affairs Officer - Chemicals"
+      ]
+    },
+    "Printing & Packaging": {
+      "Printing": [
+        "Printing Technician",
+        "Pre-Press Technician",
+        "Print Production Manager"
+      ],
+      "Packaging": [
+        "Packaging Engineer",
+        "Packaging Designer",
+        "Packaging Buyer",
+        "Sustainability - Packaging Analyst"
+      ]
+    },
+    "Gems & Jewellery": {
+      "Jewellery Design & Production": [
+        "Jewellery Designer",
+        "Gemologist",
+        "Goldsmith",
+        "Diamond Grader"
+      ],
+      "Jewellery Retail & Export": [
+        "Jewellery Sales Executive",
+        "Gems & Jewellery Exporter",
+        "Valuer - Jewellery"
+      ]
+    },
+    "Transportation & Automobile": {
+      "Automobile": [
+        "Automobile Engineer",
+        "Vehicle Design Engineer",
+        "EV Design Engineer",
+        "Automobile Service Manager",
+        "Automotive Quality Engineer"
+      ],
+      "Transportation": [
+        "Transport Manager",
+        "Traffic Engineer",
+        "Route Planner",
+        "Railway Engineer",
+        "Metro Rail Engineer",
+        "Ship Captain",
+        "Marine Engineer",
+        "Port Manager"
+      ]
+    },
+    "Space & Emerging Tech": {
+      "Space Technology": [
+        "Satellite Engineer",
+        "Space Mission Analyst",
+        "Ground Station Engineer",
+        "Space Policy Analyst"
+      ],
+      "Robotics & Automation": [
+        "Robotics Engineer",
+        "Automation Engineer",
+        "RPA Developer",
+        "AI Robotics Researcher"
+      ],
+      "Biotech & Life Sciences": [
+        "Biotechnologist",
+        "Bioinformatics Scientist",
+        "Genetic Counsellor",
+        "Stem Cell Researcher"
+      ],
+      "Nanotechnology": [
+        "Nanomaterials Scientist",
+        "Nanotech Application Engineer"
+      ]
+    },
+    "Consulting & Strategy": {
+      "Management Consulting": [
+        "Management Consultant",
+        "Strategy Analyst",
+        "Business Transformation Consultant",
+        "McKinsey / BCG / Bain Analyst"
+      ],
+      "IT Consulting": [
+        "IT Strategy Consultant",
+        "Digital Transformation Consultant",
+        "Technology Advisor"
+      ],
+      "HR Consulting": [
+        "HR Consultant",
+        "OD Consultant"
+      ],
+      "Financial Advisory": [
+        "Financial Advisor",
+        "M&A Advisor",
+        "Restructuring Consultant"
+      ],
+      "Environmental Consulting": [
+        "ESG Consultant",
+        "Sustainability Consultant",
+        "EIA Consultant"
+      ]
+    }
+  }
+}
