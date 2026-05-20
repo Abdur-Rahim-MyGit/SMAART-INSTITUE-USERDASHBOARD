@@ -1,0 +1,1442 @@
+{
+  ".NET Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Cloud Architect",
+      "DevOps Engineer",
+      "Full Stack Developer"
+    ]
+  },
+  "5G Network Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "IoT Specialist",
+      "Network Architect",
+      "Telecom Consultant"
+    ]
+  },
+  "AI Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Computer Vision Engineer",
+      "Machine Learning Specialist",
+      "Natural Language Processing Expert"
+    ]
+  },
+  "AI Ethics Specialist": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Data Privacy Consultant",
+      "Responsible AI Developer",
+      "Human-Centered AI Designer"
+    ]
+  },
+  "AI Product Manager": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Business Analyst",
+      "Digital Transformation Consultant",
+      "Product Owner"
+    ]
+  },
+  "AI Safety Researcher": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Ethics Specialist",
+      "Explainable AI Researcher",
+      "Fairness Engineer"
+    ]
+  },
+  "AI Trainer / Data Labeller": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 3.5,
+    "salary_max_lpa": 8,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Data Quality Specialist",
+      "Active Learning Specialist",
+      "Human-in-the-Loop AI Trainer"
+    ]
+  },
+  "AR/VR Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Mixed Reality Experience Designer",
+      "3D Modeller",
+      "Virtual Reality Architect"
+    ]
+  },
+  "AWS Solutions Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Architect",
+      "DevOps Engineer",
+      "AI Engineer"
+    ]
+  },
+  "Accessibility Tester": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 3.5,
+    "salary_max_lpa": 8,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "UX Designer",
+      "Digital Accessibility Specialist",
+      "Inclusive Design Consultant"
+    ]
+  },
+  "Agile Coach": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Scrum Master",
+      "Lean Coach",
+      "Organizational Change Manager"
+    ]
+  },
+  "Analog Design Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Mixed Signal Design Engineer",
+      "RF Design Engineer",
+      "Analog IC Designer"
+    ]
+  },
+  "Analytics Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Engineer",
+      "Data Scientist",
+      "Business Analyst"
+    ]
+  },
+  "Android Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Mobile AI Developer",
+      "AR/VR Developer",
+      "Full Stack Developer"
+    ]
+  },
+  "Angular Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Frontend AI Engineer",
+      "Full Stack Developer",
+      "Web3 Developer"
+    ]
+  },
+  "Ansible Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 9,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "DevOps Engineer",
+      "Cloud Engineer",
+      "Automation Specialist"
+    ]
+  },
+  "Application Security Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Security Architect",
+      "DevSecOps Engineer",
+      "Threat Intelligence Analyst"
+    ]
+  },
+  "Artificial Intelligence Specialist": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Ethics Specialist",
+      "Computer Vision Engineer",
+      "Natural Language Processing Specialist"
+    ]
+  },
+  "Associate Product Manager": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Product Owner",
+      "Technical Program Manager",
+      "Digital Transformation Consultant"
+    ]
+  },
+  "Azure Solutions Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Architect",
+      "Azure DevOps Engineer",
+      "Microsoft 365 Consultant"
+    ]
+  },
+  "BI Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered BI Specialist",
+      "Data Science Analyst",
+      "Business Analytics Consultant"
+    ]
+  },
+  "Back End Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Full Stack Developer with AI",
+      "Cloud Native Architect",
+      "DevOps Engineer with AI"
+    ]
+  },
+  "Big Data Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered Big Data Architect",
+      "Data Engineer with Machine Learning",
+      "Cloud Data Engineer with AI"
+    ]
+  },
+  "Big Data Specialist": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 9,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Data Scientist with Big Data",
+      "Big Data Analyst with AI",
+      "Data Architect with Big Data"
+    ]
+  },
+  "Blockchain Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI-powered Blockchain Auditor",
+      "Smart Contract Developer",
+      "Crypto Economist"
+    ]
+  },
+  "Blue Team Specialist": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-driven Threat Hunter",
+      "Incident Response Specialist",
+      "Security Orchestration Specialist"
+    ]
+  },
+  "Build and Release Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "CI/CD Pipeline Specialist",
+      "DevOps Engineer",
+      "Automation Test Engineer"
+    ]
+  },
+  "Business Analyst": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 10,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Digital Transformation Consultant",
+      "Process Improvement Specialist",
+      "Data Analyst"
+    ]
+  },
+  "Business Intelligence Analyst": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Analyst",
+      "Data Scientist",
+      "Business Analyst"
+    ]
+  },
+  "C++ Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Engineer",
+      "DevOps Engineer",
+      "Cloud Architect"
+    ]
+  },
+  "CISO": {
+    "demand_level": "High",
+    "salary_min_lpa": 15,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Security Architect",
+      "Cybersecurity Consultant",
+      "Incident Response Specialist"
+    ]
+  },
+  "CTO": {
+    "demand_level": "High",
+    "salary_min_lpa": 20,
+    "salary_max_lpa": 40,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Technical Architect",
+      "Innovation Officer",
+      "Digital Transformation Leader"
+    ]
+  },
+  "Chief AI Officer": {
+    "demand_level": "High",
+    "salary_min_lpa": 15,
+    "salary_max_lpa": 50,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Strategist",
+      "Machine Learning Engineer",
+      "Data Scientist"
+    ]
+  },
+  "Chief Product Officer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 12,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Product Manager - AI",
+      "AI Product Owner",
+      "Digital Transformation Lead"
+    ]
+  },
+  "Chip Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Hardware Engineer",
+      "Computer Vision Engineer",
+      "Edge AI Architect"
+    ]
+  },
+  "Cloud Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Engineer - AI",
+      "DevOps Engineer - AI",
+      "Cloud Security Architect"
+    ]
+  },
+  "Cloud Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Architect",
+      "DevOps Engineer",
+      "AIOps Specialist"
+    ]
+  },
+  "Cloud Security Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Security Consultant",
+      "Compliance Architect",
+      "Threat Intelligence Analyst"
+    ]
+  },
+  "Cloud Security Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Incident Responder",
+      "Security Orchestration Specialist",
+      "Cloud Compliance Engineer"
+    ]
+  },
+  "Computer Programmer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "AI/ML Engineer",
+      "Data Scientist",
+      "Full Stack Developer"
+    ]
+  },
+  "Computer Vision Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Engineer",
+      "Machine Learning Specialist",
+      "Deep Learning Expert"
+    ]
+  },
+  "Configuration Manager": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Infrastructure Manager",
+      "Automation Specialist",
+      "IT Service Manager"
+    ]
+  },
+  "Creative Director (Tech)": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Digital Experience Director",
+      "Innovation Manager",
+      "Virtual Reality Experience Designer"
+    ]
+  },
+  "Cyber Threat Hunter": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Incident Responder",
+      "Security Orchestration Specialist",
+      "Threat Intelligence Analyst"
+    ]
+  },
+  "Cybersecurity Analyst": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Security Specialist",
+      "Incident Response Specialist"
+    ]
+  },
+  "Cybersecurity Consultant": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Security Architect",
+      "Cybersecurity Advisor"
+    ]
+  },
+  "DFT Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Design Verification Engineer",
+      "AI-powered DFT Specialist"
+    ]
+  },
+  "Data Analyst": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Business Intelligence Analyst",
+      "Data Scientist"
+    ]
+  },
+  "Data Annotator": {
+    "demand_level": "High",
+    "salary_min_lpa": 3.5,
+    "salary_max_lpa": 8,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "AI Data Specialist",
+      "Machine Learning Engineer",
+      "Data Quality Analyst"
+    ]
+  },
+  "Data Architect": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Architect",
+      "Data Scientist",
+      "AI Solutions Architect"
+    ]
+  },
+  "Data Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Engineer",
+      "Machine Learning Engineer",
+      "Data Platform Engineer"
+    ]
+  },
+  "Data Governance Analyst": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Data Privacy Specialist",
+      "Information Security Analyst",
+      "Compliance Officer"
+    ]
+  },
+  "Data Product Manager": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Product Owner",
+      "Digital Transformation Consultant",
+      "Business Analyst"
+    ]
+  },
+  "Data Quality Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Data Validation Specialist",
+      "AI Data Validator",
+      "Quality Assurance Engineer"
+    ]
+  },
+  "Data Scientist": {
+    "demand_level": "High",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "AI Engineer",
+      "Machine Learning Specialist",
+      "Business Intelligence Developer"
+    ]
+  },
+  "Data Steward": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 10,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Data Governance Specialist",
+      "Information Security Analyst",
+      "Compliance Officer"
+    ]
+  },
+  "Database Administrator": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Cloud Database Specialist",
+      "Database Architect"
+    ]
+  },
+  "Database Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Data Engineer",
+      "Database Consultant"
+    ]
+  },
+  "Deep Learning Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Computer Vision Engineer",
+      "Natural Language Processing Specialist"
+    ]
+  },
+  "Design System Specialist": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "UX Engineer",
+      "Human-Computer Interaction Specialist"
+    ]
+  },
+  "Drone Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Autonomous Systems Specialist",
+      "UAV Software Developer",
+      "Aerial Robotics Engineer"
+    ]
+  },
+  "ERP Consultant": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Cloud ERP Specialist",
+      "Digital Transformation Consultant",
+      "AI-powered ERP Analyst"
+    ]
+  },
+  "Edge Computing Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Real-time Analytics Engineer",
+      "IoT Edge Developer",
+      "Federated Learning Engineer"
+    ]
+  },
+  "Embedded Hardware Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered Embedded Systems Designer",
+      "Hardware Acceleration Engineer",
+      "FPGA Design Engineer"
+    ]
+  },
+  "FPGA Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Hardware Engineer",
+      "Computer Vision Engineer",
+      "Edge AI Engineer"
+    ]
+  },
+  "Fab Technician": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 3.5,
+    "salary_max_lpa": 8,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Industrial Automation Specialist",
+      "Robotics Technician",
+      "Manufacturing Data Analyst"
+    ]
+  },
+  "FinOps Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Cost Optimization Specialist",
+      "Financial Data Scientist",
+      "AI-driven Budgeting Analyst"
+    ]
+  },
+  "Firmware Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Embedded AI Engineer",
+      "IoT Firmware Developer",
+      "Device Security Specialist"
+    ]
+  },
+  "GCP Solutions Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Architect",
+      "AI Engineer",
+      "DevOps Engineer"
+    ]
+  },
+  "GRC Analyst": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Compliance Analyst",
+      "Risk Manager",
+      "Audit Specialist"
+    ]
+  },
+  "Game Engine Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Game AI Developer",
+      "Virtual Reality Developer",
+      "Game Designer"
+    ]
+  },
+  "Generative AI Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Researcher",
+      "Computer Vision Engineer",
+      "Natural Language Processing Engineer"
+    ]
+  },
+  "IT Recruiter": {
+    "demand_level": "High",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 10,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Recruiter",
+      "Talent Acquisition Specialist",
+      "HR Analytics Specialist"
+    ]
+  },
+  "IT Vendor Manager": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Contract Management Specialist",
+      "Supplier Relationship Manager",
+      "Procurement Analyst"
+    ]
+  },
+  "ITSM Manager": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Service Desk Manager",
+      "Incident Manager",
+      "Problem Manager"
+    ]
+  },
+  "Identity and Access Management Specialist": {
+    "demand_level": "High",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 16,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cybersecurity Specialist",
+      "Access Management Specialist",
+      "Identity Governance Specialist"
+    ]
+  },
+  "IoT Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AIoT Specialist",
+      "Edge AI Developer",
+      "Industrial Automation Specialist"
+    ]
+  },
+  "IoT Solutions Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 12,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Smart City Architect",
+      "Industrial IoT Consultant",
+      "Digital Transformation Specialist"
+    ]
+  },
+  "Java Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Cloud Native Developer",
+      "DevOps Engineer",
+      "Full Stack Developer"
+    ]
+  },
+  "Jenkins Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "CI/CD Specialist",
+      "Automation Tester",
+      "DevSecOps Engineer"
+    ]
+  },
+  "L2 Support Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 3.5,
+    "salary_max_lpa": 8,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "AI Support Specialist",
+      "Automation Engineer"
+    ]
+  },
+  "L3 Support Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Technical Lead",
+      "Cloud Architect"
+    ]
+  },
+  "LLM Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Researcher",
+      "Natural Language Processing Specialist"
+    ]
+  },
+  "Linux Administrator": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 10,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Engineer",
+      "DevOps Engineer"
+    ]
+  },
+  "Mobile App Tester": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 3.5,
+    "salary_max_lpa": 9,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Automation Tester",
+      "AI Test Engineer",
+      "DevOps Engineer"
+    ]
+  },
+  "Motion Graphics Designer": {
+    "demand_level": "High",
+    "salary_min_lpa": 4.2,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Graphic Designer",
+      "Virtual Reality Designer",
+      "3D Animator"
+    ]
+  },
+  "NLP Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Conversational AI Engineer",
+      "Language Model Developer",
+      "Human-Computer Interaction Specialist"
+    ]
+  },
+  "Network Administrator": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 3,
+    "salary_max_lpa": 10,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Network Architect",
+      "Cybersecurity Specialist",
+      "Network Automation Engineer"
+    ]
+  },
+  "Performance Test Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Test Engineer",
+      "Automation Specialist",
+      "DevOps Engineer"
+    ]
+  },
+  "Physical Design Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI-powered Design Engineer",
+      "Computer Vision Engineer",
+      "Robotics Engineer"
+    ]
+  },
+  "Platform Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Cloud Architect",
+      "DevOps Engineer",
+      "AI-powered Platform Engineer"
+    ]
+  },
+  "Power BI Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Data Scientist",
+      "Business Intelligence Analyst",
+      "AI-powered BI Developer"
+    ]
+  },
+  "QA Manager": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "AI Test Engineer",
+      "Automation Specialist",
+      "DevOps Engineer"
+    ]
+  },
+  "Quantum Computing Researcher": {
+    "demand_level": "High",
+    "salary_min_lpa": 10,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Quantum AI Researcher",
+      "Quantum Machine Learning Engineer",
+      "Cryptography Specialist"
+    ]
+  },
+  "REST API Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "API Architect",
+      "Cloud Integration Specialist",
+      "Full Stack Developer"
+    ]
+  },
+  "RTL Design Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Digital Design Engineer",
+      "ASIC Design Engineer",
+      "FPGA Developer"
+    ]
+  },
+  "Research Scientist (AI)": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI Engineer",
+      "Machine Learning Specialist",
+      "Computer Vision Engineer"
+    ]
+  },
+  "Robotics Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Autonomous Systems Engineer",
+      "Robotics Software Engineer",
+      "Mechatronics Engineer"
+    ]
+  },
+  "Robotics Software Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered Robotics Engineer",
+      "Computer Vision Engineer",
+      "Autonomous Systems Developer"
+    ]
+  },
+  "Ruby on Rails Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Full Stack Developer",
+      "Backend Developer",
+      "DevOps Engineer"
+    ]
+  },
+  "SAP FICO Consultant": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Financial Planning Analyst",
+      "Accounting Automation Specialist",
+      "Compliance Analyst"
+    ]
+  },
+  "SAP HCM Consultant": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5.5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "HR Analytics Specialist",
+      "Talent Management Consultant",
+      "Benefits Administration Specialist"
+    ]
+  },
+  "SAP MM Consultant": {
+    "demand_level": "High",
+    "salary_min_lpa": 6.5,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Procurement Analyst",
+      "Supply Chain Optimization Specialist",
+      "Inventory Management Specialist"
+    ]
+  },
+  "SAP SD Consultant": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Sales Operations Analyst",
+      "Customer Experience Manager",
+      "Order Management Specialist"
+    ]
+  },
+  "Salesforce Consultant": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI-powered CRM Specialist",
+      "Salesforce AI Developer",
+      "Customer Experience Architect"
+    ]
+  },
+  "Salesforce Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Salesforce AI Engineer",
+      "Cloud-based AI Developer",
+      "Low-code Application Developer"
+    ]
+  },
+  "Scala Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered Data Engineer",
+      "Distributed Systems Engineer",
+      "Functional Programming Specialist"
+    ]
+  },
+  "Scrum Master": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 9,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Agile Coach",
+      "AI-powered Project Manager",
+      "Digital Transformation Specialist"
+    ]
+  },
+  "Senior Product Manager": {
+    "demand_level": "High",
+    "salary_min_lpa": 12,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI Product Owner",
+      "Digital Transformation Consultant",
+      "Product Analytics Specialist"
+    ]
+  },
+  "ServiceNow Administrator": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "ServiceNow Automation Specialist",
+      "IT Service Management Analyst",
+      "Cloud Service Manager"
+    ]
+  },
+  "ServiceNow Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 15,
+    "salary_max_lpa": 35,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "ServiceNow Implementation Consultant",
+      "Cloud Architecture Specialist",
+      "Enterprise Service Management Architect"
+    ]
+  },
+  "ServiceNow Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "ServiceNow Integration Specialist",
+      "Full Stack Developer",
+      "Automation Test Engineer"
+    ]
+  },
+  "Software Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Architect",
+      "DevOps Engineer",
+      "Technical Program Manager"
+    ]
+  },
+  "Software Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI/ML Developer",
+      "Full Stack Developer",
+      "Mobile App Developer"
+    ]
+  },
+  "Software Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Data Engineer",
+      "Cybersecurity Engineer",
+      "Solutions Engineer"
+    ]
+  },
+  "Software Quality Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Automation Test Engineer",
+      "DevTest Engineer",
+      "Quality Assurance Engineer"
+    ]
+  },
+  "Storage Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Storage Architect",
+      "Data Management Specialist",
+      "Digital Asset Manager"
+    ]
+  },
+  "Swift Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 20,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered App Developer",
+      "Mobile AI Engineer",
+      "AR/VR Experience Designer"
+    ]
+  },
+  "Systems Administrator": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Cloud Infrastructure Manager",
+      "Automation Specialist",
+      "Cybersecurity Analyst"
+    ]
+  },
+  "Systems Integration Engineer": {
+    "demand_level": "High",
+    "salary_min_lpa": 7,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "IoT Solutions Architect",
+      "AI-powered Systems Designer",
+      "Digital Transformation Consultant"
+    ]
+  },
+  "Threat Intelligence Analyst": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered Threat Hunter",
+      "Cybersecurity Data Scientist",
+      "Incident Response Specialist"
+    ]
+  },
+  "UI Designer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 10,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "AI-driven UX Designer",
+      "Human-Computer Interaction Specialist",
+      "Design Systems Specialist"
+    ]
+  },
+  "UI Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 14,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "Frontend Engineer with AI",
+      "Full Stack Developer with ML",
+      "Web3 Developer"
+    ]
+  },
+  "UX Designer": {
+    "demand_level": "High",
+    "salary_min_lpa": 5.5,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered UX Researcher",
+      "Human-Centered AI Designer",
+      "Service Designer with AI"
+    ]
+  },
+  "VR/AR Content Designer": {
+    "demand_level": "High",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "AI-powered UX Designer",
+      "Virtual Reality Experience Designer",
+      "Augmented Reality Artist"
+    ]
+  },
+  "Verification Engineer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 5,
+    "salary_max_lpa": 15,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI-driven Test Engineer",
+      "Automated Validation Specialist",
+      "Machine Learning Quality Assurance"
+    ]
+  },
+  "Vice President of Product": {
+    "demand_level": "High",
+    "salary_min_lpa": 20,
+    "salary_max_lpa": 50,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "AI-powered Product Strategist",
+      "Digital Transformation Leader",
+      "Data-driven Product Innovator"
+    ]
+  },
+  "Visual Designer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "UI/UX Designer with AI skills",
+      "Graphic Designer with Machine Learning",
+      "Digital Experience Designer"
+    ]
+  },
+  "Web3 Developer": {
+    "demand_level": "High",
+    "salary_min_lpa": 8,
+    "salary_max_lpa": 25,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Blockchain Analyst",
+      "Smart Contract Developer",
+      "Crypto Economist"
+    ]
+  },
+  "Windows Administrator": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 4.5,
+    "salary_max_lpa": 12,
+    "ai_automation_risk": "High",
+    "emerging_roles": [
+      "Cloud Infrastructure Manager",
+      "Cybersecurity Specialist",
+      "IT Service Manager"
+    ]
+  },
+  "Workday Developer": {
+    "demand_level": "Medium",
+    "salary_min_lpa": 6,
+    "salary_max_lpa": 18,
+    "ai_automation_risk": "Medium",
+    "emerging_roles": [
+      "HR Systems Analyst",
+      "Cloud HR Specialist",
+      "Workday Consultant"
+    ]
+  },
+  "Zero Trust Architect": {
+    "demand_level": "High",
+    "salary_min_lpa": 12,
+    "salary_max_lpa": 30,
+    "ai_automation_risk": "Low",
+    "emerging_roles": [
+      "Cloud Security Architect",
+      "Identity and Access Management Specialist",
+      "Threat Intelligence Analyst"
+    ]
+  }
+}

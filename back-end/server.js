@@ -207,7 +207,9 @@ app.post('/api/career-intelligence/export-excel', authMiddleware, careerSimulati
 
 logger.info('✅ Career Intelligence Routes Loaded (Excel + AI Engine + Simulation Engine)');
 
-// Health check
+// Career Agent Routes (Integrated from Career-Agent standalone system)
+app.use('/api/career-agent', require('./routes/careerAgent'));
+logger.info('✅ Career Agent Routes Loaded (/api/career-agent)');
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Server is running' });
 });

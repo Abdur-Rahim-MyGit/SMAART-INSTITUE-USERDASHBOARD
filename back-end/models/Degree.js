@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const degreeSchema = new mongoose.Schema({
+  uniqueId: {
+    type: String,
+    required: true,
+    unique: true
+  },
   level: {
     type: String,
     required: true,
@@ -13,6 +18,11 @@ const degreeSchema = new mongoose.Schema({
     index: true
   },
   fullName: {
+    type: String,
+    required: true,
+    index: true
+  },
+  abbreviation: {
     type: String,
     required: true,
     index: true

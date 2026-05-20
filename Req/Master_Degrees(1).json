@@ -1,0 +1,4272 @@
+[
+  {
+    "Degree ID": "UG-001-001",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-002",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "English",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-003",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Hindi",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-004",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "History",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-005",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Philosophy",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-006",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Political Science",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-007",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Sociology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-008",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Psychology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-009",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Economics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-010",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Geography",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-011",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Sanskrit",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-012",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Urdu",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-013",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Music",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-014",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Drama",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-001-015",
+    "Degree Group": "UG-001",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Arts",
+    "Abbreviation": "B.A.",
+    "Specialisation": "Journalism / Mass Communication",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-002-001",
+    "Degree Group": "UG-002",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Fine Arts",
+    "Abbreviation": "B.F.A.",
+    "Specialisation": "Painting",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-002-002",
+    "Degree Group": "UG-002",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Fine Arts",
+    "Abbreviation": "B.F.A.",
+    "Specialisation": "Sculpture",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-002-003",
+    "Degree Group": "UG-002",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Fine Arts",
+    "Abbreviation": "B.F.A.",
+    "Specialisation": "Applied Arts",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-002-004",
+    "Degree Group": "UG-002",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Fine Arts",
+    "Abbreviation": "B.F.A.",
+    "Specialisation": "Printmaking",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-002-005",
+    "Degree Group": "UG-002",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Fine Arts",
+    "Abbreviation": "B.F.A.",
+    "Specialisation": "Photography",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-002-006",
+    "Degree Group": "UG-002",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Fine Arts",
+    "Abbreviation": "B.F.A.",
+    "Specialisation": "Animation",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-003-001",
+    "Degree Group": "UG-003",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Performing Arts",
+    "Abbreviation": "B.P.A.",
+    "Specialisation": "Music",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-003-002",
+    "Degree Group": "UG-003",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Performing Arts",
+    "Abbreviation": "B.P.A.",
+    "Specialisation": "Dance",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-003-003",
+    "Degree Group": "UG-003",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Performing Arts",
+    "Abbreviation": "B.P.A.",
+    "Specialisation": "Theatre",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-003-004",
+    "Degree Group": "UG-003",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Bachelor of Performing Arts",
+    "Abbreviation": "B.P.A.",
+    "Specialisation": "Drama",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-001",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "General ",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-002",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Physics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-003",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Chemistry",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-004",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Biology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-005",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Mathematics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-006",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Statistics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-007",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Microbiology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-008",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Biotechnology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-009",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Biochemistry",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-010",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Computer Science",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-011",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Electronics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-012",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Environmental Science",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-013",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Zoology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-014",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Botany",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-015",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Forensic Science",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-016",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "Food Science / Nutrition",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-004-017",
+    "Degree Group": "UG-004",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Science",
+    "Degree Full Name": "Bachelor of Science",
+    "Abbreviation": "B.Sc.",
+    "Specialisation": "IT",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-001",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-002",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "Accounting & Finance",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-003",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "Banking & Insurance",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-004",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "Computer Applications",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-005",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "Taxation",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-006",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "E-Commerce",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-007",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "International Business",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-008",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "Computer Science",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-005-009",
+    "Degree Group": "UG-005",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Commerce",
+    "Abbreviation": "B.Com.",
+    "Specialisation": "Corporate Secretaryship",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-001",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-002",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "Marketing",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-003",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "Finance",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-004",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "HR",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-005",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "International Business",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-006",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "Retail",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-007",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "Operations",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-008",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "Entrepreneurship",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-006-009",
+    "Degree Group": "UG-006",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Business Administration",
+    "Abbreviation": "B.B.A.",
+    "Specialisation": "Digital Marketing",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-007-001",
+    "Degree Group": "UG-007",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Bachelor of Management Studies",
+    "Abbreviation": "B.M.S.",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-008-001",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Computer Science (CSE)",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-002",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Information Technology (IT)",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-003",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Electronics & Communication (ECE)",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-004",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Electrical & Electronics (EEE)",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-005",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Mechanical",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-006",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Civil",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-007",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Chemical",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-008",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Aerospace",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-009",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Automobile",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-010",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Biotechnology",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-011",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Petroleum",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-012",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Marine",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-013",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Metallurgy",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-014",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Mining",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-015",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Agricultural",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-008-016",
+    "Degree Group": "UG-008",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Technology",
+    "Abbreviation": "B.Tech.",
+    "Specialisation": "Textile",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-009-001",
+    "Degree Group": "UG-009",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Engineering",
+    "Abbreviation": "B.E.",
+    "Specialisation": "Computer Science",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-009-002",
+    "Degree Group": "UG-009",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Engineering",
+    "Abbreviation": "B.E.",
+    "Specialisation": "Electronics",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-009-003",
+    "Degree Group": "UG-009",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Engineering",
+    "Abbreviation": "B.E.",
+    "Specialisation": "Electrical",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-009-004",
+    "Degree Group": "UG-009",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Engineering",
+    "Abbreviation": "B.E.",
+    "Specialisation": "Mechanical",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-009-005",
+    "Degree Group": "UG-009",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Engineering",
+    "Abbreviation": "B.E.",
+    "Specialisation": "Civil",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-009-006",
+    "Degree Group": "UG-009",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Engineering",
+    "Abbreviation": "B.E.",
+    "Specialisation": "Chemical",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-009-007",
+    "Degree Group": "UG-009",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Engineering",
+    "Abbreviation": "B.E.",
+    "Specialisation": "Instrumentation",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-009-008",
+    "Degree Group": "UG-009",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Bachelor of Engineering",
+    "Abbreviation": "B.E.",
+    "Specialisation": "Production",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-011-001",
+    "Degree Group": "UG-011",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Bachelor of Computer Applications",
+    "Abbreviation": "B.C.A.",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-011-002",
+    "Degree Group": "UG-011",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Bachelor of Computer Applications",
+    "Abbreviation": "B.C.A.",
+    "Specialisation": "Data Science",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-011-003",
+    "Degree Group": "UG-011",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Bachelor of Computer Applications",
+    "Abbreviation": "B.C.A.",
+    "Specialisation": "Cyber Security",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-011-004",
+    "Degree Group": "UG-011",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Bachelor of Computer Applications",
+    "Abbreviation": "B.C.A.",
+    "Specialisation": "Cloud Computing",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-011-005",
+    "Degree Group": "UG-011",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Bachelor of Computer Applications",
+    "Abbreviation": "B.C.A.",
+    "Specialisation": "AI & ML",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-012-001",
+    "Degree Group": "UG-012",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Medicine & Bachelor of Surgery",
+    "Abbreviation": "M.B.B.S.",
+    "Specialisation": "General Medicine",
+    "Duration": 5.5
+  },
+  {
+    "Degree ID": "UG-013-001",
+    "Degree Group": "UG-013",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Dental Surgery",
+    "Abbreviation": "B.D.S.",
+    "Specialisation": "General Dentistry",
+    "Duration": 5.0
+  },
+  {
+    "Degree ID": "UG-014-001",
+    "Degree Group": "UG-014",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Ayurvedic Medicine & Surgery",
+    "Abbreviation": "B.A.M.S.",
+    "Specialisation": "General",
+    "Duration": 5.5
+  },
+  {
+    "Degree ID": "UG-015-001",
+    "Degree Group": "UG-015",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Homeopathic Medicine & Surgery",
+    "Abbreviation": "B.H.M.S.",
+    "Specialisation": "General",
+    "Duration": 5.5
+  },
+  {
+    "Degree ID": "UG-016-001",
+    "Degree Group": "UG-016",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Unani Medicine & Surgery",
+    "Abbreviation": "B.U.M.S.",
+    "Specialisation": "General",
+    "Duration": 5.5
+  },
+  {
+    "Degree ID": "UG-017-001",
+    "Degree Group": "UG-017",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Siddha Medicine & Surgery",
+    "Abbreviation": "B.S.M.S.",
+    "Specialisation": "General",
+    "Duration": 5.5
+  },
+  {
+    "Degree ID": "UG-018-001",
+    "Degree Group": "UG-018",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Naturopathy & Yogic Sciences",
+    "Abbreviation": "B.N.Y.S.",
+    "Specialisation": "General",
+    "Duration": 5.5
+  },
+  {
+    "Degree ID": "UG-019-001",
+    "Degree Group": "UG-019",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Physiotherapy",
+    "Abbreviation": "B.P.T.",
+    "Specialisation": "General",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-019-002",
+    "Degree Group": "UG-019",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Physiotherapy",
+    "Abbreviation": "B.P.T.",
+    "Specialisation": "Orthopaedics",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-019-003",
+    "Degree Group": "UG-019",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Physiotherapy",
+    "Abbreviation": "B.P.T.",
+    "Specialisation": "Neuro",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-019-004",
+    "Degree Group": "UG-019",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Physiotherapy",
+    "Abbreviation": "B.P.T.",
+    "Specialisation": "Sports",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-019-005",
+    "Degree Group": "UG-019",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Physiotherapy",
+    "Abbreviation": "B.P.T.",
+    "Specialisation": "Cardiopulmonary",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-019-006",
+    "Degree Group": "UG-019",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Physiotherapy",
+    "Abbreviation": "B.P.T.",
+    "Specialisation": "Paediatrics",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-020-001",
+    "Degree Group": "UG-020",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Occupational Therapy",
+    "Abbreviation": "B.O.T.",
+    "Specialisation": "General",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-020-002",
+    "Degree Group": "UG-020",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Occupational Therapy",
+    "Abbreviation": "B.O.T.",
+    "Specialisation": "Paediatrics",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-020-003",
+    "Degree Group": "UG-020",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Occupational Therapy",
+    "Abbreviation": "B.O.T.",
+    "Specialisation": "Neuro",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-020-004",
+    "Degree Group": "UG-020",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Occupational Therapy",
+    "Abbreviation": "B.O.T.",
+    "Specialisation": "Orthopaedics",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-020-005",
+    "Degree Group": "UG-020",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Bachelor of Occupational Therapy",
+    "Abbreviation": "B.O.T.",
+    "Specialisation": "Psychiatry",
+    "Duration": 4.5
+  },
+  {
+    "Degree ID": "UG-021-001",
+    "Degree Group": "UG-021",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "B.Sc. Nursing",
+    "Abbreviation": "B.Sc. Nursing",
+    "Specialisation": "General Nursing",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-022-001",
+    "Degree Group": "UG-022",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Allied Health Sciences",
+    "Degree Full Name": "B.Sc. Medical Lab Technology",
+    "Abbreviation": "B.Sc. MLT",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-023-001",
+    "Degree Group": "UG-023",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Allied Health Sciences",
+    "Degree Full Name": "B.Sc. Radiology & Imaging Technology",
+    "Abbreviation": "B.Sc. Radiology",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-024-001",
+    "Degree Group": "UG-024",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Allied Health Sciences",
+    "Degree Full Name": "B.Sc. Optometry",
+    "Abbreviation": "B.Sc. Optometry",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-025-001",
+    "Degree Group": "UG-025",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Allied Health Sciences",
+    "Degree Full Name": "B.Sc. Cardiac Care Technology",
+    "Abbreviation": "B.Sc. Cardiac Care",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-026-001",
+    "Degree Group": "UG-026",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Allied Health Sciences",
+    "Degree Full Name": "B.Sc. Anaesthesia Technology",
+    "Abbreviation": "B.Sc. Anaesthesia",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-027-001",
+    "Degree Group": "UG-027",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Allied Health Sciences",
+    "Degree Full Name": "B.Sc. Dialysis Technology",
+    "Abbreviation": "B.Sc. Dialysis",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-028-001",
+    "Degree Group": "UG-028",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Pharmacy",
+    "Degree Full Name": "Bachelor of Pharmacy",
+    "Abbreviation": "B.Pharm.",
+    "Specialisation": "General",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-029-001",
+    "Degree Group": "UG-029",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Law",
+    "Degree Full Name": "Bachelor of Laws",
+    "Abbreviation": "LL.B. (3-yr)",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-030-001",
+    "Degree Group": "UG-030",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Education",
+    "Abbreviation": "B.Ed.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "UG-030-002",
+    "Degree Group": "UG-030",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Education",
+    "Abbreviation": "B.Ed.",
+    "Specialisation": "Primary Education",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "UG-030-003",
+    "Degree Group": "UG-030",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Education",
+    "Abbreviation": "B.Ed.",
+    "Specialisation": "Secondary Education",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "UG-030-004",
+    "Degree Group": "UG-030",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Education",
+    "Abbreviation": "B.Ed.",
+    "Specialisation": "Special Education",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "UG-030-005",
+    "Degree Group": "UG-030",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Education",
+    "Abbreviation": "B.Ed.",
+    "Specialisation": "Languages",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "UG-030-006",
+    "Degree Group": "UG-030",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Education",
+    "Abbreviation": "B.Ed.",
+    "Specialisation": "Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "UG-030-007",
+    "Degree Group": "UG-030",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Education",
+    "Abbreviation": "B.Ed.",
+    "Specialisation": "Social Studies",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "UG-031-001",
+    "Degree Group": "UG-031",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Physical Education",
+    "Abbreviation": "B.P.Ed.",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-031-002",
+    "Degree Group": "UG-031",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Physical Education",
+    "Abbreviation": "B.P.Ed.",
+    "Specialisation": "Physical Education",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-031-003",
+    "Degree Group": "UG-031",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Physical Education",
+    "Abbreviation": "B.P.Ed.",
+    "Specialisation": "Sports Science",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-031-004",
+    "Degree Group": "UG-031",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Physical Education",
+    "Abbreviation": "B.P.Ed.",
+    "Specialisation": "Yoga",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-032-001",
+    "Degree Group": "UG-032",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Education",
+    "Degree Full Name": "Bachelor of Elementary Education",
+    "Abbreviation": "B.El.Ed.",
+    "Specialisation": "Primary & Elementary Teaching",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-034-001",
+    "Degree Group": "UG-034",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Bachelor of Architecture",
+    "Abbreviation": "B.Arch.",
+    "Specialisation": "General",
+    "Duration": 5.0
+  },
+  {
+    "Degree ID": "UG-035-001",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "General",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-002",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "Product Design",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-003",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "Fashion Design",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-004",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "Graphic Design",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-005",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "UX/UI Design",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-006",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "Interior Design",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-007",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "Animation",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-008",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "Textile Design",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-009",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "Jewellery Design",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-035-010",
+    "Degree Group": "UG-035",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Design",
+    "Degree Full Name": "Bachelor of Design",
+    "Abbreviation": "B.Des.",
+    "Specialisation": "Communication Design",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-036-001",
+    "Degree Group": "UG-036",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Agriculture",
+    "Abbreviation": "B.Sc. (Ag.)",
+    "Specialisation": "General",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-036-002",
+    "Degree Group": "UG-036",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Agriculture",
+    "Abbreviation": "B.Sc. (Ag.)",
+    "Specialisation": "Agronomy",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-036-003",
+    "Degree Group": "UG-036",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Agriculture",
+    "Abbreviation": "B.Sc. (Ag.)",
+    "Specialisation": "Horticulture",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-036-004",
+    "Degree Group": "UG-036",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Agriculture",
+    "Abbreviation": "B.Sc. (Ag.)",
+    "Specialisation": "Soil Science",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-036-005",
+    "Degree Group": "UG-036",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Agriculture",
+    "Abbreviation": "B.Sc. (Ag.)",
+    "Specialisation": "Plant Pathology",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-036-006",
+    "Degree Group": "UG-036",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Agriculture",
+    "Abbreviation": "B.Sc. (Ag.)",
+    "Specialisation": "Agricultural Economics",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-036-007",
+    "Degree Group": "UG-036",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Agriculture",
+    "Abbreviation": "B.Sc. (Ag.)",
+    "Specialisation": "Plant Breeding & Genetics",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-037-001",
+    "Degree Group": "UG-037",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Veterinary Science & Animal Husbandry",
+    "Abbreviation": "B.V.Sc. & A.H.",
+    "Specialisation": "General",
+    "Duration": 5.5
+  },
+  {
+    "Degree ID": "UG-038-001",
+    "Degree Group": "UG-038",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Fishery Science",
+    "Abbreviation": "B.F.Sc.",
+    "Specialisation": "General",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-039-001",
+    "Degree Group": "UG-039",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Forestry",
+    "Abbreviation": "B.Sc. Forestry",
+    "Specialisation": "General",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-040-001",
+    "Degree Group": "UG-040",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Bachelor of Science in Dairy Technology",
+    "Abbreviation": "B.Sc. Dairy Technology",
+    "Specialisation": "General",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-041-001",
+    "Degree Group": "UG-041",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Hotel Management",
+    "Abbreviation": "B.H.M.",
+    "Specialisation": "General",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-041-002",
+    "Degree Group": "UG-041",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Hotel Management",
+    "Abbreviation": "B.H.M.",
+    "Specialisation": "Food & Beverage",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-041-003",
+    "Degree Group": "UG-041",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Hotel Management",
+    "Abbreviation": "B.H.M.",
+    "Specialisation": "Front Office",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-041-004",
+    "Degree Group": "UG-041",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Hotel Management",
+    "Abbreviation": "B.H.M.",
+    "Specialisation": "Housekeeping",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-041-005",
+    "Degree Group": "UG-041",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Hotel Management",
+    "Abbreviation": "B.H.M.",
+    "Specialisation": "Culinary Arts",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-041-006",
+    "Degree Group": "UG-041",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Hotel Management",
+    "Abbreviation": "B.H.M.",
+    "Specialisation": "Event Management",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-042-001",
+    "Degree Group": "UG-042",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Hotel Management & Catering Technology",
+    "Abbreviation": "B.H.M.C.T.",
+    "Specialisation": "General",
+    "Duration": 4.0
+  },
+  {
+    "Degree ID": "UG-043-001",
+    "Degree Group": "UG-043",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Science in Hospitality",
+    "Abbreviation": "B.Sc. Hospitality",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-043-002",
+    "Degree Group": "UG-043",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Science in Hospitality",
+    "Abbreviation": "B.Sc. Hospitality",
+    "Specialisation": "Hotel Operations",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-043-003",
+    "Degree Group": "UG-043",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Science in Hospitality",
+    "Abbreviation": "B.Sc. Hospitality",
+    "Specialisation": "Food Service",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-043-004",
+    "Degree Group": "UG-043",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Bachelor of Science in Hospitality",
+    "Abbreviation": "B.Sc. Hospitality",
+    "Specialisation": "Tourism Management",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-044-001",
+    "Degree Group": "UG-044",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Bachelor of Journalism & Mass Communication",
+    "Abbreviation": "B.J.M.C. / B.M.C.",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-044-002",
+    "Degree Group": "UG-044",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Bachelor of Journalism & Mass Communication",
+    "Abbreviation": "B.J.M.C. / B.M.C.",
+    "Specialisation": "Print Journalism",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-044-003",
+    "Degree Group": "UG-044",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Bachelor of Journalism & Mass Communication",
+    "Abbreviation": "B.J.M.C. / B.M.C.",
+    "Specialisation": "Broadcast / Television",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-044-004",
+    "Degree Group": "UG-044",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Bachelor of Journalism & Mass Communication",
+    "Abbreviation": "B.J.M.C. / B.M.C.",
+    "Specialisation": "Digital Media",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-044-005",
+    "Degree Group": "UG-044",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Bachelor of Journalism & Mass Communication",
+    "Abbreviation": "B.J.M.C. / B.M.C.",
+    "Specialisation": "Advertising",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-044-006",
+    "Degree Group": "UG-044",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Bachelor of Journalism & Mass Communication",
+    "Abbreviation": "B.J.M.C. / B.M.C.",
+    "Specialisation": "Public Relations",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-044-007",
+    "Degree Group": "UG-044",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Bachelor of Journalism & Mass Communication",
+    "Abbreviation": "B.J.M.C. / B.M.C.",
+    "Specialisation": "Film Studies",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-045-001",
+    "Degree Group": "UG-045",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Bachelor of Social Work",
+    "Abbreviation": "B.S.W.",
+    "Specialisation": "General",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-045-002",
+    "Degree Group": "UG-045",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Bachelor of Social Work",
+    "Abbreviation": "B.S.W.",
+    "Specialisation": "Community Development",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-045-003",
+    "Degree Group": "UG-045",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Bachelor of Social Work",
+    "Abbreviation": "B.S.W.",
+    "Specialisation": "Family & Child Welfare",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-045-004",
+    "Degree Group": "UG-045",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Bachelor of Social Work",
+    "Abbreviation": "B.S.W.",
+    "Specialisation": "Medical Social Work",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-045-005",
+    "Degree Group": "UG-045",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Bachelor of Social Work",
+    "Abbreviation": "B.S.W.",
+    "Specialisation": "Rural Development",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-046-001",
+    "Degree Group": "UG-046",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Library Science",
+    "Degree Full Name": "Bachelor of Library & Information Science",
+    "Abbreviation": "B.L.I.Sc.",
+    "Specialisation": "General",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "UG-047-001",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Software Development",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-047-002",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Retail Management",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-047-003",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Healthcare",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-047-004",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Tourism & Hospitality",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-047-005",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Media Production",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-047-006",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Automotive Technology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-047-007",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Beauty & Wellness",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-047-008",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Banking & Finance",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "UG-047-009",
+    "Degree Group": "UG-047",
+    "Degree Level": "Undergraduate (UG)",
+    "Domain": "Vocational",
+    "Degree Full Name": "Bachelor of Vocation",
+    "Abbreviation": "B.Voc.",
+    "Specialisation": "Logistics & Supply Chain",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-001-001",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "English",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-002",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Hindi",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-003",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "History",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-004",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Philosophy",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-005",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Political Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-006",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Sociology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-007",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Psychology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-008",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Economics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-009",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Geography",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-010",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Sanskrit",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-011",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Linguistics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-012",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Archaeology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-001-013",
+    "Degree Group": "PG-001",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Arts",
+    "Abbreviation": "M.A.",
+    "Specialisation": "Public Administration",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-002-001",
+    "Degree Group": "PG-002",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Fine Arts",
+    "Abbreviation": "M.F.A.",
+    "Specialisation": "Painting",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-002-002",
+    "Degree Group": "PG-002",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Fine Arts",
+    "Abbreviation": "M.F.A.",
+    "Specialisation": "Sculpture",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-002-003",
+    "Degree Group": "PG-002",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Fine Arts",
+    "Abbreviation": "M.F.A.",
+    "Specialisation": "Applied Arts",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-002-004",
+    "Degree Group": "PG-002",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Fine Arts",
+    "Abbreviation": "M.F.A.",
+    "Specialisation": "Digital Arts",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-002-005",
+    "Degree Group": "PG-002",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Fine Arts",
+    "Abbreviation": "M.F.A.",
+    "Specialisation": "Photography",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-002-006",
+    "Degree Group": "PG-002",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Arts & Humanities",
+    "Degree Full Name": "Master of Fine Arts",
+    "Abbreviation": "M.F.A.",
+    "Specialisation": "Printmaking",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-001",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Physics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-002",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Chemistry",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-003",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Biology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-004",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Mathematics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-005",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Statistics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-006",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Microbiology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-007",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Biotechnology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-008",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Biochemistry",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-009",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Environmental Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-010",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Zoology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-011",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Botany",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-012",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Forensic Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-013",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Bioinformatics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-014",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Data Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-015",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "Computer Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-003-016",
+    "Degree Group": "PG-003",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Science",
+    "Degree Full Name": "Master of Science",
+    "Abbreviation": "M.Sc.",
+    "Specialisation": "IT",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-004-001",
+    "Degree Group": "PG-004",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Commerce",
+    "Abbreviation": "M.Com.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-004-002",
+    "Degree Group": "PG-004",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Commerce",
+    "Abbreviation": "M.Com.",
+    "Specialisation": "Accounting",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-004-003",
+    "Degree Group": "PG-004",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Commerce",
+    "Abbreviation": "M.Com.",
+    "Specialisation": "Finance",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-004-004",
+    "Degree Group": "PG-004",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Commerce",
+    "Abbreviation": "M.Com.",
+    "Specialisation": "Taxation",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-004-005",
+    "Degree Group": "PG-004",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Commerce",
+    "Abbreviation": "M.Com.",
+    "Specialisation": "Business Studies",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-004-006",
+    "Degree Group": "PG-004",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Commerce",
+    "Abbreviation": "M.Com.",
+    "Specialisation": "E-Commerce",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-004-007",
+    "Degree Group": "PG-004",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Commerce",
+    "Abbreviation": "M.Com.",
+    "Specialisation": "Banking",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-001",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-002",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Marketing",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-003",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Finance",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-004",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "HR",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-005",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Operations",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-006",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Strategy",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-007",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "International Business",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-008",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Business Analytics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-009",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Healthcare Management",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-010",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "IT",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-011",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Agri-Business",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-012",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Supply Chain",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-005-013",
+    "Degree Group": "PG-005",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Master of Business Administration",
+    "Abbreviation": "M.B.A.",
+    "Specialisation": "Entrepreneurship",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-006-001",
+    "Degree Group": "PG-006",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Post Graduate Diploma in Management",
+    "Abbreviation": "P.G.D.M.",
+    "Specialisation": "General",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-006-002",
+    "Degree Group": "PG-006",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Post Graduate Diploma in Management",
+    "Abbreviation": "P.G.D.M.",
+    "Specialisation": "Marketing",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-006-003",
+    "Degree Group": "PG-006",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Post Graduate Diploma in Management",
+    "Abbreviation": "P.G.D.M.",
+    "Specialisation": "Finance",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-006-004",
+    "Degree Group": "PG-006",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Post Graduate Diploma in Management",
+    "Abbreviation": "P.G.D.M.",
+    "Specialisation": "HR",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-006-005",
+    "Degree Group": "PG-006",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Post Graduate Diploma in Management",
+    "Abbreviation": "P.G.D.M.",
+    "Specialisation": "Operations",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-006-006",
+    "Degree Group": "PG-006",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Post Graduate Diploma in Management",
+    "Abbreviation": "P.G.D.M.",
+    "Specialisation": "Business Analytics",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-006-007",
+    "Degree Group": "PG-006",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Commerce & Management",
+    "Degree Full Name": "Post Graduate Diploma in Management",
+    "Abbreviation": "P.G.D.M.",
+    "Specialisation": "Rural Management",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-007-001",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "VLSI",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-002",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Embedded Systems",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-003",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "AI / ML",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-004",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Structural Engineering",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-005",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Power Systems",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-006",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Thermal Engineering",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-007",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "CAD/CAM",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-008",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Environmental Engineering",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-009",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Robotics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-010",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Nanotechnology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-011",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Computer Science Engineering",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-007-012",
+    "Degree Group": "PG-007",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Technology",
+    "Abbreviation": "M.Tech.",
+    "Specialisation": "Data Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-008-001",
+    "Degree Group": "PG-008",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Engineering",
+    "Abbreviation": "M.E.",
+    "Specialisation": "Computer Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-008-002",
+    "Degree Group": "PG-008",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Engineering",
+    "Abbreviation": "M.E.",
+    "Specialisation": "Electronics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-008-003",
+    "Degree Group": "PG-008",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Engineering",
+    "Abbreviation": "M.E.",
+    "Specialisation": "Mechanical",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-008-004",
+    "Degree Group": "PG-008",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Engineering",
+    "Abbreviation": "M.E.",
+    "Specialisation": "Civil",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-008-005",
+    "Degree Group": "PG-008",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Engineering",
+    "Abbreviation": "M.E.",
+    "Specialisation": "Chemical",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-008-006",
+    "Degree Group": "PG-008",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Engineering & Technology",
+    "Degree Full Name": "Master of Engineering",
+    "Abbreviation": "M.E.",
+    "Specialisation": "Industrial Engineering",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-009-001",
+    "Degree Group": "PG-009",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Computer Applications",
+    "Abbreviation": "M.C.A.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-009-002",
+    "Degree Group": "PG-009",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Computer Applications",
+    "Abbreviation": "M.C.A.",
+    "Specialisation": "Software Engineering",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-009-003",
+    "Degree Group": "PG-009",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Computer Applications",
+    "Abbreviation": "M.C.A.",
+    "Specialisation": "Networking",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-009-004",
+    "Degree Group": "PG-009",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Computer Applications",
+    "Abbreviation": "M.C.A.",
+    "Specialisation": "AI",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-009-005",
+    "Degree Group": "PG-009",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Computer Applications",
+    "Abbreviation": "M.C.A.",
+    "Specialisation": "Cyber Security",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-009-006",
+    "Degree Group": "PG-009",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Computer Applications",
+    "Abbreviation": "M.C.A.",
+    "Specialisation": "Data Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-009-007",
+    "Degree Group": "PG-009",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Computer Applications",
+    "Abbreviation": "M.C.A.",
+    "Specialisation": "Cloud Computing",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-010-001",
+    "Degree Group": "PG-010",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Science (CS / IT)",
+    "Abbreviation": "M.Sc. (CS/IT)",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-010-002",
+    "Degree Group": "PG-010",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Science (CS / IT)",
+    "Abbreviation": "M.Sc. (CS/IT)",
+    "Specialisation": "Artificial Intelligence",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-010-003",
+    "Degree Group": "PG-010",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Science (CS / IT)",
+    "Abbreviation": "M.Sc. (CS/IT)",
+    "Specialisation": "Data Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-010-004",
+    "Degree Group": "PG-010",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Science (CS / IT)",
+    "Abbreviation": "M.Sc. (CS/IT)",
+    "Specialisation": "Cyber Security",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-010-005",
+    "Degree Group": "PG-010",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Science (CS / IT)",
+    "Abbreviation": "M.Sc. (CS/IT)",
+    "Specialisation": "Software Engineering",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-010-006",
+    "Degree Group": "PG-010",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Science (CS / IT)",
+    "Abbreviation": "M.Sc. (CS/IT)",
+    "Specialisation": "Networking",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-010-007",
+    "Degree Group": "PG-010",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Computer Science & IT",
+    "Degree Full Name": "Master of Science (CS / IT)",
+    "Abbreviation": "M.Sc. (CS/IT)",
+    "Specialisation": "IoT",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-011-001",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "General Medicine",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-002",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Paediatrics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-003",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Dermatology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-004",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Psychiatry",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-005",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Radiology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-006",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Pathology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-007",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Microbiology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-008",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Pharmacology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-009",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Anaesthesia",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-011-010",
+    "Degree Group": "PG-011",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctor of Medicine",
+    "Abbreviation": "M.D.",
+    "Specialisation": "Community Medicine",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-012-001",
+    "Degree Group": "PG-012",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Surgery",
+    "Abbreviation": "M.S.",
+    "Specialisation": "General Surgery",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-012-002",
+    "Degree Group": "PG-012",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Surgery",
+    "Abbreviation": "M.S.",
+    "Specialisation": "Orthopaedics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-012-003",
+    "Degree Group": "PG-012",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Surgery",
+    "Abbreviation": "M.S.",
+    "Specialisation": "ENT",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-012-004",
+    "Degree Group": "PG-012",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Surgery",
+    "Abbreviation": "M.S.",
+    "Specialisation": "Ophthalmology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-012-005",
+    "Degree Group": "PG-012",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Surgery",
+    "Abbreviation": "M.S.",
+    "Specialisation": "Obstetrics & Gynaecology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-013-001",
+    "Degree Group": "PG-013",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Dental Surgery",
+    "Abbreviation": "M.D.S.",
+    "Specialisation": "Orthodontics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-013-002",
+    "Degree Group": "PG-013",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Dental Surgery",
+    "Abbreviation": "M.D.S.",
+    "Specialisation": "Oral & Maxillofacial Surgery",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-013-003",
+    "Degree Group": "PG-013",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Dental Surgery",
+    "Abbreviation": "M.D.S.",
+    "Specialisation": "Prosthodontics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-013-004",
+    "Degree Group": "PG-013",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Dental Surgery",
+    "Abbreviation": "M.D.S.",
+    "Specialisation": "Periodontics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-013-005",
+    "Degree Group": "PG-013",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Dental Surgery",
+    "Abbreviation": "M.D.S.",
+    "Specialisation": "Endodontics",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-013-006",
+    "Degree Group": "PG-013",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Dental Surgery",
+    "Abbreviation": "M.D.S.",
+    "Specialisation": "Oral Medicine & Radiology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-013-007",
+    "Degree Group": "PG-013",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Dental Surgery",
+    "Abbreviation": "M.D.S.",
+    "Specialisation": "Paediatric & Preventive Dentistry",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-014-001",
+    "Degree Group": "PG-014",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctorate of Medicine — Super Specialty",
+    "Abbreviation": "D.M.",
+    "Specialisation": "Cardiology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-014-002",
+    "Degree Group": "PG-014",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctorate of Medicine — Super Specialty",
+    "Abbreviation": "D.M.",
+    "Specialisation": "Neurology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-014-003",
+    "Degree Group": "PG-014",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctorate of Medicine — Super Specialty",
+    "Abbreviation": "D.M.",
+    "Specialisation": "Nephrology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-014-004",
+    "Degree Group": "PG-014",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctorate of Medicine — Super Specialty",
+    "Abbreviation": "D.M.",
+    "Specialisation": "Gastroenterology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-014-005",
+    "Degree Group": "PG-014",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctorate of Medicine — Super Specialty",
+    "Abbreviation": "D.M.",
+    "Specialisation": "Endocrinology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-014-006",
+    "Degree Group": "PG-014",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctorate of Medicine — Super Specialty",
+    "Abbreviation": "D.M.",
+    "Specialisation": "Oncology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-014-007",
+    "Degree Group": "PG-014",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Doctorate of Medicine — Super Specialty",
+    "Abbreviation": "D.M.",
+    "Specialisation": "Haematology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-015-001",
+    "Degree Group": "PG-015",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Magister Chirurgiae — Super Specialty",
+    "Abbreviation": "M.Ch.",
+    "Specialisation": "Neurosurgery",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-015-002",
+    "Degree Group": "PG-015",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Magister Chirurgiae — Super Specialty",
+    "Abbreviation": "M.Ch.",
+    "Specialisation": "Plastic Surgery",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-015-003",
+    "Degree Group": "PG-015",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Magister Chirurgiae — Super Specialty",
+    "Abbreviation": "M.Ch.",
+    "Specialisation": "Cardiothoracic Surgery",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-015-004",
+    "Degree Group": "PG-015",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Magister Chirurgiae — Super Specialty",
+    "Abbreviation": "M.Ch.",
+    "Specialisation": "Urology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-015-005",
+    "Degree Group": "PG-015",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Magister Chirurgiae — Super Specialty",
+    "Abbreviation": "M.Ch.",
+    "Specialisation": "Paediatric Surgery",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-015-006",
+    "Degree Group": "PG-015",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Magister Chirurgiae — Super Specialty",
+    "Abbreviation": "M.Ch.",
+    "Specialisation": "Surgical Oncology",
+    "Duration": 3.0
+  },
+  {
+    "Degree ID": "PG-016-001",
+    "Degree Group": "PG-016",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Public Health",
+    "Abbreviation": "M.P.H.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-016-002",
+    "Degree Group": "PG-016",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Public Health",
+    "Abbreviation": "M.P.H.",
+    "Specialisation": "Epidemiology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-016-003",
+    "Degree Group": "PG-016",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Public Health",
+    "Abbreviation": "M.P.H.",
+    "Specialisation": "Health Policy",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-016-004",
+    "Degree Group": "PG-016",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Public Health",
+    "Abbreviation": "M.P.H.",
+    "Specialisation": "Biostatistics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-016-005",
+    "Degree Group": "PG-016",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Public Health",
+    "Abbreviation": "M.P.H.",
+    "Specialisation": "Environmental Health",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-016-006",
+    "Degree Group": "PG-016",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Public Health",
+    "Abbreviation": "M.P.H.",
+    "Specialisation": "Global Health",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-017-001",
+    "Degree Group": "PG-017",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Hospital Administration",
+    "Abbreviation": "M.H.A.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-018-001",
+    "Degree Group": "PG-018",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Science in Nursing",
+    "Abbreviation": "M.Sc. Nursing",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-018-002",
+    "Degree Group": "PG-018",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Science in Nursing",
+    "Abbreviation": "M.Sc. Nursing",
+    "Specialisation": "Medical-Surgical Nursing",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-018-003",
+    "Degree Group": "PG-018",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Science in Nursing",
+    "Abbreviation": "M.Sc. Nursing",
+    "Specialisation": "Paediatric Nursing",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-018-004",
+    "Degree Group": "PG-018",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Science in Nursing",
+    "Abbreviation": "M.Sc. Nursing",
+    "Specialisation": "OBG Nursing",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-018-005",
+    "Degree Group": "PG-018",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Science in Nursing",
+    "Abbreviation": "M.Sc. Nursing",
+    "Specialisation": "Community Health Nursing",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-018-006",
+    "Degree Group": "PG-018",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Science in Nursing",
+    "Abbreviation": "M.Sc. Nursing",
+    "Specialisation": "Psychiatric Nursing",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-019-001",
+    "Degree Group": "PG-019",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Physiotherapy",
+    "Abbreviation": "M.P.T.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-019-002",
+    "Degree Group": "PG-019",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Physiotherapy",
+    "Abbreviation": "M.P.T.",
+    "Specialisation": "Orthopaedics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-019-003",
+    "Degree Group": "PG-019",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Physiotherapy",
+    "Abbreviation": "M.P.T.",
+    "Specialisation": "Neuro",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-019-004",
+    "Degree Group": "PG-019",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Physiotherapy",
+    "Abbreviation": "M.P.T.",
+    "Specialisation": "Sports",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-019-005",
+    "Degree Group": "PG-019",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Physiotherapy",
+    "Abbreviation": "M.P.T.",
+    "Specialisation": "Cardiopulmonary",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-019-006",
+    "Degree Group": "PG-019",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Physiotherapy",
+    "Abbreviation": "M.P.T.",
+    "Specialisation": "Paediatrics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-020-001",
+    "Degree Group": "PG-020",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Occupational Therapy",
+    "Abbreviation": "M.O.T.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-020-002",
+    "Degree Group": "PG-020",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Occupational Therapy",
+    "Abbreviation": "M.O.T.",
+    "Specialisation": "Paediatrics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-020-003",
+    "Degree Group": "PG-020",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Occupational Therapy",
+    "Abbreviation": "M.O.T.",
+    "Specialisation": "Neuro",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-020-004",
+    "Degree Group": "PG-020",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Occupational Therapy",
+    "Abbreviation": "M.O.T.",
+    "Specialisation": "Orthopaedics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-020-005",
+    "Degree Group": "PG-020",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Medicine & Health Sciences",
+    "Degree Full Name": "Master of Occupational Therapy",
+    "Abbreviation": "M.O.T.",
+    "Specialisation": "Psychiatry",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-021-001",
+    "Degree Group": "PG-021",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Pharmacy",
+    "Degree Full Name": "Master of Pharmacy",
+    "Abbreviation": "M.Pharm.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-021-002",
+    "Degree Group": "PG-021",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Pharmacy",
+    "Degree Full Name": "Master of Pharmacy",
+    "Abbreviation": "M.Pharm.",
+    "Specialisation": "Pharmaceutics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-021-003",
+    "Degree Group": "PG-021",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Pharmacy",
+    "Degree Full Name": "Master of Pharmacy",
+    "Abbreviation": "M.Pharm.",
+    "Specialisation": "Pharmacology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-021-004",
+    "Degree Group": "PG-021",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Pharmacy",
+    "Degree Full Name": "Master of Pharmacy",
+    "Abbreviation": "M.Pharm.",
+    "Specialisation": "Pharmaceutical Chemistry",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-021-005",
+    "Degree Group": "PG-021",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Pharmacy",
+    "Degree Full Name": "Master of Pharmacy",
+    "Abbreviation": "M.Pharm.",
+    "Specialisation": "Quality Assurance",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-021-006",
+    "Degree Group": "PG-021",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Pharmacy",
+    "Degree Full Name": "Master of Pharmacy",
+    "Abbreviation": "M.Pharm.",
+    "Specialisation": "Drug Regulatory Affairs",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-021-007",
+    "Degree Group": "PG-021",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Pharmacy",
+    "Degree Full Name": "Master of Pharmacy",
+    "Abbreviation": "M.Pharm.",
+    "Specialisation": "Clinical Pharmacy",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-022-001",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "General",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-022-002",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "Corporate Law",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-022-003",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "Constitutional Law",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-022-004",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "International Law",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-022-005",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "Criminal Law",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-022-006",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "Human Rights",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-022-007",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "IPR",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-022-008",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "Taxation",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-022-009",
+    "Degree Group": "PG-022",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Law",
+    "Degree Full Name": "Master of Laws",
+    "Abbreviation": "LL.M.",
+    "Specialisation": "Environmental Law",
+    "Duration": 1.0
+  },
+  {
+    "Degree ID": "PG-023-001",
+    "Degree Group": "PG-023",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Education",
+    "Abbreviation": "M.Ed.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-023-002",
+    "Degree Group": "PG-023",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Education",
+    "Abbreviation": "M.Ed.",
+    "Specialisation": "Educational Administration",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-023-003",
+    "Degree Group": "PG-023",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Education",
+    "Abbreviation": "M.Ed.",
+    "Specialisation": "Curriculum & Instruction",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-023-004",
+    "Degree Group": "PG-023",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Education",
+    "Abbreviation": "M.Ed.",
+    "Specialisation": "Special Education",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-023-005",
+    "Degree Group": "PG-023",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Education",
+    "Abbreviation": "M.Ed.",
+    "Specialisation": "Guidance & Counselling",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-023-006",
+    "Degree Group": "PG-023",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Education",
+    "Abbreviation": "M.Ed.",
+    "Specialisation": "Educational Psychology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-024-001",
+    "Degree Group": "PG-024",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Physical Education",
+    "Abbreviation": "M.P.Ed.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-024-002",
+    "Degree Group": "PG-024",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Physical Education",
+    "Abbreviation": "M.P.Ed.",
+    "Specialisation": "Sports Management",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-024-003",
+    "Degree Group": "PG-024",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Physical Education",
+    "Abbreviation": "M.P.Ed.",
+    "Specialisation": "Coaching Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-024-004",
+    "Degree Group": "PG-024",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Physical Education",
+    "Abbreviation": "M.P.Ed.",
+    "Specialisation": "Exercise Physiology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-024-005",
+    "Degree Group": "PG-024",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Education",
+    "Degree Full Name": "Master of Physical Education",
+    "Abbreviation": "M.P.Ed.",
+    "Specialisation": "Sports Psychology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-025-001",
+    "Degree Group": "PG-025",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Architecture",
+    "Abbreviation": "M.Arch.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-025-002",
+    "Degree Group": "PG-025",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Architecture",
+    "Abbreviation": "M.Arch.",
+    "Specialisation": "Urban Design",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-025-003",
+    "Degree Group": "PG-025",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Architecture",
+    "Abbreviation": "M.Arch.",
+    "Specialisation": "Landscape Architecture",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-025-004",
+    "Degree Group": "PG-025",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Architecture",
+    "Abbreviation": "M.Arch.",
+    "Specialisation": "Interior Architecture",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-025-005",
+    "Degree Group": "PG-025",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Architecture",
+    "Abbreviation": "M.Arch.",
+    "Specialisation": "Sustainable Architecture",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-025-006",
+    "Degree Group": "PG-025",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Architecture",
+    "Abbreviation": "M.Arch.",
+    "Specialisation": "Conservation & Heritage",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-026-001",
+    "Degree Group": "PG-026",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Urban & Regional Planning",
+    "Abbreviation": "M.U.R.P.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-026-002",
+    "Degree Group": "PG-026",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Urban & Regional Planning",
+    "Abbreviation": "M.U.R.P.",
+    "Specialisation": "Urban Planning",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-026-003",
+    "Degree Group": "PG-026",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Urban & Regional Planning",
+    "Abbreviation": "M.U.R.P.",
+    "Specialisation": "Regional Planning",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-026-004",
+    "Degree Group": "PG-026",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Urban & Regional Planning",
+    "Abbreviation": "M.U.R.P.",
+    "Specialisation": "Town Planning",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-026-005",
+    "Degree Group": "PG-026",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Architecture & Planning",
+    "Degree Full Name": "Master of Urban & Regional Planning",
+    "Abbreviation": "M.U.R.P.",
+    "Specialisation": "Transportation Planning",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-027-001",
+    "Degree Group": "PG-027",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Design",
+    "Degree Full Name": "Master of Design",
+    "Abbreviation": "M.Des.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-027-002",
+    "Degree Group": "PG-027",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Design",
+    "Degree Full Name": "Master of Design",
+    "Abbreviation": "M.Des.",
+    "Specialisation": "Industrial Design",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-027-003",
+    "Degree Group": "PG-027",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Design",
+    "Degree Full Name": "Master of Design",
+    "Abbreviation": "M.Des.",
+    "Specialisation": "Communication Design",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-027-004",
+    "Degree Group": "PG-027",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Design",
+    "Degree Full Name": "Master of Design",
+    "Abbreviation": "M.Des.",
+    "Specialisation": "Interaction Design",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-027-005",
+    "Degree Group": "PG-027",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Design",
+    "Degree Full Name": "Master of Design",
+    "Abbreviation": "M.Des.",
+    "Specialisation": "Fashion Design",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-027-006",
+    "Degree Group": "PG-027",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Design",
+    "Degree Full Name": "Master of Design",
+    "Abbreviation": "M.Des.",
+    "Specialisation": "Textile Design",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-027-007",
+    "Degree Group": "PG-027",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Design",
+    "Degree Full Name": "Master of Design",
+    "Abbreviation": "M.Des.",
+    "Specialisation": "Automotive Design",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-028-001",
+    "Degree Group": "PG-028",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Science in Agriculture",
+    "Abbreviation": "M.Sc. (Ag.)",
+    "Specialisation": "Agronomy",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-028-002",
+    "Degree Group": "PG-028",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Science in Agriculture",
+    "Abbreviation": "M.Sc. (Ag.)",
+    "Specialisation": "Plant Breeding & Genetics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-028-003",
+    "Degree Group": "PG-028",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Science in Agriculture",
+    "Abbreviation": "M.Sc. (Ag.)",
+    "Specialisation": "Soil Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-028-004",
+    "Degree Group": "PG-028",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Science in Agriculture",
+    "Abbreviation": "M.Sc. (Ag.)",
+    "Specialisation": "Agricultural Economics",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-028-005",
+    "Degree Group": "PG-028",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Science in Agriculture",
+    "Abbreviation": "M.Sc. (Ag.)",
+    "Specialisation": "Entomology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-028-006",
+    "Degree Group": "PG-028",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Science in Agriculture",
+    "Abbreviation": "M.Sc. (Ag.)",
+    "Specialisation": "Plant Pathology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-028-007",
+    "Degree Group": "PG-028",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Science in Agriculture",
+    "Abbreviation": "M.Sc. (Ag.)",
+    "Specialisation": "Horticulture",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-028-008",
+    "Degree Group": "PG-028",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Science in Agriculture",
+    "Abbreviation": "M.Sc. (Ag.)",
+    "Specialisation": "Agricultural Extension",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-029-001",
+    "Degree Group": "PG-029",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Veterinary Science",
+    "Abbreviation": "M.V.Sc.",
+    "Specialisation": "Animal Medicine",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-029-002",
+    "Degree Group": "PG-029",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Veterinary Science",
+    "Abbreviation": "M.V.Sc.",
+    "Specialisation": "Veterinary Surgery",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-029-003",
+    "Degree Group": "PG-029",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Veterinary Science",
+    "Abbreviation": "M.V.Sc.",
+    "Specialisation": "Pathology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-029-004",
+    "Degree Group": "PG-029",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Veterinary Science",
+    "Abbreviation": "M.V.Sc.",
+    "Specialisation": "Microbiology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-029-005",
+    "Degree Group": "PG-029",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Veterinary Science",
+    "Abbreviation": "M.V.Sc.",
+    "Specialisation": "Animal Genetics & Breeding",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-029-006",
+    "Degree Group": "PG-029",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Veterinary Science",
+    "Abbreviation": "M.V.Sc.",
+    "Specialisation": "Poultry Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-029-007",
+    "Degree Group": "PG-029",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Veterinary Science",
+    "Abbreviation": "M.V.Sc.",
+    "Specialisation": "Animal Nutrition",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-030-001",
+    "Degree Group": "PG-030",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Fishery Science",
+    "Abbreviation": "M.F.Sc.",
+    "Specialisation": "Aquaculture",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-030-002",
+    "Degree Group": "PG-030",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Fishery Science",
+    "Abbreviation": "M.F.Sc.",
+    "Specialisation": "Marine Fisheries",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-030-003",
+    "Degree Group": "PG-030",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Fishery Science",
+    "Abbreviation": "M.F.Sc.",
+    "Specialisation": "Fish Processing Technology",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-030-004",
+    "Degree Group": "PG-030",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Agriculture & Allied Sciences",
+    "Degree Full Name": "Master of Fishery Science",
+    "Abbreviation": "M.F.Sc.",
+    "Specialisation": "Fisheries Resource Management",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-031-001",
+    "Degree Group": "PG-031",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Master of Tourism Administration / Management",
+    "Abbreviation": "M.T.A. / M.T.M.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-031-002",
+    "Degree Group": "PG-031",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Master of Tourism Administration / Management",
+    "Abbreviation": "M.T.A. / M.T.M.",
+    "Specialisation": "Tourism Management",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-031-003",
+    "Degree Group": "PG-031",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Master of Tourism Administration / Management",
+    "Abbreviation": "M.T.A. / M.T.M.",
+    "Specialisation": "Eco-Tourism",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-031-004",
+    "Degree Group": "PG-031",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Master of Tourism Administration / Management",
+    "Abbreviation": "M.T.A. / M.T.M.",
+    "Specialisation": "Heritage Tourism",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-031-005",
+    "Degree Group": "PG-031",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Hotel Management & Tourism",
+    "Degree Full Name": "Master of Tourism Administration / Management",
+    "Abbreviation": "M.T.A. / M.T.M.",
+    "Specialisation": "Hospitality Management",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-032-001",
+    "Degree Group": "PG-032",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Master of Journalism & Mass Communication",
+    "Abbreviation": "M.J.M.C. / M.M.C.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-032-002",
+    "Degree Group": "PG-032",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Master of Journalism & Mass Communication",
+    "Abbreviation": "M.J.M.C. / M.M.C.",
+    "Specialisation": "Broadcast Journalism",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-032-003",
+    "Degree Group": "PG-032",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Master of Journalism & Mass Communication",
+    "Abbreviation": "M.J.M.C. / M.M.C.",
+    "Specialisation": "Digital Media",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-032-004",
+    "Degree Group": "PG-032",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Master of Journalism & Mass Communication",
+    "Abbreviation": "M.J.M.C. / M.M.C.",
+    "Specialisation": "Advertising & PR",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-032-005",
+    "Degree Group": "PG-032",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Master of Journalism & Mass Communication",
+    "Abbreviation": "M.J.M.C. / M.M.C.",
+    "Specialisation": "Corporate Communication",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-032-006",
+    "Degree Group": "PG-032",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Journalism & Mass Communication",
+    "Degree Full Name": "Master of Journalism & Mass Communication",
+    "Abbreviation": "M.J.M.C. / M.M.C.",
+    "Specialisation": "Documentary Filmmaking",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-033-001",
+    "Degree Group": "PG-033",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Master of Social Work",
+    "Abbreviation": "M.S.W.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-033-002",
+    "Degree Group": "PG-033",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Master of Social Work",
+    "Abbreviation": "M.S.W.",
+    "Specialisation": "Community Organisation",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-033-003",
+    "Degree Group": "PG-033",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Master of Social Work",
+    "Abbreviation": "M.S.W.",
+    "Specialisation": "Medical Social Work",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-033-004",
+    "Degree Group": "PG-033",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Master of Social Work",
+    "Abbreviation": "M.S.W.",
+    "Specialisation": "HR Management",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-033-005",
+    "Degree Group": "PG-033",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Master of Social Work",
+    "Abbreviation": "M.S.W.",
+    "Specialisation": "Criminology & Correctional Administration",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-033-006",
+    "Degree Group": "PG-033",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Social Work",
+    "Degree Full Name": "Master of Social Work",
+    "Abbreviation": "M.S.W.",
+    "Specialisation": "Family & Child Welfare",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-034-001",
+    "Degree Group": "PG-034",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Library Science",
+    "Degree Full Name": "Master of Library & Information Science",
+    "Abbreviation": "M.L.I.Sc.",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-034-002",
+    "Degree Group": "PG-034",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Library Science",
+    "Degree Full Name": "Master of Library & Information Science",
+    "Abbreviation": "M.L.I.Sc.",
+    "Specialisation": "Digital Libraries",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-034-003",
+    "Degree Group": "PG-034",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Library Science",
+    "Degree Full Name": "Master of Library & Information Science",
+    "Abbreviation": "M.L.I.Sc.",
+    "Specialisation": "Knowledge Management",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-034-004",
+    "Degree Group": "PG-034",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Library Science",
+    "Degree Full Name": "Master of Library & Information Science",
+    "Abbreviation": "M.L.I.Sc.",
+    "Specialisation": "Information Retrieval",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-034-005",
+    "Degree Group": "PG-034",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Library Science",
+    "Degree Full Name": "Master of Library & Information Science",
+    "Abbreviation": "M.L.I.Sc.",
+    "Specialisation": "Archival Studies",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-035-001",
+    "Degree Group": "PG-035",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Defence & Military Studies",
+    "Degree Full Name": "Master of Science in Defence Studies",
+    "Abbreviation": "M.Sc. (Defence)",
+    "Specialisation": "General",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-035-002",
+    "Degree Group": "PG-035",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Defence & Military Studies",
+    "Degree Full Name": "Master of Science in Defence Studies",
+    "Abbreviation": "M.Sc. (Defence)",
+    "Specialisation": "Defence & Strategic Studies",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-035-003",
+    "Degree Group": "PG-035",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Defence & Military Studies",
+    "Degree Full Name": "Master of Science in Defence Studies",
+    "Abbreviation": "M.Sc. (Defence)",
+    "Specialisation": "Military Science",
+    "Duration": 2.0
+  },
+  {
+    "Degree ID": "PG-035-004",
+    "Degree Group": "PG-035",
+    "Degree Level": "Postgraduate (PG)",
+    "Domain": "Defence & Military Studies",
+    "Degree Full Name": "Master of Science in Defence Studies",
+    "Abbreviation": "M.Sc. (Defence)",
+    "Specialisation": "National Security",
+    "Duration": 2.0
+  }
+]

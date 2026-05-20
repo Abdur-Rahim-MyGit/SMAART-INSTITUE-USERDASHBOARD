@@ -137,24 +137,24 @@ const Institution = () => {
             >
               {/* Outer Card — Theme Aware */}
               <div
-                className="rounded-3xl overflow-hidden bg-card text-card-foreground shadow-2xl"
+                className="rounded-3xl overflow-hidden bg-white dark:bg-card text-slate-900 dark:text-card-foreground shadow-2xl"
                 style={{
                   border: "1px solid var(--border)",
                 }}
               >
                 {/* Frame around the video */}
                 <div
-                  className="relative rounded-t-3xl bg-muted/30"
+                  className="relative rounded-t-3xl bg-slate-50 dark:bg-muted/30"
                   style={{
                     padding: "16px",
                   }}
                 >
                   {/* Founder's Message Badge */}
                   <div
-                    className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 rounded-full shadow-sm border border-border bg-card/90 backdrop-blur-md"
+                    className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 rounded-full shadow-sm border border-border bg-white/90 dark:bg-card/90 backdrop-blur-md"
                   >
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(var(--primary),0.4)]" />
-                    <span className="text-[10px] sm:text-[11px] font-bold text-card-foreground tracking-widest uppercase">
+                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-900 dark:text-card-foreground tracking-widest uppercase">
                       Leadership Message
                     </span>
                   </div>
@@ -180,16 +180,16 @@ const Institution = () => {
 
                 {/* Welcome text below */}
                 <div
-                  className="px-6 py-6 sm:px-8 sm:py-7 flex items-center justify-between gap-4 rounded-b-3xl relative overflow-hidden bg-card"
+                  className="px-6 py-6 sm:px-8 sm:py-7 flex items-center justify-between gap-4 rounded-b-3xl relative overflow-hidden bg-white dark:bg-card"
                 >
                   <div className="relative z-10">
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-1.5 tracking-tight leading-snug">
+                    <h2 className="text-xl sm:text-2xl font-bold text-[#002147] dark:text-foreground mb-1.5 tracking-tight leading-snug">
                       A Message from {" "}
                       <span className="font-extrabold text-primary">
                         Your Institution
                       </span>
                     </h2>
-                    <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
+                    <p className="text-slate-600 dark:text-muted-foreground text-sm leading-relaxed max-w-xs">
                       Hear from your institution’s leadership as they introduce this platform and share their best wishes for your learning journey and future success.
 
                     </p>

@@ -53,3 +53,30 @@ exports.getSpecializations = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+// Get all degrees structured hierarchically for cascading dropdowns
+exports.getAllDegreesHierarchical = async (req, res) => {
+  try {
+    const degrees = await Degree.find({}).sort({ level: 1, domain: 1, fullName: 1, specialization: 1 });
+    const tree = {};
+
+    degrees.forEach(d => {
+      const level = d.level;
+      const domain = d.domain;
+      const fullName = d.fullName;
+      const spec = d.specialization;
+
+      if (!tree[level]) tree[level] = {};
+      if (!tree[level][domain]) tree[level][domain] = {};
+      if (!tree[level][domain][fullName]) tree[level][domain][fullName] = [];
+      
+      if (spec && !tree[level][domain][fullName].includes(spec)) {
+        tree[level][domain][fullName].push(spec);
+      }
+    });
+
+    res.json(tree);
+  } catch (error) {
+    console.error('Error fetching hierarchical degrees:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
