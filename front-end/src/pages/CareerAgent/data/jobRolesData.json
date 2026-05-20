@@ -1,0 +1,6699 @@
+{
+  "roles": [
+    {
+      "role": ".NET Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "5G Network Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "AI Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "AI Ethics Specialist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "AI Product Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "AI Safety Researcher",
+      "family": "Information Technology"
+    },
+    {
+      "role": "AI Trainer / Data Labeller",
+      "family": "Information Technology"
+    },
+    {
+      "role": "AR/VR Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "AWS Solutions Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Accessibility Tester",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Agile Coach",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Analog Design Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Analytics Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Android Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Angular Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Ansible Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Application Security Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Artificial Intelligence Specialist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Associate Product Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Azure Solutions Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "BI Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Back End Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Big Data Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Big Data Specialist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Blockchain Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Blue Team Specialist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Build and Release Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Business Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Business Intelligence Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "C++ Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "CISO",
+      "family": "Information Technology"
+    },
+    {
+      "role": "CTO",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Chief AI Officer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Chief Product Officer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Chip Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Cloud Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Cloud Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Cloud Security Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Cloud Security Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Computer Programmer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Computer Vision Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Configuration Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Creative Director (Tech)",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Cyber Threat Hunter",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Cybersecurity Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Cybersecurity Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "DFT Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Annotator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Governance Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Product Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Quality Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Scientist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Data Steward",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Database Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Database Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Deep Learning Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Design System Specialist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "DevOps Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Digital Forensics Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Digital Twin Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Director of Product",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Drone Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "ERP Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Edge Computing Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Embedded Hardware Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Embedded Systems Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Engineering Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Enterprise Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Ethical Hacker",
+      "family": "Information Technology"
+    },
+    {
+      "role": "FPGA Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Fab Technician",
+      "family": "Information Technology"
+    },
+    {
+      "role": "FinOps Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Firmware Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Flutter Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Front End Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Full Stack Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Functional Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "GCP Solutions Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "GRC Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Game Engine Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Generative AI Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "GitOps Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Golang Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Hardware Test Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IT Asset Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IT Auditor",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IT Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IT Help Desk Technician",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IT Project Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IT Recruiter",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IT Vendor Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "ITSM Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Identity and Access Management Specialist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Incident Response Specialist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Information Security Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Infrastructure Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Interaction Designer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IoT Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "IoT Solutions Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Java Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Jenkins Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Kafka Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Kotlin Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Kubernetes Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "L1 Support Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "L2 Support Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "L3 Support Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "LLM Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Linux Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "MLOps Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Machine Learning Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Manual Tester",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Metaverse Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Microservices Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Microsoft Dynamics Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Mixed Signal Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Mobile App Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Mobile App Tester",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Motion Graphics Designer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "NLP Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Network Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Network Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Network Security Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Node.js Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Oracle Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Oracle DBA",
+      "family": "Information Technology"
+    },
+    {
+      "role": "PCB Design Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "PHP Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Penetration Tester",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Performance Test Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Physical Design Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Platform Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Power BI Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Principal Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Product Designer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Product Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Program Manager (IT)",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Prompt Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Python Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "QA Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "QA Lead",
+      "family": "Information Technology"
+    },
+    {
+      "role": "QA Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Quantum Computing Researcher",
+      "family": "Information Technology"
+    },
+    {
+      "role": "REST API Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "RTL Design Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "React Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "React Native Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Red Team Specialist",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Release Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Research Scientist (AI)",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Robotics Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Robotics Software Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Ruby on Rails Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Rust Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SAP ABAP Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SAP Basis Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SAP Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SAP FICO Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SAP HCM Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SAP MM Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SAP SD Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SDET",
+      "family": "Information Technology"
+    },
+    {
+      "role": "SOC Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Salesforce Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Salesforce Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Salesforce Consultant",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Salesforce Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Scala Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Scrum Master",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Security Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Security Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Security Operations Centre Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Semiconductor Process Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Senior Product Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "ServiceNow Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "ServiceNow Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "ServiceNow Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Signal Integrity Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Site Reliability Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Smart Contract Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Snowflake Data Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Software Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Software Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Software Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Software Quality Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Solution Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Space Tech Software Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Spark Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Staff Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Storage Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Swift Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Systems Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Systems Integration Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Tableau Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Technical Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Technical Lead",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Technical Program Manager",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Technical Support Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Terraform Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Test Automation Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Test Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Threat Intelligence Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "UI Designer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "UI Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "UX Designer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "UX Researcher",
+      "family": "Information Technology"
+    },
+    {
+      "role": "UX Writer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "VLSI Design Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "VP Engineering",
+      "family": "Information Technology"
+    },
+    {
+      "role": "VR/AR Content Designer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Verification Engineer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Vice President of Product",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Visual Designer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Vue.js Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Vulnerability Assessment Analyst",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Wearable App Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Web Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Web3 Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Windows Administrator",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Workday Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "Zero Trust Architect",
+      "family": "Information Technology"
+    },
+    {
+      "role": "iOS Developer",
+      "family": "Information Technology"
+    },
+    {
+      "role": "ALM Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "AML Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "AML Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Account Aggregator Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Accounts Executive",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Accounts Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Actuary",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Agricultural Loan Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "BNPL Product Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Bancassurance Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Bank Branch Operations Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Bank Teller",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Banking Operations Executive",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Bookkeeper",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Branch Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Budget Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "CFO",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Cash Management Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Certified Financial Planner",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Chartered Accountant",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Claims Adjuster",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Claims Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Commodity Broker",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Company Secretary",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Compliance Officer (Banking)",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Corporate Banking Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Cost and Management Accountant",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Credit Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Credit Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Credit Risk Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Crypto Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Depository Participant Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Derivatives Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Derivatives Trader",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Digital Lending Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Digital Payments Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Direct Tax Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Equity Research Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "External Auditor",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "FinTech Engineer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Finance Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Finance Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Financial Controller",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Financial Crimes Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Financial Data Scientist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Financial Planner",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Financial Reporting Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Fixed Income Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Fixed Income Trader",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Forensic Accountant",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Forex Dealer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Forex Operations Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Fraud Detection Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Fund Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "GST Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "General Insurance Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Gold Loan Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Health Insurance Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Hedge Fund Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Home Loan Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "IFRS Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "IPO Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Ind AS Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Indirect Tax Consultant",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "InsurTech Product Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Insurance Product Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Insurance Sales Agent",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Insurance Surveyor",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Insurance Underwriter",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Internal Auditor",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Investment Advisor",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Investment Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Investment Banker",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "KYC Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "KYC Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Life Insurance Advisor",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Loan Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Loan Recovery Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Loss Control Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "M&A Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "MSME Credit Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "MSME Loan Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Management Accountant",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Market Risk Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Merchant Acquiring Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Microfinance Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Mortgage Advisor",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Motor Insurance Claims Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Mutual Fund Distributor",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "NPA Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "NRI Banking Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Neobank Product Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Open Banking Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Operational Risk Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "POS Terminal Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Payment Gateway Developer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Payroll Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Portfolio Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Priority Banking Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Priority Wealth Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Private Banking Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Private Equity Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Quantitative Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "RegTech Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Reinsurance Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Relationship Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Research Analyst (Equity)",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Retail Banking Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Risk Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Risk Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "SME Banking Officer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Senior Relationship Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Statutory Auditor",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Stock Broker",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Structured Finance Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Tax Consultant",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Trade Finance Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Transfer Pricing Specialist",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Treasury Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Treasury Dealer",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Treasury Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "UPI Product Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Venture Capital Analyst",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Virtual CFO",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Wealth Manager",
+      "family": "Banking & Financial Services"
+    },
+    {
+      "role": "Anaesthesia Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Anaesthesiologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Analytical Chemist (Pharma)",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Audiologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Ayurveda Research Officer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Ayurvedic Doctor",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Bioinformatics Scientist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Biomedical Engineer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Bioprocess Engineer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Cardiac Nurse",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Cardiac Rehabilitation Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Cardiac Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Cardiac Technologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Cardiologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Cath Lab Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Chief Nursing Officer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Clinical Applications Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Clinical Data Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Clinical Nutritionist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Clinical Pharmacist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Clinical Research Associate",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Clinical Research Coordinator",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Clinical Trial Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Cosmetic Dermatologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Critical Care Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Cytogeneticist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Dental Hygienist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Dental Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Dentist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Dermatologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Diabetologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Dialysis Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Dietitian",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Digital Health Product Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Drug Discovery Scientist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Drug Information Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Drug Regulatory Affairs Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Drug Safety Officer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "ECG Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "EEG Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "EHR Implementation Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "ENT Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Emergency Medical Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Endocrinologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Endodontist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Family Medicine Doctor",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Field Service Engineer (Medical Devices)",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Formulation Scientist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Gastroenterologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "General Physician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Genomics Researcher",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Geriatrician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Gynaecologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Haematologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Haematology Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Health Data Analyst",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Health Informatics Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Health Insurance Executive",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Healthcare IT Consultant",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Healthcare Marketing Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Healthcare Operations Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Hepatologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Histo-Pathology Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Homeopathic Doctor",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Hospital Administrator",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Hospital Pharmacist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Hospital Quality Auditor",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Hospital Quality Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "ICU Nurse",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Infection Control Nurse",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Infection Control Officer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Infertility Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Interventional Cardiologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Interventional Radiologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Joint Replacement Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Lymphoedema Therapist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "MRI Technologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Maxillofacial Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical AI Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Affairs Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Billing Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Coding Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Device QA Engineer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Device R&D Engineer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Device Sales Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Lab Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Lab Technologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Records Officer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Representative",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Science Liaison",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Medical Superintendent",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Microbiology Lab Scientist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Midwife",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "NABH Coordinator",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Naturopath",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Neonatologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Nephrologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Neurologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Neurosurgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Nurse Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Nurse Practitioner",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Nursing Tutor",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Nutritionist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Obstetrician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Occupational Therapist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Oncologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Oncology Nurse",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Operation Theatre Nurse",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Operation Theatre Technician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Ophthalmologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Optometrist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Oral and Maxillofacial Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Orthodontist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Orthopaedic Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Paediatric Nurse",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Paediatric Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Paediatrician",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pain Management Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Paramedic",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pathologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pedodontist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Perfusionist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Periodontist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pharmaceutical Product Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pharmaceutical Sales Representative",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pharmacist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pharmacokineticist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pharmacovigilance Analyst",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Physiotherapist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Plastic Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Prosthetics and Orthotics Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Prosthodontist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Psychiatrist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Pulmonologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "QA Specialist (Pharma)",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Quality Control Analyst (Pharma)",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Radiation Oncologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Radiographer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Radiologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Registered Nurse",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Regulatory Affairs Manager (Medical Devices)",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Regulatory Affairs Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Remote Patient Monitoring Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Rheumatologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Siddha Practitioner",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Sonographer",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Speech and Language Therapist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Spine Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Sports Medicine Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Staff Nurse",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Surgical Oncologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Telemedicine Coordinator",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Toxicologist (Clinical)",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Transplant Coordinator",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Unani Practitioner",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Urologist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Validation Engineer (Pharma)",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Vascular Surgeon",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Veterinarian",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Wellness Programme Manager",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "Wound Care Specialist",
+      "family": "Healthcare & Life Sciences"
+    },
+    {
+      "role": "ADAS Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Additive Manufacturing Engineer (3D Printing)",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Aerodynamics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Aerospace Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Aerospace Manufacturing Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Aircraft Maintenance Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Apparel Export Manager",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Automobile Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Automotive Design Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Automotive Electronics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Automotive Software Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Automotive Testing Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Autonomous Vehicle Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Avionics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Battery Management Systems Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Beverage Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Blast Furnace Operator",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Brewing Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "CAD Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "CAM Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Casting Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Cement Process Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Ceramics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Chemical Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Chemical Process Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Confectionery Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Control Systems Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Corrosion Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Crash Safety Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Defence Systems Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Design Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Drilling Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Dyeing and Printing Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "EV Charging Systems Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "EV Design Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Electric Powertrain Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Electrical Design Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Electrical Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Electronics Design Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Electronics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Energy Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Environmental Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Ergonomics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Fabric Sourcing Manager",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Fire and Safety Officer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Flight Test Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Fluid Mechanics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Food Process Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Food Quality Analyst",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Food Safety Officer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Food Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Forging Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Garment Merchandiser",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Garment Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Gas Turbine Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Geological Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Glass Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "HSE Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "HVAC Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "High Voltage Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Hybrid Vehicle Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Industrial Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Industry 4.0 Specialist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Injection Moulding Technician",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Instrumentation Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Knitting Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Lean Manufacturing Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Maintenance Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Manufacturing Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Materials Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Mechanical Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Metallurgical Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Mineral Processing Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Mining Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "NVH Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "New Product Introduction Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Noise and Vibration Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Operations Manager (Manufacturing)",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "PLC Programmer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Packaging Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Paint Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Paper and Pulp Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Pattern Maker",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Petroleum Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Pipeline Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Piping Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Plant Manager",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Plastics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Polymer Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Power Electronics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Power Systems Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Precision Machining Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Process Design Engineer (Oil & Gas)",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Process Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Process Safety Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Product Development Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Production Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Production Manager",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Production Supervisor",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Production Supervisor (Garments)",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Propulsion Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Protection and Relay Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Quality Assurance Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Quality Control Inspector",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Quality Controller (Textiles)",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Quality Manager",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "R&D Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "R&D Manager (Food)",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "RF Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Refrigeration Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Reliability Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Reservoir Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Robotics Automation Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Rolling Mill Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Rubber Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "SCADA Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Safety Officer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Satellite Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Signal Processing Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Six Sigma Specialist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Space Systems Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Steel Plant Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Structural Engineer (Aerospace)",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Substation Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Sugar Technologist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Telecom Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Textile Chemist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Textile Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Textile Machine Operator",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Thermal Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Tooling Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "UAV Systems Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Value Engineering Specialist",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Vehicle Dynamics Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Weapons Systems Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "Welding Engineer",
+      "family": "Engineering & Manufacturing"
+    },
+    {
+      "role": "3D Visualizer (Architecture)",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Airport Design Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Architect",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "BIM Coordinator",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "BIM Manager",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Billing Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Bridge Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Building Inspector",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Building Services Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Civil Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Construction Foreman",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Contracts Manager",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Cost Estimator",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Electrical Contractor",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Environmental Engineer (Construction)",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Facility Manager",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Fire Safety Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "GIS Specialist",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Geotechnical Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Green Building Auditor",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "High-Rise Structural Consultant",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Highway Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Hydraulic Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Infrastructure Project Developer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Interior Designer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Labour Contractor",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Landscape Architect",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Landscape Designer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Leasing Manager",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "MEP Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Metro Rail Civil Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Pavement Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Plumbing Contractor",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Port Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Project Manager (Construction)",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Property Lawyer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Property Manager",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Proptech Entrepreneur",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Quantity Surveyor",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "RERA Compliance Officer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Real Estate Agent",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Real Estate Analyst",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Real Estate Broker",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Real Estate Developer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Real Estate Investment Analyst",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Resident Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Site Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Site Supervisor",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Smart City Consultant",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Soil Tester",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Structural Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Surveyor",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Town Planner",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Township Development Manager",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Transportation Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Tunnel Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Urban Planner",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Valuer / Property Appraiser",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Water Resources Engineer",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Waterproofing Specialist",
+      "family": "Construction & Real Estate"
+    },
+    {
+      "role": "Biodiversity Specialist",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Biogas Plant Manager",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Biomass Energy Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Carbon Credit Analyst",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Carbon Footprint Analyst",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Carbon Market Trader",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Circular Economy Consultant",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Clean Tech Entrepreneur",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Climate Risk Analyst",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "ESG Analyst",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "ESG Manager",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "ESG Reporting Specialist",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "EV Battery Recycling Specialist",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "EV Charging Infrastructure Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Energy Auditor",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Energy Manager",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Energy Storage Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Environmental Auditor",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Environmental Impact Assessment Specialist",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Green Building Consultant",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Green Hydrogen Specialist",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Grid Integration Specialist",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Hydropower Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "LEED Accredited Professional",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Marine Energy Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Net Zero Consultant",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Pollution Control Officer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Power Plant Operations Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Power Purchase Agreement Manager",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Renewable Energy Consultant",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Renewable Energy Finance Analyst",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Renewable Energy Project Manager",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Smart Grid Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Solar EPC Manager",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Solar Energy Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Solar Panel Installer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Sustainability Consultant",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Transmission Line Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Waste Management Specialist",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Waste-to-Energy Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Water Resource Manager",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Water Treatment Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Wind Energy Engineer",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Wind Turbine Technician",
+      "family": "Renewable Energy & Sustainability"
+    },
+    {
+      "role": "Area Sales Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Cashier",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Category Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Cold Chain Specialist",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Customer Experience Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Customer Service Representative",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Customs Broker",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "D2C Brand Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Delivery Driver",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Delivery Executive",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Demand Planner",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Distribution Centre Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Drone Delivery Coordinator",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "E-Commerce Analyst",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "E-Commerce Key Account Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "E-Commerce Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "EXIM Specialist",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "FMCG Distributor",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Fleet Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Freight Forwarder",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Hyperlocal Operations Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Import Export Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Inventory Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Kirana Store Owner",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Last Mile Delivery Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Logistics Coordinator",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Logistics Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Loss Prevention Officer",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Mall Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Marketplace Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Online Merchandiser",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Packaging Specialist",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Planogram Specialist",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Procurement Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Procurement Specialist",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Quick Commerce Operations Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Retail Analyst",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Retail Buyer",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Retail Sales Executive",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Returns Management Specialist",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Reverse Logistics Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Shop Floor Executive",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Sourcing Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Store Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Supply Chain Analyst",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Supply Chain Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Third Party Logistics Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Transportation Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Visual Merchandiser",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Warehouse Manager",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Warehouse Supervisor",
+      "family": "E-Commerce, Retail & Logistics"
+    },
+    {
+      "role": "Account Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Account Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Automobile Sales Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "B2B Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Brand Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Business Development Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Business Development Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "CMO",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "CRM Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Channel Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Chief Revenue Officer",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Cloud Sales Specialist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Content Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Content Strategist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Copywriter",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Corporate Communications Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Customer Insights Analyst",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Customer Retention Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Customer Success Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Customer Success Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Data-Driven Marketing Analyst",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Digital Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Digital Marketing Specialist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Edtech Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Email Marketing Specialist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Events Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "FMCG Sales Officer",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Field Sales Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "General Trade Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Go-to-Market Strategist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Growth Hacker",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Healthcare Sales Representative",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Influencer Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Inside Sales Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Institutional Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Insurance Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Key Account Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Loyalty Programme Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Market Research Analyst",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Marketing Analyst",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Marketing Automation Specialist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Modern Trade Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "National Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Outdoor / OOH Media Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "PPC Analyst",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "PR Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Partner Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Performance Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Pre-Sales Consultant",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Product Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Programmatic Advertising Specialist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Public Relations Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Real Estate Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Regional Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Revenue Operations Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Rural Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "SEM Specialist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "SEO Specialist",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "SaaS Sales Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Sales Engineer",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Sales Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Senior Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Shopper Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Social Media Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Social Media Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Tele-caller",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Telesales Executive",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Trade Marketing Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "VP Marketing",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "VP Sales",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Zonal Sales Manager",
+      "family": "Sales & Marketing"
+    },
+    {
+      "role": "Background Verification Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "CHRO",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Campus Recruiter",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Compensation and Benefits Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Compensation and Benefits Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Culture and Change Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "DEI Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Diversity Sourcing Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Employee Engagement Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Employee Relations Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Employer Branding Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Executive Coach",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Executive Search Consultant",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Global Mobility Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Analytics Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Business Partner",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Chatbot / AI HR Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Compliance Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Director",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Executive",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Generalist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Legal Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Operations Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Shared Services Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HR Transformation Consultant",
+      "family": "Human Resources"
+    },
+    {
+      "role": "HRIS Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Head of Talent Acquisition",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Industrial Relations Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Job Evaluation Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Labour Relations Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Learning and Development Executive",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Learning and Development Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Onboarding Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Organizational Development Consultant",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Payroll Executive",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Payroll Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "People Analytics Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Performance Management Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Recruiter",
+      "family": "Human Resources"
+    },
+    {
+      "role": "SAP SuccessFactors Consultant",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Senior HR Business Partner",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Senior Recruiter",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Staffing Consultant",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Talent Acquisition Executive",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Talent Acquisition Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Talent Acquisition Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Talent Intelligence Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Talent Management Specialist",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Technical Recruiter",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Training Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Workday Consultant",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Workforce Planning Manager",
+      "family": "Human Resources"
+    },
+    {
+      "role": "Academic Advisor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Academic Operations Manager",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Admissions Counsellor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Art Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Assistant Professor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Associate Professor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Blended Learning Designer",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Career Counsellor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Coaching Faculty",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Computer Science Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Corporate Trainer",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Creche Supervisor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Curriculum Developer",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Day Care Centre Manager",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Distance Learning Coordinator",
+      "family": "Education & Training"
+    },
+    {
+      "role": "E-Learning Developer",
+      "family": "Education & Training"
+    },
+    {
+      "role": "EdTech Product Manager",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Education Counsellor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Education Technology Sales Manager",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Educational Psychologist",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Examination Controller",
+      "family": "Education & Training"
+    },
+    {
+      "role": "High School Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "IIT JEE / NEET Faculty",
+      "family": "Education & Training"
+    },
+    {
+      "role": "ITI Instructor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Instructional Designer",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Kindergarten Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Language Instructor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Learning and Development Specialist",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Lecturer",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Librarian",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Library and Information Scientist",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Micro-Credential Designer",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Montessori Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Music Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "NEET Counsellor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Online Tutor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Physical Education Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Post-Doctoral Fellow",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Preschool Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Primary School Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Professor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Research Associate",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Research Scholar",
+      "family": "Education & Training"
+    },
+    {
+      "role": "STEM Educator",
+      "family": "Education & Training"
+    },
+    {
+      "role": "School Administrator",
+      "family": "Education & Training"
+    },
+    {
+      "role": "School Counsellor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "School Principal",
+      "family": "Education & Training"
+    },
+    {
+      "role": "School Social Worker",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Secondary School Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Skill Assessment Specialist",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Special Education Teacher",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Special Needs Assistant",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Sports Coach (School)",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Student Success Manager",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Study Abroad Consultant",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Subject Matter Expert",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Test Prep Instructor",
+      "family": "Education & Training"
+    },
+    {
+      "role": "University Registrar",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Vice Principal",
+      "family": "Education & Training"
+    },
+    {
+      "role": "Vocational Trainer",
+      "family": "Education & Training"
+    },
+    {
+      "role": "2D Animator",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "3D Animator",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Actor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Advertising Creative Director",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Art Director (Advertising)",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Art Director (Film)",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Book Author",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Brand Storyteller",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Camera Operator",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Casting Director",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Choreographer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Cinematographer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Color Grading Artist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Comic Artist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Content Creator",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Content Writer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Costume Designer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Creative Writing Instructor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "DI Technician",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Dancer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Digital News Editor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Director of Photography",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Discord Community Manager",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Documentary Filmmaker",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Dubbing Artist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Editor (Publications)",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Entertainment Journalist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Esports Manager",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Esports Player / Athlete",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Event Coordinator",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Event Manager",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Fact Checker",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Film Critic",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Film Director",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Film Producer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Foley Artist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Game Designer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Game Developer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Ghostwriter",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Graphic Designer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Illustrator",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Interpreter",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Investigative Journalist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Journalist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Level Designer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Lighting Technician",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Lyricist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Media Buyer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Media Planner",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Meme Creator / Digital Humorist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Music Composer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Musician",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Narrative Designer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "News Anchor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "News Producer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "OTT Content Strategist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "PR Specialist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Photo Editor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Photographer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Podcast Host",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Podcast Producer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Post-Production Supervisor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Production Designer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Radio Jockey",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Reporter",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Screenplay Writer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Script Writer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Set Designer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Showrunner",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Singer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Sound Designer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Sound Engineer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Sports Journalist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Storyboard Artist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Streaming Platform Manager",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Sub-Editor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Subtitle Editor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "TV Anchor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Technical Writer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Translator",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Twitch Streamer",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "VFX Artist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "VFX Supervisor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Video Editor",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Voice Over Artist",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "War Correspondent",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "Webinar Host",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "YouTuber",
+      "family": "Media, Entertainment & Content"
+    },
+    {
+      "role": "ASHA Worker",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Anganwadi Worker",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Assistant Commissioner (Tax)",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Bank Probationary Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Block Development Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Boiler Inspector",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "CBI Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Central Excise Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Chief Information Officer (Govt)",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Civil Defence Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Customs Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "DRDO Scientist",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Defence Officer (Air Force)",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Defence Officer (Army)",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Defence Officer (Navy)",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Diplomat / Foreign Service Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Disaster Relief Coordinator",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "District Collector / DM",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Drugs Inspector",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "E-Governance Specialist",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "ED Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Factory Inspector",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Food Inspector",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "GIS Officer (Government)",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Government Hospital Doctor",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Government Legal Advisor",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Government Nurse",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Government School Teacher",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Gram Panchayat Secretary",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Gramin Dak Sevak",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Groundwater Scientist",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Horticulture Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "IAS Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "IFS Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "IPS Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "IRS Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "ISRO Engineer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "ISRO Scientist",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Income Tax Inspector",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Income Tax Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Indian Audit and Accounts Service Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Indian Economic Service Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Indian Engineering Services Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Indian Forest Service Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Indian Information Service Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Indian Railways Officer (IRMS)",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Indian Statistical Service Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Inspector of Police",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Intelligence Bureau Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "LIC Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Labour Inspector",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Mid Day Meal Supervisor",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Municipal Commissioner",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Municipal Engineer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "NABARD Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Naib Tehsildar",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "PSU Engineer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "PSU Manager",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Panchayat Development Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Paramilitary Officer (CRPF/BSF/CISF/ITBP)",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Police Constable",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Postal Department Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Postman",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Public Prosecutor",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "RBI Grade B Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Railway Station Master",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Railway Technician",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "SEBI Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "SIDBI Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "SSC CGL Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "SSC CHSL Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Soil Conservation Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "State Civil Services Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "State Government Engineer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Sub-Divisional Magistrate",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Sub-Inspector of Police",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Tehsildar",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Urban Local Body Officer",
+      "family": "Government & Public Sector"
+    },
+    {
+      "role": "Agri Data Analyst",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Agri-Input Sales Representative",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Agricultural Entomologist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Agricultural Extension Officer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Agricultural Marketing Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Agricultural Scientist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Agritech Entrepreneur",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Agronomist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Animal Husbandry Officer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Apiculture Trainer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Aquaculture Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Beekeeping Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Bio-Fertiliser Technologist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Biocontrol Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Climate Smart Agriculture Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Cold Storage Manager",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Commodity Exchange Analyst",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Commodity Trader",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Controlled Environment Agriculture Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Cooperative Society Manager",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Dairy Technologist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Drone Operator (Agriculture)",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Environment Officer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "FPO Manager",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Farm Manager",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Farmer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Fisheries Officer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Fisheries Scientist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Floriculturist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Forest Ranger",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Horticulturist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Hydroponics Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Irrigation Engineer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Krishi Vigyan Kendra Scientist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Marine Fisheries Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Mushroom Cultivation Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "NABARD Development Officer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Organic Farming Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Plant Breeder",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Plant Pathologist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Poultry Farm Manager",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Precision Agriculture Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Rural Development Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Rural Entrepreneur",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Seed Technologist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Sericulture Expert",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Soil Scientist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Vertical Farming Specialist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Veterinary Officer",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Viticulturist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Warehouse Manager (Agri)",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Wildlife Conservationist",
+      "family": "Agriculture & Allied Sectors"
+    },
+    {
+      "role": "Adventure Tourism Guide",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Banquet Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Bartender",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Bell Boy / Porter",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Catering Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Chef de Partie",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Commis Chef",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Concierge",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Cruise Ship Officer",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Cultural Heritage Guide",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Destination Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Ecotourism Specialist",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Event Planner",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Executive Chef",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "F&B Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "F&B Supervisor",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Front Desk Executive",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Front Office Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Guest Experience Analyst",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Guest Relations Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Heritage Tourism Specialist",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Hotel General Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Hotel Interior Designer",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Hotel Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Hotel Sales Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Housekeeping Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Housekeeping Supervisor",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Kitchen Steward",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "MICE Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Night Auditor",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Pastry Chef",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Restaurant Captain",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Restaurant Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Revenue Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Sommelier",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Sous Chef",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Spa Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Theme Park Manager",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Tour Guide",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Tour Operator",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Tourism Officer",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Travel Agent",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Travel Insurance Specialist",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Travel Technology Specialist",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Valet Parking Attendant",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Wedding Planner",
+      "family": "Hospitality, Travel & Tourism"
+    },
+    {
+      "role": "Advocate",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Anti-Corruption Officer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Arbitrator",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Banking and Finance Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Capital Markets Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Competition Law Specialist",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Compliance Officer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Consumer Rights Advocate",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Contract Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Contract Manager",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Contract Specialist",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Corporate Governance Officer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Corporate Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Court Clerk",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Criminal Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Cyber Law Specialist",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "DPDP Compliance Specialist",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Data Privacy Officer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Debt Recovery Tribunal Advocate",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Environmental Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Family Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "GDPR Specialist",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "General Counsel",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Human Rights Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "IP Attorney",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "In-House Counsel",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Insurance Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Judicial Clerk",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Labour Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Legal Advisor",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Legal Aid Officer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Legal Analyst",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Legal Process Outsourcing Specialist",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Legal Secretary",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Legal Tech Specialist",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Litigation Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Mediator",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Mergers and Acquisitions Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Notary",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Paralegal",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Patent Attorney",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Pharmaceutical Regulatory Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Public Interest Litigation Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "RBI Compliance Officer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Real Estate Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Regulatory Affairs Manager",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Revenue Law Specialist",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Risk and Compliance Manager",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "SEBI Compliance Officer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Tax Lawyer",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Trademark Attorney",
+      "family": "Legal & Compliance"
+    },
+    {
+      "role": "Board Director",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Business Development Director",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Business Intelligence Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Business Strategy Analyst",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Business Transformation Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "CEO",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "COO",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Change Management Specialist",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Chief Digital Officer",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Chief Operating Officer",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Chief Strategy Officer",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Corporate Planning Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Digital Transformation Lead",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Director",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Entrepreneur / Founder",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Franchise Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "General Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "IPO Project Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Innovation Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Interim Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Joint Venture Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Management Consultant",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Merger Integration Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Operations Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Operations Research Analyst",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "PMO Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Program Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Project Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Senior Director",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Senior Vice President",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Startup Co-Founder",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Strategy Consultant",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Strategy Manager",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Supply Chain Strategist",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "Vice President",
+      "family": "Management & Strategy"
+    },
+    {
+      "role": "CSR Manager",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Child Labour Rehabilitation Officer",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Child Protection Officer",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Child Welfare Officer",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Clinical Psychologist",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Community Development Officer",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Community Health Worker",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Development Sector Professional",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Disability Support Worker",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Drug De-addiction Counsellor",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Drug and Alcohol Counsellor",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Gender Equality Specialist",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Geriatric Care Manager",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Grief Counsellor",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Health Education Specialist",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Humanitarian Aid Worker",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Impact Investing Analyst",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Livelihood Specialist",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Mental Health Counsellor",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "NGO Programme Manager",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Non-Profit Manager",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Old Age Care Manager",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Prisoner Rehabilitation Officer",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Probation Officer",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Public Policy Analyst",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Rehabilitation Counsellor",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Self Help Group Coordinator",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Social Entrepreneur",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Social Impact Analyst",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Social Worker",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Tribal Welfare Officer",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Volunteer Coordinator",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Women and Child Development Officer",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Youth Worker",
+      "family": "Social Services & Community"
+    },
+    {
+      "role": "Air Traffic Controller",
+      "family": "Transportation"
+    },
+    {
+      "role": "Airline Pilot",
+      "family": "Transportation"
+    },
+    {
+      "role": "Assistant Loco Pilot",
+      "family": "Transportation"
+    },
+    {
+      "role": "Auto Rickshaw Driver",
+      "family": "Transportation"
+    },
+    {
+      "role": "Bus Driver",
+      "family": "Transportation"
+    },
+    {
+      "role": "Cab Driver (App-based)",
+      "family": "Transportation"
+    },
+    {
+      "role": "Cable Car Operator",
+      "family": "Transportation"
+    },
+    {
+      "role": "Co-Pilot",
+      "family": "Transportation"
+    },
+    {
+      "role": "Deck Officer",
+      "family": "Transportation"
+    },
+    {
+      "role": "Dispatch Executive",
+      "family": "Transportation"
+    },
+    {
+      "role": "Drone Pilot",
+      "family": "Transportation"
+    },
+    {
+      "role": "E-Rickshaw Driver",
+      "family": "Transportation"
+    },
+    {
+      "role": "Fleet Supervisor",
+      "family": "Transportation"
+    },
+    {
+      "role": "Freight Broker",
+      "family": "Transportation"
+    },
+    {
+      "role": "Harbour Pilot",
+      "family": "Transportation"
+    },
+    {
+      "role": "Heavy Vehicle Driver",
+      "family": "Transportation"
+    },
+    {
+      "role": "Helicopter Pilot",
+      "family": "Transportation"
+    },
+    {
+      "role": "Loco Pilot",
+      "family": "Transportation"
+    },
+    {
+      "role": "Logistics Executive",
+      "family": "Transportation"
+    },
+    {
+      "role": "Logistics Tech Analyst",
+      "family": "Transportation"
+    },
+    {
+      "role": "Marine Engineer",
+      "family": "Transportation"
+    },
+    {
+      "role": "Metro Rail Operator",
+      "family": "Transportation"
+    },
+    {
+      "role": "Port Operations Manager",
+      "family": "Transportation"
+    },
+    {
+      "role": "Road Safety Officer",
+      "family": "Transportation"
+    },
+    {
+      "role": "Ship Captain",
+      "family": "Transportation"
+    },
+    {
+      "role": "Shipping Agent",
+      "family": "Transportation"
+    },
+    {
+      "role": "Supply Chain Visibility Analyst",
+      "family": "Transportation"
+    },
+    {
+      "role": "Taxi Driver",
+      "family": "Transportation"
+    },
+    {
+      "role": "Train Guard",
+      "family": "Transportation"
+    },
+    {
+      "role": "Transport Coordinator",
+      "family": "Transportation"
+    },
+    {
+      "role": "Truck Driver",
+      "family": "Transportation"
+    },
+    {
+      "role": "Vehicle Inspection Officer",
+      "family": "Transportation"
+    },
+    {
+      "role": "AC Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Aluminium Fabricator",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Automobile Mechanic",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Boiler Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "CNC Operator",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Carpenter",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Computer Hardware Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Crane Operator",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Diesel Mechanic",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "EV Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Electrical Supervisor",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Electrician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Electronics Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Elevator Mechanic",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "False Ceiling Installer",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Fire Alarm Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Fire Sprinkler Installer",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Fitter",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Forklift Operator",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Glass and Glazing Worker",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "HVAC Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Industrial Cleaner",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Industrial Machinery Mechanic",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Industrial Painter",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Instrumentation Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Interior Fit-Out Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Lineman",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Machinist",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Marble and Stone Worker",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Mason",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Mobile Phone Repair Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "PVC Installer",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Painter (Construction)",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Painter (Industrial)",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Pipeline Welder",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Plumber",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Plumbing Supervisor",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Refractory Mason",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Refrigeration Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Rigger",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Scaffolding Erector",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Security System Installer",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Sheet Metal Worker",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Solar Panel Technician",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Steel Fabricator",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Subsea Welder",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Tile Layer",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Tool and Die Maker",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Turner",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Two Wheeler Mechanic",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Welder",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Wireman",
+      "family": "Skilled Trades & Technical"
+    },
+    {
+      "role": "Baker",
+      "family": "Food Services"
+    },
+    {
+      "role": "Barista",
+      "family": "Food Services"
+    },
+    {
+      "role": "Canteen Manager",
+      "family": "Food Services"
+    },
+    {
+      "role": "Catering Supervisor",
+      "family": "Food Services"
+    },
+    {
+      "role": "Chef",
+      "family": "Food Services"
+    },
+    {
+      "role": "Cloud Kitchen Chef",
+      "family": "Food Services"
+    },
+    {
+      "role": "Cloud Kitchen Manager",
+      "family": "Food Services"
+    },
+    {
+      "role": "Cook",
+      "family": "Food Services"
+    },
+    {
+      "role": "Dhaba / Restaurant Owner",
+      "family": "Food Services"
+    },
+    {
+      "role": "Diet Cook (Hospital)",
+      "family": "Food Services"
+    },
+    {
+      "role": "Dishwasher",
+      "family": "Food Services"
+    },
+    {
+      "role": "Food Delivery Agent",
+      "family": "Food Services"
+    },
+    {
+      "role": "Food Entrepreneur",
+      "family": "Food Services"
+    },
+    {
+      "role": "Food Quality Inspector",
+      "family": "Food Services"
+    },
+    {
+      "role": "Food Stylist",
+      "family": "Food Services"
+    },
+    {
+      "role": "Food Truck Operator",
+      "family": "Food Services"
+    },
+    {
+      "role": "Head Cook",
+      "family": "Food Services"
+    },
+    {
+      "role": "Institutional Catering Chef",
+      "family": "Food Services"
+    },
+    {
+      "role": "Kitchen Helper",
+      "family": "Food Services"
+    },
+    {
+      "role": "Mess Manager",
+      "family": "Food Services"
+    },
+    {
+      "role": "Nutrition Coach",
+      "family": "Food Services"
+    },
+    {
+      "role": "Street Food Vendor",
+      "family": "Food Services"
+    },
+    {
+      "role": "Tiffin Service Operator",
+      "family": "Food Services"
+    },
+    {
+      "role": "Waiter / Steward",
+      "family": "Food Services"
+    },
+    {
+      "role": "Acupuncturist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Animal Trainer",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Astrologer",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Ayurvedic Therapist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Barber",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Beautician",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Bridal Makeup Artist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Child Care Worker",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Cosmetologist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Dog Walker",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Domestic Worker",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Elder Care Worker",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Fashion Stylist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Fitness Trainer",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Grooming Trainer",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Gym Manager",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Hairdresser",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Home Care Nurse",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Image Consultant",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Laundry Manager",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Life Coach",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Makeup Artist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Massage Therapist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Meditation Coach",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Nail Technician",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Nanny / Babysitter",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Naturopathy Therapist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Personal Driver / Chauffeur",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Personal Secretary",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Personal Shopper",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Personal Trainer",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Pet Care Specialist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Pet Groomer",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Pilates Instructor",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Pranic Healing Practitioner",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Reiki Practitioner",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Skincare Specialist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Sound Healing Therapist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Spa Therapist",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Tailor",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Vastu Consultant",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Wellness Coach",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Yoga Instructor",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Zumba Instructor",
+      "family": "Personal Services & Wellness"
+    },
+    {
+      "role": "Anthropologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Archaeologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Astronomer",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Astrophysicist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Biochemist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Biophysicist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Botanist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Chemist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Cognitive Scientist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Computational Biologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Ecologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Economist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Epidemiologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Food Scientist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Forensic Analyst",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Forensic Scientist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Genomic Scientist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Geologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Geophysicist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Hydrogeologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Immunologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Materials Scientist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Mathematician",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Meteorologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Microbiologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Nanotechnology Researcher",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Neuroscientist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Nuclear Scientist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Oceanographer",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Pharmacognosist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Physicist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Political Scientist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Proteomics Researcher",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Psychologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Remote Sensing Specialist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Science Communicator",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Science Policy Advisor",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Scientific Illustrator",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Seismologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Sociologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Space Researcher",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Statistician",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Structural Biologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Toxicologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Virologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Zoologist",
+      "family": "Science & Research"
+    },
+    {
+      "role": "Airport Security Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Bomb Disposal Expert",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Border Security Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "CCTV Surveillance Operator",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Canine Handler",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Coast Guard Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Corporate Security Manager",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Criminal Investigator",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Cyber Crime Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Detective",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Disaster Management Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Emergency Response Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Event Security Manager",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Fire Safety Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Firefighter",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Fraud Investigator",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Intelligence Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Loss Prevention Manager",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Maritime Security Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Narcotics Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Nuclear Security Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Police Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Private Investigator",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Security Guard",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Security Manager",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Security Supervisor",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Traffic Police Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "VIP Protection Officer",
+      "family": "Protective & Security Services"
+    },
+    {
+      "role": "Art Gallery Manager",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Art Therapist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Calligraphist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Ceramics Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Cultural Programme Officer",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Curator",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Digital Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Fashion Designer",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Fine Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Florist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Furniture Designer",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Graphic Novel Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Heritage Conservation Specialist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Industrial Designer",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Jewellery Designer",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Madhubani Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Magician",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Mime Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Museum Professional",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "NFT Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Performance Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Potter / Craftsperson",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Puppet Maker",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Puppeteer",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Rangoli Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Sand Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Sculptor",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Stand-Up Comedian",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Street Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Tattoo Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Textile Designer",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Theatre Actor",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Theatre Director",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Warli Artist",
+      "family": "Creative & Arts"
+    },
+    {
+      "role": "Affiliate Marketer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Amazon Flex Partner",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "App Reseller",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Data Entry Operator (Freelance)",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Dropshipping Entrepreneur",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Dunzo / Zepto Delivery Partner",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Fiverr Seller",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Consultant",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Data Analyst",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Designer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Developer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Marketing Consultant",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Photographer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Trainer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Translator",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Video Editor",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Freelance Writer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Gig Economy Platform Manager",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Independent Financial Advisor",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Network Marketing Professional",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Ola / Uber Driver Partner",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Online Tutor (Freelance)",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Print on Demand Seller",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Rapido Bike Taxi Partner",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Remote Customer Support Agent",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Social Media Influencer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Stock Photo / Video Creator",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Swiggy Delivery Partner",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Transcriptionist",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Upwork Freelancer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Urban Company Professional",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Virtual Assistant (Freelance)",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Voice-over Freelancer",
+      "family": "Gig & Platform Economy"
+    },
+    {
+      "role": "Zomato Delivery Partner",
+      "family": "Gig & Platform Economy"
+    }
+  ],
+  "sectors": [
+    "Agriculture & Allied Sectors",
+    "Banking & Financial Services",
+    "Construction & Real Estate",
+    "Creative & Arts",
+    "E-Commerce, Retail & Logistics",
+    "Education & Training",
+    "Engineering & Manufacturing",
+    "Food Services",
+    "Gig & Platform Economy",
+    "Government & Public Sector",
+    "Healthcare & Life Sciences",
+    "Hospitality, Travel & Tourism",
+    "Human Resources",
+    "Information Technology",
+    "Legal & Compliance",
+    "Management & Strategy",
+    "Media, Entertainment & Content",
+    "Personal Services & Wellness",
+    "Protective & Security Services",
+    "Renewable Energy & Sustainability",
+    "Sales & Marketing",
+    "Science & Research",
+    "Skilled Trades & Technical",
+    "Social Services & Community",
+    "Transportation"
+  ]
+}

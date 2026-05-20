@@ -1,0 +1,235 @@
+{
+  "id": "1779185665332",
+  "timestamp": "2026-05-19T10:14:25.332Z",
+  "status": "pending_analysis",
+  "profile_hash": "ccd25dae5decf59b043a44f68656522095de2988cc27eb09dba8550f48da0c9f",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Rahul",
+      "email": "rahul@gmail.com",
+      "phone": "3123123123",
+      "registrationNumber": "STU00006"
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Computer Science & IT",
+        "degreeGroup": "Bachelor of Computer Applications",
+        "specialisation": [
+          "General"
+        ],
+        "university": "",
+        "graduationYear": "",
+        "currentlyPursuing": false
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": {
+          "directionId": "CD-011001-S02",
+          "directionName": "Product Management & UX Design",
+          "directionDescription": "Product management and UX design sit at the intersection of technology and user experience. Associate product managers and product analysts define product features and measure performance. UX designers and UI designers design the interfaces that users interact with. BCA graduates who understand technology architecture and user-centred design principles are well placed for these roles at technology companies and digital product teams.",
+          "directionOverview": "Product management and UX design sit at the intersection of technology and user experience. Associate product managers and product analysts define product features and measure performance. UX designers and UI designers design the interfaces that users interact with. BCA graduates who understand technology architecture and user-centred design principles are well placed for these roles at technology companies and digital product teams.",
+          "type": "Primary",
+          "uniqueId": "UG-011-001",
+          "roles": [
+            {
+              "role": "Associate Product Manager",
+              "id": "JF08-007"
+            },
+            {
+              "role": "Product Manager",
+              "id": "JF08-001"
+            },
+            {
+              "role": "Product Analyst",
+              "id": "JF08-006"
+            },
+            {
+              "role": "UX Designer",
+              "id": "JF08-002"
+            },
+            {
+              "role": "UI Designer",
+              "id": "JF08-003"
+            },
+            {
+              "role": "UX Researcher",
+              "id": "JF08-004"
+            },
+            {
+              "role": "User Research Analyst",
+              "id": "JF08-010"
+            },
+            {
+              "role": "Product Operations Analyst",
+              "id": "JF08-008"
+            },
+            {
+              "role": "UX Writer",
+              "id": "JF08-013"
+            },
+            {
+              "role": "Growth Product Manager",
+              "id": "JF08-009"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011001-S02",
+        "careerDirectionName": "Product Management & UX Design",
+        "careerDirectionDescription": "Product management and UX design sit at the intersection of technology and user experience. Associate product managers and product analysts define product features and measure performance. UX designers and UI designers design the interfaces that users interact with. BCA graduates who understand technology architecture and user-centred design principles are well placed for these roles at technology companies and digital product teams.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Product Management & UX Design",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      },
+      "secondary": {
+        "careerDirection": {
+          "directionId": "CD-011001-P01",
+          "directionName": "Software Development",
+          "directionDescription": "Software development is the primary and most direct career outcome for BCA graduates. The curriculum covers programming languages (C, Java, Python, PHP), data structures, algorithms, and software engineering principles. Frontend, backend, and full-stack developer roles at IT services companies, product startups, and technology firms are the most consistent entry-level destinations for BCA graduates with practical coding competency.",
+          "directionOverview": "Software development is the primary and most direct career outcome for BCA graduates. The curriculum covers programming languages (C, Java, Python, PHP), data structures, algorithms, and software engineering principles. Frontend, backend, and full-stack developer roles at IT services companies, product startups, and technology firms are the most consistent entry-level destinations for BCA graduates with practical coding competency.",
+          "type": "Primary",
+          "uniqueId": "UG-011-001",
+          "roles": [
+            {
+              "role": "Software Engineer",
+              "id": "JF01-001"
+            },
+            {
+              "role": "Frontend Developer",
+              "id": "JF01-002"
+            },
+            {
+              "role": "Backend Developer",
+              "id": "JF01-003"
+            },
+            {
+              "role": "Full Stack Developer",
+              "id": "JF01-004"
+            },
+            {
+              "role": "Python Developer",
+              "id": "JF01-015"
+            },
+            {
+              "role": "Java Developer",
+              "id": "JF01-016"
+            },
+            {
+              "role": "Node.js Developer",
+              "id": "JF01-017"
+            },
+            {
+              "role": "PHP Developer",
+              "id": "JF01-018"
+            },
+            {
+              "role": "API Developer",
+              "id": "JF01-013"
+            },
+            {
+              "role": "Angular Developer",
+              "id": "JF01-021"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011001-P01",
+        "careerDirectionName": "Software Development",
+        "careerDirectionDescription": "Software development is the primary and most direct career outcome for BCA graduates. The curriculum covers programming languages (C, Java, Python, PHP), data structures, algorithms, and software engineering principles. Frontend, backend, and full-stack developer roles at IT services companies, product startups, and technology firms are the most consistent entry-level destinations for BCA graduates with practical coding competency.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Software Development",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      },
+      "tertiary": {
+        "careerDirection": {
+          "directionId": "CD-011001-P02",
+          "directionName": "IT Support & Systems Administration",
+          "directionDescription": "IT support and systems administration roles involve managing hardware, software, networks, and user support within organisations. BCA graduates with networking and operating system knowledge enter technical support, help desk, and systems administration roles. These positions are available across every industry sector and provide a stable career entry point for BCA graduates who prefer infrastructure over application development.",
+          "directionOverview": "IT support and systems administration roles involve managing hardware, software, networks, and user support within organisations. BCA graduates with networking and operating system knowledge enter technical support, help desk, and systems administration roles. These positions are available across every industry sector and provide a stable career entry point for BCA graduates who prefer infrastructure over application development.",
+          "type": "Primary",
+          "uniqueId": "UG-011-001",
+          "roles": [
+            {
+              "role": "Technical Support Engineer",
+              "id": "JF04-005"
+            },
+            {
+              "role": "Help Desk Technician",
+              "id": "JF04-006"
+            },
+            {
+              "role": "IT Service Desk Analyst",
+              "id": "JF04-007"
+            },
+            {
+              "role": "Desktop Support Engineer",
+              "id": "JF04-008"
+            },
+            {
+              "role": "Systems Administrator",
+              "id": "JF03-005"
+            },
+            {
+              "role": "Network Engineer",
+              "id": "JF03-006"
+            },
+            {
+              "role": "Linux Administrator",
+              "id": "JF03-009"
+            },
+            {
+              "role": "IT Consultant",
+              "id": "JF04-009"
+            },
+            {
+              "role": "Site Monitoring Engineer",
+              "id": "JF03-021"
+            },
+            {
+              "role": "IT Manager",
+              "id": "JF04-002"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011001-P02",
+        "careerDirectionName": "IT Support & Systems Administration",
+        "careerDirectionDescription": "IT support and systems administration roles involve managing hardware, software, networks, and user support within organisations. BCA graduates with networking and operating system knowledge enter technical support, help desk, and systems administration roles. These positions are available across every industry sector and provide a stable career entry point for BCA graduates who prefer infrastructure over application development.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "IT Support & Systems Administration",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      }
+    }
+  },
+  "output_generated_report": null
+}
