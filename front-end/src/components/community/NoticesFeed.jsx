@@ -163,62 +163,40 @@ const NoticesFeed = ({ currentUser }) => {
       </div>
 
       {/* ── Filter row: Date + Role + Clear ────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-3 justify-between">
-        {/* Date filter pills */}
-        <div className="flex items-center gap-1 p-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
-          {DATE_FILTERS.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setDateFilter(f.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${dateFilter === f.key
-                ? "bg-[#002147] text-white shadow-sm"
-                : "text-gray-500 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/70 dark:hover:bg-slate-700/70"
-                }`}
-            >
-              {f.label}
-            </button>
-          ))}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Date filter pills */}
+          <div className="flex items-center gap-1 p-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+            {DATE_FILTERS.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setDateFilter(f.key)}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${dateFilter === f.key
+                  ? "bg-[#002147] text-white shadow-sm"
+                  : "text-gray-500 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/70 dark:hover:bg-slate-700/70"
+                  }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Role filter pills */}
+          <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/60 dark:border-slate-700 shadow-sm">
+            {ROLE_FILTERS.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setRoleFilter(f.key)}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === f.key
+                  ? "bg-[#002147] text-white shadow-sm"
+                  : "text-gray-500 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/70 dark:hover:bg-slate-700/70"
+                  }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
-
-        {/* Separator */}
-        {/* <span className="text-gray-200 font-light hidden sm:block">|</span> */}
-
-        {/* Role filter pills */}
-        <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/60 dark:border-slate-700 shadow-sm">
-          {/* <span className="pl-2 pr-1">
-            <SlidersHorizontal className="w-3 h-3 text-gray-400" />
-          </span> */}
-          {ROLE_FILTERS.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setRoleFilter(f.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${roleFilter === f.key
-                ? "bg-[#002147] text-white shadow-sm"
-                : "text-gray-500 dark:text-slate-400 hover:text-[#002147] dark:hover:text-white hover:bg-white/70 dark:hover:bg-slate-700/70"
-                }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Clear all filters */}
-        {/* {hasActiveFilters && (
-          <button
-            onClick={clearFilters}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all"
-          >
-            <X className="w-3 h-3" />
-            Clear
-          </button>
-        )} */}
-
-        {/* Result count */}
-        {/* {!loading && (
-          <span className="ml-auto text-[11px] text-gray-400 font-semibold">
-            {visible.length} {visible.length === 1 ? "notice" : "notices"}
-          </span>
-        )} */}
       </div>
 
       {/* ── Loading ─────────────────────────────────────────────────────── */}
@@ -277,7 +255,7 @@ const NoticesFeed = ({ currentUser }) => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ delay: index * 0.04, duration: 0.2 }}
-                className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border transition-all duration-300 group ${isExpired
+                className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border transition-all duration-300 group ${isExpired
                   ? "opacity-60 border-gray-100 dark:border-slate-800"
                   : ann.isPinned
                     ? "border-amber-200 dark:border-amber-900/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
@@ -313,32 +291,21 @@ const NoticesFeed = ({ currentUser }) => {
                     )}
                     {ann.createdByRole === "admin" ? "SMAART" : "College"}
                   </span>
-                  {/* {ann.targetType === "all" && (
-                    <span className="px-2.5 py-1 bg-green-50 text-green-700 text-[10px] font-bold rounded-full">
-                      🎓 All Students
-                    </span>
-                  )}
-                  {ann.targetType === "college" &&
-                    ann.targetCollegeIds?.length > 0 && (
-                      <span className="px-3 py-1.5 bg-blue-50/50 text-blue-700 text-[10px] font-black rounded-xl border border-blue-100 uppercase tracking-widest">
-                        🏫 {ann.targetCollegeIds.map((c) => c.collegeName || "College").join(", ")}
-                      </span>
-                    )} */}
                 </div>
 
                 {/* ── Title ─────────────────────────────────────────────── */}
-                <h3 className="text-[#002147] dark:text-white text-lg font-extrabold mb-2 tracking-tight">
+                <h3 className="text-[#002147] dark:text-white text-base sm:text-lg font-extrabold mb-2 tracking-tight">
                   {ann.title}
                 </h3>
 
                 {/* ── Description ───────────────────────────────────────── */}
-                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed font-medium whitespace-pre-line mb-6">
+                <p className="text-gray-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed font-medium whitespace-pre-line mb-4 sm:mb-6">
                   {ann.description}
                 </p>
 
                 {/* ── Attachment link/preview ───────────────────────────────────── */}
                 {ann.attachmentUrl && (
-                  <div className="flex mb-6">
+                  <div className="flex mb-4 sm:mb-6">
                     {ann.attachmentType === 'video' || ann.attachmentUrl.match(/\.(mp4|webm|ogg)$/i) ? (
                       <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-slate-700 w-full max-w-2xl bg-black">
                         <video 
@@ -360,7 +327,7 @@ const NoticesFeed = ({ currentUser }) => {
                         href={ann.attachmentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-gray-50 dark:bg-slate-700 hover:bg-[#002147] dark:hover:bg-blue-600 text-[#002147] dark:text-white hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 dark:border-slate-600 hover:border-[#002147] dark:hover:border-blue-600 shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
+                        className="group/btn inline-flex items-center gap-3 px-4 py-2 sm:px-5 sm:py-2.5 bg-gray-50 dark:bg-slate-700 hover:bg-[#002147] dark:hover:bg-blue-600 text-[#002147] dark:text-white hover:text-white text-xs font-black rounded-xl sm:rounded-2xl transition-all duration-300 border border-gray-100 dark:border-slate-600 hover:border-[#002147] dark:hover:border-blue-600 shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
                       >
                         {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> :
                           <LinkIcon className="w-4 h-4" />}
@@ -371,14 +338,12 @@ const NoticesFeed = ({ currentUser }) => {
                   </div>
                 )}
 
-
-
                 {/* ── Footer: creator + time + expiry ───────────────────── */}
-                <div className="flex items-center justify-between gap-2 text-[11px] text-gray-400 font-medium pt-3 border-t border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 text-[10px] sm:text-[11px] text-gray-400 font-medium pt-3 border-t border-gray-100 dark:border-slate-700/50">
                   {/* ── Action Row: Reactions ──────────────────────────────── */}
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Reaction counts */}
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1">
                       {["👍", "❤️", "🔥", "😂", "🙌"].map((emoji) => {
                         const count = ann.reactions?.filter(r => r.emoji === emoji).length || 0;
                         const hasReacted = ann.reactions?.some(r => r.userId?.toString() === currentUser?._id?.toString() && r.emoji === emoji);
@@ -389,7 +354,7 @@ const NoticesFeed = ({ currentUser }) => {
                           <button
                             key={emoji}
                             onClick={() => handleReact(ann._id, emoji)}
-                            className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold transition-all ${hasReacted
+                            className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold transition-all ${hasReacted
                               ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                               : "bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 border border-transparent hover:bg-gray-200 dark:hover:bg-slate-600"
                               }`}
@@ -413,11 +378,11 @@ const NoticesFeed = ({ currentUser }) => {
                               e.stopPropagation();
                               setActivePicker(activePicker === ann._id ? null : ann._id);
                             }}
-                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 dark:hover:bg-slate-700 ${activePicker === ann._id ? "bg-gray-100 dark:bg-slate-700 scale-110" : ""
+                            className={`flex items-center justify-center w-8 h-8 rounded-full transition-all hover:bg-gray-100 dark:hover:bg-slate-700 ${activePicker === ann._id ? "bg-gray-100 dark:bg-slate-700 scale-110" : ""
                               }`}
                             title="React"
                           >
-                            <Heart className="w-5 h-5 cursor-pointer text-black dark:text-white hover:text-red-500" />
+                            <Heart className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer text-black dark:text-white hover:text-red-500" />
                           </button>
                         );
                       })()}
@@ -429,7 +394,7 @@ const NoticesFeed = ({ currentUser }) => {
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            className="absolute bottom-full left-0 mb-3 p-1.5 bg-white dark:bg-slate-800 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-slate-700 flex items-center gap-1 z-20"
+                            className="absolute bottom-full left-0 mb-3 p-1 bg-white dark:bg-slate-800 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-slate-700 flex items-center gap-1 z-20"
                           >
                             {["👍", "❤️", "🔥", "😂", "🙌"].map((emoji) => (
                               <button
@@ -439,7 +404,7 @@ const NoticesFeed = ({ currentUser }) => {
                                   handleReact(ann._id, emoji);
                                   setActivePicker(null);
                                 }}
-                                className="w-9 h-9 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-700 rounded-full transition-colors text-xl hover:scale-125 duration-200"
+                                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-700 rounded-full transition-colors text-lg sm:text-xl hover:scale-125 duration-200"
                               >
                                 {emoji}
                               </button>
@@ -449,8 +414,8 @@ const NoticesFeed = ({ currentUser }) => {
                       </AnimatePresence>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-[#002147]/10 dark:bg-blue-900/20 flex items-center justify-center text-[10px] font-bold text-[#002147] dark:text-blue-300 flex-shrink-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#002147]/10 dark:bg-blue-900/20 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-[#002147] dark:text-blue-300 flex-shrink-0">
                       {(ann.createdById?.fullName || "A")
                         .charAt(0)
                         .toUpperCase()}
@@ -458,11 +423,11 @@ const NoticesFeed = ({ currentUser }) => {
                     <span className="text-gray-500 dark:text-slate-300 font-semibold">
                       {ann.createdById?.fullName || "Admin"}
                     </span>
-                    <span className="text-gray-300 dark:text-slate-700">•</span>
+                    <span className="text-gray-305 dark:text-slate-700">•</span>
                     <span>{timeAgo(ann.createdAt)}</span>
                     {ann.expiryDate && (
                       <>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-305 dark:text-slate-700">•</span>
                         <span
                           className={`flex items-center gap-1 ${isExpired ? "text-gray-400" : "text-orange-500"
                             }`}
