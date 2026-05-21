@@ -31,11 +31,13 @@ const CareerAgentDashboard = () => {
     };
 
     const handleFinalizeLock = () => {
+        // "Not Interested" is handled immediately on button click (navigates directly).
+        // This function only runs when user has marked all paths as "Interested" and clicks Confirm.
         const newlyLocked = [];
-        if (selectionStates.primary === 'interested') newlyLocked.push(prefPrimary);
+        if (selectionStates.primary === 'interested')   newlyLocked.push(prefPrimary);
         if (selectionStates.secondary === 'interested') newlyLocked.push(prefSecondary);
-        if (selectionStates.tertiary === 'interested') newlyLocked.push(prefTertiary);
-        
+        if (selectionStates.tertiary === 'interested')  newlyLocked.push(prefTertiary);
+
         setLockedRoles(newlyLocked);
         setShowSelectionFlow(false);
         setShowWelcome(true);
@@ -183,12 +185,13 @@ const CareerAgentDashboard = () => {
     const currentData = getSafeRole(activeRole === 1 ? primary : activeRole === 2 ? secondary : tertiary);
     const roleName = currentData.tab1?.role_name || 'Selected Role';
 
-    // Read user's originally selected preferences from onboarding
+    // Read user's originally selected preferences — use analysis direction data first (avoids stale localStorage)
     const _draft = (() => { try { return JSON.parse(localStorage.getItem('smaart_onboarding_draft') || '{}'); } catch { return {}; } })();
     const _dp = _draft?.preferences || {};
-    const prefPrimary = localStorage.getItem('smaart_pref_primary') || _dp.primary?.careerDirectionName || _dp.primary?.role || primary?.tab1?.role_name || 'Primary';
-    const prefSecondary = localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
-    const prefTertiary = localStorage.getItem('smaart_pref_tertiary') || _dp.tertiary?.careerDirectionName || _dp.tertiary?.role || tertiary?.tab1?.role_name || 'Tertiary';
+    // Priority: analysis direction name → localStorage pref key → draft pref → role name
+    const prefPrimary   = primary?.direction?.directionName   || localStorage.getItem('smaart_pref_primary')   || _dp.primary?.careerDirectionName   || _dp.primary?.role   || primary?.tab1?.role_name   || 'Primary';
+    const prefSecondary = secondary?.direction?.directionName || localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
+    const prefTertiary  = tertiary?.direction?.directionName  || localStorage.getItem('smaart_pref_tertiary')  || _dp.tertiary?.careerDirectionName  || _dp.tertiary?.role  || tertiary?.tab1?.role_name  || 'Tertiary';
 
     // Build allDirections array for MarketIntelligence — includes roles from each direction
     const buildDirRoles = (roleData) => {
@@ -314,15 +317,24 @@ const CareerAgentDashboard = () => {
                                             Interested
                                         </button>
                                         <button 
-                                            onClick={() => setSelectionStates(prev => ({ ...prev, [item.key]: 'not_interested' }))}
+                                            onClick={() => {
+                                                // Immediately navigate to THAT tier's specific preference step
+                                                // Primary=Step3, Secondary=Step4, Tertiary=Step5
+                                                const TIER_STEP = { primary: 3, secondary: 4, tertiary: 5 };
+                                                setShowSelectionFlow(false);
+                                                navigate('/dashboard/career-agent/onboarding', {
+                                                    state: {
+                                                        startStep: TIER_STEP[item.key],
+                                                        editTier: item.key
+                                                    }
+                                                });
+                                            }}
                                             style={{
                                                 flex: 1, padding: '0.7rem', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 800,
-                                                background: selectionStates[item.key] === 'not_interested' ? 'rgba(239, 68, 68, 0.05)' : 'transparent',
-                                                border: '1.5px solid', 
-                                                borderColor: selectionStates[item.key] === 'not_interested' ? 'var(--red)' : 'var(--border2)',
-                                                color: selectionStates[item.key] === 'not_interested' ? 'var(--red)' : 'var(--muted)',
+                                                background: 'transparent',
+                                                border: '1.5px solid var(--border2)',
+                                                color: 'var(--muted)',
                                                 cursor: 'pointer', transition: 'all 0.2s',
-                                                boxShadow: selectionStates[item.key] === 'not_interested' ? '0 4px 12px rgba(239, 68, 68, 0.08)' : 'none'
                                             }}
                                         >
                                             Not Interested
@@ -411,7 +423,24 @@ const CareerAgentDashboard = () => {
                         </div>
                     </div>
                     <div className="dash-actions">
-                        <button className="btn-ghost" onClick={() => window.print()}>Print Report</button>
+                        {lockedRoles.length > 0 ? (
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                padding: '0.55rem 1.1rem',
+                                background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)',
+                                borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)',
+                            }}>
+                                <Lock size={14} /> Path Locked In
+                            </div>
+                        ) : (
+                            <button
+                                className="btn-ghost"
+                                onClick={() => handleLockPath(currentData?.tab1?.role_name)}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                            >
+                                <Lock size={14} /> Lock This Path
+                            </button>
+                        )}
                         <button className="btn-primary" onClick={() => navigate('/dashboard/career-agent/onboarding')}>New Analysis</button>
                     </div>
                 </div>
@@ -544,24 +573,7 @@ const CareerAgentDashboard = () => {
                                     }}>
                                         <Lock size={14} /> Path Locked In
                                     </div>
-                                ) : (
-                                    /* Lock button */
-                                    <button
-                                        onClick={() => handleLockPath(currentData.tab1.role_name)}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                            padding: '0.6rem 1.2rem',
-                                            background: 'var(--navy2)', border: '1px solid var(--border)',
-                                            borderRadius: '10px', cursor: 'pointer',
-                                            fontSize: '0.8rem', fontWeight: 700, color: 'var(--text1)',
-                                            transition: 'all 0.2s', flexShrink: 0,
-                                        }}
-                                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(79,142,247,0.5)'; e.currentTarget.style.color = 'var(--accent)'; }}
-                                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text1)'; }}
-                                    >
-                                        <Lock size={14} /> Lock In This Path
-                                    </button>
-                                )}
+                                ) : null}
                             </div>
                             <DirectionOverview
                                 directionData={currentData?.direction || null}

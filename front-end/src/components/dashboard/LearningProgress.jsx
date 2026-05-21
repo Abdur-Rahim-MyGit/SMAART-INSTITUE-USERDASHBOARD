@@ -31,7 +31,9 @@ const LearningProgress = memo(({ paths, loading, error }) => {
           </div>
           <div>
             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400">{t("dashboard.continue_learning")}</h3>
-            <h2 className="text-2xl font-extrabold text-[#112b6b] dark:text-white tracking-tight mt-0.5 leading-tight" style={{ letterSpacing: "-0.02em" }}>{t("dashboard.capability_program")}</h2>
+            <h2 className="text-2xl font-extrabold text-[#112b6b] dark:text-white tracking-tight mt-0.5 leading-tight" style={{ letterSpacing: "-0.02em" }}>
+              {paths.length > 0 && paths[0]?.navigateTo?.includes('career-agent') ? 'Career Directions' : t("dashboard.capability_program")}
+            </h2>
           </div>
         </div>
 
@@ -92,15 +94,17 @@ const LearningProgress = memo(({ paths, loading, error }) => {
         ) : paths.length === 0 ? (
           <div className="text-center py-8">
             <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t("dashboard.no_paths")}</p>
-            <button 
-              onClick={() => navigate('/dashboard/courses')}
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+              Complete your career analysis to see your registered career directions here.
+            </p>
+            <button
+              onClick={() => navigate('/dashboard/career-agent')}
               className="text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition"
               style={{ backgroundColor: COLORS.PRIMARY }}
               onMouseEnter={(e) => e.target.style.backgroundColor = COLORS.PRIMARY_DARK}
               onMouseLeave={(e) => e.target.style.backgroundColor = COLORS.PRIMARY}
             >
-              {t("dashboard.browse_courses")}
+              View Career Directions
             </button>
           </div>
         ) : (
