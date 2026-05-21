@@ -49,10 +49,10 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
 
 
   return (
-    <div className="w-full h-full bg-white dark:bg-slate-900 p-4 md:p-6 overflow-y-auto">
+    <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-slate-700 pb-4">
+        <div className="border-b border-slate-200 dark:border-white/10 pb-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
               <Lightbulb size={16} />
@@ -66,7 +66,7 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
             {content}
           </h2>
           {/* Progress Bar */}
-          <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-[#1a3884] rounded-full"
               initial={{ width: 0 }}
@@ -83,7 +83,7 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700"
+            className="bg-[#F8FAFC] dark:bg-[#002A5C] rounded-2xl p-6 border border-slate-200 dark:border-white/10"
           >
             <div className="mb-6">
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 block">
@@ -113,10 +113,10 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
                             ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                             : isSelected && !isCorrectAnswer
                             ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                            : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 opacity-50'
+                            : 'border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#002A5C] opacity-50'
                           : isSelected
                           ? 'border-[#1a3884] bg-[#1a3884]/5'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600'
+                          : 'border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] hover:border-slate-300 dark:hover:border-slate-600'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -169,7 +169,7 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
                 <input
                   type="text"
                   placeholder="Type your answer here..."
-                  className="w-full p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-[#1a3884] focus:outline-none"
+                  className="w-full p-4 rounded-xl border-2 border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] text-slate-900 dark:text-white focus:border-[#1a3884] focus:outline-none"
                   onChange={(e) => handleAnswerSelect(currentQuestionIndex, e.target.value)}
                   disabled={showExplanation[currentQuestionIndex]}
                 />
@@ -196,11 +196,11 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
             </AnimatePresence>
 
             {/* Navigation */}
-            <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
+            <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-white/10">
               <button
                 onClick={handlePrevious}
                 disabled={currentQuestionIndex === 0}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>

@@ -367,7 +367,7 @@ const ModuleView = ({ courseId, onBack }) => {
           onClick={() => navigateToDays(selectedModule)}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all font-medium"
+          className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-[#F8FAFC] transition-all font-medium"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Days
         </motion.button>
@@ -596,7 +596,7 @@ const ModuleView = ({ courseId, onBack }) => {
           onClick={() => navigateToModules()}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all font-medium"
+          className="flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-300 text-gray-700 hover:bg-[#F8FAFC] transition-all font-medium"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Modules
         </motion.button>
@@ -677,10 +677,10 @@ const ModuleView = ({ courseId, onBack }) => {
                   </p>
 
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-6">
-                    <span className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md group-hover:bg-white/50 transition-colors">
+                    <span className="flex items-center gap-1.5 bg-[#F8FAFC] px-2 py-1 rounded-md group-hover:bg-white/50 transition-colors">
                       <Clock className="w-3.5 h-3.5 text-orange-500" /> {getDisplayDuration(selectedModule, day.id, day.duration)}
                     </span>
-                    <span className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md group-hover:bg-white/50 transition-colors">
+                    <span className="flex items-center gap-1.5 bg-[#F8FAFC] px-2 py-1 rounded-md group-hover:bg-white/50 transition-colors">
                       <FileText className="w-3.5 h-3.5 text-blue-500" /> {day.tasks.length} Tasks
                     </span>
                   </div>

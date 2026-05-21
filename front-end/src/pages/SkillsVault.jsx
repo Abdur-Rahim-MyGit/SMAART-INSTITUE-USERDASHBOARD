@@ -16,6 +16,7 @@ import CertificateShareModal from "@/components/wallet/CertificateShareModal";
 import { userCertificateApi } from "@/services/userCertificateApi";
 import { toast } from "sonner";
 import { Share2 } from "lucide-react";
+import PageHero from "@/components/ui/PageHero";
 
 /* ══════════════════════════════════════
    Skills Vault – Your Professional Vault
@@ -109,14 +110,14 @@ const SkillsVault = () => {
 
     if (userLoading) {
         return (
-            <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg flex items-center justify-center">
+            <div className="min-h-screen bg-[#f8fafc] dark:bg-[#00152E] flex items-center justify-center">
                 <div className="w-12 h-12 border-4 border-slate-200 border-t-[#1a3884] rounded-full animate-spin shadow-lg" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg transition-colors duration-500 relative overflow-hidden">
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#00152E] transition-colors duration-500 relative overflow-hidden">
             {/* Background Decorative Elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
@@ -126,66 +127,12 @@ const SkillsVault = () => {
             <main className="w-full relative z-10 py-6 px-4 sm:px-6 lg:px-8 lg:py-8">
                 <div className="max-w-7xl mx-auto space-y-5 lg:space-y-6">
 
-                    {/* ── Premium Header (Toolkit Style) ── */}
-                    <div className="items-start gap-6">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="relative self-start overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.3)] sm:p-8 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40"
-                        >
-                            <div className="absolute inset-px rounded-[31px] border border-white/70 dark:border-white/5" />
-                            <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
-
-                            <div className="relative z-10">
-                                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50 dark:text-blue-300">
-                                    <div className="flex h-4 w-4 items-center justify-center rounded-full border border-[#1a3884]/20 bg-[#1a3884]/10 dark:bg-blue-500/20">
-                                        <Zap className="h-2.5 w-2.5" />
-                                    </div>
-                                    Secure Professional Vault
-                                </div>
-
-                                <div className="space-y-2">
-                                    <h1 className="max-w-3xl text-[2.25rem] font-black tracking-tight text-[#0f172a] sm:text-[2.5rem] lg:text-[2.75rem] lg:leading-[1.04] dark:text-white">
-                                        Skills - <span className="text-[#1a3884] dark:text-blue-400">Vault</span>
-                                    </h1>
-                                    <p className="max-w-xl text-base font-medium tracking-[0.01em] text-[#3654a1] dark:text-[#d7def0] sm:text-lg">
-                                        Your verified digital repository for professional achievements.
-                                    </p>
-                                    <p className="max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-400">
-                                        Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault.
-                                    </p>
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        {/* <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.1 }}
-                            className="relative self-start overflow-hidden rounded-[32px] border border-slate-200/80 bg-white p-6 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.25)] dark:border-slate-700/40 dark:bg-slate-900/80"
-                        >
-                            <div className="absolute inset-px rounded-[31px] border border-white/70 dark:border-white/5" />
-                            <div className="relative z-10 space-y-2.5">
-                                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">Vault Intelligence</p>
-                                <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-white leading-tight">Verified & Shareable</h2>
-                                <p className="max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">
-                                    Your vault stays focused on trusted credentials, clean sharing workflows, and polished presentation.
-                                </p>
-                            </div>
-                            <div className="relative z-10 mt-7 space-y-4">
-                                {[
-                                    { icon: Shield, text: "Blockchain Verified", color: "bg-emerald-500" },
-                                    { icon: Share2, text: "Instant Shareable Links", color: "bg-blue-500" },
-                                    { icon: Download, text: "High-Res PDF Exports", color: "bg-amber-500" },
-                                ].map((item, i) => (
-                                    <div key={i} className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-slate-50/50 px-4 py-3.5 dark:border-slate-700/50 dark:bg-slate-800/70">
-                                        <div className={`h-2.5 w-2.5 rounded-full ${item.color} shadow-lg shadow-${item.color}/20`} />
-                                        <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{item.text}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </motion.div> */}
-                    </div>
+                    {/* ── Standardized PageHero ── */}
+                    <PageHero
+                        badge="Secure Professional Vault"
+                        title="Skills Vault"
+                        subtitle="Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault."
+                    />
 
                     {/* ── Glassmorphic Tab Navigation ── */}
                     <div className="flex justify-center sticky top-4 z-50">
@@ -236,7 +183,7 @@ const SkillsVault = () => {
                                                 initial={{ opacity: 0, y: 16 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: i * 0.08 }}
-                                                className="bg-white dark:bg-slate-900/40 rounded-[24px] p-6 border border-slate-100 dark:border-slate-800 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all group"
+                                                className="bg-white dark:bg-slate-900/40 rounded-[24px] p-6 border border-slate-100 dark:border-white/8 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all group"
                                             >
                                                 <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
                                                     <stat.icon className="w-6 h-6" />
@@ -248,7 +195,7 @@ const SkillsVault = () => {
                                     </div>
 
                                     {/* What's in your wallet */}
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
                                         <div className="mb-8">
                                             <h3 className="text-xl font-black text-slate-950 dark:text-white mb-2">What's in your Skills Vault?</h3>
                                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
@@ -263,7 +210,7 @@ const SkillsVault = () => {
                                                 { icon: Zap, title: "Flashcards & Key Terms", desc: "Quick-reference cards for the six core quotients and other essential professional terminology from your learning journey." },
                                             ].map((item, i) => (
                                                 <div key={i} className="flex gap-5 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 hover:border-[#1a3884]/20 transition-all group">
-                                                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
                                                         <item.icon className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
                                                     </div>
                                                     <div>
@@ -280,7 +227,7 @@ const SkillsVault = () => {
                             {/* ════════ CERTIFICATES TAB ════════ */}
                             {activeTab === "certificates" && (
                                 <div className="space-y-8">
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
                                             <div>
                                                 <div className="flex items-center gap-3 mb-1">
@@ -316,7 +263,7 @@ const SkillsVault = () => {
                                                                 {cert.title}
                                                             </h4>
                                                             <div className="flex items-center gap-2 mt-3">
-                                                                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-slate-700">
+                                                                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/10">
                                                                     {cert.code}
                                                                 </span>
                                                                 <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-[#1a3884] dark:text-blue-400 border border-blue-100 dark:border-blue-500/20">
@@ -324,7 +271,7 @@ const SkillsVault = () => {
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                             <ChevronRight className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
                                                         </div>
                                                     </div>
@@ -334,7 +281,7 @@ const SkillsVault = () => {
                                     </div>
 
                                     {/* User Uploaded Certificates */}
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
                                             <div>
                                                 <div className="flex items-center gap-3 mb-1">
@@ -345,7 +292,7 @@ const SkillsVault = () => {
                                             </div>
                                             <button
                                                 onClick={() => setIsUploadModalOpen(true)}
-                                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-blue-600 text-white text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 transform hover:scale-[1.02] active:scale-95"
+                                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-[#1a3884] text-white text-xs font-black uppercase tracking-widest hover:bg-[#132c6b] transition-all shadow-lg shadow-blue-600/20 transform hover:scale-[1.02] active:scale-95"
                                             >
                                                 <Upload className="w-4 h-4" /> Upload Certificate
                                             </button>
@@ -359,7 +306,7 @@ const SkillsVault = () => {
                                                         initial={{ opacity: 0, scale: 0.95 }}
                                                         animate={{ opacity: 1, scale: 1 }}
                                                         transition={{ delay: i * 0.05 }}
-                                                        className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800 p-6 relative group hover:bg-white dark:hover:bg-slate-900 transition-all shadow-sm hover:shadow-xl"
+                                                        className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-white/8 p-6 relative group hover:bg-white dark:hover:bg-slate-900 transition-all shadow-sm hover:shadow-xl"
                                                     >
                                                         <div className="flex items-start gap-4 mb-5">
                                                             <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/40 border border-blue-100 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
@@ -408,7 +355,7 @@ const SkillsVault = () => {
                                                                 href={cert.certificateUrl}
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
-                                                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95"
+                                                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm active:scale-95"
                                                             >
                                                                 <Download className="w-3.5 h-3.5" /> View
                                                             </a>
@@ -423,8 +370,8 @@ const SkillsVault = () => {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <div className="text-center py-16 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-[32px] bg-slate-50/30">
-                                                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-center mx-auto mb-4">
+                                            <div className="text-center py-16 border-2 border-dashed border-slate-100 dark:border-white/8 rounded-[32px] bg-slate-50/30">
+                                                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 shadow-sm flex items-center justify-center mx-auto mb-4">
                                                     <Award className="w-8 h-8 text-slate-300 dark:text-slate-600" />
                                                 </div>
                                                 <p className="text-[15px] font-black text-slate-400 uppercase tracking-widest">No external certificates</p>
@@ -439,8 +386,8 @@ const SkillsVault = () => {
                                     </div>
 
                                     {/* Verification Section */}
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <div className="p-8 border-b border-slate-50 dark:border-slate-800">
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="p-8 border-b border-slate-50 dark:border-white/8">
                                             <h3 className="text-xl font-black text-slate-950 dark:text-white flex items-center gap-3">
                                                 <Shield className="w-6 h-6 text-emerald-500" />
                                                 Credential Verification
@@ -456,7 +403,7 @@ const SkillsVault = () => {
 
                             {/* ════════ BADGES TAB ════════ */}
                             {activeTab === "badges" && (
-                                <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
                                     <BadgeGallery badges={badges} userName={user?.fullName || "Student"} />
                                 </div>
                             )}
@@ -483,7 +430,7 @@ const SkillsVault = () => {
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: i * 0.08 }}
                                                     onClick={() => navigate(`/dashboard/courses/${course._id}/modules`)}
-                                                    className="bg-white dark:bg-slate-900/40 rounded-[30px] border border-slate-100 dark:border-slate-800 overflow-hidden cursor-pointer hover:shadow-2xl hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all group"
+                                                    className="bg-white dark:bg-slate-900/40 rounded-[30px] border border-slate-100 dark:border-white/8 overflow-hidden cursor-pointer hover:shadow-2xl hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all group"
                                                 >
                                                     {/* Thumbnail */}
                                                     <div className="h-40 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] relative overflow-hidden">
@@ -523,8 +470,8 @@ const SkillsVault = () => {
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-12 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                            <div className="w-20 h-20 mx-auto mb-6 rounded-[24px] bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center shadow-sm">
+                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-12 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                            <div className="w-20 h-20 mx-auto mb-6 rounded-[24px] bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 flex items-center justify-center shadow-sm">
                                                 <BookOpen className="w-10 h-10 text-slate-300 dark:text-slate-600" />
                                             </div>
                                             <h4 className="text-xl font-black text-slate-950 dark:text-white mb-2">No Enrolled Courses</h4>
@@ -558,7 +505,7 @@ const SkillsVault = () => {
                                         ))}
                                     </div>
 
-                                    <div className="bg-slate-50/50 dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 text-center">
+                                    <div className="bg-slate-50/50 dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 text-center">
                                         <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">
                                             More flashcards are available within each course module to help you master professional terminology.
                                         </p>
@@ -614,7 +561,7 @@ const FlashcardItem = ({ card, index }) => {
             >
                 {/* Front - Solid Background with Opacity Control */}
                 <motion.div
-                    className="absolute inset-0 bg-white dark:bg-slate-900 rounded-[28px] border border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-between shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] group-hover:shadow-2xl group-hover:border-[#1a3884]/30 transition-all duration-500"
+                    className="absolute inset-0 bg-white dark:bg-[#002147] rounded-[28px] border border-slate-100 dark:border-white/8 p-6 flex flex-col justify-between shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] group-hover:shadow-2xl group-hover:border-[#1a3884]/30 transition-all duration-500"
                     style={{
                         backfaceVisibility: "hidden",
                         WebkitBackfaceVisibility: "hidden",

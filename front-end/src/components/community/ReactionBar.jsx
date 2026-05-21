@@ -124,7 +124,7 @@ const ReactionBar = ({
               "tap-target inline-flex min-h-[44px] items-center gap-2 rounded-[12px] border border-slate-200 px-3 py-1.5 text-[13px] font-medium text-[hsl(var(--lms-primary))] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
               areRepliesOpen
                 ? "bg-slate-100 shadow-sm"
-                : "bg-white hover:border-slate-300 hover:bg-slate-50",
+                : "bg-white hover:border-slate-300 hover:bg-[#F8FAFC]",
             )}
           >
             <MessageCircle className="h-4 w-4" />
@@ -161,7 +161,7 @@ const ReactionBar = ({
             "tap-target inline-flex min-h-[44px] items-center gap-2 rounded-[12px] border border-slate-200 px-3 py-1.5 text-[13px] font-medium text-[hsl(var(--lms-primary))] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20",
             isBookmarked
               ? "bg-slate-100 shadow-sm"
-              : "bg-white hover:border-slate-300 hover:bg-slate-50",
+              : "bg-white hover:border-slate-300 hover:bg-[#F8FAFC]",
           )}
         >
           <Bookmark className="h-4 w-4" />

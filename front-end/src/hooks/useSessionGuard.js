@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
 const WARNING_THRESHOLD_MS = 5 * 60 * 1000; // Show warning at 5 minutes remaining
 const CHECK_INTERVAL_MS = 30 * 1000;          // Check every 30 seconds
@@ -45,6 +46,7 @@ const useSessionGuard = (onExpired) => {
     sessionStorage.clear();
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    clearAssessmentTimerStorage();
 
     // Broadcast to other tabs
     localStorage.setItem('logout-event', Date.now().toString());

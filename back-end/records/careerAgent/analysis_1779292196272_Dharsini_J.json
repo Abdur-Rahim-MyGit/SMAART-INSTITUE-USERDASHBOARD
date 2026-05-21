@@ -1,0 +1,548 @@
+{
+  "id": "1779292196272",
+  "timestamp": "2026-05-20T15:49:56.273Z",
+  "status": "completed",
+  "profile_hash": "281c01429bd29c638c283874a980aaeee8fa680edb92efc0134e3be7d7117271",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Dharsini J",
+      "email": "dharsinismaart@gmail.com",
+      "phone": "9445150351",
+      "registrationNumber": ""
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Engineering & Technology",
+        "degreeGroup": "Bachelor of Engineering",
+        "specialisation": [
+          "Computer Science"
+        ],
+        "university": "",
+        "graduationYear": "2027",
+        "currentlyPursuing": true
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Software Engineer",
+        "type": "Full-Time",
+        "salary": "12â€“18 LPA",
+        "locations": [
+          "Chennai"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Scale-up / High-growth company",
+          "Multinational Corporation (MNC)",
+          "Startup (Early-stage / Growth-stage)"
+        ]
+      },
+      "secondary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Data Analyst",
+        "type": "Full-Time",
+        "salary": "25+ LPA",
+        "locations": [
+          "Chennai",
+          "Coimbatore"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Scale-up / High-growth company",
+          "Multinational Corporation (MNC)"
+        ]
+      },
+      "tertiary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "AI Product Analyst",
+        "type": "Full-Time",
+        "salary": "18â€“25 LPA",
+        "locations": [
+          "Chennai"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)",
+          "Multinational Corporation (MNC)",
+          "Scale-up / High-growth company"
+        ]
+      }
+    }
+  },
+  "output_generated_report": {
+    "status": "success_deterministic",
+    "generated_at": "2026-05-20T15:49:56.558Z",
+    "preVerified": {
+      "dataFilesReady": true,
+      "primaryZone": {
+        "employer_zone": "Amber",
+        "skill_coverage_pct": 40
+      },
+      "secondaryZone": {
+        "employer_zone": "Red",
+        "skill_coverage_pct": 10
+      },
+      "tertiaryZone": {
+        "employer_zone": "Red"
+      },
+      "primaryMarket": {
+        "demand_level": "High",
+        "salary_min_lpa": 5,
+        "salary_max_lpa": 18,
+        "ai_automation_risk": "Medium",
+        "emerging_roles": [
+          "Data Engineer",
+          "Cybersecurity Engineer",
+          "Solutions Engineer"
+        ]
+      },
+      "primarySkillGap": {
+        "missing": [],
+        "matched": [],
+        "coveragePct": 0,
+        "dataReady": true,
+        "source": "local"
+      }
+    },
+    "primary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 15%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "Software Engineer",
+        "job_family": "Software Engineering",
+        "role_description": "A typical week for a junior Software Engineer at an Indian company involves fixing bugs tracked in Jira, writing unit tests, reviewing pull requests on GitHub or GitLab, and attending daily standups. They contribute to backend APIs or frontend components under senior guidance, update Confluence documentation, and use tools like IntelliJ IDEA or VS Code. In IT services companies, they may rotate across client projects involving Java or Python stacks. Expect to read tickets, write code, test locally, and raise PRs every day.",
+        "narrative_para1": "A typical week for a junior Software Engineer at an Indian company involves fixing bugs tracked in Jira, writing unit tests, reviewing pull requests on GitHub or GitLab, and attending daily standups. They contribute to backend APIs or frontend components under senior guidance, update Confluence documentation, and use tools like IntelliJ IDEA or VS Code. In IT services companies, they may rotate across client projects involving Java or Python stacks. Expect to read tickets, write code, test locally, and raise PRs every day.",
+        "narrative_para2": "GitHub Copilot, ChatGPT, and Claude are actively reshaping this role by generating boilerplate code, writing first-draft unit tests, and suggesting fixes during debugging. AI handles repetitive scaffolding and documentation drafting, freeing engineers for logic-heavy work. What remains firmly human: understanding business requirements, making architectural trade-offs, debugging context-specific production issues, and communicating clearly with cross-functional teams. AI accelerates output but cannot replace engineering judgment.",
+        "narrative_para3": "This role suits people who enjoy solving logic puzzles, can tolerate ambiguous requirements, and are comfortable asking questions when stuck rather than guessing. Patience for debugging and a habit of reading documentation carefully are genuine assets. Those who thrive tend to be methodical, curious about how systems work under the hood, and not easily frustrated when code breaks in unexpected ways. A willingness to learn continuously as a daily habit matters more than any single skill.",
+        "typical_employers_india": "MNCs, IT Product Companies, Startups, IT Services",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Actively AI-Evolving",
+        "salary_range": "₹3.5L - ₹7.0L",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "60",
+        "ai_impact": "GitHub Copilot, ChatGPT, and Claude are actively reshaping this role by generating boilerplate code, writing first-draft unit tests, and suggesting fixes during debugging. AI handles repetitive scaffolding and documentation drafting, freeing engineers for logic-heavy work. What remains firmly human: understanding business requirements, making architectural trade-offs, debugging context-specific production issues, and communicating clearly with cross-functional teams. AI accelerates output but cannot replace engineering judgment.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced Software Engineer",
+            "description": "Uses GitHub Copilot, ChatGPT daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "60%",
+          "level": "High",
+          "tasks_assisted": "AI tools like GitHub Copilot, ChatGPT, and Claude assist software engineers with code generation, debugging, boilerplate writing, and documentation drafting, covering a significant portion of routine coding tasks. Automated testing frameworks augmented with AI can generate test cases, reducing manual effort. Code review tools with AI capabilities can flag issues and suggest improvements in real time.",
+          "human_value": "Software engineers bring architectural judgment, understanding of business context, and stakeholder communication that AI cannot replicate. Creative problem-solving for novel, domain-specific challenges, ethical decision-making in design trade-offs, and mentoring junior developers remain distinctly human responsibilities."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for Software Engineer."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a Software Engineer portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified Software Engineer",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "Software Engineer Capstone",
+            "description": "Complete Software Engineer end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "This role suits people who enjoy solving logic puzzles, can tolerate ambiguous requirements, and are comfortable asking questions when stuck rather than guessing. Patience for debugging and a habit of reading documentation carefully are genuine assets. Those who thrive tend to be methodical, curious about how systems work under the hood, and not easily frustrated when code breaks in unexpected ways. A willingness to learn continuously as a daily habit matters more than any single skill.",
+        "target_audience": "UG/PG graduates with interest in Software Engineering.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "Software Engineer",
+        "job_family": "Software Engineering",
+        "narrative_para1": "A typical week for a junior Software Engineer at an Indian company involves fixing bugs tracked in Jira, writing unit tests, reviewing pull requests on GitHub or GitLab, and attending daily standups. They contribute to backend APIs or frontend components under senior guidance, update Confluence documentation, and use tools like IntelliJ IDEA or VS Code. In IT services companies, they may rotate across client projects involving Java or Python stacks. Expect to read tickets, write code, test locally, and raise PRs every day.",
+        "narrative_para2": "GitHub Copilot, ChatGPT, and Claude are actively reshaping this role by generating boilerplate code, writing first-draft unit tests, and suggesting fixes during debugging. AI handles repetitive scaffolding and documentation drafting, freeing engineers for logic-heavy work. What remains firmly human: understanding business requirements, making architectural trade-offs, debugging context-specific production issues, and communicating clearly with cross-functional teams. AI accelerates output but cannot replace engineering judgment.",
+        "narrative_para3": "This role suits people who enjoy solving logic puzzles, can tolerate ambiguous requirements, and are comfortable asking questions when stuck rather than guessing. Patience for debugging and a habit of reading documentation carefully are genuine assets. Those who thrive tend to be methodical, curious about how systems work under the hood, and not easily frustrated when code breaks in unexpected ways. A willingness to learn continuously as a daily habit matters more than any single skill.",
+        "salary_range_low": "350000",
+        "salary_range_high": "700000",
+        "ai_exposure_pct": "60",
+        "ai_exposure_level": "High",
+        "ai_exposure_detail": "AI tools like GitHub Copilot, ChatGPT, and Claude assist software engineers with code generation, debugging, boilerplate writing, and documentation drafting, covering a significant portion of routine coding tasks. Automated testing frameworks augmented with AI can generate test cases, reducing manual effort. Code review tools with AI capabilities can flag issues and suggest improvements in real time.",
+        "human_value_tasks": "Software engineers bring architectural judgment, understanding of business context, and stakeholder communication that AI cannot replicate. Creative problem-solving for novel, domain-specific challenges, ethical decision-making in design trade-offs, and mentoring junior developers remain distinctly human responsibilities.",
+        "english_requirement": "Important"
+      }
+    },
+    "secondary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "Data Analyst",
+        "job_family": "Data Engineering & Analytics",
+        "role_description": "A Data Analyst in India extracts, analyses, and visualises data to help organisations understand trends, measure performance, and make better decisions. Day-to-day work involves writing SQL queries, building dashboards in Power BI or Tableau, cleaning and transforming datasets in Python or Excel, and presenting insights to business stakeholders. Data Analysts are in very high demand across India — in IT services, banking, e-commerce, healthcare, and product companies — making this one of the most accessible well-paying entry points in the technology sector for graduates from engineering, maths, statistics, and even commerce backgrounds.",
+        "narrative_para1": "A Data Analyst in India extracts, analyses, and visualises data to help organisations understand trends, measure performance, and make better decisions. Day-to-day work involves writing SQL queries, building dashboards in Power BI or Tableau, cleaning and transforming datasets in Python or Excel, and presenting insights to business stakeholders. Data Analysts are in very high demand across India — in IT services, banking, e-commerce, healthcare, and product companies — making this one of the most accessible well-paying entry points in the technology sector for graduates from engineering, maths, statistics, and even commerce backgrounds.",
+        "narrative_para2": "AI is heavily reshaping data analysis. Power BI Copilot generates dashboards from natural language prompts and surfaces anomalies automatically. Tableau AI creates narrative summaries of chart trends. ChatGPT and Claude generate and debug SQL queries, Python wrangling scripts, and chart interpretation text. This is an AI-Evolving role with high AI exposure — routine query writing and chart creation are increasingly AI-assisted. The human advantage — asking the right business question, interpreting ambiguous data in context, and communicating insights persuasively — becomes more central and more valuable.",
+        "narrative_para3": "Data Analysis suits people who are curious about what numbers are really saying and enjoy finding stories in datasets. If you like combining logical thinking with communication — turning a complex analysis into a clear recommendation for a non-technical manager — this is a very strong career path. Comfort with SQL is the core entry skill; Python is increasingly expected. You don't need to be a mathematician, but an instinct for questioning data quality and an eye for patterns help enormously. This is one of the best-value roles in Indian tech: high demand, accessible entry requirements, and clear upward paths.",
+        "typical_employers_india": "Manufacturing Plants, PSUs, EPC Companies, Auto OEMs",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Actively AI-Evolving",
+        "salary_range": "₹3.5L - ₹7.0L",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "65",
+        "ai_impact": "AI is heavily reshaping data analysis. Power BI Copilot generates dashboards from natural language prompts and surfaces anomalies automatically. Tableau AI creates narrative summaries of chart trends. ChatGPT and Claude generate and debug SQL queries, Python wrangling scripts, and chart interpretation text. This is an AI-Evolving role with high AI exposure — routine query writing and chart creation are increasingly AI-assisted. The human advantage — asking the right business question, interpreting ambiguous data in context, and communicating insights persuasively — becomes more central and more valuable.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced Data Analyst",
+            "description": "Uses GitHub Copilot, ChatGPT daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "65%",
+          "level": "High",
+          "tasks_assisted": "Data Analysts benefit heavily from AI with ChatGPT/Claude generating and debugging SQL queries, Python data wrangling scripts, and chart descriptions. Power BI Copilot and Tableau AI (Pulse/Einstein) automate insight generation, natural language querying, and anomaly detection within dashboards. Alteryx accelerates self-service data preparation workflows, significantly reducing manual transformation effort.",
+          "human_value": "Data Analysts interpret ambiguous business questions, understand organisational context behind metrics, and communicate findings to non-technical stakeholders in a way that drives decisions — skills AI lacks. Designing the right question to ask of data, and understanding when numbers tell an incomplete story, require domain knowledge and human judgment."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for Data Analyst."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a Data Analyst portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified Data Analyst",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "Data Analyst Capstone",
+            "description": "Complete Data Analyst end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "Data Analysis suits people who are curious about what numbers are really saying and enjoy finding stories in datasets. If you like combining logical thinking with communication — turning a complex analysis into a clear recommendation for a non-technical manager — this is a very strong career path. Comfort with SQL is the core entry skill; Python is increasingly expected. You don't need to be a mathematician, but an instinct for questioning data quality and an eye for patterns help enormously. This is one of the best-value roles in Indian tech: high demand, accessible entry requirements, and clear upward paths.",
+        "target_audience": "UG/PG graduates with interest in Data Engineering & Analytics.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "Data Analyst",
+        "job_family": "Data Engineering & Analytics",
+        "narrative_para1": "A Data Analyst in India extracts, analyses, and visualises data to help organisations understand trends, measure performance, and make better decisions. Day-to-day work involves writing SQL queries, building dashboards in Power BI or Tableau, cleaning and transforming datasets in Python or Excel, and presenting insights to business stakeholders. Data Analysts are in very high demand across India — in IT services, banking, e-commerce, healthcare, and product companies — making this one of the most accessible well-paying entry points in the technology sector for graduates from engineering, maths, statistics, and even commerce backgrounds.",
+        "narrative_para2": "AI is heavily reshaping data analysis. Power BI Copilot generates dashboards from natural language prompts and surfaces anomalies automatically. Tableau AI creates narrative summaries of chart trends. ChatGPT and Claude generate and debug SQL queries, Python wrangling scripts, and chart interpretation text. This is an AI-Evolving role with high AI exposure — routine query writing and chart creation are increasingly AI-assisted. The human advantage — asking the right business question, interpreting ambiguous data in context, and communicating insights persuasively — becomes more central and more valuable.",
+        "narrative_para3": "Data Analysis suits people who are curious about what numbers are really saying and enjoy finding stories in datasets. If you like combining logical thinking with communication — turning a complex analysis into a clear recommendation for a non-technical manager — this is a very strong career path. Comfort with SQL is the core entry skill; Python is increasingly expected. You don't need to be a mathematician, but an instinct for questioning data quality and an eye for patterns help enormously. This is one of the best-value roles in Indian tech: high demand, accessible entry requirements, and clear upward paths.",
+        "salary_range_low": "350000",
+        "salary_range_high": "700000",
+        "ai_exposure_pct": "65",
+        "ai_exposure_level": "High",
+        "ai_exposure_detail": "Data Analysts benefit heavily from AI with ChatGPT/Claude generating and debugging SQL queries, Python data wrangling scripts, and chart descriptions. Power BI Copilot and Tableau AI (Pulse/Einstein) automate insight generation, natural language querying, and anomaly detection within dashboards. Alteryx accelerates self-service data preparation workflows, significantly reducing manual transformation effort.",
+        "human_value_tasks": "Data Analysts interpret ambiguous business questions, understand organisational context behind metrics, and communicate findings to non-technical stakeholders in a way that drives decisions — skills AI lacks. Designing the right question to ask of data, and understanding when numbers tell an incomplete story, require domain knowledge and human judgment.",
+        "english_requirement": "Important"
+      }
+    },
+    "tertiary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "AI Product Analyst",
+        "job_family": "Data Science & Machine Learning",
+        "role_description": "An AI Product Analyst in India works at the intersection of AI capability and product strategy — evaluating AI system quality, writing AI product requirement documents, conducting competitive analysis of AI features, performing user research on AI experience, and helping product teams make informed decisions about AI feature development. This role has emerged as product companies and GCCs increasingly need people who understand both AI capabilities and product development — bridging data science, product management, and AI evaluation disciplines.",
+        "narrative_para1": "An AI Product Analyst in India works at the intersection of AI capability and product strategy — evaluating AI system quality, writing AI product requirement documents, conducting competitive analysis of AI features, performing user research on AI experience, and helping product teams make informed decisions about AI feature development. This role has emerged as product companies and GCCs increasingly need people who understand both AI capabilities and product development — bridging data science, product management, and AI evaluation disciplines.",
+        "narrative_para2": "AI Product Analysts use ChatGPT and Claude extensively for drafting AI product requirement documents, competitor analysis synthesis, and user research summaries. OpenAI API and Anthropic Claude API usage is central to their AI evaluation workflows. GitHub Copilot assists with SQL and Python analysis scripts. Perplexity AI accelerates AI market research. This is an AI-Evolving role with high AI exposure in research and documentation, while the human core — translating business goals into AI product specifications, evaluating AI user experience, and advocating for responsible AI design — requires judgment that only deep product and AI domain knowledge provides.",
+        "narrative_para3": "AI Product Analysis suits people who are deeply curious about both AI capabilities and user experience — those who can evaluate whether an AI feature actually serves users well, not just whether it technically works. If you enjoy synthesising technical AI knowledge with product strategy thinking, can communicate AI system limitations honestly to non-technical product teams, and care about responsible AI product development — this is a compelling emerging role. Strong analytical skills, professional English, and genuine interest in AI product development are the core requirements. MBA or engineering backgrounds both provide relevant foundations.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Actively AI-Evolving",
+        "salary_range": "₹6.0L - ₹12.0L",
+        "salary_progression": null,
+        "english_requirement": "Essential",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "60",
+        "ai_impact": "AI Product Analysts use ChatGPT and Claude extensively for drafting AI product requirement documents, competitor analysis synthesis, and user research summaries. OpenAI API and Anthropic Claude API usage is central to their AI evaluation workflows. GitHub Copilot assists with SQL and Python analysis scripts. Perplexity AI accelerates AI market research. This is an AI-Evolving role with high AI exposure in research and documentation, while the human core — translating business goals into AI product specifications, evaluating AI user experience, and advocating for responsible AI design — requires judgment that only deep product and AI domain knowledge provides.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced AI Product Analyst",
+            "description": "Uses GitHub Copilot, ChatGPT daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "60%",
+          "level": "High",
+          "tasks_assisted": "AI Product Analysts use ChatGPT/Claude extensively for drafting AI product requirement documents, competitor analysis synthesis, and user research summaries. OpenAI API and Anthropic Claude API usage is central to their product evaluation workflows. GitHub Copilot assists with SQL and Python analysis scripts. Perplexity AI accelerates AI market landscape research and benchmarking.",
+          "human_value": "AI Product Analysts translate business goals into AI product specifications by deeply understanding user needs, organisational constraints, and ethical considerations that AI tools cannot independently assess. Evaluating AI system quality from a user experience perspective, arbitrating trade-offs between model capability and safety, and advocating for responsible AI product design require human judgment."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for AI Product Analyst."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a AI Product Analyst portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified AI Product Analyst",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "AI Product Analyst Capstone",
+            "description": "Complete AI Product Analyst end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "AI Product Analysis suits people who are deeply curious about both AI capabilities and user experience — those who can evaluate whether an AI feature actually serves users well, not just whether it technically works. If you enjoy synthesising technical AI knowledge with product strategy thinking, can communicate AI system limitations honestly to non-technical product teams, and care about responsible AI product development — this is a compelling emerging role. Strong analytical skills, professional English, and genuine interest in AI product development are the core requirements. MBA or engineering backgrounds both provide relevant foundations.",
+        "target_audience": "UG/PG graduates with interest in Data Science & Machine Learning.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "AI Product Analyst",
+        "job_family": "Data Science & Machine Learning",
+        "narrative_para1": "An AI Product Analyst in India works at the intersection of AI capability and product strategy — evaluating AI system quality, writing AI product requirement documents, conducting competitive analysis of AI features, performing user research on AI experience, and helping product teams make informed decisions about AI feature development. This role has emerged as product companies and GCCs increasingly need people who understand both AI capabilities and product development — bridging data science, product management, and AI evaluation disciplines.",
+        "narrative_para2": "AI Product Analysts use ChatGPT and Claude extensively for drafting AI product requirement documents, competitor analysis synthesis, and user research summaries. OpenAI API and Anthropic Claude API usage is central to their AI evaluation workflows. GitHub Copilot assists with SQL and Python analysis scripts. Perplexity AI accelerates AI market research. This is an AI-Evolving role with high AI exposure in research and documentation, while the human core — translating business goals into AI product specifications, evaluating AI user experience, and advocating for responsible AI design — requires judgment that only deep product and AI domain knowledge provides.",
+        "narrative_para3": "AI Product Analysis suits people who are deeply curious about both AI capabilities and user experience — those who can evaluate whether an AI feature actually serves users well, not just whether it technically works. If you enjoy synthesising technical AI knowledge with product strategy thinking, can communicate AI system limitations honestly to non-technical product teams, and care about responsible AI product development — this is a compelling emerging role. Strong analytical skills, professional English, and genuine interest in AI product development are the core requirements. MBA or engineering backgrounds both provide relevant foundations.",
+        "salary_range_low": "600000",
+        "salary_range_high": "1200000",
+        "ai_exposure_pct": "60",
+        "ai_exposure_level": "High",
+        "ai_exposure_detail": "AI Product Analysts use ChatGPT/Claude extensively for drafting AI product requirement documents, competitor analysis synthesis, and user research summaries. OpenAI API and Anthropic Claude API usage is central to their product evaluation workflows. GitHub Copilot assists with SQL and Python analysis scripts. Perplexity AI accelerates AI market landscape research and benchmarking.",
+        "human_value_tasks": "AI Product Analysts translate business goals into AI product specifications by deeply understanding user needs, organisational constraints, and ethical considerations that AI tools cannot independently assess. Evaluating AI system quality from a user experience perspective, arbitrating trade-offs between model capability and safety, and advocating for responsible AI product design require human judgment.",
+        "english_requirement": "Essential"
+      }
+    },
+    "ml_success_probability": null,
+    "ml_semantic_skills": [],
+    "combined_tab4": {
+      "combined_pathway_summary": "Your immediate focus must be learning the missing fundamentals for Software Engineer (Target Direction). Role success probability: Calculating",
+      "skill_gap": {
+        "current_skills": [
+          "Basic Academics",
+          "Communication"
+        ],
+        "missing_skills": []
+      },
+      "learning_roadmap": [
+        {
+          "step": "Step 1 - Foundation Skills",
+          "description": "Master prerequisites and theoretical fundamentals."
+        },
+        {
+          "step": "Step 2 - Core Technical Skills",
+          "description": "Learn core technologies."
+        },
+        {
+          "step": "Step 3 - Advanced Applications",
+          "description": "Apply skills in complex scenarios."
+        },
+        {
+          "step": "Step 4 - Projects & Portfolio",
+          "description": "Deploy market-ready portfolios demonstrating these skills."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "Certified Software Engineer Professional",
+          "issuer": "Industry Standard Provider",
+          "difficulty": "Intermediate",
+          "duration": "3 months"
+        }
+      ],
+      "courses": [
+        {
+          "course_name": "Software Engineer Crash Course",
+          "platform": "YouTube / Coursera",
+          "link_status": "Free"
+        }
+      ],
+      "projects": [
+        {
+          "project_name": "Software Engineer Capstone",
+          "description": "A complete end-to-end implementation.",
+          "skills_demonstrated": ""
+        }
+      ]
+    }
+  }
+}

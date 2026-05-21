@@ -51,7 +51,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || !showLinks
-        ? "bg-white/70 dark:bg-[#000F24]/70 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/5 py-3 shadow-lg shadow-black/5"
+        ? "bg-white/70 dark:bg-[#00152E]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/5 py-3 shadow-lg shadow-black/5"
         : "bg-transparent border-transparent py-5"
         }`}
     >
@@ -79,7 +79,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 <button
                   key={item}
                   onClick={() => handleNavItemClick(item)}
-                  className={`text-sm font-semibold transition-all duration-300 relative group ${scrolled ? 'text-[#1a3884] dark:text-gray-300 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0]' : 'text-[#1a3884] dark:text-gray-200 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0]'}`}
+                  className={`text-sm font-semibold transition-all duration-300 relative group ${scrolled ? 'text-[#1a3884] dark:text-slate-200 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0]' : 'text-[#1a3884] dark:text-slate-100 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0]'}`}
                 >
                   {item}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#C0C0C0] transition-all duration-300 group-hover:w-full rounded-full" />
@@ -89,7 +89,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
                 {/* Theme Toggle */}
                 <button
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-300 mr-2"
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-slate-200 mr-2"
                   aria-label="Toggle theme"
                 >
                   {theme === 'dark' ? (
@@ -119,7 +119,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
           <div className="flex items-center gap-2 md:hidden">
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-300"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-slate-200"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? (
@@ -148,14 +148,14 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="md:hidden bg-white dark:bg-[#000F24] border-t border-gray-100 dark:border-white/10 shadow-xl"
+          className="md:hidden bg-white dark:bg-[#00152E] border-t border-gray-100 dark:border-white/8 shadow-xl"
         >
           <div className="container mx-auto px-6 py-6 flex flex-col space-y-4">
             {navItems.map((item) => (
               <button
                 key={item}
                 onClick={() => handleNavItemClick(item)}
-                className="text-left text-gray-600 dark:text-gray-300 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0] font-medium py-2 border-b border-gray-50 dark:border-white/5"
+                className="text-left text-gray-600 dark:text-slate-200 hover:text-[#C0C0C0] dark:hover:text-[#C0C0C0] font-medium py-2 border-b border-gray-50 dark:border-white/5"
               >
                 {item}
               </button>
@@ -163,7 +163,7 @@ const Navbar = ({ onLoginClick, onSignupClick, showLinks = true }) => {
             <div className="pt-4 flex flex-col gap-3">
               <button
                 onClick={() => onLoginClick ? onLoginClick() : navigate('/?modal=true')}
-                className="w-full py-3 text-center text-[#1a3884] dark:text-white font-semibold border border-gray-200 dark:border-white/10 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                className="w-full py-3 text-center text-[#1a3884] dark:text-white font-semibold border border-gray-200 dark:border-white/10 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-white/5 transition-colors"
               >
                 Log in
               </button>

@@ -313,10 +313,10 @@ const LeftSidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 h-screen w-[280px] z-[100] lg:hidden bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col"
+            className="fixed left-0 top-0 h-screen w-[280px] z-[100] lg:hidden bg-white dark:bg-[#002147] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-2xl flex flex-col"
           >
             {/* Mobile Header */}
-            <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+            <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-[#1a3884]/15">
               <div className="flex items-center gap-3">
                 <div className="flex flex-col items-start">
                   <div className="flex items-center gap-1">
@@ -332,7 +332,7 @@ const LeftSidebar = () => {
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors"
               >
                 <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
               </button>
@@ -377,7 +377,7 @@ const LeftSidebar = () => {
                                 toggleTheme();
                                 setIsMobileOpen(false);
                               }}
-                              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]"
                             >
                               {content}
                             </button>
@@ -442,7 +442,7 @@ const LeftSidebar = () => {
                               onClick={() => setIsMobileOpen(false)}
                               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
                                 ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/25'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
                                 }`}
                             >
                               {content}
@@ -457,7 +457,7 @@ const LeftSidebar = () => {
             </div>
 
             {/* Mobile Footer */}
-            <div className="p-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
+            <div className="p-4 border-t border-slate-100 dark:border-[#1a3884]/15 space-y-2">
               <button
                 onClick={() => {
                   handleLogout();
@@ -478,10 +478,10 @@ const LeftSidebar = () => {
         initial={false}
         animate={{ width: isCollapsed ? 70 : 260 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shadow-xl`}
+        className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-[#002147] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-xl`}
         onMouseEnter={() => isCollapsed && toggleSidebar()}
       >
-        <div className={`flex flex-col items-start py-6 border-b border-slate-100 dark:border-slate-800 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
+        <div className={`flex flex-col items-start py-6 border-b border-slate-100 dark:border-[#1a3884]/15 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
           <Link to="/dashboard" className="flex flex-col items-start overflow-hidden">
             {isCollapsed ? (
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20">
@@ -539,7 +539,7 @@ const LeftSidebar = () => {
                         />
                         {/* Tooltip for collapsed state */}
                         {isCollapsed && (
-                          <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-slate-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
+                          <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-[#002A5C] text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
                             {label}
                           </div>
                         )}
@@ -581,7 +581,7 @@ const LeftSidebar = () => {
                     <button
                       key={item.label}
                       onClick={toggleTheme}
-                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 ${isCollapsed ? 'justify-center' : ''}`}
+                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] ${isCollapsed ? 'justify-center' : ''}`}
                     >
                       {content}
                     </button>
@@ -593,7 +593,7 @@ const LeftSidebar = () => {
                         : item.path}
                       className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${active
                         ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/25'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
                         } ${isCollapsed ? 'justify-center' : ''}`}
                     >
                       {content}
@@ -606,14 +606,14 @@ const LeftSidebar = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="p-3 border-t border-slate-100 dark:border-slate-800 space-y-1">
+        <div className="p-3 border-t border-slate-100 dark:border-[#1a3884]/15 space-y-1">
           {/* Section left empty after removing notification button */}
         </div>
 
         {/* User Profile Section with Hover Card */}
-        <div className="p-3 border-t border-slate-100 dark:border-slate-800 relative z-50">
+        <div className="p-3 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-50">
           <div
-            className={`flex items-center gap-3 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-slate-700/50 ${isCollapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-3 p-2 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-[#003580] ${isCollapsed ? 'justify-center' : ''}`}
             onClick={() => navigate('/dashboard/profile')}
           >
             {/* Avatar - Fixed to College Logo */}
@@ -622,10 +622,10 @@ const LeftSidebar = () => {
                 <img
                   src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
                   alt={user.college.collegeName || "College Logo"}
-                  className="w-10 h-10 rounded-lg object-contain bg-white dark:bg-slate-800 border-2 border-white dark:border-slate-700 p-1"
+                  className="w-10 h-10 rounded-lg object-contain bg-white dark:bg-[#002A5C] border-2 border-slate-100 dark:border-[#1a3884]/30 p-1"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-[#1a3884] flex items-center justify-center border-2 border-white dark:border-slate-700">
+                <div className="w-10 h-10 rounded-full bg-[#1a3884] flex items-center justify-center border-2 border-slate-100 dark:border-[#1a3884]/30">
                   <User className="w-5 h-5 text-white" />
                 </div>
               )}

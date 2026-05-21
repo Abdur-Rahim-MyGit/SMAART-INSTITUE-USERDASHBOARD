@@ -368,7 +368,7 @@ const Profile = () => {
   return (
     <>
       <PageTransition>
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-dark-bg pb-12 transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] pb-12 transition-colors duration-300">
           {loading ? (
             <ProfileSkeleton />
           ) : (
@@ -382,10 +382,10 @@ const Profile = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800 flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-8 mb-6"
+                className="bg-white dark:bg-[#002147] rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8 flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-8 mb-6"
               >
                 <div className="relative group">
-                  <div className="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-slate-800 shadow-lg">
+                  <div className="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-white/8 shadow-lg">
                     {profilePhoto ? (
                       <img
                         src={profilePhoto}
@@ -401,7 +401,7 @@ const Profile = () => {
                   </div>
                   <button
                     onClick={() => { setEditData({ name: formData.name, profilePhoto: profilePhoto }); setShowEditModal(true); }}
-                    className="absolute bottom-2 right-2 w-8 h-8 bg-[#1a3884] dark:bg-blue-600 rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform"
+                    className="absolute bottom-2 right-2 w-8 h-8 bg-[#1a3884] dark:bg-[#1a3884] rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
@@ -418,11 +418,11 @@ const Profile = () => {
                   </p>
                   <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-4">
                     <div className="flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                      <MapPin className="w-4 h-4 text-gray-400 dark:text-slate-400" />
                       <span className="text-sm font-medium">{formData.address || "Not specified"}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Building className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                      <Building className="w-4 h-4 text-gray-400 dark:text-slate-400" />
                       <span className="text-sm font-medium">{formData.institution || "Institution not set"}</span>
                     </div>
                   </div>
@@ -446,7 +446,7 @@ const Profile = () => {
                   className="space-y-6"
                 >
                   {/* Personal Information Card */}
-                  <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                  <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                     <div className="flex justify-between items-center mb-8">
                       <div className="flex gap-2 items-center">
                         <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
@@ -464,12 +464,12 @@ const Profile = () => {
                           educationLevel: formData.educationLevel,
                           department: formData.department
                         })}
-                        className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                       >
                         Edit <Edit2 className="w-4 h-4" />
                       </button>
                     </div>
-                    <hr className="my-6 border-gray-200 dark:border-slate-700" />
+                    <hr className="my-6 border-gray-200 dark:border-white/10" />
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12">
                       <InfoField label="Full Name" value={formData.name} />
                       <InfoField label="Email Address" value={formData.email} />
@@ -484,7 +484,7 @@ const Profile = () => {
                   </div>
 
                   {/* Address Card */}
-                  <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                  <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                     <div className="flex justify-between items-center mb-8">
                       <div className="flex gap-2 items-center">
                         <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
@@ -499,12 +499,12 @@ const Profile = () => {
                           state: formData.state,
                           country: formData.country
                         })}
-                        className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                        className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                       >
                         Edit <Edit2 className="w-4 h-4" />
                       </button>
                     </div>
-                    <hr className="my-6 border-gray-200 dark:border-slate-700" />
+                    <hr className="my-6 border-gray-200 dark:border-white/10" />
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-12">
                       <InfoField label="Street" value={formData.street || "Not specified"} />
                       <InfoField label="City" value={formData.city || "Not specified"} />
@@ -515,7 +515,7 @@ const Profile = () => {
 
                   {/* Education Card */}
                   {(formData.higherEducation?.length > 0 || formData.tenthDetails || formData.twelfthDetails) && (
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex justify-between items-center mb-8">
                         <div className="flex gap-2 items-center">
                           <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
@@ -527,34 +527,34 @@ const Profile = () => {
                       <div className="space-y-6">
                         {formData.higherEducation && formData.higherEducation.length > 0 ? (
                           formData.higherEducation.map((edu, idx) => (
-                            <div key={idx} className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
+                            <div key={idx} className="flex justify-between items-start p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8 w-full">
                               <div className="flex-1">
                                 <div className="flex flex-col gap-1 mb-2">
                                   <h5 className="font-bold text-gray-900 dark:text-white">{t("profile_page.higher_education")}</h5>
-                                  <hr className="my-3 border-gray-200 dark:border-slate-700" />
+                                  <hr className="my-3 border-gray-200 dark:border-white/10" />
                                   <h6 className="font-semibold text-gray-900 dark:text-white">
                                     {edu.institutionName} {edu.location && <span className="text-gray-400 font-normal">| {edu.location}</span>}
                                   </h6>
                                 </div>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                <p className="text-sm text-gray-500 dark:text-slate-300">
                                   {edu.degreeFullName || edu.degree} {edu.specialization && <span>• {edu.specialization}</span>}
                                 </p>
                                 <p className="text-xs text-gray-400 mt-1">Passing Year: {edu.yearOfPassing} • Grade: {edu.cgpaPercentage}%</p>
                               </div>
                               <button
                                 onClick={() => handleOpenEditModal('higherEducation', formData.higherEducation)}
-                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                                className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
                               >
                                 Edit <Edit2 className="w-3 h-3" />
                               </button>
                             </div>
                           ))
                         ) : (
-                          <div className="p-6 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-gray-100 dark:border-slate-800 flex flex-col items-center justify-center text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">No higher education details added yet.</p>
+                          <div className="p-6 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-gray-100 dark:border-white/8 flex flex-col items-center justify-center text-center">
+                            <p className="text-sm text-gray-500 dark:text-slate-300 mb-3">No higher education details added yet.</p>
                             <button
                               onClick={() => handleOpenEditModal('higherEducation', [])}
-                              className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm"
+                              className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm"
                             >
                               <Plus className="w-4 h-4" /> Add Higher Education
                             </button>
@@ -563,32 +563,32 @@ const Profile = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {formData.twelfthDetails && (
-                            <div className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
+                            <div className="flex justify-between items-start p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8 w-full">
                               <div className="flex-1">
                                 <h4 className="font-bold text-gray-900 dark:text-white">12th Standard</h4>
-                                <hr className="my-3 border-gray-200 dark:border-slate-700" />
-                                <p className="text-sm text-gray-500 dark:text-gray-400">{formData.twelfthDetails.schoolName}</p>
+                                <hr className="my-3 border-gray-200 dark:border-white/10" />
+                                <p className="text-sm text-gray-500 dark:text-slate-300">{formData.twelfthDetails.schoolName}</p>
                                 <p className="text-xs text-gray-400 mt-1">{formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}</p>
                               </div>
                               <button
                                 onClick={() => handleOpenEditModal('twelfthDetails', formData.twelfthDetails)}
-                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                                className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
                               >
                                 Edit <Edit2 className="w-3 h-3" />
                               </button>
                             </div>
                           )}
                           {formData.tenthDetails && (
-                            <div className="flex justify-between items-start p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full">
+                            <div className="flex justify-between items-start p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8 w-full">
                               <div className="flex-1">
                                 <h4 className="font-bold text-gray-900 dark:text-white">10th Standard</h4>
-                                <hr className="w-full my-3 border-gray-200 dark:border-slate-700" />
-                                <p className="text-sm text-gray-500 dark:text-gray-400">{formData.tenthDetails.schoolName}</p>
+                                <hr className="w-full my-3 border-gray-200 dark:border-white/10" />
+                                <p className="text-sm text-gray-500 dark:text-slate-300">{formData.tenthDetails.schoolName}</p>
                                 <p className="text-xs text-gray-400 mt-1">{formData.tenthDetails.percentage}% • {formData.tenthDetails.yearOfPassing}</p>
                               </div>
                               <button
                                 onClick={() => handleOpenEditModal('tenthDetails', formData.tenthDetails)}
-                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
+                                className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
                               >
                                 Edit <Edit2 className="w-3 h-3" />
                               </button>
@@ -602,7 +602,7 @@ const Profile = () => {
                   {/* Professional Experience & Achievements */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Work Experience */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
@@ -612,7 +612,7 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('workExperience', formData.workExperience)}
-                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         > Edit
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -620,7 +620,7 @@ const Profile = () => {
                       <div className="space-y-4">
                         {formData.workExperience && formData.workExperience.length > 0 ? (
                           formData.workExperience.map((exp, idx) => (
-                            <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                            <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
                               <h4 className="font-bold text-gray-900 dark:text-white">
                                 {exp.companyName || exp.organization} {exp.location && <span className="text-gray-400 font-normal text-xs ml-1">| {exp.location}</span>}
                               </h4>
@@ -630,7 +630,7 @@ const Profile = () => {
                                 <span>{exp.duration || "Duration not set"}</span>
                               </div>
                               {exp.description && (
-                                <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">{exp.description}</p>
+                                <p className="text-xs text-gray-600 dark:text-slate-300 mt-2 line-clamp-2">{exp.description}</p>
                               )}
                             </div>
                           ))
@@ -641,7 +641,7 @@ const Profile = () => {
                     </div>
 
                     {/* Projects */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
@@ -651,7 +651,7 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('projects', formData.projects)}
-                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
                           Edit <Edit2 className="w-4 h-4" />
                         </button>
@@ -659,14 +659,14 @@ const Profile = () => {
                       <div className="space-y-4">
                         {formData.projects && formData.projects.length > 0 ? (
                           formData.projects.map((project, idx) => (
-                            <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                            <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
                               <h4 className="font-bold text-gray-900 dark:text-white">{project.title}</h4>
                               {project.link && (
                                 <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 mt-1">
                                   View Project <Plus className="w-2 h-2" />
                                 </a>
                               )}
-                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">{project.description}</p>
+                              <p className="text-xs text-gray-600 dark:text-slate-300 mt-2">{project.description}</p>
                             </div>
                           ))
                         ) : (
@@ -676,7 +676,7 @@ const Profile = () => {
                     </div>
 
                     {/* Certificates */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
@@ -686,7 +686,7 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('certificates', formData.certificates)}
-                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
                           Edit <Edit2 className="w-4 h-4" />
                         </button>
@@ -694,7 +694,7 @@ const Profile = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {formData.certificates && formData.certificates.length > 0 ? (
                           formData.certificates.map((cert, idx) => (
-                            <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                            <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
                               <h4 className="font-bold text-gray-900 dark:text-white text-sm">{cert.title}</h4>
                               <p className="text-[10px] text-gray-500 mt-1">{cert.issuer}</p>
                               {cert.link && (
@@ -711,7 +711,7 @@ const Profile = () => {
                     </div>
 
                     {/* Extracurricular & Others */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-xl">
@@ -721,7 +721,7 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('extracurricular', formData.extracurricular)}
-                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
                           Edit <Edit2 className="w-4 h-4" />
                         </button>
@@ -741,7 +741,7 @@ const Profile = () => {
                                 )}
                               </div>
                               {item.description && (
-                                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                                <p className="text-xs text-gray-600 dark:text-slate-300 leading-relaxed">
                                   {item.description}
                                 </p>
                               )}
@@ -759,7 +759,7 @@ const Profile = () => {
                     </div>
 
                     {/* Career Preferences */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
@@ -769,7 +769,7 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('jobPreferences', formData.jobPreferences)}
-                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
                           Edit <Edit2 className="w-4 h-4" />
                         </button>
@@ -777,16 +777,16 @@ const Profile = () => {
                       <div className="space-y-4">
                         {formData.jobPreferences && formData.jobPreferences.length > 0 ? (
                           formData.jobPreferences.map((job, idx) => (
-                            <div key={idx} className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+                            <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
                               <h4 className="font-bold text-gray-900 dark:text-white">{job.preferredRole}</h4>
                               <div className="grid grid-cols-2 gap-4 mt-3">
                                 <div>
                                   <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Job Type</p>
-                                  <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">{job.jobType}</p>
+                                  <p className="text-xs font-semibold text-gray-700 dark:text-slate-100">{job.jobType}</p>
                                 </div>
                                 <div>
                                   <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Location</p>
-                                  <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">{job.preferredLocation}</p>
+                                  <p className="text-xs font-semibold text-gray-700 dark:text-slate-100">{job.preferredLocation}</p>
                                 </div>
                               </div>
                             </div>
@@ -798,7 +798,7 @@ const Profile = () => {
                     </div>
 
                     {/* Goals */}
-                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-slate-800">
+                    <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
                           <div className="p-2 bg-cyan-50 dark:bg-cyan-900/30 rounded-xl">
@@ -808,7 +808,7 @@ const Profile = () => {
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('careerGoals', formData.careerGoals)}
-                          className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-200 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
                           Edit <Edit2 className="w-4 h-4" />
                         </button>
@@ -841,28 +841,28 @@ const Profile = () => {
                       initial={{ opacity: 0, scale: 0.95, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                      className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-md w-full p-8"
+                      className="bg-white dark:bg-[#002147] rounded-3xl shadow-2xl max-w-md w-full p-8"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-between mb-8">
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white">Change Profile Photo</h3>
-                        <button onClick={() => setShowEditModal(false)} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                        <button onClick={() => setShowEditModal(false)} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#002A5C] transition-colors">
                           <X className="w-5 h-5 text-gray-500" />
                         </button>
                       </div>
                       <div className="flex flex-col items-center mb-8">
                         <div className="relative mb-4">
-                          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl">
+                          <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-white/8 shadow-xl">
                             {editData.profilePhoto ? <img src={editData.profilePhoto} alt="Profile" className="w-full h-full object-cover" /> : <span className="text-4xl font-bold text-white">{getInitials(editData.name)}</span>}
                           </div>
-                          <label className="absolute bottom-1 right-1 w-10 h-10 bg-[#1a3884] dark:bg-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg">
+                          <label className="absolute bottom-1 right-1 w-10 h-10 bg-[#1a3884] dark:bg-[#1a3884] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg">
                             {uploadingPhoto ? <Loader2 className="w-5 h-5 text-white animate-spin" /> : <Camera className="w-5 h-5 text-white" />}
                             <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
                           </label>
                         </div>
                       </div>
                       <div className="flex gap-4">
-                        <button onClick={() => setShowEditModal(false)} className="flex-1 py-3 px-4 border border-gray-200 dark:border-slate-700 rounded-2xl text-gray-700 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+                        <button onClick={() => setShowEditModal(false)} className="flex-1 py-3 px-4 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-700 dark:text-slate-200 font-bold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors">Cancel</button>
                         <button onClick={handleSaveProfile} disabled={savingProfile || uploadingPhoto || !editData.profilePhoto} className="flex-1 py-3 px-4 bg-[#1a3884] text-white rounded-2xl font-bold hover:bg-[#277a84] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg">
                           {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
                         </button>
@@ -886,15 +886,15 @@ const Profile = () => {
                       initial={{ opacity: 0, scale: 0.95, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                      className="bg-white dark:bg-slate-900 rounded-[32px] shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto"
+                      className="bg-white dark:bg-[#002147] rounded-[32px] shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="flex items-center justify-between mb-8 sticky top-0 bg-white dark:bg-slate-900 z-10 pb-4 border-b border-gray-100 dark:border-slate-800">
+                      <div className="flex items-center justify-between mb-8 sticky top-0 bg-white dark:bg-[#002147] z-10 pb-4 border-b border-gray-100 dark:border-white/8">
                         <div>
                           <h3 className="text-2xl font-black text-gray-900 dark:text-white">Edit {formatSectionTitle(activeEditSection)}</h3>
                           <p className="text-xs text-gray-400 mt-1">Keep your profile up to date for better opportunities</p>
                         </div>
-                        <button onClick={() => setShowSectionModal(false)} className="p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                        <button onClick={() => setShowSectionModal(false)} className="p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-[#002A5C] transition-colors">
                           <X className="w-6 h-6 text-gray-400" />
                         </button>
                       </div>
@@ -944,7 +944,7 @@ const Profile = () => {
                         {['higherEducation', 'workExperience', 'projects', 'certificates', 'jobPreferences', 'extracurricular'].includes(activeEditSection) && (
                           <div className="space-y-8">
                             {Array.isArray(editFormData) && editFormData.map((item, idx) => (
-                              <div key={idx} className="p-6 bg-gray-50 dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 relative">
+                              <div key={idx} className="p-6 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-3xl border border-gray-100 dark:border-white/10 relative">
                                 <button onClick={() => { const newArr = [...editFormData]; newArr.splice(idx, 1); setEditFormData(newArr); }} className="absolute top-4 right-4 p-2 bg-red-50 dark:bg-red-900 text-red-500 rounded-xl transition-opacity">
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -1009,16 +1009,16 @@ const Profile = () => {
                                           : { institutionName: "", degreeFullName: "", yearOfPassing: "", cgpaPercentage: "" };
                                 setEditFormData([...(Array.isArray(editFormData) ? editFormData : []), newItem]);
                               }}
-                              className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-[24px] text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all flex items-center justify-center gap-2 font-bold"
+                              className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-white/8 rounded-[24px] text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all flex items-center justify-center gap-2 font-bold"
                             >
                               <Plus className="w-5 h-5" /> Add Another Item
                             </button>
                           </div>
                         )}
                       </div>
-                      <div className="mt-10 flex gap-4 sticky bottom-0 bg-white dark:bg-slate-900 pt-4 border-t border-gray-100 dark:border-slate-800">
-                        <button onClick={() => setShowSectionModal(false)} className="flex-1 py-4 rounded-[20px] font-black text-slate-500 hover:bg-gray-50 dark:hover:bg-slate-800 transition-all">Cancel</button>
-                        <button onClick={handleSaveSection} disabled={savingProfile} className="flex-[2] py-4 bg-[#1a3884] text-white rounded-[20px] font-black hover:bg-blue-700 transition-all shadow-xl flex items-center justify-center gap-2">{savingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} Save Changes</button>
+                      <div className="mt-10 flex gap-4 sticky bottom-0 bg-white dark:bg-[#002147] pt-4 border-t border-gray-100 dark:border-white/8">
+                        <button onClick={() => setShowSectionModal(false)} className="flex-1 py-4 rounded-[20px] font-black text-slate-500 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all">Cancel</button>
+                        <button onClick={handleSaveSection} disabled={savingProfile} className="flex-[2] py-4 bg-[#1a3884] text-white rounded-[20px] font-black hover:bg-[#132c6b] transition-all shadow-xl flex items-center justify-center gap-2">{savingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} Save Changes</button>
                       </div>
                     </motion.div>
                   </motion.div>
@@ -1035,7 +1035,7 @@ const Profile = () => {
 // Helper Components for the redesigned layout
 const InfoField = ({ label, value }) => (
   <div className="flex flex-col min-w-0">
-    <span className="text-gray-400 dark:text-gray-500 text-[11px] uppercase font-bold tracking-wider mb-1">{label}</span>
+    <span className="text-gray-400 dark:text-slate-400 text-[11px] uppercase font-bold tracking-wider mb-1">{label}</span>
     <span className="text-gray-900 dark:text-white text-sm sm:text-base font-semibold break-words" title={value}>
       {value || "Not set"}
     </span>
@@ -1043,20 +1043,20 @@ const InfoField = ({ label, value }) => (
 );
 
 const GoalItem = ({ label, value }) => (
-  <div className="p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800">
+  <div className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
     <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">{label}</p>
-    <p className="text-xs font-semibold text-gray-700 dark:text-gray-200 leading-relaxed">{value || "No goal set yet."}</p>
+    <p className="text-xs font-semibold text-gray-700 dark:text-slate-100 leading-relaxed">{value || "No goal set yet."}</p>
   </div>
 );
 
 const ModalInput = ({ label, value, onChange, type = "text" }) => (
   <div className="space-y-1.5">
-    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">{label}</label>
+    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
     <input
       type={type}
       value={value || ""}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none"
+      className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none"
       placeholder={`Enter ${label.toLowerCase()}`}
     />
   </div>
@@ -1064,11 +1064,11 @@ const ModalInput = ({ label, value, onChange, type = "text" }) => (
 
 const ModalSelect = ({ label, value, options, onChange }) => (
   <div className="space-y-1.5">
-    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">{label}</label>
+    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
     <select
       value={value || ""}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none appearance-none"
+      className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none appearance-none"
     >
       <option value="">Select {label}</option>
       {options.map((opt) => (
@@ -1080,12 +1080,12 @@ const ModalSelect = ({ label, value, options, onChange }) => (
 
 const ModalTextarea = ({ label, value, onChange }) => (
   <div className="space-y-1.5">
-    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-gray-500 ml-1">{label}</label>
+    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
     <textarea
       value={value || ""}
       onChange={(e) => onChange(e.target.value)}
       rows={3}
-      className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none resize-none"
+      className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none resize-none"
       placeholder={`Enter your ${label.toLowerCase()}...`}
     />
   </div>

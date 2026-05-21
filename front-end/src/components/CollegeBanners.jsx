@@ -21,7 +21,7 @@ const CollegeBanners = () => {
         setLoading(false);
         return;
       }
-      
+
       try {
         console.log('[CollegeBanners] Fetching banners for college:', collegeId);
         const response = await apiCall(`/colleges/${collegeId}/banners`);
@@ -66,9 +66,9 @@ const CollegeBanners = () => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.3 }}
-        className="relative w-full overflow-hidden rounded-2xl mb-4 shadow-sm group bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
+        className="relative w-full overflow-hidden rounded-2xl mb-4 shadow-sm group bg-white dark:bg-[#002147] border border-[#C0C0C0] dark:border-white/8"
       >
-        <div className="relative aspect-[16/9] sm:aspect-[24/9] md:aspect-[32/9] lg:aspect-[40/9] w-full bg-slate-100 dark:bg-slate-800">
+        <div className="relative aspect-[21/9] sm:aspect-[32/9] lg:aspect-[40/9] w-full bg-slate-100 dark:bg-[#002A5C]">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -84,7 +84,7 @@ const CollegeBanners = () => {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-4 sm:p-6 lg:p-8">
-                <motion.h2 
+                <motion.h2
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
@@ -110,15 +110,14 @@ const CollegeBanners = () => {
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
-              
+
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-50">
                 {banners.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentIndex(idx)}
-                    className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
-                      idx === currentIndex ? 'bg-white w-4 sm:w-6' : 'bg-white/50 hover:bg-white/80'
-                    }`}
+                    className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-white w-4 sm:w-6' : 'bg-white/50 hover:bg-white/80'
+                      }`}
                   />
                 ))}
               </div>

@@ -104,7 +104,7 @@ const QuotientsGrid = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-[#001229]">
+      <div className="min-h-screen bg-[#00152E]">
         <main className="p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
             <header className="mb-8">
@@ -155,7 +155,7 @@ const QuotientsGrid = () => {
                         <div className="flex justify-between items-end mb-1">
                           <span className="text-xs font-bold text-gray-500 uppercase">Level: {scoreData?.level || 'Emerging'}</span>
                         </div>
-                        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div className="h-2 bg-[#002A5C] rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${scoreData?.rawScore || 0}%` }}
@@ -231,7 +231,7 @@ const QuotientsGrid = () => {
                     <span className="text-gray-400">Score Progress</span>
                     <span className="text-white font-bold">{selectedQuotient.rawScore || 0}/100</span>
                   </div>
-                  <div className="h-4 bg-gray-800 rounded-full overflow-hidden p-1">
+                  <div className="h-4 bg-[#002A5C] rounded-full overflow-hidden p-1">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${selectedQuotient.rawScore || 0}%` }}

@@ -148,7 +148,7 @@ const MyAssessments = () => {
                 ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white shadow-lg shadow-blue-500/20"
                 : isCurrent
                   ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white"
-                  : "border-2 border-slate-100 bg-slate-50 text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500"
+                  : "border-2 border-slate-100 bg-[#F8FAFC] text-slate-400 dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-500"
             }`}
           >
             Step {index + 1}
@@ -170,7 +170,7 @@ const MyAssessments = () => {
                   className={`relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm sm:h-16 sm:w-16 ${
                     isCompleted || (isCurrent && !isTimerActive)
                       ? "bg-blue-50 text-[#1a3884] dark:bg-blue-500/10 dark:text-blue-400"
-                      : "bg-slate-50 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+                      : "bg-[#F8FAFC] text-slate-400 dark:bg-[#002A5C] dark:text-slate-500"
                   }`}
                 >
                   {isCompleted ? (
@@ -206,7 +206,7 @@ const MyAssessments = () => {
                       data: results[assessment.key],
                       description: `View your ${assessment.title} results.`
                     })}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-600 shadow-sm transition-all hover:border-[#1a3884] hover:bg-[#1a3884] hover:text-white dark:border-slate-700 dark:bg-dark-card dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-blue-600"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-600 shadow-sm transition-all hover:border-[#1a3884] hover:bg-[#1a3884] hover:text-white dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-[#1a3884]"
                   >
                     <CheckCircle2 className="h-4 w-4" />
                     View Results
@@ -262,7 +262,7 @@ const MyAssessments = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setShowPassport(true)}
-                className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:bg-slate-50 dark:bg-dark-card dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-[#002A5C]"
+                className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:bg-[#F8FAFC] dark:bg-[#002147] dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-[#002A5C]"
               >
                 <Shield className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
                 Skills Passport
@@ -300,7 +300,7 @@ const MyAssessments = () => {
                         <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Detailed Results</p>
                       </div>
                     </div>
-                    <button onClick={() => setSelectedAssessment(null)} className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300">
+                    <button onClick={() => setSelectedAssessment(null)} className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#002A5C] dark:hover:text-slate-300">
                       <X className="h-5 w-5" />
                     </button>
                   </div>

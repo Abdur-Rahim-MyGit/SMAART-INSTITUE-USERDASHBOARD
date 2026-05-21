@@ -58,7 +58,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                 value={newTaskTitle}
                                 onChange={(e) => setNewTaskTitle(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-                                className="flex-1 px-3 py-2 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-xs focus:outline-none focus:border-[#1a3884] dark:text-white"
+                                className="flex-1 px-3 py-2 rounded-xl bg-[#F8FAFC] dark:bg-white/5 border border-gray-100 dark:border-white/10 text-xs focus:outline-none focus:border-[#1a3884] dark:text-white"
                                 autoFocus
                             />
                             <button
@@ -76,7 +76,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
             <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar max-h-[300px]">
                 {sortedTasks.length === 0 && completedTasks.length === 0 ? (
                     <div className="text-center py-8">
-                        <div className="w-12 h-12 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <div className="w-12 h-12 bg-[#F8FAFC] dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-3">
                             <Calendar className="w-6 h-6 text-gray-300" />
                         </div>
                         <p className="text-xs text-gray-400">No upcoming deadlines.</p>
@@ -85,7 +85,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                 ) : (
                     <>
                         {sortedTasks.map(task => (
-                            <div key={task._id || task.id} className="group flex gap-3 items-start p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 border border-transparent hover:border-gray-100 dark:hover:border-white/5 transition-all">
+                            <div key={task._id || task.id} className="group flex gap-3 items-start p-3 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-white/5 border border-transparent hover:border-gray-100 dark:hover:border-white/5 transition-all">
 
                                 {/* Checkbox */}
                                 <button
@@ -104,7 +104,7 @@ const UpcomingDeadlines = ({ tasks, onAddTask, onToggleTask, onDeleteTask }) => 
                                         <h4 className="text-sm font-semibold text-[#002147] dark:text-white leading-tight mb-1 truncate">{task.title}</h4>
                                     </div>
 
-                                    <div className="flex items-center gap-3 text-[10px] text-gray-500 dark:text-gray-400">
+                                    <div className="flex items-center gap-3 text-[10px] text-gray-500 dark:text-slate-300">
                                         <span className="flex items-center gap-1">
                                             <Clock className="w-3 h-3" />
                                             {task.time || 'All Day'}

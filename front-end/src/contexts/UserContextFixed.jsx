@@ -7,6 +7,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { API_BASE_URL } from '@/services/api';
+import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
 const UserContext = createContext(null);
 
@@ -95,6 +96,7 @@ export const UserProvider = ({ children }) => {
         sessionStorage.clear();
         localStorage.removeItem("user");
         localStorage.removeItem("token");
+        clearAssessmentTimerStorage();
 
         // Set a flag so the LandingPage can show a clean toast message
         sessionStorage.setItem("logged_out_other_tab", "true");
@@ -148,6 +150,7 @@ export const UserProvider = ({ children }) => {
     sessionStorage.clear();
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    clearAssessmentTimerStorage();
 
     // Step 3: Set flag for clean logout message
     sessionStorage.setItem('logged_out_other_tab', 'true');

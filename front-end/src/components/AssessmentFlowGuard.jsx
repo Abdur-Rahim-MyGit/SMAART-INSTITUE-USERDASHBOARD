@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import DashboardLoader from "@/components/DashboardLoader";
 import useTabSwitchProctor from "@/hooks/useTabSwitchProctor";
 import TabSwitchWarningOverlay from "@/components/TabSwitchWarningOverlay";
+import { clearAssessmentTimerStorage } from "@/utils/assessmentTimerStorage";
 
 /**
  * AssessmentFlowGuard component
@@ -67,15 +68,31 @@ const AssessmentFlowGuard = ({ children }) => {
     }
 
     if (serverValidate) {
+      // Skip server validation on career agent pages — they use optionalAuth and manage
+      // their own session flow. Forcing a server check here during the 15-20s AI analysis
+      // causes a race condition that logs the user out.
+      const isCareerAgentPage = window.location.pathname.includes('/career-agent');
+      if (isCareerAgentPage) {
+        return true; // Trust local session for career agent pages
+      }
+
       try {
         // Validate token with backend — prevents stale/stolen tokens from granting access
         await apiCall('/auth/me');
       } catch (err) {
-        console.warn('[AssessmentFlowGuard] Token validation failed:', err.message);
-        sessionStorage.clear();
-        setIsAuthenticated(false);
-        navigate("/", { replace: true });
-        return false;
+        // Only force logout on a genuine 401 (session invalid/expired)
+        // Do NOT logout on network errors, timeouts, or service unavailability
+        const isAuthError = err.message?.includes('Unauthorized') || err.status === 401;
+        if (isAuthError) {
+          console.warn('[AssessmentFlowGuard] Token validation failed (401):', err.message);
+          sessionStorage.clear();
+          clearAssessmentTimerStorage();
+          setIsAuthenticated(false);
+          navigate("/", { replace: true });
+          return false;
+        }
+        // Network/timeout errors — allow through (user still has valid local session)
+        console.warn('[AssessmentFlowGuard] Token validation skipped (network issue):', err.message);
       }
     }
 
@@ -144,6 +161,7 @@ const AssessmentFlowGuard = ({ children }) => {
         if (!parsedUser) {
           console.error("Invalid user data in session (null), clearing...");
           sessionStorage.clear();
+          clearAssessmentTimerStorage();
           setIsAuthenticated(false);
           setLoading(false);
           navigate("/", { replace: true });
@@ -157,6 +175,7 @@ const AssessmentFlowGuard = ({ children }) => {
         if (parsedUser.mustChangePassword === true) {
           console.warn("[AssessmentFlowGuard] mustChangePassword is still true — ejecting to login.");
           sessionStorage.clear();
+          clearAssessmentTimerStorage();
           setIsAuthenticated(false);
           setLoading(false);
           navigate("/", {
@@ -314,7 +333,7 @@ const AssessmentFlowGuard = ({ children }) => {
 
         {/* Fallback loader if splash finishes but data is still fetching */}
         {splashComplete && loading && (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-[#001229]">
+          <div className="flex flex-col items-center justify-center min-h-screen bg-[#00152E]">
             <div className="flex items-center">
               <Loader2 className="w-12 h-12 text-[#1a3884] animate-spin" />
               <p className="ml-4 text-white font-medium">Finalizing setup...</p>
@@ -362,5 +381,4 @@ const AssessmentFlowGuard = ({ children }) => {
 };
 
 export default AssessmentFlowGuard;
-
 

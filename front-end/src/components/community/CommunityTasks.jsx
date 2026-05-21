@@ -323,7 +323,7 @@ const CommunityTasks = () => {
                             className={`w-full flex items-start gap-2.5 px-2.5 py-2 rounded-xl text-left transition-all group/task ${
                               isDone
                                 ? `${cat.light} border border-transparent`
-                                : "hover:bg-gray-50 border border-transparent"
+                                : "hover:bg-[#F8FAFC] border border-transparent"
                             }`}
                           >
                             <div className="flex-shrink-0 mt-0.5">

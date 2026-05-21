@@ -20,7 +20,7 @@ export const FormInput = ({ label, name, value, onChange, placeholder, required,
                 onChange={onChange}
                 placeholder={placeholder}
                 required={required}
-                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600`}
+                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600`}
             />
         </div>
     </div>
@@ -42,7 +42,7 @@ export const FormSelect = ({ label, name, value, onChange, options, required, ic
                 value={value}
                 onChange={onChange}
                 required={required}
-                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-10 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white appearance-none cursor-pointer transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600`}
+                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-10 py-3.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] text-slate-800 dark:text-white appearance-none cursor-pointer transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600`}
             >
                 <option value="">Select...</option>
                 {options.map(opt => (
@@ -72,7 +72,7 @@ export const FormTextarea = ({ label, name, value, onChange, placeholder, requir
                 placeholder={placeholder}
                 required={required}
                 rows={3}
-                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600 resize-none`}
+                className={`w-full ${Icon ? 'pl-12' : 'pl-4'} pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] text-slate-800 dark:text-white placeholder-slate-400 transition-all duration-300 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 hover:border-slate-300 dark:hover:border-slate-600 resize-none`}
             />
         </div>
     </div>
@@ -120,14 +120,14 @@ export const ReportSection = ({ title, icon: Icon, color, children, delay = 0 })
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay }}
-            className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
+            className="bg-white dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/8 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
         >
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full px-6 py-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                className="w-full px-6 py-5 flex items-center justify-between hover:bg-[#F8FAFC] dark:hover:bg-slate-700/50 transition-colors"
             >
                 <div className="flex items-center gap-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-700`}>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center bg-[#F8FAFC] dark:bg-[#002A5C] text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/10`}>
                         <Icon size={22} />
                     </div>
                     <h3 className="text-lg font-bold text-slate-800 dark:text-white">{title}</h3>
@@ -158,15 +158,15 @@ export const ReportSection = ({ title, icon: Icon, color, children, delay = 0 })
 
 export const SkillTag = ({ text, variant = 'default' }) => {
     const variants = {
-        default: 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
-        success: 'bg-slate-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 border-slate-200 dark:border-slate-700',
-        warning: 'bg-slate-50 dark:bg-slate-800 text-amber-600 dark:text-amber-400 border-slate-200 dark:border-slate-700',
-        purple: 'bg-slate-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700',
-        rose: 'bg-slate-50 dark:bg-slate-800 text-rose-600 dark:text-rose-400 border-slate-200 dark:border-slate-700',
+        default: 'bg-[#F8FAFC] dark:bg-[#002A5C] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10',
+        success: 'bg-[#F8FAFC] dark:bg-[#002A5C] text-emerald-600 dark:text-emerald-400 border-slate-200 dark:border-white/10',
+        warning: 'bg-[#F8FAFC] dark:bg-[#002A5C] text-amber-600 dark:text-amber-400 border-slate-200 dark:border-white/10',
+        purple: 'bg-[#F8FAFC] dark:bg-[#002A5C] text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-white/10',
+        rose: 'bg-[#F8FAFC] dark:bg-[#002A5C] text-rose-600 dark:text-rose-400 border-slate-200 dark:border-white/10',
     };
 
     return (
-        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${variants[variant]} transition-colors hover:bg-slate-100 dark:hover:bg-slate-700`}>
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${variants[variant]} transition-colors hover:bg-slate-100 dark:hover:bg-[#002A5C]`}>
             {text}
         </span>
     );

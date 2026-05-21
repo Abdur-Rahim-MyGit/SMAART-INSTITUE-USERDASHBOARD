@@ -1,0 +1,731 @@
+{
+  "id": "1779373435882",
+  "timestamp": "2026-05-21T14:23:55.882Z",
+  "status": "completed",
+  "profile_hash": "75f7ade6318d8cb999dddca87e41ea262e44bcd1f4f389df808074def5c62451",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Rahman",
+      "email": "rahman@gmail.com",
+      "phone": "1234567890",
+      "registrationNumber": "STU00032"
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Computer Science & IT",
+        "degreeGroup": "Bachelor of Computer Applications",
+        "specialisation": [
+          "AI & ML",
+          "Cloud Computing"
+        ],
+        "university": "",
+        "graduationYear": "",
+        "currentlyPursuing": false
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": {
+          "directionId": "CD-011005-A02",
+          "directionName": "UX Research & Human-AI Interaction",
+          "directionDescription": "Human-AI interaction and UX research involves understanding how people interact with AI-powered systems and designing those interactions to be safe, useful, and trustworthy. UX researchers conduct user studies of AI products; user research analysts synthesise feedback from AI users; inclusive design analysts ensure AI interfaces work for diverse populations. BCA AI & ML graduates who develop psychology, research methods, and design thinking skills can build alternate careers in the nascent field of responsible AI design.",
+          "directionOverview": "Human-AI interaction and UX research involves understanding how people interact with AI-powered systems and designing those interactions to be safe, useful, and trustworthy. UX researchers conduct user studies of AI products; user research analysts synthesise feedback from AI users; inclusive design analysts ensure AI interfaces work for diverse populations. BCA AI & ML graduates who develop psychology, research methods, and design thinking skills can build alternate careers in the nascent field of responsible AI design.",
+          "type": "Primary",
+          "uniqueId": "UG-011-005",
+          "roles": [
+            {
+              "role": "UX Researcher",
+              "id": "JF08-004"
+            },
+            {
+              "role": "User Research Analyst",
+              "id": "JF08-010"
+            },
+            {
+              "role": "UX Designer",
+              "id": "JF08-002"
+            },
+            {
+              "role": "Inclusive Design Analyst",
+              "id": "JF08-016"
+            },
+            {
+              "role": "Service Designer",
+              "id": "JF08-011"
+            },
+            {
+              "role": "Interaction Designer",
+              "id": "JF08-005"
+            },
+            {
+              "role": "UX Writer",
+              "id": "JF08-013"
+            },
+            {
+              "role": "Content Designer",
+              "id": "JF08-012"
+            },
+            {
+              "role": "AI Product Analyst",
+              "id": "JF06-012"
+            },
+            {
+              "role": "Associate Product Manager",
+              "id": "JF08-007"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011005-A02",
+        "careerDirectionName": "UX Research & Human-AI Interaction",
+        "careerDirectionDescription": "Human-AI interaction and UX research involves understanding how people interact with AI-powered systems and designing those interactions to be safe, useful, and trustworthy. UX researchers conduct user studies of AI products; user research analysts synthesise feedback from AI users; inclusive design analysts ensure AI interfaces work for diverse populations. BCA AI & ML graduates who develop psychology, research methods, and design thinking skills can build alternate careers in the nascent field of responsible AI design.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "UX Research & Human-AI Interaction",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      },
+      "secondary": {
+        "careerDirection": {
+          "directionId": "CD-ENTRE-001",
+          "directionName": "Entrepreneurship",
+          "directionDescription": "Entrepreneurship is a career path where the graduate chooses to create and run their own venture rather than work as an employee. Using the knowledge, skills, and domain expertise built through their degree, the graduate identifies an opportunity and builds a business around it — whether a local enterprise, a freelance practice, a professional service, a digital venture, or a scalable startup. The graduate is the owner, the decision-maker, and the driver of the work.",
+          "directionOverview": "Entrepreneurship is a career path where the graduate chooses to create and run their own venture rather than work as an employee. Using the knowledge, skills, and domain expertise built through their degree, the graduate identifies an opportunity and builds a business around it — whether a local enterprise, a freelance practice, a professional service, a digital venture, or a scalable startup. The graduate is the owner, the decision-maker, and the driver of the work.",
+          "type": "Primary",
+          "uniqueId": "UG-011-005",
+          "roles": []
+        },
+        "careerDirectionId": "CD-ENTRE-001",
+        "careerDirectionName": "Entrepreneurship",
+        "careerDirectionDescription": "Entrepreneurship is a career path where the graduate chooses to create and run their own venture rather than work as an employee. Using the knowledge, skills, and domain expertise built through their degree, the graduate identifies an opportunity and builds a business around it — whether a local enterprise, a freelance practice, a professional service, a digital venture, or a scalable startup. The graduate is the owner, the decision-maker, and the driver of the work.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Entrepreneurship",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      },
+      "tertiary": {
+        "careerDirection": {
+          "directionId": "CD-011005-P07",
+          "directionName": "AI in Business Analytics & Decision Support",
+          "directionDescription": "AI-driven business analytics involves using machine learning models and statistical tools to support business decision-making — demand forecasting, customer churn prediction, and revenue optimisation. Business intelligence analysts build AI-enhanced dashboards; analytics engineers build data transformation layers that feed ML models; quantitative analysts build statistical decision models. BCA AI & ML graduates who develop strong SQL, Python, and BI tool skills can access these applied AI roles in commercial enterprises across all industries.",
+          "directionOverview": "AI-driven business analytics involves using machine learning models and statistical tools to support business decision-making — demand forecasting, customer churn prediction, and revenue optimisation. Business intelligence analysts build AI-enhanced dashboards; analytics engineers build data transformation layers that feed ML models; quantitative analysts build statistical decision models. BCA AI & ML graduates who develop strong SQL, Python, and BI tool skills can access these applied AI roles in commercial enterprises across all industries.",
+          "type": "Primary",
+          "uniqueId": "UG-011-005",
+          "roles": [
+            {
+              "role": "Data Analyst",
+              "id": "JF05-001"
+            },
+            {
+              "role": "Business Intelligence Analyst",
+              "id": "JF05-003"
+            },
+            {
+              "role": "Power BI Developer",
+              "id": "JF05-010"
+            },
+            {
+              "role": "Reporting Analyst",
+              "id": "JF05-013"
+            },
+            {
+              "role": "Data Visualization Analyst",
+              "id": "JF05-017"
+            },
+            {
+              "role": "Quantitative Analyst",
+              "id": "JF05-006"
+            },
+            {
+              "role": "Analytics Engineer",
+              "id": "JF05-014"
+            },
+            {
+              "role": "MIS Analyst",
+              "id": "JF27-010"
+            },
+            {
+              "role": "AI Product Analyst",
+              "id": "JF06-012"
+            },
+            {
+              "role": "Business Analyst",
+              "id": "JF55-012"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011005-P07",
+        "careerDirectionName": "AI in Business Analytics & Decision Support",
+        "careerDirectionDescription": "AI-driven business analytics involves using machine learning models and statistical tools to support business decision-making — demand forecasting, customer churn prediction, and revenue optimisation. Business intelligence analysts build AI-enhanced dashboards; analytics engineers build data transformation layers that feed ML models; quantitative analysts build statistical decision models. BCA AI & ML graduates who develop strong SQL, Python, and BI tool skills can access these applied AI roles in commercial enterprises across all industries.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "AI in Business Analytics & Decision Support",
+        "type": "Full-Time",
+        "salary": "",
+        "locations": [],
+        "location": "",
+        "orgTypes": []
+      }
+    }
+  },
+  "output_generated_report": {
+    "status": "success_deterministic",
+    "generated_at": "2026-05-21T14:23:56.005Z",
+    "preVerified": {
+      "dataFilesReady": true,
+      "primaryZone": {
+        "employer_zone": "Red",
+        "skill_coverage_pct": 0
+      },
+      "secondaryZone": {
+        "employer_zone": "Red"
+      },
+      "tertiaryZone": {
+        "employer_zone": "Amber"
+      },
+      "primaryMarket": null,
+      "primarySkillGap": {
+        "missing": [],
+        "matched": [],
+        "coveragePct": 0,
+        "dataReady": true,
+        "source": "local"
+      }
+    },
+    "primary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 15%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "UX Research & Human-AI Interaction",
+        "job_family": "",
+        "role_description": "Responsible for core operations within the UX Research & Human-AI Interaction domain.",
+        "narrative_para1": "Responsible for core operations within the UX Research & Human-AI Interaction domain.",
+        "narrative_para2": "AI systems are augmenting UX Research & Human-AI Interaction roles significantly.",
+        "narrative_para3": "UX Research & Human-AI Interaction professionals are entering a high-growth phase. Those with AI tool proficiency and cross-functional skills will thrive. Eligible programme levels: UG, PG.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Stable with AI Augmentation",
+        "salary_range": "3-8 LPA",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": 40,
+        "ai_impact": "AI tools are reshaping UX Research & Human-AI Interaction roles. 40% of routine tasks are now AI-assisted.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced UX Research & Human-AI Interaction",
+            "description": "Uses AI productivity tools daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [
+          {
+            "skill": "Domain Knowledge",
+            "priority": "High",
+            "description": "Essential core skill."
+          }
+        ],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "Growing"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "40%",
+          "level": "Medium",
+          "tasks_assisted": "Repetitive and structured tasks",
+          "human_value": "Strategic judgment, stakeholder communication, creative problem-solving"
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": [
+            "Domain Knowledge"
+          ]
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for UX Research & Human-AI Interaction."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn Domain Knowledge for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a UX Research & Human-AI Interaction portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified UX Research & Human-AI Interaction",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "UX Research & Human-AI Interaction Capstone",
+            "description": "Complete UX Research & Human-AI Interaction end-to-end project.",
+            "skills_demonstrated": "Domain Knowledge"
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "UX Research & Human-AI Interaction is evolving with AI integration across the industry.",
+        "target_audience": "UG/PG graduates with interest in UX Research & Human-AI Interaction.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {},
+      "direction": {
+        "directionId": "CD-011005-A02",
+        "directionName": "UX Research & Human-AI Interaction",
+        "directionDescription": "Human-AI interaction and UX research involves understanding how people interact with AI-powered systems and designing those interactions to be safe, useful, and trustworthy.",
+        "directionOverview": "UX researchers conduct user studies of AI products; user research analysts synthesise feedback from AI users; inclusive design analysts ensure AI interfaces work for diverse populations. BCA AI & ML graduates who develop psychology, research methods, and design thinking skills can build alternate careers in the nascent field of responsible AI design.",
+        "type": "Primary",
+        "uniqueId": "UG-011-005",
+        "degreeLevel": "B.C.A.",
+        "domainField": "",
+        "degreeFullName": "B.C.A.",
+        "specialisation": "AI & ML",
+        "roles": [
+          {
+            "role": "UX Researcher",
+            "id": "JF08-004"
+          },
+          {
+            "role": "User Research Analyst",
+            "id": "JF08-010"
+          },
+          {
+            "role": "UX Designer",
+            "id": "JF08-002"
+          },
+          {
+            "role": "Inclusive Design Analyst",
+            "id": "JF08-016"
+          },
+          {
+            "role": "Service Designer",
+            "id": "JF08-011"
+          },
+          {
+            "role": "Interaction Designer",
+            "id": "JF08-005"
+          },
+          {
+            "role": "UX Writer",
+            "id": "JF08-013"
+          },
+          {
+            "role": "Content Designer",
+            "id": "JF08-012"
+          },
+          {
+            "role": "AI Product Analyst",
+            "id": "JF06-012"
+          },
+          {
+            "role": "Associate Product Manager",
+            "id": "JF08-007"
+          }
+        ]
+      }
+    },
+    "secondary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "Entrepreneurship",
+        "job_family": "",
+        "role_description": "Responsible for core operations within the Entrepreneurship domain.",
+        "narrative_para1": "Responsible for core operations within the Entrepreneurship domain.",
+        "narrative_para2": "AI systems are augmenting Entrepreneurship roles significantly.",
+        "narrative_para3": "Entrepreneurship professionals are entering a high-growth phase. Those with AI tool proficiency and cross-functional skills will thrive. Eligible programme levels: UG, PG.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Stable with AI Augmentation",
+        "salary_range": "3-8 LPA",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": 40,
+        "ai_impact": "AI tools are reshaping Entrepreneurship roles. 40% of routine tasks are now AI-assisted.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced Entrepreneurship",
+            "description": "Uses AI productivity tools daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [
+          {
+            "skill": "Domain Knowledge",
+            "priority": "High",
+            "description": "Essential core skill."
+          }
+        ],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "Growing"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "40%",
+          "level": "Medium",
+          "tasks_assisted": "Repetitive and structured tasks",
+          "human_value": "Strategic judgment, stakeholder communication, creative problem-solving"
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": [
+            "Domain Knowledge"
+          ]
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for Entrepreneurship."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn Domain Knowledge for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a Entrepreneurship portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified Entrepreneurship",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "Entrepreneurship Capstone",
+            "description": "Complete Entrepreneurship end-to-end project.",
+            "skills_demonstrated": "Domain Knowledge"
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "Entrepreneurship is evolving with AI integration across the industry.",
+        "target_audience": "UG/PG graduates with interest in Entrepreneurship.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {},
+      "direction": {
+        "directionId": "CD-ENTRE-001",
+        "directionName": "Entrepreneurship",
+        "directionDescription": "Entrepreneurship is a career path where the graduate chooses to create and run their own venture rather than work as an employee.",
+        "directionOverview": "Using the knowledge, skills, and domain expertise built through their degree, the graduate identifies an opportunity and builds a business around it — whether a local enterprise, a freelance practice, a professional service, a digital venture, or a scalable startup. The graduate is the owner, the decision-maker, and the driver of the work.",
+        "type": "Primary",
+        "uniqueId": "UG-006-004",
+        "degreeLevel": "B.B.A.",
+        "domainField": "",
+        "degreeFullName": "B.B.A.",
+        "specialisation": "Human Resources",
+        "roles": []
+      }
+    },
+    "tertiary": {
+      "zone": "Amber",
+      "zone_message": "Moderate alignment. You need to bridge specific skill gaps.",
+      "preparation_time": "3-5 months",
+      "match_explanation": "Your alignment score is 35%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "AI in Business Analytics & Decision Support",
+        "job_family": "",
+        "role_description": "Responsible for core operations within the AI in Business Analytics & Decision Support domain.",
+        "narrative_para1": "Responsible for core operations within the AI in Business Analytics & Decision Support domain.",
+        "narrative_para2": "AI systems are augmenting AI in Business Analytics & Decision Support roles significantly.",
+        "narrative_para3": "AI in Business Analytics & Decision Support professionals are entering a high-growth phase. Those with AI tool proficiency and cross-functional skills will thrive. Eligible programme levels: UG, PG.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Stable with AI Augmentation",
+        "salary_range": "3-8 LPA",
+        "salary_progression": null,
+        "english_requirement": "Important",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": 40,
+        "ai_impact": "AI tools are reshaping AI in Business Analytics & Decision Support roles. 40% of routine tasks are now AI-assisted.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced AI in Business Analytics & Decision Support",
+            "description": "Uses AI productivity tools daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [
+          {
+            "skill": "Domain Knowledge",
+            "priority": "High",
+            "description": "Essential core skill."
+          }
+        ],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "Growing"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "40%",
+          "level": "Medium",
+          "tasks_assisted": "Repetitive and structured tasks",
+          "human_value": "Strategic judgment, stakeholder communication, creative problem-solving"
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": [
+            "Domain Knowledge"
+          ]
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for AI in Business Analytics & Decision Support."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn Domain Knowledge for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a AI in Business Analytics & Decision Support portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified AI in Business Analytics & Decision Support",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "AI in Business Analytics & Decision Support Capstone",
+            "description": "Complete AI in Business Analytics & Decision Support end-to-end project.",
+            "skills_demonstrated": "Domain Knowledge"
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "AI in Business Analytics & Decision Support is evolving with AI integration across the industry.",
+        "target_audience": "UG/PG graduates with interest in AI in Business Analytics & Decision Support.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {},
+      "direction": {
+        "directionId": "CD-011005-P07",
+        "directionName": "AI in Business Analytics & Decision Support",
+        "directionDescription": "AI-driven business analytics involves using machine learning models and statistical tools to support business decision-making — demand forecasting, customer churn prediction, and revenue optimisation.",
+        "directionOverview": "Business intelligence analysts build AI-enhanced dashboards; analytics engineers build data transformation layers that feed ML models; quantitative analysts build statistical decision models. BCA AI & ML graduates who develop strong SQL, Python, and BI tool skills can access these applied AI roles in commercial enterprises across all industries.",
+        "type": "Primary",
+        "uniqueId": "UG-011-005",
+        "degreeLevel": "B.C.A.",
+        "domainField": "",
+        "degreeFullName": "B.C.A.",
+        "specialisation": "AI & ML",
+        "roles": [
+          {
+            "role": "Data Analyst",
+            "id": "JF05-001"
+          },
+          {
+            "role": "Business Intelligence Analyst",
+            "id": "JF05-003"
+          },
+          {
+            "role": "Power BI Developer",
+            "id": "JF05-010"
+          },
+          {
+            "role": "Reporting Analyst",
+            "id": "JF05-013"
+          },
+          {
+            "role": "Data Visualization Analyst",
+            "id": "JF05-017"
+          },
+          {
+            "role": "Quantitative Analyst",
+            "id": "JF05-006"
+          },
+          {
+            "role": "Analytics Engineer",
+            "id": "JF05-014"
+          },
+          {
+            "role": "MIS Analyst",
+            "id": "JF27-010"
+          },
+          {
+            "role": "AI Product Analyst",
+            "id": "JF06-012"
+          },
+          {
+            "role": "Business Analyst",
+            "id": "JF55-012"
+          }
+        ]
+      }
+    },
+    "ml_success_probability": null,
+    "ml_semantic_skills": [],
+    "combined_tab4": {
+      "combined_pathway_summary": "Your immediate focus must be learning the missing fundamentals for UX Research & Human-AI Interaction (UX Research & Human-AI Interaction). Role success probability: Calculating",
+      "skill_gap": {
+        "current_skills": [
+          "Basic Academics",
+          "Communication"
+        ],
+        "missing_skills": []
+      },
+      "learning_roadmap": [
+        {
+          "step": "Step 1 - Foundation Skills",
+          "description": "Master prerequisites and theoretical fundamentals."
+        },
+        {
+          "step": "Step 2 - Core Technical Skills",
+          "description": "Learn core technologies."
+        },
+        {
+          "step": "Step 3 - Advanced Applications",
+          "description": "Apply skills in complex scenarios."
+        },
+        {
+          "step": "Step 4 - Projects & Portfolio",
+          "description": "Deploy market-ready portfolios demonstrating these skills."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "Certified UX Research & Human-AI Interaction Professional",
+          "issuer": "Industry Standard Provider",
+          "difficulty": "Intermediate",
+          "duration": "3 months"
+        }
+      ],
+      "courses": [
+        {
+          "course_name": "UX Research & Human-AI Interaction Crash Course",
+          "platform": "YouTube / Coursera",
+          "link_status": "Free"
+        }
+      ],
+      "projects": [
+        {
+          "project_name": "UX Research & Human-AI Interaction Capstone",
+          "description": "A complete end-to-end implementation.",
+          "skills_demonstrated": ""
+        }
+      ]
+    }
+  }
+}

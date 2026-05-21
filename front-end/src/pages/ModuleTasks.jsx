@@ -114,7 +114,7 @@ const ModuleTasks = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/dashboard/courses')}
-                className="p-3 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                className="p-3 rounded-lg bg-white hover:bg-[#F8FAFC] transition-colors"
                 style={{ border: '2px solid #C0C0C0', boxShadow: '0 0 8px rgba(192, 192, 192, 0.2)' }}
               >
                 <ArrowLeft className="w-6 h-6" style={{ color: '#002147' }} />
@@ -211,7 +211,7 @@ const ModuleTasks = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 + index * 0.05 }}
-                    className="flex items-center gap-4 p-4 rounded-lg transition-colors group cursor-pointer hover:bg-gray-50"
+                    className="flex items-center gap-4 p-4 rounded-lg transition-colors group cursor-pointer hover:bg-[#F8FAFC]"
                     style={{ border: '1px solid rgba(192, 192, 192, 0.3)' }}
                     onClick={() => handleTaskToggle(task.id)}
                   >

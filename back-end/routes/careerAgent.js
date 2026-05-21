@@ -19,8 +19,10 @@ const {
   CareerRoleModel,
   RoleProfileModel,
   RoleSkillModel,
-  CareerDirectionModel
+  CareerDirectionModel,
+  FinalCareerPathwayModel
 } = require('../models/careerAgentModels');
+
 const Degree = require('../models/Degree');
 // Auth middleware — optional auth (passes through without token, attaches user if token present)
 const { optionalAuth } = require('../middleware/auth');
@@ -81,23 +83,42 @@ router.get('/career-role/:roleName', async (req, res) => {
 
 /**
  * GET /api/career-agent/role-skills/:roleTitle
- * Fetches skills and certifications for a specific role from the roleSkills collection.
+ * Fetches skills for a specific role from the roleskillslist collection.
+ * Transforms flat rows → grouped { roleTitle, jobFamily, jobCode, skills[] } object.
  */
 router.get('/role-skills/:roleTitle', async (req, res) => {
   try {
     const { roleTitle } = req.params;
-    const escapedRoleTitle = roleTitle
-      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      .replace(/-/g, '[-–—]')
-      .replace(/ /g, '\\s+');
-    const skillsData = await RoleSkillModel.findOne({
-      roleTitle: { $regex: new RegExp(`^${escapedRoleTitle}$`, 'i') }
-    }).lean();
+    const db = req.app.locals.db || require('mongoose').connection.db;
 
-    if (!skillsData) {
+    // Exact match first, then case-insensitive regex fallback
+    let rows = await db.collection('roleskillslist')
+      .find({ 'Job Role': new RegExp(`^${decodeURIComponent(roleTitle).replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}$`, 'i') })
+      .toArray();
+
+    if (!rows.length) {
       return res.status(404).json({ error: 'Role skills not found for this role' });
     }
-    res.json(skillsData);
+
+    // Aggregate flat rows into grouped skill object
+    const first = rows[0];
+    const grouped = {
+      roleTitle: first['Job Role'],
+      jobFamily: first['Job Family'],
+      jobCode:   first['Role ID'] || '',
+      skills: rows.map(r => ({
+        skillCategory: r['Category'] || 'General',
+        skillName:     r['Skill Name'],
+        skillId:       r['Skill ID'] || '',
+        importance:    r['Category'] === 'Domain' ? 'High' :
+                       r['Category'] === 'Technical' ? 'High' :
+                       r['Category'] === 'AI-Tool' ? 'Medium' : 'Medium',
+        certificationName: r['Certification'] || null,
+        platform:          r['Platform'] || null
+      }))
+    };
+
+    res.json(grouped);
   } catch (error) {
     console.error('[career-agent] Error fetching role skills:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -106,23 +127,29 @@ router.get('/role-skills/:roleTitle', async (req, res) => {
 
 /**
  * GET /api/career-agent/role-skills/family/:jobFamily
- * Lists all available roles within a specific job family from the roleSkills collection.
- * NOTE: must be registered before /role-skills/:roleTitle to avoid "family" being captured as :roleTitle
+ * Lists all distinct role names within a job family from roleskillslist.
+ * NOTE: must be registered before /role-skills/:roleTitle
  */
 router.get('/role-skills/family/:jobFamily', async (req, res) => {
   try {
     const { jobFamily } = req.params;
-    const keywords = jobFamily
+    const db = req.app.locals.db || require('mongoose').connection.db;
+
+    // Build a keyword regex that matches the job family name broadly
+    const rawFamily = decodeURIComponent(jobFamily);
+    const keywords = rawFamily
       .replace(/[&*()]/g, ' ')
       .split(/\s+/)
-      .filter(w => w.length > 2 && !['and', 'analytics', 'engineering', 'development'].includes(w.toLowerCase()));
+      .filter(w => w.length > 2 && !['and', 'analytics', 'engineering', 'development', 'the'].includes(w.toLowerCase()));
 
-    const searchWord = keywords.length > 0 ? keywords[0] : jobFamily.split(' ')[0];
-    const regex = new RegExp(searchWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    const searchWord = keywords.length > 0 ? keywords[0] : rawFamily.split(' ')[0];
+    const regex = new RegExp(searchWord.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&'), 'i');
 
-    const roles = await RoleSkillModel.find({ jobFamily: { $regex: regex } }, 'roleTitle').lean();
-    const titles = [...new Set(roles.map(r => r.roleTitle))].sort();
-    res.json(titles);
+    const roles = await db.collection('roleskillslist')
+      .distinct('Job Role', { 'Job Family': { $regex: regex } });
+
+    const sorted = [...new Set(roles)].filter(Boolean).sort();
+    res.json(sorted);
   } catch (error) {
     console.error('[career-agent] Error fetching roles in family:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -131,54 +158,58 @@ router.get('/role-skills/family/:jobFamily', async (req, res) => {
 
 /**
  * GET /api/career-agent/role-skills/roadmap/:jobFamily
- * Aggregates all skills within a job family, sorted by frequency.
+ * Aggregates all skills within a job family from roleskillslist, sorted by overlap frequency.
  */
 router.get('/role-skills/roadmap/:jobFamily', async (req, res) => {
   try {
     const { jobFamily } = req.params;
-    const keywords = jobFamily
+    const db = req.app.locals.db || require('mongoose').connection.db;
+
+    const rawFamily = decodeURIComponent(jobFamily);
+    const keywords = rawFamily
       .replace(/[&*()]/g, ' ')
       .split(/\s+/)
-      .filter(w => w.length > 2 && !['and', 'analytics', 'engineering', 'development'].includes(w.toLowerCase()));
+      .filter(w => w.length > 2 && !['and', 'analytics', 'engineering', 'development', 'the'].includes(w.toLowerCase()));
 
-    const searchWord = keywords.length > 0 ? keywords[0] : jobFamily.split(' ')[0];
-    const regex = new RegExp(searchWord.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    const searchWord = keywords.length > 0 ? keywords[0] : rawFamily.split(' ')[0];
+    const regex = new RegExp(searchWord.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&'), 'i');
 
-    const allRoles = await RoleSkillModel.find({ jobFamily: { $regex: regex } }).lean();
-    if (!allRoles.length) return res.json([]);
+    const allRows = await db.collection('roleskillslist')
+      .find({ 'Job Family': { $regex: regex } })
+      .toArray();
 
-    const totalRoles = allRoles.length;
+    if (!allRows.length) return res.json([]);
+
+    // Count distinct roles in this family
+    const distinctRoles = [...new Set(allRows.map(r => r['Job Role']))].filter(Boolean);
+    const totalRoles = distinctRoles.length;
+
+    // Build skill frequency map
     const skillMap = {};
-    allRoles.forEach(roleDoc => {
-      if (!roleDoc.skills) return;
-      roleDoc.skills.forEach(s => {
-        const name = s.skillName;
-        if (!skillMap[name]) {
-          skillMap[name] = {
-            skillName: name,
-            occurrenceCount: 0,
-            categories: new Set(),
-            certifications: new Set(),
-            platforms: new Set(),
-            maxImportance: 'Low'
-          };
-        }
-        const entry = skillMap[name];
-        entry.occurrenceCount += 1;
-        if (s.skillCategory) entry.categories.add(s.skillCategory);
-        if (s.certificationName) entry.certifications.add(s.certificationName);
-        if (s.platform) entry.platforms.add(s.platform);
-        const imp = s.importance || 'Medium';
-        if (imp === 'High') entry.maxImportance = 'High';
-        else if (imp === 'Medium' && entry.maxImportance === 'Low') entry.maxImportance = 'Medium';
-      });
+    allRows.forEach(row => {
+      const name = row['Skill Name'];
+      if (!name) return;
+      if (!skillMap[name]) {
+        skillMap[name] = {
+          skillName: name,
+          occurrenceCount: 0,
+          categories: new Set(),
+          maxImportance: 'Medium'
+        };
+      }
+      skillMap[name].occurrenceCount += 1;
+      if (row['Category']) skillMap[name].categories.add(row['Category']);
+      // Higher importance for domain / technical
+      if (row['Category'] === 'Technical' || row['Category'] === 'Domain') {
+        skillMap[name].maxImportance = 'High';
+      }
     });
 
     const aggregated = Object.values(skillMap).map(s => ({
-      ...s,
+      skillName: s.skillName,
+      occurrenceCount: s.occurrenceCount,
       categories: [...s.categories],
-      certifications: [...s.certifications],
-      platforms: [...s.platforms],
+      maxImportance: s.maxImportance,
       overlapPercentage: Math.round((s.occurrenceCount / totalRoles) * 100)
     }));
 
@@ -208,7 +239,7 @@ router.get('/career-roles/names', async (req, res) => {
 /**
  * GET /api/career-agent/direction-roles/:directionName
  * Returns the job roles for a career direction from careerdirections collection.
- * Only returns what is actually in the DB — no fallbacks or invented data.
+ * Searches by Career Direction name first, then by job role name as fallback.
  */
 router.get('/direction-roles/:directionName', async (req, res) => {
   try {
@@ -216,9 +247,21 @@ router.get('/direction-roles/:directionName', async (req, res) => {
     const db = require('mongoose').connection.db;
 
     const cleanName = directionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const doc = await db.collection('careerdirections').findOne({
+    
+    // Primary search: by Career Direction name
+    let doc = await db.collection('careerdirections').findOne({
       'Career Direction': { $regex: cleanName, $options: 'i' }
     });
+
+    // FIX: Secondary search — if the user stored a role name instead of a direction name,
+    // find the direction that contains this role (search Job Role 1-10 fields)
+    if (!doc) {
+      const roleSearchConditions = [];
+      for (let i = 1; i <= 10; i++) {
+        roleSearchConditions.push({ [`Job Role ${i}`]: { $regex: cleanName, $options: 'i' } });
+      }
+      doc = await db.collection('careerdirections').findOne({ $or: roleSearchConditions });
+    }
 
     if (!doc) return res.json({ directionName, roles: [], found: false });
 
@@ -244,6 +287,7 @@ router.get('/direction-roles/:directionName', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch direction roles', details: err.message });
   }
 });
+
 
 
 
@@ -600,13 +644,43 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
       throw procErr;
     }
 
-    // Save to MongoDB with userId for per-user retrieval
-    const studentName = studentData.personalDetails?.name || 'Unknown';
-    const studentEmail = studentData.personalDetails?.email || loggedInUser?.email || 'Unknown';
-    const primaryRole = studentData.preferences?.primary?.role || 'Career Match';
+    // Common variables used for both FinalCareerPathway and CareerAnalysis saves
+    const studentName    = studentData.personalDetails?.name  || 'Unknown';
+    const studentEmail   = studentData.personalDetails?.email || loggedInUser?.email || 'Unknown';
+    const primaryRole    = studentData.preferences?.primary?.role || 'Career Match';
     const preVerifiedData = analysis.preVerified || {};
 
+    // ── Save / Update FinalCareerPathway (the user's per-user source of truth) ────
+    // Uses upsert so first submit creates, every edit updates the same document.
+    if (loggedInUser) {
+      const userId = loggedInUser._id || loggedInUser.id;
+      const preV = analysis.preVerified || {};
+      FinalCareerPathwayModel.findOneAndUpdate(
+        { userId },
+        {
+          $set: {
+            userId,
+            student_name:   studentName,
+            student_email:  studentEmail,
+            input_data:     studentData,       // ← full form data (edu, skills, prefs, etc.)
+            output_data:    analysis,
+            primary_role:   primaryRole,
+            secondary_role: studentData.preferences?.secondary?.role || '',
+            tertiary_role:  studentData.preferences?.tertiary?.role  || '',
+            zone_primary:   preV?.primaryZone?.employer_zone   || 'Unknown',
+            zone_secondary: preV?.secondaryZone?.employer_zone || 'Unknown',
+            zone_tertiary:  preV?.tertiaryZone?.employer_zone  || 'Unknown',
+            updated_at:     new Date()
+          },
+          $setOnInsert: { created_at: new Date() }
+        },
+        { upsert: true, new: true }
+      ).catch(err => console.warn('[career-agent] FinalCareerPathway upsert warning:', err.message));
+    }
+
+    // Also save to CareerAnalysis for history
     CareerAnalysisModel.create({
+
       userId: loggedInUser?._id || loggedInUser?.id || null,
       student_name: studentName,
       student_email: studentEmail,
@@ -639,10 +713,70 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
 });
 
 /**
- * GET /api/career-agent/my-analysis
- * Fetches the most recent career analysis for the logged-in user from MongoDB.
- * Requires authentication (JWT).
+ * GET /api/career-agent/final-pathway
+ * Returns the current user's finalcareerpathway record.
+ * Used by the onboarding edit mode to pre-fill all form fields.
  */
+router.get('/final-pathway', optionalAuth, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+    const userId = req.user._id || req.user.id;
+    const email  = req.user.email;
+
+    let record = await FinalCareerPathwayModel.findOne({ userId }).lean();
+    if (!record && email) {
+      record = await FinalCareerPathwayModel.findOne({ student_email: email }).lean();
+    }
+
+    if (!record) {
+      return res.status(404).json({ found: false, message: 'No pathway saved for this user yet.' });
+    }
+
+    return res.json({
+      found: true,
+      id: String(record._id),
+      primary_role:   record.primary_role,
+      secondary_role: record.secondary_role,
+      tertiary_role:  record.tertiary_role,
+      is_locked:      record.is_locked,
+      input_data:     record.input_data,    // ← full form data for pre-fill
+      output_data:    record.output_data,
+      updated_at:     record.updated_at
+    });
+  } catch (err) {
+    console.error('[career-agent] final-pathway GET error:', err);
+    res.status(500).json({ error: 'Failed to fetch final pathway', details: err.message });
+  }
+});
+
+/**
+ * PUT /api/career-agent/final-pathway/lock
+ * Marks the user's pathway as locked (after they confirm "Interested" in the UI).
+ */
+router.put('/final-pathway/lock', optionalAuth, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+    const userId = req.user._id || req.user.id;
+    const record = await FinalCareerPathwayModel.findOneAndUpdate(
+      { userId },
+      { $set: { is_locked: true, locked_at: new Date(), updated_at: new Date() } },
+      { new: true }
+    );
+    if (!record) {
+      return res.status(404).json({ error: 'No pathway found to lock.' });
+    }
+    return res.json({ success: true, is_locked: record.is_locked, locked_at: record.locked_at });
+  } catch (err) {
+    console.error('[career-agent] final-pathway lock error:', err);
+    res.status(500).json({ error: 'Failed to lock pathway', details: err.message });
+  }
+});
+
+
 router.get('/my-analysis', optionalAuth, async (req, res) => {
   try {
     if (!req.user) {
@@ -769,6 +903,54 @@ router.post('/feedback', async (req, res) => {
  */
 router.get('/health', (req, res) => {
   res.json({ status: 'Career Agent routes active', timestamp: new Date().toISOString() });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SKILL PROGRESS ROUTES (Career Roadmap tracking)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const { SkillProgressModel } = require('../models/careerAgentModels');
+
+/**
+ * GET /api/career-agent/user-skills/:email
+ * Returns all skill progress entries for a user.
+ */
+router.get('/user-skills/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const progress = await SkillProgressModel.find({ email: decodeURIComponent(email) }).lean();
+    res.json(progress);
+  } catch (error) {
+    console.error('[career-agent] Error fetching user skills:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * POST /api/career-agent/user-skills/progress
+ * Upserts a skill progress record for a user.
+ * Body: { email, skillName, status }
+ */
+router.post('/user-skills/progress', async (req, res) => {
+  try {
+    const { email, skillName, status } = req.body;
+    if (!email || !skillName || !status) {
+      return res.status(400).json({ error: 'email, skillName, and status are required' });
+    }
+    const valid = ['Not Started', 'In Progress', 'Completed'];
+    if (!valid.includes(status)) {
+      return res.status(400).json({ error: `status must be one of: ${valid.join(', ')}` });
+    }
+    const result = await SkillProgressModel.findOneAndUpdate(
+      { email, skillName },
+      { email, skillName, status, updatedAt: new Date() },
+      { upsert: true, new: true }
+    );
+    res.json(result);
+  } catch (error) {
+    console.error('[career-agent] Error updating skill progress:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 module.exports = router;

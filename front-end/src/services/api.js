@@ -1,5 +1,7 @@
 // API service for backend communication
 // Dynamically detect API URL based on current hostname (for mobile/network access)
+import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
+
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
   // If accessing from localhost, use localhost
@@ -130,7 +132,7 @@ export const apiCall = async (endpoint, options = {}) => {
           if (errorBody.expired) {
             // Hard 3-hour session wall reached
             sessionStorage.setItem("session_expired", "true");
-          } else if (errorBody.kicked || (errorBody.message && 
+          } else if (errorBody.kicked || (errorBody.message &&
             (errorBody.message.includes("Session invalid") || errorBody.message.includes("logged out")))) {
             // Logged in from another device — this session was killed
             sessionStorage.setItem("kicked_out", "true");
@@ -143,6 +145,7 @@ export const apiCall = async (endpoint, options = {}) => {
         sessionStorage.removeItem("user");
         sessionStorage.removeItem("sessionExpiresAt");
         localStorage.removeItem("user"); // FIX #4: Clear localStorage too
+        clearAssessmentTimerStorage();
 
         // Use window.location to force redirect and UI reset
         // FIXED: Only redirect if NOT on a public route where 401 is expected/allowed
@@ -160,6 +163,12 @@ export const apiCall = async (endpoint, options = {}) => {
         );
 
         if (!window.location.pathname.includes('/login') && !isPublicRoute) {
+          // FIX: Save the current page so the user can return after re-login
+          // This prevents silent data loss when the 3-hour session expires mid-form
+          const currentPath = window.location.pathname + window.location.search;
+          if (currentPath && currentPath !== '/') {
+            sessionStorage.setItem("redirect_after_login", currentPath);
+          }
           window.location.href = '/';
         }
 

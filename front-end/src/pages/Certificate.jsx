@@ -218,7 +218,7 @@ const Certificate = () => {
     // --- RENDER SELECTION SCREEN ---
     if (!selectedType) {
         return (
-            <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
+            <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
                 <main className="w-full relative py-12 px-4 md:px-6">
                     {/* Header */}
                     <div className="text-center mb-8">
@@ -231,12 +231,12 @@ const Certificate = () => {
 
                     {/* Tab Navigation */}
                     <div className="flex justify-center mb-8">
-                        <div className="inline-flex bg-white dark:bg-slate-800 rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-slate-700">
+                        <div className="inline-flex bg-white dark:bg-[#002A5C] rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-white/10">
                             <button
                                 onClick={() => setActiveTab('certificates')}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'certificates'
                                     ? 'bg-[#002147] text-white shadow-md'
-                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C]'
                                     }`}
                             >
                                 <Award className="w-5 h-5" />
@@ -246,7 +246,7 @@ const Certificate = () => {
                                 onClick={() => setActiveTab('badges')}
                                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'badges'
                                     ? 'bg-[#002147] text-white shadow-md'
-                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C]'
                                     }`}
                             >
                                 <Trophy className="w-5 h-5" />
@@ -263,10 +263,10 @@ const Certificate = () => {
                                     <button
                                         key={cert.id}
                                         onClick={() => setSelectedType(cert)}
-                                        className="group relative w-full p-6 rounded-2xl bg-white dark:bg-dark-card border border-gray-200 dark:border-slate-700 hover:border-[#1a3884] dark:hover:border-[#1a3884] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
+                                        className="group relative w-full p-6 rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] dark:hover:border-[#1a3884] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-[#1a3884]/10 text-[#1a3884] transition-colors">
+                                            <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] flex items-center justify-center shrink-0 group-hover:bg-[#1a3884]/10 text-[#1a3884] transition-colors">
                                                 <Award className="w-6 h-6" />
                                             </div>
                                             <div className="flex-1">
@@ -331,14 +331,14 @@ const Certificate = () => {
     const verificationUrl = qrCodeDataUrl ? `${window.location.origin}/verify-certificate/${certId}` : '';
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
             <main className="w-full relative py-8 px-4 flex flex-col items-center">
 
                 {/* Controls */}
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-4 no-print bg-white/80 dark:bg-dark-card/80 backdrop-blur-md p-2 rounded-2xl border border-gray-200 dark:border-slate-700 shadow-lg">
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-4 no-print bg-white/80 dark:bg-dark-card/80 backdrop-blur-md p-2 rounded-2xl border border-gray-200 dark:border-white/10 shadow-lg">
                     <button
                         onClick={() => setSelectedType(null)}
-                        className="flex items-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl transition-all font-medium text-sm"
+                        className="flex items-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-[#002A5C] text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl transition-all font-medium text-sm"
                     >
                         ← Back
                     </button>
@@ -346,7 +346,7 @@ const Certificate = () => {
                     <button
                         onClick={handleDownload}
                         disabled={isGenerating}
-                        className="flex items-center gap-2 bg-[#002147] hover:bg-[#0d1b2a] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-5 py-2 rounded-xl shadow-md transition-all font-bold text-sm disabled:opacity-50"
+                        className="flex items-center gap-2 bg-[#002147] hover:bg-[#0d1b2a] dark:bg-[#1a3884] dark:hover:bg-[#132c6b] text-white px-5 py-2 rounded-xl shadow-md transition-all font-bold text-sm disabled:opacity-50"
                     >
                         <Download className="w-4 h-4" />
                         {isGenerating ? 'Generating...' : 'Download PDF'}

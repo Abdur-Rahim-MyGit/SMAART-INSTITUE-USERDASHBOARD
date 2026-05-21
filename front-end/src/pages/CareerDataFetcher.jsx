@@ -155,19 +155,35 @@ const CareerDataFetcher = () => {
             const reportId = data.report?._id || data.report?.id;
             if (reportId) sessionStorage.setItem('generating_report_id', reportId);
 
-            if (data.report?.status === 'completed') {
-                setReport(data.report);
+            // FIX: The generate endpoint returns { input, output } but the DB & UI expects
+            // { careerInput, careerOutput }. Normalize the shape here so the report displays
+            // correctly (history list, PDF export, etc.) without another round-trip.
+            const normalizedReport = data.report ? {
+                ...data.report,
+                careerInput: data.report.careerInput || data.report.input,
+                careerOutput: data.report.careerOutput || data.report.output,
+            } : null;
+
+            if (normalizedReport?.status === 'completed') {
+                setReport(normalizedReport);
                 setShowForm(false);
-                setPreviousReports(prev => [data.report, ...prev]);
+                setPreviousReports(prev => [normalizedReport, ...prev]);
                 sessionStorage.removeItem('generating_report_id');
-            } else {
-                setReport(data.report);
+            } else if (normalizedReport) {
+                setReport(normalizedReport);
                 setShowForm(false);
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {
             console.error('Generation failed:', err);
-            setError(err.message || 'The AI engine is busy. Please try again in a few minutes.');
+            // FIX: Session expiry during long AI generation used to silently logout the user.
+            // Now we show a clear error message instead of just redirecting.
+            if (err.message && err.message.includes('Unauthorized')) {
+                toast.error('⚠️ Your session expired while generating. Please log in again — your form data is still in progress.');
+                setError('Your session has expired. Please refresh the page and log in again to continue.');
+            } else {
+                setError(err.message || 'The AI engine is busy. Please try again in a few minutes.');
+            }
             sessionStorage.removeItem('generating_report_id');
         } finally {
             setIsGenerating(false);
@@ -251,7 +267,7 @@ const CareerDataFetcher = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950/50 transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950/50 transition-colors duration-300">
             <main className="w-full relative py-8 px-4 md:px-0">
                 <div className="max-w-5xl mx-auto pb-12">
                     {/* Page Header */}
@@ -271,15 +287,15 @@ const CareerDataFetcher = () => {
                             <div className="flex gap-2">
                                 {previousReports.length > 0 && (
                                     <div className="relative group/history">
-                                        <button className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-amber-500 transition-all shadow-sm flex items-center gap-1.5">
+                                        <button className="p-2 rounded-lg bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-500 hover:text-amber-500 transition-all shadow-sm flex items-center gap-1.5">
                                             <Clock size={18} />
                                             <span className="text-[10px] font-bold uppercase tracking-tight hidden sm:block">History</span>
                                         </button>
-                                        <div className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl opacity-0 invisible group-hover/history:opacity-100 group-hover/history:visible transition-all z-[60] overflow-hidden">
-                                            <div className="p-3 border-b border-slate-50 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/50 text-[10px] font-bold text-slate-400 uppercase px-4">Your Intelligence History</div>
+                                        <div className="absolute top-full right-0 mt-2 w-72 bg-white dark:bg-[#002A5C] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl opacity-0 invisible group-hover/history:opacity-100 group-hover/history:visible transition-all z-[60] overflow-hidden">
+                                            <div className="p-3 border-b border-slate-50 dark:border-white/10 bg-slate-50/50 dark:bg-slate-700/50 text-[10px] font-bold text-slate-400 uppercase px-4">Your Intelligence History</div>
                                             <div className="max-h-80 overflow-y-auto no-scrollbar">
                                                 {previousReports.map((r, idx) => (
-                                                    <button key={r._id} onClick={() => viewReport(r)} className={`w-full text-left p-3 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-50 dark:border-slate-700 last:border-0 flex items-center gap-3 ${report?._id === r._id ? 'bg-indigo-50/30 dark:bg-indigo-500/5' : ''}`}>
+                                                    <button key={r._id} onClick={() => viewReport(r)} className={`w-full text-left p-3 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors border-b border-slate-50 dark:border-white/10 last:border-0 flex items-center gap-3 ${report?._id === r._id ? 'bg-indigo-50/30 dark:bg-indigo-500/5' : ''}`}>
                                                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${r.status === 'completed' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600' : 'bg-amber-100 dark:bg-amber-500/10 text-amber-600'}`}>
                                                             {idx === 0 ? 'NEW' : previousReports.length - idx}
                                                         </div>
@@ -293,13 +309,13 @@ const CareerDataFetcher = () => {
                                         </div>
                                     </div>
                                 )}
-                                <button onClick={startNew} className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 transition-all shadow-sm" title="Start New Assessment">
+                                <button onClick={startNew} className="p-2 rounded-lg bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-500 hover:text-emerald-500 transition-all shadow-sm" title="Start New Assessment">
                                     <Plus size={18} />
                                 </button>
-                                <button onClick={loadReports} disabled={loadingReports} className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-indigo-500 transition-all shadow-sm disabled:opacity-50" title="Refresh Reports">
+                                <button onClick={loadReports} disabled={loadingReports} className="p-2 rounded-lg bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-500 hover:text-indigo-500 transition-all shadow-sm disabled:opacity-50" title="Refresh Reports">
                                     <RefreshCw size={18} className={loadingReports ? 'animate-spin' : ''} />
                                 </button>
-                                <button onClick={() => setShowSimPanel(prev => !prev)} className={`p-2 rounded-lg border transition-all shadow-sm flex items-center gap-1.5 text-xs font-bold ${showSimPanel ? 'bg-violet-600 border-violet-600 text-white' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-violet-500'}`} title="Career Simulation Engine">
+                                <button onClick={() => setShowSimPanel(prev => !prev)} className={`p-2 rounded-lg border transition-all shadow-sm flex items-center gap-1.5 text-xs font-bold ${showSimPanel ? 'bg-violet-600 border-violet-600 text-white' : 'bg-white dark:bg-[#002A5C] border-slate-200 dark:border-white/10 text-slate-500 hover:text-violet-500'}`} title="Career Simulation Engine">
                                     <Cpu size={16} />
                                     <span className="hidden sm:block uppercase tracking-tight">Simulate</span>
                                 </button>
@@ -314,10 +330,10 @@ const CareerDataFetcher = () => {
                     <AnimatePresence>
                         {isGenerating && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                                <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-white dark:bg-slate-800 rounded-3xl p-10 max-w-md w-full mx-4 text-center shadow-2xl">
+                                <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="bg-white dark:bg-[#002A5C] rounded-3xl p-10 max-w-md w-full mx-4 text-center shadow-2xl">
                                     <div className="relative w-24 h-24 mx-auto mb-6">
                                         <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 animate-spin" style={{ clipPath: 'inset(0 0 50% 0)' }} />
-                                        <div className="absolute inset-2 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center">
+                                        <div className="absolute inset-2 rounded-full bg-white dark:bg-[#002A5C] flex items-center justify-center">
                                             <Brain className="w-10 h-10 text-indigo-500 animate-pulse" />
                                         </div>
                                     </div>

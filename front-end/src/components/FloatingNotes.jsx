@@ -191,10 +191,10 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                        className="fixed bottom-[164px] right-4 sm:right-8 z-[60] w-[calc(100vw-32px)] sm:w-[340px] flex flex-col rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xl overflow-hidden"
+                        className="fixed bottom-[164px] right-6 z-[60] w-[340px] flex flex-col rounded-2xl bg-white dark:bg-[#002147] border border-slate-200/80 dark:border-white/8 shadow-2xl overflow-hidden"
                     >
                         {/* Header */}
-                        <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900/80">
+                        <div className="px-4 py-3 border-b border-slate-100 dark:border-white/8 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900/80">
                             <div className="flex items-center gap-2">
                                 <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                                     <FileText className="w-3.5 h-3.5 text-white" />
@@ -209,14 +209,14 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                                 )}
                                 <button
                                     onClick={handleNewNote}
-                                    className="p-1.5 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors text-slate-500 hover:text-indigo-600 dark:text-slate-400"
+                                    className="p-1.5 rounded-lg hover:bg-slate-200/50 dark:hover:bg-[#002A5C] transition-colors text-slate-500 hover:text-indigo-600 dark:text-slate-400"
                                     title="Start new note session (Archives current)"
                                 >
                                     <Plus className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={handleManualSave}
-                                    className="p-1.5 rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors text-slate-500 hover:text-indigo-600 dark:text-slate-400"
+                                    className="p-1.5 rounded-lg hover:bg-slate-200/50 dark:hover:bg-[#002A5C] transition-colors text-slate-500 hover:text-indigo-600 dark:text-slate-400"
                                     title="Manual Save"
                                 >
                                     <Save className="w-4 h-4" />
@@ -232,7 +232,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                                 onChange={handleChange}
                                 placeholder="Start typing your notes here..."
                                 disabled={loading}
-                                className="w-full h-64 p-4 rounded-xl bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-sm focus:outline-none resize-none transition-opacity disabled:opacity-50 font-medium leading-relaxed"
+                                className="w-full h-64 p-4 rounded-xl bg-white dark:bg-[#002147] text-slate-800 dark:text-slate-200 text-sm focus:outline-none resize-none transition-opacity disabled:opacity-50 font-medium leading-relaxed"
                             />
                             {loading && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-slate-900/50">
@@ -242,7 +242,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                         </div>
 
                         {/* Footer Tips */}
-                        <div className="px-4 py-2 bg-slate-50 dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#002147] border-t border-slate-100 dark:border-white/8 flex items-center justify-between">
                             <p className="text-[10px] text-slate-400">Notes are auto-saved to your profile</p>
                             <div className="flex items-center gap-1.5">
                                 {saving ? (

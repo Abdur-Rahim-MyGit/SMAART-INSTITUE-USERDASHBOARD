@@ -416,7 +416,7 @@ const VisionBoardModal = ({ isOpen, onClose, onSave, editingBoard = null }) => {
               className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${
                 isDragging
                   ? "border-teal-500 bg-teal-50"
-                  : "border-gray-300 hover:border-teal-400 hover:bg-gray-50"
+                  : "border-gray-300 hover:border-teal-400 hover:bg-[#F8FAFC]"
               }`}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -494,7 +494,7 @@ const VisionBoardModal = ({ isOpen, onClose, onSave, editingBoard = null }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-200 flex justify-end gap-3 bg-gray-50">
+        <div className="p-4 border-t border-gray-200 flex justify-end gap-3 bg-[#F8FAFC]">
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
@@ -853,7 +853,7 @@ const VisionBoardGallery = ({ userId }) => {
 
       {/* Empty State */}
       {!isLoading && !error && boards.length === 0 && (
-        <div className="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+        <div className="text-center py-16 bg-[#F8FAFC] rounded-xl border-2 border-dashed border-gray-200">
           <Images className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             No vision boards yet

@@ -198,7 +198,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
               >
                 {colleges.length > 0 ? (
                   <div className="p-2 sm:p-3">
-                    <p className="px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest border-b border-gray-100 dark:border-white/10 mb-2">
+                    <p className="px-2 sm:px-3 py-1.5 sm:py-2 text-[10px] font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest border-b border-gray-100 dark:border-white/10 mb-2">
                       Matching Institutions
                     </p>
                     <div className="space-y-1">
@@ -220,7 +220,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                               ? "bg-[#1a3884]/10 border-[#1a3884]/30 shadow-sm"
                               : index === focusedIndex
                                 ? "bg-[#1a3884]/5 dark:bg-white/5 border-[#1a3884]/20 dark:border-white/10 shadow-sm"
-                                : "border-transparent hover:bg-gray-50 dark:hover:bg-white/5 hover:border-gray-100 dark:hover:border-white/10"
+                                : "border-transparent hover:bg-[#F8FAFC] dark:hover:bg-white/5 hover:border-gray-100 dark:hover:border-white/10"
                           }`}
                         >
                           {/* Success background sweep animation */}
@@ -238,7 +238,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                               ? "bg-[#1a3884] text-white border-[#1a3884] scale-105 shadow-md"
                               : index === focusedIndex 
                                 ? "bg-[#1a3884] text-white border-[#1a3884]" 
-                                : "bg-white dark:bg-dark-bg text-[#1a3884] dark:text-[#00a3e0] border-[#1a3884]/10 dark:border-white/10 group-hover:border-[#1a3884]/30 dark:group-hover:border-white/20"
+                                : "bg-white dark:bg-[#00152E] text-[#1a3884] dark:text-[#00a3e0] border-[#1a3884]/10 dark:border-white/10 group-hover:border-[#1a3884]/30 dark:group-hover:border-white/20"
                           }`}>
                             {college.logo ? (
                               <motion.img 
@@ -266,7 +266,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                             </div>
                             {college.address && (
                               <div className={`text-[10px] sm:text-[11px] mt-0.5 truncate flex items-center gap-1.5 font-medium transition-colors ${
-                                selectingId === college.collegeCode ? "text-[#112b6b]/70 dark:text-gray-300" : "text-gray-500 dark:text-gray-400"
+                                selectingId === college.collegeCode ? "text-[#112b6b]/70 dark:text-slate-200" : "text-gray-500 dark:text-slate-300"
                               }`}>
                                 <span className={`w-1.5 h-1.5 rounded-full transition-colors ${
                                   selectingId === college.collegeCode ? "bg-[#1a3884]" : "bg-[#00a3e0]/30 group-hover:bg-[#00a3e0]"
@@ -283,7 +283,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                   <div className="p-8 text-center bg-white dark:bg-[#001c3d]">
                     <div className="flex flex-col items-center gap-3">
                       <RefreshCw className="h-6 w-6 text-[#1a3884] animate-spin" />
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Searching...</p>
+                      <p className="text-sm font-medium text-gray-500 dark:text-slate-300">Searching...</p>
                     </div>
                   </div>
                 ) : error ? (
@@ -303,7 +303,7 @@ const InstitutionSelector = ({ onSelect, onPreviewChange }) => {
                   <div className="p-8 text-center bg-white dark:bg-[#001c3d]">
                     <div className="flex flex-col items-center gap-2">
                       <Building2 className="h-6 w-6 text-gray-300 dark:text-gray-600 mb-1" />
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No partner institution found.</p>
+                      <p className="text-sm font-medium text-gray-500 dark:text-slate-300">No partner institution found.</p>
                       <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-widest">Verify the name and try again</p>
                     </div>
                   </div>

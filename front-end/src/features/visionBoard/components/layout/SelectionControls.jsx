@@ -38,7 +38,7 @@ const SelectionControls = ({
   };
 
   return (
-    <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-white/20 shadow-2xl rounded-full px-6 py-3 flex items-center gap-6 z-[9999]">
+    <div className="fixed bottom-28 left-1/2 transform -translate-x-1/2 bg-white dark:bg-[#002A5C] border-2 border-slate-200 dark:border-white/20 shadow-2xl rounded-full px-6 py-3 flex items-center gap-6 z-[9999]">
       
       {/* Zoom Controls */}
       <div className="flex items-center gap-3">

@@ -131,6 +131,16 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
       return;
     }
 
+    // FIX: If user was redirected due to session expiry (e.g. mid career-form submit),
+    // return them to where they were instead of just /dashboard.
+    const redirectAfterLogin = sessionStorage.getItem("redirect_after_login");
+    if (redirectAfterLogin) {
+      sessionStorage.removeItem("redirect_after_login");
+      console.log("[LoginModal] Restoring previous page after session expiry:", redirectAfterLogin);
+      navigate(redirectAfterLogin);
+      return;
+    }
+
     // All other users → dashboard (or nextStep from backend)
     const nextStep = data.nextStep || "/dashboard";
     console.log("[LoginModal] Navigating to:", nextStep);
@@ -197,7 +207,7 @@ const LoginModal = ({ isOpen, onClose, onSwitchToSignup }) => {
               }}
             >
               {/* Header */}
-              <div className="bg-gray-50 p-8 flex flex-col items-center justify-center border-b border-gray-100 relative">
+              <div className="bg-[#F8FAFC] p-8 flex flex-col items-center justify-center border-b border-gray-100 relative">
                 <button
                   onClick={onClose}
                   className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"

@@ -57,7 +57,7 @@ const TemplateSelector = ({ selectedTemplate, onSelect }) => {
               <div
                 className={`relative aspect-[1.05/1] overflow-hidden rounded-2xl border p-2 ${isActive
                   ? "border-[#1a3884]/25 bg-white/80 dark:bg-[#0d1732]/80"
-                  : "border-slate-200/80 bg-slate-50/80 dark:border-white/10 dark:bg-[#0f172a]/70"
+                  : "border-slate-200/80 bg-slate-50/80 dark:border-white/10 dark:bg-[#00152E]/70"
                   }`}
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(148,163,184,0.12),transparent_55%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.07),transparent_55%)]" />

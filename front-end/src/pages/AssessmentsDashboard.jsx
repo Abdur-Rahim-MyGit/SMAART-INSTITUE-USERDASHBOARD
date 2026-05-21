@@ -16,6 +16,7 @@ import {
     TrendingUp,
 } from "lucide-react";
 import { assessmentApi } from "@/services/assessmentApi";
+import PageHero from "@/components/ui/PageHero";
 
 const STAGES = [
     {
@@ -123,33 +124,13 @@ const AssessmentsDashboard = () => {
 
     return (
         <div className="space-y-6">
-            <main className="py-4 sm:py-6 lg:py-8">
-                <div className="mx-auto max-w-7xl space-y-6 lg:space-y-8">
-                    <div className="grid gap-3 xl:grid-cols-1 xl:items-start">
-                        <motion.section
-                            initial={{ opacity: 0, y: 22, scale: 0.99 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            className="relative overflow-hidden rounded-2xl sm:rounded-[32px] border border-slate-200 bg-white p-4 sm:p-7 shadow-sm dark:border-slate-700/70 dark:bg-slate-900"
-                        >
-                            <div className="relative">
-                                <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] sm:tracking-[0.24em] text-[#1a3884] dark:border-slate-700 dark:bg-slate-800 dark:text-blue-300">
-                                    <span className="h-2 w-2 rounded-full bg-[#1a3884]" />
-                                    Assessment Journey
-                                </div>
-
-                                <div className="mt-4 sm:mt-5 max-w-2xl space-y-2 sm:space-y-3">
-                                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#1a3884] dark:text-blue-300">
-                                        Assessments Centre
-                                    </h1>
-                                    <p className="max-w-2xl text-xs sm:text-sm md:text-base font-medium leading-relaxed sm:leading-7 text-slate-600 dark:text-slate-300">
-                                        Experience a structured pathway to mastery. Track your progress, complete each
-                                        stage with confidence, and unlock your performance insights.
-                                    </p>
-                                </div>
-                            </div>
-                        </motion.section>
-                    </div>
+            <main className="px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+                <div className="mx-auto max-w-7xl space-y-8 lg:space-y-10">
+                    <PageHero
+                        badge="Assessment Journey"
+                        title="Assessments Centre"
+                        subtitle="Experience a structured pathway to mastery. Track your progress, complete each stage with confidence, and unlock your performance insights."
+                    />
 
                     <motion.section
                         initial={{ opacity: 0, y: 16 }}
@@ -186,11 +167,11 @@ const AssessmentsDashboard = () => {
 const GuidelinesSection = () => (
     <motion.div
         {...fadeUp}
-        className="group relative overflow-hidden rounded-2xl sm:rounded-[32px] border border-slate-200 bg-white shadow-sm dark:border-slate-700/70 dark:bg-slate-900"
+        className="group relative overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm dark:border-slate-700/70 dark:bg-[#002147]"
     >
-        <div className="relative z-10 flex flex-col items-start gap-6 sm:gap-8 p-4 sm:p-8 lg:flex-row lg:gap-10 lg:p-9">
-            <div className="flex h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0 items-center justify-center rounded-xl sm:rounded-[22px] border border-slate-100 bg-slate-50 text-[#1a3884] shadow-sm dark:border-slate-800 dark:bg-slate-800/50 dark:text-blue-300">
-                <Info className="h-6 sm:h-8 w-6 sm:w-8" />
+        <div className="relative z-10 flex flex-col items-start gap-8 p-6 sm:p-8 lg:flex-row lg:gap-10 lg:p-9">
+            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[22px] border border-slate-100 bg-[#F8FAFC] text-[#1a3884] shadow-sm dark:border-white/8 dark:bg-slate-800/50 dark:text-blue-300">
+                <Info className="h-8 w-8" />
             </div>
 
             <div className="flex-1 space-y-4 sm:space-y-6">
@@ -253,100 +234,95 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
         >
             <div
                 onClick={onAction}
-                className={`relative cursor-pointer overflow-hidden rounded-[24px] sm:rounded-[30px] border bg-white transition-all duration-300 dark:bg-slate-900 ${
-                    completed
-                        ? "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:hover:border-slate-600"
-                        : "border-slate-200 shadow-sm hover:border-[#1a3884]/30 hover:shadow-md dark:border-slate-700 dark:hover:border-slate-600"
-                }`}
+                className={`relative cursor-pointer overflow-hidden rounded-[30px] border bg-white transition-all duration-300 dark:bg-[#002147] ${completed
+                        ? "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
+                        : "border-slate-200 shadow-sm hover:border-[#1a3884]/30 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
+                    }`}
             >
-                <div className={`h-1 ${completed ? "bg-[#1a3884]" : "bg-slate-100 dark:bg-slate-800"}`} />
+                <div className={`h-1 ${completed ? "bg-[#1a3884]" : "bg-slate-100 dark:bg-[#002A5C]"}`} />
 
-                <div className="p-4 sm:p-7">
-                    <div className="mb-4 sm:mb-5 flex items-start gap-3 sm:gap-5 justify-between">
-                        <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-                            <div
-                                className={`flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold ${
-                                    completed
-                                        ? "bg-[#1a3884] text-white shadow-sm"
-                                        : "border border-slate-200 bg-slate-50 text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+                <div className="p-6 sm:p-7">
+                    <div className="mb-5 flex items-start gap-4 sm:gap-5">
+                        <div
+                            className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-base font-bold ${completed
+                                    ? "bg-[#1a3884] text-white shadow-sm"
+                                    : "border border-slate-200 bg-[#F8FAFC] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-400"
                                 }`}
-                            >
-                                {completed ? <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6" /> : `0${index + 1}`}
-                            </div>
-
-                            <div className="min-w-0 pt-0.5">
-                                <h3 className="text-base sm:text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-100">
-                                    {stage.title}
-                                </h3>
-                                <p className="mt-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                                    {stage.subtitle}
-                                </p>
-                            </div>
+                        >
+                            {completed ? <CheckCircle2 className="h-6 w-6" /> : `0${index + 1}`}
                         </div>
 
-                        {completed && (
-                            <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full border border-emerald-100 bg-[linear-gradient(180deg,_#ecfdf5_0%,_#dcfce7_100%)] px-2 py-1 sm:px-3 sm:py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
-                                <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                                Verified
-                            </span>
-                        )}
-                    </div>
-
-                    <p className="mb-4 sm:mb-5 text-xs sm:text-sm font-medium leading-relaxed sm:leading-6 text-slate-500 dark:text-slate-350">{stage.description}</p>
-
-                    <div className="mb-5 sm:mb-6 flex flex-wrap items-center gap-2">
-                        <InfoChip icon={FileText} label={`${stage.totalQuestions} Qs`} />
-                        <InfoChip icon={Clock} label={stage.duration} />
-                    </div>
-
-                    {completed && score !== undefined && (
-                        <div className="mb-5 sm:mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
-                            <div className="mb-3 flex items-center justify-between">
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                                    Your Performance
-                                </span>
-                                <span className="text-lg font-bold text-[#1a3884] dark:text-white sm:text-2xl">
-                                    {score}
-                                    <span className="ml-1 text-sm text-slate-500 dark:text-slate-400">%</span>
-                                </span>
-                            </div>
-                            <div className="h-2 rounded-full bg-slate-200 p-0.5 dark:bg-slate-700">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${score}%` }}
-                                    transition={{ duration: 1, ease: "easeOut", delay: 0.4 + index * 0.08 }}
-                                    className="h-full rounded-full bg-[#1a3884]"
-                                />
-                            </div>
+                        <div className="min-w-0 pt-0.5">
+                            <h3 className="text-base sm:text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-100">
+                                {stage.title}
+                            </h3>
+                            <p className="mt-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                                {stage.subtitle}
+                            </p>
                         </div>
+                    </div>
+
+                    {completed && (
+                        <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full border border-emerald-100 bg-[linear-gradient(180deg,_#ecfdf5_0%,_#dcfce7_100%)] px-2 py-1 sm:px-3 sm:py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
+                            <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                            Verified
+                        </span>
                     )}
-
-                    <motion.button
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            onAction();
-                        }}
-                        className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold transition-all duration-300 ${
-                            completed
-                                ? "border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                                : "bg-[#1a3884] text-white shadow-md hover:bg-[#002147] hover:shadow-lg hover:-translate-y-0.5"
-                        }`}
-                    >
-                        {completed ? (
-                            <>
-                                <Eye className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
-                                View Performance Report
-                                <ChevronRight className="ml-auto h-4 w-4 sm:h-5 sm:w-5 opacity-40" />
-                            </>
-                        ) : (
-                            <>
-                                <Play className="h-4.5 w-4.5 sm:h-5 sm:w-5 fill-white" />
-                                Start Stage Assessment
-                                <ArrowRight className="ml-auto h-4 w-4 sm:h-5 sm:w-5 opacity-80 transition-transform group-hover:translate-x-1" />
-                            </>
-                        )}
-                    </motion.button>
                 </div>
+
+                <p className="mb-4 sm:mb-5 text-xs sm:text-sm font-medium leading-relaxed sm:leading-6 text-slate-500 dark:text-slate-350">{stage.description}</p>
+
+                <div className="mb-5 sm:mb-6 flex flex-wrap items-center gap-2">
+                    <InfoChip icon={FileText} label={`${stage.totalQuestions} Qs`} />
+                    <InfoChip icon={Clock} label={stage.duration} />
+                </div>
+
+                {completed && score !== undefined && (
+                    <div className="mb-6 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-4 shadow-sm dark:border-white/10 dark:bg-slate-800/50">
+                        <div className="mb-3 flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                                Your Performance
+                            </span>
+                            <span className="text-lg font-bold text-[#1a3884] dark:text-white sm:text-2xl">
+                                {score}
+                                <span className="ml-1 text-sm text-slate-500 dark:text-slate-400">%</span>
+                            </span>
+                        </div>
+                        <div className="h-2 rounded-full bg-slate-200 p-0.5 dark:bg-[#003170]">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${score}%` }}
+                                transition={{ duration: 1, ease: "easeOut", delay: 0.4 + index * 0.08 }}
+                                className="h-full rounded-full bg-[#1a3884]"
+                            />
+                        </div>
+                    </div>
+                )}
+
+                <motion.button
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        onAction();
+                    }}
+                    className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold transition-all duration-300 ${completed
+                            ? "border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#002A5C]"
+                            : "bg-[#1a3884] text-white shadow-md hover:bg-[#002147] hover:shadow-lg hover:-translate-y-0.5"
+                        }`}
+                >
+                    {completed ? (
+                        <>
+                            <Eye className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+                            View Performance Report
+                            <ChevronRight className="ml-auto h-4 w-4 sm:h-5 sm:w-5 opacity-40" />
+                        </>
+                    ) : (
+                        <>
+                            <Play className="h-4.5 w-4.5 sm:h-5 sm:w-5 fill-white" />
+                            Start Stage Assessment
+                            <ArrowRight className="ml-auto h-4 w-4 sm:h-5 sm:w-5 opacity-80 transition-transform group-hover:translate-x-1" />
+                        </>
+                    )}
+                </motion.button>
             </div>
         </motion.div>
     );
@@ -355,7 +331,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
 const InfoChip = ({ icon: Icon, label }) => (
     <motion.span
         whileHover={{ y: -1, scale: 1.02 }}
-        className="inline-flex items-center gap-1.5 sm:gap-2 rounded-xl border border-slate-100 bg-white px-2.5 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-[11px] font-bold text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300"
+        className="inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-500 shadow-sm dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-300"
     >
         <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         {label}
@@ -367,27 +343,27 @@ const SkeletonGrid = () => (
         {[0, 1, 2, 3].map((item) => (
             <div
                 key={item}
-                className="overflow-hidden rounded-[28px] border border-slate-100 bg-white animate-pulse dark:border-slate-700 dark:bg-slate-900/60"
+                className="overflow-hidden rounded-[28px] border border-slate-100 bg-white animate-pulse dark:border-white/10 dark:bg-slate-900/60"
             >
-                <div className="h-1 bg-slate-100 dark:bg-slate-700" />
-                <div className="space-y-5 p-4 sm:p-7">
+                <div className="h-1 bg-slate-100 dark:bg-[#003170]" />
+                <div className="space-y-5 p-6 sm:p-7">
                     <div className="flex items-start gap-5">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-700" />
+                        <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-[#003170]" />
                         <div className="flex-1 space-y-3 pt-2">
-                            <div className="h-5 w-3/5 rounded bg-slate-100 dark:bg-slate-700" />
-                            <div className="h-3 w-2/5 rounded bg-slate-50 dark:bg-slate-800" />
+                            <div className="h-5 w-3/5 rounded bg-slate-100 dark:bg-[#003170]" />
+                            <div className="h-3 w-2/5 rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <div className="h-4 w-full rounded bg-slate-50 dark:bg-slate-800" />
-                        <div className="h-4 w-4/5 rounded bg-slate-50 dark:bg-slate-800" />
+                        <div className="h-4 w-full rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                        <div className="h-4 w-4/5 rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
                     </div>
                     <div className="flex gap-3">
-                        <div className="h-8 w-20 rounded-xl bg-slate-50 dark:bg-slate-800" />
-                        <div className="h-8 w-20 rounded-xl bg-slate-50 dark:bg-slate-800" />
-                        <div className="h-8 w-20 rounded-xl bg-slate-50 dark:bg-slate-800" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
                     </div>
-                    <div className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-800" />
+                    <div className="h-14 rounded-2xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
                 </div>
             </div>
         ))}

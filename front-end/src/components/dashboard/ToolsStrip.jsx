@@ -8,17 +8,17 @@ const ToolsStrip = memo(() => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-white/8">
       <motion.button 
         initial={{ opacity: 0, scale: 0.9 }} 
         animate={{ opacity: 1, scale: 1 }} 
         transition={{ delay: ANIMATION_DELAYS.TOOLS_WALLET }}
         onClick={() => navigate('/skills-vault')}
-        className="flex items-center gap-3 bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-none px-6 py-3 shadow-sm hover:shadow-md transition"
+        className="flex items-center gap-3 bg-white dark:bg-[#002147] border dark:border-white/8 rounded-none px-6 py-3 shadow-sm hover:shadow-md transition"
         style={{ borderColor: COLORS.SILVER }}
       >
         <span className="font-bold text-sm dark:text-white" style={{ color: COLORS.PRIMARY }}>Skills Vault</span>
-        <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-700 pl-3">
+        <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-white/10 pl-3">
           <Award className="w-4 h-4" style={{ color: COLORS.SILVER }} />
           <Shield className="w-4 h-4" style={{ color: COLORS.SILVER }} />
           <Sparkles className="w-4 h-4" style={{ color: COLORS.SILVER }} />
@@ -31,7 +31,7 @@ const ToolsStrip = memo(() => {
           animate={{ opacity: 1, scale: 1 }} 
           transition={{ delay: ANIMATION_DELAYS.TOOLS_TOOLKIT }}
           onClick={() => navigate('/smaart-toolkit')}
-          className="bg-white dark:bg-slate-900 border dark:border-slate-800 rounded-none px-6 py-3 font-bold text-sm dark:text-white shadow-sm hover:shadow-md transition"
+          className="bg-white dark:bg-[#002147] border dark:border-white/8 rounded-none px-6 py-3 font-bold text-sm dark:text-white shadow-sm hover:shadow-md transition"
           style={{ borderColor: COLORS.SILVER, color: COLORS.PRIMARY }}
         >
           Quick Access Toolkit

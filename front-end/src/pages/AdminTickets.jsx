@@ -122,7 +122,7 @@ const AdminTickets = () => {
   const activeFiltersCount = Object.values(filters).filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-[#001229]">
+    <div className="min-h-screen bg-[#00152E]">
       <main className="p-4 sm:p-6 lg:p-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -252,7 +252,7 @@ const AdminTickets = () => {
                               className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                 filters.status === option.value
                                   ? "bg-[#1a3884] text-white"
-                                  : "bg-[#001229] text-gray-400 hover:text-white"
+                                  : "bg-[#00152E] text-gray-400 hover:text-white"
                               }`}
                             >
                               {option.icon && <option.icon className={`w-3.5 h-3.5 ${option.color}`} />}
@@ -273,7 +273,7 @@ const AdminTickets = () => {
                               className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                 filters.priority === option.value
                                   ? "bg-[#1a3884] text-white"
-                                  : "bg-[#001229] text-gray-400 hover:text-white"
+                                  : "bg-[#00152E] text-gray-400 hover:text-white"
                               }`}
                             >
                               {option.color && <span className={`w-2 h-2 rounded-full ${option.color}`} />}
@@ -294,7 +294,7 @@ const AdminTickets = () => {
                               className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
                                 filters.category === option.value
                                   ? "bg-[#1a3884] text-white"
-                                  : "bg-[#001229] text-gray-400 hover:text-white"
+                                  : "bg-[#00152E] text-gray-400 hover:text-white"
                               }`}
                             >
                               {option.label}

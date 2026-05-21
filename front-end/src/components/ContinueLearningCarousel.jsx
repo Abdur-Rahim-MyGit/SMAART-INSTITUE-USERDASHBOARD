@@ -109,7 +109,7 @@ const ContinueLearningCarousel = ({ onCourseClick }) => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.05 }}
                             onClick={() => onCourseClick && onCourseClick(course._id || course.id)}
-                            className="group relative min-w-[280px] h-[200px] rounded-2xl overflow-hidden cursor-pointer flex-shrink-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300"
+                            className="group relative min-w-[280px] h-[200px] rounded-2xl overflow-hidden cursor-pointer flex-shrink-0 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300"
                         >
                             {/* Image Background */}
                             <div className="absolute inset-0">

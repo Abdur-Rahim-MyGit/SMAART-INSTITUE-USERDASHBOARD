@@ -95,6 +95,22 @@ const protect = async (req, res, next) => {
             message: 'Your session has expired after 3 hours. Please log in again.'
           });
         }
+
+        // FIX: Auto-extend session if it expires within the next 30 minutes and user is active.
+        // This prevents unexpected logouts when users are actively filling long forms
+        // (like the Career Intelligence form which requires time to complete all 9 steps).
+        const SESSION_EXTEND_THRESHOLD_MS = 30 * 60 * 1000; // 30 minutes
+        const SESSION_EXTENSION_MS = 3 * 60 * 60 * 1000; // extend by 3 hours
+        if (req.user.sessionExpiresAt) {
+          const timeUntilExpiry = new Date(req.user.sessionExpiresAt) - new Date();
+          if (timeUntilExpiry > 0 && timeUntilExpiry < SESSION_EXTEND_THRESHOLD_MS) {
+            // Silently extend session in the background (don't await to avoid slowing request)
+            const newExpiry = new Date(Date.now() + SESSION_EXTENSION_MS);
+            req.user.updateOne({ sessionExpiresAt: newExpiry }).catch(err =>
+              console.warn('Session auto-extend failed (non-critical):', err.message)
+            );
+          }
+        }
       }
 
       next();

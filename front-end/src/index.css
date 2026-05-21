@@ -86,7 +86,7 @@
   }
 
   .premium-border {
-    @apply border border-gray-100 dark:border-white/10;
+    @apply border border-gray-100 dark:border-[#1a3884]/20;
   }
 
   .community-shell {
@@ -105,19 +105,19 @@
   }
 
   .community-surface {
-    @apply bg-white dark:bg-[#002147]/60 border border-slate-200/60 dark:border-white/10 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-300;
+    @apply bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-[#1a3884]/20 shadow-[0_2px_12px_rgba(0,0,0,0.02)] transition-all duration-300;
   }
 
   .community-surface:hover {
-    @apply border-slate-300/80 dark:border-white/20 shadow-[0_8px_24px_rgba(0,0,0,0.04)];
+    @apply border-slate-300/80 dark:border-[#1a3884]/30 shadow-[0_8px_24px_rgba(0,0,0,0.04)];
   }
 
   .community-surface-muted {
-    @apply bg-slate-50/50 dark:bg-[#001A36]/50 border border-slate-100/80 dark:border-white/5;
+    @apply bg-slate-50/50 dark:bg-[#001A36]/50 border border-slate-100/80 dark:border-[#1a3884]/10;
   }
 
   .community-hero {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #001228 0%, #002147 100%);
     @apply relative overflow-hidden;
   }
 
@@ -141,21 +141,54 @@
   }
 
   .premium-card {
-    @apply bg-white dark:bg-[#002147]/80 rounded-[32px] border border-slate-200/60 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-none transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-1.5;
+    @apply bg-white dark:bg-[#002147] rounded-[32px] border border-slate-200/60 dark:border-[#1a3884]/20 shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-none transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.1)] hover:-translate-y-1.5;
   }
 
   .glass-effect {
-    @apply bg-white/80 dark:bg-[#002147]/50 backdrop-blur-2xl border border-white/20 dark:border-white/10;
+    @apply bg-white/80 dark:bg-[#002147]/80 backdrop-blur-2xl border border-white/20 dark:border-[#1a3884]/20;
   }
 
   .input-premium {
-    @apply w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 px-5 py-4 text-[16px] text-slate-700 dark:text-slate-200 outline-none transition-all duration-300 placeholder:text-slate-400 dark:placeholder:text-slate-500 hover:border-primary/50 dark:hover:border-blue-400/50 hover:bg-white dark:hover:bg-[#002A5C] hover:shadow-sm focus:border-primary dark:focus:border-blue-400 focus:bg-white dark:focus:bg-[#002A5C] focus:ring-4 focus:ring-primary/20 dark:focus:ring-blue-400/20 focus:shadow-md;
+    @apply w-full rounded-2xl border border-slate-200 dark:border-[#1a3884]/25 bg-white dark:bg-[#002147] px-5 py-4 text-[16px] text-slate-700 dark:text-slate-200 outline-none transition-all duration-300 placeholder:text-slate-400 dark:placeholder:text-slate-500 hover:border-primary/50 dark:hover:border-blue-400/50 hover:bg-white dark:hover:bg-[#002A5C] hover:shadow-sm focus:border-primary dark:focus:border-blue-400 focus:bg-white dark:focus:bg-[#002A5C] focus:ring-4 focus:ring-primary/20 dark:focus:ring-blue-400/20 focus:shadow-md;
   }
 }
 
 @layer base {
-  * {
+  /* ─────────────────────────────────────────────────────────────────
+   * SMOOTH DARK MODE TRANSITION
+   * Transitions background, text, border and SVG fill/stroke globally
+   * so switching between light & dark mode is a smooth cross-fade.
+   * Media elements are excluded to prevent accidental flickering.
+   * ───────────────────────────────────────────────────────────────── */
+  html {
+    transition:
+      background-color 300ms ease,
+      color 300ms ease;
+  }
+
+  *,
+  *::before,
+  *::after {
     @apply border-border;
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow;
+    transition-timing-function: ease;
+    transition-duration: 300ms;
+  }
+
+  /* Exclude elements where transition would cause visual glitches */
+  img,
+  video,
+  svg *,
+  [data-no-transition],
+  .no-transition {
+    transition: none !important;
+  }
+
+  /* Restore motion transitions on elements that animate */
+  [class*="animate-"],
+  [class*="motion-"] {
+    transition-property: transform, opacity;
+    transition-duration: inherit;
   }
 
   html,
@@ -168,7 +201,7 @@
   }
 
   body {
-    @apply bg-white dark:bg-navy text-[#1A1A1A] dark:text-white antialiased transition-colors duration-300;
+    @apply bg-white dark:bg-[#00152E] text-[#0F172A] dark:text-white antialiased transition-colors duration-300;
     font-family:
       "Inter",
       system-ui,
@@ -194,7 +227,7 @@
   h4,
   h5,
   h6 {
-    @apply font-bold tracking-tight text-[#002147] dark:text-white;
+    @apply font-bold tracking-tight text-[#1a3884] dark:text-white;
     font-family:
       "Inter",
       system-ui,
@@ -273,7 +306,7 @@
 
   /* Standard card — white in light, navy in dark */
   .dark-card {
-    @apply bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 rounded-2xl transition-colors duration-200;
+    @apply bg-white dark:bg-[#002147] border border-gray-200 dark:border-[#1a3884]/20 rounded-2xl transition-colors duration-200;
   }
 
   /* Card with hover lift + border highlight */
@@ -312,7 +345,7 @@
   .form-input {
     @apply w-full px-4 py-3 rounded-xl text-sm;
     @apply bg-gray-50 dark:bg-[#002A5C];
-    @apply border border-gray-200 dark:border-white/10;
+    @apply border border-gray-200 dark:border-[#1a3884]/20;
     @apply text-gray-900 dark:text-white;
     @apply placeholder-gray-400 dark:placeholder-gray-500;
     @apply focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400;
@@ -330,7 +363,7 @@
   .settings-section {
     @apply p-4 rounded-xl;
     @apply bg-gray-50 dark:bg-[#002A5C]/60;
-    @apply border border-gray-200 dark:border-white/10;
+    @apply border border-gray-200 dark:border-[#1a3884]/20;
     @apply transition-colors duration-200;
   }
 

@@ -22,7 +22,7 @@ const DashboardLoader = ({ onComplete, title = "DashBoard" }) => {
 
     return (
         <motion.div
-            className="fixed inset-0 z-[100] bg-[#001229] flex items-center justify-center overflow-hidden"
+            className="fixed inset-0 z-[100] bg-[#00152E] flex items-center justify-center overflow-hidden"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             animate={{ opacity: progress === 100 ? 0 : 1 }}

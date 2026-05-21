@@ -253,7 +253,7 @@ const LoginCard = () => {
           <div className="h-[3px] bg-gradient-to-r from-transparent via-[#002147] to-transparent opacity-80" />
 
           {/* Header */}
-          <div className="bg-gray-50 dark:bg-[#00152E] px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100 dark:border-white/10">
+          <div className="bg-[#F8FAFC] dark:bg-[#00152E] px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100 dark:border-white/10">
             {/* Icon badge */}
             <div className="w-16 h-16 flex items-center justify-center mb-4 bg-white dark:bg-[#002147] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden">
               {selectedInstitution?.logo ? (
@@ -273,7 +273,7 @@ const LoginCard = () => {
             >
               Select Your Institution
             </h2>
-            <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-2 text-center max-w-[260px] leading-relaxed">
+            <p className="text-[13px] text-gray-500 dark:text-slate-300 mt-2 text-center max-w-[260px] leading-relaxed">
               Find your college to access your personalised career dashboard.
             </p>
           </div>
@@ -315,7 +315,7 @@ const LoginCard = () => {
               {selectedInstitution?.name}
             </p>
             {selectedInstitution?.location?.city && (
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium truncate mt-0.5">
+              <p className="text-[11px] text-gray-500 dark:text-slate-300 font-medium truncate mt-0.5">
                 {selectedInstitution.location.city}
                 {selectedInstitution?.location?.state && (
                   <span className="opacity-70">, {selectedInstitution.location.state}</span>
@@ -370,7 +370,7 @@ const LoginCard = () => {
             >
               Welcome Back
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
+            <p className="text-gray-500 dark:text-slate-300 text-[12px] sm:text-[13px] font-medium max-w-[240px]">
               Access your personalized learning and career dashboard
             </p>
           </div>
@@ -394,7 +394,7 @@ const LoginCard = () => {
                 Email or Student ID
               </label>
               <div
-                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#00152E] focus-within:border-[#1a3884] dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-[#003366] focus-within:ring-4 focus-within:ring-[#1a3884]/10 dark:focus-within:ring-blue-400/20"
+                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden border border-gray-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#00152E] focus-within:border-[#1a3884] dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-[#003366] focus-within:ring-4 focus-within:ring-[#1a3884]/10 dark:focus-within:ring-blue-400/20"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-[#002147] shadow-sm border border-gray-100 dark:border-white/10 group-focus-within:border-[#1a3884]/30 dark:group-focus-within:border-blue-400/30 transition-all">
                   <Mail className="w-3.5 h-3.5 shrink-0 text-[#1a3884] dark:text-blue-400 group-focus-within:scale-110 transition-transform" />
@@ -431,7 +431,7 @@ const LoginCard = () => {
                 </button>
               </div>
               <div
-                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#00152E] focus-within:border-[#1a3884] dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-[#003366] focus-within:ring-4 focus-within:ring-[#1a3884]/10 dark:focus-within:ring-blue-400/20"
+                className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 transition-all group relative overflow-hidden border border-gray-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#00152E] focus-within:border-[#1a3884] dark:focus-within:border-blue-400 focus-within:bg-white dark:focus-within:bg-[#003366] focus-within:ring-4 focus-within:ring-[#1a3884]/10 dark:focus-within:ring-blue-400/20"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white dark:bg-[#002147] shadow-sm border border-gray-100 dark:border-white/10 group-focus-within:border-[#1a3884]/30 dark:group-focus-within:border-blue-400/30 transition-all">
                   <Lock className="w-3.5 h-3.5 shrink-0 text-[#1a3884] dark:text-blue-400 group-focus-within:scale-110 transition-transform" />
@@ -478,7 +478,7 @@ const LoginCard = () => {
                     </svg>
                   </div>
                 </div>
-                <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+                <span className="text-[11px] font-bold text-gray-500 dark:text-slate-300 uppercase tracking-wider group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                   Remember Me
                 </span>
               </label>

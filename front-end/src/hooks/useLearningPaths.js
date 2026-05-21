@@ -12,11 +12,72 @@ export const useLearningPaths = (userId) => {
         setLoading(true);
         setError(null);
 
-        // Try to fetch from API
+        // ── Priority 1: Career Directions from Career Agent Analysis ──────────
+        // Try to fetch the user's registered career directions from their analysis
+        try {
+          const token = sessionStorage.getItem('token');
+          const res = await fetch('/api/career-agent/my-analysis', {
+            credentials: 'include',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
+          if (res.ok) {
+            const payload = await res.json();
+            if (payload.found && payload.analysis) {
+              const { analysis, input_data } = payload;
+              const preferences = input_data?.preferences || {};
+
+              // Build direction name from analysis or from input_data preferences
+              const getDirectionName = (analysisPath, prefPref, localKey) => {
+                return (
+                  localStorage.getItem(localKey) ||
+                  analysisPath?.direction?.directionName ||
+                  prefPref?.careerDirectionName ||
+                  prefPref?.role ||
+                  analysisPath?.tab1?.role_name ||
+                  null
+                );
+              };
+
+              const getDirectionSubtitle = (analysisPath, prefPref) => {
+                return (
+                  analysisPath?.direction?.directionDescription ||
+                  analysisPath?.direction?.directionOverview ||
+                  prefPref?.careerDirectionName ||
+                  'Registered career direction'
+                );
+              };
+
+              const primaryName   = getDirectionName(analysis.primary,   preferences.primary,   'smaart_pref_primary');
+              const secondaryName = getDirectionName(analysis.secondary, preferences.secondary, 'smaart_pref_secondary');
+              const tertiaryName  = getDirectionName(analysis.tertiary,  preferences.tertiary,  'smaart_pref_tertiary');
+
+              const primarySub   = getDirectionSubtitle(analysis.primary,   preferences.primary);
+              const secondarySub = getDirectionSubtitle(analysis.secondary, preferences.secondary);
+              const tertiarySub  = getDirectionSubtitle(analysis.tertiary,  preferences.tertiary);
+
+              // Build path cards only for valid directions
+              const careerPaths = [
+                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   progress: 0, btnText: 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   navigateTo: '/dashboard/career-agent' },
+                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, progress: 0, btnText: 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', navigateTo: '/dashboard/career-agent' },
+                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  progress: 0, btnText: 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  navigateTo: '/dashboard/career-agent' },
+              ].filter(Boolean);
+
+              if (careerPaths.length > 0) {
+                setPaths(careerPaths);
+                setLoading(false);
+                return;
+              }
+            }
+          }
+        } catch (caErr) {
+          console.log('[useLearningPaths] Career analysis fetch failed, trying enrolled courses:', caErr.message);
+        }
+
+        // ── Priority 2: Enrolled Course Paths ────────────────────────────────
         if (userId) {
           try {
             const enrollments = await courseEnrollmentAPI.getByStudent(userId);
-            
+
             if (enrollments && enrollments.length > 0) {
               const pathsData = await Promise.all(
                 enrollments.map(async (enrollment) => {
@@ -30,7 +91,8 @@ export const useLearningPaths = (userId) => {
                       btnText: 'Continue Path',
                       icon: getIconForCourse(course.category),
                       color: getColorForCourse(course.category),
-                      enrollmentId: enrollment._id
+                      enrollmentId: enrollment._id,
+                      navigateTo: '/dashboard/courses'
                     };
                   } catch (err) {
                     console.error('Error fetching course details:', err);
@@ -50,15 +112,15 @@ export const useLearningPaths = (userId) => {
               }
             }
           } catch (apiErr) {
-            console.log('API fetch failed, using fallback data:', apiErr.message);
+            console.log('[useLearningPaths] Enrollment fetch failed:', apiErr.message);
           }
         }
 
-        // Use fallback data if API fails or no data
-        setPaths(getFallbackPaths());
+        // ── Priority 3: Empty state — no courses or career analysis yet ──────
+        setPaths([]);
       } catch (err) {
         console.error('Error in fetchLearningPaths:', err);
-        setPaths(getFallbackPaths());
+        setPaths([]);
       } finally {
         setLoading(false);
       }
@@ -72,7 +134,18 @@ export const useLearningPaths = (userId) => {
 
 export default useLearningPaths;
 
-// Helper function to get icon based on course category
+// ── Icon helpers ─────────────────────────────────────────────────────────────
+
+// Icon for career directions — based on keywords in the direction name
+const getIconForDirection = (name = '') => {
+  const n = name.toLowerCase();
+  if (n.includes('software') || n.includes('web') || n.includes('developer') || n.includes('engineering')) return 'Code';
+  if (n.includes('data') || n.includes('analytics') || n.includes('database') || n.includes('ai') || n.includes('machine') || n.includes('ml')) return 'Database';
+  if (n.includes('cloud') || n.includes('devops') || n.includes('infrastructure') || n.includes('network')) return 'Cloud';
+  return 'BookOpen';
+};
+
+// Icon for enrolled courses — based on category
 const getIconForCourse = (category) => {
   const iconMap = {
     'software': 'Code',
@@ -83,7 +156,7 @@ const getIconForCourse = (category) => {
   return iconMap[category?.toLowerCase()] || iconMap.default;
 };
 
-// Helper function to get color based on course category
+// Color for enrolled courses — based on category
 const getColorForCourse = (category) => {
   const colorMap = {
     'software': 'blue',
@@ -93,34 +166,3 @@ const getColorForCourse = (category) => {
   };
   return colorMap[category?.toLowerCase()] || colorMap.default;
 };
-
-// Fallback data when API fails
-const getFallbackPaths = () => [
-  {
-    id: 1,
-    title: 'Software Developer',
-    subtitle: 'Certification: Python, Java',
-    progress: 60,
-    btnText: 'Continue Path',
-    icon: 'Code',
-    color: 'blue'
-  },
-  {
-    id: 2,
-    title: 'AI & ML',
-    subtitle: 'Certification: Machine Learning, Deep Learning',
-    progress: 40,
-    btnText: 'Continue Path',
-    icon: 'Database',
-    color: 'indigo'
-  },
-  {
-    id: 3,
-    title: 'Cloud and DevOps',
-    subtitle: 'Session 1: Hosting Development Sprints',
-    progress: 20,
-    btnText: 'Continue Path',
-    icon: 'Cloud',
-    color: 'amber'
-  }
-];

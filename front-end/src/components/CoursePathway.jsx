@@ -64,7 +64,7 @@ const CoursePathway = ({ onCourseClick }) => {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <Badge className="mb-4 bg-indigo-600 text-white border-indigo-500 px-4 py-1.5 text-sm font-medium">
+          <Badge className="mb-4 bg-[#1a3884] text-white border-indigo-500 px-4 py-1.5 text-sm font-medium">
             <Sparkles className="w-4 h-4 mr-1.5" />
             Learning Path
           </Badge>
@@ -142,7 +142,7 @@ const ModernCourseCard = ({ step, index, onCourseClick }) => {
     if (step.active) {
       return "border-indigo-200 dark:border-indigo-800";
     }
-    return "border-slate-200 dark:border-slate-700";
+    return "border-slate-200 dark:border-white/10";
   };
 
   return (
@@ -166,8 +166,8 @@ const ModernCourseCard = ({ step, index, onCourseClick }) => {
             <div className={`
               p-4 rounded-2xl transition-all duration-300
               ${step.active 
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' 
-                : 'bg-slate-300 text-slate-500 dark:bg-slate-700 dark:text-slate-400'}
+                ? 'bg-[#1a3884] text-white shadow-lg shadow-indigo-500/30' 
+                : 'bg-slate-300 text-slate-500 dark:bg-[#003170] dark:text-slate-400'}
             `}>
               <Icon size={32} />
             </div>
@@ -209,14 +209,14 @@ const ModernCourseCard = ({ step, index, onCourseClick }) => {
                 {step.completedModules} / {step.totalModules} modules
               </span>
             </div>
-            <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+            <div className="h-2 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 whileInView={{ width: `${step.progress}%` }}
                 transition={{ duration: 1, delay: 0.2 }}
                 className={`
                   h-full rounded-full transition-all duration-500
-                  ${step.active ? 'bg-indigo-600' : 'bg-slate-400'}
+                  ${step.active ? 'bg-[#1a3884]' : 'bg-slate-400'}
                 `}
                 style={{ width: `${step.progress}%` }}
               />
@@ -230,7 +230,7 @@ const ModernCourseCard = ({ step, index, onCourseClick }) => {
                 w-full group transition-all duration-300
                 ${hovered 
                   ? 'bg-indigo-700 hover:bg-indigo-800 shadow-lg shadow-indigo-500/30' 
-                  : 'bg-indigo-600 hover:bg-indigo-700'}
+                  : 'bg-[#1a3884] hover:bg-indigo-700'}
               `}
               onClick={(e) => {
                 e.stopPropagation();
@@ -241,7 +241,7 @@ const ModernCourseCard = ({ step, index, onCourseClick }) => {
               <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           ) : (
-            <div className="text-center py-3 px-4 bg-slate-100 dark:bg-slate-800 rounded-xl">
+            <div className="text-center py-3 px-4 bg-slate-100 dark:bg-[#002A5C] rounded-xl">
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 Complete previous level to unlock
               </p>

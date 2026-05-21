@@ -373,6 +373,10 @@ router.post('/:resultId/answer', verifyAssessmentToken, async (req, res) => {
 router.post('/:resultId/submit', verifyAssessmentToken, async (req, res) => {
     try {
         const { resultId } = req.params;
+        const {
+            submissionReason = 'manual',
+            completeMissingAnswers = false
+        } = req.body || {};
 
         const result = await Result.findById(resultId);
 
@@ -398,6 +402,13 @@ router.post('/:resultId/submit', verifyAssessmentToken, async (req, res) => {
             description: assessment?.description
         });
 
+        if (!assessment) {
+            return res.status(404).json({
+                success: false,
+                error: 'Assessment not found'
+            });
+        }
+
         // Detect stage
         const stageInfo = getStageByCode(assessment?.assessmentCode);
 
@@ -411,6 +422,37 @@ router.post('/:resultId/submit', verifyAssessmentToken, async (req, res) => {
         if (result.totalQuestions === 300 && result.responses.length === 36) {
             console.log(`🔧 [FIX] Forced T1 Baseline Correction: 36/300 detected for result ${resultId}`);
             result.totalQuestions = 36;
+        }
+
+        if (completeMissingAnswers) {
+            const existingQuestionIds = new Set(
+                result.responses.map((response) => response.questionId.toString())
+            );
+
+            const missingQuestionIds = (result.questionOrder || []).filter(
+                (questionId) => !existingQuestionIds.has(questionId.toString())
+            );
+
+            if (missingQuestionIds.length > 0) {
+                console.log(
+                    `🛟 Auto-completing ${missingQuestionIds.length} unanswered questions for ${submissionReason} submission on result ${resultId}`
+                );
+
+                missingQuestionIds.forEach((questionId) => {
+                    const question = assessment.questions.id(questionId);
+
+                    result.responses.push({
+                        questionId,
+                        questionText: question?.questionText || '',
+                        selectedValue: 'UNANSWERED',
+                        isCorrect: false,
+                        score: 0,
+                        answeredAt: new Date()
+                    });
+                });
+
+                result.updateAnsweredCount();
+            }
         }
 
         // Validate all questions answered

@@ -126,6 +126,38 @@ SkillProgressSchema.index({ email: 1, skillName: 1 }, { unique: true });
 const SkillProgressModel = mongoose.models['SkillProgress'] ||
   mongoose.model('SkillProgress', SkillProgressSchema, 'skillProgress');
 
+// ── FinalCareerPathway (one record per user — their current locked pathway) ─────
+// This is THE source of truth for a user's finalised career selection.
+// Created on first submission, updated (upserted) on every re-submission/edit.
+const FinalCareerPathwaySchema = new mongoose.Schema({
+  userId:        { type: mongoose.Schema.Types.ObjectId, index: true, required: true },
+  student_email: { type: String, index: true },
+  student_name:  { type: String },
+  // Complete form data — stored so edit mode can pre-populate all steps
+  input_data:    { type: mongoose.Schema.Types.Mixed, required: true },
+  // Full analysis output
+  output_data:   { type: mongoose.Schema.Types.Mixed },
+  // Top-level role names for quick access
+  primary_role:   { type: String },
+  secondary_role: { type: String },
+  tertiary_role:  { type: String },
+  // Zone data
+  zone_primary:   { type: String },
+  zone_secondary: { type: String },
+  zone_tertiary:  { type: String },
+  // Locked status
+  is_locked:      { type: Boolean, default: false },
+  locked_at:      { type: Date },
+  created_at:     { type: Date, default: Date.now },
+  updated_at:     { type: Date, default: Date.now }
+}, { collection: 'finalcareerpathway' });
+
+// One pathway record per user
+FinalCareerPathwaySchema.index({ userId: 1 }, { unique: true });
+
+const FinalCareerPathwayModel = mongoose.models['FinalCareerPathway'] ||
+  mongoose.model('FinalCareerPathway', FinalCareerPathwaySchema, 'finalcareerpathway');
+
 module.exports = {
   CareerAnalysisModel,
   CareerAgentDataModel,
@@ -134,5 +166,6 @@ module.exports = {
   CareerDirectionModel,
   RoleProfileModel,
   RoleSkillModel,
-  SkillProgressModel
+  SkillProgressModel,
+  FinalCareerPathwayModel
 };

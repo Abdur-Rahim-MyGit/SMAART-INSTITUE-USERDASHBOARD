@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { BookOpen, BookText, ArrowRight, FileText, Sparkles, Info, StickyNote, Compass, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import PageHero from "@/components/ui/PageHero";
 
 
 const toolkitHighlights = [
@@ -101,13 +102,13 @@ const ToolkitCard = ({ section, index }) => {
         }}
         className="relative h-full cursor-pointer overflow-hidden rounded-[24px] border border-slate-200/80 bg-white/95 shadow-[0_14px_34px_-26px_rgba(15,23,42,0.24)] transition-all duration-300 hover:border-slate-300 hover:shadow-[0_24px_50px_-30px_rgba(26,56,132,0.22)] dark:border-slate-700/50 dark:bg-slate-800/60 dark:hover:border-slate-600"
       >
-        <div className="h-1 bg-[#1a3884] dark:bg-blue-600" />
+        <div className="h-1 bg-[#1a3884] dark:bg-[#1a3884]" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-br from-[#edf3ff] via-white to-transparent dark:from-blue-950/40 dark:via-transparent dark:to-transparent" />
         <div className="absolute inset-px rounded-[23px] border border-white/70 opacity-70 dark:border-white/5" />
 
         <div className="relative z-10 flex h-full flex-col p-5 sm:p-6">
           <div className="mb-4 flex items-start justify-between gap-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[18px] bg-[#1a3884] text-white shadow-lg shadow-blue-500/20 transition-transform duration-300 group-hover:scale-105 dark:bg-blue-600">
+            <div className="flex h-11 w-11 items-center justify-center rounded-[18px] bg-[#1a3884] text-white shadow-lg shadow-blue-500/20 transition-transform duration-300 group-hover:scale-105 dark:bg-[#1a3884]">
               <Icon size={20} strokeWidth={2} />
             </div>
 
@@ -158,56 +159,12 @@ const SMAArtToolkit = () => {
     <div className="space-y-6">
       <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="mx-auto max-w-7xl space-y-8">
-          <div className="items-start gap-6">
-            <div className="relative self-start overflow-hidden rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] sm:p-8 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40">
-              <div className="absolute inset-px rounded-[27px] border border-white/70 dark:border-white/5" />
-              <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
-              <div className="relative z-10 space-y-4">
-                <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
-                  <div className="flex h-4 w-4 items-center justify-center rounded-full border border-[#4f46e5]/20 bg-[#4f46e5]/10">
-                    <Sparkles className="h-2.5 w-2.5" />
-                  </div>
-                  Intelligence Suite
-                </div>
-                <div className="space-y-2">
-                  <h1 className="max-w-3xl text-[2rem] font-black tracking-tight text-[#0f172a] sm:text-[2.35rem] lg:text-[2.5rem] lg:leading-[1.04] dark:text-white">
-                    SMAART - <span className="text-[#1a3884]">Toolkit</span>
-                  </h1>
-                  <p className="max-w-xl text-base font-medium tracking-[0.01em] text-[#3654a1] dark:text-[#d7def0] sm:text-lg">
-                    Premium learning utilities with cleaner navigation and faster action.
-                  </p>
-                  <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-                    Explore our curated repository of career intelligence, wellness resources, and learning tools designed for your growth.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* <div className="relative self-start overflow-hidden rounded-[24px] border border-slate-200/80 bg-white p-5 shadow-[0_20px_50px_-36px_rgba(15,23,42,0.28)] dark:border-slate-700/40 dark:bg-slate-900/80">
-              <div className="absolute inset-px rounded-[23px] border border-white/70 dark:border-white/5" />
-              <div className="relative z-10 space-y-1.5">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Inside the toolkit</p>
-                <h2 className="text-lg font-semibold tracking-[-0.03em] text-slate-900 dark:text-white">Focused tools, cleaner access</h2>
-                <p className="max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">
-                  Everything here is organized for quick launch, low friction, and a cleaner working flow.
-                </p>
-              </div>
-              <div className="relative z-10 mt-6 space-y-3">
-                <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/90 px-4 py-3 dark:border-slate-700/50 dark:bg-slate-800/70">
-                  <div className="h-2 w-2 rounded-full bg-[#10b981]" />
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Verified resources</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/90 px-4 py-3 dark:border-slate-700/50 dark:bg-slate-800/70">
-                  <div className="h-2 w-2 rounded-full bg-blue-500" />
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">AI-enabled workflows</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/90 px-4 py-3 dark:border-slate-700/50 dark:bg-slate-800/70">
-                  <div className="h-2 w-2 rounded-full bg-amber-500" />
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Quick launch actions</span>
-                </div>
-              </div>
-            </div> */}
-          </div>
+          {/* ── Standardized PageHero ── */}
+          <PageHero
+            badge="Intelligence Suite"
+            title="SMAART Toolkit"
+            subtitle="Explore our curated repository of career intelligence, wellness resources, and learning tools designed for your growth."
+          />
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {toolkitSections.map((section, index) => (

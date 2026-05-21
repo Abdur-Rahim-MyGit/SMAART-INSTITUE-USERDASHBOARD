@@ -412,7 +412,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                               {/* Module Header Row */}
                               <div 
                                 onClick={() => toggleModule(moduleKey)}
-                                className={`flex items-center justify-between p-4 cursor-pointer transition-all hover:bg-gray-50 ${
+                                className={`flex items-center justify-between p-4 cursor-pointer transition-all hover:bg-[#F8FAFC] ${
                                   isModuleInProgress ? 'border-l-4 border-l-[#1a3884]' : 
                                   isModuleCompleted ? 'border-l-4 border-l-[#1a3884]' : ''
                                 }`}
@@ -484,7 +484,7 @@ const GraduationPathway = ({ onCourseClick }) => {
                                     animate={{ height: 'auto', opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
                                     transition={{ duration: 0.2 }}
-                                    className="border-t border-gray-100 bg-gray-50 overflow-hidden"
+                                    className="border-t border-gray-100 bg-[#F8FAFC] overflow-hidden"
                                   >
                                     <div className="p-4">
                                       <div className="flex flex-wrap gap-2">

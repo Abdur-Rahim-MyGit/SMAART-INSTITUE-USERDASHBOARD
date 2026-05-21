@@ -31,11 +31,13 @@ const CareerAgentDashboard = () => {
     };
 
     const handleFinalizeLock = () => {
+        // "Not Interested" is handled immediately on button click (navigates directly).
+        // This function only runs when user has marked all paths as "Interested" and clicks Confirm.
         const newlyLocked = [];
-        if (selectionStates.primary === 'interested') newlyLocked.push(prefPrimary);
+        if (selectionStates.primary === 'interested')   newlyLocked.push(prefPrimary);
         if (selectionStates.secondary === 'interested') newlyLocked.push(prefSecondary);
-        if (selectionStates.tertiary === 'interested') newlyLocked.push(prefTertiary);
-        
+        if (selectionStates.tertiary === 'interested')  newlyLocked.push(prefTertiary);
+
         setLockedRoles(newlyLocked);
         setShowSelectionFlow(false);
         setShowWelcome(true);
@@ -80,11 +82,85 @@ const CareerAgentDashboard = () => {
         loadAnalysis();
     }, [navigate]);
 
+    // FIX: Direction Overview shows empty because the 'direction' field is missing from saved analyses.
+    // When the engine stores a report, it attaches direction data only if fetchDirectionFromDB succeeds.
+    // This effect detects missing directions and fetches them from the API using the preference names.
+    useEffect(() => {
+        if (!data) return;
+
+        const _draft = (() => { try { return JSON.parse(localStorage.getItem('smaart_onboarding_draft') || '{}'); } catch { return {}; } })();
+        const _dp = _draft?.preferences || {};
+
+        // Get the direction name for each path — from the stored analysis or the onboarding draft
+        const getPrefName = (roleData, draftPref, localKey) => {
+            return localStorage.getItem(localKey)
+                || roleData?.direction?.directionName
+                || draftPref?.careerDirectionName
+                || draftPref?.role
+                || roleData?.tab1?.role_name
+                || null;
+        };
+
+        const primaryName   = getPrefName(data.primary,   _dp.primary,   'smaart_pref_primary');
+        const secondaryName = getPrefName(data.secondary, _dp.secondary, 'smaart_pref_secondary');
+        const tertiaryName  = getPrefName(data.tertiary,  _dp.tertiary,  'smaart_pref_tertiary');
+
+        // Only fetch for paths that are missing their direction data
+        const needsFetch = [
+            { key: 'primary',   name: primaryName,   hasDir: !!data.primary?.direction?.directionName },
+            { key: 'secondary', name: secondaryName, hasDir: !!data.secondary?.direction?.directionName },
+            { key: 'tertiary',  name: tertiaryName,  hasDir: !!data.tertiary?.direction?.directionName },
+        ].filter(p => !p.hasDir && p.name);
+
+        if (needsFetch.length === 0) return;
+
+        // Fetch missing directions and patch them into state
+        const fetchAndPatch = async () => {
+            const patches = {};
+            await Promise.all(needsFetch.map(async ({ key, name }) => {
+                try {
+                    const res = await fetch(`/api/career-agent/direction-roles/${encodeURIComponent(name)}`, { credentials: 'include' });
+                    if (res.ok) {
+                        const dir = await res.json();
+                        if (dir.found || dir.directionName) {
+                            patches[key] = {
+                                directionId:          dir.directionId   || '',
+                                directionName:        dir.directionName || name,
+                                directionDescription: dir.overview      || dir.directionDescription || '',
+                                directionOverview:    dir.overview      || '',
+                                type:                 key === 'primary' ? 'Primary' : key === 'secondary' ? 'Secondary' : 'Alternative',
+                                roles:                dir.roles         || [],
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`[Dashboard] Could not fetch direction for ${name}:`, e.message);
+                }
+            }));
+
+            if (Object.keys(patches).length > 0) {
+                setData(prev => {
+                    if (!prev) return prev;
+                    const updated = { ...prev };
+                    for (const [key, dirData] of Object.entries(patches)) {
+                        if (updated[key]) {
+                            updated[key] = { ...updated[key], direction: dirData };
+                        }
+                    }
+                    return updated;
+                });
+            }
+        };
+
+        fetchAndPatch();
+    }, [data?.primary?.tab1?.role_name, data?.secondary?.tab1?.role_name, data?.tertiary?.tab1?.role_name]);
+
+
     if (loading) {
         return (
-            <div className="career-agent-page" style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#ffffff' }}>
+            <div className="career-agent-page" style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--navy)' }}>
                 <div className="pulse-ring" style={{ width: '80px', height: '80px' }}></div>
-                <div style={{ width: '70px', height: '70px', borderRadius: '18px', background: '#f8fafc', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(37,99,235,0.1)', position: 'relative', zIndex: 2 }}>
+                <div style={{ width: '70px', height: '70px', borderRadius: '18px', background: 'var(--navy2)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(37,99,235,0.1)', position: 'relative', zIndex: 2 }}>
                     <Sparkles size={32} color="var(--accent)" className="animate-pulse" />
                 </div>
                 <h2 style={{ marginTop: '1.5rem', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text1)' }}>Synchronizing Intelligence...</h2>
@@ -109,12 +185,13 @@ const CareerAgentDashboard = () => {
     const currentData = getSafeRole(activeRole === 1 ? primary : activeRole === 2 ? secondary : tertiary);
     const roleName = currentData.tab1?.role_name || 'Selected Role';
 
-    // Read user's originally selected preferences from onboarding
+    // Read user's originally selected preferences — use analysis direction data first (avoids stale localStorage)
     const _draft = (() => { try { return JSON.parse(localStorage.getItem('smaart_onboarding_draft') || '{}'); } catch { return {}; } })();
     const _dp = _draft?.preferences || {};
-    const prefPrimary = localStorage.getItem('smaart_pref_primary') || _dp.primary?.careerDirectionName || _dp.primary?.role || primary?.tab1?.role_name || 'Primary';
-    const prefSecondary = localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
-    const prefTertiary = localStorage.getItem('smaart_pref_tertiary') || _dp.tertiary?.careerDirectionName || _dp.tertiary?.role || tertiary?.tab1?.role_name || 'Tertiary';
+    // Priority: analysis direction name → localStorage pref key → draft pref → role name
+    const prefPrimary   = primary?.direction?.directionName   || localStorage.getItem('smaart_pref_primary')   || _dp.primary?.careerDirectionName   || _dp.primary?.role   || primary?.tab1?.role_name   || 'Primary';
+    const prefSecondary = secondary?.direction?.directionName || localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
+    const prefTertiary  = tertiary?.direction?.directionName  || localStorage.getItem('smaart_pref_tertiary')  || _dp.tertiary?.careerDirectionName  || _dp.tertiary?.role  || tertiary?.tab1?.role_name  || 'Tertiary';
 
     // Build allDirections array for MarketIntelligence — includes roles from each direction
     const buildDirRoles = (roleData) => {
@@ -161,7 +238,7 @@ const CareerAgentDashboard = () => {
     const matchScore = parseInt(currentData.match_explanation?.match(/\d+/) || 75);
 
     return (
-        <div className="career-agent-page" style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingTop: '56px' }}>
+        <div className="career-agent-page">
 
             {/* ── Selection Flow Modal ── */}
             {showSelectionFlow && (
@@ -240,15 +317,24 @@ const CareerAgentDashboard = () => {
                                             Interested
                                         </button>
                                         <button 
-                                            onClick={() => setSelectionStates(prev => ({ ...prev, [item.key]: 'not_interested' }))}
+                                            onClick={() => {
+                                                // Immediately navigate to THAT tier's specific preference step
+                                                // Primary=Step3, Secondary=Step4, Tertiary=Step5
+                                                const TIER_STEP = { primary: 3, secondary: 4, tertiary: 5 };
+                                                setShowSelectionFlow(false);
+                                                navigate('/dashboard/career-agent/onboarding', {
+                                                    state: {
+                                                        startStep: TIER_STEP[item.key],
+                                                        editTier: item.key
+                                                    }
+                                                });
+                                            }}
                                             style={{
                                                 flex: 1, padding: '0.7rem', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 800,
-                                                background: selectionStates[item.key] === 'not_interested' ? 'rgba(239, 68, 68, 0.05)' : 'transparent',
-                                                border: '1.5px solid', 
-                                                borderColor: selectionStates[item.key] === 'not_interested' ? 'var(--red)' : 'var(--border2)',
-                                                color: selectionStates[item.key] === 'not_interested' ? 'var(--red)' : 'var(--muted)',
+                                                background: 'transparent',
+                                                border: '1.5px solid var(--border2)',
+                                                color: 'var(--muted)',
                                                 cursor: 'pointer', transition: 'all 0.2s',
-                                                boxShadow: selectionStates[item.key] === 'not_interested' ? '0 4px 12px rgba(239, 68, 68, 0.08)' : 'none'
                                             }}
                                         >
                                             Not Interested
@@ -330,39 +416,47 @@ const CareerAgentDashboard = () => {
                 <div className="dash-top">
                     <div>
                         <div className="dash-name">Career <span>Intelligence</span> Report</div>
-                        <div className="dash-meta" style={{ display: 'flex', gap: '1rem' }}>
+                        <div className="dash-meta">
                             <span>CANDIDATE: {localStorage.getItem('smaart_student_name') || 'Student'}</span>
-                            <span style={{ color: 'var(--muted)' }}>|</span>
+                            <span>|</span>
                             <span>{localStorage.getItem('smaart_student_email')}</span>
                         </div>
                     </div>
-                    <div className="dash-actions" style={{ display: 'flex', gap: '0.6rem' }}>
-                        <button className="btn-ghost" onClick={() => window.print()}>Print Report</button>
+                    <div className="dash-actions">
+                        {lockedRoles.length > 0 ? (
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                                padding: '0.55rem 1.1rem',
+                                background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)',
+                                borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)',
+                            }}>
+                                <Lock size={14} /> Path Locked In
+                            </div>
+                        ) : (
+                            <button
+                                className="btn-ghost"
+                                onClick={() => handleLockPath(currentData?.tab1?.role_name)}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                            >
+                                <Lock size={14} /> Lock This Path
+                            </button>
+                        )}
                         <button className="btn-primary" onClick={() => navigate('/dashboard/career-agent/onboarding')}>New Analysis</button>
                     </div>
                 </div>
 
                 <div className="role-tabs-bar">
                     <button className={`rtab ${activeRole === 1 ? 'active' : ''}`} onClick={() => setActiveRole(1)}>
-                        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: activeRole === 1 ? 700 : 600 }}>
-                                <Trophy size={16} color={activeRole === 1 ? "var(--green)" : "var(--muted)"} /> {prefPrimary}
-                            </span>
-                        </span>
+                        <Trophy size={15} />
+                        {prefPrimary}
                     </button>
                     <button className={`rtab ${activeRole === 2 ? 'active' : ''}`} onClick={() => setActiveRole(2)}>
-                        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: activeRole === 2 ? 700 : 600 }}>
-                                <Medal size={16} color={activeRole === 2 ? "var(--amber)" : "var(--muted)"} /> {prefSecondary}
-                            </span>
-                        </span>
+                        <Medal size={15} />
+                        {prefSecondary}
                     </button>
                     <button className={`rtab ${activeRole === 3 ? 'active' : ''}`} onClick={() => setActiveRole(3)}>
-                        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: activeRole === 3 ? 700 : 600 }}>
-                                <Target size={16} color={activeRole === 3 ? "var(--red)" : "var(--muted)"} /> {prefTertiary}
-                            </span>
-                        </span>
+                        <Target size={15} />
+                        {prefTertiary}
                     </button>
                 </div>
             </header>
@@ -376,7 +470,7 @@ const CareerAgentDashboard = () => {
                         </div>
                     </div>
 
-                    <div className="sidebar-nav" style={{ marginTop: '1rem' }}>
+                    <div className="sidebar-nav">
                         {panels.map(p => (
                             <button
                                 key={p.id}
@@ -389,10 +483,10 @@ const CareerAgentDashboard = () => {
                         ))}
                     </div>
 
-                    <div style={{ marginTop: 'auto', padding: '1.5rem', borderTop: '1px solid var(--border)' }}>
-                        <div className="ri-card" style={{ padding: '0.8rem', background: 'var(--navy3)' }}>
-                            <div className="ri-label" style={{ fontSize: '0.55rem' }}>Account Status</div>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>PREMIUM ACCESS</div>
+                    <div className="sidebar-footer">
+                        <div className="ri-card">
+                            <div className="ri-label">Account Status</div>
+                            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent)', marginTop: '0.2rem' }}>PREMIUM ACCESS</div>
                         </div>
                     </div>
                 </aside>
@@ -479,24 +573,7 @@ const CareerAgentDashboard = () => {
                                     }}>
                                         <Lock size={14} /> Path Locked In
                                     </div>
-                                ) : (
-                                    /* Lock button */
-                                    <button
-                                        onClick={() => handleLockPath(currentData.tab1.role_name)}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                            padding: '0.6rem 1.2rem',
-                                            background: 'var(--navy2)', border: '1px solid var(--border)',
-                                            borderRadius: '10px', cursor: 'pointer',
-                                            fontSize: '0.8rem', fontWeight: 700, color: 'var(--text1)',
-                                            transition: 'all 0.2s', flexShrink: 0,
-                                        }}
-                                        onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(79,142,247,0.5)'; e.currentTarget.style.color = 'var(--accent)'; }}
-                                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text1)'; }}
-                                    >
-                                        <Lock size={14} /> Lock In This Path
-                                    </button>
-                                )}
+                                ) : null}
                             </div>
                             <DirectionOverview
                                 directionData={currentData?.direction || null}
