@@ -37,7 +37,7 @@ const EditorTopBar = ({
       : "Ready";
 
   return (
-    <div className="flex h-16 items-center justify-between gap-2 border-b border-slate-200/60 bg-white/80 px-2 text-slate-900 shadow-[0_12px_40px_-20px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:border-slate-800/50 dark:bg-[#0d1626]/80 dark:text-white sm:px-3">
+    <div className="flex h-16 items-center justify-between gap-2 border-b border-slate-200/50 bg-white/70 px-2 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md dark:border-slate-800/50 dark:bg-[#00152E]/80 dark:text-white sm:px-3">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <Link
           to="/vision-board-pro/gallery"
@@ -87,22 +87,26 @@ const EditorTopBar = ({
       <div className="mx-1 min-w-0 flex-1 md:block">
         <div className="group relative flex min-h-[72px] items-center rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 shadow-inner transition-all focus-within:bg-white dark:border-white/10 dark:bg-slate-900/70">
           <div className="min-w-0 flex-1">
-            {/* <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                Vision Board Studio
-              </p> */}
             <Input
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value);
                 if (handleInstantCheck) handleInstantCheck(e.target.value);
               }}
-              className="h-8 border-0 bg-transparent px-0 text-left text-[18px] font-bold text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 dark:text-white dark:placeholder:text-slate-500"
+              className="h-8 border-0 bg-transparent px-0 text-left text-sm font-bold text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 dark:text-white dark:placeholder:text-slate-500"
               placeholder="Untitled vision board"
             />
           </div>
-          <div className="hidden flex-shrink-0 items-center gap-2 self-start rounded-full border border-emerald-100 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-emerald-600 shadow-sm dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400 xl:flex">
-            {isSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />}
-            {statusLabel}
+          <div className="hidden flex-shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 shadow-sm transition-all dark:border-white/10 dark:bg-slate-900 dark:text-slate-400 xl:flex">
+            {isSaving ? (
+              <Loader2 className="h-3 w-3 animate-spin text-blue-500" />
+            ) : (
+              <div className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </div>
+            )}
+            <span>{statusLabel}</span>
           </div>
         </div>
       </div>

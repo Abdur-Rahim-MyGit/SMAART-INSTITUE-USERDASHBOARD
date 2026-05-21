@@ -12,32 +12,50 @@ const { protect } = require('../middleware/auth');
 const canPost = (role) => ['admin', 'college_admin'].includes(role);
 const isAdmin = (role) => role === 'admin';
 
+const getEntityId = (value) => {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    return value._id || value.id || null;
+  }
+  return null;
+};
+
 // Build the visibility filter based on current user
 const buildVisibilityFilter = (user) => {
   const now = new Date();
-  const baseFilter = {
-    $or: [{ expiryDate: null }, { expiryDate: { $gt: now } }]
-  };
+  const baseConditions = [
+    { $or: [{ expiryDate: null }, { expiryDate: { $gt: now } }] }
+  ];
 
   if (isAdmin(user.role)) {
     // Admin sees everything
-    return baseFilter;
+    return { $and: baseConditions };
   }
 
-  const collegeId = user.college?._id || user.college;
+  const collegeId = getEntityId(user.college);
 
   if (user.role === 'college_admin' || user.role === 'student') {
-    return {
-      ...baseFilter,
-      $or: [
-        { targetType: 'all' },
+    const visibilityConditions = [
+      { targetType: 'all' }
+    ];
+
+    if (collegeId) {
+      visibilityConditions.push(
         { targetType: 'college', targetCollegeIds: collegeId }
+      );
+    }
+
+    return {
+      $and: [
+        ...baseConditions,
+        { $or: visibilityConditions }
       ]
     };
   }
 
   // Fallback (shouldn't really be reached for valid users)
-  return baseFilter;
+  return { $and: baseConditions };
 };
 
 // ─── GET /api/announcements ──────────────────────────────────────────────────
@@ -89,11 +107,19 @@ router.post('/', protect, async (req, res) => {
 
     // College admin can only target their own college
     let resolvedTarget = targetType || 'all';
-    let resolvedCollegeIds = targetCollegeIds || [];
+    let resolvedCollegeIds = Array.isArray(targetCollegeIds) ? targetCollegeIds.filter(Boolean) : [];
 
     if (user.role === 'college_admin') {
+      const collegeId = getEntityId(user.college);
+      if (!collegeId) {
+        return res.status(400).json({
+          success: false,
+          error: 'College admin account must be assigned to a college before posting announcements'
+        });
+      }
+
       resolvedTarget = 'college';
-      resolvedCollegeIds = [user.college?._id || user.college];
+      resolvedCollegeIds = [collegeId];
     }
 
     const announcement = await Announcement.create({

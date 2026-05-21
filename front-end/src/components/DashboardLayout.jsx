@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Languages, X } from "lucide-react";
+import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Globe2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -370,6 +370,15 @@ const DashboardLayout = () => {
   const searchContainerRef = useRef(null);
   const searchInputRef = useRef(null);
   const searchResults = getSearchResults(searchQuery);
+  const languageOptions = [
+    { code: 'en', name: 'English', native: 'English', shortLabel: 'EN' },
+    { code: 'hi', name: 'Hindi', native: 'हिन्दी', shortLabel: 'HI' },
+    { code: 'ta', name: 'Tamil', native: 'தமிழ்', shortLabel: 'TA' },
+    { code: 'ur', name: 'Urdu', native: 'اردو', shortLabel: 'UR' },
+    { code: 'fr', name: 'French', native: 'Français', shortLabel: 'FR' }
+  ];
+  const activeLanguageCode = (i18n.resolvedLanguage || i18n.language || 'en').split('-')[0];
+  const activeLanguage = languageOptions.find((lang) => lang.code === activeLanguageCode) || languageOptions[0];
 
   const handleMouseEnter = () => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
@@ -861,11 +870,22 @@ const DashboardLayout = () => {
                 <div className="relative" ref={languageRef}>
                   <button
                     onClick={() => setShowLanguages(!showLanguages)}
-                    className={`relative p-2 rounded-xl transition-all hover:scale-105 active:scale-95 group ${showLanguages ? 'bg-white dark:bg-[#003170] text-[#1a3884]' : 'text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-[#002A5C]'
+                    className={`relative flex items-center gap-2 rounded-xl border px-2.5 py-2 transition-all hover:scale-[1.02] active:scale-95 group ${showLanguages
+                      ? 'border-[#1a3884]/20 bg-white text-[#1a3884] shadow-sm dark:border-[#5ea0ff]/20 dark:bg-[#003170]'
+                      : 'border-transparent text-slate-500 hover:border-slate-200 hover:bg-white hover:text-[#1a3884] dark:hover:border-white/10 dark:hover:bg-[#002A5C]'
                       }`}
                     aria-label="Change Language"
                   >
-                    <Languages className="w-4.5 h-4.5" />
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${showLanguages
+                      ? 'border-[#1a3884]/15 bg-[#1a3884]/8 dark:border-[#5ea0ff]/20 dark:bg-white/10'
+                      : 'border-slate-200/80 bg-white/80 group-hover:border-[#1a3884]/15 group-hover:bg-[#1a3884]/5 dark:border-white/10 dark:bg-white/5'
+                      }`}>
+                      <Globe2 className="w-4.5 h-4.5" strokeWidth={2} />
+                    </div>
+                    <span className="hidden md:inline text-[11px] font-bold tracking-[0.18em] text-slate-400 group-hover:text-[#1a3884] dark:text-slate-500 dark:group-hover:text-slate-200">
+                      {activeLanguage.shortLabel}
+                    </span>
+                    <ChevronDown className={`hidden md:block w-3.5 h-3.5 transition-transform duration-200 ${showLanguages ? 'rotate-180 text-[#1a3884]' : 'text-slate-400 group-hover:text-[#1a3884]'}`} />
                   </button>
 
                   <AnimatePresence>
@@ -877,26 +897,33 @@ const DashboardLayout = () => {
                         transition={{ duration: 0.2 }}
                         className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-50"
                       >
+                        <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-white/8 dark:bg-white/[0.03]">
+                          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
+                            Language
+                          </p>
+                          <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                            {activeLanguage.name}
+                          </p>
+                        </div>
                         <div className="p-2 space-y-1">
-                          {[
-                            { code: 'en', name: 'English', native: 'English' },
-                            { code: 'hi', name: 'Hindi', native: 'हिन्दी' },
-                            { code: 'ta', name: 'Tamil', native: 'தமிழ்' },
-                            { code: 'ur', name: 'Urdu', native: 'اردو' },
-                            { code: 'fr', name: 'French', native: 'Français' }
-                          ].map((lang) => (
+                          {languageOptions.map((lang) => (
                             <button
                               key={lang.code}
                               onClick={() => {
                                 i18n.changeLanguage(lang.code);
                                 setShowLanguages(false);
                               }}
-                              className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${i18n.language === lang.code
+                              className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeLanguageCode === lang.code
                                 ? 'bg-[#1a3884] text-white'
                                 : 'text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
                                 }`}
                             >
-                              <span>{lang.name}</span>
+                              <div className="flex items-center gap-3">
+                                <span className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[10px] font-black tracking-[0.18em] ${activeLanguageCode === lang.code ? 'bg-white/16 text-white' : 'bg-slate-100 text-slate-500 dark:bg-white/8 dark:text-slate-300'}`}>
+                                  {lang.shortLabel}
+                                </span>
+                                <span>{lang.name}</span>
+                              </div>
                               <span className="text-[10px] opacity-60 font-bold">{lang.native}</span>
                             </button>
                           ))}

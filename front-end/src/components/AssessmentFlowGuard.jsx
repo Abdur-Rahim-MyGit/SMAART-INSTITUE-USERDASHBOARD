@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import DashboardLoader from "@/components/DashboardLoader";
 import useTabSwitchProctor from "@/hooks/useTabSwitchProctor";
 import TabSwitchWarningOverlay from "@/components/TabSwitchWarningOverlay";
+import { clearAssessmentTimerStorage } from "@/utils/assessmentTimerStorage";
 
 /**
  * AssessmentFlowGuard component
@@ -73,6 +74,7 @@ const AssessmentFlowGuard = ({ children }) => {
       } catch (err) {
         console.warn('[AssessmentFlowGuard] Token validation failed:', err.message);
         sessionStorage.clear();
+        clearAssessmentTimerStorage();
         setIsAuthenticated(false);
         navigate("/", { replace: true });
         return false;
@@ -144,6 +146,7 @@ const AssessmentFlowGuard = ({ children }) => {
         if (!parsedUser) {
           console.error("Invalid user data in session (null), clearing...");
           sessionStorage.clear();
+          clearAssessmentTimerStorage();
           setIsAuthenticated(false);
           setLoading(false);
           navigate("/", { replace: true });
@@ -157,6 +160,7 @@ const AssessmentFlowGuard = ({ children }) => {
         if (parsedUser.mustChangePassword === true) {
           console.warn("[AssessmentFlowGuard] mustChangePassword is still true — ejecting to login.");
           sessionStorage.clear();
+          clearAssessmentTimerStorage();
           setIsAuthenticated(false);
           setLoading(false);
           navigate("/", {

@@ -10,9 +10,9 @@ import jobRolesData from './data/jobRolesData.json';
 import indianCities from './data/indianCities.json';
 import useUser from '@/hooks/useUser';
 
-// â”€â”€â”€ Constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Constants
 const SALARY_OPTIONS = [
-  '0â€“3 LPA', '3â€“5 LPA', '5â€“8 LPA', '8â€“12 LPA', '12â€“18 LPA', '18â€“25 LPA', '25+ LPA'
+  '0-3 LPA', '3-5 LPA', '5-8 LPA', '8-12 LPA', '12-18 LPA', '18-25 LPA', '25+ LPA'
 ];
 const JOB_TYPE_OPTIONS = [
   'Full-Time', 'Part-Time', 'Internship (Full-Time)', 'Internship (Part-Time)',
@@ -44,16 +44,19 @@ const getRoles = (sector, family) => {
 // All roles flattened for free-text search
 const ALL_ROLES = jobRolesData.roles.map(r => r.role);
 
-// Education cascading: Level â†’ Domain â†’ DegreeGroup â†’ Specialisation
+// Education cascading: Level -> Domain -> DegreeGroup -> Specialisation
 // Education cascading dynamic helpers
 const getDomains = (eduData, level) => level && eduData[level] ? Object.keys(eduData[level] || {}) : [];
 const getDegreeGroups = (eduData, level, domain) => level && domain && eduData[level]?.[domain] ? Object.keys(eduData[level]?.[domain] || {}) : [];
 const getSpecialisations = (eduData, level, domain, degree) => level && domain && degree ? eduData[level]?.[domain]?.[degree] || [] : [];
 
 const STEPS = ['Personal Details', 'Education', 'Primary Preference', 'Secondary Preference', 'Tertiary Preference', 'Review & Submit'];
+const STEP_DISPLAY_LABELS = ['Personal', 'Education', 'Primary', 'Secondary', 'Tertiary', 'Review'];
+
+const createEmptyValidationState = () => ({ messages: [], fields: {} });
 
 
-// â”€â”€â”€ MultiSelect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// MultiSelect
 function MultiSelect({ options, selected = [], onChange, max = 3, placeholder = 'Select...' }) {
 
   const toggle = (opt) => {
@@ -70,7 +73,7 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder = 
       <div className="tags" style={{ marginBottom: '0.6rem' }}>
         {selected.map(s => (
           <span key={s} className="tag">
-            {s} <button type="button" onClick={() => toggle(s)}>Ã—</button>
+            {s} <button type="button" onClick={() => toggle(s)}>x</button>
           </span>
         ))}
         {selected.length === 0 && <span style={{ color: 'var(--muted)', fontSize: '0.78rem' }}>{placeholder}</span>}
@@ -103,7 +106,7 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder = 
   );
 }
 
-// â”€â”€â”€ RoleSearchInput â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// RoleSearchInput
 function RoleSearchInput({ value, onChange, sector, family, dbRoles = [] }) {
   const [show, setShow] = useState(false);
   const [query, setQuery] = useState(value);
@@ -151,7 +154,7 @@ function RoleSearchInput({ value, onChange, sector, family, dbRoles = [] }) {
   );
 }
 
-// â”€â”€â”€ CitySearchInput â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// CitySearchInput
 function CitySearchInput({ selected = [], onChange, max = 3 }) {
   const [query, setQuery] = useState('');
   const cities = Array.isArray(indianCities) ? indianCities : (indianCities.cities || []);
@@ -171,7 +174,7 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
     <div>
       <div className="tags" style={{ marginBottom: '0.4rem' }}>
         {selected.map(c => (
-          <span key={c} className="tag">{c} <button type="button" onClick={() => remove(c)}>Ã—</button></span>
+          <span key={c} className="tag">{c} <button type="button" onClick={() => remove(c)}>x</button></span>
         ))}
       </div>
       <div style={{ position: 'relative' }}>
@@ -197,7 +200,7 @@ function CitySearchInput({ selected = [], onChange, max = 3 }) {
   );
 }
 
-// â”€â”€â”€ CareerDirectionSelector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// CareerDirectionSelector
 function CareerDirectionSelector({ directions = [], selected = null, onChange, loading = false, excludeRoles = [] }) {
   if (loading) {
     return (
@@ -316,7 +319,7 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
   );
 }
 
-function PrefBlock({ label, colorClass, data, onChange, directions = [], directionsLoading = false, dbRoles = [], excludeRoles = [], excludeDirections = [] }) {
+function PrefBlock({ label, colorClass, data, onChange, directions = [], directionsLoading = false, dbRoles = [], excludeRoles = [], excludeDirections = [], fieldErrors = {} }) {
   const sectors = ALL_SECTORS;
   const up = (field, val) => onChange({ ...data, [field]: val });
 
@@ -338,6 +341,8 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
     gap: '0.8rem',
     textTransform: 'uppercase'
   };
+
+  const fieldErrorClass = (key) => fieldErrors[key] ? 'field-error' : '';
 
   return (
     <div style={{
@@ -363,7 +368,9 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
             <div className="fgrid">
               <div className="fg full">
                 <label className="fl">Desired Job Role <span className="req">*</span></label>
-                <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
+                <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
+                  <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
+                </div>
               </div>
               <div className="fg full">
                 <label className="fl" style={{ marginBottom: '0.6rem', display: 'block' }}>Career Directions</label>
@@ -386,20 +393,24 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
              <div className="fgrid">
                <div className="fg full">
                  <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(56,189,248,0.05)', borderRadius: '8px', border: '1px solid rgba(56,189,248,0.1)' }}>
-                   â„¹ï¸ Career directions mapped to your profile have been selected in previous preferences. Please type a specific desired job role below.
+                   Career directions mapped to your profile have been selected in previous preferences. Please type a specific desired job role below.
                  </div>
                  <label className="fl">Desired Job Role <span className="req">*</span></label>
-                 <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
+                 <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
+                   <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
+                 </div>
                </div>
              </div>
           ) : (
             <div className="fgrid">
               <div className="fg full">
                 <div style={{ fontSize: '0.72rem', color: 'var(--text2)', marginBottom: '0.8rem', padding: '0.6rem 0.9rem', background: 'rgba(245,158,11,0.05)', borderRadius: '8px', border: '1px solid rgba(245,158,11,0.1)' }}>
-                  âš ï¸ Complete your Education details first to load directions, or type a role below.
+                  Complete your Education details first to load directions, or type a role below.
                 </div>
                 <label className="fl">Desired Job Role <span className="req">*</span></label>
-                <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
+                <div className={fieldErrorClass(`preferences.${colorClass}.role`)}>
+                  <RoleSearchInput value={data.role || ''} onChange={v => up('role', v)} dbRoles={dbRoles.filter(r => !excludeRoles.includes(r))} />
+                </div>
               </div>
             </div>
           )}
@@ -416,19 +427,21 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
               </select>
             </div>
             <div className="fg">
-              <label className="fl">Expected CTC (Range)</label>
-              <select value={data.salary || ''} onChange={e => up('salary', e.target.value)}>
+              <label className="fl">Expected CTC (Range) <span className="req">*</span></label>
+              <select className={fieldErrorClass(`preferences.${colorClass}.salary`)} value={data.salary || ''} onChange={e => up('salary', e.target.value)}>
                 <option value="">Select range...</option>
                 {SALARY_OPTIONS.map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
             <div className="fg full">
-              <label className="fl">Location Preferences (Max 3)</label>
-              <CitySearchInput
-                selected={Array.isArray(data.locations) ? data.locations : (data.location ? [data.location] : [])}
-                onChange={v => onChange({ ...data, locations: v, location: v[0] || '' })}
-                max={3}
-              />
+              <label className="fl">Location Preferences (Max 3) <span className="req">*</span></label>
+              <div className={fieldErrorClass(`preferences.${colorClass}.locations`)}>
+                <CitySearchInput
+                  selected={Array.isArray(data.locations) ? data.locations : (data.location ? [data.location] : [])}
+                  onChange={v => onChange({ ...data, locations: v, location: v[0] || '' })}
+                  max={3}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -437,14 +450,16 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem' }}>
           <div style={sectionLabelStyle}><span style={{ color: '#a78bfa', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Briefcase size={16} /> 03</span> Organization Fit</div>
           <div className="fg full">
-            <label className="fl">Target Cultures (Multi)</label>
-            <MultiSelect
-              options={ORG_TYPE_OPTIONS}
-              selected={Array.isArray(data.orgTypes) ? data.orgTypes : (data.orgType ? [data.orgType] : [])}
-              onChange={v => onChange({ ...data, orgTypes: v })}
-              max={3}
-              placeholder="e.g. MNC, Startup, Public Sector..."
-            />
+            <label className="fl">Target Cultures (Multi) <span className="req">*</span></label>
+            <div className={fieldErrorClass(`preferences.${colorClass}.orgTypes`)}>
+              <MultiSelect
+                options={ORG_TYPE_OPTIONS}
+                selected={Array.isArray(data.orgTypes) ? data.orgTypes : (data.orgType ? [data.orgType] : [])}
+                onChange={v => onChange({ ...data, orgTypes: v })}
+                max={3}
+                placeholder="e.g. MNC, Startup, Public Sector..."
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -452,7 +467,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
   );
 }
 
-// â”€â”€â”€ TagInput (Simple) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// TagInput (Simple)
 function TagInput({ tags = [], onChange, placeholder = "Type & press Enter..." }) {
   const [input, setInput] = useState('');
   const add = () => {
@@ -464,7 +479,7 @@ function TagInput({ tags = [], onChange, placeholder = "Type & press Enter..." }
     <div>
       <div className="tags" style={{ marginBottom: '0.5rem' }}>
         {tags.map(t => (
-          <span key={t} className="tag">{t} <button type="button" onClick={() => onChange(tags.filter(x => x !== t))}>Ã—</button></span>
+          <span key={t} className="tag">{t} <button type="button" onClick={() => onChange(tags.filter(x => x !== t))}>x</button></span>
         ))}
       </div>
       <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -479,7 +494,7 @@ function TagInput({ tags = [], onChange, placeholder = "Type & press Enter..." }
   );
 }
 
-// â”€â”€â”€ SkillSection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// SkillSection
 function SkillSection({ skills, onChange }) {
   const [name, setName] = useState('');
   const [status, setStatus] = useState('Verified');
@@ -551,8 +566,8 @@ function SkillSection({ skills, onChange }) {
         {skills.map((s, idx) => (
           <span key={idx} className="tag" style={{ padding: '0.5rem 1rem', borderLeft: `5px solid ${s.status === 'Verified' ? 'var(--accent)' : 'var(--amber)'}`, background: 'rgba(255,255,255,0.04)' }}>
             <strong>{s.name}</strong>
-            <span style={{ fontSize: '0.65rem', opacity: 0.8, marginLeft: '0.5rem', color: s.status === 'Verified' ? 'var(--accent)' : 'var(--amber)' }}>â— {s.status.toUpperCase()}</span>
-            <button type="button" onClick={() => onChange(skills.filter((_, i) => i !== idx))} style={{ marginLeft: '0.8rem', opacity: 0.6 }}>Ã—</button>
+            <span style={{ fontSize: '0.65rem', opacity: 0.8, marginLeft: '0.5rem', color: s.status === 'Verified' ? 'var(--accent)' : 'var(--amber)' }}>STATUS: {s.status.toUpperCase()}</span>
+            <button type="button" onClick={() => onChange(skills.filter((_, i) => i !== idx))} style={{ marginLeft: '0.8rem', opacity: 0.6 }}>x</button>
           </span>
         ))}
         {skills.length === 0 && <p style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center', padding: '1rem' }}>No skills added yet. Add your verified and self-learnt skills above.</p>}
@@ -566,13 +581,14 @@ function SkillSection({ skills, onChange }) {
   );
 }
 
-// â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Main Component
 const CareerAgentOnboarding = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [validationState, setValidationState] = useState(createEmptyValidationState);
   const [eduData, setEduData] = useState({});
   const [dbRoles, setDbRoles] = useState([]);
 
@@ -586,7 +602,7 @@ const CareerAgentOnboarding = () => {
       .catch(err => console.error('Failed to load career roles:', err));
   }, []);
 
-  // â”€â”€â”€ AUTO-FILL PERSONAL DETAILS FROM PROFILE â”€â”€â”€
+  // AUTO-FILL PERSONAL DETAILS FROM PROFILE
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -736,9 +752,157 @@ const CareerAgentOnboarding = () => {
   const isUG = formData.education.some(edu => edu.level === 'Undergraduate (UG)');
   const isPG = formData.education.some(edu => edu.level === 'Postgraduate (PG)');
 
+  const setFieldError = (fields, key) => {
+    fields[key] = true;
+  };
+
+  const getPreferenceSelections = (pref) => ({
+    locations: Array.isArray(pref?.locations) ? pref.locations : (pref?.location ? [pref.location] : []),
+    orgTypes: Array.isArray(pref?.orgTypes) ? pref.orgTypes : (pref?.orgType ? [pref.orgType] : [])
+  });
+
+  // ── Step Validation Logic ──────────────────────────────────────────────
+  const validateStep = (currentStep) => {
+    const messages = [];
+    const fields = {};
+    switch (currentStep) {
+      case 1: {
+        if (!formData.personalDetails.name?.trim()) {
+          messages.push('Full Name is required');
+          setFieldError(fields, 'personal.name');
+        }
+        if (!formData.personalDetails.email?.trim()) {
+          messages.push('Email Address is required');
+          setFieldError(fields, 'personal.email');
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.personalDetails.email.trim())) {
+          messages.push('Please enter a valid email address');
+          setFieldError(fields, 'personal.email');
+        }
+        if (!formData.personalDetails.phone?.trim()) {
+          messages.push('Phone Number is required');
+          setFieldError(fields, 'personal.phone');
+        } else if (!/^\d{10}$/.test(formData.personalDetails.phone.trim())) {
+          messages.push('Phone Number must be a valid 10-digit mobile number');
+          setFieldError(fields, 'personal.phone');
+        }
+        if (!formData.personalDetails.registrationNumber?.trim()) {
+          messages.push('Registration Number is required');
+          setFieldError(fields, 'personal.registrationNumber');
+        }
+        break;
+      }
+      case 2: {
+        const primaryEdu = formData.education[0];
+        if (!primaryEdu?.level) {
+          messages.push('Degree Level is required');
+          setFieldError(fields, 'education.0.level');
+        }
+        if (!primaryEdu?.domain) {
+          messages.push('Domain is required');
+          setFieldError(fields, 'education.0.domain');
+        }
+        if (!primaryEdu?.degreeGroup) {
+          messages.push('Degree Group is required');
+          setFieldError(fields, 'education.0.degreeGroup');
+        }
+        if (!primaryEdu?.specialisation?.length) {
+          messages.push('At least one Specialisation must be selected');
+          setFieldError(fields, 'education.0.specialisation');
+        }
+        if (!primaryEdu?.graduationYear?.toString().trim()) {
+          messages.push('Graduation Year is required');
+          setFieldError(fields, 'education.0.graduationYear');
+        }
+        break;
+      }
+      case 3: {
+        const pref = formData.preferences.primary;
+        const { locations, orgTypes } = getPreferenceSelections(pref);
+        if (!pref?.role?.trim()) {
+          messages.push('Select a Career Direction or type a Desired Job Role');
+          setFieldError(fields, 'preferences.primary.role');
+        }
+        if (!pref?.salary) {
+          messages.push('Select the expected CTC range');
+          setFieldError(fields, 'preferences.primary.salary');
+        }
+        if (!locations.length) {
+          messages.push('Add at least one preferred location');
+          setFieldError(fields, 'preferences.primary.locations');
+        }
+        if (!orgTypes.length) {
+          messages.push('Select at least one target culture');
+          setFieldError(fields, 'preferences.primary.orgTypes');
+        }
+        break;
+      }
+      case 4: {
+        const pref = formData.preferences.secondary;
+        const { locations, orgTypes } = getPreferenceSelections(pref);
+        if (!pref?.role?.trim()) {
+          messages.push('Select a Career Direction or type a Desired Job Role');
+          setFieldError(fields, 'preferences.secondary.role');
+        }
+        if (!pref?.salary) {
+          messages.push('Select the expected CTC range');
+          setFieldError(fields, 'preferences.secondary.salary');
+        }
+        if (!locations.length) {
+          messages.push('Add at least one preferred location');
+          setFieldError(fields, 'preferences.secondary.locations');
+        }
+        if (!orgTypes.length) {
+          messages.push('Select at least one target culture');
+          setFieldError(fields, 'preferences.secondary.orgTypes');
+        }
+        break;
+      }
+      case 5: {
+        const pref = formData.preferences.tertiary;
+        const { locations, orgTypes } = getPreferenceSelections(pref);
+        if (!pref?.role?.trim()) {
+          messages.push('Select a Career Direction or type a Desired Job Role');
+          setFieldError(fields, 'preferences.tertiary.role');
+        }
+        if (!pref?.salary) {
+          messages.push('Select the expected CTC range');
+          setFieldError(fields, 'preferences.tertiary.salary');
+        }
+        if (!locations.length) {
+          messages.push('Add at least one preferred location');
+          setFieldError(fields, 'preferences.tertiary.locations');
+        }
+        if (!orgTypes.length) {
+          messages.push('Select at least one target culture');
+          setFieldError(fields, 'preferences.tertiary.orgTypes');
+        }
+        break;
+      }
+      default: break;
+    }
+    return { messages, fields };
+  };
+
+  // Clear validation errors whenever the step changes
+  useEffect(() => { setValidationState(createEmptyValidationState()); }, [step]);
+
+  const getFieldErrorClass = (key) => validationState.fields[key] ? 'field-error' : '';
+  const currentStepValidation = validateStep(step);
+  const isCurrentStepComplete = currentStepValidation.messages.length === 0;
+
   const handleNext = async () => {
+    const nextValidation = validateStep(step);
+    if (nextValidation.messages.length > 0) {
+      setValidationState(nextValidation);
+      // Scroll to bottom so the user sees the validation banner near the button
+      setTimeout(() => {
+        const banner = document.querySelector('.validation-banner');
+        if (banner) banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+      return;
+    }
+    setValidationState(createEmptyValidationState());
     if (step === 1) await savePersonalDetails();
-    // Steps 1-5 are sequential; step 6 is Review & Submit (skip old 6 & 7)
     setStep(s => s + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -755,7 +919,7 @@ const CareerAgentOnboarding = () => {
       };
       const res = await axios.post('/api/career-agent/onboarding', payload, { withCredentials: true });
 
-      // â”€â”€ Normalise both response shapes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // Normalise both response shapes
       // Normal:   {status: 'success', analysis: {...} }
       // Cache hit: {success: true, cached: true, data: {output_generated_report: {...} } }
       let analysisData = res.data?.analysis
@@ -764,7 +928,7 @@ const CareerAgentOnboarding = () => {
         || (res.data?.data && typeof res.data.data === 'object' ? res.data.data : null);
 
       const analysisId = res.data?.id || res.data?.data?.id || Date.now().toString();
-      // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+      // Response normalization
 
       if (analysisData) {
         localStorage.setItem('smaart_analysis', JSON.stringify(analysisData));
@@ -891,33 +1055,34 @@ const CareerAgentOnboarding = () => {
   return (
     <PageTransition>
     <div className="career-agent-page screen-onboard">
-      {/* â”€â”€ STEP PROGRESS INDICATOR â”€â”€ */}
-      <div style={{ maxWidth: '680px', margin: '0 auto 2.5rem', padding: '0 1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+      {/* STEP PROGRESS INDICATOR */}
+      <div style={{ maxWidth: '920px', margin: '0 auto 3rem', padding: '0 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem' }}>
           {STEPS.map((label, idx) => {
             const sn = idx + 1;
             const isDone = step > sn;
             const isActive = step === sn;
+            const displayLabel = STEP_DISPLAY_LABELS[idx] || label;
             return (
               <React.Fragment key={sn}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem', minWidth: '60px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.7rem', minWidth: '92px', flex: '0 0 92px' }}>
                   <div style={{
-                    width: '30px', height: '30px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.72rem', fontWeight: 800, transition: 'all 0.3s',
+                    width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '0.8rem', fontWeight: 800, transition: 'all 0.3s',
                     background: isDone ? '#10b981' : isActive ? 'var(--accent)' : '#f1f5f9',
                     color: isDone || isActive ? '#fff' : '#94a3b8',
                     border: isActive ? '2px solid var(--accent)' : isDone ? '2px solid #10b981' : '2px solid #e2e8f0',
                     boxShadow: isActive ? '0 0 0 4px rgba(37,99,235,0.12)' : 'none',
-                    transform: isActive ? 'scale(1.12)' : 'scale(1)',
+                    transform: isActive ? 'scale(1.08)' : 'scale(1)',
                   }}>
-                    {isDone ? 'âœ“' : sn}
+                    {isDone ? 'OK' : sn}
                   </div>
-                  <span style={{ fontSize: '0.52rem', fontWeight: 700, color: isActive ? 'var(--accent)' : isDone ? '#10b981' : '#94a3b8', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.03em', lineHeight: 1.2 }}>
-                    {label}
+                  <span style={{ fontSize: '0.66rem', fontWeight: 700, color: isActive ? 'var(--accent)' : isDone ? '#10b981' : '#94a3b8', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1.35, maxWidth: '92px', whiteSpace: 'normal' }}>
+                    {displayLabel}
                   </span>
                 </div>
                 {idx < STEPS.length - 1 && (
-                  <div style={{ flex: 1, height: '2px', background: step > sn ? '#10b981' : '#e2e8f0', borderRadius: '2px', marginBottom: '18px', transition: 'background 0.3s' }} />
+                  <div style={{ flex: 1, minWidth: '18px', height: '2px', background: step > sn ? '#10b981' : '#e2e8f0', borderRadius: '2px', marginTop: '18px', transition: 'background 0.3s' }} />
                 )}
               </React.Fragment>
             );
@@ -926,7 +1091,7 @@ const CareerAgentOnboarding = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        {/* â”€â”€ STEP 1: PERSONAL DETAILS â€” CLEAN & SIMPLE â”€â”€ */}
+        {/* STEP 1: PERSONAL DETAILS */}
         {step === 1 && (
           <div className="form-card">
             <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><User size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
@@ -953,7 +1118,7 @@ const CareerAgentOnboarding = () => {
               {/* Full Name */}
               <div className="fg">
                 <label className="fl">Full Name <span className="req">*</span></label>
-                <input type="text" required placeholder="e.g. Priya Sharma"
+                <input className={getFieldErrorClass('personal.name')} type="text" required placeholder="e.g. Priya Sharma"
                   value={formData.personalDetails.name}
                   onChange={e => updatePersonal('name', e.target.value)}
                 />
@@ -962,7 +1127,7 @@ const CareerAgentOnboarding = () => {
               {/* Email Address */}
               <div className="fg">
                 <label className="fl">Email Address <span className="req">*</span></label>
-                <input type="email" required placeholder="your@email.com"
+                <input className={getFieldErrorClass('personal.email')} type="email" required placeholder="your@email.com"
                   value={formData.personalDetails.email}
                   onChange={e => updatePersonal('email', e.target.value)}
                 />
@@ -970,8 +1135,8 @@ const CareerAgentOnboarding = () => {
 
               {/* Phone Number */}
               <div className="fg">
-                <label className="fl">Phone Number</label>
-                <input type="tel" placeholder="10-digit mobile number"
+                <label className="fl">Phone Number <span className="req">*</span></label>
+                <input className={getFieldErrorClass('personal.phone')} type="tel" placeholder="10-digit mobile number"
                   value={formData.personalDetails.phone}
                   onChange={e => updatePersonal('phone', e.target.value)}
                   maxLength={10}
@@ -980,8 +1145,8 @@ const CareerAgentOnboarding = () => {
 
               {/* Registration Number */}
               <div className="fg">
-                <label className="fl">Registration Number</label>
-                <input type="text" placeholder="e.g. REG-12345"
+                <label className="fl">Registration Number <span className="req">*</span></label>
+                <input className={getFieldErrorClass('personal.registrationNumber')} type="text" placeholder="e.g. REG-12345"
                   value={formData.personalDetails.registrationNumber}
                   onChange={e => updatePersonal('registrationNumber', e.target.value)}
                 />
@@ -997,13 +1162,13 @@ const CareerAgentOnboarding = () => {
         )}
 
 
-        {/* â”€â”€ STEP 2: EDUCATION â€” MULTIPLE SUPPORT â”€â”€ */}
+        {/* STEP 2: EDUCATION */}
         {step === 2 && (
           <div className="form-card">
             <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><GraduationCap size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Education</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: '0.1rem', fontWeight: 400 }}>Your academic background â€” you can add up to 3 qualifications.</div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: '0.1rem', fontWeight: 400 }}>Your academic background - you can add up to 3 qualifications.</div>
               </div>
               <span className="step-tag">STEP 2 / 6</span>
             </div>
@@ -1034,7 +1199,7 @@ const CareerAgentOnboarding = () => {
                     {/* Level */}
                     <div className="fg">
                       <label className="fl">Degree Level <span className="req">*</span></label>
-                      <select required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)}>
+                      <select className={i === 0 ? getFieldErrorClass('education.0.level') : ''} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)}>
                         <option value="">Select Level...</option>
                         {Object.keys(eduData).map(l => <option key={l}>{l}</option>)}
                       </select>
@@ -1043,7 +1208,7 @@ const CareerAgentOnboarding = () => {
                     {/* Domain */}
                     <div className="fg">
                       <label className="fl">Domain <span className="req">*</span></label>
-                      <select required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled={!edu.level}>
+                      <select className={i === 0 ? getFieldErrorClass('education.0.domain') : ''} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled={!edu.level}>
                         <option value="">Select Domain...</option>
                         {getDomains(eduData, edu.level).map(d => <option key={d}>{d}</option>)}
                       </select>
@@ -1052,7 +1217,7 @@ const CareerAgentOnboarding = () => {
                     {/* Degree Group */}
                     <div className="fg">
                       <label className="fl">Degree Group <span className="req">*</span></label>
-                      <select required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled={!edu.domain}>
+                      <select className={i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled={!edu.domain}>
                         <option value="">Select Degree...</option>
                         {getDegreeGroups(eduData, edu.level, edu.domain).map(d => <option key={d}>{d}</option>)}
                       </select>
@@ -1060,20 +1225,22 @@ const CareerAgentOnboarding = () => {
 
                     {/* Graduation Year */}
                     <div className="fg">
-                      <label className="fl">Year of Graduation / Expected</label>
-                      <input type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} />
+                      <label className="fl">Year of Graduation / Expected <span className="req">*</span></label>
+                      <input className={i === 0 ? getFieldErrorClass('education.0.graduationYear') : ''} type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} />
                     </div>
 
                     {/* Specialisation (Multi) */}
                     <div className="fg">
                       <label className="fl">Specialisation(s) <span className="req">*</span></label>
-                      <MultiSelect
-                        options={getSpecialisations(eduData, edu.level, edu.domain, edu.degreeGroup)}
-                        selected={edu.specialisation || []}
-                        onChange={v => updateEdu(i, 'specialisation', v)}
-                        max={2}
-                        placeholder="Select specialisation(s)..."
-                      />
+                      <div className={i === 0 ? getFieldErrorClass('education.0.specialisation') : ''}>
+                        <MultiSelect
+                          options={getSpecialisations(eduData, edu.level, edu.domain, edu.degreeGroup)}
+                          selected={edu.specialisation || []}
+                          onChange={v => updateEdu(i, 'specialisation', v)}
+                          max={2}
+                          placeholder="Select specialisation(s)..."
+                        />
+                      </div>
                     </div>
 
                     {/* Currently Pursuing */}
@@ -1100,7 +1267,7 @@ const CareerAgentOnboarding = () => {
           </div>
         )}
 
-        {/* â”€â”€ STEP 3: PRIMARY PREFERENCE â”€â”€ */}
+        {/* STEP 3: PRIMARY PREFERENCE */}
         {step === 3 && (
           <div className="form-card">
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
@@ -1112,14 +1279,14 @@ const CareerAgentOnboarding = () => {
                   <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Primary Preference</span>
                   <span className="step-tag">STEP 3 / 6</span>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your main career direction â€” used for your deepest intelligence analysis.</p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your main career direction - used for your deepest intelligence analysis.</p>
               </div>
             </div>
-            <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} />
+            <PrefBlock label="Primary Preference" colorClass="primary" data={formData.preferences.primary} onChange={d => updatePref('primary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[]} excludeDirections={[]} fieldErrors={validationState.fields} />
           </div>
         )}
 
-        {/* â”€â”€ STEP 4: SECONDARY PREFERENCE â”€â”€ */}
+        {/* STEP 4: SECONDARY PREFERENCE */}
         {step === 4 && (
           <div className="form-card">
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
@@ -1131,14 +1298,14 @@ const CareerAgentOnboarding = () => {
                   <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Secondary Preference</span>
                   <span className="step-tag">STEP 4 / 6</span>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your alternative path â€” helps calculate market zone overlap.</p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your alternative path - helps calculate market zone overlap.</p>
               </div>
             </div>
-            <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} />
+            <PrefBlock label="Secondary Preference" colorClass="secondary" data={formData.preferences.secondary} onChange={d => updatePref('secondary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
           </div>
         )}
 
-        {/* â”€â”€ STEP 5: TERTIARY PREFERENCE â”€â”€ */}
+        {/* STEP 5: TERTIARY PREFERENCE */}
         {step === 5 && (
           <div className="form-card">
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
@@ -1150,20 +1317,20 @@ const CareerAgentOnboarding = () => {
                   <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Tertiary Preference</span>
                   <span className="step-tag">STEP 5 / 6</span>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your backup or curiosity direction â€” gives a complete market view.</p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your backup or curiosity direction - gives a complete market view.</p>
               </div>
             </div>
-            <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} />
+            <PrefBlock label="Tertiary Preference" colorClass="tertiary" data={formData.preferences.tertiary} onChange={d => updatePref('tertiary', d)} directions={careerDirections} directionsLoading={directionsLoading} dbRoles={dbRoles} excludeRoles={[formData.preferences.primary?.role, formData.preferences.secondary?.role].filter(Boolean)} excludeDirections={[formData.preferences.primary?.careerDirectionId, formData.preferences.secondary?.careerDirectionId].filter(Boolean)} fieldErrors={validationState.fields} />
           </div>
         )}
 
-        {/* â”€â”€ STEP 6: REVIEW & SUBMIT â”€â”€ */}
+        {/* ── STEP 6: REVIEW & SUBMIT ── */}
         {step === 6 && (
           <div className="form-card">
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '2rem' }}>
               <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(16,185,129,0.2)' }}>
-                <CheckCircle size={22} color="#10b981" />
+        {/* STEP 6: REVIEW & SUBMIT */}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
@@ -1186,7 +1353,7 @@ const CareerAgentOnboarding = () => {
                 {formData.education.map((edu, idx) => (
                   <div key={idx} style={{ marginBottom: idx < formData.education.length - 1 ? '0.6rem' : 0 }}>
                     <p style={{ fontSize: '0.9rem', color: 'var(--text1)', fontWeight: 700 }}>{edu.degreeGroup || 'Not set'} {edu.specialisation?.length > 0 ? `in ${edu.specialisation.join(', ')}` : ''}</p>
-                    {edu.graduationYear && <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.1rem' }}>Class of {edu.graduationYear}{edu.currentlyPursuing ? ' Â· Currently Pursuing' : ''}</p>}
+                    {edu.graduationYear && <p style={{ fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.1rem' }}>Class of {edu.graduationYear}{edu.currentlyPursuing ? ' - Currently Pursuing' : ''}</p>}
                   </div>
                 ))}
               </div>
@@ -1203,7 +1370,7 @@ const CareerAgentOnboarding = () => {
                       <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                         <span style={{ fontSize: '0.6rem', fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.06em', minWidth: '60px' }}>{label}</span>
                         <span style={{ fontSize: '0.88rem', color: 'var(--text1)', fontWeight: 600 }}>{val?.careerDirectionName || val?.role}</span>
-                        {val?.role && val?.careerDirectionName && <span style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>â†’ {val.role}</span>}
+                        {val?.role && val?.careerDirectionName && <span style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>Role: {val.role}</span>}
                       </div>
                     )
                   ))}
@@ -1214,13 +1381,13 @@ const CareerAgentOnboarding = () => {
 
             {error && (
               <div style={{ color: '#ef4444', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', padding: '1rem', marginBottom: '1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                âš ï¸ {error}
+                {error}
               </div>
             )}
 
             <div style={{ background: 'linear-gradient(135deg,rgba(37,99,235,0.06),rgba(34,211,238,0.03))', border: '1px solid rgba(37,99,235,0.15)', borderRadius: '14px', padding: '1rem 1.2rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
               <Sparkles size={16} color="var(--accent)" style={{ flexShrink: 0 }} />
-              Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This typically takes 15â€“30 seconds.
+              Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This typically takes 15-30 seconds.
             </div>
 
             <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #2563eb)', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(26,56,132,0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}>
@@ -1230,12 +1397,34 @@ const CareerAgentOnboarding = () => {
           </div>
         )}
 
-        {/* â”€â”€ NAVIGATION â”€â”€ */}
+        {/* VALIDATION ERROR BANNER */}
+        <AnimatePresence>
+          {validationState.messages.length > 0 && (
+            <motion.div
+              className="validation-banner"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            >
+              <div className="validation-banner-inner">
+                <div className="validation-banner-icon">
+                  <ShieldCheck size={20} />
+                </div>
+                <div className="validation-banner-content">
+                  <div className="validation-banner-title">Complete all required fields to continue to the next step.</div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* NAVIGATION */}
         <div className="form-nav">
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             {step > 1 && (
               <button type="button" className="btn-back" onClick={() => setStep(s => s - 1)}>
-                â† Back
+                Back
               </button>
             )}
             <button type="button" className="btn-reset" onClick={resetProfile}>
@@ -1243,9 +1432,11 @@ const CareerAgentOnboarding = () => {
             </button>
           </div>
           <div style={{ display: 'flex', gap: '1.2rem', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--muted)' }}>Step {step} of {STEPS.length}</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 600, color: isCurrentStepComplete ? '#10b981' : 'var(--muted)' }}>
+              {isCurrentStepComplete ? 'All required details completed' : `Step ${step} of ${STEPS.length}`}
+            </span>
             {step < STEPS.length && (
-              <button type="button" className="btn-primary-onboard" onClick={handleNext}>
+              <button type="button" className={`btn-primary-onboard${validationState.messages.length > 0 ? ' shake' : ''}`} onClick={handleNext}>
                 Save & Continue <Navigation size={16} />
               </button>
             )}

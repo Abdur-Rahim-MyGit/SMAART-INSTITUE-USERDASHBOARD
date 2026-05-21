@@ -1,5 +1,7 @@
 // API service for backend communication
 // Dynamically detect API URL based on current hostname (for mobile/network access)
+import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
+
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
   // If accessing from localhost, use localhost
@@ -143,6 +145,7 @@ export const apiCall = async (endpoint, options = {}) => {
         sessionStorage.removeItem("user");
         sessionStorage.removeItem("sessionExpiresAt");
         localStorage.removeItem("user"); // FIX #4: Clear localStorage too
+        clearAssessmentTimerStorage();
 
         // Use window.location to force redirect and UI reset
         // FIXED: Only redirect if NOT on a public route where 401 is expected/allowed
