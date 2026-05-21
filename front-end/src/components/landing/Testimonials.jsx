@@ -62,7 +62,7 @@ const Testimonials = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-base text-gray-600 dark:text-gray-300"
+            className="text-base text-gray-600 dark:text-slate-200"
           >
             Guided by the SMAART Values Framework
           </motion.p>
@@ -129,7 +129,7 @@ const Testimonials = () => {
                 variant="ghost"
                 size="icon"
                 onClick={prev}
-                className="rounded-full w-8 h-8 text-gray-400 dark:text-gray-500 hover:text-[#1a3884] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-all"
+                className="rounded-full w-8 h-8 text-gray-400 dark:text-slate-400 hover:text-[#1a3884] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-all"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -137,7 +137,7 @@ const Testimonials = () => {
                 variant="ghost"
                 size="icon"
                 onClick={next}
-                className="rounded-full w-8 h-8 text-gray-400 dark:text-gray-500 hover:text-[#1a3884] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-all"
+                className="rounded-full w-8 h-8 text-gray-400 dark:text-slate-400 hover:text-[#1a3884] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 transition-all"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>

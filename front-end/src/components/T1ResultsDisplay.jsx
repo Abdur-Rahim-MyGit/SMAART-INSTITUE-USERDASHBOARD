@@ -151,7 +151,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
             className="max-w-7xl mx-auto py-8 px-4"
         >
             {/* Main Results Card */}
-            <div className="bg-gradient-to-br from-white via-slate-50 to-white dark:from-[#0B1120] dark:via-[#001229] dark:to-[#0B1120] rounded-[2.5rem] border-2 border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden relative">
+            <div className="bg-gradient-to-br from-white via-slate-50 to-white dark:from-[#0B1120] dark:via-[#001229] dark:to-[#0B1120] rounded-[2.5rem] border-2 border-slate-200 dark:border-white/8 shadow-2xl overflow-hidden relative">
                 {/* Animated Background */}
                 <div className="absolute inset-0 opacity-30 dark:opacity-20">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#1a3884]/20 to-emerald-500/20 rounded-full blur-3xl animate-pulse" />
@@ -271,7 +271,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                                         initial={{ y: 50, opacity: 0, scale: 0.9 }}
                                         animate={{ y: 0, opacity: 1, scale: 1 }}
                                         transition={{ delay: 0.7 + index * 0.1, type: "spring" }}
-                                        className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border-2 border-slate-200 dark:border-slate-800 hover:border-[#1a3884]/50 hover:shadow-2xl hover:shadow-[#1a3884]/10 transition-all duration-300 overflow-hidden"
+                                        className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border-2 border-slate-200 dark:border-white/8 hover:border-[#1a3884]/50 hover:shadow-2xl hover:shadow-[#1a3884]/10 transition-all duration-300 overflow-hidden"
                                     >
                                         {/* Hover Gradient Effect */}
                                         <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
@@ -316,7 +316,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                                             </div>
 
                                             {/* Progress Bar */}
-                                            <div className="relative h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                            <div className="relative h-3 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
                                                 {/* Threshold markers */}
                                                 <div className="absolute left-[20%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
                                                 <div className="absolute left-[40%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
@@ -382,7 +382,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
 
                         <button
                             onClick={() => navigate("/dashboard/assessment-centre")}
-                            className="px-8 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-slate-50 dark:hover:bg-slate-700 hover:scale-105 transition-all duration-300 border-2 border-slate-200 dark:border-slate-700 w-full sm:w-auto"
+                            className="px-8 py-4 bg-white dark:bg-[#002A5C] text-slate-700 dark:text-slate-300 rounded-2xl font-bold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] hover:scale-105 transition-all duration-300 border-2 border-slate-200 dark:border-white/10 w-full sm:w-auto"
                         >
                             All Assessments
                         </button>
@@ -393,7 +393,7 @@ const T1ResultsDisplay = ({ testResults, user, navigate }) => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 1.7 }}
-                        className="mt-12 p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800"
+                        className="mt-12 p-6 bg-[#F8FAFC] dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-white/8"
                     >
                         <h4 className="text-sm font-bold text-slate-600 dark:text-slate-400 mb-4 text-center uppercase tracking-wider">
                             Band Classification System

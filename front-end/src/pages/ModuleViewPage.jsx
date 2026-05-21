@@ -43,7 +43,7 @@ const IntroScreen = ({ lines, onFinish }) => {
   }, [currentLineIndex, lines]);
 
   return (
-    <div className="w-full h-full bg-[#001229] flex flex-col items-center justify-center p-4 sm:p-8 md:p-12 text-center pointer-events-auto">
+    <div className="w-full h-full bg-[#00152E] flex flex-col items-center justify-center p-4 sm:p-8 md:p-12 text-center pointer-events-auto">
       <div className="max-w-2xl w-full flex flex-col gap-4 sm:gap-6 md:gap-8">
         {/* Progress Dots */}
         <div className="flex justify-center gap-1.5 sm:gap-2 mb-2 sm:mb-4">
@@ -654,7 +654,7 @@ const ModuleViewPage = () => {
 
   if (!courseData) {
     return (
-      <div className="min-h-screen bg-[#001229] flex items-center justify-center">
+      <div className="min-h-screen bg-[#00152E] flex items-center justify-center">
         <div className="text-center p-8 max-w-md">
           <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldCheck className="w-8 h-8 text-red-500" />

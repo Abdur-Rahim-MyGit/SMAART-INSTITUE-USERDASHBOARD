@@ -99,7 +99,7 @@ const AIChat = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
             <main className="w-full relative py-8 px-4 md:px-0">
                     <div className="max-w-5xl mx-auto pb-12">
 
@@ -125,7 +125,7 @@ const AIChat = () => {
                         </div>
 
                         {/* Chat Container */}
-                        <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden">
+                        <div className="bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl overflow-hidden">
 
                             {/* Messages Area */}
                             <div className="h-[600px] overflow-y-auto p-6 space-y-4">
@@ -157,7 +157,7 @@ const AIChat = () => {
                                                     ? 'bg-gradient-to-br from-blue-500 to-cyan-600 text-white'
                                                     : message.isError
                                                         ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800'
-                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200'
+                                                        : 'bg-slate-100 dark:bg-[#002A5C] text-slate-800 dark:text-slate-200'
                                                     }`}>
                                                     {message.role === 'user' ? (
                                                         <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
@@ -175,9 +175,9 @@ const AIChat = () => {
                                                                     h3: ({ node, ...props }) => <h3 className="text-sm font-bold mb-1" {...props} />,
                                                                     code: ({ node, inline, ...props }) =>
                                                                         inline ? (
-                                                                            <code className="bg-slate-200 dark:bg-slate-700 px-1 py-0.5 rounded text-xs font-mono" {...props} />
+                                                                            <code className="bg-slate-200 dark:bg-[#003170] px-1 py-0.5 rounded text-xs font-mono" {...props} />
                                                                         ) : (
-                                                                            <code className="block bg-slate-200 dark:bg-slate-700 p-2 rounded text-xs font-mono overflow-x-auto" {...props} />
+                                                                            <code className="block bg-slate-200 dark:bg-[#003170] p-2 rounded text-xs font-mono overflow-x-auto" {...props} />
                                                                         ),
                                                                     a: ({ node, ...props }) => <a className="text-blue-600 dark:text-blue-400 hover:underline" {...props} target="_blank" rel="noopener noreferrer" />
                                                                 }}
@@ -205,7 +205,7 @@ const AIChat = () => {
                                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
                                             <Bot className="w-5 h-5 text-white" />
                                         </div>
-                                        <div className="bg-slate-100 dark:bg-slate-800 px-4 py-3 rounded-2xl">
+                                        <div className="bg-slate-100 dark:bg-[#002A5C] px-4 py-3 rounded-2xl">
                                             <div className="flex items-center gap-2">
                                                 <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
                                                 <span className="text-slate-600 dark:text-slate-400">Thinking...</span>
@@ -238,7 +238,7 @@ const AIChat = () => {
                             )}
 
                             {/* Input Area */}
-                            <div className="border-t border-slate-200 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-900/50">
+                            <div className="border-t border-slate-200 dark:border-white/10 p-4 bg-[#F8FAFC] dark:bg-slate-900/50">
                                 <div className="flex gap-3">
                                     <textarea
                                         value={inputMessage}
@@ -246,7 +246,7 @@ const AIChat = () => {
                                         onKeyPress={handleKeyPress}
                                         placeholder="Ask me anything about your career..."
                                         rows={1}
-                                        className="flex-1 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 text-slate-800 dark:text-white placeholder-slate-400"
+                                        className="flex-1 px-4 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 text-slate-800 dark:text-white placeholder-slate-400"
                                         disabled={isLoading}
                                     />
                                     <button

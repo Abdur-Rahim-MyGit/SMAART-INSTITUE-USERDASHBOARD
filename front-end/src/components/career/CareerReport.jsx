@@ -1,4 +1,4 @@
-import { motion } from 'react';
+import { motion } from 'framer-motion';
 import {
     Brain, Target, Database, Briefcase, Sparkles,
     TrendingUp, Clock, AlertTriangle, ArrowRight, Loader2, RefreshCw, FileText, Download, Table,
@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 
 import { CircularProgress, ReportSection, SkillTag, PriorityBadge } from './CareerUIComponents';
+import PageHero from '@/components/ui/PageHero';
 
 const CareerReport = ({
     report, reportRef, startNew, loadReports,
@@ -13,19 +14,19 @@ const CareerReport = ({
     isExporting, previousReports, viewReport
 }) => {
     if (!report) return (
-        <div className="min-h-[400px] flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 text-center">
-            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center mb-4">
+        <div className="min-h-[400px] flex flex-col items-center justify-center p-12 bg-white dark:bg-[#002A5C] rounded-3xl border border-slate-200 dark:border-white/10 text-center">
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-[#003170] flex items-center justify-center mb-4">
                 <AlertTriangle size={32} className="text-slate-400" />
             </div>
             <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Report Not Found</h3>
             <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6">We couldn't load the requested career report. It may still be generating or has been moved.</p>
-            <button onClick={startNew} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold transition-all hover:scale-105">Start New Assessment</button>
+            <button onClick={startNew} className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-bold transition-all hover:scale-105">Start New Assessment</button>
         </div>
     );
 
     if (report.status === 'processing' || report.status === 'pending') {
         return (
-            <div className="min-h-[400px] flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 text-center">
+            <div className="min-h-[400px] flex flex-col items-center justify-center p-12 bg-white dark:bg-[#002A5C] rounded-3xl border border-slate-200 dark:border-white/10 text-center">
                 <Loader2 size={48} className="animate-spin text-indigo-500 mb-6" />
                 <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Analyzing Data...</h3>
                 <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6">Our engines are busy building your career intelligence. This usually takes 30-60 seconds.</p>
@@ -38,12 +39,12 @@ const CareerReport = ({
 
     if (!report.output && !report.careerOutput) {
         return (
-            <div className="min-h-[400px] flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 text-center">
+            <div className="min-h-[400px] flex flex-col items-center justify-center p-12 bg-white dark:bg-[#002A5C] rounded-3xl border border-slate-200 dark:border-white/10 text-center">
                 <Zap size={48} className="text-amber-500 mb-6" />
                 <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Generation Incomplete</h3>
                 <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6">The report was saved but the AI analysis is still being processed. Please refresh in a moment.</p>
                 <div className="flex gap-3">
-                    <button onClick={loadReports} className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold transition-all">Check Again</button>
+                    <button onClick={loadReports} className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-bold transition-all">Check Again</button>
                     <button onClick={startNew} className="px-6 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold transition-all">Reset Form</button>
                 </div>
             </div>
@@ -54,30 +55,22 @@ const CareerReport = ({
 
     return (
         <div ref={reportRef} className="space-y-6">
-            {/* Report Header */}
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 mb-6 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-                <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4">
-                        <Brain className="w-10 h-10" />
-                        <div>
-                            <h2 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white">Career Intelligence Report</h2>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Version {report.version} • Generated {new Date(report.generatedDate || report.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
+            {/* Standardized PageHero */}
+            <PageHero
+                badge="Career Intelligence"
+                title="Career Intelligence Report"
+                subtitle={`Version ${report.version} • Generated ${new Date(report.generatedDate || report.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+            />
 
             {/* Action Bar */}
-            <div className="flex flex-wrap gap-3 p-4 bg-white/80 dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 backdrop-blur-md shadow-sm sticky top-4 z-40">
-                <button onClick={startNew} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl">
+            <div className="flex flex-wrap gap-3 p-4 bg-white/80 dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-white/8 backdrop-blur-md shadow-sm sticky top-4 z-40">
+                <button onClick={startNew} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#1a3884] hover:bg-indigo-700 text-white font-semibold text-sm transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl">
                     <RefreshCw size={16} /> Generate New
                 </button>
-                <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all shadow-sm">
+                <button onClick={() => setShowForm(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all shadow-sm">
                     <FileText size={16} /> View Form
                 </button>
-                <div className="h-10 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block" />
+                <div className="h-10 w-px bg-slate-200 dark:bg-[#003170] mx-1 hidden sm:block" />
                 <button onClick={handleDownloadPDF} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm transition-all shadow-lg shadow-emerald-500/30 hover:shadow-xl ml-auto">
                     <Download size={16} /> PDF
                 </button>
@@ -93,13 +86,13 @@ const CareerReport = ({
 
             {/* 0. Blueprint Dashboard Summary */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center justify-center text-center">
+                <div className="bg-white dark:bg-[#002147] p-6 rounded-2xl border border-slate-200 dark:border-white/8 shadow-sm flex flex-col items-center justify-center text-center">
                     <CircularProgress percentage={output.careerMatchPercentage || 85} label="Career Alignment" color="#6366f1" size={140} />
                     <p className="text-xs text-slate-400 mt-4 leading-relaxed max-w-[180px]">Based on your goals and background match to {report.careerInput?.interestedJobRole}</p>
                 </div>
 
                 <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group transition-transform">
+                    <div className="bg-white dark:bg-[#002147] p-5 rounded-2xl border border-slate-200 dark:border-white/8 shadow-sm transition-all hover:shadow-md group transition-transform">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="p-3 rounded-2xl bg-indigo-500 text-white shadow-lg shadow-indigo-500/30">
                                 <Target size={20} />
@@ -114,13 +107,13 @@ const CareerReport = ({
                                 <span className="text-slate-500">Market Demand</span>
                                 <span className="text-emerald-500 font-bold">{output.marketDemand?.demandLevel || 'High'}</span>
                             </div>
-                            <div className="w-full h-1.5 bg-indigo-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                            <div className="w-full h-1.5 bg-indigo-100 dark:bg-[#003170] rounded-full overflow-hidden">
                                 <motion.div initial={{ width: 0 }} animate={{ width: '85%' }} className="h-full bg-indigo-500" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group transition-transform">
+                    <div className="bg-white dark:bg-[#002147] p-5 rounded-2xl border border-slate-200 dark:border-white/8 shadow-sm transition-all hover:shadow-md group transition-transform">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="p-3 rounded-2xl bg-purple-500 text-white shadow-lg shadow-purple-500/30">
                                 <Zap size={20} />
@@ -135,7 +128,7 @@ const CareerReport = ({
                         </p>
                     </div>
 
-                    <div className="sm:col-span-2 bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 flex items-start gap-4 shadow-sm">
+                    <div className="sm:col-span-2 bg-[#F8FAFC] dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-white/10 flex items-start gap-4 shadow-sm">
                         <div className="hidden">
                             <Brain size={120} />
                         </div>
@@ -221,8 +214,8 @@ const CareerReport = ({
             <ReportSection title="Human Intelligence Skills (15+)" icon={Heart} color="from-rose-500 to-pink-500" delay={0.2}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {(output.humanIntelligenceSkills || output.humanSkills)?.map((skill, i) => (
-                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors">
-                            <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">
+                        <div key={i} className="flex items-start gap-3 p-3 rounded-xl bg-[#F8FAFC] dark:bg-slate-700/40 border border-slate-100 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors">
+                            <div className="w-8 h-8 rounded-lg bg-white dark:bg-[#002A5C] shadow-sm border border-slate-200 dark:border-white/10 text-white flex items-center justify-center flex-shrink-0 text-xs font-bold">
                                 {i + 1}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -251,7 +244,7 @@ const CareerReport = ({
                                 <h4 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3">{labels[level]}</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {jobs.map((job, i) => (
-                                        <div key={i} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700">
+                                        <div key={i} className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-slate-700/40 border border-slate-100 dark:border-white/10">
                                             <div className="flex items-center gap-2 mb-1.5">
                                                 <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${colors[level]}`} />
                                                 <span className="font-semibold text-sm text-slate-800 dark:text-white">{job.title}</span>
@@ -298,10 +291,10 @@ const CareerReport = ({
                                 transition={{ delay: 0.4 + i * 0.1 }}
                                 className="flex items-start gap-4 relative"
                             >
-                                <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-white flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-lg shadow-indigo-500/30 z-10">
+                                <div className="w-12 h-12 rounded-full bg-white dark:bg-[#002A5C] shadow-sm border border-slate-200 dark:border-white/10 text-white flex items-center justify-center flex-shrink-0 text-sm font-bold shadow-lg shadow-indigo-500/30 z-10">
                                     {i + 1}
                                 </div>
-                                <div className="flex-1 bg-slate-50 dark:bg-slate-700/40 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+                                <div className="flex-1 bg-[#F8FAFC] dark:bg-slate-700/40 rounded-xl p-4 border border-slate-100 dark:border-white/10">
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="font-bold text-sm text-slate-800 dark:text-white">{step.role}</span>
                                         <span className="text-[10px] font-bold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded-full">{step.timeline}</span>
@@ -324,7 +317,7 @@ const CareerReport = ({
                             { label: 'Automation Risk', value: output.futureScope?.automationRisk, icon: Shield, color: 'from-amber-500 to-red-500' },
                             { label: 'How to Stay Relevant', value: output.futureScope?.stayRelevantTips, icon: Lightbulb, color: 'from-emerald-500 to-teal-500' },
                         ].map((item, i) => (
-                            <div key={i} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700">
+                            <div key={i} className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-slate-700/40 border border-slate-100 dark:border-white/10">
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${item.color} text-white flex items-center justify-center`}>
                                         <item.icon size={14} />
@@ -369,7 +362,7 @@ const CareerReport = ({
                         { label: 'Geographic Demand', value: output.marketDemand?.geographicDemand },
                         { label: 'Industry Trends', value: output.marketDemand?.industryTrends },
                     ].map((item, i) => (
-                        <div key={i} className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700">
+                        <div key={i} className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-slate-700/40 border border-slate-100 dark:border-white/10">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{item.label}</span>
                             <p className="text-sm font-semibold text-slate-800 dark:text-white mt-1">{item.value || 'N/A'}</p>
                         </div>
@@ -426,7 +419,7 @@ const CareerReport = ({
                 <ReportSection title="Qualifications & Degrees" icon={GraduationCap} color="from-teal-500 to-cyan-500" delay={0.52}>
                     <div className="space-y-2">
                         {output.qualificationsNeeded.map((q, i) => (
-                            <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700">
+                            <div key={i} className="p-3 rounded-xl bg-[#F8FAFC] dark:bg-slate-700/40 border border-slate-100 dark:border-white/10">
                                 <span className="font-semibold text-sm text-slate-800 dark:text-white">{q.qualification}</span>
                                 {q.relevance && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{q.relevance}</p>}
                             </div>
@@ -445,7 +438,7 @@ const CareerReport = ({
                             { label: 'HI Skills from DB', value: output.dataSource.hiSkillsFromDB },
                             { label: 'Certifications', value: output.dataSource.certificationsFromDB },
                         ].map((item, i) => (
-                            <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700 text-center">
+                            <div key={i} className="p-3 rounded-xl bg-[#F8FAFC] dark:bg-slate-700/40 border border-slate-100 dark:border-white/10 text-center">
                                 <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{item.label}</p>
                                 <p className="text-sm font-bold text-slate-800 dark:text-white">{item.value}</p>
                                 {item.sub && <p className="text-[10px] text-slate-400">{item.sub}</p>}
@@ -465,7 +458,7 @@ const CareerReport = ({
                                 onClick={() => viewReport(r)}
                                 className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${(r.id || r._id) === (report.id || report._id)
                                     ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10'
-                                    : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                                    : 'border-slate-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-slate-700/50'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">

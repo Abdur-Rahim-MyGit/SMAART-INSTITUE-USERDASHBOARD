@@ -25,6 +25,7 @@ import {
   Edit,
   Sparkles,
 } from "lucide-react";
+import PageHero from "@/components/ui/PageHero";
 import {
   getAllVisionBoards,
   deleteVisionBoard,
@@ -59,9 +60,9 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98 }}
-      className={`group relative overflow-hidden rounded-[24px] border bg-white transition-all duration-500 hover:-translate-y-1.5 dark:bg-[#0f172a] ${viewMode === "list" ? "md:flex" : ""} ${isCurrentVision
+      className={`group relative overflow-hidden rounded-[24px] border bg-white transition-all duration-500 hover:-translate-y-1.5 dark:bg-[#00152E] ${viewMode === "list" ? "md:flex" : ""} ${isCurrentVision
         ? "border-primary/30 shadow-[0_20px_50px_rgba(26,56,132,0.12)] ring-1 ring-primary/10"
-        : "border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 dark:border-slate-800 dark:hover:border-slate-700 dark:hover:shadow-black/40"
+        : "border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 dark:border-white/8 dark:hover:border-slate-700 dark:hover:shadow-black/40"
         }`}
     >
       {isCurrentVision && (
@@ -71,7 +72,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
         </div>
       )}
 
-      <div className={`relative overflow-hidden bg-slate-100 dark:bg-slate-900 ${viewMode === "list" ? "md:w-[320px] md:flex-shrink-0" : "aspect-[4/5]"}`}>
+      <div className={`relative overflow-hidden bg-slate-100 dark:bg-[#002147] ${viewMode === "list" ? "md:w-[320px] md:flex-shrink-0" : "aspect-[4/5]"}`}>
         {board.collageImage ? (
           <img
             src={board.collageImage}
@@ -115,7 +116,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/70 bg-white/92 text-slate-700 shadow-lg transition-colors hover:bg-slate-100 dark:border-white/10 dark:bg-[#081120]/90 dark:text-slate-200 dark:hover:bg-slate-800"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/70 bg-white/92 text-slate-700 shadow-lg transition-colors hover:bg-slate-100 dark:border-white/10 dark:bg-[#081120]/90 dark:text-slate-200 dark:hover:bg-[#002A5C]"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
@@ -126,14 +127,14 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
                   className="fixed inset-0 z-10"
                   onClick={() => setShowMenu(false)}
                 />
-                <div className="absolute right-0 top-full z-30 mt-2 w-40 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-slate-700 dark:bg-slate-800">
+                <div className="absolute right-0 top-full z-30 mt-2 w-40 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-white/10 dark:bg-[#002A5C]">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onDuplicate(board);
                       setShowMenu(false);
                     }}
-                    className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                    className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-slate-700/50"
                   >
                     <Copy className="w-3.5 h-3.5" /> Duplicate
                   </button>
@@ -143,7 +144,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
                       onEdit(board);
                       setShowMenu(false);
                     }}
-                    className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700/50"
+                    className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-slate-700/50"
                   >
                     <Edit className="w-3.5 h-3.5" /> Edit
                   </button>
@@ -171,7 +172,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
             <span className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] ${
               isCurrentVision 
                 ? "bg-primary/10 text-primary" 
-                : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300"
+                : "bg-slate-100 text-slate-500 dark:bg-[#002A5C] dark:text-slate-300"
             }`}>
               {isCurrentVision ? "Current Focus" : "Stored Vision"}
             </span>
@@ -192,7 +193,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
             size="sm"
             variant="outline"
             onClick={() => onPreview(board)}
-            className="flex-1 rounded-[14px] border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+            className="flex-1 rounded-[14px] border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:bg-[#002A5C]"
           >
             Preview
           </Button>
@@ -254,7 +255,7 @@ const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white dark:bg-[#0f172a] rounded-[24px] max-w-md w-full p-8 shadow-2xl border border-slate-100 dark:border-slate-800"
+          className="bg-white dark:bg-[#00152E] rounded-[24px] max-w-md w-full p-8 shadow-2xl border border-slate-100 dark:border-white/8"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mx-auto mb-4">
@@ -370,7 +371,7 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="bg-white dark:bg-[#0f172a] rounded-[28px] w-auto max-w-[90vw] shadow-2xl border border-slate-100 dark:border-slate-800"
+          className="bg-white dark:bg-[#00152E] rounded-[28px] w-auto max-w-[90vw] shadow-2xl border border-slate-100 dark:border-white/8"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
@@ -792,57 +793,33 @@ const VisionBoardGalleryPro = () => {
 
 
   return (
-    <main className="min-h-screen w-full bg-[#F8FAFC] px-4 py-5 transition-colors duration-300 dark:bg-dark-card md:px-8">
+    <main className="min-h-screen w-full bg-[#F8FAFC] px-4 py-5 transition-colors duration-300 dark:bg-[#002147] md:px-8">
       <div className="mx-auto max-w-[1600px] pb-6">
-        <section className="relative overflow-hidden rounded-[28px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] px-6 py-5 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.35)] sm:px-8 sm:py-6 dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40">
-          {/* Decorative background gradient to match Toolkit style */}
-          <div className="absolute inset-px rounded-[27px] border border-white/70 dark:border-white/5" />
-          <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-[#d8e6ff] blur-3xl dark:bg-blue-700/10" />
-          <div className="pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-indigo-50/20 blur-3xl dark:bg-indigo-900/5" />
-
-          <div className="relative flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-            <div className="max-w-3xl">
-              <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/85 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#4f46e5] shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50">
-                <div className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#4f46e5]/20 bg-[#4f46e5]/10">
-                  <Sparkles className="h-2 w-2" />
-                </div>
-                Vision Journey
-              </div>
-              <div className="space-y-2">
-                <h1 className="max-w-3xl text-[1.7rem] font-black tracking-tight text-[#0f172a] sm:text-[2.0rem] lg:text-[2.2rem] lg:leading-tight dark:text-white">
-                  Vision Board - <span className="text-[#1a3884]">Gallery</span>
-                </h1>
-                <p className="max-w-xl text-sm font-medium tracking-[0.01em] text-[#3654a1] dark:text-[#d7def0] sm:text-[16px]">
-                  Experience a focused visual journey with cleaner navigation and faster action.
-                </p>
-                <p className="max-w-2xl text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">
-                  Create detailed boards for your goals, track your aspirations with clarity, 
-                  and keep your primary vision active on your dashboard to stay inspired.
-                </p>
-              </div>
+        {/* ── Standardized PageHero ── */}
+        <PageHero
+          badge="Vision Journey"
+          title="Vision Board Gallery"
+          subtitle="Create detailed boards for your goals, track your aspirations with clarity, and keep your primary vision active on your dashboard to stay inspired."
+        >
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-100 bg-white dark:bg-[#002147] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-white shadow-sm dark:border-white/10">
+              <Grid3X3 className="h-3.5 w-3.5 text-[#1a3884] dark:text-blue-400" />
+              {boards.length} / {maxAllowed} SLOTS
             </div>
-
-            <div className="flex flex-wrap items-center gap-3.5 xl:pb-1">
-              <div className="inline-flex items-center gap-2 rounded-[14px] border border-slate-100 bg-slate-50/50 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-white">
-                <Grid3X3 className="h-3 w-3 text-primary dark:text-blue-400" />
-                {boards.length} / {maxAllowed} slots
-              </div>
-              <Button
-                onClick={handleCreateNew}
-                disabled={!canCreateMore}
-                className={`h-[46px] rounded-[14px] px-6 text-[13px] font-bold tracking-wide shadow-lg transition-all active:scale-95 ${canCreateMore
-                  ? "bg-[#1a3884] text-white hover:bg-[#132c6b] hover:shadow-primary/30"
-                  : "cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-slate-800"
-                  }`}
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create New Board
-              </Button>
-            </div>
+            <Button
+              onClick={handleCreateNew}
+              disabled={!canCreateMore}
+              className={`h-11 rounded-xl px-5 text-sm font-bold tracking-wide shadow-md transition-all active:scale-95 ${
+                canCreateMore
+                  ? "bg-[#1a3884] text-white hover:bg-[#132c6b]"
+                  : "cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-[#002A5C]"
+              }`}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create New Board
+            </Button>
           </div>
-
-
-        </section>
+        </PageHero>
 
         <div className="mt-4">
           {isLoading ? (
@@ -851,7 +828,7 @@ const VisionBoardGalleryPro = () => {
               <p className="animate-pulse text-slate-400">Loading your boards...</p>
             </div>
           ) : boards.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-white py-24 text-center shadow-sm dark:border-slate-700 dark:bg-[#0b1627]">
+            <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-white py-24 text-center shadow-sm dark:border-white/10 dark:bg-[#0b1627]">
               <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#1a3884]/10">
                 <Images className="h-8 w-8 text-[#1a3884]" />
               </div>
@@ -865,7 +842,7 @@ const VisionBoardGalleryPro = () => {
               </Button>
             </div>
           ) : filteredBoards.length === 0 ? (
-            <div className="rounded-[28px] border border-slate-200 bg-white px-6 py-20 text-center shadow-sm dark:border-slate-800 dark:bg-[#0b1627]">
+            <div className="rounded-[28px] border border-slate-200 bg-white px-6 py-20 text-center shadow-sm dark:border-white/8 dark:bg-[#0b1627]">
               <Search className="mx-auto mb-4 h-10 w-10 text-slate-300 dark:text-slate-600" />
               <h3 className="text-xl font-semibold text-slate-900 dark:text-white">No boards match those filters</h3>
               <p className="mt-2 text-slate-500 dark:text-slate-400">Try another search term or switch back to all boards.</p>
@@ -928,7 +905,7 @@ const VisionBoardGalleryPro = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-[#0f172a] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200 dark:border-slate-700"
+              className="bg-white dark:bg-[#00152E] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200 dark:border-white/10"
               onClick={(e) => e.stopPropagation()}
             >
               <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-2">Manifest your Vision</h3>
@@ -952,7 +929,7 @@ const VisionBoardGalleryPro = () => {
                     }}
                     placeholder="e.g., My Professional Journey 2026"
                     maxLength={TITLE_CHAR_LIMIT}
-                    className="h-12 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 rounded-xl font-medium"
+                    className="h-12 bg-slate-50 dark:bg-[#002147] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 rounded-xl font-medium"
                   />
                 </div>
                 <div>
@@ -972,7 +949,7 @@ const VisionBoardGalleryPro = () => {
                     rows={4}
                     placeholder="Describe what you want to achieve and why it matters to you…"
                     maxLength={DESCRIPTION_CHAR_LIMIT}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none font-medium leading-relaxed"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none font-medium leading-relaxed"
                   />
                 </div>
               </div>
@@ -981,7 +958,7 @@ const VisionBoardGalleryPro = () => {
                 <Button
                   variant="outline"
                   onClick={() => setShowCreateModal(false)}
-                  className="h-12 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl font-bold px-6"
+                  className="h-12 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 bg-white dark:bg-[#002A5C] hover:bg-slate-50 dark:hover:bg-[#002A5C] rounded-xl font-bold px-6"
                 >
                   Cancel
                 </Button>

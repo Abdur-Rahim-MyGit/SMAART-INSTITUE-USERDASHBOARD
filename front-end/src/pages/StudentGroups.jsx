@@ -102,7 +102,7 @@ const StudentGroups = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0F4F8] dark:bg-dark-bg font-sans pb-20 transition-all duration-300 relative overflow-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] font-sans pb-20 transition-all duration-300 relative overflow-hidden">
       {/* Background Blobs */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 mix-blend-multiply opacity-70 animate-blob" />
@@ -132,7 +132,7 @@ const StudentGroups = () => {
             <Loader2 className="w-8 h-8 text-[#002147] animate-spin" />
           </div>
         ) : groups.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
+          <div className="text-center py-20 bg-white dark:bg-[#002A5C] rounded-3xl border border-dashed border-gray-200 dark:border-white/10">
             <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-blue-500" />
             </div>
@@ -214,7 +214,7 @@ const StudentGroups = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-0 m-auto max-w-lg h-fit bg-white dark:bg-slate-900 rounded-3xl shadow-2xl z-50 p-6 md:p-8 overflow-y-auto max-h-[90vh]"
+              className="fixed inset-0 m-auto max-w-lg h-fit bg-white dark:bg-[#002147] rounded-3xl shadow-2xl z-50 p-6 md:p-8 overflow-y-auto max-h-[90vh]"
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-[#002147] dark:text-white">Create Group</h2>
@@ -228,32 +228,32 @@ const StudentGroups = () => {
 
               <form onSubmit={handleCreate} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Group Name</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">Group Name</label>
                   <input
                     type="text"
                     required
                     maxLength={50}
                     value={newGroup.name}
                     onChange={(e) => setNewGroup(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002147]/20 dark:focus:ring-blue-500/40 focus:border-[#002147] dark:focus:border-blue-500 transition-all text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002147]/20 dark:focus:ring-blue-500/40 focus:border-[#002147] dark:focus:border-blue-500 transition-all text-gray-900 dark:text-white"
                     placeholder="e.g., CS Study Group"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">Description</label>
                   <textarea
                     rows={3}
                     maxLength={200}
                     value={newGroup.description}
                     onChange={(e) => setNewGroup(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002147]/20 dark:focus:ring-blue-500/40 focus:border-[#002147] dark:focus:border-blue-500 transition-all resize-none text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#002147]/20 dark:focus:ring-blue-500/40 focus:border-[#002147] dark:focus:border-blue-500 transition-all resize-none text-gray-900 dark:text-white"
                     placeholder="What is this group about?"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Icon</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">Icon</label>
                   <div className="flex flex-wrap gap-3">
                     {ICONS.map((item) => {
                       const Icon = item.icon;
@@ -265,7 +265,7 @@ const StudentGroups = () => {
                           onClick={() => setNewGroup(prev => ({ ...prev, icon: item.name }))}
                           className={`p-3 rounded-xl border transition-all ${isSelected 
                             ? 'bg-[#002147] border-[#002147] text-white' 
-                            : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-500 dark:text-gray-400 hover:border-gray-300 dark:hover:border-slate-600'
+                            : 'bg-white dark:bg-[#002A5C] border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-300 hover:border-gray-300 dark:hover:border-slate-600'
                           }`}
                         >
                           <Icon className="w-5 h-5" />
@@ -276,7 +276,7 @@ const StudentGroups = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Color</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-200 mb-2">Color</label>
                   <div className="flex flex-wrap gap-3">
                     {COLORS.map((color) => {
                       const isSelected = newGroup.color === color;

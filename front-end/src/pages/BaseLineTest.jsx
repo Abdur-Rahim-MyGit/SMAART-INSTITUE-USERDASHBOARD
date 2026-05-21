@@ -644,7 +644,7 @@ const BaseLineTest = () => {
 
 
   if (loading) return (
-    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex items-center justify-center transition-colors duration-300">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center transition-colors duration-300">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1a3884] mx-auto mb-4"></div>
         <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">Loading {stageConfig.title}...</p>
@@ -653,8 +653,8 @@ const BaseLineTest = () => {
   );
 
   if (error) return (
-    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex items-center justify-center p-4 transition-colors duration-300">
-      <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-dark-card rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center p-4 transition-colors duration-300">
+      <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#002147] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
         <div className="text-red-500 text-5xl mb-4">⚠</div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Error</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
@@ -666,16 +666,16 @@ const BaseLineTest = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 dark:text-white transition-colors duration-300">
       <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
         {!submitted ? (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col lg:flex-row gap-8">
             {/* Main Question Area */}
-            <div className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-dark-card rounded-3xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden relative">
+            <div className="flex-1 flex flex-col min-h-[500px] bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden relative">
               {/* Background gradient effect */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3884]/5 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-dark-elevated/30 relative z-10">
+              <div className="p-6 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-dark-elevated/30 relative z-10">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
                   <div className="text-right">
@@ -694,7 +694,7 @@ const BaseLineTest = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
                     <motion.div
                       className="h-full bg-[#1a3884]"
                       initial={{ width: 0 }}
@@ -726,13 +726,13 @@ const BaseLineTest = () => {
                         disabled={interactionLocked || submitting || timeExpired}
                         className={`group relative p-3 md:p-5 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-left hover:scale-[1.01] active:scale-[0.99] ${isSelected
                           ? 'border-[#1a3884] bg-[#1a3884]/10 shadow-[0_0_30px_-10px_rgba(26,56,132,0.3)]'
-                          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-[#1a3884]/50 hover:bg-slate-50 dark:hover:bg-slate-800'
+                          : 'border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 hover:border-[#1a3884]/50 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
                           }`}
                       >
                         <div className="flex items-center gap-3 md:gap-4">
                           <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-2 flex items-center justify-center font-bold text-sm md:text-base shrink-0 transition-colors shadow-sm ${isSelected
                             ? 'bg-[#1a3884] border-[#1a3884] text-white'
-                            : 'border-slate-300 dark:border-slate-600 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] group-hover:text-[#1a3884]'
+                            : 'border-slate-300 dark:border-white/15 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] group-hover:text-[#1a3884]'
                             }`}>
                             {option.value}
                           </div>
@@ -756,7 +756,7 @@ const BaseLineTest = () => {
                         onClick={nextQ}
                         disabled={timeElapsed < 5000 || interactionLocked || submitting || timeExpired}
                         className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#1a3884]/20 transition-all flex items-center gap-2 ${timeElapsed < 5000
-                          ? 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                          ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 cursor-not-allowed'
                           : 'bg-[#1a3884] text-white hover:bg-[#277a84] hover:shadow-2xl hover:-translate-y-1'
                           }`}
                       >
@@ -777,13 +777,13 @@ const BaseLineTest = () => {
               </div>
 
               {/* Footer Controls */}
-              <div className="p-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50/80 dark:bg-dark-elevated/20 flex justify-end items-center backdrop-blur-sm">
+              <div className="p-4 border-t border-slate-100 dark:border-white/10 bg-slate-50/80 dark:bg-dark-elevated/20 flex justify-end items-center backdrop-blur-sm">
                 <button
                   onClick={() => submit()}
                   disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered}
                   className={`px-6 md:px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-sm md:text-base ${allQuestionsAnswered
                       ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-lg shadow-amber-500/20 hover:-translate-y-0.5"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-200 dark:bg-[#002A5C] text-slate-400 cursor-not-allowed"
                     }`}
                 >
                   {submitting ? (
@@ -807,7 +807,7 @@ const BaseLineTest = () => {
             </div>
 
             {/* Navigation Sidebar */}
-            <div className="lg:w-80 bg-white dark:bg-dark-card rounded-3xl border border-slate-200 dark:border-slate-700 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
+            <div className="lg:w-80 bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
               <div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                   <Target className="text-[#1a3884]" size={20} /> Question Map
@@ -822,7 +822,7 @@ const BaseLineTest = () => {
                           ? 'bg-[#1a3884] text-white shadow-md scale-105 border-2 border-[#1a5f66]'
                           : selectedAnswers[q._id]
                             ? 'bg-[#1a3884]/10 text-[#1a3884] border border-[#1a3884]/30'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-transparent'
+                            : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-transparent'
                         }`}
                     >
                       {idx + 1}
@@ -835,19 +835,19 @@ const BaseLineTest = () => {
                 </div>
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/8">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884]" /> Answered</span>
                   <span className="font-bold text-slate-900 dark:text-white">{Object.keys(selectedAnswers).length}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-slate-800" /> Remaining</span>
+                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-[#002A5C]" /> Remaining</span>
                   <span className="font-bold text-slate-900 dark:text-white">{questions.length - Object.keys(selectedAnswers).length}</span>
                 </div>
               </div>
 
               {/* DEV: Auto Answer */}
-              <div className="pt-4 border-t border-dashed border-slate-200 dark:border-slate-800 opacity-50 hover:opacity-100 transition-opacity">
+              <div className="pt-4 border-t border-dashed border-slate-200 dark:border-white/8 opacity-50 hover:opacity-100 transition-opacity">
                 <button
                   disabled={submitting || interactionLocked || timeExpired}
                   onClick={async () => {
@@ -875,7 +875,7 @@ const BaseLineTest = () => {
                       setSubmitting(false);
                     }
                   }}
-                  className="w-full py-2 bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+                  className="w-full py-2 bg-slate-200 dark:bg-[#002A5C] text-slate-600 dark:text-slate-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-slate-300 dark:hover:bg-[#002A5C] transition-colors"
                 >
                   ⚡ Auto-Fill (Dev)
                 </button>
@@ -890,7 +890,7 @@ const BaseLineTest = () => {
           >
             {/* Main Results Card */}
             {/* Main Results Card - Minimal Configuration */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm p-8 max-w-4xl mx-auto relative">
+            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/8 rounded-2xl shadow-sm p-8 max-w-4xl mx-auto relative">
               
               {/* Top Left User Info */}
               <div className="absolute top-8 left-8 hidden sm:block text-left">
@@ -900,7 +900,7 @@ const BaseLineTest = () => {
               </div>
 
               {/* Header Section */}
-              <div className="text-center mb-10 border-b border-slate-100 dark:border-slate-800 pb-8 sm:mt-2">
+              <div className="text-center mb-10 border-b border-slate-100 dark:border-white/8 pb-8 sm:mt-2">
 
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                   {stageKey === 'T1' ? 'Baseline Established' : `${stageConfig.name} Assessment Complete`}
@@ -913,7 +913,7 @@ const BaseLineTest = () => {
               </div>
 
               {/* Professional Score Display */}
-              <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 border border-slate-100 dark:border-slate-700">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-xl p-6 border border-slate-100 dark:border-white/10">
                 <div className="text-center md:text-right">
                   <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Overall Score</div>
                   <div className="text-5xl font-bold text-slate-900 dark:text-white">
@@ -922,7 +922,7 @@ const BaseLineTest = () => {
                   </div>
                 </div>
 
-                <div className="hidden md:block w-px h-16 bg-slate-200 dark:bg-slate-700" />
+                <div className="hidden md:block w-px h-16 bg-slate-200 dark:bg-[#003170]" />
 
                 <div className="text-center md:text-left">
                   <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Proficiency Level</div>
@@ -954,7 +954,7 @@ const BaseLineTest = () => {
                         initial={{ y: 50, opacity: 0, scale: 0.9 }}
                         animate={{ y: 0, opacity: 1, scale: 1 }}
                         transition={{ delay: 0.7 + index * 0.1, type: "spring" }}
-                        className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-5 hover:border-slate-300 transition-colors"
+                        className="bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-lg p-5 hover:border-slate-300 transition-colors"
                       >
                         <div className="relative z-10">
                           {/* Header */}
@@ -993,7 +993,7 @@ const BaseLineTest = () => {
                           </div>
 
                           {/* Progress Bar */}
-                          <div className="relative h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div className="relative h-3 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
                             {/* Threshold markers */}
                             <div className="absolute left-[20%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
                             <div className="absolute left-[40%] top-0 bottom-0 w-0.5 bg-white/30 dark:bg-black/20 z-10" />
@@ -1038,7 +1038,7 @@ const BaseLineTest = () => {
               >
                 <button
                   onClick={() => downloadReport(user, testResults)}
-                  className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+                  className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
                 >
                   <Download className="w-4 h-4" />
                   Download Report
@@ -1059,14 +1059,14 @@ const BaseLineTest = () => {
 
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+                  className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
                 >
                   Go to Dashboard
                 </button>
 
                 <button
                   onClick={() => navigate("/dashboard/assessment-centre")}
-                  className="px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
+                  className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
                 >
                   All Assessments
                 </button>
@@ -1082,7 +1082,7 @@ const BaseLineTest = () => {
       {
         showExitWarning && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-dark-card p-8 rounded-3xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-700">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-[#002147] p-8 rounded-3xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-white/10">
               <div className="w-20 h-20 bg-amber-50 dark:bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <XCircle className="w-10 h-10 text-amber-500" />
               </div>
@@ -1098,7 +1098,7 @@ const BaseLineTest = () => {
                   onClick={() => {
                     handleRestart();
                   }}
-                  className="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-xl font-semibold hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-slate-100 dark:bg-[#002A5C] text-slate-600 dark:text-slate-400 rounded-xl font-semibold hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Restart Assessment (Dev Mode)

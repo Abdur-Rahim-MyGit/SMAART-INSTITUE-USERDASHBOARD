@@ -62,7 +62,7 @@ const BadgeCard = ({ badge, onClick, isLocked = false }) => {
                             }}
                         >
                             <FaShieldAlt className="w-12 h-12 text-white drop-shadow-md" />
-                            <div className="absolute -bottom-1 -right-1 bg-white dark:bg-slate-800 p-1.5 shadow-md">
+                            <div className="absolute -bottom-1 -right-1 bg-white dark:bg-[#002A5C] p-1.5 shadow-md">
                                 <FaAward className={`w-4 h-4 ${badgeStyle.textColor}`} />
                             </div>
                         </div>

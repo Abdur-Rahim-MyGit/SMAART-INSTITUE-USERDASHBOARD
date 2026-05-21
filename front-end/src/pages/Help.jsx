@@ -101,7 +101,7 @@ const Help = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E]">
       <main className="p-4 sm:p-6 lg:p-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -116,7 +116,7 @@ const Help = () => {
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Help & Support</h1>
               </div>
-              <p className="text-gray-500 dark:text-gray-400">Get answers to common questions or raise a support ticket</p>
+              <p className="text-gray-500 dark:text-slate-300">Get answers to common questions or raise a support ticket</p>
             </div>
 
             {/* Tab Navigation */}
@@ -130,7 +130,7 @@ const Help = () => {
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all ${
                       activeTab === tab.id
                         ? "bg-[#1a3884] text-white"
-                        : "bg-white dark:bg-dark-card text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-white/10"
+                        : "bg-white dark:bg-[#002147] text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-white/10"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -172,9 +172,9 @@ const Help = () => {
                   {/* FAQ List */}
                   <div className="space-y-3">
                     {filteredFaqs.length === 0 ? (
-                      <div className="p-8 text-center rounded-xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10">
-                        <FileQuestion className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
-                        <p className="text-gray-500 dark:text-gray-400">No FAQs match your search</p>
+                      <div className="p-8 text-center rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10">
+                        <FileQuestion className="w-12 h-12 text-gray-400 dark:text-slate-400 mx-auto mb-3" />
+                        <p className="text-gray-500 dark:text-slate-300">No FAQs match your search</p>
                       </div>
                     ) : (
                       filteredFaqs.map((faq, index) => (
@@ -183,7 +183,7 @@ const Help = () => {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="rounded-xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm dark:shadow-none"
+                          className="rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm dark:shadow-none"
                         >
                           <button
                             onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
@@ -204,7 +204,7 @@ const Help = () => {
                                 exit={{ height: 0, opacity: 0 }}
                                 transition={{ duration: 0.2 }}
                               >
-                                <div className="px-4 pb-4 text-gray-600 dark:text-gray-400">
+                                <div className="px-4 pb-4 text-gray-600 dark:text-slate-300">
                                   {faq.answer}
                                 </div>
                               </motion.div>
@@ -217,32 +217,32 @@ const Help = () => {
 
                   {/* Contact Info */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-                    <div className="p-4 rounded-xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
+                    <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 rounded-lg bg-[#1a3884]/20">
                           <Mail className="w-5 h-5 text-[#1a3884]" />
                         </div>
                         <h3 className="text-gray-900 dark:text-white font-medium">Email Support</h3>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">support@smaartminds.com</p>
-                      <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">We respond within 24 hours</p>
+                      <p className="text-gray-600 dark:text-slate-300 text-sm">support@smaartminds.com</p>
+                      <p className="text-gray-400 dark:text-slate-400 text-xs mt-1">We respond within 24 hours</p>
                     </div>
-                    <div className="p-4 rounded-xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
+                    <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
                       <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 rounded-lg bg-[#1a3884]/20">
                           <Phone className="w-5 h-5 text-[#1a3884]" />
                         </div>
                         <h3 className="text-gray-900 dark:text-white font-medium">Phone Support</h3>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">+91 1800-123-4567</p>
-                      <p className="text-gray-400 dark:text-gray-500 text-xs mt-1">Mon-Fri, 9AM-6PM IST</p>
+                      <p className="text-gray-600 dark:text-slate-300 text-sm">+91 1800-123-4567</p>
+                      <p className="text-gray-400 dark:text-slate-400 text-xs mt-1">Mon-Fri, 9AM-6PM IST</p>
                     </div>
                   </div>
 
                   {/* CTA to create ticket */}
                   <div className="p-6 rounded-xl bg-gradient-to-r from-[#1a3884]/10 dark:from-[#1a3884]/20 to-gray-50 dark:to-[#002147] border border-gray-200 dark:border-white/10 text-center">
                     <h3 className="text-gray-900 dark:text-white font-medium mb-2">Can't find what you're looking for?</h3>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Create a support ticket and our team will help you out</p>
+                    <p className="text-gray-500 dark:text-slate-300 text-sm mb-4">Create a support ticket and our team will help you out</p>
                     <button
                       onClick={() => setActiveTab('create')}
                       className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors"
@@ -263,10 +263,10 @@ const Help = () => {
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="rounded-2xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 p-6 shadow-sm dark:shadow-none">
+                  <div className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 p-6 shadow-sm dark:shadow-none">
                     <div className="mb-6">
                       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Create Support Ticket</h2>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm">Describe your issue and we'll get back to you as soon as possible</p>
+                      <p className="text-gray-500 dark:text-slate-300 text-sm">Describe your issue and we'll get back to you as soon as possible</p>
                     </div>
                     <TicketForm
                       onSuccess={handleTicketCreated}
@@ -329,7 +329,7 @@ const Help = () => {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="p-4 rounded-xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
+                        <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
                           <div className="flex flex-wrap gap-2">
                             <span className="text-sm text-gray-400 mr-2">Status:</span>
                             {['', 'open', 'in-progress', 'resolved', 'closed'].map((status) => (
@@ -339,7 +339,7 @@ const Help = () => {
                                 className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                                   statusFilter === status
                                     ? "bg-[#1a3884] text-white"
-                                    : "bg-gray-100 dark:bg-dark-card text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                    : "bg-gray-100 dark:bg-[#002147] text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
                                 }`}
                               >
                                 {status || 'All'}
@@ -358,10 +358,10 @@ const Help = () => {
                       <p className="text-gray-400">Loading tickets...</p>
                     </div>
                   ) : tickets.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 rounded-xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
-                      <Inbox className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-3" />
+                    <div className="flex flex-col items-center justify-center py-12 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
+                      <Inbox className="w-12 h-12 text-gray-400 dark:text-slate-400 mb-3" />
                       <h3 className="text-gray-900 dark:text-white font-medium mb-1">No tickets yet</h3>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">Create a ticket to get help from our support team</p>
+                      <p className="text-gray-500 dark:text-slate-300 text-sm mb-4">Create a ticket to get help from our support team</p>
                       <button
                         onClick={() => setActiveTab('create')}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white hover:bg-[#1a3884]/80 transition-colors"

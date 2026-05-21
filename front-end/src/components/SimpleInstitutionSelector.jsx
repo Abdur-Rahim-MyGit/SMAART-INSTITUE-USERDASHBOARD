@@ -142,7 +142,7 @@ const SimpleInstitutionSelector = ({ onSelect }) => {
                     placeholder="Search institutions..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1a3884] focus:bg-white transition-all"
+                    className="w-full pl-10 pr-4 py-3 bg-[#F8FAFC] border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1a3884] focus:bg-white transition-all"
                   />
                 </div>
               </div>

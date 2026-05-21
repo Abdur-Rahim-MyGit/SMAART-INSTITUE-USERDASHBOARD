@@ -69,7 +69,7 @@ const Institution = () => {
 
   return (
     <div
-      className="min-h-screen relative overflow-x-hidden transition-colors duration-300 bg-[#f4f7fa] dark:bg-[#002147]"
+      className="min-h-screen relative overflow-x-hidden transition-colors duration-300 bg-[#F8FAFC] dark:bg-[#002147]"
     >
       <NeuralBackground theme={theme} />
       {/* Subtle background crest watermark */}
@@ -104,7 +104,7 @@ const Institution = () => {
               </div>
               <div className="flex-1 text-center sm:text-left">
                 <p className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">No institution selected</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Please go back and choose your college to access the login portal.</p>
+                <p className="text-xs text-gray-500 dark:text-slate-300">Please go back and choose your college to access the login portal.</p>
               </div>
               <button
                 onClick={() => navigate('/', { replace: true })}
@@ -144,7 +144,7 @@ const Institution = () => {
               >
                 {/* Frame around the video */}
                 <div
-                  className="relative rounded-t-3xl bg-slate-50 dark:bg-muted/30"
+                  className="relative rounded-t-3xl bg-[#F8FAFC] dark:bg-muted/30"
                   style={{
                     padding: "16px",
                   }}

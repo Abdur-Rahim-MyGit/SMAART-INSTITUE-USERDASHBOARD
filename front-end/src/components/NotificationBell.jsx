@@ -88,7 +88,7 @@ const NotificationBell = () => {
         title={`Notifications (${unreadCount} unread) - ${wsStatus}`}
         disabled={isLoading}
       >
-        <Bell className={`w-5 h-5 text-gray-600 dark:text-gray-300 ${
+        <Bell className={`w-5 h-5 text-gray-600 dark:text-slate-200 ${
           isLoading ? 'animate-pulse' : ''
         }`} />
         
@@ -125,7 +125,7 @@ const NotificationBell = () => {
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-[#001A36] rounded"
               >
-                <X className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                <X className="w-3 h-3 text-gray-500 dark:text-slate-300" />
               </button>
             </div>
           </div>
@@ -133,7 +133,7 @@ const NotificationBell = () => {
           {/* Notifications List */}
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+              <div className="p-4 text-center text-gray-500 dark:text-slate-300">
                 <Bell className="w-8 h-8 mx-auto mb-2 text-gray-400" />
                 <p className="text-sm">No notifications yet</p>
               </div>
@@ -143,7 +143,7 @@ const NotificationBell = () => {
                   key={notification._id}
                   type="button"
                   onClick={() => handleNotificationClick(notification)}
-                  className="w-full p-3 text-left hover:bg-gray-50 dark:hover:bg-[#001A36] border-b border-gray-100 dark:border-white/5 transition-colors group"
+                  className="w-full p-3 text-left hover:bg-[#F8FAFC] dark:hover:bg-[#001A36] border-b border-gray-100 dark:border-white/5 transition-colors group"
                 >
                   <div className="flex items-start gap-3">
                     {/* Icon */}
@@ -164,20 +164,20 @@ const NotificationBell = () => {
                           <p className="font-semibold text-gray-900 dark:text-white group-hover:dark:text-blue-300 text-sm transition-colors">
                             {notification.title}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mt-1">
+                          <p className="text-xs text-gray-500 dark:text-slate-300 uppercase tracking-wide mt-1">
                             {TYPE_LABELS[notification.type] || notification.type}
                           </p>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                          <span className="text-xs text-gray-400 dark:text-slate-400">
                             {new Date(notification.createdAt).toLocaleDateString()}
                           </span>
                           {!notification.isRead && (
-                            <div className="w-2 h-2 bg-blue-600 rounded-full ml-2 mt-1" />
+                            <div className="w-2 h-2 bg-[#1a3884] rounded-full ml-2 mt-1" />
                           )}
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-gray-600 dark:text-slate-300 mt-1">
                         {notification.message}
                       </p>
                     </div>

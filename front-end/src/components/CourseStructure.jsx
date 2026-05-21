@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { STAGES, TRACKS } from "@/data/courseStructureData";
+import PageHero from "@/components/ui/PageHero";
 
 /* ─── Stage visual config ─── */
 const STAGE_CONFIG = {
@@ -68,8 +69,8 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
         onMouseMove={handleMouseMove}
         className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden border border-black/5 dark:border-white/5 ${
           isUnlocked
-            ? "bg-white dark:bg-dark-card hover:-translate-y-2"
-            : "bg-gray-50 dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
+            ? "bg-white dark:bg-[#002147] hover:-translate-y-2"
+            : "bg-[#F8FAFC] dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
         }`}
         style={{
           boxShadow: isUnlocked 
@@ -111,7 +112,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
               <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${
                 isUnlocked
                   ? "text-[#112b6b] dark:text-white"
-                  : "text-gray-400 dark:text-gray-500"
+                  : "text-gray-400 dark:text-slate-400"
               }`} style={{ letterSpacing: "-0.02em" }}>
                 {stage.name}
               </h3>
@@ -188,8 +189,8 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
         onMouseMove={handleMouseMove}
         className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden border border-black/5 dark:border-white/5 ${
           isUnlocked
-            ? "bg-white dark:bg-dark-card hover:-translate-y-2"
-            : "bg-gray-50 dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
+            ? "bg-white dark:bg-[#002147] hover:-translate-y-2"
+            : "bg-[#F8FAFC] dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
         }`}
         style={{
           boxShadow: isUnlocked 
@@ -233,7 +234,7 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
               <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${
                 isUnlocked
                   ? "text-[#112b6b] dark:text-white"
-                  : "text-gray-400 dark:text-gray-500"
+                  : "text-gray-400 dark:text-slate-400"
               }`} style={{ letterSpacing: "-0.02em" }}>
                 {track.shortName}
               </h3>
@@ -289,9 +290,9 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
         isCompleted
           ? "bg-green-50/50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30"
           : isCurrent
-          ? "bg-white dark:bg-dark-card shadow-lg border-[#1a3884] dark:border-[#4c6ef5]"
+          ? "bg-white dark:bg-[#002147] shadow-lg border-[#1a3884] dark:border-[#4c6ef5]"
           : isUnlocked
-          ? "bg-white dark:bg-dark-card hover:shadow-md hover:-translate-y-1 border-black/5 dark:border-white/5"
+          ? "bg-white dark:bg-[#002147] hover:shadow-md hover:-translate-y-1 border-black/5 dark:border-white/5"
           : "bg-gray-50/50 dark:bg-dark-bg/50 cursor-not-allowed opacity-60 border-black/5 dark:border-white/5"
       }`}
       style={{
@@ -334,7 +335,7 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
           </span>
           
           <h4 className={`font-bold text-[15px] mb-1 leading-tight ${
-            isUnlocked ? "text-[#112b6b] dark:text-white" : "text-gray-400 dark:text-gray-500"
+            isUnlocked ? "text-[#112b6b] dark:text-white" : "text-gray-400 dark:text-slate-400"
           }`}>
             {course.title}
           </h4>
@@ -384,13 +385,13 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
       </button>
 
       {/* Stage header - Refined and Sized Appropriately */}
-      <section className="rounded-[24px] border border-slate-200 bg-white px-6 py-6 mb-8 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-8 md:py-8 transition-all duration-300 relative overflow-hidden">
+      <section className="rounded-[24px] border border-slate-200 bg-white px-6 py-6 mb-8 shadow-sm dark:border-white/8 dark:bg-[#0b1627] md:px-8 md:py-8 transition-all duration-300 relative overflow-hidden">
         {/* Background Decorative Gradient */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-slate-50/50 to-transparent dark:from-white/5 pointer-events-none" />
         
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-8 relative z-10">
           <div className="flex items-start gap-6">
-            <div className={`w-20 h-20 rounded-[22px] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-lg flex items-center justify-center flex-shrink-0 text-[#1a3884] dark:text-blue-400 transform transition-transform duration-500`}>
+            <div className={`w-20 h-20 rounded-[22px] bg-white dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 shadow-lg flex items-center justify-center flex-shrink-0 text-[#1a3884] dark:text-blue-400 transform transition-transform duration-500`}>
               <Icon className="w-10 h-10" />
             </div>
             <div>
@@ -437,7 +438,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
 
         {/* Enhanced Progress bar */}
         <div className="mt-8">
-          <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden p-0.5 shadow-inner">
+          <div className="h-2 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden p-0.5 shadow-inner">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${pct}%` }}
@@ -451,7 +452,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
       {/* Assessment gate banner */}
       {stage.assessmentGate && (
         <div className="mb-8 flex items-center gap-5 p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-slate-100 flex items-center justify-center flex-shrink-0">
             <TrendingUp className="w-6 h-6 text-[#1a3884]" />
           </div>
           <div className="flex-1">
@@ -461,7 +462,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
           {userProgress.assessmentsPassed?.includes(stage.assessmentGate) ? (
             <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 uppercase tracking-wider">Passed</div>
           ) : (
-            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-slate-50 text-gray-500 border border-slate-100 uppercase tracking-wider">Locked</div>
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#F8FAFC] text-gray-500 border border-slate-100 uppercase tracking-wider">Locked</div>
           )}
         </div>
       )}
@@ -519,72 +520,43 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg transition-colors duration-500 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#00152E] transition-colors duration-500 relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
         <div className="absolute top-[20%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
       </div>
 
-      {/* Page header - Vision Board Inspired Style - Hidden when stage selected */}
+      {/* Page header — standardized PageHero */}
       {!selectedStageId && (
         <div className="relative z-10 px-6 md:px-12 py-6">
           <div className="max-w-7xl mx-auto">
-            <motion.section
-              initial={{ opacity: 0, y: 22, scale: 0.99 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -2 }}
-              className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.16),_transparent_30%),linear-gradient(135deg,_#ffffff_0%,_#f8fbff_52%,_#eef4ff_100%)] p-5 shadow-[0_24px_60px_-36px_rgba(15,23,42,0.24)] dark:border-slate-700/70 dark:bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.18),_transparent_32%),linear-gradient(135deg,_rgba(15,23,42,1)_0%,_rgba(15,23,42,0.98)_48%,_rgba(30,41,59,1)_100%)] sm:p-6 md:p-8"
+            <PageHero
+              badge="Learning Journey"
+              title="Programme"
+              titleAccent="SMAART"
+              accentFirst={true}
+              subtitle="Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence."
             >
-              <div className="pointer-events-none absolute -right-10 top-0 h-32 w-32 rounded-full bg-blue-200/40 blur-3xl dark:bg-blue-500/10" />
-              <div className="pointer-events-none absolute bottom-0 left-8 h-24 w-24 rounded-full bg-cyan-100/50 blur-3xl dark:bg-cyan-400/10" />
-
-                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 relative z-10">
-                <div className="max-w-2xl space-y-5">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/60 backdrop-blur-md px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-[#1a3884] shadow-sm dark:border-blue-400/20 dark:bg-slate-900/60 dark:text-blue-300">
-                    <span className="h-2 w-2 rounded-full bg-gradient-to-r from-[#1a3884] to-[#4f7cf3]" />
-                    Learning Journey
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h1 className="text-[1.75rem] font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-[2rem] lg:text-[2.25rem] lg:leading-[1.1]">
-                      SMAART <span className="text-[#1a3884] dark:text-blue-300">Programme</span>
-                    </h1>
-                    <p className="max-w-xl text-[13px] font-medium leading-6 text-slate-600 dark:text-slate-300 sm:text-sm">
-                      Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence.
-                    </p>
-                  </div>
+              {/* Progress stat card */}
+              <div className="flex items-center gap-5 bg-white dark:bg-[#002147] border border-gray-100 dark:border-white/10 rounded-2xl px-6 py-4 shadow-sm">
+                <div className="text-center">
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Completion</div>
+                  <div className="text-3xl font-black text-[#1a3884] dark:text-blue-300 leading-none tabular-nums">{overallPct}%</div>
                 </div>
-
-                {/* Overall progress card - Matching the assessment center metrics style */}
-                <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-5 group-hover:opacity-10 transition duration-1000"></div>
-                  <div className="relative flex items-center gap-6 bg-white/80 dark:bg-slate-900/60 border border-white/80 dark:border-slate-700/70 rounded-[24px] px-6 py-5 shadow-[0_16px_34px_-28px_rgba(15,23,42,0.24)] backdrop-blur overflow-hidden">
-                    <div className="text-center relative z-10">
-                      <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.24em] mb-2">Completion</div>
-                      <div className="text-4xl font-black text-[#1a3884] dark:text-blue-300 leading-none tabular-nums">{overallPct}%</div>
-                    </div>
-                    <div className="h-12 w-px bg-slate-200 dark:bg-slate-700" />
-                    <div className="space-y-3 relative z-10">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]" />
-                        <span className="text-[13px] font-black text-slate-900 dark:text-slate-100">{totalCompleted} Mastered</span>
-                      </div>
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700" />
-                        <span className="text-[13px] font-black text-slate-400 dark:text-slate-500">{totalCourses - totalCompleted} Remaining</span>
-                      </div>
-                    </div>
-                    
-                    {/* Subtle background icon */}
-                    <div className="absolute -right-4 -bottom-4 opacity-[0.03] dark:opacity-[0.05] rotate-12">
-                      <GraduationCap className="w-24 h-24 text-[#1a3884] dark:text-white" />
-                    </div>
+                <div className="h-10 w-px bg-slate-200 dark:bg-white/10" />
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">{totalCompleted} Mastered</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
+                    <span className="text-[12px] font-bold text-slate-400 dark:text-slate-500">{totalCourses - totalCompleted} Remaining</span>
                   </div>
                 </div>
               </div>
-            </motion.section>
+            </PageHero>
           </div>
         </div>
       )}

@@ -66,9 +66,9 @@ const CollegeBanners = () => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.3 }}
-        className="relative w-full overflow-hidden rounded-2xl mb-4 shadow-sm group bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
+        className="relative w-full overflow-hidden rounded-2xl mb-4 shadow-sm group bg-white dark:bg-[#002147] border border-[#C0C0C0] dark:border-white/8"
       >
-        <div className="relative aspect-[21/9] sm:aspect-[32/9] lg:aspect-[40/9] w-full bg-slate-100 dark:bg-slate-800">
+        <div className="relative aspect-[21/9] sm:aspect-[32/9] lg:aspect-[40/9] w-full bg-slate-100 dark:bg-[#002A5C]">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}

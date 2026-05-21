@@ -105,7 +105,7 @@ const EmotionChatbot = ({ studentName = "friend" }) => {
             onKeyDown={handleKeyDown}
             placeholder="Type how you're feeling..."
             rows={2}
-            className="flex-1 px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
+            className="flex-1 px-4 py-3 bg-[#F8FAFC] border border-gray-100 rounded-2xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none resize-none"
           />
           <button
             onClick={handleSend}

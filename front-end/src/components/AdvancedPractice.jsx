@@ -43,10 +43,10 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
 
 
   return (
-    <div className="w-full h-full bg-white dark:bg-slate-900 p-4 md:p-6 overflow-y-auto">
+    <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-slate-700 pb-4">
+        <div className="border-b border-slate-200 dark:border-white/10 pb-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
               <Target size={16} />
@@ -59,7 +59,7 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
           <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2">
             {content}
           </h2>
-          <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-[#1a3884] rounded-full"
               initial={{ width: 0 }}
@@ -106,7 +106,7 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
                             ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                             : isSelected && !isCorrectAnswer
                             ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                            : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/20 opacity-50'
+                            : 'border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-slate-900/20 opacity-50'
                           : isSelected
                           ? 'border-[#1a3884] bg-blue-50 dark:bg-[#1a3884]/20'
                           : 'border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 hover:border-[#1a3884]/50 dark:hover:border-blue-500/50'
@@ -119,10 +119,10 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
                               ? 'border-green-500 bg-green-500'
                               : isSelected && !isCorrectAnswer
                               ? 'border-red-500 bg-red-500'
-                              : 'border-slate-300 dark:border-slate-700'
+                              : 'border-slate-300 dark:border-white/10'
                             : isSelected
                             ? 'border-[#1a3884] bg-[#1a3884]'
-                            : 'border-slate-300 dark:border-slate-700'
+                            : 'border-slate-300 dark:border-white/10'
                         }`}>
                           {showResult ? (
                             isCorrectAnswer || (isSelected && !isCorrectAnswer) ? (

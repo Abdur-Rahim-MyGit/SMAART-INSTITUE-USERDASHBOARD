@@ -77,7 +77,7 @@ const FAQAccordion = () => {
                 </span>
                 <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 border ${activeIndex === index
                   ? 'bg-[#1a3884] text-white border-[#1a3884] rotate-180'
-                  : 'bg-white dark:bg-white/10 text-gray-400 dark:text-gray-300 border-gray-200 dark:border-white/20 group-hover:border-[#C0C0C0] group-hover:text-[#C0C0C0]'
+                  : 'bg-white dark:bg-white/10 text-gray-400 dark:text-slate-200 border-gray-200 dark:border-white/20 group-hover:border-[#C0C0C0] group-hover:text-[#C0C0C0]'
                   }`}>
                   {activeIndex === index ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                 </div>
@@ -91,7 +91,7 @@ const FAQAccordion = () => {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
-                    <div className="px-6 pb-6 text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-white/10 pt-4 font-light">
+                    <div className="px-6 pb-6 text-gray-600 dark:text-slate-200 leading-relaxed border-t border-gray-100 dark:border-white/10 pt-4 font-light">
                       {faq.answer}
                     </div>
                   </motion.div>

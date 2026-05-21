@@ -202,7 +202,7 @@ const PostCard = ({
           </h3>
 
           {post.media?.url && post.media?.resourceType === "image" ? (
-            <div className="overflow-hidden rounded-[16px] border border-slate-200 bg-slate-50">
+            <div className="overflow-hidden rounded-[16px] border border-slate-200 bg-[#F8FAFC]">
               <img
                 src={post.media.url}
                 alt={post.title || "Community post media"}
@@ -220,7 +220,7 @@ const PostCard = ({
               href={post.media.url}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-[14px] border border-slate-200 bg-slate-50 px-4 py-3 text-[14px] font-medium text-[hsl(var(--lms-primary))] transition-colors hover:border-primary/15 hover:bg-white"
+              className="inline-flex items-center gap-2 rounded-[14px] border border-slate-200 bg-[#F8FAFC] px-4 py-3 text-[14px] font-medium text-[hsl(var(--lms-primary))] transition-colors hover:border-primary/15 hover:bg-white"
             >
               <Paperclip className="h-4 w-4" />
               Open attachment

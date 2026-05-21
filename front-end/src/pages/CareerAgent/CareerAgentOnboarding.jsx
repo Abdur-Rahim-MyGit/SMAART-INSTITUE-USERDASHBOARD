@@ -846,10 +846,10 @@ const CareerAgentOnboarding = () => {
 
   if (isSubmitting) {
     return (
-      <div id="screen-loading" className="career-agent-page" style={{ background: '#ffffff', zIndex: 9999, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div id="screen-loading" className="career-agent-page" style={{ background: 'var(--navy)', zIndex: 9999, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
           <div className="pulse-ring"></div>
-          <div style={{ width: '100px', height: '100px', borderRadius: '25px', background: '#f8fafc', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(37,99,235,0.15)', zIndex: 2, position: 'relative' }}>
+          <div style={{ width: '100px', height: '100px', borderRadius: '25px', background: 'var(--navy2)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(37,99,235,0.15)', zIndex: 2, position: 'relative' }}>
             <Sparkles size={48} color="var(--accent)" className="animate-pulse" />
           </div>
         </div>

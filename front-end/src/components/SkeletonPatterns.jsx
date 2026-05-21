@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const CardSkeleton = () => (
-  <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-6 space-y-4 bg-white dark:bg-slate-900 shadow-sm">
+  <div className="rounded-xl border border-slate-200 dark:border-white/8 p-6 space-y-4 bg-white dark:bg-[#002147] shadow-sm">
     <div className="flex items-center gap-4">
       <Skeleton className="h-12 w-12 rounded-xl" />
       <div className="space-y-2 flex-1">
@@ -14,7 +14,7 @@ export const CardSkeleton = () => (
       <Skeleton className="h-3 w-full" />
       <Skeleton className="h-3 w-2/3" />
     </div>
-    <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800">
+    <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-white/8">
       <Skeleton className="h-8 w-24 rounded-lg" />
       <Skeleton className="h-5 w-16 rounded-full" />
     </div>
@@ -22,7 +22,7 @@ export const CardSkeleton = () => (
 );
 
 export const TableRowSkeleton = () => (
-  <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800 last:border-0 animate-pulse">
+  <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-white/8 last:border-0 animate-pulse">
     <div className="flex items-center gap-4 flex-1">
       <Skeleton className="h-10 w-10 rounded-lg flex-shrink-0" />
       <div className="space-y-2 flex-1">
@@ -38,7 +38,7 @@ export const TableRowSkeleton = () => (
 );
 
 export const FormStepSkeleton = () => (
-  <div className="space-y-8 animate-pulse p-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+  <div className="space-y-8 animate-pulse p-6 bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/8 shadow-sm">
     <div className="space-y-3">
       <Skeleton className="h-6 w-1/4" />
       <Skeleton className="h-4 w-2/3" />
@@ -61,7 +61,7 @@ export const FormStepSkeleton = () => (
         ))}
       </div>
     </div>
-    <div className="flex justify-between pt-8 border-t border-slate-100 dark:border-slate-800">
+    <div className="flex justify-between pt-8 border-t border-slate-100 dark:border-white/8">
       <Skeleton className="h-10 w-24 rounded-xl" />
       <Skeleton className="h-10 w-32 rounded-xl" />
     </div>
@@ -71,7 +71,7 @@ export const FormStepSkeleton = () => (
 export const ReportSkeleton = () => (
   <div className="space-y-8 animate-pulse max-w-5xl mx-auto">
     {/* Header */}
-    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm">
+    <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/8 rounded-2xl p-8 shadow-sm">
       <div className="flex items-center gap-6">
         <Skeleton className="h-16 w-16 rounded-2xl" />
         <div className="space-y-3 flex-1">
@@ -83,13 +83,13 @@ export const ReportSkeleton = () => (
     
     {/* Stats Grid */}
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center gap-4">
+      <div className="bg-white dark:bg-[#002147] p-8 rounded-2xl border border-slate-200 dark:border-white/8 shadow-sm flex flex-col items-center gap-4">
         <Skeleton className="h-32 w-32 rounded-full" />
         <Skeleton className="h-4 w-24" />
       </div>
       <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div key={i} className="bg-white dark:bg-[#002147] p-6 rounded-2xl border border-slate-200 dark:border-white/8 shadow-sm">
             <div className="flex items-center gap-4 mb-4">
               <Skeleton className="h-10 w-10 rounded-lg" />
               <div className="space-y-2 flex-1">
@@ -103,8 +103,8 @@ export const ReportSkeleton = () => (
     </div>
 
     {/* Section */}
-    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-      <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+    <div className="bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/8 shadow-sm overflow-hidden">
+      <div className="p-6 border-b border-slate-100 dark:border-white/8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Skeleton className="h-10 w-10 rounded-lg" />
           <Skeleton className="h-6 w-48" />
@@ -141,7 +141,7 @@ export const ProfileSkeleton = () => (
     </div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
       <div className="md:col-span-1 space-y-6">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-4">
+        <div className="bg-white dark:bg-[#002147] rounded-2xl p-6 border border-slate-200 dark:border-white/8 space-y-4">
           <Skeleton className="h-6 w-32 mb-4" />
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center gap-3">
@@ -152,7 +152,7 @@ export const ProfileSkeleton = () => (
         </div>
       </div>
       <div className="md:col-span-2 space-y-6">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-6">
+        <div className="bg-white dark:bg-[#002147] rounded-2xl p-6 border border-slate-200 dark:border-white/8 space-y-6">
           <div className="flex justify-between">
             <Skeleton className="h-6 w-48" />
             <Skeleton className="h-6 w-24" />
@@ -171,7 +171,7 @@ export const ProfileSkeleton = () => (
 export const DashboardSkeleton = () => (
   <div className="space-y-8 animate-pulse p-4 max-w-7xl mx-auto">
     {/* Hero Skeleton */}
-    <div className="h-64 w-full rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 flex flex-col justify-end gap-4 shadow-sm">
+    <div className="h-64 w-full rounded-3xl bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/8 p-8 flex flex-col justify-end gap-4 shadow-sm">
       <Skeleton className="h-10 w-1/3" />
       <Skeleton className="h-4 w-1/2" />
     </div>
@@ -198,7 +198,7 @@ export const DashboardSkeleton = () => (
     {/* Events/Tools Grid */}
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-[#002147] rounded-2xl p-6 border border-slate-200 dark:border-white/8">
           <Skeleton className="h-6 w-32 mb-6" />
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -208,7 +208,7 @@ export const DashboardSkeleton = () => (
         </div>
       </div>
       <div className="space-y-6">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-[#002147] rounded-2xl p-6 border border-slate-200 dark:border-white/8">
           <Skeleton className="h-6 w-32 mb-6" />
           <div className="grid grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
@@ -224,7 +224,7 @@ export const DashboardSkeleton = () => (
 export const AssessmentsSkeleton = () => (
   <div className="space-y-8 animate-pulse p-4 max-w-4xl mx-auto">
     {/* Banner Skeleton */}
-    <div className="h-48 w-full rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 flex flex-col justify-center items-center gap-4">
+    <div className="h-48 w-full rounded-3xl bg-slate-100 dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 p-8 flex flex-col justify-center items-center gap-4">
       <Skeleton className="h-10 w-2/3" />
       <Skeleton className="h-4 w-1/3" />
     </div>
@@ -239,10 +239,10 @@ export const AssessmentsSkeleton = () => (
     <div className="relative pl-8 space-y-12 before:absolute before:left-2 before:top-0 before:bottom-0 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
       {[1, 2, 3].map((i) => (
         <div key={i} className="relative flex items-center gap-6">
-          <div className="absolute -left-[30px] w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 flex items-center justify-center z-10">
+          <div className="absolute -left-[30px] w-12 h-12 rounded-xl bg-white dark:bg-[#002147] border-2 border-slate-100 dark:border-white/8 flex items-center justify-center z-10">
             <Skeleton className="h-4 w-4 rounded-full" />
           </div>
-          <div className="flex-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+          <div className="flex-1 bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/8 p-6 shadow-sm">
             <div className="flex gap-4 mb-4">
               <Skeleton className="h-14 w-14 rounded-full" />
               <div className="flex-1 space-y-2">
@@ -262,7 +262,7 @@ export const AssessmentsSkeleton = () => (
 export const NotificationsSkeleton = () => (
   <div className="space-y-6 animate-pulse max-w-6xl mx-auto">
     {/* Header Skeleton */}
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex justify-between items-center">
+    <div className="bg-white dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/8 p-6 flex justify-between items-center">
       <div className="flex items-center gap-4">
         <Skeleton className="h-12 w-12 rounded-xl" />
         <div className="space-y-2">
@@ -277,7 +277,7 @@ export const NotificationsSkeleton = () => (
     </div>
 
     {/* Summary Card Skeleton */}
-    <div className="h-48 w-full rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-6 space-y-6">
+    <div className="h-48 w-full rounded-xl bg-slate-100 dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 p-6 space-y-6">
       <div className="flex justify-between">
         <div className="space-y-2">
           <Skeleton className="h-6 w-48" />
@@ -295,7 +295,7 @@ export const NotificationsSkeleton = () => (
     {/* List Skeleton */}
     <div className="space-y-4">
       <Skeleton className="h-4 w-24 mb-2 ml-2" />
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+      <div className="bg-white dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/8 divide-y divide-slate-100 dark:divide-slate-800">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="p-4 flex gap-4">
             <Skeleton className="h-12 w-12 rounded-xl" />

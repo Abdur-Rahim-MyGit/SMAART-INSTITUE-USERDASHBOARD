@@ -8,7 +8,7 @@ import NeuralBackground from "@/components/ui/NeuralBackground";
 const SignupSuccess = () => {
   const { theme } = useTheme();
   return (
-    <div className="min-h-screen bg-[#f4f7fa] dark:bg-dark-bg flex items-center justify-center px-4 py-8 relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center px-4 py-8 relative overflow-hidden transition-colors duration-300">
       <NeuralBackground theme={theme} />
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] right-[-5%] w-[700px] h-[700px] rounded-full bg-blue-100/50 opacity-40 blur-[120px]" />

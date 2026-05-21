@@ -15,7 +15,7 @@ const SimulationPanel = ({
             className="mt-8 bg-white dark:bg-slate-800/80 rounded-3xl border border-violet-200 dark:border-violet-500/20 shadow-2xl shadow-violet-500/10 overflow-hidden"
         >
             {/* Header */}
-            <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 text-slate-800 dark:text-white relative overflow-hidden">
+            <div className="bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 p-6 text-slate-800 dark:text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                 <div className="relative z-10 flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center">
@@ -61,7 +61,7 @@ const SimulationPanel = ({
                                     const v = Math.min(Math.max(parseInt(e.target.value) || 1, 1), 50);
                                     setSimCount(v);
                                 }}
-                                className="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white text-lg font-bold transition-all focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
+                                className="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002147] text-slate-800 dark:text-white text-lg font-bold transition-all focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10"
                                 placeholder="50"
                             />
                         </div>
@@ -92,7 +92,7 @@ const SimulationPanel = ({
                         className="rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-500/10 dark:to-fuchsia-500/10 border border-violet-200 dark:border-violet-500/20 p-5"
                     >
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center">
                                 <CheckCircle2 size={20} className="text-white" />
                             </div>
                             <div>
@@ -146,7 +146,7 @@ const SimulationPanel = ({
                 )}
 
                 {/* What gets stored */}
-                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-700">
+                <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-slate-700/40 border border-slate-200 dark:border-white/10">
                     <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">📦 What gets stored in MongoDB per profile:</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-500 dark:text-slate-400">
                         {[

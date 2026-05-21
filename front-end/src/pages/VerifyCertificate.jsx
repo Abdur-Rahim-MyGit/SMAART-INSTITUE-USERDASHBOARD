@@ -128,7 +128,7 @@ const VerifyCertificate = () => {
                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight font-heading">
                         Certificate <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#2a4d9e] dark:from-[#C0C0C0] dark:to-[#A8A8A8]">Verification</span>
                     </h1>
-                    <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
+                    <p className="text-gray-600 dark:text-slate-300 max-w-2xl mx-auto text-lg leading-relaxed">
                         Verify the authenticity of SMAART Institute credentials securely via our blockchain-enabled checkpoint system.
                     </p>
                 </motion.div>
@@ -142,7 +142,7 @@ const VerifyCertificate = () => {
                         transition={{ delay: 0.1 }}
                         className="lg:col-span-5 space-y-6"
                     >
-                        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-8 md:p-10 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden">
+                        <div className="bg-white dark:bg-[#002147] rounded-[32px] p-8 md:p-10 border border-slate-200 dark:border-white/8 shadow-2xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-[#1a3884]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                             <div className="relative z-10">
 
@@ -151,7 +151,7 @@ const VerifyCertificate = () => {
                                 <button
                                     onClick={() => setIsScanning(false)}
                                     className={`flex-1 py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2.5 ${!isScanning
-                                        ? 'bg-white dark:bg-slate-800 text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
+                                        ? 'bg-white dark:bg-[#002A5C] text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
                                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                         }`}
                                 >
@@ -161,7 +161,7 @@ const VerifyCertificate = () => {
                                 <button
                                     onClick={() => setIsScanning(true)}
                                     className={`flex-1 py-3.5 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2.5 ${isScanning
-                                        ? 'bg-white dark:bg-slate-800 text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
+                                        ? 'bg-white dark:bg-[#002A5C] text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
                                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                         }`}
                                 >
@@ -199,10 +199,10 @@ const VerifyCertificate = () => {
                                             </div>
 
                                             <div className="text-center">
-                                                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                                                <p className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-1">
                                                     {isQrScanning ? 'Reading QR code...' : 'Select a QR code image'}
                                                 </p>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                <p className="text-xs text-gray-500 dark:text-slate-300">
                                                     Pick a photo of the certificate from your gallery or files
                                                 </p>
                                             </div>
@@ -244,7 +244,7 @@ const VerifyCertificate = () => {
                                                     value={certificateId}
                                                     onChange={(e) => setCertificateId(e.target.value)}
                                                     placeholder="e.g. SMAART-CAP-2025-ABC12"
-                                                    className="w-full h-16 px-6 pl-14 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-600 focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/5 transition-all outline-none font-medium"
+                                                    className="w-full h-16 px-6 pl-14 rounded-2xl border-2 border-slate-100 dark:border-white/8 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-600 focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/5 transition-all outline-none font-medium"
                                                 />
                                                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600 group-focus-within:text-[#1a3884] transition-colors" />
                                             </div>
@@ -302,7 +302,7 @@ const VerifyCertificate = () => {
                                     <p className="text-red-700 dark:text-red-300 text-lg mb-6">{error}</p>
                                     <button
                                         onClick={() => { setError(null); setCertificateId(''); }}
-                                        className="px-6 py-2 bg-white dark:bg-transparent border border-gray-300 dark:border-white/20 text-gray-700 dark:text-white rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 transition-colors font-semibold"
+                                        className="px-6 py-2 bg-white dark:bg-transparent border border-gray-300 dark:border-white/20 text-gray-700 dark:text-white rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-white/5 transition-colors font-semibold"
                                     >
                                         Try Again
                                     </button>
@@ -339,7 +339,7 @@ const VerifyCertificate = () => {
                                                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
                                                     {verificationResult.verified ? 'Certified Authentic' : 'Verification Issue'}
                                                 </h2>
-                                                <p className="text-gray-500 dark:text-gray-400 mt-1">
+                                                <p className="text-gray-500 dark:text-slate-300 mt-1">
                                                     {verificationResult.message}
                                                 </p>
                                             </div>
@@ -350,16 +350,16 @@ const VerifyCertificate = () => {
                                             <div className="space-y-8">
                                                 <div className="grid md:grid-cols-2 gap-8">
                                                     <div>
-                                                        <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest font-semibold">Awarded To</label>
+                                                        <label className="text-xs text-gray-500 dark:text-slate-300 uppercase tracking-widest font-semibold">Awarded To</label>
                                                         <p className="text-2xl font-bold text-[#1a3884] dark:text-[#C0C0C0] mt-1 font-heading">
                                                             {verificationResult.certificate.fullName}
                                                         </p>
-                                                        <p className="text-sm text-gray-400 dark:text-gray-500 mt-1 font-mono">
+                                                        <p className="text-sm text-gray-400 dark:text-slate-400 mt-1 font-mono">
                                                             ID: {verificationResult.certificate.studentId}
                                                         </p>
                                                     </div>
                                                     <div>
-                                                        <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest font-semibold">Credential</label>
+                                                        <label className="text-xs text-gray-500 dark:text-slate-300 uppercase tracking-widest font-semibold">Credential</label>
                                                         <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">
                                                             {verificationResult.certificate.certificateTitle}
                                                         </p>
@@ -370,10 +370,10 @@ const VerifyCertificate = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="bg-gray-50 dark:bg-dark-elevated/30 rounded-2xl p-6 border border-gray-100 dark:border-white/5">
+                                                <div className="bg-[#F8FAFC] dark:bg-dark-elevated/30 rounded-2xl p-6 border border-gray-100 dark:border-white/5">
                                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                                         <div>
-                                                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                                                            <div className="flex items-center gap-2 text-gray-500 dark:text-slate-300 mb-1">
                                                                 <Calendar className="w-4 h-4" />
                                                                 <span className="text-xs font-semibold uppercase">Date</span>
                                                             </div>
@@ -382,7 +382,7 @@ const VerifyCertificate = () => {
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                                                            <div className="flex items-center gap-2 text-gray-500 dark:text-slate-300 mb-1">
                                                                 <TrendingUp className="w-4 h-4" />
                                                                 <span className="text-xs font-semibold uppercase">Band</span>
                                                             </div>
@@ -391,7 +391,7 @@ const VerifyCertificate = () => {
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                                                            <div className="flex items-center gap-2 text-gray-500 dark:text-slate-300 mb-1">
                                                                 <Award className="w-4 h-4" />
                                                                 <span className="text-xs font-semibold uppercase">Type</span>
                                                             </div>
@@ -400,7 +400,7 @@ const VerifyCertificate = () => {
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
+                                                            <div className="flex items-center gap-2 text-gray-500 dark:text-slate-300 mb-1">
                                                                 <Hash className="w-4 h-4" />
                                                                 <span className="text-xs font-semibold uppercase">Verifications</span>
                                                             </div>
@@ -414,7 +414,7 @@ const VerifyCertificate = () => {
                                                 {/* Validated Skills */}
                                                 {verificationResult.certificate.validatedSkills && verificationResult.certificate.validatedSkills.length > 0 && (
                                                     <div>
-                                                        <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest font-semibold mb-3 block">Validated Competencies</label>
+                                                        <label className="text-xs text-gray-500 dark:text-slate-300 uppercase tracking-widest font-semibold mb-3 block">Validated Competencies</label>
                                                         <div className="flex flex-wrap gap-2">
                                                             {verificationResult.certificate.validatedSkills.map((skill, index) => (
                                                                 <span key={index} className="px-3 py-1.5 rounded-lg bg-[#1a3884]/5 dark:bg-[#1a3884]/20 border border-[#1a3884]/10 dark:border-white/10 text-[#1a3884] dark:text-[#7ba0ff] text-xs font-bold flex items-center gap-1.5">
@@ -427,7 +427,7 @@ const VerifyCertificate = () => {
                                                 )}
 
                                                 <div className="pt-6 border-t border-gray-100 dark:border-white/10">
-                                                    <div className="text-xs text-gray-400 dark:text-gray-500 max-w-sm">
+                                                    <div className="text-xs text-gray-400 dark:text-slate-400 max-w-sm">
                                                         This digital credential is cryptographically secured. Altering this result page is technically impossible without the private keys.
                                                     </div>
                                                 </div>
@@ -441,9 +441,9 @@ const VerifyCertificate = () => {
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
-                                    className="bg-white dark:bg-dark-card/80 backdrop-blur-xl rounded-3xl p-10 border border-gray-200 dark:border-white/10 shadow-xl h-full flex flex-col justify-center items-center text-center text-gray-500 dark:text-gray-400"
+                                    className="bg-white dark:bg-dark-card/80 backdrop-blur-xl rounded-3xl p-10 border border-gray-200 dark:border-white/10 shadow-xl h-full flex flex-col justify-center items-center text-center text-gray-500 dark:text-slate-300"
                                 >
-                                    <div className="w-24 h-24 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
+                                    <div className="w-24 h-24 bg-[#F8FAFC] dark:bg-white/5 rounded-full flex items-center justify-center mb-6">
                                         <Search className="w-10 h-10 opacity-30" />
                                     </div>
                                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready to Verify</h3>
@@ -462,7 +462,7 @@ const VerifyCertificate = () => {
     // Logged-in users get the dashboard layout
     if (isLoggedIn) {
         return (
-            <div className="min-h-screen bg-[#F8F9FC] dark:bg-dark-bg transition-colors duration-300 font-sans relative overflow-x-hidden">
+            <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 font-sans relative overflow-x-hidden">
                 <PageTransition>
                     <div className="min-h-screen pb-20 lg:pb-0">
                         {pageContent}
@@ -474,7 +474,7 @@ const VerifyCertificate = () => {
 
     // Guests get the public layout (with landing Navbar)
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-500 font-sans relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-500 font-sans relative overflow-x-hidden">
             <Navbar showLinks={true} />
             {pageContent}
         </div>

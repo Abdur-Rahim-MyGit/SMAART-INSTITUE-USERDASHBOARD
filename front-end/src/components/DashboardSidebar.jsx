@@ -177,11 +177,11 @@ const DashboardSidebar = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[80] border-b border-slate-200/60 bg-white/95 shadow-md backdrop-blur-xl transition-all duration-300 dark:border-white/10 dark:bg-slate-900/95">
+      <header className="fixed top-0 left-0 right-0 z-[80] border-b border-slate-200/60 bg-white/95 shadow-md backdrop-blur-xl transition-colors duration-300 dark:border-[#1a3884]/20 dark:bg-[#002147]/98">
         <div className="flex h-18 items-center justify-between px-4 py-3 lg:px-8">
           <div className="flex shrink-0 items-center gap-3">
             <button
-              className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden"
+              className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-[#002A5C] lg:hidden"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
             >
               {isMobileOpen ? <X className="h-5 w-5 text-slate-600 dark:text-slate-300" /> : <Menu className="h-5 w-5 text-slate-600 dark:text-slate-300" />}
@@ -269,7 +269,7 @@ const DashboardSidebar = () => {
 
             <button
               onClick={toggleTheme}
-              className="rounded-lg p-2 text-slate-500 transition-all hover:bg-slate-100 hover:text-[#1a3884] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-blue-300"
+              className="rounded-lg p-2 text-slate-500 transition-all hover:bg-slate-100 hover:text-[#1a3884] dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-blue-300"
               aria-label="Toggle Theme"
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -295,7 +295,7 @@ const DashboardSidebar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute -right-12 mt-2 w-[300px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:right-0 sm:w-96"
+                    className="absolute -right-12 mt-2 w-[300px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-white/10 dark:bg-[#002147] sm:right-0 sm:w-96"
                     style={{ zIndex: 9999 }}
                   >
                     <div className="flex items-center justify-between bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3">
@@ -320,14 +320,14 @@ const DashboardSidebar = () => {
                       </div>
                     </div>
 
-                    <div className="max-h-[350px] overflow-y-auto bg-white dark:bg-slate-900">
+                    <div className="max-h-[350px] overflow-y-auto bg-white dark:bg-[#002147]">
                       {notifLoading ? (
                         <div className="flex justify-center py-10">
                           <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1a3884] border-t-transparent" />
                         </div>
                       ) : notifications.length === 0 ? (
                         <div className="flex flex-col items-center px-4 py-10 text-center">
-                          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
+                          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-[#002A5C]">
                             <Bell className="h-7 w-7 text-slate-400" />
                           </div>
                           <p className="font-medium text-slate-500 dark:text-slate-400">No notifications yet</p>
@@ -344,7 +344,7 @@ const DashboardSidebar = () => {
                             <div
                               key={notification._id}
                               onClick={() => handleNotificationClick(notification)}
-                              className={`flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 ${!notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+                              className={`flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] ${!notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
                             >
                               <div
                                 className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
@@ -366,7 +366,7 @@ const DashboardSidebar = () => {
                       )}
                     </div>
 
-                    <div className="border-t border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
+                    <div className="border-t border-slate-100 bg-[#F8FAFC] px-4 py-3 dark:border-white/10 dark:bg-[#002A5C]">
                       <button
                         onClick={() => {
                           navigate('/notifications');
@@ -408,9 +408,9 @@ const DashboardSidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: -300 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 z-[100] flex h-screen w-[280px] flex-col border-r border-slate-100 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 lg:hidden"
+            className="fixed left-0 top-0 z-[100] flex h-screen w-[280px] flex-col border-r border-slate-100 bg-white shadow-2xl dark:border-[#1a3884]/15 dark:bg-[#002147] lg:hidden"
           >
-            <div className="flex items-center justify-between border-b border-slate-100 p-4 dark:border-slate-800">
+            <div className="flex items-center justify-between border-b border-slate-100 p-4 dark:border-[#1a3884]/15">
               <div className="flex items-center gap-2">
                 <Link to="/" className="flex items-center group" onClick={() => setIsMobileOpen(false)}>
                   <div className="flex flex-col items-start">
@@ -428,7 +428,7 @@ const DashboardSidebar = () => {
 
                 {user?.college?.logo && (
                   <div className="ml-1 flex items-center gap-2">
-                    <div className="mx-1 h-5 w-[1px] bg-slate-200 dark:bg-slate-700" />
+                    <div className="mx-1 h-5 w-[1px] bg-slate-200 dark:bg-[#003170]" />
                     <div className="flex h-8 w-auto items-center justify-center transition-all duration-300">
                       <img
                         src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
@@ -455,7 +455,7 @@ const DashboardSidebar = () => {
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-[#002A5C]"
               >
                 <X className="h-5 w-5 text-slate-500 dark:text-slate-400" />
               </button>
@@ -479,7 +479,7 @@ const DashboardSidebar = () => {
                         onClick={() => setIsMobileOpen(false)}
                         className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${isActive
                           ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/30'
-                          : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800'
+                          : 'text-slate-600 hover:bg-[#F8FAFC] dark:text-slate-400 dark:hover:bg-[#002A5C]'
                           }`}
                       >
                         <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-[#1a3884]'}`} />
@@ -491,10 +491,10 @@ const DashboardSidebar = () => {
               </div>
             </nav>
 
-            <div className="border-t border-slate-100 p-3 dark:border-slate-800">
+            <div className="border-t border-slate-100 p-3 dark:border-[#1a3884]/15">
               <button
                 onClick={toggleTheme}
-                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-600 transition-colors hover:bg-[#F8FAFC] dark:text-slate-400 dark:hover:bg-[#002A5C]"
               >
                 {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-500" /> : <Moon className="h-5 w-5 text-[#1a3884]" />}
                 <span className="font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
@@ -515,7 +515,7 @@ const DashboardSidebar = () => {
               </Link>
             </div>
 
-            <div className="space-y-1 border-t border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-900/50">
+            <div className="space-y-1 border-t border-slate-100 bg-[#F8FAFC] p-3 dark:border-[#1a3884]/15 dark:bg-[#001A38]">
               {bottomMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isHelpButton = item.label === 'Help';
@@ -528,7 +528,7 @@ const DashboardSidebar = () => {
                         setIsMobileOpen(false);
                         setIsChatbotOpen(true);
                       }}
-                      className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-slate-500 transition-all hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                      className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-slate-500 transition-all hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-slate-200"
                     >
                       <Icon className="h-5 w-5" />
                       <span className="text-sm font-medium">{item.label}</span>
@@ -541,7 +541,7 @@ const DashboardSidebar = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMobileOpen(false)}
-                    className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-slate-500 transition-all hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                    className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-slate-500 transition-all hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-slate-200"
                   >
                     <Icon className="h-5 w-5" />
                     <span className="text-sm font-medium">{item.label}</span>

@@ -400,7 +400,7 @@ const MindCareSessions = () => {
                               onClick={() => setSelectedDomain(domain.id)}
                               className={`p-4 rounded-xl text-left transition-all ${selectedDomain === domain.id
                                 ? "bg-[#1a3884]/10 border-2 border-[#1a3884]"
-                                : "bg-gray-50 border-2 border-transparent hover:border-gray-200"
+                                : "bg-[#F8FAFC] border-2 border-transparent hover:border-gray-200"
                                 }`}
                             >
                               <div className="flex items-center gap-3">
@@ -430,7 +430,7 @@ const MindCareSessions = () => {
                         onChange={(e) => setIssueDescription(e.target.value)}
                         placeholder="Please describe what you'd like to discuss in the session..."
                         rows={4}
-                        className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none"
+                        className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none"
                       />
                     </div>
 
@@ -443,7 +443,7 @@ const MindCareSessions = () => {
                         <select
                           value={selectedCoach}
                           onChange={(e) => setSelectedCoach(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
+                          className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
                         >
                           <option value="">Any available coach</option>
                           {coaches.map((coach) => (
@@ -466,7 +466,7 @@ const MindCareSessions = () => {
                           value={preferredDate}
                           onChange={(e) => setPreferredDate(e.target.value)}
                           min={new Date().toISOString().split("T")[0]}
-                          className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
+                          className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
                         />
                       </div>
                       <div>
@@ -477,7 +477,7 @@ const MindCareSessions = () => {
                           type="time"
                           value={preferredTime}
                           onChange={(e) => setPreferredTime(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
+                          className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
                         />
                       </div>
                     </div>
@@ -487,7 +487,7 @@ const MindCareSessions = () => {
                       <button
                         type="button"
                         onClick={() => setActiveTab("sessions")}
-                        className="px-6 py-3 rounded-xl border border-gray-200 text-gray-500 font-medium hover:bg-gray-50 transition-colors"
+                        className="px-6 py-3 rounded-xl border border-gray-200 text-gray-500 font-medium hover:bg-[#F8FAFC] transition-colors"
                       >
                         Cancel
                       </button>
@@ -559,14 +559,14 @@ const MindCareSessions = () => {
                 onChange={(e) => setFeedbackComment(e.target.value)}
                 placeholder="Share your experience (optional)..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none mb-6"
+                className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none mb-6"
               />
 
               {/* Actions */}
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowFeedbackModal(false)}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-500 font-medium hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-500 font-medium hover:bg-[#F8FAFC] transition-colors"
                 >
                   Cancel
                 </button>

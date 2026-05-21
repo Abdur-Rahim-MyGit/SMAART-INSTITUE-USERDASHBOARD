@@ -314,7 +314,7 @@ const AssessmentFlowGuard = ({ children }) => {
 
         {/* Fallback loader if splash finishes but data is still fetching */}
         {splashComplete && loading && (
-          <div className="flex flex-col items-center justify-center min-h-screen bg-[#001229]">
+          <div className="flex flex-col items-center justify-center min-h-screen bg-[#00152E]">
             <div className="flex items-center">
               <Loader2 className="w-12 h-12 text-[#1a3884] animate-spin" />
               <p className="ml-4 text-white font-medium">Finalizing setup...</p>

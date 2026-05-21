@@ -28,7 +28,7 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
             exit={{ opacity: 0, scale: 0.96, y: 20 }}
             transition={{ type: "spring", stiffness: 400, damping: 30 }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-2xl z-10 overflow-hidden rounded-[2rem] bg-white dark:bg-dark-card shadow-2xl dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-black/5 dark:border-white/10"
+            className="relative w-full max-w-2xl z-10 overflow-hidden rounded-[2rem] bg-white dark:bg-[#002147] shadow-2xl dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] border border-black/5 dark:border-white/10"
             style={{ 
               boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.03)"
             }}
@@ -47,7 +47,7 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-dark-elevated shadow-sm border border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:bg-[#1a3884] dark:hover:bg-blue-600 hover:text-white hover:border-[#1a3884] dark:hover:border-blue-600 transition-all duration-300 group z-20"
+                className="absolute top-6 right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white dark:bg-dark-elevated shadow-sm border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-300 hover:bg-[#1a3884] dark:hover:bg-[#1a3884] hover:text-white hover:border-[#1a3884] dark:hover:border-blue-600 transition-all duration-300 group z-20"
                 aria-label="Close modal"
               >
                 <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
@@ -86,13 +86,13 @@ const InstitutionSelectModal = ({ isOpen, onClose, onInstitutionSelected }) => {
               >
                 Select Your Institution
               </h2>
-              <p className="relative z-10 text-gray-500 dark:text-gray-400 text-[12px] sm:text-[13px] font-medium mt-1.5 text-center max-w-[280px] leading-relaxed">
+              <p className="relative z-10 text-gray-500 dark:text-slate-300 text-[12px] sm:text-[13px] font-medium mt-1.5 text-center max-w-[280px] leading-relaxed">
                 Find your college to access your personalized learning and career dashboard.
               </p>
             </div>
 
             {/* ── Body ── */}
-            <div className="px-6 py-8 sm:px-10 sm:py-10 bg-white dark:bg-dark-card">
+            <div className="px-6 py-8 sm:px-10 sm:py-10 bg-white dark:bg-[#002147]">
               <InstitutionSelector 
                 onSelect={onInstitutionSelected} 
                 onPreviewChange={setPreviewInstitution}

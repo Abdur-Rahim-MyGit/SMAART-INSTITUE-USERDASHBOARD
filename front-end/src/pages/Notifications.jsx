@@ -173,14 +173,14 @@ const Notifications = () => {
   const hasMore = (pagination?.page || 1) < (pagination?.pages || 1);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC] dark:bg-dark-bg text-slate-900 font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] text-slate-900 font-sans transition-colors duration-300">
       <main className="container mx-auto max-w-6xl px-3 py-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6"
         >
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#002A5C]">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-800">
@@ -195,7 +195,7 @@ const Notifications = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="hidden items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400 sm:flex">
+                <div className="hidden items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-500 dark:border-white/10 dark:text-slate-400 sm:flex">
                   <span
                     className={`h-2.5 w-2.5 rounded-full ${
                       wsStatus === 'connected'
@@ -215,7 +215,7 @@ const Notifications = () => {
                 </div>
                 <button
                   onClick={handleRefresh}
-                  className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+                  className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-slate-200"
                   title="Refresh"
                 >
                   <RefreshCw className="h-5 w-5" />
@@ -241,13 +241,13 @@ const Notifications = () => {
               </div>
             </div>
 
-            <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4 dark:border-slate-700">
+            <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4 dark:border-white/10">
               <button
                 onClick={() => setFilter('all')}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   filter === 'all'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700'
+                    ? 'bg-[#1a3884] text-white'
+                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#002A5C]'
                 }`}
               >
                 All
@@ -256,8 +256,8 @@ const Notifications = () => {
                 onClick={() => setFilter('unread')}
                 className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   filter === 'unread'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700'
+                    ? 'bg-[#1a3884] text-white'
+                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#002A5C]'
                 }`}
               >
                 Unread
@@ -284,7 +284,7 @@ const Notifications = () => {
             transition={{ delay: 0.1 }}
             className="mb-6"
           >
-            <div className="rounded-xl border border-blue-800 bg-gradient-to-br from-blue-900 to-indigo-800 p-5 text-white shadow-lg dark:border-slate-700 dark:from-slate-800 dark:to-slate-800">
+            <div className="rounded-xl border border-blue-800 bg-gradient-to-br from-blue-900 to-indigo-800 p-5 text-white shadow-lg dark:border-white/10 dark:from-slate-800 dark:to-slate-800">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <h2 className="text-lg font-semibold text-white">Welcome back, {summary.fullName}!</h2>
@@ -343,10 +343,10 @@ const Notifications = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+            className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#002A5C]"
           >
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-700/50">
+              <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[#F8FAFC] dark:bg-slate-700/50">
                 <Bell className="h-12 w-12 text-slate-400 dark:text-slate-500" />
               </div>
               <h2 className="mb-2 text-xl font-semibold text-slate-900 dark:text-white">
@@ -366,7 +366,7 @@ const Notifications = () => {
                 <h3 className="mb-3 px-2 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {dateLabel}
                 </h3>
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm divide-y divide-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:divide-slate-700">
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm divide-y divide-slate-100 dark:border-white/10 dark:bg-[#002A5C] dark:divide-slate-700">
                   <AnimatePresence>
                     {items.map((notification) => {
                       const IconComponent = getIcon(notification.icon);
@@ -380,8 +380,8 @@ const Notifications = () => {
                           className={`relative group transition-colors ${
                             !notification.isRead
                               ? 'bg-blue-50/50 dark:bg-blue-900/10'
-                              : 'bg-white dark:bg-slate-800'
-                          } hover:bg-slate-50 dark:hover:bg-slate-700/50`}
+                              : 'bg-white dark:bg-[#002A5C]'
+                          } hover:bg-[#F8FAFC] dark:hover:bg-slate-700/50`}
                         >
                           <button
                             onClick={() => handleNotificationClick(notification)}
@@ -410,7 +410,7 @@ const Notifications = () => {
                                     {formatTimeAgo(notification.createdAt)}
                                   </span>
                                   {!notification.isRead && (
-                                    <div className="ml-auto mt-1 h-2 w-2 rounded-full bg-blue-600" />
+                                    <div className="ml-auto mt-1 h-2 w-2 rounded-full bg-[#1a3884]" />
                                   )}
                                 </div>
                               </div>
@@ -454,7 +454,7 @@ const Notifications = () => {
               <div className="flex justify-center pt-4">
                 <button
                   onClick={loadMore}
-                  className="rounded-xl border border-slate-200 bg-white px-6 py-3 font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  className="rounded-xl border border-slate-200 bg-white px-6 py-3 font-medium text-slate-700 shadow-sm transition-colors hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#002A5C]"
                 >
                   Load more notifications
                 </button>

@@ -84,13 +84,13 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
                         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-slate-900 rounded-3xl shadow-2xl"
+                        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#002147] rounded-3xl shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close Button */}
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-100 dark:bg-[#002A5C] hover:bg-slate-200 dark:hover:bg-[#002A5C] transition-colors"
                         >
                             <FaTimes className="w-5 h-5 text-slate-500" />
                         </button>
@@ -118,7 +118,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                         `}
                                     >
                                         <FaShieldAlt className="w-20 h-20 text-white drop-shadow-lg" />
-                                        <div className="absolute -bottom-2 -right-2 bg-white dark:bg-slate-800 rounded-full p-2 shadow-lg">
+                                        <div className="absolute -bottom-2 -right-2 bg-white dark:bg-[#002A5C] rounded-full p-2 shadow-lg">
                                             <FaAward className={`w-6 h-6 ${unifiedStyle.textColor}`} />
                                         </div>
                                         
@@ -182,7 +182,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     </div>
 
                                     {/* QR Code */}
-                                    <div className="flex items-center gap-4 p-4 bg-white dark:bg-slate-800 rounded-none border border-slate-200 dark:border-slate-700">
+                                    <div className="flex items-center gap-4 p-4 bg-white dark:bg-[#002A5C] rounded-none border border-slate-200 dark:border-white/10">
                                         <QRCodeSVG
                                             value={verificationUrl}
                                             size={80}
@@ -203,7 +203,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 rounded-none">
+                        <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-none">
                             {/* Share Buttons */}
                             <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-4 font-medium">
                                 Share your achievement

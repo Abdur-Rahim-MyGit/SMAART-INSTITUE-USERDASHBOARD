@@ -126,7 +126,7 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
           style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}
         >
           {/* ── Header ──────────────────────────────────────────────────────── */}
-          <div className="bg-gray-50 px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
+          <div className="bg-[#F8FAFC] px-8 pt-8 pb-7 flex flex-col items-center border-b border-gray-100">
             {/* Shield badge */}
             <div className="mb-3 p-3 bg-white rounded-2xl shadow-sm border border-gray-100 w-14 h-14 flex items-center justify-center">
               <ShieldCheck className="w-6 h-6 text-[#1a3884]" />
@@ -175,7 +175,7 @@ const FirstLoginPasswordModal = ({ isOpen, onClose, tempToken, email, fullName, 
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">
                 Account Email
               </label>
-              <div className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 bg-gray-50 border border-gray-100 opacity-60 cursor-not-allowed">
+              <div className="flex items-center gap-2.5 px-3.5 rounded-xl h-11 bg-[#F8FAFC] border border-gray-100 opacity-60 cursor-not-allowed">
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-white shadow-sm border border-gray-100">
                   <Lock className="w-3.5 h-3.5 text-gray-400" />
                 </div>

@@ -28,9 +28,19 @@ const DirectionOverview = ({ directionData }) => {
         );
     }
 
-    const { directionId, directionName, directionDescription, directionOverview, type, roles = [] } = directionData;
+    // FIX: Normalize fields — the direction-roles API returns a single `overview` field,
+    // but the engine stores both `directionDescription` and `directionOverview`.
+    // Support both shapes so the UI always shows content.
+    const normalizedData = {
+        ...directionData,
+        directionDescription: directionData.directionDescription || directionData.overview || '',
+        directionOverview:    directionData.directionOverview    || directionData.overview || '',
+    };
+
+    const { directionId, directionName, directionDescription, directionOverview, type, roles = [] } = normalizedData;
 
     const validRoles = roles.filter(r => r.role && r.role.trim() !== '');
+
 
     /* ── Type badge colour ── */
     const typeMeta = {

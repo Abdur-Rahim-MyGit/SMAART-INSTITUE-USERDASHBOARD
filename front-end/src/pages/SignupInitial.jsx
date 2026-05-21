@@ -64,7 +64,7 @@ const SignupInitial = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden transition-colors duration-300 bg-[#f4f7fa] dark:bg-[#002147] flex items-center justify-center px-4 py-10">
+    <div className="min-h-screen relative overflow-x-hidden transition-colors duration-300 bg-[#F8FAFC] dark:bg-[#002147] flex items-center justify-center px-4 py-10">
       <NeuralBackground theme={theme} />
       {/* Background glow blobs — same as login page */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">

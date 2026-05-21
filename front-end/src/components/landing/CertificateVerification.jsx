@@ -145,7 +145,7 @@ const CertificateVerification = () => {
                                         Verification
                                     </span>
                                 </h2>
-                                <p className="text-gray-600 dark:text-gray-300 text-base mb-10 leading-relaxed max-w-md font-light">
+                                <p className="text-gray-600 dark:text-slate-200 text-base mb-10 leading-relaxed max-w-md font-light">
                                     Verify the authenticity of SMAART Institute credentials instantly. Our secure blockchain-backed verification system ensures trust and credibility.
                                 </p>
 
@@ -167,9 +167,9 @@ const CertificateVerification = () => {
                                                 <item.icon className="w-5 h-5 text-[#1a3884] dark:text-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-colors" />
                                             </div>
                                             <div>
-                                                <h4 className="text-gray-400 dark:text-gray-500 font-bold text-[9px] uppercase tracking-widest mb-0.5">{item.title}</h4>
+                                                <h4 className="text-gray-400 dark:text-slate-400 font-bold text-[9px] uppercase tracking-widest mb-0.5">{item.title}</h4>
                                                 <p className="text-[#002147] dark:text-white font-bold text-base leading-none mb-0.5">{item.info}</p>
-                                                <p className="text-gray-500 dark:text-gray-400 text-[11px] font-light tracking-wide">{item.sub}</p>
+                                                <p className="text-gray-500 dark:text-slate-300 text-[11px] font-light tracking-wide">{item.sub}</p>
                                             </div>
                                         </motion.div>
                                     ))}
@@ -211,7 +211,7 @@ const CertificateVerification = () => {
                                                 <button
                                                     onClick={() => { setActiveTab('id'); setVerificationResult(null); setError(null); }}
                                                     className={`flex-1 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all duration-300 ${activeTab === 'id'
-                                                        ? 'bg-white dark:bg-slate-800 text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
+                                                        ? 'bg-white dark:bg-[#002A5C] text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
                                                         : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                                                 >
                                                     <Hash className="w-3.5 h-3.5" />
@@ -220,7 +220,7 @@ const CertificateVerification = () => {
                                                 <button
                                                     onClick={() => { setActiveTab('scan'); setVerificationResult(null); setError(null); }}
                                                     className={`flex-1 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all duration-300 ${activeTab === 'scan'
-                                                        ? 'bg-white dark:bg-slate-800 text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
+                                                        ? 'bg-white dark:bg-[#002A5C] text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
                                                         : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                                                 >
                                                     <QrCode className="w-3.5 h-3.5" />
@@ -249,7 +249,7 @@ const CertificateVerification = () => {
                                                             <div id="reader-landing-hidden" className="hidden"></div>
 
                                                             <div className="flex flex-col items-center gap-6">
-                                                                <div className="w-24 h-24 rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center group-hover:border-[#1a3884] transition-colors">
+                                                                <div className="w-24 h-24 rounded-2xl bg-slate-50 dark:bg-[#002147] border-2 border-dashed border-slate-200 dark:border-white/8 flex items-center justify-center group-hover:border-[#1a3884] transition-colors">
                                                                     {isQrScanning ? (
                                                                         <Loader2 className="w-10 h-10 text-[#1a3884] animate-spin" />
                                                                     ) : (
@@ -300,7 +300,7 @@ const CertificateVerification = () => {
                                                                         value={certificateId}
                                                                         onChange={(e) => setCertificateId(e.target.value)}
                                                                         placeholder="e.g. SMAART-CAP-2025-ABC12"
-                                                                        className="w-full h-16 px-6 pl-14 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/5 transition-all outline-none font-medium"
+                                                                        className="w-full h-16 px-6 pl-14 rounded-2xl border-2 border-slate-100 dark:border-white/8 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/5 transition-all outline-none font-medium"
                                                                     />
                                                                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600 group-focus-within:text-[#1a3884] transition-colors" />
                                                                 </div>
@@ -347,7 +347,7 @@ const CertificateVerification = () => {
                                                                             <XCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
                                                                         </div>
                                                                         <h3 className="text-xl font-bold text-red-600 dark:text-red-400">Verification Failed</h3>
-                                                                        <p className="text-gray-600 dark:text-gray-300">{error}</p>
+                                                                        <p className="text-gray-600 dark:text-slate-200">{error}</p>
                                                                         <button
                                                                             onClick={() => { setVerificationResult(null); setError(null); }}
                                                                             className="mt-4 px-6 py-2 bg-gray-100 dark:bg-white/10 rounded-none text-sm font-bold"
@@ -365,7 +365,7 @@ const CertificateVerification = () => {
                                                                             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                                                                                 {verificationResult.verified ? 'Valid Certificate' : 'Issue Detected'}
                                                                             </h3>
-                                                                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                                            <p className="text-sm text-gray-500 dark:text-slate-300">
                                                                                 {verificationResult.message}
                                                                             </p>
                                                                         </div>
@@ -384,11 +384,11 @@ const CertificateVerification = () => {
                                                                                 <div className="grid grid-cols-2 gap-4">
                                                                                     <div>
                                                                                         <label className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Issued</label>
-                                                                                        <p className="text-sm font-mono text-gray-700 dark:text-gray-300">{new Date(verificationResult.certificate.issueDate).toLocaleDateString()}</p>
+                                                                                        <p className="text-sm font-mono text-gray-700 dark:text-slate-200">{new Date(verificationResult.certificate.issueDate).toLocaleDateString()}</p>
                                                                                     </div>
                                                                                     <div>
                                                                                         <label className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Band</label>
-                                                                                        <p className="text-sm font-mono text-gray-700 dark:text-gray-300">{verificationResult.certificate.readinessBand}</p>
+                                                                                        <p className="text-sm font-mono text-gray-700 dark:text-slate-200">{verificationResult.certificate.readinessBand}</p>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>

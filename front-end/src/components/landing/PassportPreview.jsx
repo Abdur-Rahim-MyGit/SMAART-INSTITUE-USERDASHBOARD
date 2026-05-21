@@ -69,7 +69,7 @@ const PassportPreview = () => {
                 </div>
 
                 {/* Body */}
-                <div className="p-6 md:p-8 text-gray-600 dark:text-gray-300 relative z-10">
+                <div className="p-6 md:p-8 text-gray-600 dark:text-slate-200 relative z-10">
                   <div className="flex items-center gap-6 mb-8">
                     <div className="w-20 h-20 bg-gray-100 dark:bg-white/10 rounded-2xl border border-gray-200 dark:border-white/10 shadow-inner flex items-center justify-center">
                       <div className="w-10 h-10 text-gray-300 dark:text-gray-600">
@@ -107,7 +107,7 @@ const PassportPreview = () => {
                       <div className="h-10 w-10 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10" />
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1 font-bold">Issued By</p>
+                      <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-slate-400 mb-1 font-bold">Issued By</p>
                       <p className="font-bold text-[#C0C0C0] text-xl font-heading tracking-tight">SMAART Institute</p>
                     </div>
                   </div>
@@ -138,7 +138,7 @@ const PassportPreview = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-base sm:text-lg mb-10 leading-relaxed text-gray-600 dark:text-gray-400 font-light max-w-2xl mx-auto lg:mx-0"
+              className="text-base sm:text-lg mb-10 leading-relaxed text-gray-600 dark:text-slate-300 font-light max-w-2xl mx-auto lg:mx-0"
             >
               A verifiable, lifelong record of capability development and progression. It captures not just what you know, but what you can do—providing trusted evidence of your readiness for the future of work.
             </motion.p>
@@ -150,7 +150,7 @@ const PassportPreview = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.4 + index * 0.1 }}
-                  className="flex items-center gap-5 text-gray-700 dark:text-gray-300"
+                  className="flex items-center gap-5 text-gray-700 dark:text-slate-200"
                 >
                   <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[#C0C0C0]/20 text-[#C0C0C0] shrink-0">
                     <CheckCircle className="w-5 h-5" />

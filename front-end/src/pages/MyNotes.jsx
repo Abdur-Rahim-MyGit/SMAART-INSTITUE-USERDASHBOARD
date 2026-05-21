@@ -177,7 +177,7 @@ const MyNotes = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
             <main className="w-full relative py-8 px-4 md:px-6">
                 <div className="max-w-7xl mx-auto pb-12">
 
@@ -234,9 +234,9 @@ const MyNotes = () => {
                                 <motion.div
                                     layout
                                     onClick={openNewNote}
-                                    className="min-h-[250px] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group"
+                                    className="min-h-[250px] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-white/10 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group"
                                 >
-                                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#002A5C] flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                                         <Plus className="w-6 h-6 text-slate-400 group-hover:text-blue-500" />
                                     </div>
                                     <p className="text-slate-500 font-medium group-hover:text-blue-600">Create New Note</p>
@@ -286,10 +286,10 @@ const MyNotes = () => {
             <AnimatePresence>
                 {showModal && (
                     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
-                        <div className="bg-white dark:bg-[#1e293b] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                        <div className="bg-white dark:bg-[#002147] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
 
                             {/* Modal Header */}
-                            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700">
+                            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/10">
                                 <h2 className="font-bold text-lg text-slate-800 dark:text-white">
                                     {currentNote.id ? "Edit Note" : "New Note"}
                                 </h2>
@@ -328,13 +328,13 @@ const MyNotes = () => {
                             </div>
 
                             {/* Modal Footer */}
-                            <div className="p-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-black/20">
+                            <div className="p-4 border-t border-gray-100 dark:border-white/10 flex justify-between items-center bg-[#F8FAFC] dark:bg-black/20">
                                 <div className="flex items-center gap-4">
                                     <div className="text-xs text-slate-400">
                                         {currentNote.updatedAt && `Last edited: ${formatDate(currentNote.updatedAt)}`}
                                     </div>
                                 </div>
-                                <Button onClick={handleSaveNote} className="bg-blue-600 hover:bg-blue-700 text-white shadow-md">
+                                <Button onClick={handleSaveNote} className="bg-[#1a3884] hover:bg-[#132c6b] text-white shadow-md">
                                     <Save className="w-4 h-4 mr-2" /> Save Note
                                 </Button>
                             </div>

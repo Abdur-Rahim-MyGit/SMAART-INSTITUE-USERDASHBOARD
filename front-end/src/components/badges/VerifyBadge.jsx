@@ -176,7 +176,7 @@ const VerifyBadge = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         onSubmit={handleManualVerify}
-                        className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg mb-8"
+                        className="bg-white dark:bg-[#002A5C] rounded-2xl p-6 shadow-lg mb-8"
                     >
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                             Enter Badge ID
@@ -187,7 +187,7 @@ const VerifyBadge = () => {
                                 value={manualId}
                                 onChange={(e) => setManualId(e.target.value)}
                                 placeholder="e.g., BADGE-CRQ-2026-001"
-                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:ring-2 focus:ring-[#1a3884] focus:border-transparent outline-none transition-all"
+                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#002147] text-slate-800 dark:text-white focus:ring-2 focus:ring-[#1a3884] focus:border-transparent outline-none transition-all"
                             />
                             <button
                                 type="submit"
@@ -217,7 +217,7 @@ const VerifyBadge = () => {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-lg text-center"
+                        className="bg-white dark:bg-[#002A5C] rounded-2xl p-8 shadow-lg text-center"
                     >
                         <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
                             <FaTimesCircle className="w-10 h-10 text-red-500" />
@@ -354,7 +354,7 @@ const VerifyBadge = () => {
                                     </div>
 
                                     {/* QR Code */}
-                                    <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl">
+                                    <div className="flex items-center gap-4 p-4 bg-[#F8FAFC] rounded-xl">
                                         <QRCodeSVG
                                             value={window.location.href}
                                             size={80}
@@ -374,7 +374,7 @@ const VerifyBadge = () => {
                             </div>
 
                             {/* Footer */}
-                            <div className="bg-slate-50 px-8 py-4 border-t border-slate-200">
+                            <div className="bg-[#F8FAFC] px-8 py-4 border-t border-slate-200">
                                 <p className="text-xs text-slate-500 text-center">
                                     This certificate verifies the authenticity of the above badge credential.
                                     Issued by SMAART Institute © {new Date().getFullYear()}
@@ -419,7 +419,7 @@ const VerifyBadge = () => {
     // Logged-in users get the dashboard layout
     if (isLoggedIn) {
         return (
-            <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
+            <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
                 <DashboardSidebar />
                 <PageTransition>
                     <div className="min-h-screen pb-20 lg:pb-0">
@@ -432,7 +432,7 @@ const VerifyBadge = () => {
 
     // Guests get the public Navbar layout
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
             <Navbar showLinks={true} />
             {pageContent}
         </div>

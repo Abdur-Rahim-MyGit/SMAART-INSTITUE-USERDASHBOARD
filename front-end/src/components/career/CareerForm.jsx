@@ -52,7 +52,7 @@ const CareerForm = ({
                                 {DEGREE_GROUPS.map(deg => (
                                     <button key={deg} type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, degreeGroup: deg, specialisation: '' }))}
-                                        className={`p-3 rounded-xl border-2 text-sm font-semibold text-center transition-all duration-200 ${formData.degreeGroup === deg ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-md' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-indigo-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                        className={`p-3 rounded-xl border-2 text-sm font-semibold text-center transition-all duration-200 ${formData.degreeGroup === deg ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-md' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-indigo-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'}`}>
                                         {formData.degreeGroup === deg && <CheckCircle2 size={13} className="inline mr-1 text-indigo-500" />}{deg}
                                     </button>
                                 ))}
@@ -65,7 +65,7 @@ const CareerForm = ({
                                     {specs.map(sp => (
                                         <button key={sp} type="button"
                                             onClick={() => setFormData(prev => ({ ...prev, specialisation: sp }))}
-                                            className={`p-3 rounded-xl border-2 text-sm font-semibold text-center transition-all duration-200 ${formData.specialisation === sp ? 'border-violet-500 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-violet-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                            className={`p-3 rounded-xl border-2 text-sm font-semibold text-center transition-all duration-200 ${formData.specialisation === sp ? 'border-violet-500 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-violet-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'}`}>
                                             {formData.specialisation === sp && <CheckCircle2 size={13} className="inline mr-1 text-violet-500" />}{sp}
                                         </button>
                                     ))}
@@ -91,7 +91,7 @@ const CareerForm = ({
                                 {years.map(yr => (
                                     <button key={yr} type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, yearOfStudy: yr }))}
-                                        className={`p-6 rounded-2xl border-2 text-center font-bold transition-all duration-200 ${formData.yearOfStudy === yr ? 'border-indigo-500 bg-indigo-500 text-white shadow-xl shadow-indigo-500/30 scale-105' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                        className={`p-6 rounded-2xl border-2 text-center font-bold transition-all duration-200 ${formData.yearOfStudy === yr ? 'border-indigo-500 bg-indigo-500 text-white shadow-xl shadow-indigo-500/30 scale-105' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-indigo-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'}`}>
                                         <div className="text-2xl font-black">{yr.split(' ')[1]}</div>
                                         <div className="text-xs mt-1 opacity-70">{yr}</div>
                                     </button>
@@ -121,7 +121,7 @@ const CareerForm = ({
                                 <Briefcase size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                                 <input id="roleSearchInput" type="text"
                                     placeholder="Search role… e.g. Data Analyst, UX Designer"
-                                    className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                                    className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                                     onChange={e => {
                                         const val = e.target.value;
                                         if (val.length > 1) {
@@ -134,10 +134,10 @@ const CareerForm = ({
                                 />
                             </div>
                             {isSearchingRole && roleSuggestions.length > 0 && (
-                                <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-hidden max-h-52 overflow-y-auto no-scrollbar">
-                                    <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase bg-slate-50 dark:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700">SMAART Role Database</div>
+                                <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-hidden max-h-52 overflow-y-auto no-scrollbar">
+                                    <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase bg-[#F8FAFC] dark:bg-slate-700/50 border-b border-slate-100 dark:border-white/10">SMAART Role Database</div>
                                     {roleSuggestions.map((s, i) => (
-                                        <button key={i} className="w-full text-left px-4 py-2.5 text-sm hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 border-b border-slate-50 dark:border-slate-700 last:border-0"
+                                        <button key={i} className="w-full text-left px-4 py-2.5 text-sm hover:bg-indigo-50 dark:hover:bg-[#002A5C] transition-colors text-slate-700 dark:text-slate-200 border-b border-slate-50 dark:border-white/10 last:border-0"
                                             onClick={() => { addRole(s); document.getElementById('roleSearchInput').value = ''; }}>
                                             {s}
                                         </button>
@@ -163,7 +163,7 @@ const CareerForm = ({
             case 3:
                 return (
                     <motion.div key="sector" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-8">
-                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-500 font-medium">
+                        <div className="p-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-xs text-slate-500 font-medium">
                             Both fields are <strong>optional</strong> — they boost your career match score, not filter it.
                         </div>
                         <div>
@@ -182,7 +182,7 @@ const CareerForm = ({
                                                     toast.error('Maximum 2 sectors allowed');
                                                 }
                                             }}
-                                            className={`p-2.5 rounded-xl border text-xs font-semibold text-left transition-all ${sel ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                            className={`p-2.5 rounded-xl border text-xs font-semibold text-left transition-all ${sel ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-emerald-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'}`}>
                                             {sel && <CheckCircle2 size={11} className="inline mr-1 text-emerald-500" />}{s}
                                         </button>
                                     );
@@ -195,7 +195,7 @@ const CareerForm = ({
                                 {COMPANY_TYPES.map(ct => (
                                     <button key={ct} type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, companyTypePreference: ct }))}
-                                        className={`flex-1 py-5 rounded-2xl border-2 font-bold text-sm transition-all duration-200 flex flex-col items-center gap-1 ${formData.companyTypePreference === ct ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-md' : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                        className={`flex-1 py-5 rounded-2xl border-2 font-bold text-sm transition-all duration-200 flex flex-col items-center gap-1 ${formData.companyTypePreference === ct ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-md' : 'border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'}`}>
                                         <span className="text-2xl">{ct === 'STARTUP' ? '🚀' : ct === 'TRADITIONAL' ? '🏢' : '🌐'}</span>
                                         <span className="text-xs">{ct}</span>
                                     </button>
@@ -233,7 +233,7 @@ const CareerForm = ({
                                                 toast.error('Maximum 3 interests allowed');
                                             }
                                         }}
-                                        className={`p-4 rounded-2xl border-2 text-center flex flex-col items-center gap-2 transition-all duration-200 ${sel ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-lg scale-105' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-indigo-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                        className={`p-4 rounded-2xl border-2 text-center flex flex-col items-center gap-2 transition-all duration-200 ${sel ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-lg scale-105' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-indigo-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'}`}>
                                         <span className="text-2xl">{item.icon}</span>
                                         <span className="text-xs font-bold leading-tight">{item.name}</span>
                                     </button>
@@ -254,7 +254,7 @@ const CareerForm = ({
                                 return (
                                     <button key={tl} type="button"
                                         onClick={() => setFormData(prev => ({ ...prev, placementTimeline: tl, isPriority: isPri }))}
-                                        className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 ${sel ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 shadow-xl shadow-indigo-500/10 scale-[1.02]' : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                                        className={`p-5 rounded-2xl border-2 text-left transition-all duration-200 ${sel ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 shadow-xl shadow-indigo-500/10 scale-[1.02]' : 'border-slate-200 dark:border-white/10 hover:border-indigo-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'}`}>
                                         <div className="flex items-center justify-between mb-1">
                                             <span className={`text-sm font-bold ${sel ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-200'}`}>{tl}</span>
                                             <div className="flex items-center gap-2">
@@ -286,20 +286,20 @@ const CareerForm = ({
                 };
                 return (
                     <motion.div key="skills" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
-                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-500 font-medium">
-                            Add skills from the suggestions below, or type any skill (programming language, tool, soft skill, certification) and press <kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-[10px] font-mono">Enter</kbd> or click Add.
+                        <div className="p-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-xs text-slate-500 font-medium">
+                            Add skills from the suggestions below, or type any skill (programming language, tool, soft skill, certification) and press <kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-[#003170] rounded text-[10px] font-mono">Enter</kbd> or click Add.
                         </div>
                         <div className="flex gap-2">
                             <input type="text" value={skillInput}
                                 onChange={e => setSkillInput(e.target.value)}
                                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addSkill(skillInput); } }}
                                 placeholder="e.g. Python, Leadership, AWS, Figma…"
-                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm" />
+                                className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm" />
                             <button type="button" onClick={() => addSkill(skillInput)}
-                                className="px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700 active:scale-95 transition-all">Add</button>
+                                className="px-5 py-3 rounded-xl bg-[#1a3884] text-white font-bold text-sm hover:bg-indigo-700 active:scale-95 transition-all">Add</button>
                         </div>
                         {formData.currentSkills.length > 0 && (
-                            <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                            <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10">
                                 {formData.currentSkills.map((sk, i) => (
                                     <span key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-sm font-semibold border border-indigo-200 dark:border-indigo-500/30">
                                         {sk}
@@ -331,7 +331,7 @@ const CareerForm = ({
                     <motion.div key="domain" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
                         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                             <div className="lg:col-span-2">
-                                <div className="p-8 rounded-[2rem] bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden h-full">
+                                <div className="p-8 rounded-[2rem] bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm border border-slate-200 dark:border-white/10 relative overflow-hidden h-full">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
                                     <div className="relative z-10 flex flex-col h-full">
                                         <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center mb-6">
@@ -378,9 +378,9 @@ const CareerForm = ({
     };
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/8 shadow-sm overflow-hidden">
             {/* Step Indicator */}
-            <div className="p-6 border-b border-slate-100 dark:border-slate-700">
+            <div className="p-6 border-b border-slate-100 dark:border-white/10">
                 <div className="flex items-center justify-between max-w-2xl mx-auto">
                     {FORM_STEPS.map((step, i) => {
                         const StepIcon = step.icon;
@@ -392,9 +392,9 @@ const CareerForm = ({
                                     onClick={() => i <= currentStep && setCurrentStep(i)}
                                     className={`relative flex flex-col items-center gap-2 transition-all duration-300 ${i <= currentStep ? 'cursor-pointer' : 'cursor-default'}`}
                                 >
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-white shadow-lg shadow-indigo-500/30 scale-110'
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 ${isActive ? 'bg-white dark:bg-[#002A5C] shadow-sm border border-slate-200 dark:border-white/10 text-white shadow-lg shadow-indigo-500/30 scale-110'
                                         : isCompleted ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                                            : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
+                                            : 'bg-slate-100 dark:bg-[#003170] text-slate-400'
                                         }`}>
                                         {isCompleted ? <CheckCircle2 size={20} /> : <StepIcon size={20} />}
                                     </div>
@@ -403,7 +403,7 @@ const CareerForm = ({
                                     </span>
                                 </button>
                                 {i < FORM_STEPS.length - 1 && (
-                                    <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors ${i < currentStep ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                                    <div className={`w-12 lg:w-20 h-0.5 mx-2 rounded-full transition-colors ${i < currentStep ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-[#003170]'}`} />
                                 )}
                             </div>
                         );
@@ -424,11 +424,11 @@ const CareerForm = ({
             </div>
 
             {/* Navigation */}
-            <div className="p-6 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+            <div className="p-6 border-t border-slate-100 dark:border-white/10 flex items-center justify-between">
                 <button
                     onClick={() => currentStep > 0 && setCurrentStep(currentStep - 1)}
                     disabled={currentStep === 0}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${currentStep === 0 ? 'opacity-40 cursor-not-allowed text-slate-400' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all ${currentStep === 0 ? 'opacity-40 cursor-not-allowed text-slate-400' : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#002A5C]'
                         }`}
                 >
                     <ArrowLeft size={16} /> Back
@@ -446,7 +446,7 @@ const CareerForm = ({
                         disabled={!validateStep()}
                         className={`flex items-center gap-2 px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${validateStep()
                             ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100'
-                            : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
+                            : 'bg-slate-200 dark:bg-[#003170] text-slate-400 cursor-not-allowed'
                             }`}
                     >
                         Next <ArrowRight size={16} />
@@ -457,7 +457,7 @@ const CareerForm = ({
                         disabled={!validateStep() || isGenerating}
                         className={`flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-sm transition-all ${validateStep() && !isGenerating
                             ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm hover:bg-slate-800 dark:hover:bg-slate-100'
-                            : 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
+                            : 'bg-slate-200 dark:bg-[#003170] text-slate-400 cursor-not-allowed'
                             }`}
                     >
                         {isGenerating ? <><Loader2 size={16} className="animate-spin" /> Generating...</> : <><Brain size={16} /> Generate Career Intelligence</>}

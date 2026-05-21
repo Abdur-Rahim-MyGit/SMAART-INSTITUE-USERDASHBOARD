@@ -150,7 +150,7 @@ const NoticesFeed = ({ currentUser }) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search announcements…"
-          className="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-2xl text-sm font-semibold text-[#002147] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[#002147]/5 focus:border-[#002147]/30 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
+          className="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 dark:bg-slate-800/50 border border-gray-200 dark:border-white/10 rounded-2xl text-sm font-semibold text-[#002147] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[#002147]/5 focus:border-[#002147]/30 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
         />
         {searchQuery && (
           <button
@@ -165,7 +165,7 @@ const NoticesFeed = ({ currentUser }) => {
       {/* ── Filter row: Date + Role + Clear ────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         {/* Date filter pills */}
-        <div className="flex items-center gap-1 p-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+        <div className="flex items-center gap-1 p-1 bg-gray-100/50 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
           {DATE_FILTERS.map((f) => (
             <button
               key={f.key}
@@ -184,7 +184,7 @@ const NoticesFeed = ({ currentUser }) => {
         {/* <span className="text-gray-200 font-light hidden sm:block">|</span> */}
 
         {/* Role filter pills */}
-        <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/60 dark:border-slate-700 shadow-sm">
+        <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/60 dark:border-white/10 shadow-sm">
           {/* <span className="pl-2 pr-1">
             <SlidersHorizontal className="w-3 h-3 text-gray-400" />
           </span> */}
@@ -278,10 +278,10 @@ const NoticesFeed = ({ currentUser }) => {
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ delay: index * 0.04, duration: 0.2 }}
                 className={`bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-3xl p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border transition-all duration-300 group ${isExpired
-                  ? "opacity-60 border-gray-100 dark:border-slate-800"
+                  ? "opacity-60 border-gray-100 dark:border-white/8"
                   : ann.isPinned
-                    ? "border-amber-200 dark:border-amber-900/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
-                    : "border-white/40 dark:border-slate-700/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
+                    ? "border-amber-200 dark:border-amber-900/50 hover:bg-white dark:hover:bg-[#002A5C] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
+                    : "border-white/40 dark:border-slate-700/40 hover:bg-white dark:hover:bg-[#002A5C] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-0.5"
                   }`}
               >
                 {/* Subtle indicator for pinned */}
@@ -303,7 +303,7 @@ const NoticesFeed = ({ currentUser }) => {
                   <span
                     className={`flex items-center gap-1 px-2.5 py-1 text-[10px] font-black rounded-full uppercase tracking-wider ${ann.createdByRole === "admin"
                       ? "bg-[#002147]/10 dark:bg-blue-900/30 text-[#002147] dark:text-blue-400 border border-[#002147]/5 dark:border-blue-800/30"
-                      : "bg-blue-50 dark:bg-slate-700 text-blue-700 dark:text-slate-300 border border-blue-100 dark:border-slate-600"
+                      : "bg-blue-50 dark:bg-[#003170] text-blue-700 dark:text-slate-300 border border-blue-100 dark:border-slate-600"
                       }`}
                   >
                     {ann.createdByRole === "admin" ? (
@@ -340,7 +340,7 @@ const NoticesFeed = ({ currentUser }) => {
                 {ann.attachmentUrl && (
                   <div className="flex mb-6">
                     {ann.attachmentType === 'video' || ann.attachmentUrl.match(/\.(mp4|webm|ogg)$/i) ? (
-                      <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-slate-700 w-full max-w-2xl bg-black">
+                      <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-white/10 w-full max-w-2xl bg-black">
                         <video 
                           src={ann.attachmentUrl} 
                           controls
@@ -348,7 +348,7 @@ const NoticesFeed = ({ currentUser }) => {
                         />
                       </div>
                     ) : ann.attachmentType === 'image' || ann.attachmentUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
-                      <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-slate-700 w-full max-w-2xl bg-gray-50 dark:bg-slate-800">
+                      <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-white/10 w-full max-w-2xl bg-[#F8FAFC] dark:bg-[#002A5C]">
                         <img 
                           src={ann.attachmentUrl} 
                           alt="Announcement Attachment" 
@@ -360,7 +360,7 @@ const NoticesFeed = ({ currentUser }) => {
                         href={ann.attachmentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-gray-50 dark:bg-slate-700 hover:bg-[#002147] dark:hover:bg-blue-600 text-[#002147] dark:text-white hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 dark:border-slate-600 hover:border-[#002147] dark:hover:border-blue-600 shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
+                        className="group/btn inline-flex items-center gap-3 px-5 py-2.5 bg-[#F8FAFC] dark:bg-[#003170] hover:bg-[#002147] dark:hover:bg-[#1a3884] text-[#002147] dark:text-white hover:text-white text-xs font-black rounded-2xl transition-all duration-300 border border-gray-100 dark:border-slate-600 hover:border-[#002147] dark:hover:border-blue-600 shadow-sm hover:shadow-lg hover:shadow-blue-900/10"
                       >
                         {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> :
                           <LinkIcon className="w-4 h-4" />}
@@ -391,7 +391,7 @@ const NoticesFeed = ({ currentUser }) => {
                             onClick={() => handleReact(ann._id, emoji)}
                             className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold transition-all ${hasReacted
                               ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
-                              : "bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-slate-400 border border-transparent hover:bg-gray-200 dark:hover:bg-slate-600"
+                              : "bg-gray-100 dark:bg-[#003170] text-gray-600 dark:text-slate-400 border border-transparent hover:bg-gray-200 dark:hover:bg-slate-600"
                               }`}
                           >
                             <span>{emoji}</span>
@@ -413,7 +413,7 @@ const NoticesFeed = ({ currentUser }) => {
                               e.stopPropagation();
                               setActivePicker(activePicker === ann._id ? null : ann._id);
                             }}
-                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 dark:hover:bg-slate-700 ${activePicker === ann._id ? "bg-gray-100 dark:bg-slate-700 scale-110" : ""
+                            className={`flex items-center justify-center w-9 h-9 rounded-full transition-all hover:bg-gray-100 dark:hover:bg-[#002A5C] ${activePicker === ann._id ? "bg-gray-100 dark:bg-[#003170] scale-110" : ""
                               }`}
                             title="React"
                           >
@@ -429,7 +429,7 @@ const NoticesFeed = ({ currentUser }) => {
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            className="absolute bottom-full left-0 mb-3 p-1.5 bg-white dark:bg-slate-800 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-slate-700 flex items-center gap-1 z-20"
+                            className="absolute bottom-full left-0 mb-3 p-1.5 bg-white dark:bg-[#002A5C] rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 dark:border-white/10 flex items-center gap-1 z-20"
                           >
                             {["👍", "❤️", "🔥", "😂", "🙌"].map((emoji) => (
                               <button
@@ -439,7 +439,7 @@ const NoticesFeed = ({ currentUser }) => {
                                   handleReact(ann._id, emoji);
                                   setActivePicker(null);
                                 }}
-                                className="w-9 h-9 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-700 rounded-full transition-colors text-xl hover:scale-125 duration-200"
+                                className="w-9 h-9 flex items-center justify-center hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] rounded-full transition-colors text-xl hover:scale-125 duration-200"
                               >
                                 {emoji}
                               </button>

@@ -27,10 +27,10 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
 
 
   return (
-    <div className="w-full h-full bg-white dark:bg-slate-900 p-4 md:p-6 overflow-y-auto">
+    <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-slate-700 pb-4">
+        <div className="border-b border-slate-200 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-2">
             <BookOpen size={16} />
             <span>Case Study</span>
@@ -59,7 +59,7 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700"
+            className="bg-white dark:bg-[#002A5C] rounded-2xl p-6 border border-slate-200 dark:border-white/10"
           >
             <div className="mb-6">
               <span className="text-xs font-black text-[#1a3884] dark:text-blue-400 mb-2 block uppercase tracking-widest">
@@ -87,7 +87,7 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
                           ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                           : isSelected && !isCorrectAnswer
                           ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                          : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 opacity-50'
+                          : 'border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#002A5C] opacity-50'
                         : isSelected
                         ? 'border-[#1a3884] bg-blue-50 dark:bg-[#1a3884]/20'
                         : 'border-slate-200 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 hover:border-[#1a3884]/50 dark:hover:border-blue-500/50'
@@ -103,7 +103,7 @@ const CaseStudy = ({ content, mcq, onComplete, isCompleted }) => {
                             : 'border-slate-300 dark:border-slate-600'
                           : isSelected
                           ? 'border-[#1a3884] bg-[#1a3884]'
-                          : 'border-slate-300 dark:border-slate-700'
+                          : 'border-slate-300 dark:border-white/10'
                       }`}>
                         {showExplanation ? (
                           isCorrectAnswer || (isSelected && !isCorrectAnswer) ? (
