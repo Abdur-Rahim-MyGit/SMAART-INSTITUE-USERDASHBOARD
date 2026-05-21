@@ -9,7 +9,7 @@ const FeaturePoint = ({ icon: Icon, title, desc }) => (
         </div>
         <div>
             <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#1a3884] dark:group-hover:text-[#C0C0C0] transition-colors">{title}</h4>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{desc}</p>
+            <p className="text-gray-600 dark:text-slate-300 text-sm leading-relaxed">{desc}</p>
         </div>
     </div>
 );
@@ -33,7 +33,7 @@ const FeatureDeepDive = () => {
                             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#001226]/50 backdrop-blur-sm">
                                 <div className="text-center p-6 border border-gray-200 dark:border-white/10 rounded-xl bg-white/50 dark:bg-white/5">
                                     <BrainCircuit className="w-12 h-12 text-[#1a3884] dark:text-[#C0C0C0] mx-auto mb-3 opacity-50" />
-                                    <span className="text-gray-500 dark:text-gray-400 font-mono text-xs uppercase tracking-widest">
+                                    <span className="text-gray-500 dark:text-slate-300 font-mono text-xs uppercase tracking-widest">
                                         Professional & Technical<br />Capability View
                                     </span>
                                 </div>
@@ -60,7 +60,7 @@ const FeatureDeepDive = () => {
                         <div>
                             <span className="text-[#1a3884] dark:text-[#C0C0C0] font-bold tracking-wider text-sm uppercase">Professional & Technical Capability™</span>
                             <h3 className="text-3xl md:text-4xl font-bold text-[#1a3884] dark:text-white mt-2 mb-4">Campus to Career™</h3>
-                            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-light">
+                            <p className="text-lg text-gray-600 dark:text-slate-200 leading-relaxed font-light">
                                 Preparing learners for entry into the workforce and aligning their capability with professional practice. We bridge the gap between academic theory and workplace reality.
                             </p>
                         </div>
@@ -91,7 +91,7 @@ const FeatureDeepDive = () => {
                         <div>
                             <span className="text-[#C0C0C0] font-bold tracking-wider text-sm uppercase">Innovation & Impact Capability™</span>
                             <h3 className="text-3xl md:text-4xl font-bold text-[#1a3884] dark:text-white mt-2 mb-4">Career to Life™</h3>
-                            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-light">
+                            <p className="text-lg text-gray-600 dark:text-slate-200 leading-relaxed font-light">
                                 Supporting long-term progression, leadership transition, and the ability to create value through innovation. For those ready to shape the future.
                             </p>
                         </div>
@@ -121,7 +121,7 @@ const FeatureDeepDive = () => {
                             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-[#001226]/50 backdrop-blur-sm">
                                 <div className="text-center p-6 border border-gray-200 dark:border-white/10 rounded-xl bg-white/50 dark:bg-white/5">
                                     <Trophy className="w-12 h-12 text-[#C0C0C0] mx-auto mb-3 opacity-50" />
-                                    <span className="text-gray-500 dark:text-gray-400 font-mono text-xs uppercase tracking-widest">
+                                    <span className="text-gray-500 dark:text-slate-300 font-mono text-xs uppercase tracking-widest">
                                         Leadership & Innovation<br />Analytics
                                     </span>
                                 </div>

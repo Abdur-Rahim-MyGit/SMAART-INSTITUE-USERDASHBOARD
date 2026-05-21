@@ -83,7 +83,7 @@ const StudentOnboarding = ({ user }) => {
       icon: Home,
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
-        <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
+        <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
            <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
              <Home className="w-8 h-8" />
            </div>
@@ -97,7 +97,7 @@ const StudentOnboarding = ({ user }) => {
       icon: BookOpen,
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
-        <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
+        <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
            <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
              <BookOpen className="w-8 h-8" />
            </div>
@@ -111,7 +111,7 @@ const StudentOnboarding = ({ user }) => {
       icon: Lightbulb,
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
-        <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
+        <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
            <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
              <Lightbulb className="w-8 h-8" />
            </div>
@@ -125,7 +125,7 @@ const StudentOnboarding = ({ user }) => {
       icon: User,
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
-        <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
+        <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
            <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
              <User className="w-8 h-8" />
            </div>
@@ -139,7 +139,7 @@ const StudentOnboarding = ({ user }) => {
       icon: HelpCircle,
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
-        <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
+        <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
            <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
              <HelpCircle className="w-8 h-8" />
            </div>
@@ -246,7 +246,7 @@ const StudentOnboarding = ({ user }) => {
                   <Button
                     onClick={handlePrev}
                     variant="outline"
-                    className="flex-1 h-12 rounded-xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
+                    className="flex-1 h-12 rounded-xl border-slate-200 text-slate-600 font-bold hover:bg-[#F8FAFC]"
                   >
                     <ChevronLeft size={18} className="mr-2" /> Previous
                   </Button>

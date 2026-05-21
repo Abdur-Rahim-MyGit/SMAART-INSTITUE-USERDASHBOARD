@@ -55,7 +55,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               <span className="text-3xl sm:text-4xl md:text-5xl block mt-2 mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#C0C0C0] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300 drop-shadow-sm">
                 Employability & Impact Ecosystem
               </span>
-              <span className="text-xl sm:text-3xl text-gray-600 dark:text-gray-300 font-bold block mt-2">
+              <span className="text-xl sm:text-3xl text-gray-600 dark:text-slate-200 font-bold block mt-2">
                 for the changing world of work.
               </span>
             </motion.h1>
@@ -64,7 +64,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light"
+              className="text-sm sm:text-base text-gray-600 dark:text-slate-200 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light"
             >
               Responding to intelligent automation, job restructuring, and capability shift.
               <br />
@@ -111,7 +111,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.6 }}
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-x-8 gap-y-3 text-sm text-gray-600 dark:text-gray-400 font-medium"
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-x-8 gap-y-3 text-sm text-gray-600 dark:text-slate-300 font-medium"
             >
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-[#C0C0C0]" />
@@ -154,7 +154,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
                   <span className="font-bold">EQ</span>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Emotional Quotient</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-300">Emotional Quotient</p>
                   <p className="text-sm font-bold text-gray-900 dark:text-white">+14% Growth</p>
                 </div>
               </div>
@@ -170,7 +170,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
                   <span className="font-bold">AI</span>
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Career Match</p>
+                  <p className="text-xs text-gray-500 dark:text-slate-300">Career Match</p>
                   <p className="text-sm font-bold text-gray-900 dark:text-white">98% Accuracy</p>
                 </div>
               </div>

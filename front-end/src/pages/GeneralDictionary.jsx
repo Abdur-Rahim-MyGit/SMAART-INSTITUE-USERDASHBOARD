@@ -205,12 +205,12 @@ const GeneralDictionary = () => {
 
                     <div className="space-y-6">
                       {definition.meanings.map((meaning, index) => (
-                        <div key={index} className="border-b border-slate-100 dark:border-slate-700 last:border-0 pb-6 last:pb-0">
+                        <div key={index} className="border-b border-slate-100 dark:border-white/10 last:border-0 pb-6 last:pb-0">
                           <div className="flex items-center gap-3 mb-3">
                             <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-semibold rounded-full italic">
                               {meaning.partOfSpeech}
                             </span>
-                            <div className="h-px flex-1 bg-slate-100 dark:bg-slate-700" />
+                            <div className="h-px flex-1 bg-slate-100 dark:bg-[#003170]" />
                           </div>
 
                           <ul className="space-y-3">
@@ -247,7 +247,7 @@ const GeneralDictionary = () => {
                               setSearchTerm(syn);
                               fetchData(syn);
                             }}
-                            className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-blue-900/40 dark:hover:text-blue-300 rounded-lg text-sm text-slate-700 dark:text-slate-300 transition-colors capitalize"
+                            className="px-3 py-1.5 bg-slate-100 dark:bg-[#003170] hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-blue-900/40 dark:hover:text-blue-300 rounded-lg text-sm text-slate-700 dark:text-slate-300 transition-colors capitalize"
                           >
                             {syn}
                           </button>
@@ -312,7 +312,7 @@ const GeneralDictionary = () => {
                       setSearchTerm(item);
                       fetchData(item);
                     }}
-                    className="block w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-sm transition-colors"
+                    className="block w-full text-left px-3 py-2 rounded-lg hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-slate-600 dark:text-slate-300 text-sm transition-colors"
                   >
                     {item}
                   </button>

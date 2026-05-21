@@ -23,7 +23,7 @@ const InteractiveMenu = () => {
             key={item.label}
             to={item.path}
             className={`text-sm font-semibold transition-all relative py-2 ${
-              isActive ? "text-[#002147] dark:text-white" : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              isActive ? "text-[#002147] dark:text-white" : "text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
             {item.label}

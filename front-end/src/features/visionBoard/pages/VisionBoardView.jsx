@@ -224,20 +224,20 @@ const VisionBoardView = () => {
   return (
     <div className="min-h-screen bg-[#f4f7fb] dark:bg-[#06101d]">
       <div className="mx-auto max-w-[1440px] px-4 py-5 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-[#0b1627]">
-          <div className="border-b border-slate-200 px-4 py-4 dark:border-slate-800 sm:px-6">
+        <div className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm dark:border-white/8 dark:bg-[#0b1627]">
+          <div className="border-b border-slate-200 px-4 py-4 dark:border-white/8 sm:px-6">
             <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
               <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate("/vision-board-pro/gallery")}
-                className="rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+                className="rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-[#002A5C] dark:hover:text-white"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Back to Gallery
               </Button>
-              <div className="hidden h-6 w-px bg-slate-200 sm:block dark:bg-slate-700" />
+              <div className="hidden h-6 w-px bg-slate-200 sm:block dark:bg-[#003170]" />
               <div>
                 <div className="mb-2 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300">
                   Presentation View
@@ -264,7 +264,7 @@ const VisionBoardView = () => {
                 variant="outline"
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:bg-[#002A5C]"
               >
                 {isDownloading ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -341,7 +341,7 @@ const VisionBoardView = () => {
           </div>
         </div>
 
-        <div className="border-t border-slate-200 px-6 py-4 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
+        <div className="border-t border-slate-200 px-6 py-4 text-sm text-slate-500 dark:border-white/8 dark:text-slate-400">
           Designed in Vision Board Studio
         </div>
       </div>

@@ -53,10 +53,10 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
   };
 
   return (
-    <div className="w-full h-full bg-white dark:bg-slate-900 p-4 md:p-6 overflow-y-auto">
+    <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-slate-700 pb-4">
+        <div className="border-b border-slate-200 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-2">
             <MessageSquare size={16} />
             <span>Reflection Task</span>
@@ -94,7 +94,7 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
                           className={`flex-1 h-12 rounded-lg border-2 transition-all font-bold flex items-center justify-center ${
                             isSelected
                               ? 'border-[#0891b2] dark:border-[#1a3884] bg-[#0891b2] text-white shadow-lg scale-105'
-                              : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
+                              : 'border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-500 hover:border-slate-300 dark:hover:border-slate-600'
                           } ${submitted ? 'cursor-default' : 'cursor-pointer hover:scale-105 active:scale-95'}`}
                         >
                           {val}
@@ -113,7 +113,7 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
                           className={`w-full text-left p-3 rounded-lg border-2 transition-all flex items-center justify-between ${
                             isSelected
                               ? 'border-[#0891b2] dark:border-[#1a3884] bg-[#0891b2]/10 dark:bg-[#1a3884]/10'
-                              : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                              : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-slate-600'
                           } ${submitted ? 'cursor-default' : 'cursor-pointer'}`}
                         >
                           <span className={`${isSelected ? 'font-medium' : ''} text-slate-700 dark:text-slate-300`}>
@@ -133,7 +133,7 @@ const ReflectionTask = ({ content, onComplete, isCompleted, initialResult }) => 
                     disabled={submitted}
                     placeholder="Type your reflection here..."
                     rows={6}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-[#0891b2] dark:focus:border-[#1a3884] focus:outline-none transition-colors resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-[#0891b2] dark:focus:border-[#1a3884] focus:outline-none transition-colors resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 )}
               </label>

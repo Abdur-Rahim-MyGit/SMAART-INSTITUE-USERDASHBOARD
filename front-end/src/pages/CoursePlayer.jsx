@@ -312,7 +312,7 @@ const CoursePlayer = () => {
                     transition={{ duration: 0.2 }}
                     className="p-6"
                   >
-                    <div className="bg-gray-50 rounded-xl p-6">
+                    <div className="bg-[#F8FAFC] rounded-xl p-6">
                       <h4 className="font-semibold text-gray-900 mb-3">Lesson Preview</h4>
                       <p className="text-gray-600 leading-relaxed">
                         {stepData.content || 'Watch this lesson to continue your learning journey.'}
@@ -339,7 +339,7 @@ const CoursePlayer = () => {
                     transition={{ duration: 0.2 }}
                     className="p-6"
                   >
-                    <div className="bg-gray-50 rounded-xl p-6">
+                    <div className="bg-[#F8FAFC] rounded-xl p-6">
                       <h4 className="font-semibold text-gray-900 mb-3">Video Transcription</h4>
                       <p className="text-gray-600 leading-relaxed italic">
                         Transcription will be available here once the video content is processed.
@@ -405,7 +405,7 @@ const CoursePlayer = () => {
       default:
         return (
           <div className="prose prose-sm dark:prose-invert max-w-none">
-            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+            <p className="text-gray-700 dark:text-slate-200 whitespace-pre-line leading-relaxed">
               {stepData.content}
             </p>
           </div>
@@ -415,7 +415,7 @@ const CoursePlayer = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-dark-bg flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-[#00152E] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a3884]"></div>
       </div>
     );
@@ -423,7 +423,7 @@ const CoursePlayer = () => {
 
   if (!course) {
     return (
-      <div className="min-h-screen bg-white dark:bg-dark-bg flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-[#00152E] flex items-center justify-center">
         <div className="text-center p-8">
           <Lock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-[#112b6b] dark:text-white mb-2">Course Not Found</h2>
@@ -440,7 +440,7 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-dark-bg transition-colors duration-500 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#00152E] transition-colors duration-500 relative overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-50/50 dark:bg-blue-900/5 rounded-full blur-[120px] -mr-64 -mt-64 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-50/50 dark:bg-indigo-900/5 rounded-full blur-[120px] -ml-64 -mb-64 pointer-events-none" />
@@ -460,7 +460,7 @@ const CoursePlayer = () => {
                 </div>
                 <span>Back to Overview</span>
               </button>
-              <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
+              <div className="h-5 w-px bg-slate-200 dark:bg-[#003170]" />
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="bg-slate-100 text-[#1a3884] border-transparent font-bold px-3 py-0.5 text-[10px]">
                   {stage}
@@ -530,7 +530,7 @@ const CoursePlayer = () => {
                       </p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-xl p-5 mb-6 border border-gray-200">
+                    <div className="bg-[#F8FAFC] rounded-xl p-5 mb-6 border border-gray-200">
                       <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                         <Sparkles className="w-3.5 h-3.5" />
                         Course Details
@@ -587,7 +587,7 @@ const CoursePlayer = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 mb-6 shadow-sm relative overflow-hidden"
+                    className="p-6 bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/8 mb-6 shadow-sm relative overflow-hidden"
                   >
                     <div className="flex items-center justify-between mb-8">
                       <div className="flex items-center gap-4">
@@ -601,7 +601,7 @@ const CoursePlayer = () => {
                           <p className="text-xs text-blue-600 font-bold uppercase tracking-wider">Active Session</p>
                         </div>
                       </div>
-                      <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-500 border border-slate-100 dark:border-slate-700">
+                      <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl text-xs font-bold text-slate-500 border border-slate-100 dark:border-white/10">
                         {learningFlowData?.steps[activeStep]?.duration || '5-10 min'}
                       </div>
                     </div>
@@ -609,7 +609,7 @@ const CoursePlayer = () => {
                     {learningFlowData?.steps[activeStep] ? (
                       renderStepContent(learningFlowData.steps[activeStep], activeStep)
                     ) : (
-                      <div className="p-8 text-center bg-gray-50 rounded-xl">
+                      <div className="p-8 text-center bg-[#F8FAFC] rounded-xl">
                         <Sparkles className="w-12 h-12 text-[#1a3884]/20 mx-auto mb-4" />
                         <h4 className="font-bold text-gray-400">Content Coming Soon</h4>
                         <p className="text-sm text-gray-400">Step {activeStep} content is being prepared.</p>
@@ -663,10 +663,10 @@ const CoursePlayer = () => {
               className="space-y-6"
             >
               {/* Progress Card */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm"
+              <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 border border-slate-200 dark:border-white/8 shadow-sm"
               >
                 <h3 className="text-base font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                  <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] flex items-center justify-center border border-slate-200 dark:border-white/10">
                     <Target className="w-5 h-5 text-[#1a3884]" />
                   </div>
                   Progress
@@ -680,7 +680,7 @@ const CoursePlayer = () => {
                         {Math.round((videoProgress / 100) * 100)}%
                       </span>
                     </div>
-                    <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <div className="h-2.5 bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(videoProgress / 100) * 100}%` }}
@@ -697,7 +697,7 @@ const CoursePlayer = () => {
                         {Object.keys(completedSteps).length}/9
                       </span>
                     </div>
-                    <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700">
+                    <div className="h-2.5 bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(Object.keys(completedSteps).length / 9) * 100}%` }}
@@ -725,16 +725,16 @@ const CoursePlayer = () => {
                 </div>
               </div>
               {/* Curriculum Flow Card */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm"
+              <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 border border-slate-200 dark:border-white/8 shadow-sm"
               >
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                    <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] flex items-center justify-center border border-slate-200 dark:border-white/10">
                       <PlayCircle className="w-5 h-5 text-[#1a3884]" />
                     </div>
                     Curriculum
                   </h3>
-                  <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold text-slate-500">
+                  <div className="px-3 py-1 bg-slate-100 dark:bg-[#002A5C] rounded-lg text-xs font-bold text-slate-500">
                     {Object.keys(completedSteps).length}/9
                   </div>
                 </div>
@@ -754,10 +754,10 @@ const CoursePlayer = () => {
                           isActive
                             ? 'bg-[#1a3884] border-[#1a3884] text-white shadow-md'
                             : status === 'completed'
-                            ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'
+                            ? 'bg-[#F8FAFC] dark:bg-slate-800/50 border-slate-100 dark:border-white/8'
                             : status === 'locked'
                             ? 'opacity-40 cursor-not-allowed border-transparent'
-                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-[#1a3884]/30'
+                            : 'bg-white dark:bg-[#002147] border-slate-200 dark:border-white/8 hover:border-[#1a3884]/30'
                         }`}
                       >
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${

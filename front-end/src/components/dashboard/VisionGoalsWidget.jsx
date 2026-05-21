@@ -27,7 +27,7 @@ const VisionGoalsWidget = () => {
 
   if (loading) {
     return (
-      <div className="w-full h-64 bg-slate-50 dark:bg-slate-900/40 rounded-[32px] animate-pulse flex flex-col items-center justify-center border border-slate-100 dark:border-slate-800">
+      <div className="w-full h-64 bg-[#F8FAFC] dark:bg-slate-900/40 rounded-[32px] animate-pulse flex flex-col items-center justify-center border border-slate-100 dark:border-white/8">
         <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
         <p className="text-slate-400 font-bold tracking-wide uppercase text-xs">Syncing your vision...</p>
       </div>
@@ -94,7 +94,7 @@ const VisionGoalsWidget = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-[32px] bg-white dark:bg-[#0f172a] shadow-2xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-800 p-8 md:p-12"
+      className="relative overflow-hidden rounded-[32px] bg-white dark:bg-[#00152E] shadow-2xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-white/8 p-8 md:p-12"
     >
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-blue-100/50 to-transparent dark:from-blue-900/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
@@ -121,7 +121,7 @@ const VisionGoalsWidget = () => {
             </button>
             <button 
               onClick={() => navigate('/vision-board-pro/gallery')}
-              className="group flex items-center gap-2.5 px-6 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all active:scale-95 shadow-sm hover:shadow-lg"
+              className="group flex items-center gap-2.5 px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] hover:border-slate-300 dark:hover:border-slate-600 transition-all active:scale-95 shadow-sm hover:shadow-lg"
             >
               Gallery <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
             </button>
@@ -136,7 +136,7 @@ const VisionGoalsWidget = () => {
             {visionData.image ? (
               <div className="relative group w-full max-w-[320px] mx-auto perspective-1000">
                 <div className="absolute inset-0 bg-gradient-to-tr from-[#1a3884] to-emerald-400 rounded-3xl blur-[40px] opacity-20 group-hover:opacity-40 transition-opacity duration-700"></div>
-                <div className="relative bg-white p-3 pb-8 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform rotate-[-2deg] group-hover:rotate-0 group-hover:-translate-y-2 transition-all duration-500 border border-slate-100 dark:border-slate-800">
+                <div className="relative bg-white p-3 pb-8 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform rotate-[-2deg] group-hover:rotate-0 group-hover:-translate-y-2 transition-all duration-500 border border-slate-100 dark:border-white/8">
                   <div className="rounded-xl overflow-hidden bg-slate-100 aspect-square flex items-center justify-center relative">
                      <img 
                       src={visionData.image} 
@@ -155,7 +155,7 @@ const VisionGoalsWidget = () => {
             </div>
               </div>
             ) : (
-               <div className="w-full aspect-square max-w-[320px] mx-auto rounded-3xl bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-slate-700 flex flex-col items-center justify-center p-8 text-center">
+               <div className="w-full aspect-square max-w-[320px] mx-auto rounded-3xl bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center p-8 text-center">
                   <Star className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
                   <button onClick={handleEdit} className="px-4 py-2 bg-[#1a3884] text-white rounded-full text-sm font-bold shadow-md hover:bg-blue-800 transition-colors">
                     Create Design
@@ -183,7 +183,7 @@ const VisionGoalsWidget = () => {
             {shortTerm.length > 0 ? (
               <ul className="space-y-4">
                 {shortTerm.map((goal, idx) => (
-                  <li key={idx} className="flex items-start gap-4 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <li key={idx} className="flex items-start gap-4 p-3 rounded-2xl hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 transition-colors">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 text-sm font-bold shadow-sm">
                       {idx + 1}
                     </div>
@@ -192,7 +192,7 @@ const VisionGoalsWidget = () => {
                 ))}
               </ul>
             ) : (
-              <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-white/30 dark:bg-slate-800/30">
+              <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl bg-white/30 dark:bg-slate-800/30">
                 <p className="text-slate-400 dark:text-slate-500 font-medium text-sm mb-3">No short-term goals added yet.</p>
                 <button 
                   onClick={handleEdit}
@@ -221,7 +221,7 @@ const VisionGoalsWidget = () => {
             {longTerm.length > 0 ? (
               <ul className="space-y-4">
                 {longTerm.map((goal, idx) => (
-                  <li key={idx} className="flex items-start gap-4 p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <li key={idx} className="flex items-start gap-4 p-3 rounded-2xl hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 transition-colors">
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-sm font-bold shadow-sm">
                       {idx + 1}
                     </div>
@@ -230,7 +230,7 @@ const VisionGoalsWidget = () => {
                 ))}
               </ul>
             ) : (
-              <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl bg-white/30 dark:bg-slate-800/30">
+              <div className="h-32 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl bg-white/30 dark:bg-slate-800/30">
                 <p className="text-slate-400 dark:text-slate-500 font-medium text-sm mb-3">No long-term goals added yet.</p>
                 <button 
                   onClick={handleEdit}

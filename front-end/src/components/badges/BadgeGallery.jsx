@@ -124,7 +124,7 @@ const BadgeGallery = ({ badges: userEarnedBadges = [], userName = 'Student' }) =
                     <select
                         value={activeCategory}
                         onChange={(e) => setActiveCategory(e.target.value)}
-                        className="appearance-none bg-white dark:bg-slate-800 border-2 border-[#1a3884] text-[#002147] dark:text-white rounded-none px-4 py-2 pr-10 font-semibold text-sm cursor-pointer shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-[#1a3884] focus:ring-offset-2"
+                        className="appearance-none bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#002147] dark:text-white rounded-none px-4 py-2 pr-10 font-semibold text-sm cursor-pointer shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-[#1a3884] focus:ring-offset-2"
                     >
                         {categories.map((cat) => (
                             <option key={cat.id} value={cat.id}>

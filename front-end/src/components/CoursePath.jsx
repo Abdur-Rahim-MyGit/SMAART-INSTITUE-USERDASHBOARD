@@ -118,7 +118,7 @@ const CoursePath = ({ completedCourses, onCourseClick }) => {
                         ? 'bg-white border-gray-100 hover:border-[#1a3884]/30 hover:shadow-md' 
                         : isInProgress 
                         ? 'bg-white border-[#C0C0C0]/30 shadow-md hover:shadow-lg' 
-                        : 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
+                        : 'bg-[#F8FAFC] border-gray-100 opacity-60 cursor-not-allowed'
                     }`}
                   >
                     <div className="flex items-center gap-3">

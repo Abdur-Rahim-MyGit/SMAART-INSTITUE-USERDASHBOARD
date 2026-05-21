@@ -277,7 +277,7 @@ const AddDetails = () => {
 
     if (isInitialLoading) {
         return (
-            <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center">
+            <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="w-12 h-12 animate-spin text-[#1a3884]" />
                     <p className="font-sans italic text-slate-500">Loading your profile data...</p>
@@ -288,7 +288,7 @@ const AddDetails = () => {
 
     if (isSuccess) {
         return (
-            <div className="fixed inset-0 z-50 bg-[#FDFBF7] flex items-center justify-center flex-col p-6 text-center">
+            <div className="fixed inset-0 z-50 bg-[#F8FAFC] flex items-center justify-center flex-col p-6 text-center">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 10 }} className="w-24 h-24 bg-[#1a3884] rounded-full flex items-center justify-center shadow-2xl mb-8">
                     <CheckCircle2 className="w-12 h-12 text-white" />
                 </motion.div>
@@ -300,7 +300,7 @@ const AddDetails = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#FDFBF7] text-slate-900 font-sans selection:bg-[#C0C0C0]/30">
+        <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-[#C0C0C0]/30">
             <div className="max-w-4xl mx-auto py-10 px-4 relative">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-8 md:p-10 shadow-[0_20px_70px_-15px_rgba(0,0,0,0.1),0_0_20px_rgba(192,192,192,0.4)] border-2 border-[#C0C0C0] relative flex flex-col min-h-[600px]">
 
@@ -335,7 +335,7 @@ const AddDetails = () => {
                                                 <User className="w-16 h-16 text-slate-300" />
                                             )}
                                         </div>
-                                        <label className="absolute bottom-2 right-2 w-10 h-10 bg-[#1a3884] rounded-full flex items-center justify-center text-white shadow-lg cursor-pointer hover:bg-blue-600 transition-colors">
+                                        <label className="absolute bottom-2 right-2 w-10 h-10 bg-[#1a3884] rounded-full flex items-center justify-center text-white shadow-lg cursor-pointer hover:bg-[#1a3884] transition-colors">
                                                 <Camera className="w-5 h-5" />
                                                 <input type="file" className="hidden" accept="image/*" onChange={async (e) => {
                                                     const file = e.target.files[0];

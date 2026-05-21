@@ -107,7 +107,7 @@ const Library = () => {
     : books.filter(book => book.category.toLowerCase().includes(category));
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#002147]">
       <main className="container mx-auto px-4 md:px-6 py-8">
           <div className="mb-8">
             <motion.h1
@@ -128,7 +128,7 @@ const Library = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by title, author, or topic..."
-                className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 shadow-sm transition-all"
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] focus:ring-2 focus:ring-blue-500 shadow-sm transition-all"
               />
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             </form>
@@ -139,8 +139,8 @@ const Library = () => {
                   key={cat.id}
                   onClick={() => setCategory(cat.id)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${category === cat.id
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
+                    ? "bg-[#1a3884] text-white shadow-md"
+                    : "bg-white dark:bg-[#002A5C] text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C] border border-slate-200 dark:border-white/10"
                     }`}
                 >
                   {cat.label}
@@ -153,7 +153,7 @@ const Library = () => {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="h-96 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />
+                <div key={i} className="h-96 bg-slate-200 dark:bg-[#002A5C] rounded-xl animate-pulse" />
               ))}
             </div>
           ) : filteredBooks.length > 0 ? (
@@ -165,7 +165,7 @@ const Library = () => {
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.05 }}
-                    className="group relative bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700"
+                    className="group relative bg-white dark:bg-[#002A5C] rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-white/10"
                   >
                     <div className="aspect-[2/3] overflow-hidden bg-slate-100 relative">
                       <img

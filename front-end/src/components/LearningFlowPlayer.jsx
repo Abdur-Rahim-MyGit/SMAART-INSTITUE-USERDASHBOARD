@@ -47,7 +47,7 @@ const LearningFlowPlayer = ({
   const steps = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   const stepMetadata = {
     A: { icon: Video, title: "Why", color: "bg-blue-500" },
-    B: { icon: Video, title: "Story", color: "bg-blue-600" },
+    B: { icon: Video, title: "Story", color: "bg-[#1a3884]" },
     C: { icon: Video, title: "Framework", color: "bg-[#1a3884]" },
     D: { icon: Lightbulb, title: "Practice", color: "bg-amber-500" },
     E: { icon: RotateCcw, title: "Flash Cards", color: "bg-[#1a3884]" },
@@ -99,7 +99,7 @@ const LearningFlowPlayer = ({
       case 'C':
         return (
           <div className="space-y-6">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div className="bg-white dark:bg-[#002147] rounded-2xl shadow-lg overflow-hidden border border-slate-200 dark:border-white/8">
               <CustomVideoPlayer
                 videoUrl={currentStepData.videoUrl || 'https://www.w3schools.com/html/mov_bbb.mp4'}
                 title={`${activeStep}: ${currentStepData.title}`}
@@ -198,8 +198,8 @@ const LearningFlowPlayer = ({
         <div className="absolute bottom-[10%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
       </div>
       {/* Left Sidebar - Learning Path */}
-      <div className="w-full lg:w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+      <div className="w-full lg:w-80 bg-white dark:bg-[#002147] border-r border-slate-200 dark:border-white/8 flex flex-col">
+        <div className="p-6 border-b border-slate-100 dark:border-white/8">
           <Button
             variant="ghost"
             size="sm"
@@ -233,10 +233,10 @@ const LearningFlowPlayer = ({
                 disabled={!isUnlocked}
                 className={`w-full p-3.5 rounded-2xl flex items-center gap-3 transition-all duration-300 group ${isActive
                     ? 'bg-white shadow-md border border-[#1a3884]/10 ring-1 ring-[#1a3884]/5'
-                    : 'hover:bg-slate-50 border border-transparent'
+                    : 'hover:bg-[#F8FAFC] border border-transparent'
                   }`}
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isCompleted ? 'bg-green-500' : isActive ? meta.color : 'bg-slate-200 dark:bg-slate-800'
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isCompleted ? 'bg-green-500' : isActive ? meta.color : 'bg-slate-200 dark:bg-[#002A5C]'
                   }`}>
                   {isCompleted ? (
                     <CheckCircle2 className="w-5 h-5 text-white" />
@@ -264,14 +264,14 @@ const LearningFlowPlayer = ({
         </div>
 
         {/* Progress Bar */}
-        <div className="p-6 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
+        <div className="p-6 bg-[#F8FAFC] dark:bg-slate-900/50 border-t border-slate-100 dark:border-white/8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-slate-500">OVERALL PROGRESS</span>
             <span className="text-xs font-bold text-indigo-600">
               {Math.round((Object.keys(completedSteps).length / steps.length) * 100)}%
             </span>
           </div>
-          <div className="h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-2 bg-slate-200 dark:bg-[#002A5C] rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(Object.keys(completedSteps).length / steps.length) * 100}%` }}
@@ -284,7 +284,7 @@ const LearningFlowPlayer = ({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Header */}
-        <div className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between px-8 z-10">
+        <div className="h-16 border-b border-slate-200 dark:border-white/8 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex items-center justify-between px-8 z-10">
           <div className="flex items-center gap-4">
             <Badge variant="outline" className="bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 border-indigo-200">
               Step {steps.indexOf(activeStep) + 1}
@@ -299,7 +299,7 @@ const LearningFlowPlayer = ({
             <div className="flex flex-col items-end">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Course Progress</span>
               <div className="flex items-center gap-2">
-                <div className="w-32 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-32 h-1.5 bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
                   <div
                     className="h-full bg-indigo-500 transition-all duration-500"
                     style={{ width: `${(Object.keys(completedSteps).length / steps.length) * 100}%` }}
@@ -314,7 +314,7 @@ const LearningFlowPlayer = ({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 lg:p-8">
+        <div className="flex-1 overflow-y-auto bg-[#F8FAFC] dark:bg-[#00152E] p-4 lg:p-8">
           <div className="max-w-5xl mx-auto h-full">
             <AnimatePresence mode="wait">
               <motion.div
@@ -398,7 +398,7 @@ const LearningFlowPlayer = ({
 
             {/* Optional Supplementary Materials */}
             {learningFlow?.supplementary && (
-              <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800">
+              <div className="mt-12 pt-8 border-t border-slate-200 dark:border-white/8">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-emerald-500" />
                   Supplementary Materials
@@ -410,7 +410,7 @@ const LearningFlowPlayer = ({
                       href={item.url || "#"}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all flex items-center justify-between group"
+                      className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/8 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all flex items-center justify-between group"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600">

@@ -221,7 +221,7 @@ const ProfileAnalysis = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-slate-50 dark:bg-[#000d1a] flex items-center justify-center">
+            <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="w-12 h-12 animate-spin text-purple-500 mx-auto mb-4" />
                     <p className="text-slate-600 dark:text-slate-400 font-medium">Syncing with SMAART Cloud...</p>
@@ -231,7 +231,7 @@ const ProfileAnalysis = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#eef2f5] dark:bg-[#000d1a] transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
             <main className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
                     {/* Breadcrumb & Title */}
                     <div className="mb-8">
@@ -255,7 +255,7 @@ const ProfileAnalysis = () => {
                             <button
                                 onClick={handleManualFetch}
                                 disabled={fetching}
-                                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-purple-500 transition-all font-bold text-sm"
+                                className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#002A5C] text-slate-700 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-white/10 hover:border-purple-500 transition-all font-bold text-sm"
                             >
                                 <RefreshCw className={`w-4 h-4 ${fetching ? 'animate-spin' : ''}`} />
                                 Sync Profile Data
@@ -274,7 +274,7 @@ const ProfileAnalysis = () => {
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all duration-300 ${isActive
                                         ? 'bg-purple-600 text-white shadow-xl shadow-purple-500/20'
-                                        : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
+                                        : 'bg-white dark:bg-[#002A5C] text-slate-500 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
                                         }`}
                                 >
                                     <Icon className="w-4 h-4" />
@@ -296,7 +296,7 @@ const ProfileAnalysis = () => {
                             >
                                 {/* Left: Profile Form */}
                                 <div className="lg:col-span-2 space-y-6">
-                                    <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm">
+                                    <div className="bg-white dark:bg-[#002A5C] rounded-3xl border border-slate-200 dark:border-white/10 p-6 sm:p-8 shadow-sm">
                                         <div className="flex items-center justify-between mb-8">
                                             <h2 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">
                                                 <GraduationCap className="w-6 h-6 text-purple-600" />
@@ -316,7 +316,7 @@ const ProfileAnalysis = () => {
                                                     type="text"
                                                     value={formData.fullName}
                                                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
+                                                    className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
                                                     placeholder="Your name"
                                                 />
                                             </div>
@@ -327,7 +327,7 @@ const ProfileAnalysis = () => {
                                                     type="text"
                                                     value={formData.education}
                                                     onChange={(e) => setFormData({ ...formData, education: e.target.value })}
-                                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
+                                                    className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
                                                     placeholder="Highest degree, Institution"
                                                 />
                                             </div>
@@ -338,7 +338,7 @@ const ProfileAnalysis = () => {
                                                     rows="3"
                                                     value={formData.goals}
                                                     onChange={(e) => setFormData({ ...formData, goals: e.target.value })}
-                                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
+                                                    className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
                                                     placeholder="What are your short and long-term career objectives?"
                                                 ></textarea>
                                             </div>
@@ -349,7 +349,7 @@ const ProfileAnalysis = () => {
                                                     type="text"
                                                     value={formData.jobSector}
                                                     onChange={(e) => setFormData({ ...formData, jobSector: e.target.value })}
-                                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
+                                                    className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
                                                     placeholder="e.g. Technology, Health, Finance"
                                                 />
                                             </div>
@@ -360,7 +360,7 @@ const ProfileAnalysis = () => {
                                                     type="text"
                                                     value={formData.salaryExpectation}
                                                     onChange={(e) => setFormData({ ...formData, salaryExpectation: e.target.value })}
-                                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
+                                                    className="w-full px-4 py-3 bg-[#F8FAFC] dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800 dark:text-white"
                                                     placeholder="Desired annual/monthly salary"
                                                 />
                                             </div>
@@ -393,7 +393,7 @@ const ProfileAnalysis = () => {
                                     </div>
 
                                     {/* Skills Section */}
-                                    <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-sm">
+                                    <div className="bg-white dark:bg-[#002A5C] rounded-3xl border border-slate-200 dark:border-white/10 p-6 sm:p-8 shadow-sm">
                                         <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                                             <Award className="w-6 h-6 text-blue-500" />
                                             Skills Inventory
@@ -404,12 +404,12 @@ const ProfileAnalysis = () => {
                                                 value={skillInput}
                                                 onChange={(e) => setSkillInput(e.target.value)}
                                                 onKeyPress={(e) => e.key === 'Enter' && addSkill()}
-                                                className="flex-1 px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                                className="flex-1 px-4 py-3 bg-[#F8FAFC] dark:bg-[#002147] rounded-xl border border-slate-200 dark:border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                                 placeholder="Add a skill (e.g. React, Python, Leadership)"
                                             />
                                             <button
                                                 onClick={addSkill}
-                                                className="px-6 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all"
+                                                className="px-6 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#132c6b] transition-all"
                                             >
                                                 Add
                                             </button>
@@ -460,7 +460,7 @@ const ProfileAnalysis = () => {
                                         </div>
                                     </div>
 
-                                    <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                                    <div className="bg-white dark:bg-[#002A5C] rounded-3xl p-6 border border-slate-200 dark:border-white/10 shadow-sm">
                                         <h4 className="font-black text-slate-800 dark:text-white mb-4">Support</h4>
                                         <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mb-4">Need help defining your career goals? Chat with our coach directly.</p>
                                         <button
@@ -480,12 +480,12 @@ const ProfileAnalysis = () => {
                                 key="analysis-content"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm min-h-[400px]"
+                                className="bg-white dark:bg-[#002A5C] rounded-3xl border border-slate-200 dark:border-white/10 p-8 shadow-sm min-h-[400px]"
                             >
                                 {analyzing ? (
                                     <div className="flex flex-col items-center justify-center py-20 text-center">
                                         <div className="relative w-24 h-24 mb-8">
-                                            <div className="absolute inset-0 border-8 border-purple-100 dark:border-slate-700 rounded-full"></div>
+                                            <div className="absolute inset-0 border-8 border-purple-100 dark:border-white/10 rounded-full"></div>
                                             <svg className="w-full h-full rotate-[-90deg]">
                                                 <circle
                                                     cx="48" cy="48" r="40"
@@ -502,7 +502,7 @@ const ProfileAnalysis = () => {
                                     </div>
                                 ) : profileAnalysis ? (
                                     <div className="prose dark:prose-invert max-w-none">
-                                        <div className="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100 dark:border-slate-700">
+                                        <div className="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100 dark:border-white/10">
                                             <Sparkles className="w-8 h-8 text-purple-600" />
                                             <div>
                                                 <h2 className="m-0 text-2xl font-black">AI Career Analysis</h2>
@@ -513,7 +513,7 @@ const ProfileAnalysis = () => {
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                                        <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-full mb-6">
+                                        <div className="p-6 bg-[#F8FAFC] dark:bg-[#002147] rounded-full mb-6">
                                             <Sparkles className="w-12 h-12 text-slate-300" />
                                         </div>
                                         <h3 className="text-xl font-bold text-slate-400">No active analysis found.</h3>
@@ -528,7 +528,7 @@ const ProfileAnalysis = () => {
                                 key="tab-content"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm min-h-[400px]"
+                                className="bg-white dark:bg-[#002A5C] rounded-3xl border border-slate-200 dark:border-white/10 p-8 shadow-sm min-h-[400px]"
                             >
                                 {activeTab === 'career-paths' && (
                                     careerRecommendations ? (

@@ -151,7 +151,7 @@ const Performance = () => {
 
     if (loading || userLoading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-[#F8F9FC] dark:bg-dark-bg">
+            <div className="flex h-screen items-center justify-center bg-[#F8FAFC] dark:bg-[#00152E]">
                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
@@ -167,7 +167,7 @@ const Performance = () => {
     const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
 
     return (
-        <div className="min-h-screen bg-[#F8F9FC] dark:bg-dark-bg font-sans transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] font-sans transition-colors duration-300">
             <main className="p-4 md:p-8 overflow-y-auto">
                 <div className="max-w-7xl mx-auto space-y-8">
 
@@ -190,7 +190,7 @@ const Performance = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.1 }}
                                 key={i}
-                                className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex items-center justify-between"
+                                className="bg-white dark:bg-[#002A5C] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-between"
                             >
                                 <div>
                                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{stat.label}</p>
@@ -210,7 +210,7 @@ const Performance = () => {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700"
+                            className="bg-white dark:bg-[#002A5C] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/10"
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -244,7 +244,7 @@ const Performance = () => {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.1 }}
-                            className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700"
+                            className="bg-white dark:bg-[#002A5C] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/10"
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -277,15 +277,15 @@ const Performance = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden"
+                        className="bg-white dark:bg-[#002A5C] rounded-2xl shadow-sm border border-slate-100 dark:border-white/10 overflow-hidden"
                     >
-                        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                        <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
                             <h3 className="font-bold text-slate-900 dark:text-white">Detailed Course Performance</h3>
                             <button className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline">Download Report</button>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm text-left align-middle">
-                                <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-xs">
+                                <thead className="bg-[#F8FAFC] dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold text-xs">
                                     <tr>
                                         <th className="px-6 py-4 whitespace-nowrap">Course Name</th>
                                         <th className="px-6 py-4 whitespace-nowrap">Status</th>
@@ -296,7 +296,7 @@ const Performance = () => {
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                                     {enrollments.length > 0 ? enrollments.map((course, i) => (
-                                        <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                                        <tr key={i} className="hover:bg-[#F8FAFC] dark:hover:bg-slate-700/30 transition-colors">
                                             <td className="px-6 py-4 font-medium text-slate-900 dark:text-white max-w-[200px] truncate" title={course.course?.title}>
                                                 {course.course?.title || 'Unknown Course'}
                                             </td>
@@ -310,7 +310,7 @@ const Performance = () => {
                                             </td>
                                             <td className="px-6 py-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                    <div className="w-16 h-1.5 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full bg-blue-500 rounded-full"
                                                             style={{ width: `${course.calculatedProgress || course.progress || 0}%` }}

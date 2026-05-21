@@ -99,7 +99,7 @@ const FeatureCard = ({ feature, index }) => {
             {/* Glow Effect */}
             <div className={`absolute -inset-0.5 bg-gradient-to-r ${feature.color} rounded-2xl opacity-0 group-hover:opacity-75 blur-xl transition duration-500`} />
 
-            <div className="relative h-full bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-slate-700 p-6 transition-all duration-300 group-hover:translate-y-[-4px] group-hover:shadow-2xl">
+            <div className="relative h-full bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/10 p-6 transition-all duration-300 group-hover:translate-y-[-4px] group-hover:shadow-2xl">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
                     <div className={`${feature.iconBg} w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}>
@@ -119,11 +119,11 @@ const FeatureCard = ({ feature, index }) => {
                 </p>
 
                 {/* Action */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-700">
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/10">
                     <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                         Explore
                     </span>
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-indigo-600 transition-all duration-300 group-hover:scale-110">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-[#002A5C] flex items-center justify-center group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-indigo-600 transition-all duration-300 group-hover:scale-110">
                         <ArrowRight className="w-4 h-4 text-slate-600 dark:text-slate-400 group-hover:text-white transition-colors" />
                     </div>
                 </div>
@@ -164,7 +164,7 @@ const AICareerCoach = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-[#001229] transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
             <main className="w-full relative py-8 px-4 md:px-0">
                     <div className="max-w-7xl mx-auto pb-12">
 

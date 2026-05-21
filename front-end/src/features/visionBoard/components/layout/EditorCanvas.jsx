@@ -168,12 +168,12 @@ const EditorCanvas = ({
                     {(guideState.spacingX || guideState.spacingY) && (
                       <div className="absolute right-3 top-3 flex flex-col gap-1">
                         {guideState.spacingX ? (
-                          <div className="rounded-xl bg-[#0f172a]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
+                          <div className="rounded-xl bg-[#00152E]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
                             X Gap {guideState.spacingX}px
                           </div>
                         ) : null}
                         {guideState.spacingY ? (
-                          <div className="rounded-xl bg-[#0f172a]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
+                          <div className="rounded-xl bg-[#00152E]/92 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-xl backdrop-blur-xl border border-white/10">
                             Y Gap {guideState.spacingY}px
                           </div>
                         ) : null}

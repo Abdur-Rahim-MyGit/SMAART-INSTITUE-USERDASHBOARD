@@ -41,20 +41,20 @@ const EditorTopBar = ({
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <Link
           to="/vision-board-pro/gallery"
-          className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-slate-800"
+          className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-[#002A5C]"
         >
           <ChevronLeft className="h-4 w-4" />
           <span className="hidden sm:block">Boards</span>
         </Link>
 
-        <div className="hidden items-center gap-1 rounded-2xl border border-slate-200 bg-slate-50/50 p-1 dark:border-slate-700 dark:bg-slate-900/60 sm:flex">
+        <div className="hidden items-center gap-1 rounded-2xl border border-slate-200 bg-slate-50/50 p-1 dark:border-white/10 dark:bg-slate-900/60 sm:flex">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                  className="h-8 w-8 text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-white"
                   onClick={onUndo}
                   disabled={!canUndo}
                 >
@@ -71,7 +71,7 @@ const EditorTopBar = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                  className="h-8 w-8 text-slate-600 hover:bg-white hover:text-slate-900 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-white"
                   onClick={onRedo}
                   disabled={!canRedo}
                 >
@@ -85,7 +85,7 @@ const EditorTopBar = ({
       </div>
 
       <div className="mx-1 min-w-0 flex-1 md:block">
-        <div className="group relative flex min-h-[72px] items-center rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 shadow-inner transition-all focus-within:bg-white dark:border-slate-700 dark:bg-slate-900/70">
+        <div className="group relative flex min-h-[72px] items-center rounded-2xl border border-slate-200/80 bg-slate-50/80 px-4 py-3 shadow-inner transition-all focus-within:bg-white dark:border-white/10 dark:bg-slate-900/70">
           <div className="min-w-0 flex-1">
             {/* <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
                 Vision Board Studio
@@ -110,7 +110,7 @@ const EditorTopBar = ({
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
-          className="h-10 gap-2 rounded-2xl border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-slate-800"
+          className="h-10 gap-2 rounded-2xl border-slate-200 bg-white px-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-[#002A5C]"
           onClick={onSave}
           disabled={isSaving}
         >
@@ -123,7 +123,7 @@ const EditorTopBar = ({
         </Button>
 
         <Button
-          className="h-10 gap-2 rounded-2xl bg-[#1a3884] px-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5 hover:bg-[#1a3884]/90 hover:shadow-blue-500/40 dark:bg-blue-600 sm:px-4"
+          className="h-10 gap-2 rounded-2xl bg-[#1a3884] px-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5 hover:bg-[#1a3884]/90 hover:shadow-blue-500/40 dark:bg-[#1a3884] sm:px-4"
           onClick={onPreview}
         >
           <Eye className="h-4 w-4" />

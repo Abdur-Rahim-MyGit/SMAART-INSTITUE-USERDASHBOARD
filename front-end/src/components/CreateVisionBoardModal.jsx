@@ -412,7 +412,7 @@ const CreateVisionBoardModal = ({ isOpen, onClose, onSuccess, userId }) => {
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-[#F8FAFC] transition-colors font-medium"
                     disabled={uploading}
                   >
                     Cancel

@@ -224,7 +224,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-[420px] bg-white dark:bg-dark-card overflow-hidden shadow-2xl z-10 flex flex-col border border-black/5 dark:border-white/10"
+            className="relative w-full max-w-[420px] bg-white dark:bg-[#002147] overflow-hidden shadow-2xl z-10 flex flex-col border border-black/5 dark:border-white/10"
             style={{
               borderRadius: "24px",
             }}
@@ -233,7 +233,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
             {!showForceLogout ? (
               <div className="flex flex-col">
                 {/* Header */}
-                <div className="bg-gray-50 dark:bg-dark-bg/50 p-8 flex flex-col items-center justify-center border-b border-gray-100 dark:border-white/5 relative">
+                <div className="bg-[#F8FAFC] dark:bg-dark-bg/50 p-8 flex flex-col items-center justify-center border-b border-gray-100 dark:border-white/5 relative">
                   <button
                     onClick={onClose}
                     className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors z-30"
@@ -246,7 +246,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                   <h2 className="text-gray-900 dark:text-white text-xs font-bold font-sans tracking-[0.2em] uppercase opacity-90 pt-3 px-6 text-center z-10">
                     Verify Your Email
                   </h2>
-                  <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-2 text-center px-8">
+                  <p className="text-[13px] text-gray-500 dark:text-slate-300 mt-2 text-center px-8">
                     We've sent a security code to <br />
                     <span className="text-[#112b6b] dark:text-white font-bold">{email}</span>
                   </p>
@@ -316,7 +316,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                   </form>
 
                   <div className="mt-8 text-center pt-6 border-t border-gray-50 dark:border-white/5">
-                    <p className="text-gray-400 dark:text-gray-500 text-[12px] font-medium mb-3">
+                    <p className="text-gray-400 dark:text-slate-400 text-[12px] font-medium mb-3">
                       Didn't receive the code?
                     </p>
                     <button
@@ -338,7 +338,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
               </div>
             ) : (
               // Force Logout Confirmation View
-              <div className="p-8 text-center bg-white dark:bg-dark-card">
+              <div className="p-8 text-center bg-white dark:bg-[#002147]">
                 <button
                   onClick={onClose}
                   className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors z-30"
@@ -352,7 +352,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                 </div>
 
                 <h3 className="text-[20px] font-extrabold text-gray-900 dark:text-white mb-2">Active Session</h3>
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 mb-8 max-w-[280px] mx-auto leading-relaxed">
+                <p className="text-[13px] text-gray-500 dark:text-slate-300 mb-8 max-w-[280px] mx-auto leading-relaxed">
                   {forceLogoutMessage || "You are already logged in on another device."}
                 </p>
 
@@ -371,7 +371,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     onClick={handleForceLogoutCancel}
                     variant="ghost"
                     disabled={isLoading}
-                    className="w-full h-11 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-bold text-[13px] transition-colors"
+                    className="w-full h-11 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white font-bold text-[13px] transition-colors"
                   >
                     Cancel
                   </Button>

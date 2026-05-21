@@ -48,13 +48,13 @@ const ServiceCard = ({ service, index }) => {
           {service.title}
         </h3>
 
-        <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed flex-grow text-sm sm:text-base">
+        <p className="text-gray-600 dark:text-slate-200 mb-8 leading-relaxed flex-grow text-sm sm:text-base">
           {service.description}
         </p>
 
         <ul className="space-y-4 mb-8 border-t border-gray-100 dark:border-white/10 pt-6">
           {service.features.map((feature) => (
-            <li key={feature} className="flex items-center text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
+            <li key={feature} className="flex items-center text-sm text-gray-500 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
               <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0] mr-3 shadow-[0_0_8px_#C0C0C0]" />
               {feature}
             </li>
@@ -126,7 +126,7 @@ const ServiceCards = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed font-light"
+            className="text-lg text-gray-600 dark:text-slate-200 leading-relaxed font-light"
           >
             We develop capabilities that enable employability, career progression, and sustained career longevity.
           </motion.p>

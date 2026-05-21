@@ -1466,7 +1466,7 @@ const VisionBoardEditorPro = () => {
   };
 
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden bg-[#eef3f9] dark:bg-[#040814]">
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-[#eef3f9] dark:bg-[#00152E]">
 
       {/* Top Bar */}
       <EditorTopBar

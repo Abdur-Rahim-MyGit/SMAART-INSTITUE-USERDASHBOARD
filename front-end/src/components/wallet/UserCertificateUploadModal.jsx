@@ -103,10 +103,10 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="bg-white dark:bg-slate-800 rounded-none w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-700"
+          className="bg-white dark:bg-[#002A5C] rounded-none w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10"
         >
           {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-none bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
                 <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -116,7 +116,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                 <p className="text-xs text-slate-500 dark:text-slate-400">Add a new credential to your vault</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-none transition-colors text-slate-400">
+            <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-none transition-colors text-slate-400">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -134,7 +134,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                     value={formData.title}
                     onChange={handleChange}
                     placeholder="e.g. AWS Solutions Architect"
-                    className="w-full px-4 py-2.5 rounded-none bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                   />
                 </div>
 
@@ -147,7 +147,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                     value={formData.issuer}
                     onChange={handleChange}
                     placeholder="e.g. Amazon Web Services"
-                    className="w-full px-4 py-2.5 rounded-none bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    className="w-full px-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                   />
                 </div>
 
@@ -160,7 +160,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                       name="issueDate"
                       value={formData.issueDate}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 rounded-none bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full px-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -170,7 +170,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                       name="expiryDate"
                       value={formData.expiryDate}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 rounded-none bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full px-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -185,7 +185,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                       value={formData.verificationUrl}
                       onChange={handleChange}
                       placeholder="https://verify.example.com/..."
-                      className="w-full pl-10 pr-4 py-2.5 rounded-none bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -200,7 +200,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                       value={formData.qrCodeIdentifier}
                       onChange={handleChange}
                       placeholder="e.g. ABC-123-XYZ"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-none bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -217,7 +217,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                   className={`relative h-full min-h-[280px] border-2 border-dashed rounded-none flex flex-col items-center justify-center p-6 transition-all ${
                     dragActive
                       ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10"
-                      : "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 hover:border-blue-400 dark:hover:border-blue-500/50"
+                      : "border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-slate-900/50 hover:border-blue-400 dark:hover:border-blue-500/50"
                   }`}
                 >
                   {file ? (
@@ -242,7 +242,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                       </div>
                       <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Drag and drop file here</p>
                       <p className="text-xs text-slate-400 mb-4 font-medium">PDF, JPG, PNG or WEBP (Max 10MB)</p>
-                      <label className="cursor-pointer px-5 py-2 rounded-none bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm">
+                      <label className="cursor-pointer px-5 py-2 rounded-none bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm">
                         Browse Files
                         <input type="file" className="hidden" accept=".pdf,image/*" onChange={handleFileChange} />
                       </label>
@@ -252,11 +252,11 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 flex justify-end gap-3">
+            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/10 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-none border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+                className="px-6 py-2.5 rounded-none border border-slate-200 dark:border-white/10 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
               >
                 Cancel
               </button>

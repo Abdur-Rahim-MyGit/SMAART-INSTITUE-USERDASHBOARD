@@ -50,7 +50,7 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="w-full px-6 py-8 sm:px-10 lg:px-12 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800/50 relative overflow-hidden transition-all duration-300">
+    <div className="w-full px-6 py-8 sm:px-10 lg:px-12 bg-white dark:bg-[#002147] border-b border-slate-100 dark:border-slate-800/50 relative overflow-hidden transition-all duration-300">
       {/* Decorative background element */}
       <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-blue-50/50 to-transparent dark:from-blue-900/10 pointer-events-none" />
       

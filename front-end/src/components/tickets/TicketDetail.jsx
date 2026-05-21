@@ -173,7 +173,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-[#001229] border border-[#1a3884]/30 flex flex-col"
+        className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-[#00152E] border border-[#1a3884]/30 flex flex-col"
       >
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-[#1a3884]/20">

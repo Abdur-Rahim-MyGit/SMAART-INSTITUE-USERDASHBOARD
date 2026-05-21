@@ -70,7 +70,7 @@ const SignupModal = ({ isOpen, onClose, onSwitchToLogin }) => {
             }}
           >
             {/* Header */}
-            <div className="bg-gray-50 p-8 flex flex-col items-center justify-center border-b border-gray-100 relative">
+            <div className="bg-[#F8FAFC] p-8 flex flex-col items-center justify-center border-b border-gray-100 relative">
               <button
                 onClick={onClose}
                 className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 transition-colors z-30"

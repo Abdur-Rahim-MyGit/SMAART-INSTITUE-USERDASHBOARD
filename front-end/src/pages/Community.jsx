@@ -22,7 +22,7 @@ const Community = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-dark-bg pb-24 selection:bg-[#002147]/20">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] pb-24 selection:bg-[#002147]/20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         
         {/* ── Header Section ────────────────────────────────────────────── */}
@@ -50,7 +50,7 @@ const Community = () => {
                 transition={{ delay: 0.1 }}
                 className="flex items-center gap-2 mt-1"
               >
-                <p className="text-gray-500 dark:text-gray-400 font-medium text-sm">
+                <p className="text-gray-500 dark:text-slate-300 font-medium text-sm">
                   Official notices and updates from your institution
                 </p>
               </motion.div>
@@ -63,7 +63,7 @@ const Community = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-white/40 dark:bg-dark-card backdrop-blur-3xl rounded-[2rem] p-2 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-white/60 dark:border-white/10 relative overflow-hidden"
+          className="bg-white/40 dark:bg-[#002147] backdrop-blur-3xl rounded-[2rem] p-2 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] border border-white/60 dark:border-white/10 relative overflow-hidden"
         >
           {/* Decorative background glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/40 dark:bg-blue-900/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />

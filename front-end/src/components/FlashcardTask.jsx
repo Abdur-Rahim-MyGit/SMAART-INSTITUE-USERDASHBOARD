@@ -53,7 +53,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
       
       <div className="max-w-4xl mx-auto space-y-6 relative z-10">
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-slate-700 pb-4">
+        <div className="border-b border-slate-200 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-2">
             <RotateCcw size={16} />
             <span>Flash Cards</span>
@@ -81,7 +81,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             >
               {/* Front - Force Solid Background and Visibility */}
               <motion.div
-                className="absolute inset-0 bg-slate-900 dark:bg-slate-950 rounded-3xl flex items-center justify-center p-10 border border-white/10 overflow-hidden"
+                className="absolute inset-0 bg-slate-900 dark:bg-[#00152E] rounded-3xl flex items-center justify-center p-10 border border-white/10 overflow-hidden"
                 style={{ 
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -114,7 +114,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
 
               {/* Back - Force Solid Background and Visibility */}
               <motion.div
-                className="absolute inset-0 bg-white dark:bg-[#0f172a] rounded-3xl flex items-center justify-center p-10 border border-slate-200 dark:border-slate-800"
+                className="absolute inset-0 bg-white dark:bg-[#00152E] rounded-3xl flex items-center justify-center p-10 border border-slate-200 dark:border-white/8"
                 style={{ 
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -144,7 +144,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             <button
               onClick={handlePrevious}
               disabled={currentIndex === 0}
-              className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="p-3 rounded-full bg-slate-100 dark:bg-[#002A5C] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#002A5C] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <ChevronLeft size={20} />
             </button>
@@ -156,7 +156,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             <button
               onClick={handleNext}
               disabled={currentIndex === flashcards.length - 1}
-              className="p-3 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="p-3 rounded-full bg-slate-100 dark:bg-[#002A5C] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#002A5C] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <ChevronRight size={20} />
             </button>

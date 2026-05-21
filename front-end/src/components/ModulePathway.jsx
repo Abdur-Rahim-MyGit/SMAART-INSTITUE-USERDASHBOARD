@@ -95,14 +95,14 @@ const ModulePathway = ({ modules, onModuleClick, getModuleCompletedCount }) => {
           <button
             onClick={() => scroll('left')}
             disabled={!canScrollLeft}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-[60] w-12 h-12 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700 transition-all duration-300 ${!canScrollLeft ? 'opacity-0 scale-90 cursor-default' : 'hover:scale-110 text-slate-700 dark:text-slate-200 shadow-blue-500/10'}`}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-[60] w-12 h-12 rounded-full flex items-center justify-center bg-white dark:bg-[#002A5C] shadow-xl border border-slate-100 dark:border-white/10 transition-all duration-300 ${!canScrollLeft ? 'opacity-0 scale-90 cursor-default' : 'hover:scale-110 text-slate-700 dark:text-slate-200 shadow-blue-500/10'}`}
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             onClick={() => scroll('right')}
             disabled={!canScrollRight}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-[60] w-12 h-12 rounded-full flex items-center justify-center bg-white dark:bg-slate-800 shadow-xl border border-slate-100 dark:border-slate-700 transition-all duration-300 ${!canScrollRight ? 'opacity-0 scale-90 cursor-default' : 'hover:scale-110 text-slate-700 dark:text-slate-200 shadow-blue-500/10'}`}
+            className={`absolute right-0 top-1/2 -translate-y-1/2 z-[60] w-12 h-12 rounded-full flex items-center justify-center bg-white dark:bg-[#002A5C] shadow-xl border border-slate-100 dark:border-white/10 transition-all duration-300 ${!canScrollRight ? 'opacity-0 scale-90 cursor-default' : 'hover:scale-110 text-slate-700 dark:text-slate-200 shadow-blue-500/10'}`}
           >
             <ChevronRight className="w-6 h-6" />
           </button>
@@ -160,7 +160,7 @@ const ModulePathway = ({ modules, onModuleClick, getModuleCompletedCount }) => {
             }}
           >
             <div className="bg-gradient-to-r from-emerald-400 to-green-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-full mb-3 shadow-lg animate-pulse tracking-widest ring-4 ring-white/50 dark:ring-slate-800/50 uppercase">GRADUATION</div>
-            <h3 className="text-sm font-black leading-tight drop-shadow-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 py-3 rounded-2xl text-center border border-slate-200 dark:border-slate-800">You're ready for<br />Certification!</h3>
+            <h3 className="text-sm font-black leading-tight drop-shadow-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-4 py-3 rounded-2xl text-center border border-slate-200 dark:border-white/8">You're ready for<br />Certification!</h3>
           </div>
 
           {/* MODULE CARDS */}
@@ -179,7 +179,7 @@ const ModulePathway = ({ modules, onModuleClick, getModuleCompletedCount }) => {
               <div key={module.id} className="snap-center">
                 {/* Visual Connector Dot on the Road */}
                 <div 
-                  className={`absolute w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border-4 z-20 shadow-2xl flex items-center justify-center transition-all duration-300 ${isLocked ? 'grayscale' : ''}`}
+                  className={`absolute w-12 h-12 rounded-2xl bg-white dark:bg-[#002147] border-4 z-20 shadow-2xl flex items-center justify-center transition-all duration-300 ${isLocked ? 'grayscale' : ''}`}
                   style={{ 
                     left: `${pos.x}px`, 
                     top: `${pos.y}px`, 
@@ -219,8 +219,8 @@ const ModulePathway = ({ modules, onModuleClick, getModuleCompletedCount }) => {
                       <div className={`absolute left-1/2 -translate-x-1/2 w-0.5 bg-gradient-to-b ${isAbove ? 'top-full h-[60px] from-slate-200 via-slate-200 to-transparent' : 'bottom-full h-[60px] from-transparent via-slate-200 to-slate-200'} dark:via-slate-800 transition-opacity group-hover:opacity-100 opacity-40`} />
 
                       <div className={`
-                        relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border-2 
-                        ${isLocked ? 'border-slate-100 dark:border-slate-800 opacity-80' : 'border-slate-200/50 dark:border-slate-800 hover:border-blue-500/30'} 
+                        relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-[#002147] border-2 
+                        ${isLocked ? 'border-slate-100 dark:border-white/8 opacity-80' : 'border-slate-200/50 dark:border-white/8 hover:border-blue-500/30'} 
                         shadow-2xl shadow-slate-200/40 dark:shadow-none transition-all duration-500 
                         ${!isLocked ? 'hover:-translate-y-2' : ''}
                       `}>
@@ -236,7 +236,7 @@ const ModulePathway = ({ modules, onModuleClick, getModuleCompletedCount }) => {
                           <div className="bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg text-white text-[10px] font-bold uppercase tracking-widest opacity-90">
                             Module {String(module.id).padStart(2, '0')}
                           </div>
-                          <div className="bg-white/95 dark:bg-slate-900 p-2 rounded-xl text-slate-700 dark:text-slate-300 shadow-md">
+                          <div className="bg-white/95 dark:bg-[#002147] p-2 rounded-xl text-slate-700 dark:text-slate-300 shadow-md">
                             {isLocked ? (
                               <Lock size={16} />
                             ) : progressPercent === 100 ? (
@@ -272,7 +272,7 @@ const ModulePathway = ({ modules, onModuleClick, getModuleCompletedCount }) => {
                                 <span>Progress</span>
                                 <span>{progressPercent}%</span>
                             </div>
-                            <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
                                 <motion.div 
                                     className="h-full rounded-full"
                                     initial={{ width: 0 }}
@@ -291,8 +291,8 @@ const ModulePathway = ({ modules, onModuleClick, getModuleCompletedCount }) => {
                           className={`
                             w-full py-3 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all duration-300
                             ${isLocked 
-                                ? 'bg-slate-50 dark:bg-slate-800 text-slate-400 cursor-not-allowed border border-slate-100 dark:border-slate-800' 
-                                : 'bg-slate-50 dark:bg-slate-800/50 text-blue-600 dark:text-blue-400 border border-blue-50/50 dark:border-blue-900/30 hover:bg-blue-600 hover:text-white hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20'
+                                ? 'bg-[#F8FAFC] dark:bg-[#002A5C] text-slate-400 cursor-not-allowed border border-slate-100 dark:border-white/8' 
+                                : 'bg-[#F8FAFC] dark:bg-slate-800/50 text-blue-600 dark:text-blue-400 border border-blue-50/50 dark:border-blue-900/30 hover:bg-[#1a3884] hover:text-white hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20'
                             }
                           `}
                         >

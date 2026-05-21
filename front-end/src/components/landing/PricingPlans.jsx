@@ -72,7 +72,7 @@ const PricingPlans = () => {
 
                             <div className="mb-6">
                                 <span className="text-4xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
-                                {plan.period && <span className="text-gray-500 dark:text-gray-400 text-sm">{plan.period}</span>}
+                                {plan.period && <span className="text-gray-500 dark:text-slate-300 text-sm">{plan.period}</span>}
                             </div>
 
                             <p className="text-gray-600 dark:text-gray-200 text-sm mb-8 min-h-[40px]">{plan.description}</p>

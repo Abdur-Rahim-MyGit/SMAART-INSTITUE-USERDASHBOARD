@@ -109,7 +109,7 @@ const ModernVideoPlayer = ({
   const currentDay = currentModule?.days?.[selectedDay - 1];
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-50">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-[#F8FAFC]">
       {/* Left Side - Video Player */}
       <div className="flex-1 p-4 lg:p-8">
         <div className="max-w-5xl mx-auto">
@@ -185,7 +185,7 @@ const ModernVideoPlayer = ({
                     transition={{ duration: 0.2 }}
                     className="min-h-[200px]"
                   >
-                    <div className="bg-gray-50 rounded-xl p-6">
+                    <div className="bg-[#F8FAFC] rounded-xl p-6">
                       <h4 className="font-semibold text-gray-900 mb-3">Lesson Preview</h4>
                       <p className="text-gray-600 leading-relaxed">
                         {currentDay?.description || 'Watch this lesson to continue your learning journey.'}
@@ -212,7 +212,7 @@ const ModernVideoPlayer = ({
                     transition={{ duration: 0.2 }}
                     className="min-h-[200px]"
                   >
-                    <div className="bg-gray-50 rounded-xl p-6">
+                    <div className="bg-[#F8FAFC] rounded-xl p-6">
                       <h4 className="font-semibold text-gray-900 mb-3">Video Transcription</h4>
                       <p className="text-gray-600 leading-relaxed italic">
                         Transcription will be available here once the video content is processed.
@@ -301,7 +301,7 @@ const ModernVideoPlayer = ({
                   {/* Module Header */}
                   <button
                     onClick={() => toggleModule(moduleIndex)}
-                    className="w-full p-4 flex items-center justify-between bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className="w-full p-4 flex items-center justify-between bg-[#F8FAFC] hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
@@ -349,7 +349,7 @@ const ModernVideoPlayer = ({
                                   isActive 
                                     ? 'bg-indigo-50 border-2 border-indigo-500' 
                                     : status === 'locked'
-                                    ? 'bg-gray-50 opacity-50 cursor-not-allowed'
+                                    ? 'bg-[#F8FAFC] opacity-50 cursor-not-allowed'
                                     : 'hover:bg-gray-100 border-2 border-transparent'
                                 }`}
                               >

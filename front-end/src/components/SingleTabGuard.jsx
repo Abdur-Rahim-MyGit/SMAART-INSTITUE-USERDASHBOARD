@@ -49,7 +49,7 @@ const SingleTabGuard = ({ children }) => {
 
   if (isDuplicate) {
     return (
-      <div className="fixed inset-0 min-h-screen flex items-center justify-center bg-[#001229] p-4 z-[99999]">
+      <div className="fixed inset-0 min-h-screen flex items-center justify-center bg-[#00152E] p-4 z-[99999]">
         <div className="max-w-md w-full bg-[#002147] rounded-2xl p-8 text-center shadow-2xl border border-white/10">
           <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <AlertTriangle className="w-10 h-10 text-amber-500" />

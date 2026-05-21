@@ -63,21 +63,21 @@ const DashboardHome = () => {
 
   if ((userLoading || dashboardLoading) && !loadingError) {
     return (
-      <div className="min-h-screen p-4 sm:p-8 space-y-8 bg-[#f8fafc] dark:bg-slate-950 animate-pulse">
+      <div className="min-h-screen p-4 sm:p-8 space-y-8 bg-[#F8FAFC] dark:bg-[#00152E] animate-pulse">
         {/* Skeleton Hero */}
-        <div className="w-full h-32 sm:h-40 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
+        <div className="w-full h-32 sm:h-40 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
 
         {/* Skeleton Banners */}
-        <div className="w-full h-48 sm:h-64 lg:h-80 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
+        <div className="w-full h-48 sm:h-64 lg:h-80 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
 
         {/* Skeleton Progress */}
-        <div className="w-full h-40 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
+        <div className="w-full h-40 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
 
         {/* Skeleton Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="w-full h-24 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
-          <div className="w-full h-24 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
-          <div className="w-full h-24 bg-slate-200 dark:bg-slate-800 rounded-3xl" />
+          <div className="w-full h-24 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
+          <div className="w-full h-24 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
+          <div className="w-full h-24 bg-slate-200 dark:bg-[#002147] rounded-3xl" />
         </div>
       </div>
     );
@@ -85,7 +85,7 @@ const DashboardHome = () => {
 
   if (loadingError) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] dark:bg-slate-950 p-6 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] dark:bg-[#00152E] p-6 text-center">
         <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
           <AlertCircle className="w-8 h-8 text-red-500" />
         </div>
@@ -96,7 +96,7 @@ const DashboardHome = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-2.5 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] text-white rounded-full font-semibold shadow-md hover:shadow-lg transition-all"
+            className="px-6 py-2.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5"
           >
             Try Again
           </button>
@@ -106,7 +106,7 @@ const DashboardHome = () => {
               localStorage.clear();
               window.location.href = '/';
             }}
-            className="px-6 py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-full font-semibold hover:bg-slate-50 transition-all"
+            className="px-6 py-2.5 bg-white dark:bg-[#002147] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 rounded-xl font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
           >
             Logout & Reset
           </button>

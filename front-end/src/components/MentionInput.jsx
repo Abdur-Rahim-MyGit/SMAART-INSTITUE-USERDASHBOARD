@@ -175,7 +175,7 @@ const MentionInput = ({
                 className={`px-4 py-3 cursor-pointer transition-colors flex items-center gap-3 ${
                   index === selectedIndex
                     ? 'bg-blue-50 border-l-4 border-blue-500'
-                    : 'hover:bg-gray-50'
+                    : 'hover:bg-[#F8FAFC]'
                 }`}
               >
                 {user.profileImage ? (

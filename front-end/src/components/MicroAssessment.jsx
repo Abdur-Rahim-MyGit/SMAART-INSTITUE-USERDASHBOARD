@@ -159,7 +159,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto bg-white dark:bg-[#002147] rounded-2xl shadow-sm border border-gray-100 dark:border-white/8 overflow-hidden">
       
       {/* HEADER */}
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-3 md:p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
@@ -213,7 +213,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                  <span>Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
                  <span>Score: {score}</span>
                </div>
-               <div className="h-2 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+               <div className="h-2 bg-gray-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
                  <motion.div 
                    className="h-full bg-[#1a3884]"
                    initial={{ width: 0 }}
@@ -242,11 +242,11 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      if (showExplanation) {
                         if (isCorrect) btnClass += "border-green-500 bg-green-50 text-green-800 dark:bg-green-500/10 dark:text-green-400";
                         else if (isSelected) btnClass += "border-red-500 bg-red-50 text-red-800 dark:bg-red-500/10 dark:text-red-400";
-                        else btnClass += "border-gray-200 dark:border-slate-800 opacity-50";
+                        else btnClass += "border-gray-200 dark:border-white/8 opacity-50";
                      } else {
                         btnClass += isSelected 
                           ? "border-[#1a3884] bg-[#1a3884]/10 text-[#0e5c65] dark:text-blue-300 dark:bg-[#1a3884]/20" 
-                          : "border-gray-200 dark:border-slate-700 hover:border-[#1a3884]/50 hover:bg-slate-50 dark:hover:bg-slate-800";
+                          : "border-gray-200 dark:border-white/10 hover:border-[#1a3884]/50 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]";
                      }
 
                      return (
@@ -336,7 +336,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between ";
                      if (isCorrect) btnClass += "border-green-500 bg-green-50 dark:bg-green-500/10 text-green-800 dark:text-green-400";
                      else if (isUserChoice) btnClass += "border-red-500 bg-red-50 dark:bg-red-500/10 text-red-800 dark:text-red-400";
-                     else btnClass += "border-gray-100 dark:border-slate-800 opacity-60";
+                     else btnClass += "border-gray-100 dark:border-white/8 opacity-60";
 
                      return (
                        <div key={idx} className={btnClass}>
@@ -345,13 +345,13 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                          </div>
                          {isCorrect && <CheckCircle2 size={18} className="text-green-500" />}
                          {isUserChoice && !isCorrect && <XCircle size={18} className="text-red-500" />}
-                         {isUserChoice && <span className="text-[10px] font-bold uppercase ml-2 px-2 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-slate-600 dark:text-slate-400">Your Answer</span>}
+                         {isUserChoice && <span className="text-[10px] font-bold uppercase ml-2 px-2 py-0.5 bg-slate-200 dark:bg-[#003170] rounded text-slate-600 dark:text-slate-400">Your Answer</span>}
                        </div>
                      );
                   })}
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                <div className="bg-[#F8FAFC] dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-white/10">
                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Explanation</p>
                    <p className="text-sm text-slate-600 dark:text-slate-400">
                       {shuffledQuestions[currentQuestionIndex].explanation || "No explanation provided for this question."}
@@ -362,7 +362,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                     <button
                         onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
                         disabled={currentQuestionIndex === 0}
-                        className="flex-1 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30"
+                        className="flex-1 px-4 py-2 border border-slate-200 dark:border-white/10 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30"
                     >
                         Previous
                     </button>
@@ -414,7 +414,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                         setCurrentQuestionIndex(0);
                         setStep('review');
                     }}
-                    className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-slate-800 border-2 border-[#1a3884] text-[#1a3884] rounded-xl font-bold shadow-sm transition-all hover:bg-[#1a3884]/5"
+                    className="w-full sm:w-auto px-8 py-3 bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#1a3884] rounded-xl font-bold shadow-sm transition-all hover:bg-[#1a3884]/5"
                   >
                     Review Responses
                   </button>

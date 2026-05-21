@@ -80,11 +80,85 @@ const CareerAgentDashboard = () => {
         loadAnalysis();
     }, [navigate]);
 
+    // FIX: Direction Overview shows empty because the 'direction' field is missing from saved analyses.
+    // When the engine stores a report, it attaches direction data only if fetchDirectionFromDB succeeds.
+    // This effect detects missing directions and fetches them from the API using the preference names.
+    useEffect(() => {
+        if (!data) return;
+
+        const _draft = (() => { try { return JSON.parse(localStorage.getItem('smaart_onboarding_draft') || '{}'); } catch { return {}; } })();
+        const _dp = _draft?.preferences || {};
+
+        // Get the direction name for each path — from the stored analysis or the onboarding draft
+        const getPrefName = (roleData, draftPref, localKey) => {
+            return localStorage.getItem(localKey)
+                || roleData?.direction?.directionName
+                || draftPref?.careerDirectionName
+                || draftPref?.role
+                || roleData?.tab1?.role_name
+                || null;
+        };
+
+        const primaryName   = getPrefName(data.primary,   _dp.primary,   'smaart_pref_primary');
+        const secondaryName = getPrefName(data.secondary, _dp.secondary, 'smaart_pref_secondary');
+        const tertiaryName  = getPrefName(data.tertiary,  _dp.tertiary,  'smaart_pref_tertiary');
+
+        // Only fetch for paths that are missing their direction data
+        const needsFetch = [
+            { key: 'primary',   name: primaryName,   hasDir: !!data.primary?.direction?.directionName },
+            { key: 'secondary', name: secondaryName, hasDir: !!data.secondary?.direction?.directionName },
+            { key: 'tertiary',  name: tertiaryName,  hasDir: !!data.tertiary?.direction?.directionName },
+        ].filter(p => !p.hasDir && p.name);
+
+        if (needsFetch.length === 0) return;
+
+        // Fetch missing directions and patch them into state
+        const fetchAndPatch = async () => {
+            const patches = {};
+            await Promise.all(needsFetch.map(async ({ key, name }) => {
+                try {
+                    const res = await fetch(`/api/career-agent/direction-roles/${encodeURIComponent(name)}`, { credentials: 'include' });
+                    if (res.ok) {
+                        const dir = await res.json();
+                        if (dir.found || dir.directionName) {
+                            patches[key] = {
+                                directionId:          dir.directionId   || '',
+                                directionName:        dir.directionName || name,
+                                directionDescription: dir.overview      || dir.directionDescription || '',
+                                directionOverview:    dir.overview      || '',
+                                type:                 key === 'primary' ? 'Primary' : key === 'secondary' ? 'Secondary' : 'Alternative',
+                                roles:                dir.roles         || [],
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.warn(`[Dashboard] Could not fetch direction for ${name}:`, e.message);
+                }
+            }));
+
+            if (Object.keys(patches).length > 0) {
+                setData(prev => {
+                    if (!prev) return prev;
+                    const updated = { ...prev };
+                    for (const [key, dirData] of Object.entries(patches)) {
+                        if (updated[key]) {
+                            updated[key] = { ...updated[key], direction: dirData };
+                        }
+                    }
+                    return updated;
+                });
+            }
+        };
+
+        fetchAndPatch();
+    }, [data?.primary?.tab1?.role_name, data?.secondary?.tab1?.role_name, data?.tertiary?.tab1?.role_name]);
+
+
     if (loading) {
         return (
-            <div className="career-agent-page" style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#ffffff' }}>
+            <div className="career-agent-page" style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'var(--navy)' }}>
                 <div className="pulse-ring" style={{ width: '80px', height: '80px' }}></div>
-                <div style={{ width: '70px', height: '70px', borderRadius: '18px', background: '#f8fafc', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(37,99,235,0.1)', position: 'relative', zIndex: 2 }}>
+                <div style={{ width: '70px', height: '70px', borderRadius: '18px', background: 'var(--navy2)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(37,99,235,0.1)', position: 'relative', zIndex: 2 }}>
                     <Sparkles size={32} color="var(--accent)" className="animate-pulse" />
                 </div>
                 <h2 style={{ marginTop: '1.5rem', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text1)' }}>Synchronizing Intelligence...</h2>
@@ -161,7 +235,7 @@ const CareerAgentDashboard = () => {
     const matchScore = parseInt(currentData.match_explanation?.match(/\d+/) || 75);
 
     return (
-        <div className="career-agent-page" style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingTop: '56px' }}>
+        <div className="career-agent-page">
 
             {/* ── Selection Flow Modal ── */}
             {showSelectionFlow && (
@@ -330,13 +404,13 @@ const CareerAgentDashboard = () => {
                 <div className="dash-top">
                     <div>
                         <div className="dash-name">Career <span>Intelligence</span> Report</div>
-                        <div className="dash-meta" style={{ display: 'flex', gap: '1rem' }}>
+                        <div className="dash-meta">
                             <span>CANDIDATE: {localStorage.getItem('smaart_student_name') || 'Student'}</span>
-                            <span style={{ color: 'var(--muted)' }}>|</span>
+                            <span>|</span>
                             <span>{localStorage.getItem('smaart_student_email')}</span>
                         </div>
                     </div>
-                    <div className="dash-actions" style={{ display: 'flex', gap: '0.6rem' }}>
+                    <div className="dash-actions">
                         <button className="btn-ghost" onClick={() => window.print()}>Print Report</button>
                         <button className="btn-primary" onClick={() => navigate('/dashboard/career-agent/onboarding')}>New Analysis</button>
                     </div>
@@ -344,25 +418,16 @@ const CareerAgentDashboard = () => {
 
                 <div className="role-tabs-bar">
                     <button className={`rtab ${activeRole === 1 ? 'active' : ''}`} onClick={() => setActiveRole(1)}>
-                        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: activeRole === 1 ? 700 : 600 }}>
-                                <Trophy size={16} color={activeRole === 1 ? "var(--green)" : "var(--muted)"} /> {prefPrimary}
-                            </span>
-                        </span>
+                        <Trophy size={15} />
+                        {prefPrimary}
                     </button>
                     <button className={`rtab ${activeRole === 2 ? 'active' : ''}`} onClick={() => setActiveRole(2)}>
-                        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: activeRole === 2 ? 700 : 600 }}>
-                                <Medal size={16} color={activeRole === 2 ? "var(--amber)" : "var(--muted)"} /> {prefSecondary}
-                            </span>
-                        </span>
+                        <Medal size={15} />
+                        {prefSecondary}
                     </button>
                     <button className={`rtab ${activeRole === 3 ? 'active' : ''}`} onClick={() => setActiveRole(3)}>
-                        <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: activeRole === 3 ? 700 : 600 }}>
-                                <Target size={16} color={activeRole === 3 ? "var(--red)" : "var(--muted)"} /> {prefTertiary}
-                            </span>
-                        </span>
+                        <Target size={15} />
+                        {prefTertiary}
                     </button>
                 </div>
             </header>
@@ -376,7 +441,7 @@ const CareerAgentDashboard = () => {
                         </div>
                     </div>
 
-                    <div className="sidebar-nav" style={{ marginTop: '1rem' }}>
+                    <div className="sidebar-nav">
                         {panels.map(p => (
                             <button
                                 key={p.id}
@@ -389,10 +454,10 @@ const CareerAgentDashboard = () => {
                         ))}
                     </div>
 
-                    <div style={{ marginTop: 'auto', padding: '1.5rem', borderTop: '1px solid var(--border)' }}>
-                        <div className="ri-card" style={{ padding: '0.8rem', background: 'var(--navy3)' }}>
-                            <div className="ri-label" style={{ fontSize: '0.55rem' }}>Account Status</div>
-                            <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>PREMIUM ACCESS</div>
+                    <div className="sidebar-footer">
+                        <div className="ri-card">
+                            <div className="ri-label">Account Status</div>
+                            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent)', marginTop: '0.2rem' }}>PREMIUM ACCESS</div>
                         </div>
                     </div>
                 </aside>

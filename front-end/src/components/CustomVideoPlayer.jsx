@@ -591,7 +591,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                           <button
                             key={speed}
                             onClick={() => handleSpeedChange(speed)}
-                            className={`w-full px-4 py-2 text-sm text-left hover:bg-slate-50 transition-colors ${playbackSpeed === speed ? 'bg-slate-100 font-bold' : ''
+                            className={`w-full px-4 py-2 text-sm text-left hover:bg-[#F8FAFC] transition-colors ${playbackSpeed === speed ? 'bg-slate-100 font-bold' : ''
                               }`}
                             style={{ color: playbackSpeed === speed ? '#002147' : '#002147' }}
                           >

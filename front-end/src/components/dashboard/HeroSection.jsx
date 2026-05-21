@@ -12,7 +12,7 @@ const HeroSection = memo(({ userName }) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: ANIMATION_DURATIONS.SLOW, ease: "easeOut" }}
-      className="relative w-full py-6 px-6 sm:py-7 sm:px-8 rounded-[24px] overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-sm shadow-xl shadow-gray-200/40 dark:shadow-black/20 border border-gray-100 dark:border-slate-800 transition-all duration-300"
+      className="relative w-full py-6 px-6 sm:py-7 sm:px-8 rounded-[24px] overflow-hidden bg-white dark:bg-[#002147] shadow-xl shadow-gray-200/40 dark:shadow-black/30 border border-gray-100/80 dark:border-[#1a3884]/20 transition-colors duration-300"
     >
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" 

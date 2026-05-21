@@ -21,12 +21,12 @@ const LearningProgress = memo(({ paths, loading, error }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: ANIMATION_DELAYS.SECTIONS }}
-      className="bg-white dark:bg-slate-900/40 backdrop-blur-sm border border-gray-100 dark:border-slate-800 rounded-[32px] shadow-xl shadow-gray-200/30 dark:shadow-black/20 overflow-hidden relative transition-all duration-300"
+      className="bg-white dark:bg-[#002147] border border-gray-100/80 dark:border-[#1a3884]/20 rounded-[32px] shadow-xl shadow-gray-200/30 dark:shadow-black/30 overflow-hidden relative transition-colors duration-300"
     >
       {/* Continue Learning Bar */}
       <div className="p-8 border-b border-gray-50 dark:border-slate-800/50 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-5">
-          <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center border border-gray-100 dark:border-slate-700 shadow-sm transition-all duration-300 group-hover:shadow-md">
+          <div className="w-14 h-14 bg-white dark:bg-[#002A5C] rounded-2xl flex items-center justify-center border border-gray-100/80 dark:border-[#1a3884]/20 shadow-sm">
             <BookOpen className="w-7 h-7 text-[#1a3884] dark:text-blue-400" />
           </div>
           <div>
@@ -41,7 +41,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
               <span className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">Overall Progress</span>
               <span className="text-[13px] font-extrabold text-[#1a3884] dark:text-blue-400">{averageProgress}%</span>
             </div>
-            <div className="h-2 w-full bg-gray-50 dark:bg-slate-800 rounded-full overflow-hidden border border-gray-100/50 dark:border-slate-700/50">
+            <div className="h-2 w-full bg-[#F8FAFC] dark:bg-[#002A5C] rounded-full overflow-hidden border border-gray-100/50 dark:border-slate-700/50">
               <div 
                 className="h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(59,130,246,0.3)]"
                 style={{ width: `${averageProgress}%`, background: "linear-gradient(90deg, #112b6b 0%, #1a3884 100%)" }}
@@ -51,7 +51,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
           
           <button 
             onClick={() => navigate('/dashboard/courses')}
-            className="relative h-12 px-8 bg-[#112b6b] dark:bg-[#1a3884] hover:bg-[#1a3884] dark:hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg shadow-[#112b6b]/20 dark:shadow-blue-900/30 hover:-translate-y-1 active:translate-y-0 whitespace-nowrap overflow-hidden group"
+            className="relative h-12 px-8 bg-[#112b6b] dark:bg-[#1a3884] hover:bg-[#1a3884] dark:hover:bg-[#1a3884] text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg shadow-[#112b6b]/20 dark:shadow-blue-900/30 hover:-translate-y-1 active:translate-y-0 whitespace-nowrap overflow-hidden group"
           >
             <div className="relative z-10 flex items-center gap-2">
               {t("dashboard.continue_learning")}
@@ -66,15 +66,15 @@ const LearningProgress = memo(({ paths, loading, error }) => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
+              <div key={i} className="bg-white dark:bg-[#002147] border border-slate-200/80 dark:border-[#1a3884]/20 rounded-xl p-5 shadow-sm">
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse"></div>
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#002A5C] animate-pulse"></div>
                   <div className="flex-1">
-                    <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded animate-pulse mb-2"></div>
-                    <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded animate-pulse w-3/4"></div>
+                    <div className="h-4 bg-slate-100 dark:bg-[#002A5C] rounded animate-pulse mb-2"></div>
+                    <div className="h-3 bg-slate-100 dark:bg-[#002A5C] rounded animate-pulse w-3/4"></div>
                   </div>
                 </div>
-                <div className="h-10 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"></div>
+                <div className="h-10 bg-slate-100 dark:bg-[#002A5C] rounded-xl animate-pulse"></div>
               </div>
             ))}
           </div>

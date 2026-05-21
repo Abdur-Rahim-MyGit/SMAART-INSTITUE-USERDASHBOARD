@@ -202,7 +202,7 @@ const FloatingDictionary = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                        className="fixed bottom-24 right-6 z-[60] w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden"
+                        className="fixed bottom-24 right-6 z-[60] w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-[#002A5C] border border-slate-200/80 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden"
                     >
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/80">
@@ -278,7 +278,7 @@ const FloatingDictionary = () => {
                                         {result.phonetics?.find(p => p.audio) && (
                                             <button
                                                 onClick={() => playAudio(result.phonetics.find(p => p.audio).audio)}
-                                                className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-[#1a3884] dark:hover:text-blue-400 transition-colors"
+                                                className="p-1 rounded-md hover:bg-slate-100 dark:hover:bg-[#002A5C] text-slate-400 hover:text-[#1a3884] dark:hover:text-blue-400 transition-colors"
                                             >
                                                 <Volume2 className="w-3.5 h-3.5" />
                                             </button>

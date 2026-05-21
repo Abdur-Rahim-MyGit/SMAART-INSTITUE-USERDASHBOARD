@@ -373,7 +373,7 @@ const GroupChat = () => {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-[#F8FAFC]">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
@@ -381,7 +381,7 @@ const GroupChat = () => {
           <div className="flex items-center gap-5">
             <button
               onClick={() => navigate('/dashboard/groups')}
-              className="p-3 bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+              className="p-3 bg-[#F8FAFC] hover:bg-gray-100 text-gray-500 rounded-2xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
             >
               <ChevronLeft className="w-5 h-5" />
               <span className="font-medium text-sm">Back</span>
@@ -407,7 +407,7 @@ const GroupChat = () => {
                 setShowMsgSearch(!showMsgSearch);
                 if (!showMsgSearch) setMsgSearchQuery('');
               }}
-              className={`p-3 rounded-2xl transition-all ${showMsgSearch ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'hover:bg-gray-50 text-gray-400'}`}
+              className={`p-3 rounded-2xl transition-all ${showMsgSearch ? 'bg-[#1a3884] text-white shadow-lg shadow-blue-200' : 'hover:bg-[#F8FAFC] text-gray-400'}`}
               title="Search Messages"
             >
               <Search className="w-5 h-5" />
@@ -417,7 +417,7 @@ const GroupChat = () => {
                 setShowMediaGallery(!showMediaGallery);
                 if (showMembers) setShowMembers(false);
               }}
-              className={`p-3 rounded-2xl transition-all ${showMediaGallery ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'hover:bg-gray-50 text-gray-400'}`}
+              className={`p-3 rounded-2xl transition-all ${showMediaGallery ? 'bg-[#1a3884] text-white shadow-lg shadow-blue-200' : 'hover:bg-[#F8FAFC] text-gray-400'}`}
               title="Media Gallery"
             >
               <ImageIcon className="w-5 h-5" />
@@ -427,7 +427,7 @@ const GroupChat = () => {
                 setShowMembers(!showMembers);
                 if (showMediaGallery) setShowMediaGallery(false);
               }}
-              className={`p-3 rounded-2xl transition-all ${showMembers ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'hover:bg-gray-50 text-gray-400'}`}
+              className={`p-3 rounded-2xl transition-all ${showMembers ? 'bg-[#1a3884] text-white shadow-lg shadow-blue-200' : 'hover:bg-[#F8FAFC] text-gray-400'}`}
             >
               <Users className="w-5 h-5" />
             </button>
@@ -657,7 +657,7 @@ const GroupChat = () => {
                                       initial={{ width: 0 }}
                                       animate={{ width: `${percentage}%` }}
                                       transition={{ duration: 1, ease: "circOut" }}
-                                      className={`absolute inset-0 opacity-20 ${isMe ? 'bg-white' : 'bg-blue-600'}`}
+                                      className={`absolute inset-0 opacity-20 ${isMe ? 'bg-white' : 'bg-[#1a3884]'}`}
                                     />
                                   )}
 
@@ -766,7 +766,7 @@ const GroupChat = () => {
 
                             {/* Shared Poll Display */}
                             {msg.sharedPost.poll && (
-                              <div className={`mb-3 p-3 rounded-xl ${isMe ? 'bg-white/10' : 'bg-gray-50'}`}>
+                              <div className={`mb-3 p-3 rounded-xl ${isMe ? 'bg-white/10' : 'bg-[#F8FAFC]'}`}>
                                 <div className="flex items-center gap-2 mb-2">
                                   <TrendingUp className={`w-4 h-4 ${isMe ? 'text-white/70' : 'text-blue-500'}`} />
                                   <span className={`text-xs font-bold ${isMe ? 'text-white/90' : 'text-gray-700'}`}>
@@ -918,7 +918,7 @@ const GroupChat = () => {
               className="mb-4 relative w-fit group/preview"
             >
               {mediaType === 'video' ? (
-                <div className="h-24 w-40 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-900 flex items-center justify-center overflow-hidden">
+                <div className="h-24 w-40 rounded-2xl border-2 border-dashed border-gray-200 bg-[#002147] flex items-center justify-center overflow-hidden">
                   <Video className="w-10 h-10 text-white opacity-50" />
                 </div>
               ) : (
@@ -953,7 +953,7 @@ const GroupChat = () => {
               <button
                 type="button"
                 onClick={() => setShowPollEditor(true)}
-                className={`p-3.5 transition-all rounded-full ${showPollEditor ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50/50'}`}
+                className={`p-3.5 transition-all rounded-full ${showPollEditor ? 'bg-[#1a3884] text-white shadow-lg shadow-blue-200' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50/50'}`}
                 disabled={sending}
                 title="Create Poll"
               >
@@ -1180,7 +1180,7 @@ const GroupChat = () => {
                             setPollData(prev => ({ ...prev, options: newOptions }));
                           }}
                           placeholder={`Option ${idx + 1}`}
-                          className="flex-1 px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-[#002147] font-medium placeholder:text-gray-300 focus:bg-white focus:border-blue-200 outline-none transition-all"
+                          className="flex-1 px-6 py-4 bg-[#F8FAFC] border-2 border-transparent rounded-2xl text-[#002147] font-medium placeholder:text-gray-300 focus:bg-white focus:border-blue-200 outline-none transition-all"
                         />
                         {pollData.options.length > 2 && (
                           <button
@@ -1204,7 +1204,7 @@ const GroupChat = () => {
                     )}
                   </div>
 
-                  <div className="flex flex-col md:flex-row gap-6 p-8 bg-gray-50 rounded-[2.5rem]">
+                  <div className="flex flex-col md:flex-row gap-6 p-8 bg-[#F8FAFC] rounded-[2.5rem]">
                     <div className="flex-1">
                       <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3 block px-1">Poll Expiry</label>
                       <div className="relative">
@@ -1286,7 +1286,7 @@ const GroupChat = () => {
                     <button
                       key={student._id}
                       onClick={() => handleAddMember(student._id)}
-                      className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                      className="w-full flex items-center gap-3 p-2 hover:bg-[#F8FAFC] rounded-lg transition-colors text-left"
                     >
                       <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-xs">
                         {student.fullName?.charAt(0)}

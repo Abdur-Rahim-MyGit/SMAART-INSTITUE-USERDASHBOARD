@@ -132,7 +132,7 @@ const TaskQuestion = ({ task, onComplete, isCompleted }) => {
       {/* Header - Click to Expand */}
       <motion.button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between py-2 sm:py-3 px-2 sm:px-4 bg-white rounded-lg hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between py-2 sm:py-3 px-2 sm:px-4 bg-white rounded-lg hover:bg-[#F8FAFC] transition-colors"
       >
         <div className="flex items-center gap-2 sm:gap-3 text-left flex-1 min-w-0">
           <div className={`
@@ -220,7 +220,7 @@ const TaskQuestion = ({ task, onComplete, isCompleted }) => {
                           </div>
                           <button
                             onClick={handleRetry}
-                            className="px-4 py-1.5 bg-white rounded-md text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors"
+                            className="px-4 py-1.5 bg-white rounded-md text-sm font-semibold shadow-sm hover:bg-[#F8FAFC] transition-colors"
                           >
                             Try Again
                           </button>

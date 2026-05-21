@@ -75,6 +75,22 @@ const LandingPage = () => {
       }, 500);
     }
 
+    // FIX: Show a clear message when a 3-hour session expires mid-use
+    if (sessionStorage.getItem('session_expired')) {
+      setTimeout(() => {
+        toast.error("Your session has expired after 3 hours of use. Please log in again to continue.", {
+          duration: 8000,
+          position: 'top-center',
+          style: {
+            border: '2px solid #f59e0b',
+            backgroundColor: '#fef3c7',
+            color: '#78350f'
+          }
+        });
+        sessionStorage.removeItem('session_expired');
+      }, 500);
+    }
+
     // Check for intentional cross-tab logout
     if (sessionStorage.getItem('logged_out_other_tab')) {
       setTimeout(() => {
@@ -119,7 +135,7 @@ const LandingPage = () => {
   };
 
   return (
-    <PageTransition className="min-h-screen bg-white dark:bg-dark-card text-gray-900 dark:text-white selection:bg-[#1a3884] selection:text-white transition-colors duration-300">
+    <PageTransition className="min-h-screen bg-white dark:bg-[#00152E] text-gray-900 dark:text-white selection:bg-[#1a3884] selection:text-white transition-colors duration-300">
       <Helmet>
         <title>SMAART Institute | AI-Powered Student Career Analyser</title>
         <meta name="description" content="Unlock your future with SMAART Institute. The first AI Career Coach integrating EQ, Cognitive Skills, and Academic Performance to guide students to success." />

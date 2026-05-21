@@ -117,7 +117,7 @@ const ActivityFeed = ({ userId }) => {
                     <div className="w-10 h-10 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-2">
                         <Clock className="w-5 h-5 text-gray-400" />
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 dark:text-slate-300">
                         No recent activity
                     </p>
                 </div>
@@ -129,7 +129,7 @@ const ActivityFeed = ({ userId }) => {
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/5"
+                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-white/5 transition-colors border border-transparent hover:border-gray-100 dark:hover:border-white/5"
                         >
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center mt-1 ${activity.color === 'green' ? 'bg-green-100 dark:bg-green-500/20' :
                                     activity.color === 'purple' ? 'bg-purple-100 dark:bg-purple-500/20' :
@@ -144,7 +144,7 @@ const ActivityFeed = ({ userId }) => {
                                 <p className="text-sm font-semibold text-[#002147] dark:text-white leading-tight mb-1">
                                     {activity.title}
                                 </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                <p className="text-xs text-gray-500 dark:text-slate-300">
                                     {getTimeAgo(activity.time)}
                                 </p>
                             </div>

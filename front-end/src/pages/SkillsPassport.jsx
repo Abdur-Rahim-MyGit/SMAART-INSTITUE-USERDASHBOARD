@@ -13,10 +13,10 @@ import SkillsPassportSkeleton from "@/components/skeletons/SkillsPassportSkeleto
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import { toast as sonnerToast } from "sonner";
 import { useTheme } from "@/contexts/ThemeContext";
-
 import { getBackendUrl } from "@/services/api";
 import { useTranslation } from "react-i18next";
 import spImage from "@/assets/sp.jpeg";
+import PageHero from "@/components/ui/PageHero";
 
 
 // --- Constants & Metadata ---
@@ -208,7 +208,7 @@ const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => (
     <motion.div
         whileHover={{ y: -12, scale: 1.02 }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        className="group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white dark:bg-dark-card p-6 shadow-lg transition-all duration-500 hover:shadow-xl dark:border-white/10"
+        className="group relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] p-6 shadow-lg transition-all duration-500 hover:shadow-xl"
     >
         <div className="absolute inset-0 bg-gradient-to-br from-teal/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div className="absolute inset-x-12 top-0 h-[2px] bg-gradient-to-r from-transparent via-teal/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
@@ -216,11 +216,11 @@ const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => (
         <div className="flex items-start justify-between gap-5 relative z-10">
             <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-dark-elevated shadow-sm border border-slate-100 dark:border-white/5 group-hover:scale-110 group-hover:bg-teal group-hover:text-white transition-all duration-500">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-[#1a3884]/20 group-hover:scale-110 group-hover:bg-[#1a3884] group-hover:text-white transition-all duration-500">
                         <AccentIcon className="h-5 w-5" />
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold leading-tight text-slate-900 dark:text-white group-hover:text-teal transition-colors duration-300">{item.title}</h3>
+                        <h3 className="text-xl font-bold leading-tight text-slate-900 dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-blue-300 transition-colors duration-300">{item.title}</h3>
                         <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-500 transition-colors">
                             {item.platform}
                         </p>
@@ -239,10 +239,10 @@ const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => (
             </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-between gap-4 pt-6 border-t border-slate-100 dark:border-white/5 relative z-10">
+        <div className="mt-6 flex items-center justify-between gap-4 pt-6 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-10">
             <div className="flex -space-x-2">
                 {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-6 w-6 rounded-full border-2 border-white dark:border-slate-800 bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                    <div key={i} className="h-6 w-6 rounded-full border-2 border-white dark:border-[#1a3884]/30 bg-slate-200 dark:bg-[#003170] overflow-hidden">
                         <div className="h-full w-full bg-gradient-to-br from-slate-400 to-slate-500 opacity-20" />
                     </div>
                 ))}
@@ -268,7 +268,7 @@ const AnimatedBackground = () => (
 );
 
 const IconBox = ({ children, className = "" }) => (
-    <div className={`p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 ${className}`}>
+    <div className={`p-3.5 rounded-2xl bg-slate-100 dark:bg-[#002A5C] text-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 ${className}`}>
         {children}
     </div>
 );
@@ -280,7 +280,7 @@ const SkillBadge = ({ skill, verified = false }) => (
         whileHover={{ scale: 1.05 }}
         className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-sm ${verified
             ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 shimmer-effect"
-            : "bg-slate-50 dark:bg-dark-elevated text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/5"
+            : "bg-[#F8FAFC] dark:bg-dark-elevated text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/5"
             }`}>
         {verified && <ShieldCheck className="w-4 h-4" />}
         {skill}
@@ -709,73 +709,47 @@ const SkillsPassport = () => {
                 className="max-w-6xl mx-auto space-y-8 md:space-y-10"
                 ref={containerRef}
             >
-                <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.55 }}
-                    className="rounded-3xl border border-slate-200/60 bg-white dark:bg-dark-card px-7 py-8 md:px-10 md:py-8 shadow-lg dark:border-white/10"
+                {/* Standardized PageHero */}
+                <PageHero
+                    badge="Digital Skills Passport"
+                    title="Skills Passport"
+                    subtitle="Your secure, AI-verified credential of capability. Designed for employers who demand proof, and professionals who seek growth."
                 >
-                    <div className="max-w-3xl">
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="inline-flex items-center rounded-full border border-slate-300/80 bg-white dark:bg-dark-elevated px-4 py-2 text-[9px] font-bold uppercase tracking-[0.24em] text-slate-800 dark:text-slate-200 shadow-sm">
-                                Digital Skills Passport
-                            </div>
-                            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 text-[9px] font-bold uppercase tracking-[0.24em] text-emerald-700 dark:text-emerald-400 shadow-sm">
-                                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white dark:bg-emerald-500 ring-1 ring-emerald-200 dark:ring-emerald-400">
-                                    <BadgeCheck className="h-3 w-3 dark:text-white" />
-                                </span>
-                                Employer Verifiable
-                            </div>
-                        </div>
-
-                        <h1 className="mt-6 max-w-3xl text-2xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white sm:text-3xl md:text-4xl">
-                            The future of verified talent.
-                        </h1>
-
-                        <p className="mt-4 max-w-3xl text-base font-medium leading-relaxed text-slate-600 dark:text-slate-400 md:text-lg">
-                            Your secure, AI-verified credential of capability. Designed for employers who demand proof, and professionals who seek growth.
-                        </p>
-
-                        <div className="mt-7 flex flex-wrap items-center gap-3">
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={handleExport}
-                                disabled={isExporting}
-                                className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl px-5 text-sm font-bold text-white bg-teal hover:bg-teal-hover shadow-lg transition-all disabled:opacity-70"
-                            >
-                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/20">
-                                    <Download className="h-3.5 w-3.5 text-white" />
-                                </span>
-                                <span className="text-white">{isExporting ? "Exporting PDF..." : "Get Passport PDF"}</span>
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                onClick={async () => {
-                                    try {
-                                        await navigator.clipboard.writeText(passportShareUrl);
-                                        sonnerToast.success("Passport link copied!");
-                                    } catch {
-                                        sonnerToast.error("Unable to copy passport link.");
-                                    }
-                                }}
-                                className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-dark-elevated px-5 text-sm font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:border-slate-300 dark:hover:border-white/20"
-                            >
-                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 dark:bg-white/5 ring-1 ring-slate-200 dark:ring-white/10">
-                                    <Share2 className="h-3.5 w-3.5 text-slate-600 dark:text-slate-400" />
-                                </span>
-                                <span>Share Identity</span>
-                            </motion.button>
-                        </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={handleExport}
+                            disabled={isExporting}
+                            className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl px-5 text-sm font-bold text-white bg-[#1a3884] hover:bg-[#132c6b] shadow-lg transition-all disabled:opacity-70"
+                        >
+                            <Download className="h-4 w-4" />
+                            {isExporting ? "Exporting..." : "Get Passport PDF"}
+                        </motion.button>
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={async () => {
+                                try {
+                                    await navigator.clipboard.writeText(passportShareUrl);
+                                    sonnerToast.success("Passport link copied!");
+                                } catch {
+                                    sonnerToast.error("Unable to copy passport link.");
+                                }
+                            }}
+                            className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl border border-slate-200 dark:border-[#1a3884]/25 bg-white dark:bg-[#002147] px-5 text-sm font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-[#002A5C]"
+                        >
+                            <Share2 className="h-4 w-4" />
+                            Share Identity
+                        </motion.button>
                     </div>
-                </motion.div>
+                </PageHero>
 
                 <div
                     ref={passportExportRef}
-                    className="rounded-3xl overflow-hidden shadow-2xl border border-slate-200/50 dark:border-white/10 bg-white dark:bg-dark-card transition-all"
+                    className="rounded-3xl overflow-hidden shadow-2xl border border-slate-200/50 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] transition-all"
                 >
-                    <div className="bg-slate-50 dark:bg-dark-card p-6 sm:p-10 md:p-14 text-slate-900 dark:text-white relative transition-colors">
+                    <div className="bg-[#F8FAFC] dark:bg-[#002147] p-6 sm:p-10 md:p-14 text-slate-900 dark:text-white relative transition-colors">
                         <div className="absolute top-0 right-10 h-52 w-52 rounded-full bg-teal/10 blur-3xl pointer-events-none" />
                         <div className="absolute bottom-8 left-20 h-36 w-36 rounded-full bg-navy/10 blur-3xl pointer-events-none" />
 
@@ -842,7 +816,7 @@ const SkillsPassport = () => {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white dark:border-slate-900 bg-emerald-500 text-white shadow-lg">
+                                            <div className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white dark:border-white/8 bg-emerald-500 text-white shadow-lg">
                                                 <BadgeCheck className="h-3.5 w-3.5" />
                                             </div>
                                         </div>
@@ -870,7 +844,7 @@ const SkillsPassport = () => {
                                                     />
                                                 </div>
                                             </div>
-                                            <div className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white dark:border-slate-900 bg-emerald-500 text-white shadow-lg">
+                                            <div className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white dark:border-white/8 bg-emerald-500 text-white shadow-lg">
                                                 <BadgeCheck className="h-3.5 w-3.5" />
                                             </div>
                                         </div>
@@ -885,7 +859,7 @@ const SkillsPassport = () => {
                                 initial={{ opacity: 0, y: 18 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.08, duration: 0.5 }}
-                                className="mx-auto max-w-5xl rounded-[24px] border border-slate-200/70 dark:border-white/10 bg-white/88 dark:bg-dark-card/55 px-6 py-6 sm:px-8 backdrop-blur-xl shadow-[0_18px_42px_-24px_rgba(15,23,42,0.2)]"
+                                className="mx-auto max-w-5xl rounded-[24px] border border-slate-200/70 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] px-6 py-6 sm:px-8 shadow-[0_18px_42px_-24px_rgba(15,23,42,0.2)]"
                             >
                                 <div className="mb-6">
                                     <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Ten Professional Standards</p>
@@ -902,12 +876,12 @@ const SkillsPassport = () => {
                                             animate={{ opacity: 1, scale: 1 }}
                                             transition={{ delay: 0.05 * index }}
                                             whileHover={{ y: -5 }}
-                                            className="group relative rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white/50 dark:bg-slate-800/20 p-5 shadow-sm transition-all duration-300 hover:bg-white dark:hover:bg-dark-elevated"
+                                            className="group relative rounded-2xl border border-slate-200/80 dark:border-[#1a3884]/20 bg-white dark:bg-[#002A5C]/40 p-5 shadow-sm transition-all duration-300 hover:bg-slate-50 dark:hover:bg-[#002A5C]/60"
                                         >
                                             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                                                 <Sparkles className="w-12 h-12" />
                                             </div>
-                                            <p className="text-xs font-bold leading-snug tracking-[0.1em] text-teal dark:text-teal-light uppercase mb-3">
+                                            <p className="text-xs font-bold leading-snug tracking-[0.1em] text-[#1a3884] dark:text-blue-400 uppercase mb-3">
                                                 {standard.title}
                                             </p>
                                             <p className="min-h-[48px] text-[11px] leading-snug font-medium text-slate-500 dark:text-slate-400">
@@ -935,7 +909,7 @@ const SkillsPassport = () => {
                             </motion.div>
 
                             <div className="max-w-5xl mx-auto px-2 sm:px-4">
-                                <div className="flex sm:flex-wrap justify-start sm:justify-center gap-2 p-2 bg-slate-100/50 dark:bg-dark-elevated backdrop-blur-xl rounded-[28px] border border-slate-200 dark:border-slate-800 shadow-inner overflow-x-auto no-scrollbar">
+                                <div className="flex sm:flex-wrap justify-start sm:justify-center gap-2 p-2 bg-slate-100/50 dark:bg-[#001A38] backdrop-blur-xl rounded-[28px] border border-slate-200 dark:border-[#1a3884]/20 shadow-inner overflow-x-auto no-scrollbar">
                                     {[
                                         { id: 'smart', label: 'SMAART Courses', icon: Sparkles },
                                         { id: 'other', label: 'Technical Skills', icon: Briefcase },
@@ -972,7 +946,7 @@ const SkillsPassport = () => {
                                 transition={{ duration: 0.35 }}
                                 className="mx-auto w-full max-w-5xl space-y-6"
                             >
-                                <div className="rounded-[40px] border border-slate-200/60 dark:border-white/5 bg-white dark:bg-dark-card p-8 md:p-12 shadow-sm backdrop-blur-2xl">
+                                <div className="rounded-[40px] border border-slate-200/60 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] p-8 md:p-12 shadow-sm">
                                     <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-3">
@@ -988,7 +962,7 @@ const SkillsPassport = () => {
                                                 {tabCollections[activeTab].description}
                                             </p>
                                         </div>
-                                        <div className="flex flex-col items-center justify-center rounded-[32px] bg-slate-50 dark:bg-dark-elevated border border-slate-100 dark:border-white/5 px-8 py-6 shadow-sm">
+                                        <div className="flex flex-col items-center justify-center rounded-[32px] bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-[#1a3884]/20 px-8 py-6 shadow-sm">
                                             <span className="text-4xl font-bold text-teal dark:text-teal-light">{tabCollections[activeTab].items.length}</span>
                                             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Verified Records</span>
                                         </div>

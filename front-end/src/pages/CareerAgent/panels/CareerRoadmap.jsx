@@ -19,7 +19,7 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
 
                 // 1. Fetch existing progress
                 try {
-                    const progRes = await fetch(`/api/user-skills/${encodeURIComponent(userEmail)}`);
+                    const progRes = await fetch(`/api/career-agent/user-skills/${encodeURIComponent(userEmail)}`);
                     if (progRes.ok) {
                         const progData = await progRes.json();
                         const progMap = {};
@@ -42,7 +42,7 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
                         mongoRoleData?.job_family_name || mongoRoleData?.tab1?.job_family_name;
                     if (jf) {
                         const cleanFamily = jf.split(' ')[0];
-                        const familyRes = await fetch(`/api/role-skills/family/${encodeURIComponent(cleanFamily)}`);
+                        const familyRes = await fetch(`/api/career-agent/role-skills/family/${encodeURIComponent(cleanFamily)}`);
                         if (familyRes.ok) roles = await familyRes.json();
                     }
                 }
@@ -58,7 +58,7 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
                 const skillSets = await Promise.all(
                     targetRoles.map(async (role) => {
                         try {
-                            const res = await fetch(`/api/role-skills/${encodeURIComponent(role)}`);
+                            const res = await fetch(`/api/career-agent/role-skills/${encodeURIComponent(role)}`);
                             if (!res.ok) return [];
                             const data = await res.json();
                             return data.skills || [];
@@ -114,7 +114,7 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
     const handleStatusChange = async (skillName, newStatus) => {
         setSkillProgress(prev => ({ ...prev, [skillName]: newStatus }));
         try {
-            await fetch('/api/user-skills/progress', {
+            await fetch('/api/career-agent/user-skills/progress', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail, skillName, status: newStatus })

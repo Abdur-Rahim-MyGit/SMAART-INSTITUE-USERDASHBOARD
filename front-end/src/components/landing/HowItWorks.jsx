@@ -46,7 +46,7 @@ const HowItWorks = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-gray-600 dark:text-gray-300 font-light"
+            className="text-xl text-gray-600 dark:text-slate-200 font-light"
           >
             How capability is built for modern work. Integrating skills, judgement, and adaptability.
           </motion.p>
@@ -89,13 +89,13 @@ const HowItWorks = () => {
                   {step.title}
                 </h3>
 
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed max-w-xs text-lg font-light">
+                <p className="text-gray-600 dark:text-slate-300 leading-relaxed max-w-xs text-lg font-light">
                   {step.description}
                 </p>
 
                 {/* Animated Lock State (Decorative) */}
                 <div className="mt-8 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
-                  <div className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 dark:border-white/10">
+                  <div className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-slate-200 bg-gray-100 dark:bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 dark:border-white/10">
                     {index === 0 ? <Unlock className="w-3 h-3 text-[#C0C0C0]" /> : <Lock className="w-3 h-3" />}
                     {index === 0 ? "Unlocked" : "Locked"}
                   </div>

@@ -91,7 +91,7 @@ const ContactForm = () => {
                     SMAART Institute
                   </span>
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 text-base mb-10 leading-relaxed max-w-md font-light">
+                <p className="text-gray-600 dark:text-slate-200 text-base mb-10 leading-relaxed max-w-md font-light">
                   Ready to transform your institution? Our team is here to guide you through the implementation of SMAART Institute. Let's build something extraordinary together.
                 </p>
 
@@ -113,9 +113,9 @@ const ContactForm = () => {
                         <item.icon className="w-5 h-5 text-[#1a3884] dark:text-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-colors" />
                       </div>
                       <div>
-                        <h4 className="text-gray-400 dark:text-gray-500 font-bold text-[9px] uppercase tracking-widest mb-0.5">{item.title}</h4>
+                        <h4 className="text-gray-400 dark:text-slate-400 font-bold text-[9px] uppercase tracking-widest mb-0.5">{item.title}</h4>
                         <p className="text-[#002147] dark:text-white font-bold text-base leading-none mb-0.5">{item.info}</p>
-                        <p className="text-gray-500 dark:text-gray-400 text-[11px] font-light tracking-wide">{item.sub}</p>
+                        <p className="text-gray-500 dark:text-slate-300 text-[11px] font-light tracking-wide">{item.sub}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -147,7 +147,7 @@ const ContactForm = () => {
                         <CheckCircle className="w-12 h-12 text-[#1a3884] dark:text-[#C0C0C0]" />
                       </div>
                       <h3 className="text-3xl font-bold text-[#002147] dark:text-white mb-4 tracking-tight">Message Received!</h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-10 max-w-sm mx-auto text-lg leading-relaxed font-light">Thank you for reaching out. A specialist from our team will contact you within one business day.</p>
+                      <p className="text-gray-600 dark:text-slate-200 mb-10 max-w-sm mx-auto text-lg leading-relaxed font-light">Thank you for reaching out. A specialist from our team will contact you within one business day.</p>
                       <Button onClick={() => setIsSuccess(false)} variant="outline" className="border-gray-200 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 px-10 py-6 rounded-2xl transition-all duration-300 text-lg font-bold">
                         Send Another Inquiry
                       </Button>
@@ -156,13 +156,13 @@ const ContactForm = () => {
                     <div className="flex-grow">
                       <div className="mb-8">
                         <h3 className="text-xl font-bold text-[#002147] dark:text-white mb-1">Send us a message</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 font-light">Tell us about your institution's needs.</p>
+                        <p className="text-sm text-gray-500 dark:text-slate-300 font-light">Tell us about your institution's needs.</p>
                       </div>
 
                       <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="grid md:grid-cols-2 gap-8">
                           <div className="space-y-3">
-                            <Label htmlFor="name" className="text-gray-900 dark:text-gray-300 font-bold text-xs uppercase tracking-widest pl-1">Full Name</Label>
+                            <Label htmlFor="name" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">Full Name</Label>
                             <Input
                               id="name"
                               name="name"
@@ -174,7 +174,7 @@ const ContactForm = () => {
                             />
                           </div>
                           <div className="space-y-3">
-                            <Label htmlFor="institution" className="text-gray-900 dark:text-gray-300 font-bold text-xs uppercase tracking-widest pl-1">Institution</Label>
+                            <Label htmlFor="institution" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">Institution</Label>
                             <Input
                               id="institution"
                               name="institution"
@@ -188,7 +188,7 @@ const ContactForm = () => {
 
                         <div className="grid md:grid-cols-2 gap-8">
                           <div className="space-y-3">
-                            <Label htmlFor="email" className="text-gray-900 dark:text-gray-300 font-bold text-xs uppercase tracking-widest pl-1">Email Address</Label>
+                            <Label htmlFor="email" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">Email Address</Label>
                             <Input
                               id="email"
                               name="email"
@@ -201,7 +201,7 @@ const ContactForm = () => {
                             />
                           </div>
                           <div className="space-y-3">
-                            <Label htmlFor="phone" className="text-gray-900 dark:text-gray-300 font-bold text-xs uppercase tracking-widest pl-1">Phone Number</Label>
+                            <Label htmlFor="phone" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">Phone Number</Label>
                             <Input
                               id="phone"
                               name="phone"
@@ -215,7 +215,7 @@ const ContactForm = () => {
                         </div>
 
                         <div className="space-y-3">
-                          <Label htmlFor="query" className="text-gray-900 dark:text-gray-300 font-bold text-xs uppercase tracking-widest pl-1">How can we help?</Label>
+                          <Label htmlFor="query" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">How can we help?</Label>
                           <Textarea
                             id="query"
                             name="query"

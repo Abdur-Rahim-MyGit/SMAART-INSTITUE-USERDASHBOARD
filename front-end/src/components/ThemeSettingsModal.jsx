@@ -150,7 +150,7 @@ const ThemeSettingsModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Preview Section */}
-                <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="mt-8 p-4 bg-[#F8FAFC] rounded-xl border border-gray-200">
                   <h3 className="text-sm font-semibold text-gray-700 mb-3">Preview</h3>
                   <div className="flex gap-2 flex-wrap">
                     <button
@@ -176,7 +176,7 @@ const ThemeSettingsModal = ({ isOpen, onClose }) => {
               </div>
 
               {/* Footer */}
-              <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
+              <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-[#F8FAFC]">
                 <button
                   onClick={handleReset}
                   className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium"

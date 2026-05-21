@@ -16,6 +16,7 @@ import {
     TrendingUp,
 } from "lucide-react";
 import { assessmentApi } from "@/services/assessmentApi";
+import PageHero from "@/components/ui/PageHero";
 
 const STAGES = [
     {
@@ -125,142 +126,11 @@ const AssessmentsDashboard = () => {
         <div className="space-y-6">
             <main className="px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
                 <div className="mx-auto max-w-7xl space-y-8 lg:space-y-10">
-                    <div className="grid gap-3 xl:grid-cols-1 xl:items-start">
-                        <motion.section
-                            initial={{ opacity: 0, y: 22, scale: 0.99 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700/70 dark:bg-slate-900 sm:p-7"
-                        >
-                            <div className="relative">
-                                <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-[#1a3884] dark:border-slate-700 dark:bg-slate-800 dark:text-blue-300">
-                                    <span className="h-2 w-2 rounded-full bg-[#1a3884]" />
-                                    Assessment Journey
-                                </div>
-
-                                <div className="mt-5 max-w-2xl space-y-3">
-                                    <h1 className="text-2xl font-bold tracking-tight text-[#1a3884] dark:text-blue-300 sm:text-3xl">
-                                        Assessments Centre
-                                    </h1>
-                                    <p className="max-w-2xl text-sm font-medium leading-7 text-slate-600 dark:text-slate-300 sm:text-base">
-                                        Experience a structured pathway to mastery. Track your progress, complete each
-                                        stage with confidence, and unlock your performance insights.
-                                    </p>
-                                </div>
-
-                                <div className="mt-6 hidden grid gap-3 sm:grid-cols-3 xl:max-w-2xl">
-                                    {METRICS.map((metric, index) => {
-                                        const Icon = metric.icon;
-
-                                        return (
-                                            <motion.div
-                                                key={metric.label}
-                                                initial={{ opacity: 0, y: 14 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: 0.14 + index * 0.07, duration: 0.4 }}
-                                                whileHover={{ y: -3, scale: 1.01 }}
-                                                className="rounded-[22px] border border-white/80 bg-white/80 px-4 py-4 shadow-[0_16px_34px_-28px_rgba(15,23,42,0.24)] backdrop-blur dark:border-slate-700/70 dark:bg-slate-900/60"
-                                            >
-                                                <div className="flex items-center justify-between gap-3">
-                                                    <div className="rounded-2xl bg-blue-50 p-2.5 text-[#1a3884] dark:bg-blue-500/10 dark:text-blue-300">
-                                                        <Icon className="h-4 w-4" />
-                                                    </div>
-                                                    <span className="text-lg font-black text-slate-900 dark:text-slate-100">
-                                                        {metric.value}
-                                                    </span>
-                                                </div>
-                                                <p className="mt-3 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-                                                    {metric.label}
-                                                </p>
-                                            </motion.div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </motion.section>
-
-                        {/* Hidden as per user request
-                        <motion.aside
-                            initial={{ opacity: 0, y: 22, scale: 0.99 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            transition={{ delay: 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            whileHover={{ y: -2 }}
-                            className="overflow-hidden rounded-[28px] border border-slate-200/80 bg-[linear-gradient(180deg,_rgba(255,255,255,0.95)_0%,_rgba(248,251,255,0.98)_100%)] p-5 shadow-[0_22px_54px_-36px_rgba(15,23,42,0.22)] dark:border-slate-700/70 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,0.92)_0%,_rgba(30,41,59,0.96)_100%)]"
-                        >
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">
-                                        Overall Progress
-                                    </p>
-                                    <div className="flex items-end gap-2">
-                                        <h2 className="text-3xl font-black leading-none text-[#1a3884] dark:text-blue-300">
-                                            {pct}
-                                        </h2>
-                                        <span className="pb-1 text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-                                            Score
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-3 text-[#1a3884] shadow-inner dark:from-blue-500/10 dark:to-indigo-500/10 dark:text-blue-300">
-                                    <TrendingUp className="h-5 w-5" />
-                                </div>
-                            </div>
-
-                            <div className="mt-4 rounded-[24px] border border-slate-200/80 bg-white/85 p-4 dark:border-slate-700/70 dark:bg-slate-900/70">
-                                <div className="flex items-center justify-between gap-3">
-                                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-300">
-                                        Stage completion progress
-                                    </p>
-                                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-                                        {pct} / 100
-                                    </p>
-                                </div>
-                                <div className="mt-3 h-2 rounded-full bg-slate-100 p-0.5 dark:bg-slate-700/80">
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${pct}%` }}
-                                        transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                                        className="h-full rounded-full bg-gradient-to-r from-[#1a3884] via-[#3564d6] to-[#5d8dff]"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="mt-4 grid grid-cols-2 gap-3">
-                                <div className="rounded-2xl border border-emerald-100 bg-[linear-gradient(180deg,_rgba(236,253,245,1)_0%,_rgba(220,252,231,0.72)_100%)] px-4 py-3 dark:border-emerald-500/20 dark:bg-[linear-gradient(180deg,_rgba(6,95,70,0.28)_0%,_rgba(6,78,59,0.18)_100%)]">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-600/80 dark:text-emerald-300">
-                                        Completed
-                                    </p>
-                                    <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">
-                                        {completedCount}
-                                    </p>
-                                </div>
-
-                                <div className="rounded-2xl border border-slate-200 bg-[linear-gradient(180deg,_rgba(248,250,252,1)_0%,_rgba(241,245,249,0.85)_100%)] px-4 py-3 dark:border-slate-700/70 dark:bg-[linear-gradient(180deg,_rgba(30,41,59,0.9)_0%,_rgba(15,23,42,0.85)_100%)]">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
-                                        Remaining
-                                    </p>
-                                    <p className="mt-1 text-lg font-black text-slate-900 dark:text-slate-100">
-                                        {STAGES.length - completedCount}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3 dark:border-slate-700/70 dark:bg-slate-900/70">
-                                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
-                                    Current Status
-                                </p>
-                                <p className="mt-1 text-sm font-semibold text-slate-600 dark:text-slate-300">
-                                    {completedCount === STAGES.length
-                                        ? "All stages completed. Reports are ready to review."
-                                        : completedCount === 0
-                                            ? "You are ready to begin the first assessment stage."
-                                            : "Continue from your next unlocked stage to complete the journey."}
-                                </p>
-                            </div>
-                        </motion.aside>
-                        */}
-                    </div>
+                    <PageHero
+                        badge="Assessment Journey"
+                        title="Assessments Centre"
+                        subtitle="Experience a structured pathway to mastery. Track your progress, complete each stage with confidence, and unlock your performance insights."
+                    />
 
                     <motion.section
                         initial={{ opacity: 0, y: 16 }}
@@ -297,10 +167,10 @@ const AssessmentsDashboard = () => {
 const GuidelinesSection = () => (
     <motion.div
         {...fadeUp}
-        className="group relative overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm dark:border-slate-700/70 dark:bg-slate-900"
+        className="group relative overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm dark:border-slate-700/70 dark:bg-[#002147]"
     >
         <div className="relative z-10 flex flex-col items-start gap-8 p-6 sm:p-8 lg:flex-row lg:gap-10 lg:p-9">
-            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[22px] border border-slate-100 bg-slate-50 text-[#1a3884] shadow-sm dark:border-slate-800 dark:bg-slate-800/50 dark:text-blue-300">
+            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[22px] border border-slate-100 bg-[#F8FAFC] text-[#1a3884] shadow-sm dark:border-white/8 dark:bg-slate-800/50 dark:text-blue-300">
                 <Info className="h-8 w-8" />
             </div>
 
@@ -364,13 +234,13 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
         >
             <div
                 onClick={onAction}
-                className={`relative cursor-pointer overflow-hidden rounded-[30px] border bg-white transition-all duration-300 dark:bg-slate-900 ${
+                className={`relative cursor-pointer overflow-hidden rounded-[30px] border bg-white transition-all duration-300 dark:bg-[#002147] ${
                     completed
-                        ? "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:hover:border-slate-600"
-                        : "border-slate-200 shadow-sm hover:border-[#1a3884]/30 hover:shadow-md dark:border-slate-700 dark:hover:border-slate-600"
+                        ? "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
+                        : "border-slate-200 shadow-sm hover:border-[#1a3884]/30 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
                 }`}
             >
-                <div className={`h-1 ${completed ? "bg-[#1a3884]" : "bg-slate-100 dark:bg-slate-800"}`} />
+                <div className={`h-1 ${completed ? "bg-[#1a3884]" : "bg-slate-100 dark:bg-[#002A5C]"}`} />
 
                 <div className="p-6 sm:p-7">
                     <div className="mb-5 flex items-start gap-4 sm:gap-5">
@@ -378,7 +248,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                             className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-base font-bold ${
                                 completed
                                     ? "bg-[#1a3884] text-white shadow-sm"
-                                    : "border border-slate-200 bg-slate-50 text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+                                    : "border border-slate-200 bg-[#F8FAFC] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-400"
                             }`}
                         >
                             {completed ? <CheckCircle2 className="h-6 w-6" /> : `0${index + 1}`}
@@ -409,7 +279,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                     </div>
 
                     {completed && score !== undefined && (
-                        <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800/50">
+                        <div className="mb-6 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-4 shadow-sm dark:border-white/10 dark:bg-slate-800/50">
                             <div className="mb-3 flex items-center justify-between">
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                                     Your Performance
@@ -419,7 +289,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                                     <span className="ml-1 text-sm text-slate-500 dark:text-slate-400">%</span>
                                 </span>
                             </div>
-                            <div className="h-2 rounded-full bg-slate-200 p-0.5 dark:bg-slate-700">
+                            <div className="h-2 rounded-full bg-slate-200 p-0.5 dark:bg-[#003170]">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${score}%` }}
@@ -437,7 +307,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         }}
                         className={`flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 text-sm font-bold transition-all duration-300 ${
                             completed
-                                ? "border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                                ? "border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#002A5C]"
                                 : "bg-[#1a3884] text-white shadow-md hover:bg-[#002147] hover:shadow-lg hover:-translate-y-0.5"
                         }`}
                     >
@@ -464,7 +334,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
 const InfoChip = ({ icon: Icon, label }) => (
     <motion.span
         whileHover={{ y: -1, scale: 1.02 }}
-        className="inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300"
+        className="inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-500 shadow-sm dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-300"
     >
         <Icon className="h-3.5 w-3.5" />
         {label}
@@ -476,27 +346,27 @@ const SkeletonGrid = () => (
         {[0, 1, 2, 3].map((item) => (
             <div
                 key={item}
-                className="overflow-hidden rounded-[28px] border border-slate-100 bg-white animate-pulse dark:border-slate-700 dark:bg-slate-900/60"
+                className="overflow-hidden rounded-[28px] border border-slate-100 bg-white animate-pulse dark:border-white/10 dark:bg-slate-900/60"
             >
-                <div className="h-1 bg-slate-100 dark:bg-slate-700" />
+                <div className="h-1 bg-slate-100 dark:bg-[#003170]" />
                 <div className="space-y-5 p-6 sm:p-7">
                     <div className="flex items-start gap-5">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-700" />
+                        <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-[#003170]" />
                         <div className="flex-1 space-y-3 pt-2">
-                            <div className="h-5 w-3/5 rounded bg-slate-100 dark:bg-slate-700" />
-                            <div className="h-3 w-2/5 rounded bg-slate-50 dark:bg-slate-800" />
+                            <div className="h-5 w-3/5 rounded bg-slate-100 dark:bg-[#003170]" />
+                            <div className="h-3 w-2/5 rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <div className="h-4 w-full rounded bg-slate-50 dark:bg-slate-800" />
-                        <div className="h-4 w-4/5 rounded bg-slate-50 dark:bg-slate-800" />
+                        <div className="h-4 w-full rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                        <div className="h-4 w-4/5 rounded bg-[#F8FAFC] dark:bg-[#002A5C]" />
                     </div>
                     <div className="flex gap-3">
-                        <div className="h-8 w-20 rounded-xl bg-slate-50 dark:bg-slate-800" />
-                        <div className="h-8 w-20 rounded-xl bg-slate-50 dark:bg-slate-800" />
-                        <div className="h-8 w-20 rounded-xl bg-slate-50 dark:bg-slate-800" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
+                        <div className="h-8 w-20 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
                     </div>
-                    <div className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-800" />
+                    <div className="h-14 rounded-2xl bg-[#F8FAFC] dark:bg-[#002A5C]" />
                 </div>
             </div>
         ))}

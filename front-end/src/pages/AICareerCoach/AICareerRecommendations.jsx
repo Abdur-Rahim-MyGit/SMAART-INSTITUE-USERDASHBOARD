@@ -26,7 +26,7 @@ const AICareerRecommendations = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E]">
             <main className="w-full relative py-8 px-4 md:px-0">
                     <div className="max-w-4xl mx-auto pb-12">
                         <div className="mb-6 px-4">
@@ -38,7 +38,7 @@ const AICareerRecommendations = () => {
                             <p className="text-slate-600 dark:text-slate-400">Get personalized career path suggestions</p>
                         </div>
 
-                        <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-slate-700 p-8">
+                        <div className="bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/10 p-8">
                             {!recommendations ? (
                                 <div className="text-center py-12">
                                     <Target className="w-16 h-16 text-purple-600 mx-auto mb-4" />

@@ -119,14 +119,14 @@ const AIProfile = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg flex items-center justify-center">
+            <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#e8ecef] dark:bg-dark-bg transition-colors duration-300">
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
             <main className="w-full relative py-8 px-4 md:px-0">
                     <div className="max-w-4xl mx-auto pb-12">
 
@@ -145,7 +145,7 @@ const AIProfile = () => {
                         </div>
 
                         {/* Form */}
-                        <div className="bg-white dark:bg-[#1e293b] rounded-2xl border border-slate-200 dark:border-slate-700 p-6 md:p-8 mb-6">
+                        <div className="bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/10 p-6 md:p-8 mb-6">
                             <div className="space-y-6">
 
                                 {/* Skills */}
@@ -160,7 +160,7 @@ const AIProfile = () => {
                                             onChange={(e) => setSkillInput(e.target.value)}
                                             onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
                                             placeholder="Add a skill (e.g., JavaScript, Leadership)"
-                                            className="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white"
+                                            className="flex-1 px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white"
                                         />
                                         <button
                                             onClick={addSkill}
@@ -195,7 +195,7 @@ const AIProfile = () => {
                                     <select
                                         value={formData.experienceLevel}
                                         onChange={(e) => setFormData(prev => ({ ...prev, experienceLevel: e.target.value }))}
-                                        className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white"
+                                        className="w-full px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white"
                                     >
                                         <option value="Beginner">Beginner</option>
                                         <option value="Intermediate">Intermediate</option>
@@ -214,7 +214,7 @@ const AIProfile = () => {
                                         onChange={(e) => setFormData(prev => ({ ...prev, experience: e.target.value }))}
                                         placeholder="Describe your work experience..."
                                         rows={4}
-                                        className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white resize-none"
+                                        className="w-full px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white resize-none"
                                     />
                                 </div>
 
@@ -228,7 +228,7 @@ const AIProfile = () => {
                                         onChange={(e) => setFormData(prev => ({ ...prev, education: e.target.value }))}
                                         placeholder="Describe your educational background..."
                                         rows={3}
-                                        className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white resize-none"
+                                        className="w-full px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white resize-none"
                                     />
                                 </div>
 
@@ -242,7 +242,7 @@ const AIProfile = () => {
                                         value={formData.targetRole}
                                         onChange={(e) => setFormData(prev => ({ ...prev, targetRole: e.target.value }))}
                                         placeholder="e.g., Software Engineer, Data Scientist"
-                                        className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white"
+                                        className="w-full px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white"
                                     />
                                 </div>
 
@@ -256,7 +256,7 @@ const AIProfile = () => {
                                         onChange={(e) => setFormData(prev => ({ ...prev, goals: e.target.value }))}
                                         placeholder="What are your career aspirations?"
                                         rows={3}
-                                        className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white resize-none"
+                                        className="w-full px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-slate-800 dark:text-white resize-none"
                                     />
                                 </div>
 

@@ -1222,7 +1222,7 @@ const ComprehensiveSignup = () => {
                     {currentStep < steps.length - 1 ? (
                       <button 
                         onClick={handleNextStep}
-                        className="px-8 py-3 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-blue-800 transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2"
+                        className="px-8 py-3 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-[#0d1f4d] transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2"
                       >
                         Next
                         <ChevronRight className="w-4 h-4" />

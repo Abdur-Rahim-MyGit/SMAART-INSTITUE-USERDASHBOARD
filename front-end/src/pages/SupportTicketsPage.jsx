@@ -76,14 +76,14 @@ const SupportTicketsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg transition-colors duration-300">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
       <div className="pt-4">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-slate-500 dark:text-gray-400 hover:text-[#1a3884] transition-colors mb-4"
+              className="flex items-center gap-2 text-slate-500 dark:text-slate-300 hover:text-[#1a3884] transition-colors mb-4"
             >
               <ArrowLeft className="w-4 h-4" />
               Back
@@ -96,7 +96,7 @@ const SupportTicketsPage = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Support Center</h1>
-                  <p className="text-slate-500 dark:text-gray-400 mt-1">
+                  <p className="text-slate-500 dark:text-slate-300 mt-1">
                     We're here to help you 24/7
                   </p>
                 </div>
@@ -108,7 +108,7 @@ const SupportTicketsPage = () => {
                   onClick={() => setActiveTab('create')}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'create'
                     ? 'bg-[#1a3884] text-white shadow-md'
-                    : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+                    : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
                   <Plus size={16} /> New Ticket
@@ -117,7 +117,7 @@ const SupportTicketsPage = () => {
                   onClick={() => setActiveTab('history')}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'history'
                     ? 'bg-[#1a3884] text-white shadow-md'
-                    : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
+                    : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
                   <History size={16} /> History
@@ -143,7 +143,7 @@ const SupportTicketsPage = () => {
                         Ticket submitted successfully
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-300 mt-1">
                       Your ITSM reference number is{' '}
                       <span className="font-mono text-indigo-400 font-bold">{successTicket.itsmTicketNumber}</span>
                       . Use this to track your issue status.
@@ -160,7 +160,7 @@ const SupportTicketsPage = () => {
                         Chat conversation included
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-gray-400">
+                    <p className="text-xs text-slate-500 dark:text-slate-300">
                       Your chat history will be automatically attached to this ticket.
                     </p>
                   </div>
@@ -224,7 +224,7 @@ const SupportTicketsPage = () => {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-4 rounded-xl bg-white dark:bg-dark-card border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
+                      <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
                         <div className="flex flex-wrap gap-2">
                           <span className="text-sm text-gray-400 mr-2">Status:</span>
                           {['', 'open', 'in-progress', 'resolved', 'closed'].map((status) => (
@@ -233,7 +233,7 @@ const SupportTicketsPage = () => {
                               onClick={() => setStatusFilter(status)}
                               className={`px-3 py-1 text-sm rounded-lg transition-colors ${statusFilter === status
                                   ? "bg-[#1a3884] text-white"
-                                  : "bg-gray-100 dark:bg-dark-card text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                  : "bg-gray-100 dark:bg-[#002147] text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
                                 }`}
                             >
                               {status || 'All'}
@@ -256,7 +256,7 @@ const SupportTicketsPage = () => {
                       <LifeBuoy className="w-8 h-8 text-slate-400" />
                     </div>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Tickets Yet</h3>
-                    <p className="text-slate-500 dark:text-gray-400 mb-6">You haven't submitted any support requests.</p>
+                    <p className="text-slate-500 dark:text-slate-300 mb-6">You haven't submitted any support requests.</p>
                     <button onClick={() => setActiveTab('create')} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg font-bold shadow-lg shadow-[#1a3884]/20 hover:scale-105 transition-transform">Create Ticket</button>
                   </div>
                 ) : (

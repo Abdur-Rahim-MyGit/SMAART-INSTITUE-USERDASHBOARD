@@ -138,7 +138,7 @@ const VerifyOTP = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-4 bg-[#f4f7fa] dark:bg-[#002147] relative overflow-hidden transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center py-8 sm:py-10 md:py-12 px-3 sm:px-4 bg-[#F8FAFC] dark:bg-[#002147] relative overflow-hidden transition-colors duration-300">
       <NeuralBackground theme={theme} />
       {/* Background Glows */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -215,7 +215,7 @@ const VerifyOTP = () => {
                 }
               }}
               maxLength="6"
-              className="bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400 text-center text-xl sm:text-2xl tracking-[0.5em] font-mono h-14 sm:h-16 rounded-xl focus:border-[#002147] focus:ring-4 focus:ring-[#002147]/10 focus:bg-white outline-none transition-all shadow-sm"
+              className="bg-[#F8FAFC] border-gray-200 text-gray-900 placeholder:text-gray-400 text-center text-xl sm:text-2xl tracking-[0.5em] font-mono h-14 sm:h-16 rounded-xl focus:border-[#002147] focus:ring-4 focus:ring-[#002147]/10 focus:bg-white outline-none transition-all shadow-sm"
               aria-describedby="otp-timer otp-label"
               required
             />
@@ -225,7 +225,7 @@ const VerifyOTP = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="flex items-center justify-between p-3.5 sm:p-4 bg-gray-50 rounded-xl border border-gray-100 shadow-sm"
+            className="flex items-center justify-between p-3.5 sm:p-4 bg-[#F8FAFC] rounded-xl border border-gray-100 shadow-sm"
           >
             <div className="flex items-center gap-2">
               <MailOpen className="w-4 h-4 text-gray-400" />
@@ -268,7 +268,7 @@ const VerifyOTP = () => {
               type="button"
               onClick={handleResendOTP}
               disabled={isLoading}
-              className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 h-10 sm:h-11 text-sm font-semibold transition-colors rounded-xl shadow-sm"
+              className="w-full bg-white hover:bg-[#F8FAFC] text-gray-700 border border-gray-200 h-10 sm:h-11 text-sm font-semibold transition-colors rounded-xl shadow-sm"
             >
               {isLoading ? "Resending..." : "Send New Code"}
             </Button>
