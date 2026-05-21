@@ -258,10 +258,10 @@ const CoursePlayer = () => {
             {/* Tab Switcher Section */}
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-white/10 shadow-sm overflow-hidden">
               {/* Tab Navigation */}
-              <div className="flex p-1.5 bg-slate-100/50 dark:bg-slate-800/50 m-4 rounded-xl border border-slate-200/30 dark:border-white/5">
+              <div className="flex p-1.5 bg-slate-100/50 dark:bg-slate-800/50 m-2 sm:m-4 rounded-xl border border-slate-200/30 dark:border-white/5">
                 <button
                   onClick={() => setActiveTab('preview')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold transition-all duration-300 text-sm relative ${
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-xs sm:text-sm relative ${
                     activeTab === 'preview'
                       ? 'text-white'
                       : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
@@ -274,14 +274,14 @@ const CoursePlayer = () => {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <span className="relative z-10 flex items-center gap-2">
-                    <BookOpen size={16} className={activeTab === 'preview' ? 'text-white' : 'text-slate-400'} />
+                  <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
+                    <BookOpen size={14} className={activeTab === 'preview' ? 'text-white' : 'text-slate-400'} />
                     Preview
                   </span>
                 </button>
                 <button
                   onClick={() => setActiveTab('transcription')}
-                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold transition-all duration-300 text-sm relative ${
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-xs sm:text-sm relative ${
                     activeTab === 'transcription'
                       ? 'text-white'
                       : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
@@ -294,8 +294,8 @@ const CoursePlayer = () => {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <span className="relative z-10 flex items-center gap-2">
-                    <FileText size={16} className={activeTab === 'transcription' ? 'text-white' : 'text-slate-400'} />
+                  <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
+                    <FileText size={14} className={activeTab === 'transcription' ? 'text-white' : 'text-slate-400'} />
                     Transcription
                   </span>
                 </button>
@@ -310,20 +310,20 @@ const CoursePlayer = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="p-6"
+                    className="p-3 sm:p-6"
                   >
-                    <div className="bg-gray-50 rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Lesson Preview</h4>
-                      <p className="text-gray-600 leading-relaxed">
+                    <div className="bg-gray-50 dark:bg-slate-800/40 rounded-xl p-4 sm:p-6">
+                      <h4 className="font-semibold text-gray-900 dark:text-slate-200 mb-2 sm:mb-3 text-sm sm:text-base">Lesson Preview</h4>
+                      <p className="text-gray-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
                         {stepData.content || 'Watch this lesson to continue your learning journey.'}
                       </p>
-                      <div className="mt-4 flex items-center gap-4 text-sm text-gray-500">
+                      <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4" />
+                          <Clock className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
                           <span>{stepData.duration || '5-10 min'}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <PlayCircle className="w-4 h-4" />
+                          <PlayCircle className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
                           <span>Video Lesson</span>
                         </div>
                       </div>
@@ -337,14 +337,14 @@ const CoursePlayer = () => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="p-6"
+                    className="p-3 sm:p-6"
                   >
-                    <div className="bg-gray-50 rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Video Transcription</h4>
-                      <p className="text-gray-600 leading-relaxed italic">
+                    <div className="bg-gray-50 dark:bg-slate-800/40 rounded-xl p-4 sm:p-6">
+                      <h4 className="font-semibold text-gray-900 dark:text-slate-200 mb-2 sm:mb-3 text-sm sm:text-base">Video Transcription</h4>
+                      <p className="text-gray-600 dark:text-slate-350 text-xs sm:text-sm leading-relaxed italic">
                         Transcription will be available here once the video content is processed.
                       </p>
-                      <p className="text-gray-500 text-sm mt-4">
+                      <p className="text-gray-500 dark:text-slate-450 text-[11px] sm:text-xs mt-3 sm:mt-4 leading-relaxed">
                         This feature allows you to read along with the video content, making it easier to follow along and review key points.
                       </p>
                     </div>
@@ -448,9 +448,9 @@ const CoursePlayer = () => {
       <div className="relative z-10">
       {/* Header */}
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-white/10 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-5">
               <button
                 onClick={handleBack}
                 className="group flex items-center gap-2 text-slate-500 hover:text-[#1a3884] transition-all duration-300 font-bold text-xs"
@@ -460,7 +460,7 @@ const CoursePlayer = () => {
                 </div>
                 <span>Back to Overview</span>
               </button>
-              <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
+              <div className="hidden xs:block h-5 w-px bg-slate-200 dark:bg-slate-700" />
               <div className="flex items-center gap-3">
                 <Badge variant="secondary" className="bg-slate-100 text-[#1a3884] border-transparent font-bold px-3 py-0.5 text-[10px]">
                   {stage}
@@ -500,7 +500,7 @@ const CoursePlayer = () => {
                       </span>
                     )}
                   </div>
-                  <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-2 leading-tight">
                     {course.title}
                   </h1>
                   <p className="text-sm text-slate-500">{course.subtitle}</p>
@@ -536,7 +536,7 @@ const CoursePlayer = () => {
                         Course Details
                       </h3>
                       
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-1">
                           <p className="text-xs font-medium text-gray-400">Course ID</p>
                           <p className="text-sm font-bold text-[#002147]">{course.id}</p>
@@ -587,21 +587,21 @@ const CoursePlayer = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 mb-6 shadow-sm relative overflow-hidden"
+                    className="p-3 sm:p-6 bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 mb-6 shadow-sm relative overflow-hidden"
                   >
-                    <div className="flex items-center justify-between mb-8">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-[#1a3884] flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#1a3884] flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-md flex-shrink-0">
                           {activeStep}
                         </div>
                         <div>
-                          <h3 className="font-bold text-2xl text-slate-900 dark:text-white leading-tight">
+                          <h3 className="font-bold text-lg sm:text-2xl text-slate-900 dark:text-white leading-tight">
                             {learningFlowData?.steps[activeStep]?.title || `Step ${activeStep}`}
                           </h3>
-                          <p className="text-xs text-blue-600 font-bold uppercase tracking-wider">Active Session</p>
+                          <p className="text-[10px] sm:text-xs text-blue-600 font-bold uppercase tracking-wider">Active Session</p>
                         </div>
                       </div>
-                      <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-xs font-bold text-slate-500 border border-slate-100 dark:border-slate-700">
+                      <div className="px-3 py-1.5 sm:px-4 sm:py-2 bg-slate-50 dark:bg-slate-800 rounded-xl text-[11px] sm:text-xs font-bold text-slate-500 border border-slate-100 dark:border-slate-700 w-fit">
                         {learningFlowData?.steps[activeStep]?.duration || '5-10 min'}
                       </div>
                     </div>
@@ -816,7 +816,7 @@ const CoursePlayer = () => {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 20 }}
               transition={{ type: "spring", duration: 0.5 }}
-              className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl border border-gray-200"
+              className="bg-white rounded-3xl p-5 sm:p-8 max-w-lg w-full shadow-2xl border border-gray-200"
             >
               {/* Animated Trophy Icon */}
               <div className="flex justify-center mb-6">

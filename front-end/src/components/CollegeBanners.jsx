@@ -68,7 +68,7 @@ const CollegeBanners = () => {
         transition={{ duration: 0.3 }}
         className="relative w-full overflow-hidden rounded-2xl mb-4 shadow-sm group bg-white dark:bg-slate-900 border border-[#C0C0C0] dark:border-slate-800"
       >
-        <div className="relative aspect-[21/9] sm:aspect-[32/9] lg:aspect-[40/9] w-full bg-slate-100 dark:bg-slate-800">
+        <div className="relative aspect-[16/9] sm:aspect-[24/9] md:aspect-[32/9] lg:aspect-[40/9] w-full bg-slate-100 dark:bg-slate-800">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -88,7 +88,7 @@ const CollegeBanners = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="text-white text-lg sm:text-2xl font-bold font-sans max-w-4xl leading-snug drop-shadow-md pr-12"
+                  className="text-white text-sm sm:text-lg md:text-2xl font-bold font-sans max-w-4xl leading-snug drop-shadow-md pr-4 sm:pr-12"
                 >
                   {banners[currentIndex].message}
                 </motion.h2>

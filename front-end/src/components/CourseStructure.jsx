@@ -88,7 +88,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
         )}
 
         <div className="relative z-10">
-          <div className="flex items-start gap-6">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             {/* Icon Box - Matching LoginCard style */}
             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${
               isUnlocked 
@@ -208,7 +208,7 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
         )}
 
         <div className="relative z-10">
-          <div className="flex items-start gap-6">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             {/* Icon Box */}
             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${
               isUnlocked 
@@ -384,14 +384,14 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
       </button>
 
       {/* Stage header - Refined and Sized Appropriately */}
-      <section className="rounded-[24px] border border-slate-200 bg-white px-6 py-6 mb-8 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:px-8 md:py-8 transition-all duration-300 relative overflow-hidden">
+      <section className="rounded-[24px] border border-slate-200 bg-white p-5 sm:p-6 mb-6 shadow-sm dark:border-slate-800 dark:bg-[#0b1627] md:p-8 md:mb-8 transition-all duration-300 relative overflow-hidden">
         {/* Background Decorative Gradient */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-slate-50/50 to-transparent dark:from-white/5 pointer-events-none" />
         
-        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-8 relative z-10">
-          <div className="flex items-start gap-6">
-            <div className={`w-20 h-20 rounded-[22px] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-lg flex items-center justify-center flex-shrink-0 text-[#1a3884] dark:text-blue-400 transform transition-transform duration-500`}>
-              <Icon className="w-10 h-10" />
+        <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 sm:gap-8 relative z-10">
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+            <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-[22px] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-lg flex items-center justify-center flex-shrink-0 text-[#1a3884] dark:text-blue-400 transform transition-transform duration-500`}>
+              <Icon className="w-8 h-8 sm:w-10 sm:h-10" />
             </div>
             <div>
               <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">
@@ -413,20 +413,20 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
           </div>
 
           {/* Stats Section - Refined sizes */}
-          <div className="relative group">
+          <div className="relative group w-full xl:w-auto">
             <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-5 group-hover:opacity-10 transition duration-1000"></div>
-            <div className="relative flex items-center gap-6 bg-slate-50/50 dark:bg-[#001835] border border-slate-100 dark:border-white/5 rounded-[20px] px-6 py-5 shadow-sm overflow-hidden">
-              <div className="text-center">
+            <div className="relative flex flex-col sm:flex-row items-center sm:items-stretch gap-4 sm:gap-6 bg-slate-50/50 dark:bg-[#001835] border border-slate-100 dark:border-white/5 rounded-[20px] p-5 sm:px-6 sm:py-5 shadow-sm overflow-hidden w-full">
+              <div className="text-center flex-shrink-0">
                 <div className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Stage Progress</div>
                 <div className="text-3xl font-black text-[#1a3884] dark:text-blue-400 leading-none tabular-nums">{pct}%</div>
               </div>
-              <div className="h-10 w-px bg-slate-200 dark:bg-white/10" />
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
+              <div className="hidden sm:block h-10 w-px bg-slate-200 dark:bg-white/10" />
+              <div className="space-y-1 text-center sm:text-left flex flex-col justify-center w-full sm:w-auto">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   <span className="text-[12px] font-bold text-[#112b6b] dark:text-slate-200">{completedCount} Mastered</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
                   <span className="text-[12px] font-bold text-slate-400">{stage.totalCourses - completedCount} Remaining</span>
                 </div>
@@ -450,7 +450,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
 
       {/* Assessment gate banner */}
       {stage.assessmentGate && (
-        <div className="mb-8 flex items-center gap-5 p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 p-4 sm:p-5 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-2xl shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center flex-shrink-0">
             <TrendingUp className="w-6 h-6 text-[#1a3884]" />
           </div>
@@ -528,7 +528,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
 
       {/* Page header - Vision Board Inspired Style - Hidden when stage selected */}
       {!selectedStageId && (
-        <div className="relative z-10 px-6 md:px-12 py-6">
+        <div className="relative z-10 px-4 sm:px-6 md:px-12 py-4 md:py-6">
           <div className="max-w-7xl mx-auto">
             <motion.section
               initial={{ opacity: 0, y: 22, scale: 0.99 }}
@@ -540,7 +540,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
               <div className="pointer-events-none absolute -right-10 top-0 h-32 w-32 rounded-full bg-blue-200/40 blur-3xl dark:bg-blue-500/10" />
               <div className="pointer-events-none absolute bottom-0 left-8 h-24 w-24 rounded-full bg-cyan-100/50 blur-3xl dark:bg-cyan-400/10" />
 
-                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 relative z-10">
+              <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6 relative z-10">
                 <div className="max-w-2xl space-y-5">
                   <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/60 backdrop-blur-md px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.24em] text-[#1a3884] shadow-sm dark:border-blue-400/20 dark:bg-slate-900/60 dark:text-blue-300">
                     <span className="h-2 w-2 rounded-full bg-gradient-to-r from-[#1a3884] to-[#4f7cf3]" />
@@ -548,7 +548,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
                   </div>
                   
                   <div className="space-y-4">
-                    <h1 className="text-[1.75rem] font-black tracking-tight text-slate-950 dark:text-slate-50 sm:text-[2rem] lg:text-[2.25rem] lg:leading-[1.1]">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[2.25rem] font-black tracking-tight text-slate-950 dark:text-slate-50 lg:leading-[1.1]">
                       SMAART <span className="text-[#1a3884] dark:text-blue-300">Programme</span>
                     </h1>
                     <p className="max-w-xl text-[13px] font-medium leading-6 text-slate-600 dark:text-slate-300 sm:text-sm">
@@ -558,27 +558,27 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
                 </div>
 
                 {/* Overall progress card - Matching the assessment center metrics style */}
-                <div className="relative group">
+                <div className="relative group w-full xl:w-auto">
                   <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-5 group-hover:opacity-10 transition duration-1000"></div>
-                  <div className="relative flex items-center gap-6 bg-white/80 dark:bg-slate-900/60 border border-white/80 dark:border-slate-700/70 rounded-[24px] px-6 py-5 shadow-[0_16px_34px_-28px_rgba(15,23,42,0.24)] backdrop-blur overflow-hidden">
-                    <div className="text-center relative z-10">
+                  <div className="relative flex flex-col sm:flex-row items-center sm:items-stretch gap-4 sm:gap-6 bg-white/80 dark:bg-slate-900/60 border border-white/80 dark:border-slate-700/70 rounded-[24px] p-5 sm:px-6 sm:py-5 shadow-[0_16px_34px_-28px_rgba(15,23,42,0.24)] backdrop-blur overflow-hidden w-full">
+                    <div className="text-center relative z-10 flex-shrink-0">
                       <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.24em] mb-2">Completion</div>
                       <div className="text-4xl font-black text-[#1a3884] dark:text-blue-300 leading-none tabular-nums">{overallPct}%</div>
                     </div>
-                    <div className="h-12 w-px bg-slate-200 dark:bg-slate-700" />
-                    <div className="space-y-3 relative z-10">
-                      <div className="flex items-center gap-2.5">
+                    <div className="hidden sm:block h-12 w-px bg-slate-200 dark:bg-slate-700" />
+                    <div className="space-y-3 relative z-10 flex-1 flex flex-col justify-center w-full sm:w-auto text-center sm:text-left">
+                      <div className="flex items-center justify-center sm:justify-start gap-2.5">
                         <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]" />
                         <span className="text-[13px] font-black text-slate-900 dark:text-slate-100">{totalCompleted} Mastered</span>
                       </div>
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center justify-center sm:justify-start gap-2.5">
                         <div className="w-2.5 h-2.5 rounded-full bg-slate-200 dark:bg-slate-700" />
                         <span className="text-[13px] font-black text-slate-400 dark:text-slate-500">{totalCourses - totalCompleted} Remaining</span>
                       </div>
                     </div>
                     
                     {/* Subtle background icon */}
-                    <div className="absolute -right-4 -bottom-4 opacity-[0.03] dark:opacity-[0.05] rotate-12">
+                    <div className="absolute -right-4 -bottom-4 opacity-[0.03] dark:opacity-[0.05] rotate-12 pointer-events-none">
                       <GraduationCap className="w-24 h-24 text-[#1a3884] dark:text-white" />
                     </div>
                   </div>
@@ -590,7 +590,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
       )}
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-6 md:py-8 relative z-10">
         <AnimatePresence mode="wait">
           {!selectedStageId ? (
             /* Category cards view */
@@ -600,7 +600,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
                     Human Intelligence Courses
                    <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                   {STAGES.map((stage, i) => {
                     const cfg = STAGE_CONFIG[stage.id];
                     const unlocked = isStageUnlocked(stage);
@@ -628,7 +628,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
                    Readiness Tracks
                    <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                   {TRACKS.map((track, i) => {
                     const unlocked = isTrackUnlocked(track.id);
                     const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;

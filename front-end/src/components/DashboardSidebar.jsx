@@ -18,8 +18,11 @@ import {
   Sun,
   Moon,
   Users,
-  ClipboardCheck
+  ClipboardCheck,
+  ChevronDown,
+  Languages
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import ChatbotModal from "@/components/ChatbotModal";
 import NotificationToast from "@/components/NotificationToast";
@@ -53,6 +56,8 @@ const DashboardSidebar = () => {
   const navigate = useNavigate();
   const { user } = useUser();
   const { theme, setTheme } = useTheme();
+  const { t, i18n } = useTranslation();
+  const [showLanguages, setShowLanguages] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -499,6 +504,57 @@ const DashboardSidebar = () => {
                 {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-500" /> : <Moon className="h-5 w-5 text-[#1a3884]" />}
                 <span className="font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
               </button>
+
+              <button
+                onClick={() => setShowLanguages(!showLanguages)}
+                className="mt-1 flex w-full items-center justify-between rounded-xl px-4 py-3 text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
+              >
+                <div className="flex items-center gap-3">
+                  <Languages className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
+                  <span className="font-medium">Language</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold tracking-wider">
+                    {i18n.language === 'en' ? 'EN' : i18n.language === 'hi' ? 'HI' : i18n.language === 'ta' ? 'TA' : i18n.language === 'ur' ? 'UR' : i18n.language === 'fr' ? 'FR' : i18n.language.toUpperCase()}
+                  </span>
+                  <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${showLanguages ? 'rotate-180' : ''}`} />
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {showLanguages && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="overflow-hidden mt-1 px-2 space-y-1"
+                  >
+                    {[
+                      { code: 'en', name: 'English' },
+                      { code: 'hi', name: 'Hindi (हिन्दी)' },
+                      { code: 'ta', name: 'Tamil (தமிழ்)' },
+                      { code: 'ur', name: 'Urdu (اردو)' },
+                      { code: 'fr', name: 'French (Français)' }
+                    ].map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          i18n.changeLanguage(lang.code);
+                          setShowLanguages(false);
+                          setIsMobileOpen(false);
+                        }}
+                        className={`w-full flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                          i18n.language === lang.code
+                            ? 'bg-[#1a3884] text-white shadow-sm'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <span>{lang.name}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="p-3">

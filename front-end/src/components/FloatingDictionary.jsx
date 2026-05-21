@@ -151,11 +151,10 @@ const FloatingDictionary = () => {
             <motion.div
                 layout
                 onClick={() => setOpen(!open)}
-                className="fixed bottom-8 left-1/2 lg:left-auto lg:right-8 z-50 h-14 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-[#1a3884] dark:text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/20 dark:border-slate-700/50 flex items-center gap-4 px-5 cursor-pointer hover:shadow-blue-600/20 transition-all duration-300 group overflow-hidden"
-                initial={{ y: 100, x: "-50%", opacity: 0 }}
+                className="fixed bottom-6 right-4 sm:right-8 z-50 h-14 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-[#1a3884] dark:text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/20 dark:border-slate-700/50 flex items-center gap-3 p-2.5 sm:px-5 cursor-pointer hover:shadow-blue-600/20 transition-all duration-300 group overflow-hidden"
+                initial={{ y: 100, opacity: 0 }}
                 animate={{
                     y: 0,
-                    x: typeof window !== 'undefined' && window.innerWidth < 1024 ? "-50%" : "0%",
                     opacity: 1
                 }}
                 whileHover={{ scale: 1.02, y: -2 }}
@@ -179,7 +178,7 @@ const FloatingDictionary = () => {
                     <motion.div
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="flex flex-col pr-4"
+                        className="hidden sm:flex flex-col pr-4"
                     >
                         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 leading-none mb-1">Quick Search</span>
                         <span className="text-sm font-bold tracking-tight text-slate-500 dark:text-slate-400 whitespace-nowrap italic">Look up a word...</span>
@@ -188,7 +187,7 @@ const FloatingDictionary = () => {
 
                 {/* Status dot */}
                 {!open && (
-                    <div className="flex items-center gap-1.5 ml-auto">
+                    <div className="flex items-center gap-1.5 ml-auto hidden sm:flex">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     </div>
                 )}
@@ -202,7 +201,7 @@ const FloatingDictionary = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                        className="fixed bottom-24 right-6 z-[60] w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden"
+                        className="fixed bottom-24 right-4 sm:right-8 z-[60] w-[calc(100vw-32px)] sm:w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden"
                     >
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/80">

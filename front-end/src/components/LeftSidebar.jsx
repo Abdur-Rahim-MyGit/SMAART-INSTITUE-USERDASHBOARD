@@ -17,6 +17,8 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Languages,
 
   Star,
   LogOut,
@@ -91,6 +93,7 @@ const menuGroups = [
     items: [
       { icon: Sun, label: "sidebar.theme", isThemeToggle: true, onlyMobile: true },
       { icon: Bell, label: "sidebar.notifications", path: "/dashboard/notifications", onlyMobile: true },
+      { icon: Languages, label: "sidebar.language", isLanguageToggle: true, onlyMobile: true },
       { icon: Settings, label: "sidebar.settings", path: "/dashboard/settings" },
       { icon: HelpCircle, label: "sidebar.help", path: "/dashboard/support" },
     ]
@@ -102,7 +105,8 @@ const menuGroups = [
 const LeftSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [showLanguages, setShowLanguages] = useState(false);
   const { theme, setTheme } = useTheme();
   const { isCollapsed, toggleSidebar, isMobileOpen, setIsMobileOpen } = useSidebar();
   const { user, logout } = useUser();
@@ -343,8 +347,8 @@ const LeftSidebar = () => {
                   </p>
                   <div className="space-y-1">
                     {group.items.map((item, itemIndex) => {
-                      const Icon = item.isThemeToggle ? (theme === 'dark' ? Sun : Moon) : item.icon;
-                      const label = item.isThemeToggle ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : t(item.label);
+                      const Icon = item.isThemeToggle ? (theme === 'dark' ? Sun : Moon) : item.isLanguageToggle ? Languages : item.icon;
+                      const label = item.isThemeToggle ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : item.isLanguageToggle ? 'Language' : t(item.label);
                       const active = isActive(item.path);
 
                       const content = (
@@ -377,6 +381,59 @@ const LeftSidebar = () => {
                             >
                               {content}
                             </button>
+                          ) : item.isLanguageToggle ? (
+                            <div className="w-full">
+                              <button
+                                onClick={() => setShowLanguages(!showLanguages)}
+                                className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <Icon className="w-5 h-5 text-[#1a3884]" />
+                                  <span className="font-medium text-sm">{label}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold tracking-wider">
+                                    {i18n.language === 'en' ? 'EN' : i18n.language === 'hi' ? 'HI' : i18n.language === 'ta' ? 'TA' : i18n.language === 'ur' ? 'UR' : i18n.language === 'fr' ? 'FR' : i18n.language.toUpperCase()}
+                                  </span>
+                                  <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${showLanguages ? 'rotate-180' : ''}`} />
+                                </div>
+                              </button>
+
+                              <AnimatePresence>
+                                {showLanguages && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="overflow-hidden px-2 space-y-1 pl-8"
+                                  >
+                                    {[
+                                      { code: 'en', name: 'English' },
+                                      { code: 'hi', name: 'Hindi (हिन्दी)' },
+                                      { code: 'ta', name: 'Tamil (தமிழ்)' },
+                                      { code: 'ur', name: 'Urdu (اردو)' },
+                                      { code: 'fr', name: 'French (Français)' }
+                                    ].map((lang) => (
+                                      <button
+                                        key={lang.code}
+                                        onClick={() => {
+                                          i18n.changeLanguage(lang.code);
+                                          setShowLanguages(false);
+                                          setIsMobileOpen(false);
+                                        }}
+                                        className={`w-full flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                                          i18n.language === lang.code
+                                            ? 'bg-[#1a3884] text-white shadow-sm'
+                                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                        }`}
+                                      >
+                                        <span>{lang.name}</span>
+                                      </button>
+                                    ))}
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
                           ) : (
                             <Link
                               to={item.path === '/dashboard/career-agent' 

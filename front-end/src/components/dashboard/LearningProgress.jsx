@@ -24,19 +24,19 @@ const LearningProgress = memo(({ paths, loading, error }) => {
       className="bg-white dark:bg-slate-900/40 backdrop-blur-sm border border-gray-100 dark:border-slate-800 rounded-[32px] shadow-xl shadow-gray-200/30 dark:shadow-black/20 overflow-hidden relative transition-all duration-300"
     >
       {/* Continue Learning Bar */}
-      <div className="p-8 border-b border-gray-50 dark:border-slate-800/50 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
-          <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center border border-gray-100 dark:border-slate-700 shadow-sm transition-all duration-300 group-hover:shadow-md">
-            <BookOpen className="w-7 h-7 text-[#1a3884] dark:text-blue-400" />
+      <div className="p-5 sm:p-8 border-b border-gray-50 dark:border-slate-800/50 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-6">
+        <div className="flex items-center gap-3 sm:gap-5">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center border border-gray-100 dark:border-slate-700 shadow-sm transition-all duration-300 group-hover:shadow-md shrink-0">
+            <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-[#1a3884] dark:text-blue-400" />
           </div>
-          <div>
-            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400">{t("dashboard.continue_learning")}</h3>
-            <h2 className="text-2xl font-extrabold text-[#112b6b] dark:text-white tracking-tight mt-0.5 leading-tight" style={{ letterSpacing: "-0.02em" }}>{t("dashboard.capability_program")}</h2>
+          <div className="min-w-0">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400 truncate">{t("dashboard.continue_learning")}</h3>
+            <h2 className="text-xl sm:text-2xl font-extrabold text-[#112b6b] dark:text-white tracking-tight mt-0.5 leading-tight" style={{ letterSpacing: "-0.02em" }}>{t("dashboard.capability_program")}</h2>
           </div>
         </div>
 
-        <div className="flex items-center gap-8 w-full md:w-auto">
-          <div className="flex-1 md:w-48 lg:w-72">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 w-full md:w-auto">
+          <div className="w-full sm:w-48 md:w-56 lg:w-72">
             <div className="flex justify-between items-center mb-2">
               <span className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">Overall Progress</span>
               <span className="text-[13px] font-extrabold text-[#1a3884] dark:text-blue-400">{averageProgress}%</span>
@@ -51,9 +51,9 @@ const LearningProgress = memo(({ paths, loading, error }) => {
           
           <button 
             onClick={() => navigate('/dashboard/courses')}
-            className="relative h-12 px-8 bg-[#112b6b] dark:bg-[#1a3884] hover:bg-[#1a3884] dark:hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg shadow-[#112b6b]/20 dark:shadow-blue-900/30 hover:-translate-y-1 active:translate-y-0 whitespace-nowrap overflow-hidden group"
+            className="relative h-12 px-8 bg-[#112b6b] dark:bg-[#1a3884] hover:bg-[#1a3884] dark:hover:bg-blue-600 text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg shadow-[#112b6b]/20 dark:shadow-blue-900/30 hover:-translate-y-1 active:translate-y-0 whitespace-nowrap overflow-hidden group w-full sm:w-auto"
           >
-            <div className="relative z-10 flex items-center gap-2">
+            <div className="relative z-10 flex items-center justify-center gap-2">
               {t("dashboard.continue_learning")}
               <motion.span animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>→</motion.span>
             </div>
@@ -64,7 +64,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
       {/* Path Cards Grid */}
       <div className="p-4 bg-slate-50/30 dark:bg-slate-800/10">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-sm">
                 <div className="flex items-start gap-3 mb-3">
@@ -104,7 +104,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {paths.map((path) => (
               <PathCard key={path.id} path={path} />
             ))}
