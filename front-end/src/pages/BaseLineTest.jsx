@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { assessmentApi } from "@/services/assessmentApi";
-import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase, RefreshCw } from "lucide-react";
+import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase, RefreshCw, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
+import { buildAssessmentTimerStorageKeys, clearAssessmentTimerStorage } from "@/utils/assessmentTimerStorage";
 
 // Stage configuration map
 const STAGE_MAP = {
@@ -112,8 +113,6 @@ const BaseLineTest = () => {
   const assessmentCode = stageConfig.code;
   const questionLimit = stageConfig.questionLimit;
   const stageDurationSeconds = stageConfig.durationMinutes * 60;
-  const timerStartStorageKey = `${stageKey}_startTime`;
-  const timerWarningStorageKey = `${stageKey}_oneMinuteWarningShown`;
 
   // State management
   const [user, setUser] = useState(null);
@@ -143,36 +142,30 @@ const BaseLineTest = () => {
 
   // Manual navigation guard for standard BrowserRouter
   useEffect(() => {
+    if (submitted || loading || !resultId || timeExpired) return;
+
     const handleBeforeUnload = (e) => {
-      if (!submitted && !loading && !!resultId) {
-        const msg = "Are you sure you want to leave? Your assessment progress will be lost.";
-        e.preventDefault();
-        e.returnValue = msg;
-        return msg;
-      }
+      const msg = "Are you sure you want to leave? Your assessment progress will be lost.";
+      e.preventDefault();
+      e.returnValue = msg;
+      return msg;
     };
 
-    const handlePopState = (e) => {
-      if (!submitted && !loading && !!resultId) {
-        // Prevent back navigation by pushing current state back
-        window.history.pushState(null, "", window.location.pathname);
-        setShowExitWarning(true);
-      }
-    };
-
-    if (!submitted && !loading && !!resultId) {
-      window.addEventListener("beforeunload", handleBeforeUnload);
-      window.addEventListener("popstate", handlePopState);
-      
-      // Push an extra entry to the history stack so we can intercept the first 'back' click
+    const handlePopState = () => {
       window.history.pushState(null, "", window.location.pathname);
-    }
+      setShowExitWarning(true);
+      toast.warning("Back navigation is disabled during the assessment.");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+    window.history.pushState(null, "", window.location.pathname);
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [submitted, loading, resultId]);
+  }, [submitted, loading, resultId, timeExpired]);
 
   // Badge notification state
   const [earnedBadge, setEarnedBadge] = useState(null);
@@ -202,6 +195,9 @@ const BaseLineTest = () => {
   const current = questions[index];
   const currentQuestionId = current?._id;
   const selectedValue = selectedAnswers[currentQuestionId] || null;
+  const activeUserId = user?.id || user?._id || "anonymous";
+  const { startTimeKey: timerStartStorageKey, warningShownKey: timerWarningStorageKey } =
+    buildAssessmentTimerStorageKeys(stageKey, activeUserId);
 
   // Calculate progress based on answered questions
   const answeredCount = Object.keys(selectedAnswers).length;
@@ -212,7 +208,15 @@ const BaseLineTest = () => {
   const clearTimerPersistence = useCallback(() => {
     localStorage.removeItem(timerStartStorageKey);
     localStorage.removeItem(timerWarningStorageKey);
-  }, [timerStartStorageKey, timerWarningStorageKey]);
+    if (activeUserId === "anonymous") {
+      clearAssessmentTimerStorage();
+    }
+  }, [activeUserId, timerStartStorageKey, timerWarningStorageKey]);
+
+  const leaveAssessmentPage = useCallback(() => {
+    setShowExitWarning(false);
+    navigate("/dashboard/assessment-centre", { replace: true });
+  }, [navigate]);
 
   const formatCountdown = useCallback((totalSeconds) => {
     const safeSeconds = Math.max(totalSeconds, 0);
@@ -443,7 +447,10 @@ const BaseLineTest = () => {
         await finalizeUnansweredQuestions();
       }
 
-      const response = await assessmentApi.submitAssessment(resultId, assessmentToken);
+      const response = await assessmentApi.submitAssessment(resultId, assessmentToken, {
+        submissionReason: reason,
+        completeMissingAnswers: forceTimeoutCompletion || reason === "violation",
+      });
 
       if (response.success) {
         submitSucceeded = true;
@@ -619,17 +626,6 @@ const BaseLineTest = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
     // Blur window detection is too aggressive sometimes, sticking to visibilitychange for now
 
-    // Block Exit
-    const beforeUnload = (e) => { e.preventDefault(); e.returnValue = ""; };
-    window.addEventListener("beforeunload", beforeUnload);
-    const onPopState = () => {
-      window.history.pushState(null, "", window.location.href);
-      setShowExitWarning(true);
-      toast.warning("Back navigation is disabled during the assessment.");
-    };
-    window.history.pushState(null, "", window.location.href);
-    window.addEventListener("popstate", onPopState);
-
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
       document.removeEventListener("copy", handleCopyCutPaste);
@@ -637,8 +633,6 @@ const BaseLineTest = () => {
       document.removeEventListener("paste", handleCopyCutPaste);
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("beforeunload", beforeUnload);
-      window.removeEventListener("popstate", onPopState);
     };
   }, [submitted, loading, submit]); // Added submit to dependencies if stable (or remove if causes loop, submit uses refs or is stable)
 
@@ -677,7 +671,18 @@ const BaseLineTest = () => {
 
               <div className="p-6 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-dark-elevated/30 relative z-10">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowExitWarning(true)}
+                      disabled={submitting || interactionLocked || timeExpired}
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/40 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Back
+                    </button>
+                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
+                  </div>
                   <div className="text-right">
                     <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
                       Time Left:{" "}
@@ -844,6 +849,21 @@ const BaseLineTest = () => {
                   <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-[#002A5C]" /> Remaining</span>
                   <span className="font-bold text-slate-900 dark:text-white">{questions.length - Object.keys(selectedAnswers).length}</span>
                 </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 dark:border-white/8">
+                <button
+                  type="button"
+                  disabled={loading || submitting || interactionLocked || timeExpired || !resultId}
+                  onClick={handleRestart}
+                  className="w-full py-3 px-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold hover:bg-rose-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Clear Assessment (Dev)
+                </button>
+                <p className="mt-2 text-[11px] leading-5 text-slate-400 dark:text-slate-500 text-center">
+                  Development only. This clears the current attempt after the assessment has started.
+                </p>
               </div>
 
               {/* DEV: Auto Answer */}
@@ -1087,22 +1107,17 @@ const BaseLineTest = () => {
                 <XCircle className="w-10 h-10 text-amber-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">Don't Leave Yet!</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-center mb-8">Back navigation is disabled during the assessment. Use the submit button when you are ready to leave.</p>
+              <p className="text-slate-500 dark:text-slate-400 text-center mb-8">Back navigation is disabled while the assessment is in progress. If you leave now, you will return to the assessment dashboard.</p>
               <div className="flex flex-col gap-3">
+                <button
+                  onClick={leaveAssessmentPage}
+                  className="w-full py-4 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-[#003170] transition-all shadow-sm"
+                >
+                  Leave Assessment
+                </button>
                 <button onClick={() => {
                   setShowExitWarning(false);
                 }} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Continue Assessment</button>
-                
-                {/* Development Only: Restart Button */}
-                <button 
-                  onClick={() => {
-                    handleRestart();
-                  }}
-                  className="w-full py-3 bg-slate-100 dark:bg-[#002A5C] text-slate-600 dark:text-slate-400 rounded-xl font-semibold hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Restart Assessment (Dev Mode)
-                </button>
               </div>
             </motion.div>
           </div>

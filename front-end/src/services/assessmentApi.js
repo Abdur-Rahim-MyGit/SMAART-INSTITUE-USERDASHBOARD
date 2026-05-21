@@ -76,11 +76,12 @@ export const assessmentApi = {
      * @param {string} token - Assessment session token
      * @returns {Promise} Final results with scores
      */
-    submitAssessment: async (resultId, token = null) => {
+    submitAssessment: async (resultId, token = null, options = {}) => {
         const headers = token ? { 'x-assessment-token': token } : {};
         return apiCall(`/results/${resultId}/submit`, {
             method: 'POST',
-            headers
+            headers,
+            body: JSON.stringify(options)
         });
     },
 
