@@ -68,16 +68,31 @@ const AssessmentFlowGuard = ({ children }) => {
     }
 
     if (serverValidate) {
+      // Skip server validation on career agent pages — they use optionalAuth and manage
+      // their own session flow. Forcing a server check here during the 15-20s AI analysis
+      // causes a race condition that logs the user out.
+      const isCareerAgentPage = window.location.pathname.includes('/career-agent');
+      if (isCareerAgentPage) {
+        return true; // Trust local session for career agent pages
+      }
+
       try {
         // Validate token with backend — prevents stale/stolen tokens from granting access
         await apiCall('/auth/me');
       } catch (err) {
-        console.warn('[AssessmentFlowGuard] Token validation failed:', err.message);
-        sessionStorage.clear();
-        clearAssessmentTimerStorage();
-        setIsAuthenticated(false);
-        navigate("/", { replace: true });
-        return false;
+        // Only force logout on a genuine 401 (session invalid/expired)
+        // Do NOT logout on network errors, timeouts, or service unavailability
+        const isAuthError = err.message?.includes('Unauthorized') || err.status === 401;
+        if (isAuthError) {
+          console.warn('[AssessmentFlowGuard] Token validation failed (401):', err.message);
+          sessionStorage.clear();
+          clearAssessmentTimerStorage();
+          setIsAuthenticated(false);
+          navigate("/", { replace: true });
+          return false;
+        }
+        // Network/timeout errors — allow through (user still has valid local session)
+        console.warn('[AssessmentFlowGuard] Token validation skipped (network issue):', err.message);
       }
     }
 
@@ -366,5 +381,4 @@ const AssessmentFlowGuard = ({ children }) => {
 };
 
 export default AssessmentFlowGuard;
-
 

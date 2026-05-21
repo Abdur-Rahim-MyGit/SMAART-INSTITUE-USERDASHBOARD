@@ -19,8 +19,10 @@ const {
   CareerRoleModel,
   RoleProfileModel,
   RoleSkillModel,
-  CareerDirectionModel
+  CareerDirectionModel,
+  FinalCareerPathwayModel
 } = require('../models/careerAgentModels');
+
 const Degree = require('../models/Degree');
 // Auth middleware — optional auth (passes through without token, attaches user if token present)
 const { optionalAuth } = require('../middleware/auth');
@@ -642,13 +644,43 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
       throw procErr;
     }
 
-    // Save to MongoDB with userId for per-user retrieval
-    const studentName = studentData.personalDetails?.name || 'Unknown';
-    const studentEmail = studentData.personalDetails?.email || loggedInUser?.email || 'Unknown';
-    const primaryRole = studentData.preferences?.primary?.role || 'Career Match';
+    // Common variables used for both FinalCareerPathway and CareerAnalysis saves
+    const studentName    = studentData.personalDetails?.name  || 'Unknown';
+    const studentEmail   = studentData.personalDetails?.email || loggedInUser?.email || 'Unknown';
+    const primaryRole    = studentData.preferences?.primary?.role || 'Career Match';
     const preVerifiedData = analysis.preVerified || {};
 
+    // ── Save / Update FinalCareerPathway (the user's per-user source of truth) ────
+    // Uses upsert so first submit creates, every edit updates the same document.
+    if (loggedInUser) {
+      const userId = loggedInUser._id || loggedInUser.id;
+      const preV = analysis.preVerified || {};
+      FinalCareerPathwayModel.findOneAndUpdate(
+        { userId },
+        {
+          $set: {
+            userId,
+            student_name:   studentName,
+            student_email:  studentEmail,
+            input_data:     studentData,       // ← full form data (edu, skills, prefs, etc.)
+            output_data:    analysis,
+            primary_role:   primaryRole,
+            secondary_role: studentData.preferences?.secondary?.role || '',
+            tertiary_role:  studentData.preferences?.tertiary?.role  || '',
+            zone_primary:   preV?.primaryZone?.employer_zone   || 'Unknown',
+            zone_secondary: preV?.secondaryZone?.employer_zone || 'Unknown',
+            zone_tertiary:  preV?.tertiaryZone?.employer_zone  || 'Unknown',
+            updated_at:     new Date()
+          },
+          $setOnInsert: { created_at: new Date() }
+        },
+        { upsert: true, new: true }
+      ).catch(err => console.warn('[career-agent] FinalCareerPathway upsert warning:', err.message));
+    }
+
+    // Also save to CareerAnalysis for history
     CareerAnalysisModel.create({
+
       userId: loggedInUser?._id || loggedInUser?.id || null,
       student_name: studentName,
       student_email: studentEmail,
@@ -681,10 +713,70 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
 });
 
 /**
- * GET /api/career-agent/my-analysis
- * Fetches the most recent career analysis for the logged-in user from MongoDB.
- * Requires authentication (JWT).
+ * GET /api/career-agent/final-pathway
+ * Returns the current user's finalcareerpathway record.
+ * Used by the onboarding edit mode to pre-fill all form fields.
  */
+router.get('/final-pathway', optionalAuth, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+    const userId = req.user._id || req.user.id;
+    const email  = req.user.email;
+
+    let record = await FinalCareerPathwayModel.findOne({ userId }).lean();
+    if (!record && email) {
+      record = await FinalCareerPathwayModel.findOne({ student_email: email }).lean();
+    }
+
+    if (!record) {
+      return res.status(404).json({ found: false, message: 'No pathway saved for this user yet.' });
+    }
+
+    return res.json({
+      found: true,
+      id: String(record._id),
+      primary_role:   record.primary_role,
+      secondary_role: record.secondary_role,
+      tertiary_role:  record.tertiary_role,
+      is_locked:      record.is_locked,
+      input_data:     record.input_data,    // ← full form data for pre-fill
+      output_data:    record.output_data,
+      updated_at:     record.updated_at
+    });
+  } catch (err) {
+    console.error('[career-agent] final-pathway GET error:', err);
+    res.status(500).json({ error: 'Failed to fetch final pathway', details: err.message });
+  }
+});
+
+/**
+ * PUT /api/career-agent/final-pathway/lock
+ * Marks the user's pathway as locked (after they confirm "Interested" in the UI).
+ */
+router.put('/final-pathway/lock', optionalAuth, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+    const userId = req.user._id || req.user.id;
+    const record = await FinalCareerPathwayModel.findOneAndUpdate(
+      { userId },
+      { $set: { is_locked: true, locked_at: new Date(), updated_at: new Date() } },
+      { new: true }
+    );
+    if (!record) {
+      return res.status(404).json({ error: 'No pathway found to lock.' });
+    }
+    return res.json({ success: true, is_locked: record.is_locked, locked_at: record.locked_at });
+  } catch (err) {
+    console.error('[career-agent] final-pathway lock error:', err);
+    res.status(500).json({ error: 'Failed to lock pathway', details: err.message });
+  }
+});
+
+
 router.get('/my-analysis', optionalAuth, async (req, res) => {
   try {
     if (!req.user) {

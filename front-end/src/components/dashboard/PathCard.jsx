@@ -33,7 +33,7 @@ const PathCard = memo(({ path }) => {
       </div>
 
       <button
-        onClick={() => navigate('/dashboard/courses')}
+        onClick={() => navigate(path.navigateTo || '/dashboard/courses')}
         className="w-full h-11 bg-[#f8fafc] dark:bg-[#002A5C] hover:bg-[#112b6b] dark:hover:bg-[#1a3884] text-[#112b6b] dark:text-blue-400 hover:text-white dark:hover:text-white border border-gray-100 dark:border-white/10 hover:border-[#112b6b] rounded-xl text-[13px] font-bold transition-all duration-300 flex items-center justify-center gap-2 group/btn"
       >
         {path.btnText}

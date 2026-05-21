@@ -1,7 +1,7 @@
 import './careerAgent.css';
 import React, { useState, useEffect, useRef } from 'react';
 import PageTransition from '@/components/PageTransition';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, GraduationCap, Target, Briefcase, ShieldCheck, CheckCircle, MapPin, CreditCard, Clock, Compass, Search, Navigation, Zap, Trophy, Sparkles } from 'lucide-react';
@@ -584,8 +584,16 @@ function SkillSection({ skills, onChange }) {
 // Main Component
 const CareerAgentOnboarding = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useUser();
-  const [step, setStep] = useState(1);
+
+  // If coming from "Not Interested" flow, we jump to a specific step to edit just that preference
+  const editState = location.state || {};
+  const editTier   = editState.editTier   || null;   // 'primary' | 'secondary' | 'tertiary' | null
+  const startStep  = editState.startStep  || 1;      // 3, 4, or 5 for the preference steps
+  const isEditMode = !!editTier;
+
+  const [step, setStep] = useState(isEditMode ? startStep : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [validationState, setValidationState] = useState(createEmptyValidationState);
@@ -602,7 +610,106 @@ const CareerAgentOnboarding = () => {
       .catch(err => console.error('Failed to load career roles:', err));
   }, []);
 
-  // AUTO-FILL PERSONAL DETAILS FROM PROFILE
+  // ─── EDIT MODE: Pre-fill ALL form data so education is loaded when jumping to Step 3/4/5 ──
+  // Tries 3 sources in order:
+  //   1. /final-pathway (new dedicated endpoint — accurate after backend restart)
+  //   2. /my-analysis   (existing endpoint — already stores full input_data, works NOW)
+  //   3. localStorage   (last resort — cleared after submit, may be empty)
+  useEffect(() => {
+    if (!isEditMode) return;
+
+    const token = sessionStorage.getItem('token');
+    const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+    const normaliseInputData = (saved) => {
+      if (!saved) return null;
+      // Ensure education is an array
+      if (saved.education && !Array.isArray(saved.education)) {
+        saved.education = [saved.education];
+      }
+      if (saved.education) {
+        saved.education.forEach(edu => {
+          if (edu.specialisation && !Array.isArray(edu.specialisation)) {
+            edu.specialisation = [edu.specialisation];
+          }
+          if (!edu.specialisation) edu.specialisation = [];
+        });
+      }
+      // Ensure skills are objects
+      if (Array.isArray(saved.skills) && saved.skills.length > 0 && typeof saved.skills[0] === 'string') {
+        saved.skills = saved.skills.map(s => ({ name: s, status: 'Verified' }));
+      }
+      return saved;
+    };
+
+    const applyPreFill = (saved) => {
+      if (!saved) return;
+      setFormData(prev => ({
+        ...prev,
+        personalDetails: { ...prev.personalDetails, ...(saved.personalDetails || {}) },
+        education:   (saved.education   && saved.education.length > 0)  ? saved.education   : prev.education,
+        skills:      (saved.skills      && saved.skills.length > 0)     ? saved.skills      : prev.skills,
+        experience:  (saved.experience  && saved.experience.length > 0) ? saved.experience  : prev.experience,
+        preferences: {
+          primary:   saved.preferences?.primary   || prev.preferences.primary,
+          secondary: saved.preferences?.secondary || prev.preferences.secondary,
+          tertiary:  saved.preferences?.tertiary  || prev.preferences.tertiary,
+        }
+      }));
+    };
+
+    const loadSavedData = async () => {
+      // ── Source 1: /final-pathway (new dedicated collection) ──────────────────
+      try {
+        const r = await fetch('/api/career-agent/final-pathway', {
+          credentials: 'include', headers: authHeaders
+        });
+        if (r.ok) {
+          const d = await r.json();
+          if (d?.found && d.input_data) {
+            console.log('[EditMode] Pre-filling from final-pathway');
+            applyPreFill(normaliseInputData(d.input_data));
+            return; // success — stop here
+          }
+        }
+      } catch (e) {
+        console.warn('[EditMode] final-pathway unavailable, trying my-analysis…');
+      }
+
+      // ── Source 2: /my-analysis (existing endpoint, already has input_data) ───
+      try {
+        const r = await fetch('/api/career-agent/my-analysis', {
+          credentials: 'include', headers: authHeaders
+        });
+        if (r.ok) {
+          const d = await r.json();
+          if (d?.found && d.input_data) {
+            console.log('[EditMode] Pre-filling from my-analysis');
+            applyPreFill(normaliseInputData(d.input_data));
+            return; // success — stop here
+          }
+        }
+      } catch (e) {
+        console.warn('[EditMode] my-analysis unavailable, trying localStorage…');
+      }
+
+      // ── Source 3: localStorage draft (last resort, may be empty after submit) ─
+      try {
+        const raw = localStorage.getItem('smaart_onboarding_draft');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          console.log('[EditMode] Pre-filling from localStorage draft');
+          applyPreFill(normaliseInputData(parsed));
+        }
+      } catch (e) {
+        console.warn('[EditMode] localStorage draft unavailable');
+      }
+    };
+
+    loadSavedData();
+  }, [isEditMode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // â”€â”€â”€ AUTO-FILL PERSONAL DETAILS FROM PROFILE â”€â”€â”€
   useEffect(() => {
     if (user) {
       setFormData(prev => ({
@@ -681,54 +788,66 @@ const CareerAgentOnboarding = () => {
   const [careerDirections, setCareerDirections] = useState([]);
   const [directionsLoading, setDirectionsLoading] = useState(false);
 
-  // Career Direction: fetch Unique ID when primary education is fully filled
+  // Career Direction: fetch directions for ALL selected specialisations and merge them.
+  // If 2 specialisations are selected (each with 10 directions) → 20 total directions.
+  // Secondary excludes the 1 picked as primary → 19 shown.
+  // Tertiary excludes primary + secondary picks → 18 shown.
   useEffect(() => {
     const edu = formData.education[0];
     console.log('[CareerAgentOnboarding] Education changed:', edu);
-    // Allow fetching even if specialisation is empty (backend defaults to 'General')
-    if (edu?.level && edu?.domain && edu?.degreeGroup) {
-      const spec = edu?.specialisation?.length > 0 ? edu.specialisation[0] : 'General';
-      console.log('[CareerAgentOnboarding] Fetching unique-id for:', { level: edu.level, domain: edu.domain, degreeFullName: edu.degreeGroup, specialisation: spec });
-      axios.get('/api/career-agent/unique-id', {
-        params: { level: edu.level, domain: edu.domain, degreeFullName: edu.degreeGroup, specialisation: spec }
-      }).then(res => {
-        console.log('[CareerAgentOnboarding] unique-id response:', res.data);
-        setCareerUniqueId(res.data.found ? res.data.uniqueId : null);
-      }).catch((err) => {
-        console.error('[CareerAgentOnboarding] unique-id error:', err);
-        setCareerUniqueId(null);
-      });
-    } else {
-      console.log('[CareerAgentOnboarding] Education incomplete. Clearing uniqueId.');
+
+    if (!edu?.level || !edu?.domain || !edu?.degreeGroup) {
+      console.log('[CareerAgentOnboarding] Education incomplete. Clearing directions.');
       setCareerUniqueId(null);
       setCareerDirections([]);
+      return;
     }
+
+    // Collect all specialisations to fetch for (at least one — 'General' if none selected)
+    const specs = edu.specialisation?.length > 0 ? edu.specialisation : ['General'];
+    console.log('[CareerAgentOnboarding] Fetching directions for specs:', specs);
+
+    setDirectionsLoading(true);
+
+    // Fetch unique-id + directions for EACH specialisation in parallel
+    const fetchForSpec = async (spec) => {
+      try {
+        const idRes = await axios.get('/api/career-agent/unique-id', {
+          params: { level: edu.level, domain: edu.domain, degreeFullName: edu.degreeGroup, specialisation: spec }
+        });
+        if (!idRes.data.found || !idRes.data.uniqueId) return [];
+        const dirRes = await axios.get(`/api/career-agent/directions/${idRes.data.uniqueId}`);
+        return dirRes.data.found ? dirRes.data.directions : [];
+      } catch (err) {
+        console.warn(`[CareerAgentOnboarding] Failed for spec "${spec}":`, err.message);
+        return [];
+      }
+    };
+
+    Promise.all(specs.map(fetchForSpec))
+      .then(results => {
+        // Merge all direction arrays — deduplicate by directionId
+        const seen = new Set();
+        const merged = [];
+        for (const dirs of results) {
+          for (const dir of dirs) {
+            if (!seen.has(dir.directionId)) {
+              seen.add(dir.directionId);
+              merged.push(dir);
+            }
+          }
+        }
+        console.log(`[CareerAgentOnboarding] Merged ${merged.length} directions from ${specs.length} spec(s)`);
+        setCareerDirections(merged);
+      })
+      .finally(() => setDirectionsLoading(false));
+
   }, [
     formData.education[0]?.level,
     formData.education[0]?.domain,
     formData.education[0]?.degreeGroup,
     JSON.stringify(formData.education[0]?.specialisation)
   ]);
-
-  // Career Direction: fetch directions when uniqueId changes
-  useEffect(() => {
-    console.log('[CareerAgentOnboarding] careerUniqueId changed:', careerUniqueId);
-    if (careerUniqueId) {
-      setDirectionsLoading(true);
-      axios.get(`/api/career-agent/directions/${careerUniqueId}`)
-        .then(res => {
-          console.log('[CareerAgentOnboarding] directions response:', res.data);
-          setCareerDirections(res.data.found ? res.data.directions : []);
-        })
-        .catch((err) => {
-          console.error('[CareerAgentOnboarding] directions error:', err);
-          setCareerDirections([]);
-        })
-        .finally(() => setDirectionsLoading(false));
-    } else {
-      setCareerDirections([]);
-    }
-  }, [careerUniqueId]);
 
   const updatePersonal = (field, val) => setFormData(f => ({ ...f, personalDetails: { ...f.personalDetails, [field]: val } }));
   const updateEdu = (i, field, val) => setFormData(f => {
@@ -952,7 +1071,13 @@ const CareerAgentOnboarding = () => {
         localStorage.setItem('smaart_pref_tertiary', prefs.tertiary?.careerDirectionName || prefs.tertiary?.role || '');
 
         localStorage.removeItem('smaart_onboarding_draft');
-        navigate('/dashboard/career-agent/dashboard');
+
+        if (isEditMode) {
+          // Edit mode: go back to career agent dashboard so user can lock the updated path
+          navigate('/dashboard/career-agent/dashboard');
+        } else {
+          navigate('/dashboard/career-agent/dashboard');
+        }
       } else {
         // Response came back but had no usable analysis data
         console.error('No analysis data in response:', res.data);
@@ -1055,9 +1180,45 @@ const CareerAgentOnboarding = () => {
   return (
     <PageTransition>
     <div className="career-agent-page screen-onboard">
-      {/* STEP PROGRESS INDICATOR */}
-      <div style={{ maxWidth: '920px', margin: '0 auto 3rem', padding: '0 1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem' }}>
+      {/* ── EDIT MODE BANNER ── shown when user came via "Not Interested" */}
+      {isEditMode && (
+        <div style={{ maxWidth: '680px', margin: '0 auto 1.5rem', padding: '0 1rem' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '1rem',
+            background: 'rgba(245,158,11,0.08)', border: '1.5px solid rgba(245,158,11,0.35)',
+            borderRadius: '16px', padding: '1rem 1.2rem',
+          }}>
+            <div style={{
+              width: '40px', height: '40px', borderRadius: '12px', flexShrink: 0,
+              background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.2rem'
+            }}>✏️</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#d97706', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Re-selecting {editTier ? (editTier.charAt(0).toUpperCase() + editTier.slice(1)) : ''} Preference
+              </div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text2)', marginTop: '0.15rem' }}>
+                You marked this as "Not Interested". Pick a new direction and re-submit — only this preference will be updated.
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard/career-agent/dashboard')}
+              style={{
+                padding: '0.5rem 1rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700,
+                background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)',
+                color: '#d97706', cursor: 'pointer', flexShrink: 0, whiteSpace: 'nowrap'
+              }}
+            >
+              ← Back
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── STEP PROGRESS INDICATOR (hidden in edit mode) ── */}
+      {!isEditMode && <div style={{ maxWidth: '680px', margin: '0 auto 2.5rem', padding: '0 1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
           {STEPS.map((label, idx) => {
             const sn = idx + 1;
             const isDone = step > sn;
@@ -1088,7 +1249,7 @@ const CareerAgentOnboarding = () => {
             );
           })}
         </div>
-      </div>
+      </div>}
 
       <form onSubmit={handleSubmit}>
         {/* STEP 1: PERSONAL DETAILS */}
