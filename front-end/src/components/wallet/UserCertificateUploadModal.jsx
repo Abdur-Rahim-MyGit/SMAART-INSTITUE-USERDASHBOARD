@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, CheckCircle2, AlertCircle, Loader2, Calendar, Shield, Link as LinkIcon, QrCode } from 'lucide-react';
+import { X, Upload, CheckCircle2, Loader2, Link as LinkIcon, QrCode, Shield } from 'lucide-react';
 import { userCertificateApi } from '@/services/userCertificateApi';
 import { toast } from 'sonner';
 
@@ -70,7 +70,7 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
       
       if (response.success) {
         toast.success('Certificate uploaded successfully!');
-        onUploadSuccess(response.data);
+        if (onUploadSuccess) onUploadSuccess(response.data);
         onClose();
         // Reset form
         setFormData({
@@ -103,30 +103,34 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="bg-white dark:bg-[#002A5C] rounded-none w-full max-w-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10"
+          className="bg-white dark:bg-[#002147] rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-white/8"
         >
           {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-100 dark:border-white/10 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-none bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <div className="px-8 py-5 border-b border-slate-100 dark:border-white/8 flex items-center justify-between bg-white dark:bg-[#002147]">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center">
+                <Upload className="w-6 h-6 text-[#4F46E5] dark:text-blue-400" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Upload Certificate</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Add a new credential to your vault</p>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Upload Certificate</h3>
+                <p className="text-xs text-gray-500 dark:text-slate-400">Add a new credential to your vault</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-none transition-colors text-slate-400">
+            <button 
+              onClick={onClose} 
+              type="button"
+              className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-full transition-colors text-slate-400"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[80vh]">
-            <div className="grid md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="p-8">
+            <div className="grid md:grid-cols-2 gap-8">
               {/* Left Column: Form Fields */}
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate Title</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate Title</label>
                   <input
                     required
                     type="text"
@@ -134,12 +138,12 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                     value={formData.title}
                     onChange={handleChange}
                     placeholder="e.g. AWS Solutions Architect"
-                    className="w-full px-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issuing Organization</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issuing Organization</label>
                   <input
                     required
                     type="text"
@@ -147,102 +151,102 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
                     value={formData.issuer}
                     onChange={handleChange}
                     placeholder="e.g. Amazon Web Services"
-                    className="w-full px-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issue Date</label>
+                    <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issue Date</label>
                     <input
                       required
                       type="date"
                       name="issueDate"
                       value={formData.issueDate}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Expiry (Optional)</label>
+                    <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Expiry (Optional)</label>
                     <input
                       type="date"
                       name="expiryDate"
                       value={formData.expiryDate}
                       onChange={handleChange}
-                      className="w-full px-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification URL</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification URL</label>
                   <div className="relative">
-                    <LinkIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="url"
                       name="verificationUrl"
                       value={formData.verificationUrl}
                       onChange={handleChange}
                       placeholder="https://verify.example.com/..."
-                      className="w-full pl-10 pr-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification Code / QR ID</label>
+                  <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification Code / QR ID</label>
                   <div className="relative">
-                    <QrCode className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <QrCode className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                       type="text"
                       name="qrCodeIdentifier"
                       value={formData.qrCodeIdentifier}
                       onChange={handleChange}
                       placeholder="e.g. ABC-123-XYZ"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-none bg-[#F8FAFC] dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                      className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Right Column: File Upload */}
-              <div className="space-y-4">
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate File (PDF/Image)</label>
+              <div className="flex flex-col h-full">
+                <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate File (PDF/Image)</label>
                 <div
                   onDragEnter={handleDrag}
                   onDragLeave={handleDrag}
                   onDragOver={handleDrag}
                   onDrop={handleDrop}
-                  className={`relative h-full min-h-[280px] border-2 border-dashed rounded-none flex flex-col items-center justify-center p-6 transition-all ${
+                  className={`relative flex-1 min-h-[300px] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center p-6 transition-all ${
                     dragActive
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/10"
-                      : "border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-slate-900/50 hover:border-blue-400 dark:hover:border-blue-500/50"
+                      ? "border-[#859DF4] bg-blue-50/50 dark:bg-blue-900/10"
+                      : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#001E3D] hover:border-[#859DF4] dark:hover:border-[#859DF4]/50"
                   }`}
                 >
                   {file ? (
-                    <div className="text-center">
-                      <div className="w-16 h-16 rounded-none bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-3">
-                        <CheckCircle2 className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
+                    <div className="text-center p-4">
+                      <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mx-auto mb-4 border border-emerald-100 dark:border-emerald-800/30">
+                        <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                       </div>
-                      <p className="text-sm font-bold text-slate-900 dark:text-white mb-1 truncate max-w-[200px]">{file.name}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                      <p className="text-sm font-bold text-slate-800 dark:text-white mb-1 truncate max-w-[220px]">{file.name}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500">{(file.size / (1024 * 1024)).toFixed(2)} MB</p>
                       <button
                         type="button"
                         onClick={() => setFile(null)}
-                        className="mt-4 text-xs font-bold text-red-500 hover:text-red-600 transition-colors"
+                        className="mt-5 text-xs font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 dark:bg-red-950/20 px-3 py-1.5 rounded-lg"
                       >
                         Remove File
                       </button>
                     </div>
                   ) : (
-                    <div className="text-center">
-                      <div className="w-16 h-16 rounded-none bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
-                        <Upload className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                    <div className="text-center flex flex-col items-center justify-center h-full">
+                      <div className="w-16 h-16 rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
+                        <Upload className="w-7 h-7 text-[#4F46E5] dark:text-blue-400" />
                       </div>
-                      <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Drag and drop file here</p>
-                      <p className="text-xs text-slate-400 mb-4 font-medium">PDF, JPG, PNG or WEBP (Max 10MB)</p>
-                      <label className="cursor-pointer px-5 py-2 rounded-none bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm">
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">Drag and drop file here</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mb-5 font-medium">PDF, JPG, PNG or WEBP (Max 10MB)</p>
+                      <label className="cursor-pointer px-5 py-2.5 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-xs font-bold text-gray-700 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm">
                         Browse Files
                         <input type="file" className="hidden" accept=".pdf,image/*" onChange={handleFileChange} />
                       </label>
@@ -252,27 +256,28 @@ const UserCertificateUploadModal = ({ isOpen, onClose, onUploadSuccess }) => {
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/10 flex justify-end gap-3">
+            {/* Footer Actions */}
+            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/8 flex justify-end gap-4 bg-white dark:bg-[#002147]">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-none border border-slate-200 dark:border-white/10 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
+                className="px-8 py-3 rounded-xl border border-slate-200 dark:border-white/10 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading || (!file && !formData.title)}
-                className="px-8 py-2.5 rounded-none bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-bold shadow-lg shadow-blue-600/20 transition-all flex items-center gap-2 disabled:opacity-50 disabled:shadow-none"
+                className="px-8 py-3 rounded-xl bg-[#859DF4] hover:bg-[#728BE8] text-white text-sm font-bold shadow-lg shadow-blue-500/10 transition-all flex items-center gap-2 disabled:opacity-50 disabled:shadow-none"
               >
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Uploading...
+                    Saving...
                   </>
                 ) : (
                   <>
-                    <Shield className="w-4 h-4" />
+                    <Shield className="w-4.5 h-4.5" />
                     Save Credential
                   </>
                 )}

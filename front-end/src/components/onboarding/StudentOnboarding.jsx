@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  X, ChevronRight, ChevronLeft, CheckCircle2, 
-  Home, BookOpen, Brain, MessageSquare, User, HelpCircle, 
+import {
+  X, ChevronRight, ChevronLeft, CheckCircle2,
+  Home, BookOpen, Brain, MessageSquare, User, HelpCircle,
   Sparkles, Award, Zap, Wallet, Lightbulb
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ const StudentOnboarding = ({ user }) => {
 
   useEffect(() => {
     if (!user?.email) return;
-    
+
     const hasSeenOnboarding = localStorage.getItem(`hasSeenStudentOnboarding_${user.email}`);
     if (!hasSeenOnboarding) {
       // Small delay if needed, but since it mounts after splash it can show faster
@@ -84,10 +84,10 @@ const StudentOnboarding = ({ user }) => {
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
         <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
-           <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
-             <Home className="w-8 h-8" />
-           </div>
-           <p className="text-sm text-slate-600 text-center">Monitor your 'Level' progression and see exactly which skills are placing you closer to your target career roles.</p>
+          <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
+            <Home className="w-8 h-8" />
+          </div>
+          <p className="text-sm text-slate-600 text-center">Monitor your 'Level' progression and see exactly which skills are placing you closer to your target career roles.</p>
         </div>
       )
     },
@@ -98,10 +98,10 @@ const StudentOnboarding = ({ user }) => {
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
         <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
-           <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
-             <BookOpen className="w-8 h-8" />
-           </div>
-           <p className="text-sm text-slate-600 text-center">Follow the visual career roadmap to ensure you're developing the specific competencies that employers value most today.</p>
+          <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
+            <BookOpen className="w-8 h-8" />
+          </div>
+          <p className="text-sm text-slate-600 text-center">Follow the visual career roadmap to ensure you're developing the specific competencies that employers value most today.</p>
         </div>
       )
     },
@@ -112,10 +112,10 @@ const StudentOnboarding = ({ user }) => {
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
         <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
-           <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
-             <Lightbulb className="w-8 h-8" />
-           </div>
-           <p className="text-sm text-slate-600 text-center">Explore our toolkit to enhance your learning experience with specialized resources designed for your success.</p>
+          <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
+            <Lightbulb className="w-8 h-8" />
+          </div>
+          <p className="text-sm text-slate-600 text-center">Explore our toolkit to enhance your learning experience with specialized resources designed for your success.</p>
         </div>
       )
     },
@@ -126,10 +126,10 @@ const StudentOnboarding = ({ user }) => {
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
         <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
-           <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
-             <User className="w-8 h-8" />
-           </div>
-           <p className="text-sm text-slate-600 text-center">Your profile keeps track of your verified achievements and certifications, ready to be showcased to future employers.</p>
+          <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
+            <User className="w-8 h-8" />
+          </div>
+          <p className="text-sm text-slate-600 text-center">Your profile keeps track of your verified achievements and certifications, ready to be showcased to future employers.</p>
         </div>
       )
     },
@@ -140,10 +140,10 @@ const StudentOnboarding = ({ user }) => {
       color: "from-[#1a3884] to-[#1a3884]",
       content: (
         <div className="bg-[#F8FAFC] p-6 rounded-xl border border-slate-100 flex flex-col items-center gap-4">
-           <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
-             <HelpCircle className="w-8 h-8" />
-           </div>
-           <p className="text-sm text-slate-600 text-center">Reach out to our support team or explore the SMAART Toolkit for a collection of specialized resources to enhance your experience.</p>
+          <div className="p-3 bg-white rounded-lg shadow-md border border-[#1a3884]/10 text-[#1a3884]">
+            <HelpCircle className="w-8 h-8" />
+          </div>
+          <p className="text-sm text-slate-600 text-center">Reach out to our support team or explore the SMAART Toolkit for a collection of specialized resources to enhance your experience.</p>
         </div>
       )
     },
@@ -181,20 +181,20 @@ const StudentOnboarding = ({ user }) => {
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          className="relative w-full max-w-lg bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3),0_0_20px_rgba(192,192,192,0.4)] overflow-hidden border-4 border-[#C0C0C0] ring-1 ring-[#C0C0C0]/50"
+          className="relative w-full max-w-lg max-h-[calc(100vh-2rem)] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3),0_0_20px_rgba(192,192,192,0.4)] overflow-y-auto border-4 border-[#C0C0C0] ring-1 ring-[#C0C0C0]/50"
         >
           {/* Top Progress Bar */}
           <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-100 flex">
             {steps.map((_, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={`h-full transition-all duration-500 ${idx + 1 <= currentStep ? 'bg-[#1a3884]' : 'bg-transparent'}`}
                 style={{ width: `${100 / totalSteps}%` }}
               />
             ))}
           </div>
 
-          <button 
+          <button
             onClick={skipOnboarding}
             className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-20 p-2"
           >
@@ -202,27 +202,27 @@ const StudentOnboarding = ({ user }) => {
           </button>
 
           {/* Header Gradient */}
-          <div className={`h-32 bg-gradient-to-br ${currentData.color} flex items-center justify-center p-6 relative overflow-hidden`}>
-             <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 left-0 w-24 h-24 border-t border-l border-white rounded-tl-3xl" />
-                <div className="absolute bottom-0 right-0 w-24 h-24 border-b border-r border-white rounded-br-3xl" />
-             </div>
-             <motion.div
-               key={currentStep}
-               initial={{ scale: 0.5, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1 }}
-               className="bg-white/20 backdrop-blur-md p-4 rounded-2xl border border-white/30 text-white"
-             >
-               <Icon size={40} />
-             </motion.div>
+          <div className={`h-28 sm:h-32 bg-gradient-to-br ${currentData.color} flex items-center justify-center p-6 relative overflow-hidden`}>
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-24 h-24 border-t border-l border-white rounded-tl-3xl" />
+              <div className="absolute bottom-0 right-0 w-24 h-24 border-b border-r border-white rounded-br-3xl" />
+            </div>
+            <motion.div
+              key={currentStep}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white/20 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-white/30 text-white"
+            >
+              <Icon size={32} className="sm:w-10 sm:h-10" />
+            </motion.div>
           </div>
 
-          <div className="p-8 pt-6">
-            <div className="text-center mb-8">
+          <div className="p-5 sm:p-8 pt-5 sm:pt-6">
+            <div className="text-center mb-5 sm:mb-8">
               <span className="inline-block px-3 py-1 bg-blue-50 text-[#1a3884] text-[10px] font-bold uppercase tracking-widest rounded-full mb-3">
                 Step {currentStep} of {totalSteps}
               </span>
-              <h2 className="text-2xl font-sans font-extrabold text-[#1a3884] mb-3">
+              <h2 className="text-xl sm:text-2xl font-sans font-extrabold text-[#1a3884] mb-2 sm:mb-3">
                 {currentData.title}
               </h2>
               <p className="text-slate-600 leading-relaxed text-sm">
@@ -235,28 +235,27 @@ const StudentOnboarding = ({ user }) => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="mb-10"
+              className="mb-6 sm:mb-10"
             >
               {currentData.content}
             </motion.div>
 
-            <div className="flex flex-col items-center gap-4">
-              <div className="flex items-center gap-3 w-full">
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-3 w-full">
                 {currentStep > 1 && (
                   <Button
                     onClick={handlePrev}
                     variant="outline"
                     className="flex-1 h-12 rounded-xl border-slate-200 text-slate-600 font-bold hover:bg-[#F8FAFC]"
                   >
-                    <ChevronLeft size={18} className="mr-2" /> Previous
+                    <ChevronLeft size={18} className="mr-1 sm:mr-2" /> Previous
                   </Button>
                 )}
-                
+
                 <Button
                   onClick={handleNext}
-                  className={`flex-[2] h-12 rounded-xl font-bold shadow-lg transition-transform active:scale-95 ${
-                    currentStep === totalSteps ? 'bg-[#1a3884] hover:bg-[#2349a8]' : 'bg-[#1a3884] hover:bg-[#2349a8]'
-                  }`}
+                  className={`flex-[2] h-11 sm:h-12 rounded-xl font-bold shadow-lg transition-transform active:scale-95 text-sm sm:text-base ${currentStep === totalSteps ? 'bg-[#1a3884] hover:bg-[#2349a8]' : 'bg-[#1a3884] hover:bg-[#2349a8]'
+                    }`}
                 >
                   {currentStep === totalSteps ? (
                     <>Get Started <CheckCircle2 size={18} className="ml-2" /></>
@@ -266,7 +265,7 @@ const StudentOnboarding = ({ user }) => {
                 </Button>
               </div>
 
-              <button 
+              <button
                 onClick={skipOnboarding}
                 className="text-xs font-bold text-slate-400 hover:text-[#1a3884] transition-colors"
               >
@@ -278,11 +277,10 @@ const StudentOnboarding = ({ user }) => {
           {/* Dots Indicator */}
           <div className="flex justify-center gap-1.5 pb-6">
             {steps.map((_, idx) => (
-              <div 
+              <div
                 key={idx}
-                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                  idx + 1 === currentStep ? 'w-4 bg-[#1a3884]' : 'bg-slate-200'
-                }`}
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx + 1 === currentStep ? 'w-4 bg-[#1a3884]' : 'bg-slate-200'
+                  }`}
               />
             ))}
           </div>

@@ -350,6 +350,7 @@ const getSearchResults = (query) => {
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isCareerAgentDashboard = location.pathname === '/dashboard/career-agent/dashboard';
   const { t, i18n } = useTranslation();
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
   const { theme, setTheme } = useTheme();
@@ -580,15 +581,17 @@ const DashboardLayout = () => {
       />
 
       {/* Left Sidebar */}
-      <LeftSidebar />
+      {!isCareerAgentDashboard && <LeftSidebar />}
 
       {/* Main Content Area */}
       <main
-        className={`transition-all duration-300 min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] ${isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]'
-          }`}
+        className={`transition-all duration-300 min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] ${
+          isCareerAgentDashboard ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]')
+        }`}
       >
         {/* Top Header Bar - Premium AI SaaS Style */}
-        <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#002147]/90 backdrop-blur-xl border-none sm:border-b border-slate-200/30 dark:border-[#1a3884]/20 shadow-[0_1px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.30)] transition-colors duration-300">
+        {!isCareerAgentDashboard && (
+          <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#002147]/90 backdrop-blur-xl border-none sm:border-b border-slate-200/30 dark:border-[#1a3884]/20 shadow-[0_1px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.30)] transition-colors duration-300">
           <div className="flex items-center justify-between px-4 md:px-8 h-[70px] max-w-[1600px] mx-auto">
 
             {/* LEFT SECTION: Menu Toggle (Mobile) + Page Title & Breadcrumb */}
@@ -995,14 +998,15 @@ const DashboardLayout = () => {
             </div>
           </div>
         </header>
+        )}
 
         {/* Page Content */}
-        <div className="p-4 sm:p-6 lg:p-8">
+        <div className={isCareerAgentDashboard ? "p-0" : "p-4 sm:p-6 lg:p-8"}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="max-w-[1600px] mx-auto"
+            className={isCareerAgentDashboard ? "w-full" : "max-w-[1600px] mx-auto"}
           >
             <Outlet />
           </motion.div>

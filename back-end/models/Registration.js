@@ -163,6 +163,10 @@ const registrationSchema = new mongoose.Schema({
     certificateFile: String, // file path
     link: String,
     yearOfCompletion: String,
+    issueDate: Date,
+    expiryDate: Date,
+    verificationUrl: String,
+    qrCodeIdentifier: String,
   }],
 
   // Legacy fields for backward compatibility

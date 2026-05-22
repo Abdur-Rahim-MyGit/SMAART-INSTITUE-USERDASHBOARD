@@ -313,46 +313,35 @@ const NoticesFeed = ({ currentUser }) => {
                     )}
                     {ann.createdByRole === "admin" ? "SMAART" : "College"}
                   </span>
-                  {/* {ann.targetType === "all" && (
-                    <span className="px-2.5 py-1 bg-green-50 text-green-700 text-[10px] font-bold rounded-full">
-                      🎓 All Students
-                    </span>
-                  )}
-                  {ann.targetType === "college" &&
-                    ann.targetCollegeIds?.length > 0 && (
-                      <span className="px-3 py-1.5 bg-blue-50/50 text-blue-700 text-[10px] font-black rounded-xl border border-blue-100 uppercase tracking-widest">
-                        🏫 {ann.targetCollegeIds.map((c) => c.collegeName || "College").join(", ")}
-                      </span>
-                    )} */}
                 </div>
 
                 {/* ── Title ─────────────────────────────────────────────── */}
-                <h3 className="text-[#002147] dark:text-white text-lg font-extrabold mb-2 tracking-tight">
+                <h3 className="text-[#002147] dark:text-white text-base sm:text-lg font-extrabold mb-2 tracking-tight">
                   {ann.title}
                 </h3>
 
                 {/* ── Description ───────────────────────────────────────── */}
-                <p className="text-gray-600 dark:text-slate-400 text-sm leading-relaxed font-medium whitespace-pre-line mb-6">
+                <p className="text-gray-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed font-medium whitespace-pre-line mb-4 sm:mb-6">
                   {ann.description}
                 </p>
 
                 {/* ── Attachment link/preview ───────────────────────────────────── */}
                 {ann.attachmentUrl && (
-                  <div className="flex mb-6">
+                  <div className="flex mb-4 sm:mb-6">
                     {ann.attachmentType === 'video' || ann.attachmentUrl.match(/\.(mp4|webm|ogg)$/i) ? (
                       <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-white/10 w-full max-w-2xl bg-black">
-                        <video 
-                          src={ann.attachmentUrl} 
+                        <video
+                          src={ann.attachmentUrl}
                           controls
-                          className="w-full h-auto max-h-[400px]" 
+                          className="w-full h-auto max-h-[400px]"
                         />
                       </div>
                     ) : ann.attachmentType === 'image' || ann.attachmentUrl.match(/\.(jpeg|jpg|gif|png|webp)$/i) ? (
                       <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-white/10 w-full max-w-2xl bg-[#F8FAFC] dark:bg-[#002A5C]">
-                        <img 
-                          src={ann.attachmentUrl} 
-                          alt="Announcement Attachment" 
-                          className="w-full h-auto object-cover max-h-[400px]" 
+                        <img
+                          src={ann.attachmentUrl}
+                          alt="Announcement Attachment"
+                          className="w-full h-auto object-cover max-h-[400px]"
                         />
                       </div>
                     ) : (
@@ -371,14 +360,12 @@ const NoticesFeed = ({ currentUser }) => {
                   </div>
                 )}
 
-
-
                 {/* ── Footer: creator + time + expiry ───────────────────── */}
-                <div className="flex items-center justify-between gap-2 text-[11px] text-gray-400 font-medium pt-3 border-t border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 text-[10px] sm:text-[11px] text-gray-400 font-medium pt-3 border-t border-gray-100 dark:border-slate-700/50">
                   {/* ── Action Row: Reactions ──────────────────────────────── */}
                   <div className="flex flex-wrap items-center gap-2">
                     {/* Reaction counts */}
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1">
                       {["👍", "❤️", "🔥", "😂", "🙌"].map((emoji) => {
                         const count = ann.reactions?.filter(r => r.emoji === emoji).length || 0;
                         const hasReacted = ann.reactions?.some(r => r.userId?.toString() === currentUser?._id?.toString() && r.emoji === emoji);
@@ -389,7 +376,7 @@ const NoticesFeed = ({ currentUser }) => {
                           <button
                             key={emoji}
                             onClick={() => handleReact(ann._id, emoji)}
-                            className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold transition-all ${hasReacted
+                            className={`flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold transition-all ${hasReacted
                               ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800"
                               : "bg-gray-100 dark:bg-[#003170] text-gray-600 dark:text-slate-400 border border-transparent hover:bg-gray-200 dark:hover:bg-slate-600"
                               }`}
@@ -417,7 +404,7 @@ const NoticesFeed = ({ currentUser }) => {
                               }`}
                             title="React"
                           >
-                            <Heart className="w-5 h-5 cursor-pointer text-black dark:text-white hover:text-red-500" />
+                            <Heart className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer text-black dark:text-white hover:text-red-500" />
                           </button>
                         );
                       })()}
@@ -449,8 +436,8 @@ const NoticesFeed = ({ currentUser }) => {
                       </AnimatePresence>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-[#002147]/10 dark:bg-blue-900/20 flex items-center justify-center text-[10px] font-bold text-[#002147] dark:text-blue-300 flex-shrink-0">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#002147]/10 dark:bg-blue-900/20 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-[#002147] dark:text-blue-300 flex-shrink-0">
                       {(ann.createdById?.fullName || "A")
                         .charAt(0)
                         .toUpperCase()}
@@ -458,11 +445,11 @@ const NoticesFeed = ({ currentUser }) => {
                     <span className="text-gray-500 dark:text-slate-300 font-semibold">
                       {ann.createdById?.fullName || "Admin"}
                     </span>
-                    <span className="text-gray-300 dark:text-slate-700">•</span>
+                    <span className="text-gray-305 dark:text-slate-700">•</span>
                     <span>{timeAgo(ann.createdAt)}</span>
                     {ann.expiryDate && (
                       <>
-                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-305 dark:text-slate-700">•</span>
                         <span
                           className={`flex items-center gap-1 ${isExpired ? "text-gray-400" : "text-orange-500"
                             }`}

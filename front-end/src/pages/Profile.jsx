@@ -25,7 +25,12 @@ import {
   Rocket,
   Trash2,
   Trash,
-  MapPinHouse
+  MapPinHouse,
+  Upload,
+  Shield,
+  QrCode,
+  CheckCircle2,
+  Link as LinkIcon
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -99,6 +104,191 @@ const Profile = () => {
   const [activeEditSection, setActiveEditSection] = useState(null); // e.g., 'personal', 'address', 'education', etc.
   const [editFormData, setEditFormData] = useState({});
   const [showSectionModal, setShowSectionModal] = useState(false);
+
+  // Certificate Specific Modal State
+  const [showCertModal, setShowCertModal] = useState(false);
+  const [editingCertIndex, setEditingCertIndex] = useState(null);
+  const [certFormData, setCertFormData] = useState({
+    title: "",
+    issuer: "",
+    issueDate: "",
+    expiryDate: "",
+    verificationUrl: "",
+    qrCodeIdentifier: "",
+    certificateFile: "",
+  });
+  const [certDragActive, setCertDragActive] = useState(false);
+  const [uploadingCertFile, setUploadingCertFile] = useState(false);
+
+  const handleOpenCertificateModal = (index = null) => {
+    if (index !== null) {
+      setEditingCertIndex(index);
+      const cert = formData.certificates[index];
+      setCertFormData({
+        title: cert.title || "",
+        issuer: cert.issuer || cert.issuingOrg || "",
+        issueDate: cert.issueDate ? new Date(cert.issueDate).toISOString().split('T')[0] : "",
+        expiryDate: cert.expiryDate ? new Date(cert.expiryDate).toISOString().split('T')[0] : "",
+        verificationUrl: cert.verificationUrl || cert.link || "",
+        qrCodeIdentifier: cert.qrCodeIdentifier || cert.id || "",
+        certificateFile: cert.certificateFile || cert.link || "",
+      });
+    } else {
+      setEditingCertIndex(null);
+      setCertFormData({
+        title: "",
+        issuer: "",
+        issueDate: "",
+        expiryDate: "",
+        verificationUrl: "",
+        qrCodeIdentifier: "",
+        certificateFile: "",
+      });
+    }
+    setShowCertModal(true);
+  };
+
+  const handleSaveCertificate = async (e) => {
+    if (e) e.preventDefault();
+    if (!certFormData.title) {
+      toast.error("Certificate Title is required");
+      return;
+    }
+
+    setSavingProfile(true);
+    try {
+      const updatedCerts = [...formData.certificates];
+      const certPayload = {
+        id: certFormData.qrCodeIdentifier || Math.random().toString(36).substr(2, 9),
+        title: certFormData.title,
+        issuer: certFormData.issuer,
+        issuingOrg: certFormData.issuer,
+        issueDate: certFormData.issueDate,
+        expiryDate: certFormData.expiryDate,
+        verificationUrl: certFormData.verificationUrl,
+        link: certFormData.verificationUrl || certFormData.certificateFile,
+        qrCodeIdentifier: certFormData.qrCodeIdentifier,
+        certificateFile: certFormData.certificateFile,
+      };
+
+      if (editingCertIndex !== null) {
+        updatedCerts[editingCertIndex] = certPayload;
+      } else {
+        updatedCerts.push(certPayload);
+      }
+
+      const response = await fetch(`${API_BASE_URL}/users/register-section`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          section: 'certificates',
+          data: updatedCerts
+        })
+      });
+
+      if (response.ok) {
+        toast.success(editingCertIndex !== null ? "Certificate updated successfully" : "Certificate added successfully");
+        await refreshUser();
+        setShowCertModal(false);
+      } else {
+        const err = await response.json();
+        toast.error(err.message || "Failed to save certificate");
+      }
+    } catch (error) {
+      console.error('Error saving certificate:', error);
+      toast.error('Connection error. Please try again.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleDeleteCertificate = async (index) => {
+    if (!window.confirm("Are you sure you want to remove this certificate?")) return;
+
+    setSavingProfile(true);
+    try {
+      const updatedCerts = formData.certificates.filter((_, idx) => idx !== index);
+
+      const response = await fetch(`${API_BASE_URL}/users/register-section`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          section: 'certificates',
+          data: updatedCerts
+        })
+      });
+
+      if (response.ok) {
+        toast.success("Certificate removed successfully");
+        await refreshUser();
+      } else {
+        const err = await response.json();
+        toast.error(err.message || "Failed to delete certificate");
+      }
+    } catch (error) {
+      console.error('Error deleting certificate:', error);
+      toast.error('Connection error. Please try again.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleCertDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setCertDragActive(true);
+    } else if (e.type === "dragleave") {
+      setCertDragActive(false);
+    }
+  };
+
+  const handleCertDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCertDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      await handleCertFileUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleCertFileSelect = async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      await handleCertFileUpload(e.target.files[0]);
+    }
+  };
+
+  const handleCertFileUpload = async (file) => {
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size should be less than 10MB');
+      return;
+    }
+
+    setUploadingCertFile(true);
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload`, {
+        method: 'POST',
+        body: formDataUpload
+      });
+      const data = await response.json();
+      if (data.url) {
+        setCertFormData(prev => ({ ...prev, certificateFile: data.url }));
+        toast.success('Certificate file uploaded successfully');
+      } else {
+        toast.error('Failed to upload file');
+      }
+    } catch (error) {
+      console.error('Error uploading certificate file:', error);
+      toast.error('Failed to upload file');
+    } finally {
+      setUploadingCertFile(false);
+    }
+  };
 
   // Force refresh user details on mount to get latest badges/progress
   useEffect(() => {
@@ -674,8 +864,6 @@ const Profile = () => {
                         )}
                       </div>
                     </div>
-
-                    {/* Certificates */}
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
                       <div className="flex items-center justify-between gap-3 mb-6">
                         <div className="flex items-center gap-3">
@@ -685,20 +873,50 @@ const Profile = () => {
                           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Certifications</h3>
                         </div>
                         <button
-                          onClick={() => handleOpenEditModal('certificates', formData.certificates)}
-                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          onClick={() => handleOpenCertificateModal()}
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-[#859DF4] px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          Edit <Edit2 className="w-4 h-4" />
+                          Add <Plus className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {formData.certificates && formData.certificates.length > 0 ? (
                           formData.certificates.map((cert, idx) => (
-                            <div key={idx} className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
-                              <h4 className="font-bold text-gray-900 dark:text-white text-sm">{cert.title}</h4>
-                              <p className="text-[10px] text-gray-500 mt-1">{cert.issuer}</p>
-                              {cert.link && (
-                                <a href={getPreviewUrl(cert.link)} target="_blank" rel="noopener noreferrer" className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold mt-2 inline-block">
+                            <div key={idx} className="p-5 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8 relative group transition-all hover:shadow-sm">
+                              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={() => handleOpenCertificateModal(idx)}
+                                  className="p-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:scale-105 transition-transform"
+                                  title="Edit Certificate"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteCertificate(idx)}
+                                  className="p-1.5 bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400 rounded-lg hover:scale-105 transition-transform"
+                                  title="Delete Certificate"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                              <h4 className="font-bold text-gray-900 dark:text-white text-sm pr-12 truncate">{cert.title}</h4>
+                              <p className="text-xs text-gray-500 mt-1">{cert.issuer || cert.issuingOrg}</p>
+                              
+                              <div className="mt-3 flex flex-wrap gap-2 text-[10px] text-gray-400">
+                                {cert.issueDate && (
+                                  <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                                    Issued: {new Date(cert.issueDate).toLocaleDateString()}
+                                  </span>
+                                )}
+                                {cert.qrCodeIdentifier && (
+                                  <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                                    ID: {cert.qrCodeIdentifier}
+                                  </span>
+                                )}
+                              </div>
+
+                              {(cert.certificateFile || cert.link) && (
+                                <a href={getPreviewUrl(cert.certificateFile || cert.link)} target="_blank" rel="noopener noreferrer" className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-3 inline-block hover:underline">
                                   View Certificate
                                 </a>
                               )}
@@ -941,7 +1159,7 @@ const Profile = () => {
                             <ModalTextarea label="Long Term Goal" value={editFormData.longTerm} onChange={(val) => setEditFormData({ ...editFormData, longTerm: val })} />
                           </div>
                         )}
-                        {['higherEducation', 'workExperience', 'projects', 'certificates', 'jobPreferences', 'extracurricular'].includes(activeEditSection) && (
+                        {['higherEducation', 'workExperience', 'projects', 'jobPreferences', 'extracurricular'].includes(activeEditSection) && (
                           <div className="space-y-8">
                             {Array.isArray(editFormData) && editFormData.map((item, idx) => (
                               <div key={idx} className="p-6 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-3xl border border-gray-100 dark:border-white/10 relative">
@@ -975,13 +1193,6 @@ const Profile = () => {
                                       <div className="md:col-span-2"><ModalTextarea label="Description" value={item.description} onChange={(v) => { const n = [...editFormData]; n[idx].description = v; setEditFormData(n); }} /></div>
                                     </>
                                   )}
-                                  {activeEditSection === 'certificates' && (
-                                    <>
-                                      <ModalInput label="Certificate Title" value={item.title} onChange={(v) => { const n = [...editFormData]; n[idx].title = v; setEditFormData(n); }} />
-                                      <ModalInput label="Issuer" value={item.issuer || item.issuingOrg} onChange={(v) => { const n = [...editFormData]; n[idx].issuer = v; setEditFormData(n); }} />
-                                      <ModalInput label="Link" value={item.link || item.verificationUrl} onChange={(v) => { const n = [...editFormData]; n[idx].link = v; setEditFormData(n); }} />
-                                    </>
-                                  )}
                                   {activeEditSection === 'extracurricular' && (
                                     <>
                                       <ModalInput label="Activity Type" value={typeof item === 'string' ? item : item.activityType} onChange={(v) => { const n = [...editFormData]; n[idx] = typeof item === 'string' ? v : { ...item, activityType: v }; setEditFormData(n); }} />
@@ -1004,9 +1215,8 @@ const Profile = () => {
                                 const newItem = activeEditSection === 'extracurricular' ? { activityType: "", level: "", description: "" }
                                   : activeEditSection === 'workExperience' ? { companyName: "", role: "", duration: "", description: "" }
                                     : activeEditSection === 'projects' ? { title: "", link: "", description: "" }
-                                      : activeEditSection === 'certificates' ? { title: "", issuer: "", link: "" }
-                                        : activeEditSection === 'jobPreferences' ? { preferredRole: "", preferredLocation: "", jobType: "" }
-                                          : { institutionName: "", degreeFullName: "", yearOfPassing: "", cgpaPercentage: "" };
+                                      : activeEditSection === 'jobPreferences' ? { preferredRole: "", preferredLocation: "", jobType: "" }
+                                        : { institutionName: "", degreeFullName: "", yearOfPassing: "", cgpaPercentage: "" };
                                 setEditFormData([...(Array.isArray(editFormData) ? editFormData : []), newItem]);
                               }}
                               className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-white/8 rounded-[24px] text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all flex items-center justify-center gap-2 font-bold"
@@ -1022,6 +1232,205 @@ const Profile = () => {
                       </div>
                     </motion.div>
                   </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Premium Certificate Upload Modal */}
+              <AnimatePresence>
+                {showCertModal && (
+                  <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                      className="bg-white dark:bg-[#002147] rounded-[32px] w-full max-w-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-white/8"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {/* Header */}
+                      <div className="px-8 py-5 border-b border-slate-100 dark:border-white/8 flex items-center justify-between bg-white dark:bg-[#002147]">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center">
+                            <Upload className="w-6 h-6 text-[#859DF4] dark:text-blue-400" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                              {editingCertIndex !== null ? "Edit Certificate" : "Upload Certificate"}
+                            </h3>
+                            <p className="text-xs text-gray-500 dark:text-slate-400">Add a new credential to your vault</p>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => setShowCertModal(false)} 
+                          type="button"
+                          className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-full transition-colors text-slate-400"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSaveCertificate} className="p-8">
+                        <div className="grid md:grid-cols-2 gap-8">
+                          {/* Left Column: Form Fields */}
+                          <div className="space-y-5">
+                            <div>
+                              <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate Title</label>
+                              <input
+                                required
+                                type="text"
+                                value={certFormData.title}
+                                onChange={(e) => setCertFormData({ ...certFormData, title: e.target.value })}
+                                placeholder="e.g. AWS Solutions Architect"
+                                className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issuing Organization</label>
+                              <input
+                                required
+                                type="text"
+                                value={certFormData.issuer}
+                                onChange={(e) => setCertFormData({ ...certFormData, issuer: e.target.value })}
+                                placeholder="e.g. Amazon Web Services"
+                                className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                              />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issue Date</label>
+                                <input
+                                  required
+                                  type="date"
+                                  value={certFormData.issueDate}
+                                  onChange={(e) => setCertFormData({ ...certFormData, issueDate: e.target.value })}
+                                  className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Expiry (Optional)</label>
+                                <input
+                                  type="date"
+                                  value={certFormData.expiryDate}
+                                  onChange={(e) => setCertFormData({ ...certFormData, expiryDate: e.target.value })}
+                                  className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification URL</label>
+                              <div className="relative">
+                                <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input
+                                  type="url"
+                                  value={certFormData.verificationUrl}
+                                  onChange={(e) => setCertFormData({ ...certFormData, verificationUrl: e.target.value })}
+                                  placeholder="https://verify.example.com/..."
+                                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification Code / QR ID</label>
+                              <div className="relative">
+                                <QrCode className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input
+                                  type="text"
+                                  value={certFormData.qrCodeIdentifier}
+                                  onChange={(e) => setCertFormData({ ...certFormData, qrCodeIdentifier: e.target.value })}
+                                  placeholder="e.g. ABC-123-XYZ"
+                                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right Column: File Upload */}
+                          <div className="flex flex-col h-full">
+                            <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate File (PDF/Image)</label>
+                            <div
+                              onDragEnter={handleCertDrag}
+                              onDragLeave={handleCertDrag}
+                              onDragOver={handleCertDrag}
+                              onDrop={handleCertDrop}
+                              className={`relative flex-1 min-h-[300px] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center p-6 transition-all ${
+                                certDragActive
+                                  ? "border-[#859DF4] bg-blue-50/50 dark:bg-blue-900/10"
+                                  : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#001E3D] hover:border-[#859DF4] dark:hover:border-[#859DF4]/50"
+                              }`}
+                            >
+                              {certFormData.certificateFile ? (
+                                <div className="text-center p-4">
+                                  <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mx-auto mb-4 border border-emerald-100 dark:border-emerald-800/30">
+                                    <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                                  </div>
+                                  <p className="text-sm font-bold text-slate-800 dark:text-white mb-1 truncate max-w-[220px]">
+                                    {certFormData.certificateFile.split('/').pop()}
+                                  </p>
+                                  <p className="text-xs text-slate-400 dark:text-slate-500">File attached successfully</p>
+                                  <button
+                                    type="button"
+                                    onClick={() => setCertFormData({ ...certFormData, certificateFile: "" })}
+                                    className="mt-5 text-xs font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 dark:bg-red-950/20 px-3 py-1.5 rounded-lg"
+                                  >
+                                    Remove File
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="text-center flex flex-col items-center justify-center h-full">
+                                  <div className="w-16 h-16 rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
+                                    {uploadingCertFile ? (
+                                      <Loader2 className="w-7 h-7 text-[#859DF4] animate-spin" />
+                                    ) : (
+                                      <Upload className="w-7 h-7 text-[#859DF4] dark:text-blue-400" />
+                                    )}
+                                  </div>
+                                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">
+                                    {uploadingCertFile ? "Uploading certificate..." : "Drag and drop file here"}
+                                  </p>
+                                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-5 font-medium">PDF, JPG, PNG or WEBP (Max 10MB)</p>
+                                  <label className="cursor-pointer px-5 py-2.5 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-xs font-bold text-gray-700 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm">
+                                    Browse Files
+                                    <input type="file" className="hidden" accept=".pdf,image/*" onChange={handleCertFileSelect} disabled={uploadingCertFile} />
+                                  </label>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Footer Actions */}
+                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/8 flex justify-end gap-4 bg-white dark:bg-[#002147]">
+                          <button
+                            type="button"
+                            onClick={() => setShowCertModal(false)}
+                            className="px-8 py-3 rounded-xl border border-slate-200 dark:border-white/10 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={uploadingCertFile || (!certFormData.title)}
+                            className="px-8 py-3 rounded-xl bg-[#859DF4] hover:bg-[#728BE8] text-white text-sm font-bold shadow-lg shadow-blue-500/10 transition-all flex items-center gap-2 disabled:opacity-50 disabled:shadow-none"
+                          >
+                            {savingProfile ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Shield className="w-4.5 h-4.5" />
+                                Save Credential
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </form>
+                    </motion.div>
+                  </div>
                 )}
               </AnimatePresence>
             </main>

@@ -21,7 +21,7 @@ const CollegeBanners = () => {
         setLoading(false);
         return;
       }
-      
+
       try {
         console.log('[CollegeBanners] Fetching banners for college:', collegeId);
         const response = await apiCall(`/colleges/${collegeId}/banners`);
@@ -84,11 +84,11 @@ const CollegeBanners = () => {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-4 sm:p-6 lg:p-8">
-                <motion.h2 
+                <motion.h2
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="text-white text-lg sm:text-2xl font-bold font-sans max-w-4xl leading-snug drop-shadow-md pr-12"
+                  className="text-white text-sm sm:text-lg md:text-2xl font-bold font-sans max-w-4xl leading-snug drop-shadow-md pr-4 sm:pr-12"
                 >
                   {banners[currentIndex].message}
                 </motion.h2>
@@ -110,15 +110,14 @@ const CollegeBanners = () => {
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
-              
+
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-50">
                 {banners.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentIndex(idx)}
-                    className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
-                      idx === currentIndex ? 'bg-white w-4 sm:w-6' : 'bg-white/50 hover:bg-white/80'
-                    }`}
+                    className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-white w-4 sm:w-6' : 'bg-white/50 hover:bg-white/80'
+                      }`}
                   />
                 ))}
               </div>

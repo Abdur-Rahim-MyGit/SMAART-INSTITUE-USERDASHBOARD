@@ -61,7 +61,7 @@ const dynamicStorage = new CloudinaryStorage({
 const fileFilter = (req, file, cb) => {
   // Allowed file types
   const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'image/jpg', 'image/webp', 'video/mp4', 'video/mpeg', 'video/quicktime', 'video/x-msvideo'];
-  
+
   // SECURITY: Strict extension check to prevent MIME spoofing
   const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.webp', '.mp4', '.mpeg', '.mov', '.avi'];
   const ext = path.extname(file.originalname).toLowerCase();
@@ -155,7 +155,7 @@ const registrationStorage = new CloudinaryStorage({
 // File filter for registration (includes PDFs)
 const registrationFileFilter = (req, file, cb) => {
   const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'image/jpg', 'image/webp'];
-  
+
   // SECURITY: Strict extension check to prevent MIME spoofing
   const allowedExts = ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.webp'];
   const ext = path.extname(file.originalname).toLowerCase();

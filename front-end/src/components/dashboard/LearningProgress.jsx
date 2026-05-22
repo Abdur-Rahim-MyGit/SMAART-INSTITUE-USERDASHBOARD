@@ -9,10 +9,10 @@ import PathCard from "./PathCard";
 const LearningProgress = memo(({ paths, loading, error }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const averageProgress = useMemo(() => 
-    paths.length > 0 
-      ? Math.round(paths.reduce((acc, p) => acc + p.progress, 0) / paths.length) 
-      : 0, 
+  const averageProgress = useMemo(() =>
+    paths.length > 0
+      ? Math.round(paths.reduce((acc, p) => acc + p.progress, 0) / paths.length)
+      : 0,
     [paths]
   );
 
@@ -37,25 +37,25 @@ const LearningProgress = memo(({ paths, loading, error }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-8 w-full md:w-auto">
-          <div className="flex-1 md:w-48 lg:w-72">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 w-full md:w-auto">
+          <div className="w-full sm:w-48 md:w-56 lg:w-72">
             <div className="flex justify-between items-center mb-2">
               <span className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">Overall Progress</span>
               <span className="text-[13px] font-extrabold text-[#1a3884] dark:text-blue-400">{averageProgress}%</span>
             </div>
             <div className="h-2 w-full bg-[#F8FAFC] dark:bg-[#002A5C] rounded-full overflow-hidden border border-gray-100/50 dark:border-slate-700/50">
-              <div 
+              <div
                 className="h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(59,130,246,0.3)]"
                 style={{ width: `${averageProgress}%`, background: "linear-gradient(90deg, #112b6b 0%, #1a3884 100%)" }}
               ></div>
             </div>
           </div>
-          
-          <button 
+
+          <button
             onClick={() => navigate('/dashboard/courses')}
             className="relative h-12 px-8 bg-[#112b6b] dark:bg-[#1a3884] hover:bg-[#1a3884] dark:hover:bg-[#1a3884] text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-lg shadow-[#112b6b]/20 dark:shadow-blue-900/30 hover:-translate-y-1 active:translate-y-0 whitespace-nowrap overflow-hidden group"
           >
-            <div className="relative z-10 flex items-center gap-2">
+            <div className="relative z-10 flex items-center justify-center gap-2">
               {t("dashboard.continue_learning")}
               <motion.span animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>→</motion.span>
             </div>
@@ -66,7 +66,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
       {/* Path Cards Grid */}
       <div className="p-4 bg-slate-50/30 dark:bg-slate-800/10">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="bg-white dark:bg-[#002147] border border-slate-200/80 dark:border-[#1a3884]/20 rounded-xl p-5 shadow-sm">
                 <div className="flex items-start gap-3 mb-3">
@@ -83,7 +83,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
         ) : error ? (
           <div className="text-center py-8">
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t("dashboard.unable_to_load_paths")}</p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="text-sm dark:text-blue-400 font-semibold hover:underline"
               style={{ color: COLORS.PRIMARY }}
@@ -108,7 +108,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {paths.map((path) => (
               <PathCard key={path.id} path={path} />
             ))}
