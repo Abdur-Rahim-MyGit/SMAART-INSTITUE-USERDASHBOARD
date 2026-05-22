@@ -633,14 +633,14 @@ const styles = {
         bottom: '100%',
         right: '0',
         transform: 'translateY(-8px)',
-        background: 'rgba(10, 15, 30, 0.95)',
+        background: 'var(--navy2)',
         backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '6px',
-        padding: '0.6rem',
-        width: '150px',
+        border: '1px solid var(--border)',
+        borderRadius: '8px',
+        padding: '0.65rem 0.75rem',
+        width: '170px',
         zIndex: 100,
-        boxShadow: '0 8px 20px rgba(0,0,0,0.6)',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
         animation: 'fadeInUp 0.2s ease forwards',
         pointerEvents: 'none'
     },
@@ -651,7 +651,7 @@ const styles = {
         textTransform: 'uppercase',
         letterSpacing: '0.05em',
         marginBottom: '0.4rem',
-        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        borderBottom: '1px solid var(--border)',
         paddingBottom: '0.3rem'
     },
     tooltipList: {
@@ -672,7 +672,7 @@ const styles = {
         height: '0',
         borderLeft: '6px solid transparent',
         borderRight: '6px solid transparent',
-        borderTop: '6px solid rgba(10, 15, 30, 0.95)'
+        borderTop: '6px solid var(--navy2)'
     }
 };
 
