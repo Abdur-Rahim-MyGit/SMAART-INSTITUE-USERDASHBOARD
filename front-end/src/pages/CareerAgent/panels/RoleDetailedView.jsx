@@ -193,7 +193,7 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                 </div>
             ) : roleProfile ? (
                 <>
-                    {/* ── 4-section grid ── */}
+                    {/* ── 2-section grid (What This Role Does + Who Should Consider) ── */}
                     <div className="rdv-box-grid">
 
                         {/* BOX 1 – What This Role Actually Does */}
@@ -227,32 +227,7 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                             )}
                         </div>
 
-                        {/* BOX 2 – How AI Is Changing This Role */}
-                        <div style={{ ...styles.box, ...styles.boxAccent }}>
-                            <div style={styles.boxHeader}>
-                                <span style={styles.boxIconWrap}>💹</span>
-                                <div style={styles.boxTitle}>How AI Is Changing This Role</div>
-                            </div>
-                            <div style={styles.boxDivider} />
-                            {roleProfile.howAiChanging ? (
-                                <p style={styles.boxText}>{roleProfile.howAiChanging}</p>
-                            ) : (
-                                <p style={styles.missingText}>AI evolution narrative not available for this role.</p>
-                            )}
-
-                            {/* AI Exposure badge */}
-                            {roleProfile.aiExposureLevel && (
-                                <div style={styles.aiBadge}>
-                                    <span style={styles.aiBadgeDot} />
-                                    <span style={styles.aiBadgeText}>
-                                        AI Exposure: {roleProfile.aiExposureLevel}
-                                        {roleProfile.aiExposurePct > 0 && ` (${roleProfile.aiExposurePct}%)`}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* BOX 3 – Who Should Consider This Role */}
+                        {/* BOX 2 – Who Should Consider This Role */}
                         <div style={styles.box}>
                             <div style={styles.boxHeader}>
                                 <span style={styles.boxIconWrap}>🧑‍💼</span>
@@ -263,32 +238,6 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                                 <p style={styles.boxText}>{roleProfile.whoShouldConsider}</p>
                             ) : (
                                 <p style={styles.missingText}>Suitability narrative not available for this role.</p>
-                            )}
-                        </div>
-
-                        {/* BOX 4 – Career Growth Path */}
-                        <div style={{ ...styles.box, ...styles.boxGrowth }}>
-                            <div style={styles.boxHeader}>
-                                <span style={styles.boxIconWrap}>📈</span>
-                                <div style={styles.boxTitle}>Career Growth Path</div>
-                            </div>
-                            <div style={styles.boxDivider} />
-                            {roleProfile.careerGrowthPath ? (
-                                <p style={styles.boxText}>{roleProfile.careerGrowthPath}</p>
-                            ) : (
-                                <p style={styles.missingText}>
-                                    Career growth path data is not yet available for this role in the database.
-                                </p>
-                            )}
-
-                            {/* Human value tasks */}
-                            {roleProfile.humanValueTasks && (
-                                <div style={styles.humanValueBox}>
-                                    <div style={styles.humanValueLabel}>🧠 What AI Cannot Replace</div>
-                                    <p style={{ ...styles.boxText, marginTop: '0.4rem', fontSize: '0.82rem' }}>
-                                        {roleProfile.humanValueTasks}
-                                    </p>
-                                </div>
                             )}
                         </div>
                     </div>
