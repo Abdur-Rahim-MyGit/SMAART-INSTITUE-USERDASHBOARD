@@ -253,7 +253,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                 </div>
 
                 {/* OTP Form */}
-                <div className="px-10 py-10 overflow-y-auto custom-scrollbar">
+                <div className="px-5 sm:px-10 py-6 sm:py-10 overflow-y-auto custom-scrollbar">
                   <div
                     role="status"
                     aria-live="polite"
@@ -267,7 +267,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                     <div
                       role="group"
                       aria-label="One-time password input"
-                      className="flex justify-center gap-3"
+                      className="flex justify-center gap-1.5 sm:gap-3"
                       onPaste={handlePaste}
                     >
                       {otp.map((digit, index) => (
@@ -282,7 +282,7 @@ const LoginOtpModal = ({ isOpen, onClose, tempToken, email, onSuccess }) => {
                           autoComplete={index === 0 ? "one-time-code" : "off"}
                           onChange={(e) => handleChange(index, e.target.value)}
                           onKeyDown={(e) => handleKeyDown(index, e)}
-                          className="w-12 h-16 text-center text-2xl font-bold bg-[#f8fafc] dark:bg-dark-bg/50 border border-[#e2e8f0] dark:border-white/10 rounded-xl focus:border-[#1a3884] dark:focus:border-[#00a3e0] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:ring-[#00a3e0]/20 focus:bg-white dark:focus:bg-[#001c3d] outline-none transition-all shadow-sm text-[#112b6b] dark:text-white"
+                          className="w-9 h-12 sm:w-12 sm:h-16 text-center text-lg sm:text-2xl font-bold bg-[#f8fafc] dark:bg-dark-bg/50 border border-[#e2e8f0] dark:border-white/10 rounded-lg sm:rounded-xl focus:border-[#1a3884] dark:focus:border-[#00a3e0] focus:ring-4 focus:ring-[#1a3884]/10 dark:focus:ring-[#00a3e0]/20 focus:bg-white dark:focus:bg-[#001c3d] outline-none transition-all shadow-sm text-[#112b6b] dark:text-white"
                         />
                       ))}
                     </div>

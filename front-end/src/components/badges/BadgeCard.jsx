@@ -1,113 +1,86 @@
-import { useState } from 'react';
-import { FaShieldAlt, FaLock, FaAward } from 'react-icons/fa';
+import { Trophy, Award, Sparkles, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Unified badge style — navy/teal brand palette
-const badgeStyle = {
-    gradient: 'from-[#1a3884] via-[#287a84] to-[#002147]',
-    glow: 'shadow-[#1a3884]/30',
-    bgGlow: 'bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20',
-    borderColor: '#1a3884',
-    textColor: 'text-[#002147] dark:text-teal-300',
+// Clean category styling matching standard quotient card colors
+const tierStyles = {
+    gold: {
+        bg: 'bg-amber-50 dark:bg-amber-950/25',
+        color: 'text-amber-500 dark:text-amber-400',
+        border: 'group-hover:border-amber-500/30'
+    },
+    silver: {
+        bg: 'bg-slate-50 dark:bg-slate-800/50',
+        color: 'text-slate-400 dark:text-slate-300',
+        border: 'group-hover:border-slate-400/30'
+    },
+    bronze: {
+        bg: 'bg-orange-50 dark:bg-orange-950/20',
+        color: 'text-orange-600 dark:text-orange-400',
+        border: 'group-hover:border-orange-500/30'
+    },
+    standard: {
+        bg: 'bg-blue-50 dark:bg-blue-900/20',
+        color: 'text-[#1a3884] dark:text-blue-400',
+        border: 'group-hover:border-[#1a3884]/30'
+    }
 };
 
-const BadgeCard = ({ badge, onClick, isLocked = false }) => {
-    const [isHovered, setIsHovered] = useState(false);
+const BadgeCard = ({ badge, onClick }) => {
+    const tier = badge.tier?.toLowerCase() || 'standard';
+    const style = tierStyles[tier] || tierStyles.standard;
+
+    // Pick dynamic icons based on tier
+    const isGoldOrTrophy = tier === 'gold' || badge.title?.toLowerCase().includes('gold') || badge.title?.toLowerCase().includes('conqueror');
+    const BadgeIcon = isGoldOrTrophy ? Trophy : Award;
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: isLocked ? 1 : 1.04, y: isLocked ? 0 : -6 }}
-            transition={{ duration: 0.3 }}
-            className={`relative cursor-pointer ${isLocked ? 'opacity-60 grayscale cursor-not-allowed' : ''}`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onClick={() => !isLocked && onClick?.(badge)}
+            whileHover={{ y: -4 }}
+            transition={{ duration: 0.25 }}
+            onClick={() => onClick?.(badge)}
+            className={`bg-white dark:bg-slate-900/40 rounded-[24px] p-6 border border-slate-100 dark:border-white/8 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all duration-300 group cursor-pointer ${style.border}`}
         >
-            {/* Outer glow frame — sharp corners, color border + glow */}
-            <div
-                className="relative overflow-hidden p-[2px] transition-all duration-300"
-                style={{
-                    background: isLocked
-                        ? 'linear-gradient(135deg, #64748b, #94a3b8)'
-                        : 'linear-gradient(135deg, #1a3884, #287a84, #002147)',
-                    boxShadow: isLocked
-                        ? 'none'
-                        : isHovered
-                            ? '0 0 0 1px #1a388466, 0 0 24px #1a388455, 0 8px 32px #1a388433'
-                            : '0 0 0 1px #1a388433, 0 4px 20px #1a388422',
-                }}
-            >
-                {/* Inner Card */}
-                <div
-                    className={`relative ${badgeStyle.bgGlow} p-5 backdrop-blur-sm`}
-                    style={{
-                        border: `1px solid ${isLocked ? '#94a3b840' : '#1a388430'}`,
-                    }}
-                >
-                    {/* Lock Overlay */}
-                    {isLocked && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-10">
-                            <FaLock className="w-8 h-8 text-white/80" />
+            <div className="flex flex-col h-full justify-between min-h-[220px]">
+                <div>
+                    {/* Clean rounded icon slot */}
+                    <div className="flex justify-between items-start mb-4">
+                        <div className={`w-12 h-12 rounded-xl ${style.bg} ${style.color} flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                            <BadgeIcon className="w-6 h-6" />
                         </div>
-                    )}
-
-                    {/* Shield Icon */}
-                    <div className="relative flex justify-center mb-4">
-                        <div
-                            className="relative w-20 h-20 flex items-center justify-center shadow-lg"
-                            style={{
-                                background: 'linear-gradient(135deg, #1a3884, #287a84, #002147)',
-                            }}
-                        >
-                            <FaShieldAlt className="w-12 h-12 text-white drop-shadow-md" />
-                            <div className="absolute -bottom-1 -right-1 bg-white dark:bg-[#002A5C] p-1.5 shadow-md">
-                                <FaAward className={`w-4 h-4 ${badgeStyle.textColor}`} />
-                            </div>
-                        </div>
-
-                        {/* Animated Glow Ring */}
-                        {!isLocked && isHovered && (
-                            <motion.div
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1.3, opacity: 0.4 }}
-                                className="absolute inset-0 w-20 h-20 mx-auto bg-gradient-to-br from-[#1a3884] via-[#287a84] to-[#002147] blur-xl"
-                            />
-                        )}
+                        
+                        {/* Verified Pill Status */}
+                        <span className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-md border border-emerald-100/50 dark:border-emerald-900/30">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                            Active
+                        </span>
                     </div>
 
-                    {/* Badge Title */}
-                    <h3 className={`text-center font-bold text-sm mb-1 ${badgeStyle.textColor}`}>
+                    {/* Title & Description */}
+                    <h4 className="text-base font-black text-slate-950 dark:text-white leading-tight mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors duration-200">
                         {badge.title}
-                    </h3>
-
-                    {/* Badge Description */}
-                    <p className="text-center text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                    </h4>
+                    
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                         {badge.description}
                     </p>
+                </div>
 
-                    {/* XP Badge */}
-                    {badge.xp && (
-                        <div className="mt-3 flex justify-center">
-                            <span
-                                className="px-3 py-1 text-xs font-bold text-white shadow-md"
-                                style={{
-                                    background: 'linear-gradient(90deg, #1a3884, #287a84)',
-                                    boxShadow: '0 2px 10px #1a388444',
-                                }}
-                            >
-                                +{badge.xp} XP
-                            </span>
-                        </div>
+                {/* Footer XP Pill */}
+                <div className="mt-4 pt-3 border-t border-slate-50 dark:border-white/5 flex items-center justify-between">
+                    {badge.xp ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-[#1a3884] dark:text-blue-400 bg-blue-50/50 dark:bg-[#002A5C]/40 px-2.5 py-1 rounded-lg">
+                            <Sparkles className="w-3 h-3 text-amber-500" />
+                            +{badge.xp} XP
+                        </span>
+                    ) : (
+                        <span className="text-[10px] text-slate-400 dark:text-slate-500">Unlocked</span>
                     )}
 
-                    {/* Earned Date */}
-                    {badge.earnedDate && !isLocked && (
-                        <p className="text-center text-[10px] text-slate-400 dark:text-slate-500 mt-2">
-                            Earned: {new Date(badge.earnedDate).toLocaleDateString()}
-                        </p>
-                    )}
+                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+                        View
+                    </span>
                 </div>
             </div>
         </motion.div>

@@ -1,17 +1,33 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaShieldAlt, FaTimes, FaLinkedin, FaFacebook, FaTwitter, FaDownload, FaExternalLinkAlt, FaCheckCircle, FaAward } from 'react-icons/fa';
+import { Trophy, Award, X, Linkedin, Facebook, Download, ExternalLink, CheckCircle2, Sparkles } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 
-const unifiedStyle = {
-    gradient: 'from-[#1a3884] via-[#287a84] to-[#002147]',
-    bgGradient: 'from-teal-50 to-blue-50 dark:from-teal-950/20 dark:to-blue-950/20',
-    textColor: 'text-[#002147] dark:text-teal-300',
-    borderColor: 'border-[#1a3884]',
-    icon: FaShieldAlt,
+// Clean category styling matching standard quotient card colors
+const tierStyles = {
+    gold: {
+        bg: 'bg-amber-50 dark:bg-amber-950/25',
+        color: 'text-amber-500 dark:text-amber-400',
+        textColor: 'text-amber-800 dark:text-amber-400'
+    },
+    silver: {
+        bg: 'bg-slate-50 dark:bg-slate-800/50',
+        color: 'text-slate-400 dark:text-slate-300',
+        textColor: 'text-slate-700 dark:text-slate-300'
+    },
+    bronze: {
+        bg: 'bg-orange-50 dark:bg-orange-950/20',
+        color: 'text-orange-600 dark:text-orange-400',
+        textColor: 'text-orange-800 dark:text-orange-400'
+    },
+    standard: {
+        bg: 'bg-blue-50 dark:bg-blue-900/20',
+        color: 'text-[#1a3884] dark:text-blue-400',
+        textColor: 'text-[#1a3884] dark:text-teal-400'
+    }
 };
 
 const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
@@ -20,6 +36,12 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
     if (!badge) return null;
     
     const verificationUrl = `${window.location.origin}/verify-badge/${badge._id || badge.id}`;
+    const tier = badge.tier?.toLowerCase() || 'standard';
+    const style = tierStyles[tier] || tierStyles.standard;
+
+    // Pick dynamic icons based on tier
+    const isGoldOrTrophy = tier === 'gold' || badge.title?.toLowerCase().includes('gold') || badge.title?.toLowerCase().includes('conqueror');
+    const BadgeIcon = isGoldOrTrophy ? Trophy : Award;
 
     const handleShare = async (platform) => {
         setIsSharing(true);
@@ -76,182 +98,146 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm"
                     onClick={onClose}
                 >
                     <motion.div
-                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                        initial={{ scale: 0.96, opacity: 0, y: 12 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#002147] rounded-3xl shadow-2xl"
+                        exit={{ scale: 0.96, opacity: 0, y: 12 }}
+                        transition={{ type: 'spring', damping: 28, stiffness: 350 }}
+                        className="relative w-full max-w-xl max-h-[96vh] overflow-y-auto bg-white dark:bg-[#002147] rounded-[24px] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15)] border border-slate-100 dark:border-white/8 scrollbar-thin"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close Button */}
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-100 dark:bg-[#002A5C] hover:bg-slate-200 dark:hover:bg-[#002A5C] transition-colors"
+                            className="absolute top-4 right-4 z-20 p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-500 transition-all shadow-sm"
                         >
-                            <FaTimes className="w-5 h-5 text-slate-500" />
+                            <X className="w-4 h-4" />
                         </button>
 
                         {/* Certificate Content for PDF */}
-                        <div id="badge-certificate-content" className={`bg-gradient-to-br ${unifiedStyle.bgGradient}`}>
-                            {/* Header Banner */}
-                            <div className={`bg-gradient-to-r ${unifiedStyle.gradient} p-6 text-center`}>
-                                <h2 className="text-2xl font-bold text-white mb-1">Achievement Unlocked!</h2>
-                                <p className="text-white/80 text-sm">SMAART Institute Badge Credential</p>
-                            </div>
+                        <div id="badge-certificate-content" className="bg-white dark:bg-slate-900/30 relative overflow-hidden py-5 px-6 border-b border-slate-50 dark:border-white/5">
+                            <div className="flex flex-col items-center">
+                                {/* Clean Square-Rounded Icon Container - scaled down */}
+                                <div className={`w-12 h-12 rounded-xl ${style.bg} ${style.color} flex items-center justify-center mb-3 mt-1 shadow-sm`}>
+                                    <BadgeIcon className="w-6 h-6" />
+                                </div>
 
-                            {/* Badge Display */}
-                            <div className="p-8">
-                                <div className="flex flex-col items-center">
-                                    {/* Badge Icon */}
-                                    <motion.div
-                                        initial={{ scale: 0, rotate: -180 }}
-                                        animate={{ scale: 1, rotate: 0 }}
-                                        transition={{ type: 'spring', delay: 0.2, damping: 15 }}
-                                        className={`
-                                            relative w-32 h-32 flex items-center justify-center
-                                            bg-gradient-to-br ${unifiedStyle.gradient}
-                                            rounded-full shadow-2xl mb-6
-                                        `}
-                                    >
-                                        <FaShieldAlt className="w-20 h-20 text-white drop-shadow-lg" />
-                                        <div className="absolute -bottom-2 -right-2 bg-white dark:bg-[#002A5C] rounded-full p-2 shadow-lg">
-                                            <FaAward className={`w-6 h-6 ${unifiedStyle.textColor}`} />
-                                        </div>
-                                        
-                                        {/* Shine Effect */}
-                                        <motion.div
-                                            initial={{ x: '-100%', opacity: 0.5 }}
-                                            animate={{ x: '200%', opacity: 0 }}
-                                            transition={{ duration: 1, delay: 0.5 }}
-                                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent skew-x-12 rounded-full"
-                                        />
-                                    </motion.div>
+                                {/* Achievement Badge Title - scaled down */}
+                                <h3 className="text-xl font-black text-slate-950 dark:text-white tracking-tight mb-1.5 text-center">
+                                    {badge.title}
+                                </h3>
 
-                                    {/* Badge Title */}
-                                    <h3 className={`text-2xl font-bold ${unifiedStyle.textColor} text-center mb-2`}>
-                                        {badge.title}
-                                    </h3>
+                                {/* Verification checkmark pill - tighter margins */}
+                                <span className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2.5 py-0.5 rounded-md border border-emerald-100/50 dark:border-emerald-900/30 mb-3">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                                    Verified Credential
+                                </span>
 
-                                    {/* Category Label */}
-                                    <span className={`
-                                        px-4 py-1 rounded-none text-sm font-bold uppercase
-                                        bg-gradient-to-r ${unifiedStyle.gradient} text-white
-                                        shadow-md mb-4
-                                    `}>
-                                        {badge.category || 'Achievement'}
-                                    </span>
+                                {/* Description - tighter margins */}
+                                <p className="text-slate-500 dark:text-slate-400 text-xs font-medium text-center max-w-sm mb-4 leading-relaxed line-clamp-3">
+                                    {badge.description}
+                                </p>
 
-                                    {/* Description */}
-                                    <p className="text-slate-600 dark:text-slate-300 text-center max-w-md mb-6">
-                                        {badge.description}
-                                    </p>
-
-                                    {/* Stats Grid */}
-                                    <div className="grid grid-cols-2 gap-4 w-full max-w-md mb-6">
-                                        <div className={`text-center p-3 rounded-xl ${unifiedStyle.bgGradient} border ${unifiedStyle.borderColor}`}>
-                                            <p className="text-2xl font-bold text-slate-800 dark:text-white">
-                                                {badge.xp || 0}
-                                            </p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">XP Earned</p>
-                                        </div>
-                                        <div className={`text-center p-3 rounded-xl ${unifiedStyle.bgGradient} border ${unifiedStyle.borderColor}`}>
-                                            <p className="text-2xl font-bold text-slate-800 dark:text-white">
-                                                <FaCheckCircle className="inline w-5 h-5 text-green-500" />
-                                            </p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Verified</p>
-                                        </div>
+                                {/* Award Details Card - tighter spacing and margins */}
+                                <div className="w-full max-w-sm p-4 rounded-xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 flex flex-col gap-2.5 mb-4 text-xs">
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Recipient</span>
+                                        <span className="font-black text-slate-900 dark:text-white">{userName}</span>
                                     </div>
-
-                                    {/* Awarded To */}
-                                    <div className="text-center mb-6">
-                                        <p className="text-sm text-slate-500 dark:text-slate-400">Awarded to</p>
-                                        <p className="text-lg font-bold text-slate-800 dark:text-white">{userName}</p>
-                                        {badge.earnedDate && (
-                                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    <div className="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-2">
+                                        <span className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">XP Credit</span>
+                                        <span className="font-black text-[#1a3884] dark:text-blue-400 flex items-center gap-1">
+                                            <Sparkles className="w-3 h-3 text-amber-500" />
+                                            +{badge.xp || 0} XP
+                                        </span>
+                                    </div>
+                                    {badge.earnedDate && (
+                                        <div className="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-2">
+                                            <span className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Earned Date</span>
+                                            <span className="font-bold text-slate-700 dark:text-slate-300">
                                                 {new Date(badge.earnedDate).toLocaleDateString('en-GB', {
                                                     day: 'numeric',
                                                     month: 'long',
                                                     year: 'numeric',
                                                 })}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* QR Code */}
-                                    <div className="flex items-center gap-4 p-4 bg-white dark:bg-[#002A5C] rounded-none border border-slate-200 dark:border-white/10">
-                                        <QRCodeSVG
-                                            value={verificationUrl}
-                                            size={80}
-                                            level="H"
-                                            includeMargin={true}
-                                            bgColor="#ffffff"
-                                            fgColor="#002147"
-                                        />
-                                        <div className="text-left">
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Verify this badge</p>
-                                            <p className="text-xs font-mono text-slate-600 dark:text-slate-300 break-all max-w-[200px]">
-                                                {badge._id || badge.id}
-                                            </p>
+                                            </span>
                                         </div>
+                                    )}
+                                </div>
+
+                                {/* QR Code & Verification Section - tighter padding */}
+                                <div className="flex items-center gap-3.5 p-3 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-white/5 shadow-sm max-w-sm w-full">
+                                    <QRCodeSVG
+                                        value={verificationUrl}
+                                        size={56}
+                                        level="H"
+                                        includeMargin={false}
+                                        bgColor="transparent"
+                                        fgColor="#1a3884"
+                                    />
+                                    <div className="text-left">
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Verification code</p>
+                                        <p className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 break-all max-w-[200px]">
+                                            {badge._id || badge.id}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="p-6 border-t border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-none">
-                            {/* Share Buttons */}
-                            <p className="text-sm text-slate-500 dark:text-slate-400 text-center mb-4 font-medium">
-                                Share your achievement
+                        {/* Actions Footer - reduced padding and tighter button grids */}
+                        <div className="p-5 bg-slate-50/50 dark:bg-slate-900/10 rounded-b-[24px]">
+                            {/* Share Options */}
+                            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-center mb-2">
+                                Share Credential
                             </p>
-                            <div className="flex justify-center gap-3 mb-4">
+                            <div className="flex justify-center flex-wrap gap-2 mb-4">
                                 <button
                                     onClick={() => handleShare('linkedin')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-2 px-4 py-2 bg-[#0077b5] hover:bg-[#006699] text-white rounded-none transition-colors font-medium text-sm"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0077b5] hover:bg-[#006699] text-white rounded-lg transition-all font-bold text-[9px] uppercase tracking-wider shadow-sm"
                                 >
-                                    <FaLinkedin className="w-4 h-4" />
+                                    <Linkedin className="w-3 h-3" />
                                     LinkedIn
                                 </button>
                                 <button
                                     onClick={() => handleShare('facebook')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-2 px-4 py-2 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded-none transition-colors font-medium text-sm"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded-lg transition-all font-bold text-[9px] uppercase tracking-wider shadow-sm"
                                 >
-                                    <FaFacebook className="w-4 h-4" />
+                                    <Facebook className="w-3 h-3" />
                                     Facebook
                                 </button>
                                 <button
                                     onClick={() => handleShare('twitter')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-2 px-4 py-2 bg-[#1da1f2] hover:bg-[#1a8cd8] text-white rounded-none transition-colors font-medium text-sm"
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0f1419] hover:bg-[#181d22] text-white rounded-lg transition-all font-bold text-[9px] uppercase tracking-wider shadow-sm"
                                 >
-                                    <FaTwitter className="w-4 h-4" />
-                                    Twitter
+                                    <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
+                                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                    </svg>
+                                    X
                                 </button>
                             </div>
 
-                            {/* Download & Verify Buttons */}
-                            <div className="flex justify-center gap-3">
+                            {/* Download & Verification Actions - condensed size */}
+                            <div className="flex justify-center flex-wrap gap-2.5">
                                 <button
                                     onClick={handleDownloadCertificate}
-                                    className="flex items-center gap-2 px-5 py-2 bg-[#002147] hover:bg-[#001a38] text-white rounded-none transition-colors font-medium text-sm"
+                                    className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-[11px] font-black uppercase tracking-widest hover:shadow-sm transform active:scale-95 transition-all"
                                 >
-                                    <FaDownload className="w-4 h-4" />
-                                    Download Certificate
+                                    <Download className="w-3.5 h-3.5" /> Download Certificate
                                 </button>
                                 <a
                                     href={verificationUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center gap-2 px-5 py-2 bg-[#1a3884] hover:bg-[#287a84] text-white rounded-none transition-colors font-medium text-sm"
+                                    className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 text-[#002147] dark:text-white text-[11px] font-black uppercase tracking-widest hover:shadow-sm hover:border-[#1a3884] dark:hover:border-blue-500 transform active:scale-95 transition-all"
                                 >
-                                    <FaExternalLinkAlt className="w-4 h-4" />
-                                    Verify Badge
+                                    <ExternalLink className="w-3.5 h-3.5" /> Verify Badge
                                 </a>
                             </div>
                         </div>
@@ -263,4 +249,3 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
 };
 
 export default BadgeModal;
-

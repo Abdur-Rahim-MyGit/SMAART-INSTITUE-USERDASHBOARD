@@ -313,8 +313,8 @@ const Settings = () => {
                     key={themeOption}
                     onClick={() => setTheme(themeOption.toLowerCase())}
                     className={`p-4 rounded-xl border-2 transition-all hover:scale-[1.02] ${currentTheme === themeOption.toLowerCase()
-                        ? "border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20"
-                        : "border-gray-200 dark:border-white/10 hover:border-[#1a3884]/50 dark:hover:border-[#1a3884]/60"
+                      ? "border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20"
+                      : "border-gray-200 dark:border-white/10 hover:border-[#1a3884]/50 dark:hover:border-[#1a3884]/60"
                       }`}
                   >
                     <span className="text-gray-900 dark:text-white font-medium">{themeOption}</span>

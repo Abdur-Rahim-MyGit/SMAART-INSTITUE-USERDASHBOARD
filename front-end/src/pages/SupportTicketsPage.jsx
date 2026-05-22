@@ -89,38 +89,38 @@ const SupportTicketsPage = () => {
               Back
             </button>
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20">
-                  <LifeBuoy className="w-6 h-6 text-white" />
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20 flex-shrink-0">
+                  <LifeBuoy className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Support Center</h1>
-                  <p className="text-slate-500 dark:text-slate-300 mt-1">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Support Center</h1>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5 sm:mt-1">
                     We're here to help you 24/7
                   </p>
                 </div>
               </div>
 
               {/* Tabs */}
-              <div className="flex gap-1 p-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
+              <div className="flex w-full md:w-auto gap-1 p-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl shadow-sm">
                 <button
                   onClick={() => setActiveTab('create')}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'create'
+                  className={`flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'create'
                     ? 'bg-[#1a3884] text-white shadow-md'
                     : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
-                  <Plus size={16} /> New Ticket
+                  <Plus size={15} /> New Ticket
                 </button>
                 <button
                   onClick={() => setActiveTab('history')}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'history'
+                  className={`flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'history'
                     ? 'bg-[#1a3884] text-white shadow-md'
                     : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
-                  <History size={16} /> History
+                  <History size={15} /> History
                 </button>
               </div>
             </div>
@@ -261,30 +261,30 @@ const SupportTicketsPage = () => {
                   </div>
                 ) : (
                   tickets.map((ticket) => (
-                    <div key={ticket._id} onClick={() => setSelectedTicket(ticket)} className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-[#1a3884]/50 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all group cursor-pointer">
-                      <div className="flex justify-between items-start mb-4">
+                    <div key={ticket._id} onClick={() => setSelectedTicket(ticket)} className="bg-white dark:bg-white/5 p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-[#1a3884]/50 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all group cursor-pointer">
+                      <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4 mb-4">
                         <div>
-                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                             <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">#{ticket.ticketId || ticket._id.slice(-6)}</span>
                             {ticket.itsmTicketNumber && (
-                              <span className="px-2 py-0.5 text-xs rounded-full border bg-indigo-500/20 text-indigo-400 border-indigo-500/30 font-mono flex items-center gap-1">
+                              <span className="px-2 py-0.5 text-[10px] sm:text-xs rounded-full border bg-indigo-500/20 text-indigo-400 border-indigo-500/30 font-mono flex items-center gap-1">
                                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 inline-block" />
                                 {ticket.itsmTicketNumber}
                               </span>
                             )}
                           </div>
-                          <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#1a3884] transition-colors">{ticket.title}</h3>
+                          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#1a3884] transition-colors">{ticket.title}</h3>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${statusColor(ticket.status)} capitalize shadow-sm`}>
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold border ${statusColor(ticket.status)} capitalize shadow-sm flex-shrink-0`}>
                           {ticket.status}
                         </span>
                       </div>
 
-                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-6 line-clamp-2">
+                      <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm mb-5 sm:mb-6 line-clamp-2">
                         {ticket.description}
                       </p>
 
-                      <div className="flex items-center gap-6 text-xs text-slate-500">
+                      <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-slate-500">
                         <span className="flex items-center gap-1">
                           <Clock size={14} /> {new Date(ticket.createdAt).toLocaleDateString()}
                         </span>

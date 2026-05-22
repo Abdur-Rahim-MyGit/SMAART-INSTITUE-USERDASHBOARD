@@ -165,7 +165,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
       onClick={onClose}
     >
       <motion.div
@@ -173,7 +173,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl bg-[#00152E] border border-[#1a3884]/30 flex flex-col"
+        className="w-full max-w-3xl max-h-[94vh] sm:max-h-[90vh] overflow-hidden rounded-xl sm:rounded-2xl bg-[#00152E] border border-[#1a3884]/30 flex flex-col my-auto"
       >
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-[#1a3884]/20">
@@ -199,7 +199,7 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           {/* Meta Info */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             <div className="p-3 rounded-xl bg-[#002147] border border-[#1a3884]/20">
               <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                 <Tag className="w-3 h-3" />
@@ -297,8 +297,8 @@ const TicketDetail = ({ ticket, onClose, onUpdate, isAdmin = false, currentUser 
                         : 'bg-[#1a3884]/10 border-[#1a3884]/20'
                       }`}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${isItsmMessage(response) ? 'bg-indigo-500/30' : 'bg-[#1a3884]/30'
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${isItsmMessage(response) ? 'bg-indigo-500/30' : 'bg-[#1a3884]/30'
                         }`}>
                         <span className={`text-[10px] font-medium ${isItsmMessage(response) ? 'text-indigo-400' : 'text-[#6b8de8]'
                           }`}>
