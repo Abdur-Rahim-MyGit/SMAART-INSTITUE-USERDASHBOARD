@@ -213,6 +213,17 @@ router.delete('/reset/:userId/:stage', async (req, res) => {
         const { userId, stage } = req.params;
         const stageKey = stage.toUpperCase();
 
+        if (stageKey === 'ALL') {
+            const [result, blResult] = await Promise.all([
+                StageResult.deleteMany({ userId }),
+                BaseLineResult.deleteMany({ userId })
+            ]);
+            return res.json({
+                success: true,
+                message: `Deleted all (${result.deletedCount}) stage results and (${blResult.deletedCount}) baseline results for user ${userId}`
+            });
+        }
+
         const result = await StageResult.deleteMany({ userId, stage: stageKey });
 
         // If T1, also clear BaseLineResult

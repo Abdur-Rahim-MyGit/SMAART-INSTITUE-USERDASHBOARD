@@ -574,8 +574,8 @@ const Profile = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white dark:bg-[#002147] rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8 flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-8 mb-6"
               >
-                <div className="relative group">
-                  <div className="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-white/8 shadow-lg">
+                <div className="relative group flex-shrink-0">
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-white/8 shadow-lg">
                     {profilePhoto ? (
                       <img
                         src={profilePhoto}
@@ -584,45 +584,44 @@ const Profile = () => {
                         loading="lazy"
                       />
                     ) : (
-                      <span className="text-4xl font-bold text-white">
+                      <span className="text-3xl sm:text-4xl font-bold text-white">
                         {getInitials(formData.name)}
                       </span>
                     )}
                   </div>
                   <button
                     onClick={() => { setEditData({ name: formData.name, profilePhoto: profilePhoto }); setShowEditModal(true); }}
-                    className="absolute bottom-2 right-2 w-8 h-8 bg-[#1a3884] dark:bg-[#1a3884] rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform"
+                    className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-8 h-8 bg-[#1a3884] dark:bg-[#1a3884] rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className="text-center md:text-left flex-1">
-                  <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-4 mb-2">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                <div className="text-center md:text-left flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row items-center md:items-end gap-2 md:gap-4 mb-2 flex-wrap justify-center md:justify-start">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate max-w-full">
                       {formData.nickname || formData.name || "Student"}
                     </h2>
+                    
+                    {/* Active Status Badge - Responsive next to name */}
+                    <div className="inline-flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-2.5 py-1 rounded-lg">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                      <span className="text-[10px] font-black text-green-700 dark:text-green-400 uppercase tracking-widest">Active</span>
+                    </div>
                   </div>
-                  <p className="font-medium text-lg">
+                  <p className="font-medium text-lg text-slate-500 dark:text-slate-400">
                     Student
                   </p>
-                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-4">
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-gray-400 dark:text-slate-400" />
-                      <span className="text-sm font-medium">{formData.address || "Not specified"}</span>
+                  
+                  <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-6 mt-4">
+                    <div className="flex items-center gap-1.5 text-center md:text-left min-w-0">
+                      <MapPin className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.address || "Not specified"}</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Building className="w-4 h-4 text-gray-400 dark:text-slate-400" />
-                      <span className="text-sm font-medium">{formData.institution || "Institution not set"}</span>
+                    <div className="flex items-center gap-1.5 text-center md:text-left min-w-0">
+                      <Building className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.institution || "Institution not set"}</span>
                     </div>
-                  </div>
-                </div>
-
-                {/* Status Badge */}
-                <div className="hidden lg:block bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-4 py-2 rounded-2xl">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span className="text-sm font-bold text-green-700 dark:text-green-400 uppercase tracking-wider">Active</span>
                   </div>
                 </div>
               </motion.div>
@@ -930,18 +929,18 @@ const Profile = () => {
 
                     {/* Extracurricular & Others */}
                     <div className="bg-white dark:bg-[#002147] rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-white/8">
-                      <div className="flex items-center justify-between gap-3 mb-6">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-xl">
+                      <div className="flex items-center justify-between gap-3 mb-6 min-w-0">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-xl flex-shrink-0">
                             <Users className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Extracurricular</h3>
+                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Extracurricular</h3>
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('extracurricular', formData.extracurricular)}
-                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
+                          className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-xs sm:text-sm font-bold transition-colors shadow-sm flex-shrink-0"
                         >
-                          Edit <Edit2 className="w-4 h-4" />
+                          Edit <Edit2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                       <div className="flex flex-col gap-4">
@@ -1097,29 +1096,29 @@ const Profile = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[110] p-4 overflow-y-auto"
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[110] p-3 sm:p-4 overflow-y-auto"
                     onClick={() => setShowSectionModal(false)}
                   >
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                      className="bg-white dark:bg-[#002147] rounded-[32px] shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto"
+                      className="bg-white dark:bg-[#002147] rounded-[24px] sm:rounded-[32px] shadow-2xl max-w-2xl w-full p-5 sm:p-6 md:p-8 max-h-[92vh] overflow-y-auto scrollbar-thin my-auto"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="flex items-center justify-between mb-8 sticky top-0 bg-white dark:bg-[#002147] z-10 pb-4 border-b border-gray-100 dark:border-white/8">
+                      <div className="flex items-center justify-between mb-6 sticky top-0 bg-white dark:bg-[#002147] z-10 pb-3 border-b border-gray-100 dark:border-white/8">
                         <div>
-                          <h3 className="text-2xl font-black text-gray-900 dark:text-white">Edit {formatSectionTitle(activeEditSection)}</h3>
-                          <p className="text-xs text-gray-400 mt-1">Keep your profile up to date for better opportunities</p>
+                          <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">Edit {formatSectionTitle(activeEditSection)}</h3>
+                          <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5">Keep your profile up to date for better opportunities</p>
                         </div>
-                        <button onClick={() => setShowSectionModal(false)} className="p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-[#002A5C] transition-colors">
-                          <X className="w-6 h-6 text-gray-400" />
+                        <button onClick={() => setShowSectionModal(false)} className="p-2 sm:p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-[#002A5C] transition-colors">
+                          <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
                         </button>
                       </div>
 
-                      <div className="space-y-6">
+                      <div className="space-y-5 sm:space-y-6">
                         {activeEditSection === 'personalDetails' && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                             <ModalInput label="Full Name" value={editFormData.fullName} onChange={(val) => setEditFormData({ ...editFormData, fullName: val })} />
                             <ModalInput label="Nick Name" value={editFormData.nickname} onChange={(val) => setEditFormData({ ...editFormData, nickname: val })} />
                             <ModalInput label="Phone Number" value={editFormData.mobileNumber} onChange={(val) => setEditFormData({ ...editFormData, mobileNumber: val })} />
@@ -1129,7 +1128,7 @@ const Profile = () => {
                           </div>
                         )}
                         {activeEditSection === 'address' && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                             <ModalInput label="Street" value={editFormData.street} onChange={(val) => setEditFormData({ ...editFormData, street: val })} />
                             <ModalInput label="City" value={editFormData.city} onChange={(val) => setEditFormData({ ...editFormData, city: val })} />
                             <ModalInput label="State" value={editFormData.state} onChange={(val) => setEditFormData({ ...editFormData, state: val })} />
@@ -1137,7 +1136,7 @@ const Profile = () => {
                           </div>
                         )}
                         {activeEditSection === 'twelfthDetails' && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                             <ModalInput label="School Name" value={editFormData.schoolName} onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })} />
                             <ModalInput label="Board" value={editFormData.board} onChange={(val) => setEditFormData({ ...editFormData, board: val })} />
                             <ModalInput label="Percentage" value={editFormData.percentage} onChange={(val) => setEditFormData({ ...editFormData, percentage: val })} />
@@ -1145,7 +1144,7 @@ const Profile = () => {
                           </div>
                         )}
                         {activeEditSection === 'tenthDetails' && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
                             <ModalInput label="School Name" value={editFormData.schoolName} onChange={(val) => setEditFormData({ ...editFormData, schoolName: val })} />
                             <ModalInput label="Board" value={editFormData.board} onChange={(val) => setEditFormData({ ...editFormData, board: val })} />
                             <ModalInput label="Percentage" value={editFormData.percentage} onChange={(val) => setEditFormData({ ...editFormData, percentage: val })} />
@@ -1153,16 +1152,16 @@ const Profile = () => {
                           </div>
                         )}
                         {activeEditSection === 'careerGoals' && (
-                          <div className="space-y-6">
+                          <div className="space-y-5 sm:space-y-6">
                             <ModalTextarea label="Short Term Goal" value={editFormData.shortTerm} onChange={(val) => setEditFormData({ ...editFormData, shortTerm: val })} />
                             <ModalTextarea label="Medium Term Goal" value={editFormData.mediumTerm} onChange={(val) => setEditFormData({ ...editFormData, mediumTerm: val })} />
                             <ModalTextarea label="Long Term Goal" value={editFormData.longTerm} onChange={(val) => setEditFormData({ ...editFormData, longTerm: val })} />
                           </div>
                         )}
                         {['higherEducation', 'workExperience', 'projects', 'jobPreferences', 'extracurricular'].includes(activeEditSection) && (
-                          <div className="space-y-8">
+                          <div className="space-y-6 sm:space-y-8">
                             {Array.isArray(editFormData) && editFormData.map((item, idx) => (
-                              <div key={idx} className="p-6 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-3xl border border-gray-100 dark:border-white/10 relative">
+                              <div key={idx} className="p-4 sm:p-6 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-[20px] sm:rounded-3xl border border-gray-100 dark:border-white/10 relative">
                                 <button onClick={() => { const newArr = [...editFormData]; newArr.splice(idx, 1); setEditFormData(newArr); }} className="absolute top-4 right-4 p-2 bg-red-50 dark:bg-red-900 text-red-500 rounded-xl transition-opacity">
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -1219,16 +1218,16 @@ const Profile = () => {
                                         : { institutionName: "", degreeFullName: "", yearOfPassing: "", cgpaPercentage: "" };
                                 setEditFormData([...(Array.isArray(editFormData) ? editFormData : []), newItem]);
                               }}
-                              className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-white/8 rounded-[24px] text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all flex items-center justify-center gap-2 font-bold"
+                              className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-white/8 rounded-[20px] sm:rounded-[24px] text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all flex items-center justify-center gap-2 font-bold text-sm"
                             >
                               <Plus className="w-5 h-5" /> Add Another Item
                             </button>
                           </div>
                         )}
                       </div>
-                      <div className="mt-10 flex gap-4 sticky bottom-0 bg-white dark:bg-[#002147] pt-4 border-t border-gray-100 dark:border-white/8">
-                        <button onClick={() => setShowSectionModal(false)} className="flex-1 py-4 rounded-[20px] font-black text-slate-500 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all">Cancel</button>
-                        <button onClick={handleSaveSection} disabled={savingProfile} className="flex-[2] py-4 bg-[#1a3884] text-white rounded-[20px] font-black hover:bg-[#132c6b] transition-all shadow-xl flex items-center justify-center gap-2">{savingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} Save Changes</button>
+                      <div className="mt-8 flex flex-col sm:flex-row gap-3 sticky bottom-0 bg-white dark:bg-[#002147] pt-3 border-t border-gray-100 dark:border-white/8">
+                        <button onClick={() => setShowSectionModal(false)} className="py-3 px-6 rounded-[16px] font-black text-slate-500 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all text-sm order-2 sm:order-1">Cancel</button>
+                        <button onClick={handleSaveSection} disabled={savingProfile} className="flex-1 py-3 px-6 bg-[#1a3884] text-white rounded-[16px] font-black hover:bg-[#132c6b] transition-all shadow-xl flex items-center justify-center gap-2 text-sm order-1 sm:order-2">{savingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} Save Changes</button>
                       </div>
                     </motion.div>
                   </motion.div>
@@ -1238,25 +1237,25 @@ const Profile = () => {
               {/* Premium Certificate Upload Modal */}
               <AnimatePresence>
                 {showCertModal && (
-                  <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                  <div className="fixed inset-0 z-[120] flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto" onClick={() => setShowCertModal(false)}>
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                      className="bg-white dark:bg-[#002147] rounded-[32px] w-full max-w-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-white/8"
+                      className="bg-white dark:bg-[#002147] rounded-[24px] sm:rounded-[32px] w-full max-w-3xl max-h-[95vh] sm:max-h-[92vh] overflow-y-auto shadow-2xl border border-slate-100 dark:border-white/8 scrollbar-thin my-auto"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {/* Header */}
-                      <div className="px-8 py-5 border-b border-slate-100 dark:border-white/8 flex items-center justify-between bg-white dark:bg-[#002147]">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center">
-                            <Upload className="w-6 h-6 text-[#859DF4] dark:text-blue-400" />
+                      <div className="px-5 sm:px-6 md:px-8 py-4 sm:py-5 border-b border-slate-100 dark:border-white/8 flex items-center justify-between bg-white dark:bg-[#002147] sticky top-0 z-10">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                            <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-[#859DF4] dark:text-blue-400" />
                           </div>
                           <div>
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                               {editingCertIndex !== null ? "Edit Certificate" : "Upload Certificate"}
                             </h3>
-                            <p className="text-xs text-gray-500 dark:text-slate-400">Add a new credential to your vault</p>
+                            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-slate-400">Add a new credential to your vault</p>
                           </div>
                         </div>
                         <button 
@@ -1268,58 +1267,58 @@ const Profile = () => {
                         </button>
                       </div>
 
-                      <form onSubmit={handleSaveCertificate} className="p-8">
-                        <div className="grid md:grid-cols-2 gap-8">
+                      <form onSubmit={handleSaveCertificate} className="p-5 sm:p-6 md:p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 md:gap-8">
                           {/* Left Column: Form Fields */}
-                          <div className="space-y-5">
+                          <div className="space-y-4 sm:space-y-5">
                             <div>
-                              <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate Title</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate Title</label>
                               <input
                                 required
                                 type="text"
                                 value={certFormData.title}
                                 onChange={(e) => setCertFormData({ ...certFormData, title: e.target.value })}
                                 placeholder="e.g. AWS Solutions Architect"
-                                className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                                className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                               />
                             </div>
 
                             <div>
-                              <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issuing Organization</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issuing Organization</label>
                               <input
                                 required
                                 type="text"
                                 value={certFormData.issuer}
                                 onChange={(e) => setCertFormData({ ...certFormData, issuer: e.target.value })}
                                 placeholder="e.g. Amazon Web Services"
-                                className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                                className="w-full px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                               />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issue Date</label>
+                                <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issue Date</label>
                                 <input
                                   required
                                   type="date"
                                   value={certFormData.issueDate}
                                   onChange={(e) => setCertFormData({ ...certFormData, issueDate: e.target.value })}
-                                  className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
+                                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs sm:text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
                                 />
                               </div>
                               <div>
-                                <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Expiry (Optional)</label>
+                                <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Expiry (Optional)</label>
                                 <input
                                   type="date"
                                   value={certFormData.expiryDate}
                                   onChange={(e) => setCertFormData({ ...certFormData, expiryDate: e.target.value })}
-                                  className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
+                                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs sm:text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all"
                                 />
                               </div>
                             </div>
 
                             <div>
-                              <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification URL</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification URL</label>
                               <div className="relative">
                                 <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
@@ -1327,13 +1326,13 @@ const Profile = () => {
                                   value={certFormData.verificationUrl}
                                   onChange={(e) => setCertFormData({ ...certFormData, verificationUrl: e.target.value })}
                                   placeholder="https://verify.example.com/..."
-                                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                                  className="w-full pl-11 pr-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                                 />
                               </div>
                             </div>
 
                             <div>
-                              <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification Code / QR ID</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification Code / QR ID</label>
                               <div className="relative">
                                 <QrCode className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
@@ -1341,7 +1340,7 @@ const Profile = () => {
                                   value={certFormData.qrCodeIdentifier}
                                   onChange={(e) => setCertFormData({ ...certFormData, qrCodeIdentifier: e.target.value })}
                                   placeholder="e.g. ABC-123-XYZ"
-                                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
+                                  className="w-full pl-11 pr-4 py-2.5 sm:py-3 rounded-xl bg-[#F8FAFC] dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-[#859DF4]/20 focus:border-[#859DF4] outline-none transition-all placeholder-gray-400 dark:placeholder-gray-500"
                                 />
                               </div>
                             </div>
@@ -1349,13 +1348,13 @@ const Profile = () => {
 
                           {/* Right Column: File Upload */}
                           <div className="flex flex-col h-full">
-                            <label className="block text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate File (PDF/Image)</label>
+                            <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate File (PDF/Image)</label>
                             <div
                               onDragEnter={handleCertDrag}
                               onDragLeave={handleCertDrag}
                               onDragOver={handleCertDrag}
                               onDrop={handleCertDrop}
-                              className={`relative flex-1 min-h-[300px] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center p-6 transition-all ${
+                              className={`relative flex-1 min-h-[160px] sm:min-h-[220px] md:min-h-[300px] border-2 border-dashed rounded-[20px] sm:rounded-3xl flex flex-col items-center justify-center p-5 sm:p-6 transition-all ${
                                 certDragActive
                                   ? "border-[#859DF4] bg-blue-50/50 dark:bg-blue-900/10"
                                   : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#001E3D] hover:border-[#859DF4] dark:hover:border-[#859DF4]/50"
@@ -1363,35 +1362,35 @@ const Profile = () => {
                             >
                               {certFormData.certificateFile ? (
                                 <div className="text-center p-4">
-                                  <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mx-auto mb-4 border border-emerald-100 dark:border-emerald-800/30">
-                                    <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center mx-auto mb-3 sm:mb-4 border border-emerald-100 dark:border-emerald-800/30">
+                                    <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-500" />
                                   </div>
-                                  <p className="text-sm font-bold text-slate-800 dark:text-white mb-1 truncate max-w-[220px]">
+                                  <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white mb-1 truncate max-w-[180px] sm:max-w-[220px]">
                                     {certFormData.certificateFile.split('/').pop()}
                                   </p>
-                                  <p className="text-xs text-slate-400 dark:text-slate-500">File attached successfully</p>
+                                  <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500">File attached successfully</p>
                                   <button
                                     type="button"
                                     onClick={() => setCertFormData({ ...certFormData, certificateFile: "" })}
-                                    className="mt-5 text-xs font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 dark:bg-red-950/20 px-3 py-1.5 rounded-lg"
+                                    className="mt-4 sm:mt-5 text-[10px] sm:text-xs font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 dark:bg-red-950/20 px-3 py-1.5 rounded-lg"
                                   >
                                     Remove File
                                   </button>
                                 </div>
                               ) : (
                                 <div className="text-center flex flex-col items-center justify-center h-full">
-                                  <div className="w-16 h-16 rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-4">
+                                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-[#EEF4FF] dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-3 sm:mb-4">
                                     {uploadingCertFile ? (
-                                      <Loader2 className="w-7 h-7 text-[#859DF4] animate-spin" />
+                                      <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 text-[#859DF4] animate-spin" />
                                     ) : (
-                                      <Upload className="w-7 h-7 text-[#859DF4] dark:text-blue-400" />
+                                      <Upload className="w-6 h-6 sm:w-7 sm:h-7 text-[#859DF4] dark:text-blue-400" />
                                     )}
                                   </div>
-                                  <p className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">
+                                  <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">
                                     {uploadingCertFile ? "Uploading certificate..." : "Drag and drop file here"}
                                   </p>
-                                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-5 font-medium">PDF, JPG, PNG or WEBP (Max 10MB)</p>
-                                  <label className="cursor-pointer px-5 py-2.5 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-xs font-bold text-gray-700 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm">
+                                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-3 sm:mb-5 font-medium">PDF, JPG, PNG or WEBP (Max 10MB)</p>
+                                  <label className="cursor-pointer px-4 py-2 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-[10px] sm:text-xs font-bold text-gray-700 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm">
                                     Browse Files
                                     <input type="file" className="hidden" accept=".pdf,image/*" onChange={handleCertFileSelect} disabled={uploadingCertFile} />
                                   </label>
@@ -1402,18 +1401,18 @@ const Profile = () => {
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/8 flex justify-end gap-4 bg-white dark:bg-[#002147]">
+                        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-100 dark:border-white/8 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 bg-white dark:bg-[#002147] sticky bottom-0 z-10">
                           <button
                             type="button"
                             onClick={() => setShowCertModal(false)}
-                            className="px-8 py-3 rounded-xl border border-slate-200 dark:border-white/10 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all"
+                            className="px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl border border-slate-200 dark:border-white/10 text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all order-2 sm:order-1"
                           >
                             Cancel
                           </button>
                           <button
                             type="submit"
                             disabled={uploadingCertFile || (!certFormData.title)}
-                            className="px-8 py-3 rounded-xl bg-[#859DF4] hover:bg-[#728BE8] text-white text-sm font-bold shadow-lg shadow-blue-500/10 transition-all flex items-center gap-2 disabled:opacity-50 disabled:shadow-none"
+                            className="px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl bg-[#859DF4] hover:bg-[#728BE8] text-white text-xs sm:text-sm font-bold shadow-lg shadow-blue-500/10 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none order-1 sm:order-2"
                           >
                             {savingProfile ? (
                               <>
@@ -1422,7 +1421,7 @@ const Profile = () => {
                               </>
                             ) : (
                               <>
-                                <Shield className="w-4.5 h-4.5" />
+                                <Shield className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                                 Save Credential
                               </>
                             )}

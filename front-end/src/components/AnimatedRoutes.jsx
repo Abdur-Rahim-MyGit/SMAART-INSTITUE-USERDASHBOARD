@@ -46,6 +46,7 @@ const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
 const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
+const Badges = lazy(() => import('@/pages/Badges'));
 const Performance = lazy(() => import('@/pages/Performance'));
 const SkillsVault = lazy(() => import('@/pages/SkillsVault'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
@@ -186,6 +187,8 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/quotients-grid" element={<QuotientsGrid />} />
                         <Route path="/certificate" element={<Certificate />} />
                         <Route path="/dashboard/certificate" element={<Certificate />} />
+                        <Route path="/badges" element={<Badges />} />
+                        <Route path="/dashboard/badges" element={<Badges />} />
                         <Route path="/dashboard/performance" element={<Performance />} />
 
                         {/* AI Career Coach Routes */}

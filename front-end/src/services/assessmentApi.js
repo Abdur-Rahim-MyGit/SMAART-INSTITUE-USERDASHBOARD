@@ -143,4 +143,15 @@ export const assessmentApi = {
     getStageStatus: async (userId) => {
         return apiCall(`/stageresults/user/${userId}/status`);
     },
+
+    /**
+     * Reset all stage results for a user (T1-T4)
+     * @param {string} userId - User ID
+     * @returns {Promise} Confirmation
+     */
+    resetAllStages: async (userId) => {
+        return apiCall(`/stageresults/reset/${userId}/ALL`, {
+            method: 'DELETE'
+        });
+    },
 };

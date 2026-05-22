@@ -180,7 +180,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
         <label className="block text-sm font-medium text-slate-700 dark:text-white mb-2">
           Category <span className="text-red-400">*</span>
         </label>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-3 gap-3">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.value}
