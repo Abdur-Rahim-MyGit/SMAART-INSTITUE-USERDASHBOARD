@@ -1,0 +1,95 @@
+name: SMAART Minds Option B ECS Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: smaart-backend
+  ECS_SERVICE: smaart-backend-service
+  ECS_CLUSTER: smaart-production-cluster
+  ECS_TASK_DEFINITION: aws-deployment/ecs-task-definition.json
+  CONTAINER_NAME: backend
+
+jobs:
+  deploy:
+    name: Build, Scan and Deploy to AWS ECS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Setup Node for security scanning / linting checks before build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: './back-end/package-lock.json'
+
+      - name: Security Scan (npm audit)
+        run: |
+          cd back-end
+          npm audit --audit-level=high
+
+      # Configure AWS credentials securely using OpenID Connect (OIDC) - No long-lived AWS keys in github secrets
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<AWS_ACCOUNT_ID>:role/GithubActionsECSRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Build Docker Image
+      - name: Build, tag, and push Backend Image to ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f aws-deployment/Dockerfile .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      # Render task definition by injecting new image URI
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      # Deploy the new container task definition to ECS Cluster securely
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      # Build Frontend & Deploy to AWS S3 Bucket
+      - name: Build Frontend & Sync to S3
+        run: |
+          cd front-end
+          npm ci
+          # Configure production endpoint URL
+          echo "VITE_API_URL=https://api.smaartminds.com" > .env.production
+          npm run build
+          aws s3 sync dist/ s3://app.smaartminds.com --delete
+
+      # Invalidate CloudFront CDN edge caches to reflect updates instantly
+      - name: Invalidate CloudFront CDN Cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id E123456789ABCD --paths "/*"
