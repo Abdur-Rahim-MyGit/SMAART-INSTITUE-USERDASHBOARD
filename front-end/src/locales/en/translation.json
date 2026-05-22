@@ -32,7 +32,8 @@
     "help": "Help & Support",
     "save_changes": "Save Changes",
     "cancel": "Cancel",
-    "language_region": "Language & Region"
+    "language_region": "Language & Region",
+    "customisation": "Customisation"
   },
   "dashboard": {
     "good_morning": "Good Morning",

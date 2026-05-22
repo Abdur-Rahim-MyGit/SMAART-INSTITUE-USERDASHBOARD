@@ -875,7 +875,7 @@ const Profile = () => {
                           onClick={() => handleOpenCertificateModal()}
                           className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-[#859DF4] px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          Add <Plus className="w-4 h-4" />
+                          Upload <Upload className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { ChevronRight } from 'lucide-react';
 
 const SkillsPanel = ({ roleName, mongoRoleData, direction }) => {
     const [selectedRole, setSelectedRole] = useState(roleName);
@@ -155,20 +156,7 @@ const SkillsPanel = ({ roleName, mongoRoleData, direction }) => {
             
             {/* ── Role Selector Tabs ── */}
             {familyRoles.length > 0 && (
-                <div 
-                    className="custom-scrollbar"
-                    style={{ 
-                        display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.8rem', 
-                        borderBottom: '1px solid var(--border)',
-                        msOverflowStyle: 'none'
-                    }}
-                >
-                    <style>{`
-                        .custom-scrollbar::-webkit-scrollbar { height: 4px; }
-                        .custom-scrollbar::-webkit-scrollbar-track { background: var(--navy3); border-radius: 10px; }
-                        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-                        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-                    `}</style>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
                     {familyRoles.map(role => {
                         const isSel = selectedRole === role;
                         return (
@@ -176,17 +164,23 @@ const SkillsPanel = ({ roleName, mongoRoleData, direction }) => {
                                 key={role}
                                 onClick={() => setSelectedRole(role)}
                                 style={{
-                                    padding: '0.5rem 1.1rem', borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '0.42rem 0.95rem',
                                     background: isSel ? 'var(--accent)' : 'var(--navy3)',
                                     border: '1px solid',
                                     borderColor: isSel ? 'var(--accent)' : 'var(--border)',
+                                    borderRadius: '100px',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 600,
                                     color: isSel ? 'white' : 'var(--text2)',
-                                    cursor: 'pointer', whiteSpace: 'nowrap', transition: 'all 0.2s',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
                                     boxShadow: isSel ? '0 4px 12px var(--border2)' : 'none',
-                                    flexShrink: 0
                                 }}
                             >
                                 {role}
+                                {isSel && <ChevronRight size={13} style={{ marginLeft: '3px' }} />}
                             </button>
                         );
                     })}
@@ -233,20 +227,6 @@ const SkillsPanel = ({ roleName, mongoRoleData, direction }) => {
                                         .map((s, i) => (
                                             <div key={i} style={styles.skillTag}>
                                                 <span style={styles.skillName}>{s.skillName}</span>
-                                                {s.importance && (
-                                                    <span style={{
-                                                        ...styles.importance,
-                                                        background: s.importance === 'High'
-                                                            ? 'var(--navy4)'
-                                                            : 'var(--navy3)',
-                                                        color: s.importance === 'High'
-                                                            ? 'var(--accent)'
-                                                            : 'var(--muted)',
-                                                        border: `1px solid ${s.importance === 'High' ? 'var(--border2)' : 'var(--border)'}`,
-                                                    }}>
-                                                        {s.importance}
-                                                    </span>
-                                                )}
                                             </div>
                                         ))
                                     }
