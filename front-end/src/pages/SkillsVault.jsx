@@ -11,11 +11,7 @@ import apiCall, { coursesAPI } from "@/services/api";
 import { assessmentApi } from "@/services/assessmentApi";
 import BadgeGallery from "@/components/badges/BadgeGallery";
 import CertificateVerification from "@/components/landing/CertificateVerification";
-import UserCertificateUploadModal from "@/components/wallet/UserCertificateUploadModal";
-import CertificateShareModal from "@/components/wallet/CertificateShareModal";
-import { userCertificateApi } from "@/services/userCertificateApi";
 import { toast } from "sonner";
-import { Share2 } from "lucide-react";
 import PageHero from "@/components/ui/PageHero";
 
 /* ══════════════════════════════════════
@@ -36,25 +32,15 @@ const SkillsVault = () => {
     const [activeTab, setActiveTab] = useState("overview");
     const [courses, setCourses] = useState([]);
     const [stageStatus, setStageStatus] = useState({});
-    const [userCertificates, setUserCertificates] = useState([]);
-    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-    const [selectedShareCert, setSelectedShareCert] = useState(null);
     const [loading, setLoading] = useState(true);
 
     /* ── Data fetch ── */
     useEffect(() => {
         const fetchAll = async () => {
             try {
-                const [courseRes, userCertRes] = await Promise.allSettled([
-                    coursesAPI.getAll(),
-                    userCertificateApi.getAll()
-                ]);
-                if (courseRes.status === "fulfilled" && courseRes.value?.courses) {
-                    setCourses(courseRes.value.courses);
-                }
-                if (userCertRes.status === "fulfilled" && userCertRes.value?.success) {
-                    setUserCertificates(userCertRes.value.data);
+                const courseRes = await coursesAPI.getAll();
+                if (courseRes?.courses) {
+                    setCourses(courseRes.courses);
                 }
 
                 // Assessment status
@@ -75,18 +61,6 @@ const SkillsVault = () => {
         };
         fetchAll();
     }, []);
-
-    const handleDeleteUserCert = async (id) => {
-        try {
-            const res = await userCertificateApi.delete(id);
-            if (res.success) {
-                setUserCertificates(prev => prev.filter(c => c._id !== id));
-                toast.success("Certificate removed from vault");
-            }
-        } catch (err) {
-            toast.error("Failed to delete certificate");
-        }
-    };
 
     /* ── Derived stats ── */
     const badges = user?.badges || [];
@@ -280,110 +254,7 @@ const SkillsVault = () => {
                                         </div>
                                     </div>
 
-                                    {/* User Uploaded Certificates */}
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
-                                            <div>
-                                                <div className="flex items-center gap-3 mb-1">
-                                                    <Shield className="w-6 h-6 text-blue-500" />
-                                                    <h3 className="text-xl font-black text-slate-950 dark:text-white">Your Uploaded Credentials</h3>
-                                                </div>
-                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">External certifications you've added to your vault</p>
-                                            </div>
-                                            <button
-                                                onClick={() => setIsUploadModalOpen(true)}
-                                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-[#1a3884] text-white text-xs font-black uppercase tracking-widest hover:bg-[#132c6b] transition-all shadow-lg shadow-blue-600/20 transform hover:scale-[1.02] active:scale-95"
-                                            >
-                                                <Upload className="w-4 h-4" /> Upload Certificate
-                                            </button>
-                                        </div>
 
-                                        {userCertificates.length > 0 ? (
-                                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                {userCertificates.map((cert, i) => (
-                                                    <motion.div
-                                                        key={cert._id}
-                                                        initial={{ opacity: 0, scale: 0.95 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        transition={{ delay: i * 0.05 }}
-                                                        className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-white/8 p-6 relative group hover:bg-white dark:hover:bg-slate-900 transition-all shadow-sm hover:shadow-xl"
-                                                    >
-                                                        <div className="flex items-start gap-4 mb-5">
-                                                            <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/40 border border-blue-100 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
-                                                                <FileText className="w-6 h-6" />
-                                                            </div>
-                                                            <div className="min-w-0 flex-1 pt-1">
-                                                                <h4 className="text-[15px] font-black text-slate-950 dark:text-white leading-tight mb-1 truncate">
-                                                                    {cert.title}
-                                                                </h4>
-                                                                <p className="text-[11px] text-slate-400 font-black uppercase tracking-wider truncate">{cert.issuer}</p>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="space-y-2 mb-4">
-                                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                                                                <Calendar className="w-3 h-3 text-slate-400" />
-                                                                Issued: {new Date(cert.issueDate).toLocaleDateString()}
-                                                            </div>
-                                                            {cert.verificationUrl && (
-                                                                <a
-                                                                    href={cert.verificationUrl}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="flex items-center gap-2 text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-wider"
-                                                                >
-                                                                    <LinkIcon className="w-3 h-3" />
-                                                                    Verify Credential
-                                                                </a>
-                                                            )}
-                                                            {cert.qrCodeIdentifier && (
-                                                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                                                    <QrCode className="w-3 h-3" />
-                                                                    ID: {cert.qrCodeIdentifier}
-                                                                </div>
-                                                            )}
-                                                        </div>
-
-                                                        <div className="flex items-center gap-2">
-                                                            <button
-                                                                onClick={() => { setSelectedShareCert(cert); setIsShareModalOpen(true); }}
-                                                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all shadow-sm active:scale-95"
-                                                            >
-                                                                <Share2 className="w-3.5 h-3.5" /> Share
-                                                            </button>
-                                                            <a
-                                                                href={cert.certificateUrl}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm active:scale-95"
-                                                            >
-                                                                <Download className="w-3.5 h-3.5" /> View
-                                                            </a>
-                                                            <button
-                                                                onClick={() => handleDeleteUserCert(cert._id)}
-                                                                className="p-2.5 rounded-xl border border-red-100 dark:border-red-900/30 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all active:scale-90"
-                                                            >
-                                                                <X className="w-4 h-4" />
-                                                            </button>
-                                                        </div>
-                                                    </motion.div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="text-center py-16 border-2 border-dashed border-slate-100 dark:border-white/8 rounded-[32px] bg-slate-50/30">
-                                                <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 shadow-sm flex items-center justify-center mx-auto mb-4">
-                                                    <Award className="w-8 h-8 text-slate-300 dark:text-slate-600" />
-                                                </div>
-                                                <p className="text-[15px] font-black text-slate-400 uppercase tracking-widest">No external certificates</p>
-                                                <button
-                                                    onClick={() => setIsUploadModalOpen(true)}
-                                                    className="mt-4 text-xs font-black text-[#1a3884] dark:text-blue-400 hover:underline uppercase tracking-widest"
-                                                >
-                                                    Add your first credential
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
 
                                     {/* Verification Section */}
                                     <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
@@ -525,17 +396,6 @@ const SkillsVault = () => {
                 </div>
             </main>
 
-            <UserCertificateUploadModal
-                isOpen={isUploadModalOpen}
-                onClose={() => setIsUploadModalOpen(false)}
-                onUploadSuccess={(newCert) => setUserCertificates(prev => [newCert, ...prev])}
-            />
-
-            <CertificateShareModal
-                isOpen={isShareModalOpen}
-                onClose={() => { setIsShareModalOpen(false); setSelectedShareCert(null); }}
-                certificate={selectedShareCert}
-            />
         </div>
     );
 };

@@ -423,6 +423,13 @@ const CareerAgentDashboard = () => {
                         </div>
                     </div>
                     <div className="dash-actions">
+                        <button
+                            className="btn-ghost"
+                            onClick={() => navigate('/dashboard')}
+                            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid var(--border)' }}
+                        >
+                            ← Back to Dashboard
+                        </button>
                         {lockedRoles.length > 0 ? (
                             <div style={{
                                 display: 'flex', alignItems: 'center', gap: '0.5rem',
@@ -481,13 +488,6 @@ const CareerAgentDashboard = () => {
                                 {p.label}
                             </button>
                         ))}
-                    </div>
-
-                    <div className="sidebar-footer">
-                        <div className="ri-card">
-                            <div className="ri-label">Account Status</div>
-                            <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent)', marginTop: '0.2rem' }}>PREMIUM ACCESS</div>
-                        </div>
                     </div>
                 </aside>
 
