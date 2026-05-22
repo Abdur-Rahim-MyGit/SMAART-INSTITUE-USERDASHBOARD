@@ -173,7 +173,6 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
     return (
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             <div style={styles.roadmapHeader}>
-                <div style={styles.badge}><Zap size={14} style={{ marginRight: '0.4rem' }} /> Data-Driven Path</div>
                 <h2 style={styles.title}>Dynamic Career Roadmap</h2>
                 <p style={styles.subtitle}>
                     Strategic learning path based on skill overlaps across all {totalRolesCount} roles within this family.
@@ -278,7 +277,7 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
             </div>
 
             <div style={{ ...styles.progressActions, opacity: isHovered ? 1 : 0, transform: isHovered ? 'translateY(0)' : 'translateY(5px)' }}>
-                {status !== 'In Progress' && (
+                {status !== 'In Progress' && status !== 'Completed' && (
                     <button
                         onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'In Progress'); }}
                         style={{ ...styles.actionBtn, background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.3)' }}

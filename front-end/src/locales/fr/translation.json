@@ -31,7 +31,8 @@
     "help": "Aide et support",
     "save_changes": "Enregistrer les modifications",
     "cancel": "Annuler",
-    "language_region": "Langue et région"
+    "language_region": "Langue et région",
+    "customisation": "Personnalisation"
   },
   "dashboard": {
     "good_morning": "Bonjour",

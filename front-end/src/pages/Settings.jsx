@@ -167,8 +167,7 @@ const Settings = () => {
     { id: "profile", label: t("settings.profile_settings"), icon: User, description: "Manage your personal information" },
     { id: "notifications", label: t("settings.notifications"), icon: Bell, description: "Configure notification preferences" },
     { id: "privacy", label: t("settings.privacy"), icon: Shield, description: "Manage your privacy settings" },
-    { id: "appearance", label: t("settings.appearance"), icon: Palette, description: "Customize your dashboard look" },
-    { id: "language", label: t("settings.language"), icon: Globe, description: "Set your language and timezone" },
+    { id: "customisation", label: t("settings.customisation"), icon: Palette, description: "Customize theme, language, and regional settings" },
     { id: "help", label: t("settings.help"), icon: HelpCircle, description: "Get help and contact support" },
   ];
 
@@ -228,6 +227,21 @@ const Settings = () => {
                     className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors resize-none"
                   />
                 </div>
+                <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-gray-900 dark:text-white font-medium">Change Password</h4>
+                      <p className="text-gray-500 dark:text-slate-300 text-sm">Update your account password</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowChangePasswordModal(true)}
+                      className="px-4 py-2 rounded-lg border border-[#1a3884] text-[#1a3884] font-medium hover:bg-[#1a3884]/10 transition-colors"
+                    >
+                      Change
+                    </button>
+                  </div>
+                </div>
               </>
             )}
           </div>
@@ -239,9 +253,6 @@ const Settings = () => {
             {[
               { label: "Email Notifications", description: "Receive updates via email" },
               { label: "Push Notifications", description: "Get push notifications on your device" },
-              { label: "Assessment Reminders", description: "Remind me about pending assessments" },
-              { label: "Course Updates", description: "Notify me about new course content" },
-              { label: "Coach Session Reminders", description: "Reminders for scheduled coaching sessions" },
               { label: "Community Activity", description: "Updates from community discussions" },
             ].map((item, index) => (
               <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
@@ -262,47 +273,54 @@ const Settings = () => {
         return (
           <div className="space-y-6">
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h4 className="text-gray-900 dark:text-white font-medium">Profile Visibility</h4>
-                  <p className="text-gray-500 dark:text-slate-300 text-sm">Control who can see your profile</p>
-                </div>
-                <select className="px-3 py-2 rounded-lg bg-white dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white focus:outline-none focus:border-[#1a3884] dark:focus:border-blue-400 transition-colors">
-                  <option>Everyone</option>
-                  <option>Only Me</option>
-                  <option>Connections</option>
-                </select>
-              </div>
-            </div>
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-gray-900 dark:text-white font-medium">Two-Factor Authentication</h4>
                   <p className="text-gray-500 dark:text-slate-300 text-sm">Add an extra layer of security</p>
                 </div>
-                <button className="px-4 py-2 rounded-lg bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors">
+                <button type="button" className="px-4 py-2 rounded-lg bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors">
                   Enable
                 </button>
               </div>
             </div>
-            <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-gray-900 dark:text-white font-medium">Change Password</h4>
-                  <p className="text-gray-500 dark:text-slate-300 text-sm">Update your account password</p>
-                </div>
-                <button
-                  onClick={() => setShowChangePasswordModal(true)}
-                  className="px-4 py-2 rounded-lg border border-[#1a3884] text-[#1a3884] font-medium hover:bg-[#1a3884]/10 transition-colors"
-                >
-                  Change
-                </button>
-              </div>
+
+            {/* SMAART Security & Privacy Guidelines */}
+            <div className="p-5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+              <h4 className="flex items-center gap-2 text-[#002147] dark:text-blue-200 font-semibold mb-3">
+                <Shield className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
+                SMAART Security & Privacy Guidelines
+              </h4>
+              <ul className="space-y-3.5 text-sm text-gray-600 dark:text-slate-300">
+                <li className="flex gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                  <span>
+                    <strong>Cognitive & EQ Data Protection:</strong> Your baseline quotient test scores, EQ response data, and AI career coaching queries are encrypted and strictly used to personalize your learning roadmap.
+                  </span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                  <span>
+                    <strong>Academic Record Confidentiality:</strong> Your course progress, badges, and verified skills certificates are kept private and accessible only to you and authorized institutional administrators.
+                  </span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                  <span>
+                    <strong>Account Integrity:</strong> Ensure you do not share credentials. Enable Two-Factor Authentication to secure your diagnostic metrics and dynamic career roadmap.
+                  </span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
+                  <span>
+                    <strong>Community & Sharing:</strong> While peer group chats and public forum discussions are visible to other student members, all your assessment data remains strictly confidential.
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
         );
 
-      case "appearance":
+      case "customisation":
         return (
           <div className="space-y-6">
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
@@ -311,6 +329,7 @@ const Settings = () => {
                 {["Light", "Dark"].map((themeOption) => (
                   <button
                     key={themeOption}
+                    type="button"
                     onClick={() => setTheme(themeOption.toLowerCase())}
                     className={`p-4 rounded-xl border-2 transition-all hover:scale-[1.02] ${currentTheme === themeOption.toLowerCase()
                         ? "border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20"
@@ -322,12 +341,7 @@ const Settings = () => {
                 ))}
               </div>
             </div>
-          </div>
-        );
 
-      case "language":
-        return (
-          <div className="space-y-6">
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
               <label className="block text-gray-900 dark:text-white font-medium mb-3">{t("settings.language")}</label>
               <select
@@ -368,23 +382,6 @@ const Settings = () => {
                 <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                 <option value="YYYY-MM-DD">YYYY-MM-DD</option>
               </select>
-            </div>
-
-            <div className="flex justify-end pt-4">
-              <button
-                onClick={handleSaveLanguage}
-                disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 bg-[#1a3884] text-white rounded-xl font-semibold hover:bg-[#1a3884]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-900/20"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  "Save Settings"
-                )}
-              </button>
             </div>
           </div>
         );
@@ -586,19 +583,21 @@ const Settings = () => {
             {renderTabContent()}
 
             {/* Save Button */}
-            <div className="mt-8 flex justify-end gap-3">
-              <button className="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-[#1a3884]/50 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#1a3884] transition-colors">
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveProfile}
-                disabled={saving}
-                className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                Save Changes
-              </button>
-            </div>
+            {(activeTab === "profile" || activeTab === "customisation") && (
+              <div className="mt-8 flex justify-end gap-3">
+                <button className="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-[#1a3884]/50 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#1a3884] transition-colors">
+                  Cancel
+                </button>
+                <button
+                  onClick={activeTab === "profile" ? handleSaveProfile : handleSaveLanguage}
+                  disabled={saving}
+                  className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Save Changes
+                </button>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>

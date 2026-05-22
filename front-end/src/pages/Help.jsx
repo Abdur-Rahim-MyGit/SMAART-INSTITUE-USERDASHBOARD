@@ -40,10 +40,6 @@ const FAQ_ITEMS = [
   {
     question: "Can I download my certificates?",
     answer: "Yes! Once you complete a course, go to Skills Passport where you can view and download all your earned certificates."
-  },
-  {
-    question: "How do I contact my coach?",
-    answer: "Go to Mind Care Sessions to schedule a session with your assigned coach or browse available coaches for booking."
   }
 ];
 
