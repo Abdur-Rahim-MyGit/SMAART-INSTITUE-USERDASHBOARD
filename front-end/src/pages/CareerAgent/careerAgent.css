@@ -27,6 +27,9 @@
   --header-border: rgba(0,0,0,0.08);
   --sidebar-bg: #ffffff;
   --sidebar-hover: rgba(26, 56, 132, 0.06);
+  --tooltip-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-hover: rgba(26, 56, 132, 0.04);
   --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   font-family: var(--font);
@@ -54,6 +57,9 @@
   --header-border: rgba(255,255,255,0.07);
   --sidebar-bg: #00152E;
   --sidebar-hover: rgba(79,142,247,0.08);
+  --tooltip-bg: #001835;
+  --card-bg: rgba(0,33,71,0.98);
+  --card-hover: rgba(26,56,132,0.12);
   --green:  #34d399;
   --amber:  #fbbf24;
   --red:    #f87171;

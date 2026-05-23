@@ -13,9 +13,11 @@ import CareerRoadmap from './panels/CareerRoadmap';
 import CareerDirectionCard from './panels/CareerDirectionCard';
 import Certifications from './panels/Certifications';
 import { useNavigate } from 'react-router-dom';
-import { Compass, ClipboardList, BarChart3, Dna, Map, Award, Rocket, Bot, Mic, FileText, Code, Lock, Unlock, CheckCircle, Trophy, Medal, Target, Sparkles } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Compass, ClipboardList, BarChart3, Dna, Map, Award, Rocket, Bot, Mic, FileText, Code, Lock, Unlock, CheckCircle, Trophy, Medal, Target, Sparkles, Sun, Moon, Monitor } from 'lucide-react';
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
+    const { theme, setTheme } = useTheme();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     const [activeRole, setActiveRole] = useState(1);
@@ -105,31 +107,35 @@ const CareerAgentDashboard = () => {
         const secondaryName = getPrefName(data.secondary, _dp.secondary, 'smaart_pref_secondary');
         const tertiaryName  = getPrefName(data.tertiary,  _dp.tertiary,  'smaart_pref_tertiary');
 
-        // Only fetch for paths that are missing their direction data
-        const needsFetch = [
-            { key: 'primary',   name: primaryName,   hasDir: !!data.primary?.direction?.directionName },
-            { key: 'secondary', name: secondaryName, hasDir: !!data.secondary?.direction?.directionName },
-            { key: 'tertiary',  name: tertiaryName,  hasDir: !!data.tertiary?.direction?.directionName },
-        ].filter(p => !p.hasDir && p.name);
+        // ALWAYS re-fetch roles from DB for ALL paths — the cached direction.roles in the
+        // saved analysis may be incomplete. Only skip if we have no name to search by.
+        const toFetch = [
+            { key: 'primary',   name: primaryName },
+            { key: 'secondary', name: secondaryName },
+            { key: 'tertiary',  name: tertiaryName },
+        ].filter(p => p.name);
 
-        if (needsFetch.length === 0) return;
+        if (toFetch.length === 0) return;
 
-        // Fetch missing directions and patch them into state
+        // Fetch fresh direction+roles from DB and patch into state
         const fetchAndPatch = async () => {
             const patches = {};
-            await Promise.all(needsFetch.map(async ({ key, name }) => {
+            await Promise.all(toFetch.map(async ({ key, name }) => {
                 try {
                     const res = await fetch(`/api/career-agent/direction-roles/${encodeURIComponent(name)}`, { credentials: 'include' });
                     if (res.ok) {
                         const dir = await res.json();
                         if (dir.found || dir.directionName) {
+                            // Preserve existing direction meta (description etc.) but ALWAYS overwrite roles with fresh DB data
+                            const existingDir = data[key]?.direction || {};
                             patches[key] = {
-                                directionId:          dir.directionId   || '',
-                                directionName:        dir.directionName || name,
-                                directionDescription: dir.overview      || dir.directionDescription || '',
-                                directionOverview:    dir.overview      || '',
-                                type:                 key === 'primary' ? 'Primary' : key === 'secondary' ? 'Secondary' : 'Alternative',
-                                roles:                dir.roles         || [],
+                                ...existingDir,
+                                directionId:          dir.directionId   || existingDir.directionId   || '',
+                                directionName:        dir.directionName || existingDir.directionName || name,
+                                directionDescription: dir.overview      || existingDir.directionDescription || '',
+                                directionOverview:    dir.overview      || existingDir.directionOverview    || '',
+                                type:                 existingDir.type  || (key === 'primary' ? 'Primary' : key === 'secondary' ? 'Secondary' : 'Alternative'),
+                                roles:                dir.roles         || [],  // ← always use fresh DB roles (full list)
                             };
                         }
                     }
@@ -430,6 +436,31 @@ const CareerAgentDashboard = () => {
                         >
                             ← Back to Dashboard
                         </button>
+
+                        {/* ── Theme Switcher ── */}
+                        <button
+                            onClick={() => {
+                                const next = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
+                                setTheme(next);
+                            }}
+                            title={`Theme: ${theme} — click to switch`}
+                            style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                width: '36px', height: '36px',
+                                borderRadius: '10px',
+                                border: '1px solid var(--border2)',
+                                background: 'var(--card)',
+                                color: 'var(--text2)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                flexShrink: 0,
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.color = 'var(--text2)'; }}
+                        >
+                            {theme === 'dark' ? <Moon size={15} /> : theme === 'light' ? <Sun size={15} /> : <Monitor size={15} />}
+                        </button>
+
                         {lockedRoles.length > 0 ? (
                             <div style={{
                                 display: 'flex', alignItems: 'center', gap: '0.5rem',

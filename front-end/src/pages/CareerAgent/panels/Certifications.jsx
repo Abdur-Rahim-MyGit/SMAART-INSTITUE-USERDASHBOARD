@@ -25,8 +25,8 @@ const CertCard = ({ cert, totalRoles }) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: hovered ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${hovered ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.07)'}`,
+        background: hovered ? 'var(--card-hover, rgba(26,56,132,0.06))' : 'var(--card-bg, rgba(255,255,255,0.9))',
+        border: `1px solid ${hovered ? color + '50' : 'var(--border, rgba(0,0,0,0.1))'}`,
         borderRadius: '12px',
         padding: '1rem 1.1rem 0.9rem',
         transition: 'all 0.18s ease',
@@ -36,6 +36,7 @@ const CertCard = ({ cert, totalRoles }) => {
         gap: '0.5rem',
         minHeight: '110px',
         position: 'relative',
+        boxShadow: hovered ? `0 4px 16px ${color}18` : '0 1px 4px rgba(0,0,0,0.06)',
       }}
     >
       {/* Row 1: Cert name + X/10 Roles badge */}
@@ -65,13 +66,13 @@ const CertCard = ({ cert, totalRoles }) => {
           {rolesHovered && cert.roles && cert.roles.length > 0 && (
             <div style={{
               position: 'absolute', top: 'calc(100% + 6px)', right: 0,
-              background: 'rgba(10,14,28,0.97)',
+              background: 'var(--tooltip-bg, #ffffff)',
               border: `1px solid ${color}40`,
               borderRadius: '10px',
               padding: '0.65rem 0.85rem',
               zIndex: 9999,
               minWidth: '185px',
-              boxShadow: `0 10px 30px rgba(0,0,0,0.6), 0 0 0 1px ${color}20`,
+              boxShadow: `0 10px 30px rgba(0,0,0,0.15), 0 0 0 1px ${color}20`,
               pointerEvents: 'none',
             }}>
               <div style={{ fontSize: '0.6rem', fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>
@@ -98,8 +99,8 @@ const CertCard = ({ cert, totalRoles }) => {
         <div style={{ marginTop: 'auto' }}>
           <span style={{
             padding: '0.18rem 0.55rem',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.11)',
+            background: `${color}12`,
+            border: `1px solid ${color}30`,
             borderRadius: '5px',
             fontSize: '0.68rem', color: 'var(--text2)',
           }}>
