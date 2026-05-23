@@ -67,9 +67,9 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
         onClick={onClick}
         disabled={!isUnlocked}
         onMouseMove={handleMouseMove}
-        className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden border border-black/5 dark:border-white/5 ${isUnlocked
-            ? "bg-white dark:bg-[#002147] hover:-translate-y-2"
-            : "bg-[#F8FAFC] dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
+        className={`w-full text-left p-5 sm:p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden border border-black/5 dark:border-white/5 ${isUnlocked
+          ? "bg-white dark:bg-[#002147] hover:-translate-y-2"
+          : "bg-[#F8FAFC] dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
           }`}
         style={{
           boxShadow: isUnlocked
@@ -91,8 +91,8 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
           <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             {/* Icon Box - Matching LoginCard style */}
             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
-                ? "bg-white border-gray-100 group-hover:scale-110 group-hover:shadow-md"
-                : "bg-gray-100 border-gray-200"
+              ? "bg-white border-gray-100 group-hover:scale-110 group-hover:shadow-md"
+              : "bg-gray-100 border-gray-200"
               }`}>
               <Icon className={`w-7 h-7 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />
             </div>
@@ -107,8 +107,8 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
               </div>
 
               <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${isUnlocked
-                  ? "text-[#112b6b] dark:text-white"
-                  : "text-gray-400 dark:text-slate-400"
+                ? "text-[#112b6b] dark:text-white"
+                : "text-gray-400 dark:text-slate-400"
                 }`} style={{ letterSpacing: "-0.02em" }}>
                 {stage.name}
               </h3>
@@ -181,9 +181,9 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
         onClick={onClick}
         disabled={!isUnlocked}
         onMouseMove={handleMouseMove}
-        className={`w-full text-left p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden border border-black/5 dark:border-white/5 ${isUnlocked
-            ? "bg-white dark:bg-[#002147] hover:-translate-y-2"
-            : "bg-[#F8FAFC] dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
+        className={`w-full text-left p-5 sm:p-6 rounded-[24px] transition-all duration-500 group relative overflow-hidden border border-black/5 dark:border-white/5 ${isUnlocked
+          ? "bg-white dark:bg-[#002147] hover:-translate-y-2"
+          : "bg-[#F8FAFC] dark:bg-dark-bg/50 cursor-not-allowed opacity-60"
           }`}
         style={{
           boxShadow: isUnlocked
@@ -205,8 +205,8 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
           <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
             {/* Icon Box */}
             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm border transition-all duration-300 ${isUnlocked
-                ? "bg-white border-gray-100 group-hover:scale-110 group-hover:shadow-md"
-                : "bg-gray-100 border-gray-200"
+              ? "bg-white border-gray-100 group-hover:scale-110 group-hover:shadow-md"
+              : "bg-gray-100 border-gray-200"
               }`}>
               {track.id === 'PIQ' && <Brain className={`w-7 h-7 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />}
               {track.id === 'AIQ' && <Bot className={`w-7 h-7 ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"}`} />}
@@ -223,8 +223,8 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
               </div>
 
               <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${isUnlocked
-                  ? "text-[#112b6b] dark:text-white"
-                  : "text-gray-400 dark:text-slate-400"
+                ? "text-[#112b6b] dark:text-white"
+                : "text-gray-400 dark:text-slate-400"
                 }`} style={{ letterSpacing: "-0.02em" }}>
                 {track.shortName}
               </h3>
@@ -275,12 +275,12 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
       transition={{ duration: 0.4, delay }}
       onClick={onClick}
       className={`relative rounded-2xl p-4 cursor-pointer transition-all duration-300 group overflow-hidden border ${isCompleted
-          ? "bg-green-50/50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30"
-          : isCurrent
-            ? "bg-white dark:bg-[#002147] shadow-lg border-[#1a3884] dark:border-[#4c6ef5]"
-            : isUnlocked
-              ? "bg-white dark:bg-[#002147] hover:shadow-md hover:-translate-y-1 border-black/5 dark:border-white/5"
-              : "bg-gray-50/50 dark:bg-dark-bg/50 cursor-not-allowed opacity-60 border-black/5 dark:border-white/5"
+        ? "bg-green-50/50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30"
+        : isCurrent
+          ? "bg-white dark:bg-[#002147] shadow-lg border-[#1a3884] dark:border-[#4c6ef5]"
+          : isUnlocked
+            ? "bg-white dark:bg-[#002147] hover:shadow-md hover:-translate-y-1 border-black/5 dark:border-white/5"
+            : "bg-gray-50/50 dark:bg-dark-bg/50 cursor-not-allowed opacity-60 border-black/5 dark:border-white/5"
         }`}
       style={{
         borderWidth: isCurrent ? "1.5px" : "1px",
@@ -291,12 +291,12 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
     >
       <div className="flex items-start gap-4">
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 border ${isCompleted
-            ? "bg-green-500 border-green-600 text-white shadow-sm"
-            : isCurrent
-              ? "bg-[#1a3884] border-[#112b6b] text-white shadow-md"
-              : isUnlocked
-                ? "bg-white border-gray-100 text-gray-400 group-hover:border-[#1a3884]/30 group-hover:text-[#1a3884]"
-                : "bg-gray-100 border-gray-200 text-gray-400"
+          ? "bg-green-500 border-green-600 text-white shadow-sm"
+          : isCurrent
+            ? "bg-[#1a3884] border-[#112b6b] text-white shadow-md"
+            : isUnlocked
+              ? "bg-white border-gray-100 text-gray-400 group-hover:border-[#1a3884]/30 group-hover:text-[#1a3884]"
+              : "bg-gray-100 border-gray-200 text-gray-400"
           }`}>
           {isCompleted ? (
             <CheckCircle2 className="w-5 h-5" />
@@ -311,10 +311,10 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
 
         <div className="flex-1 min-w-0">
           <span className={`inline-block text-[9px] font-bold px-2 py-0.5 rounded-md mb-2 uppercase tracking-widest ${isCompleted
-              ? "bg-green-100 text-green-700"
-              : isCurrent
-                ? "bg-[#1a3884]/10 text-[#1a3884]"
-                : "bg-gray-100 text-gray-500"
+            ? "bg-green-100 text-green-700"
+            : isCurrent
+              ? "bg-[#1a3884]/10 text-[#1a3884]"
+              : "bg-gray-100 text-gray-500"
             }`}>
             {course.id}
           </span>
@@ -369,7 +369,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
       </button>
 
       {/* Stage header - Refined and Sized Appropriately */}
-      <section className="rounded-[24px] border border-slate-200 bg-white px-6 py-6 mb-8 shadow-sm dark:border-white/8 dark:bg-[#0b1627] md:px-8 md:py-8 transition-all duration-300 relative overflow-hidden">
+      <section className="rounded-[24px] border border-slate-200 bg-white px-4 py-5 sm:px-6 sm:py-6 mb-8 shadow-sm dark:border-white/8 dark:bg-[#0b1627] md:px-8 md:py-8 transition-all duration-300 relative overflow-hidden">
         {/* Background Decorative Gradient */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-slate-50/50 to-transparent dark:from-white/5 pointer-events-none" />
 
@@ -504,7 +504,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#00152E] transition-colors duration-500 relative overflow-hidden">
+    <div className="w-full relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
@@ -513,7 +513,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
 
       {/* Page header — standardized PageHero */}
       {!selectedStageId && (
-        <div className="relative z-10 px-4 sm:px-6 md:px-12 py-4 md:py-6">
+        <div className="relative z-10 py-4">
           <div className="max-w-7xl mx-auto">
             <PageHero
               badge="Learning Journey"
@@ -546,7 +546,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
       )}
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-6 md:py-8 relative z-10">
+      <div className="max-w-7xl mx-auto py-6 relative z-10">
         <AnimatePresence mode="wait">
           {!selectedStageId ? (
             /* Category cards view */

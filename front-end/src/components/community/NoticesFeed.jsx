@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   Megaphone,
   Pin,
@@ -21,35 +22,35 @@ import {
 } from "lucide-react";
 import { announcementsAPI } from "@/services/announcementsApi";
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-const timeAgo = (dateString) => {
-  const date = new Date(dateString);
-  const diffMs = Date.now() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
-};
-
-// ── Filter config ─────────────────────────────────────────────────────────────
-const DATE_FILTERS = [
-  { key: "all", label: "All" },
-  { key: "today", label: "Today" },
-  { key: "week", label: "This Week" },
-];
-
-const ROLE_FILTERS = [
-  { key: "all", label: "All" },
-  { key: "admin", label: "🌐 SMAART Admin" },
-  { key: "college_admin", label: "🏫 College Admin" },
-];
-
 // ── Component ─────────────────────────────────────────────────────────────────
 const NoticesFeed = ({ currentUser }) => {
+  const { t } = useTranslation();
+
+  const timeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const diffMs = Date.now() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffMins < 1) return t("community_page.just_now");
+    if (diffMins < 60) return `${diffMins} ${t("community_page.m_ago")}`;
+    if (diffHours < 24) return `${diffHours} ${t("community_page.h_ago")}`;
+    if (diffDays < 7) return `${diffDays} ${t("community_page.d_ago")}`;
+    return date.toLocaleDateString();
+  };
+
+  const DATE_FILTERS = [
+    { key: "all", label: t("community_page.filter_all") },
+    { key: "today", label: t("community_page.filter_today") },
+    { key: "week", label: t("community_page.filter_week") },
+  ];
+
+  const ROLE_FILTERS = [
+    { key: "all", label: t("community_page.filter_all") },
+    { key: "admin", label: t("community_page.filter_smaart_admin") },
+    { key: "college_admin", label: t("community_page.filter_college_admin") },
+  ];
+
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dateFilter, setDateFilter] = useState("all");
@@ -149,7 +150,7 @@ const NoticesFeed = ({ currentUser }) => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search announcements…"
+          placeholder={t("community_page.search_placeholder")}
           className="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 dark:bg-slate-800/50 border border-gray-200 dark:border-white/10 rounded-2xl text-sm font-semibold text-[#002147] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[#002147]/5 focus:border-[#002147]/30 focus:bg-white dark:focus:bg-slate-800 transition-all shadow-sm"
         />
         {searchQuery && (
@@ -180,14 +181,8 @@ const NoticesFeed = ({ currentUser }) => {
           ))}
         </div>
 
-        {/* Separator */}
-        {/* <span className="text-gray-200 font-light hidden sm:block">|</span> */}
-
         {/* Role filter pills */}
         <div className="flex items-center gap-1 p-1 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/60 dark:border-white/10 shadow-sm">
-          {/* <span className="pl-2 pr-1">
-            <SlidersHorizontal className="w-3 h-3 text-gray-400" />
-          </span> */}
           {ROLE_FILTERS.map((f) => (
             <button
               key={f.key}
@@ -201,24 +196,6 @@ const NoticesFeed = ({ currentUser }) => {
             </button>
           ))}
         </div>
-
-        {/* Clear all filters */}
-        {/* {hasActiveFilters && (
-          <button
-            onClick={clearFilters}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded-xl transition-all"
-          >
-            <X className="w-3 h-3" />
-            Clear
-          </button>
-        )} */}
-
-        {/* Result count */}
-        {/* {!loading && (
-          <span className="ml-auto text-[11px] text-gray-400 font-semibold">
-            {visible.length} {visible.length === 1 ? "notice" : "notices"}
-          </span>
-        )} */}
       </div>
 
       {/* ── Loading ─────────────────────────────────────────────────────── */}
@@ -238,24 +215,24 @@ const NoticesFeed = ({ currentUser }) => {
           <Megaphone className="w-12 h-12 text-gray-200 dark:text-slate-700 mx-auto mb-4" />
           {hasActiveFilters || searchQuery ? (
             <>
-              <p className="text-gray-600 dark:text-slate-300 font-bold mb-1">No results found</p>
+              <p className="text-gray-600 dark:text-slate-300 font-bold mb-1">{t("community_page.no_results")}</p>
               <p className="text-gray-400 dark:text-slate-500 text-sm mb-4">
-                Try adjusting your search or filter.
+                {t("community_page.no_results_desc")}
               </p>
               <button
                 onClick={clearFilters}
                 className="px-4 py-2 text-xs font-bold text-[#002147] dark:text-white bg-[#002147]/5 dark:bg-white/5 hover:bg-[#002147]/10 dark:hover:bg-white/10 rounded-xl transition-all"
               >
-                Clear filters
+                {t("community_page.clear_filters")}
               </button>
             </>
           ) : (
             <>
               <p className="text-gray-600 dark:text-slate-300 font-bold mb-1">
-                No announcements yet
+                {t("community_page.no_announcements")}
               </p>
               <p className="text-gray-400 dark:text-slate-500 text-sm">
-                Check back later for updates from your institution.
+                {t("community_page.no_announcements_desc")}
               </p>
             </>
           )}
@@ -292,12 +269,12 @@ const NoticesFeed = ({ currentUser }) => {
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   {ann.isPinned && !isExpired && (
                     <span className="flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                      <Pin className="w-2.5 h-2.5" /> Pinned
+                      <Pin className="w-2.5 h-2.5" /> {t("community_page.pinned")}
                     </span>
                   )}
                   {isExpired && (
                     <span className="px-2.5 py-1 bg-gray-100 text-gray-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                      Expired
+                      {t("community_page.expired")}
                     </span>
                   )}
                   <span
@@ -311,7 +288,7 @@ const NoticesFeed = ({ currentUser }) => {
                     ) : (
                       <School className="w-3 h-3" />
                     )}
-                    {ann.createdByRole === "admin" ? "SMAART" : "College"}
+                    {ann.createdByRole === "admin" ? t("community_page.smaart") : t("community_page.college")}
                   </span>
                 </div>
 
@@ -353,7 +330,7 @@ const NoticesFeed = ({ currentUser }) => {
                       >
                         {ann.attachmentType === 'pdf' ? <FileText className="w-4 h-4" /> :
                           <LinkIcon className="w-4 h-4" />}
-                        View Attachment
+                        {t("community_page.view_attachment")}
                         <ArrowUpRight className="w-3.5 h-3.5 opacity-50 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-all" />
                       </a>
                     )}
@@ -443,7 +420,7 @@ const NoticesFeed = ({ currentUser }) => {
                         .toUpperCase()}
                     </div>
                     <span className="text-gray-500 dark:text-slate-300 font-semibold">
-                      {ann.createdById?.fullName || "Admin"}
+                      {ann.createdById?.fullName || t("community_page.admin")}
                     </span>
                     <span className="text-gray-305 dark:text-slate-700">•</span>
                     <span>{timeAgo(ann.createdAt)}</span>
@@ -451,11 +428,11 @@ const NoticesFeed = ({ currentUser }) => {
                       <>
                         <span className="text-gray-305 dark:text-slate-700">•</span>
                         <span
-                          className={`flex items-center gap-1 ${isExpired ? "text-gray-400" : "text-orange-500"
+                           className={`flex items-center gap-1 ${isExpired ? "text-gray-400" : "text-orange-500"
                             }`}
                         >
                           <Calendar className="w-3 h-3" />
-                          {isExpired ? "Expired" : "Expires"}{" "}
+                          {isExpired ? t("community_page.expired") : t("community_page.expires")}{" "}
                           {new Date(ann.expiryDate).toLocaleDateString()}
                         </span>
                       </>

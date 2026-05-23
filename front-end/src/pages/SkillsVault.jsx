@@ -109,8 +109,8 @@ const SkillsVault = () => {
                     />
 
                     {/* ── Glassmorphic Tab Navigation ── */}
-                    <div className="flex justify-center sticky top-4 z-50">
-                        <div className="inline-flex bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[24px] p-2 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] border border-slate-200/50 dark:border-slate-700/50 overflow-x-auto max-w-full no-scrollbar">
+                    <div className="flex justify-center sticky top-4 z-50 px-2 sm:px-0">
+                        <div className="inline-flex bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[24px] p-1.5 sm:p-2 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] border border-slate-200/50 dark:border-slate-700/50 overflow-x-auto max-w-full no-scrollbar">
                             {TABS.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
@@ -118,12 +118,12 @@ const SkillsVault = () => {
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-2.5 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isActive
+                                        className={`flex items-center gap-1.5 sm:gap-2.5 px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isActive
                                             ? "bg-[#1a3884] text-white shadow-lg shadow-blue-900/20 scale-105"
                                             : "text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
                                             }`}
                                     >
-                                        <Icon className={`w-4 h-4 ${isActive ? 'scale-110' : ''}`} />
+                                        <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isActive ? 'scale-110' : ''}`} />
                                         {tab.label}
                                     </button>
                                 );
@@ -157,39 +157,39 @@ const SkillsVault = () => {
                                                 initial={{ opacity: 0, y: 16 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 transition={{ delay: i * 0.08 }}
-                                                className="bg-white dark:bg-slate-900/40 rounded-[24px] p-6 border border-slate-100 dark:border-white/8 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all group"
+                                                className="bg-white dark:bg-slate-900/40 rounded-[24px] p-4 sm:p-6 border border-slate-100 dark:border-white/8 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all group"
                                             >
-                                                <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
-                                                    <stat.icon className="w-6 h-6" />
+                                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
+                                                    <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                                                 </div>
-                                                <h3 className="text-3xl font-black text-slate-950 dark:text-white leading-none">{stat.value}</h3>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{stat.label}</p>
+                                                <h3 className="text-2xl sm:text-3xl font-black text-slate-950 dark:text-white leading-none">{stat.value}</h3>
+                                                <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{stat.label}</p>
                                             </motion.div>
                                         ))}
                                     </div>
 
                                     {/* What's in your wallet */}
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <div className="mb-8">
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-5 sm:p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="mb-6 sm:mb-8">
                                             <h3 className="text-xl font-black text-slate-950 dark:text-white mb-2">What's in your Skills Vault?</h3>
                                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
                                                 Your Skills Vault is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources.
                                             </p>
                                         </div>
-                                        <div className="grid sm:grid-cols-2 gap-5">
+                                        <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
                                             {[
                                                 { icon: Award, title: "Certificates", desc: "Verified professional credentials issued upon completing programme milestones — Capacity, Capability, Leadership, and the Master Diploma." },
                                                 { icon: Trophy, title: "Badges & Achievements", desc: "Micro-credentials earned through course activities, assessments, and engagement — each one verifiable and shareable." },
                                                 { icon: BookOpen, title: "Course Overview", desc: "A dashboard view of all your enrolled courses, modules completed, and overall progress across the SMAART curriculum." },
                                                 { icon: Zap, title: "Flashcards & Key Terms", desc: "Quick-reference cards for the six core quotients and other essential professional terminology from your learning journey." },
                                             ].map((item, i) => (
-                                                <div key={i} className="flex gap-5 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 hover:border-[#1a3884]/20 transition-all group">
-                                                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                                                        <item.icon className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
+                                                <div key={i} className="flex gap-4 sm:gap-5 p-4 sm:p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 hover:border-[#1a3884]/20 transition-all group">
+                                                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                                        <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#1a3884] dark:text-blue-400" />
                                                     </div>
                                                     <div>
-                                                        <h4 className="text-[15px] font-black text-slate-900 dark:text-white mb-1">{item.title}</h4>
-                                                        <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
+                                                        <h4 className="text-[14px] sm:text-[15px] font-black text-slate-900 dark:text-white mb-1">{item.title}</h4>
+                                                        <p className="text-[12px] sm:text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -200,25 +200,25 @@ const SkillsVault = () => {
 
                             {/* ════════ CERTIFICATES TAB ════════ */}
                             {activeTab === "certificates" && (
-                                <div className="space-y-8">
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+                                <div className="space-y-6 sm:space-y-8">
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-5 sm:p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-6 sm:mb-8">
                                             <div>
                                                 <div className="flex items-center gap-3 mb-1">
-                                                    <Award className="w-6 h-6 text-amber-500" />
-                                                    <h3 className="text-xl font-black text-slate-950 dark:text-white">Professional Credentials</h3>
+                                                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
+                                                    <h3 className="text-lg sm:text-xl font-black text-slate-950 dark:text-white">Professional Credentials</h3>
                                                 </div>
-                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Your verified SMAART Institute certifications</p>
+                                                <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">Your verified SMAART Institute certifications</p>
                                             </div>
                                             <button
                                                 onClick={() => navigate("/dashboard/certificate")}
-                                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] active:scale-95 transition-all"
+                                                className="inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] active:scale-95 transition-all"
                                             >
                                                 <Download className="w-4 h-4" /> Download Centre
                                             </button>
                                         </div>
 
-                                        <div className="grid sm:grid-cols-2 gap-5">
+                                        <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
                                             {certificateTypes.map((cert, i) => (
                                                 <motion.div
                                                     key={cert.id}
@@ -226,17 +226,17 @@ const SkillsVault = () => {
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: i * 0.08 }}
                                                     onClick={() => navigate("/dashboard/certificate")}
-                                                    className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800/80 p-6 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-xl hover:bg-white dark:hover:bg-slate-900 transition-all group"
+                                                    className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800/80 p-4 sm:p-6 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-xl hover:bg-white dark:hover:bg-slate-900 transition-all group"
                                                 >
-                                                    <div className="flex items-start gap-5">
-                                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                                                            <Award className="w-7 h-7 text-white" />
+                                                    <div className="flex items-start gap-4 sm:gap-5">
+                                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                                                            <Award className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="text-[15px] font-black text-slate-900 dark:text-white leading-snug mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
+                                                            <h4 className="text-[14px] sm:text-[15px] font-black text-slate-900 dark:text-white leading-snug mb-1.5 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
                                                                 {cert.title}
                                                             </h4>
-                                                            <div className="flex items-center gap-2 mt-3">
+                                                            <div className="flex items-center gap-2 mt-2">
                                                                 <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/10">
                                                                     {cert.code}
                                                                 </span>
@@ -245,7 +245,7 @@ const SkillsVault = () => {
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <div className="hidden sm:flex w-10 h-10 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                             <ChevronRight className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
                                                         </div>
                                                     </div>
@@ -258,12 +258,12 @@ const SkillsVault = () => {
 
                                     {/* Verification Section */}
                                     <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <div className="p-8 border-b border-slate-50 dark:border-white/8">
-                                            <h3 className="text-xl font-black text-slate-950 dark:text-white flex items-center gap-3">
-                                                <Shield className="w-6 h-6 text-emerald-500" />
+                                        <div className="p-5 sm:p-8 border-b border-slate-50 dark:border-white/8">
+                                            <h3 className="text-lg sm:text-xl font-black text-slate-950 dark:text-white flex items-center gap-3">
+                                                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
                                                 Credential Verification
                                             </h3>
-                                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Verify any SMAART certificate using its unique ID or QR code.</p>
+                                            <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Verify any SMAART certificate using its unique ID or QR code.</p>
                                         </div>
                                         <div className="p-2">
                                             <CertificateVerification />
@@ -274,7 +274,7 @@ const SkillsVault = () => {
 
                             {/* ════════ BADGES TAB ════════ */}
                             {activeTab === "badges" && (
-                                <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-4 sm:p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
                                     <BadgeGallery badges={badges} userName={user?.fullName || "Student"} />
                                 </div>
                             )}
@@ -304,7 +304,7 @@ const SkillsVault = () => {
                                                     className="bg-white dark:bg-slate-900/40 rounded-[30px] border border-slate-100 dark:border-white/8 overflow-hidden cursor-pointer hover:shadow-2xl hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all group"
                                                 >
                                                     {/* Thumbnail */}
-                                                    <div className="h-40 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] relative overflow-hidden">
+                                                    <div className="h-36 sm:h-40 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] relative overflow-hidden">
                                                         {course.thumbnail && (
                                                             <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                                         )}
@@ -319,14 +319,14 @@ const SkillsVault = () => {
                                                         </div>
                                                     </div>
 
-                                                    <div className="p-6">
-                                                        <h4 className="text-[17px] font-black text-slate-950 dark:text-white mb-2 line-clamp-1 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
+                                                    <div className="p-4 sm:p-6">
+                                                        <h4 className="text-[16px] sm:text-[17px] font-black text-slate-950 dark:text-white mb-2 line-clamp-1 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
                                                             {course.title}
                                                         </h4>
-                                                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2 mb-5 leading-relaxed">
+                                                        <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 sm:mb-5 leading-relaxed">
                                                             {course.description || "Professional development course"}
                                                         </p>
-                                                        <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                                        <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400">
                                                             <span className="flex items-center gap-1.5">
                                                                 <BookOpen className="w-3.5 h-3.5" />
                                                                 {course.modules?.length || 0} Modules
@@ -341,7 +341,7 @@ const SkillsVault = () => {
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-12 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-6 sm:p-12 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
                                             <div className="w-20 h-20 mx-auto mb-6 rounded-[24px] bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 flex items-center justify-center shadow-sm">
                                                 <BookOpen className="w-10 h-10 text-slate-300 dark:text-slate-600" />
                                             </div>
@@ -449,7 +449,7 @@ const FlashcardItem = ({ card, index }) => {
 
                 {/* Back - Solid Background with Opacity Control */}
                 <motion.div
-                    className="absolute inset-0 bg-slate-900 rounded-[28px] p-8 flex flex-col justify-center text-white shadow-2xl overflow-hidden"
+                    className="absolute inset-0 bg-slate-900 rounded-[28px] p-6 sm:p-8 flex flex-col justify-center text-white shadow-2xl overflow-hidden"
                     style={{
                         backfaceVisibility: "hidden",
                         WebkitBackfaceVisibility: "hidden",

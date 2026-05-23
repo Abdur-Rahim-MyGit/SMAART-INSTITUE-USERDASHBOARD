@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import html2canvas from "html2canvas";
 import { useToast } from "@/hooks/use-toast";
 
@@ -30,7 +31,6 @@ import EditorTopBar from "../components/layout/EditorTopBar";
 import EditorSidebar from "../components/layout/EditorSidebar";
 import EditorDrawer from "../components/layout/EditorDrawer";
 import EditorCanvas from "../components/layout/EditorCanvas";
-import EditorBottomBar from "../components/layout/EditorBottomBar";
 import PreviewModal from "../components/modals/PreviewModal";
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -38,6 +38,7 @@ import PreviewModal from "../components/modals/PreviewModal";
 // ═══════════════════════════════════════════════════════════════════════════
 
 const VisionBoardEditorPro = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -51,16 +52,16 @@ const VisionBoardEditorPro = () => {
     const userStr = sessionStorage.getItem("user");
     if (!userStr || userStr === '{}' || userStr === 'undefined' || userStr === 'null') {
       toast({
-        title: "Authentication Required",
-        description: "Please log in to create vision boards",
+        title: t("vision_board.toast_auth_required_title") || "Authentication Required",
+        description: t("vision_board.toast_auth_required_desc") || "Please log in to create vision boards",
         variant: "destructive",
       });
       navigate("/", { replace: true });
     }
-  }, [navigate, toast]);
+  }, [navigate, toast, t]);
 
   // Board state
-  const initialTitle = (location.state?.initialTitle || "Untitled Vision Board").slice(0, TITLE_CHAR_LIMIT);
+  const initialTitle = (location.state?.initialTitle || t("vision_board.untitled_board") || "Untitled Vision Board").slice(0, TITLE_CHAR_LIMIT);
   const initialDescription = (location.state?.initialDescription || "").slice(0, DESCRIPTION_CHAR_LIMIT);
 
   const initialShortTermGoals = location.state?.initialShortTermGoals || [];
@@ -88,7 +89,7 @@ const VisionBoardEditorPro = () => {
 
   // New State for Canvas Layout
   const [zoomLevel, setZoomLevel] = useState(50); 
-  const [activePanel, setActivePanel] = useState("templates"); 
+  const [activePanel, setActivePanel] = useState(null); 
   const isFirstRender = useRef(true);
 
   // Auto-fit function
@@ -106,7 +107,7 @@ const VisionBoardEditorPro = () => {
     const uiWidth = sidebarWidth + drawerWidth;
     
     const targetWidth = containerWidth - uiWidth - (isMobile ? 32 : 80); // Reduced margin
-    const targetHeight = containerHeight - (isMobile ? 220 : 160); // Reduced height margin (TopBar + BottomBar)
+    const targetHeight = containerHeight - (isMobile ? 160 : 120); // Height margin (TopBar only)
 
     const currentRatio = ASPECT_RATIOS[aspectRatio];
     if (!currentRatio) return;
@@ -128,11 +129,6 @@ const VisionBoardEditorPro = () => {
 
   // Auto-fit on mount and when ratio changes
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
     const timer = setTimeout(() => {
       fitCanvas();
     }, 100);
@@ -156,8 +152,8 @@ const VisionBoardEditorPro = () => {
 
           if (!nsfwResult.isSafe) {
             toast({
-              title: "Explicit Content",
-              description: nsfwResult.reason || "Explicit content detected.",
+              title: t("vision_board.toast_explicit_content") || "Explicit Content",
+              description: nsfwResult.reason || t("vision_board.toast_explicit_content_desc") || "Explicit content detected.",
               variant: "destructive",
             });
             return;
@@ -202,8 +198,8 @@ const VisionBoardEditorPro = () => {
     const result = moderateText(text, true);
     if (!result.isClean) {
       toast({
-        title: "Inappropriate Content",
-        description: "Your text contains inappropriate language. Please revise it.",
+        title: t("vision_board.toast_inappropriate_content") || "Inappropriate Content",
+        description: t("vision_board.toast_inappropriate_content_desc") || "Your text contains inappropriate language. Please revise it.",
         variant: "destructive",
       });
       return true;
@@ -352,7 +348,7 @@ const VisionBoardEditorPro = () => {
     const imageLayers = Object.entries(images).map(([id, image]) => ({
       id: Number(id),
       type: "image",
-      name: image.name || `Image ${Number(id) + 1}`,
+      name: image.name || `${t("vision_board.image")} ${Number(id) + 1}`,
       hidden: Boolean(image.hidden),
       locked: Boolean(image.locked),
       zIndex: image.zIndex || 10,
@@ -361,7 +357,7 @@ const VisionBoardEditorPro = () => {
     const textLayers = Object.entries(textOverlays).map(([id, overlay]) => ({
       id,
       type: "text",
-      name: overlay.name || overlay.text || "Text layer",
+      name: overlay.name || overlay.text || t("vision_board.text_layer"),
       hidden: Boolean(overlay.hidden),
       locked: Boolean(overlay.locked),
       zIndex: overlay.zIndex || 50,
@@ -370,7 +366,7 @@ const VisionBoardEditorPro = () => {
     const assetLayers = Object.entries(assetOverlays).map(([id, asset]) => ({
       id,
       type: "asset",
-      name: asset.name || "Canvas asset",
+      name: asset.name || t("vision_board.canvas_asset"),
       hidden: Boolean(asset.hidden),
       locked: Boolean(asset.locked),
       zIndex: asset.zIndex || 35,
@@ -505,8 +501,8 @@ const VisionBoardEditorPro = () => {
 
       if (!nsfwResult.isSafe) {
         toast({
-          title: "Explicit Content",
-          description: nsfwResult.reason || "Explicit content detected.",
+          title: t("vision_board.toast_explicit_content") || "Explicit Content",
+          description: nsfwResult.reason || t("vision_board.toast_explicit_content_desc") || "Explicit content detected.",
           variant: "destructive",
         });
         return;
@@ -528,7 +524,7 @@ const VisionBoardEditorPro = () => {
           blur: 0,
           tint: "rgba(0,0,0,0)",
           filterPreset: "clean",
-          name: `Image ${slotId + 1}`,
+          name: `${t("vision_board.image")} ${slotId + 1}`,
           hidden: false,
           locked: false,
           zIndex: getNextLayerZIndex(),
@@ -553,7 +549,7 @@ const VisionBoardEditorPro = () => {
           blur: 0,
           tint: "rgba(0,0,0,0)",
           filterPreset: "clean",
-          name: `Image ${slotId + 1}`,
+          name: `${t("vision_board.image")} ${slotId + 1}`,
           hidden: false,
           locked: false,
           zIndex: getNextLayerZIndex(),
@@ -598,8 +594,8 @@ const VisionBoardEditorPro = () => {
         const nsfwResult = await checkBase64ImageNSFW(imageData);
         if (!nsfwResult.isSafe) {
           toast({
-            title: "Explicit Content",
-            description: nsfwResult.reason || "Explicit content detected.",
+            title: t("vision_board.toast_explicit_content") || "Explicit Content",
+            description: nsfwResult.reason || t("vision_board.toast_explicit_content_desc") || "Explicit content detected.",
             variant: "destructive",
           });
           return;
@@ -645,7 +641,7 @@ const VisionBoardEditorPro = () => {
 
   const handleAddUploadToCanvas = (upload) => {
     handleAddAssetToCanvas({
-      name: upload.name || "Saved upload",
+      name: upload.name || t("vision_board.saved_upload"),
       src: upload.src || upload,
       width: upload.width || 180,
       height: upload.height || 180,
@@ -671,7 +667,7 @@ const VisionBoardEditorPro = () => {
       [id]: {
         ...textData,
         id,
-        name: textData.name || `Text ${nextTextId}`,
+        name: textData.name || `${t("vision_board.text_label")} ${nextTextId}`,
         hidden: false,
         locked: false,
         zIndex: getNextLayerZIndex(),
@@ -827,8 +823,8 @@ const VisionBoardEditorPro = () => {
 
     if (!availableSlot) {
       toast({
-        title: "No Empty Slot",
-        description: "Add another layout slot before duplicating this image.",
+        title: t("vision_board.toast_no_empty_slot") || "No Empty Slot",
+        description: t("vision_board.toast_no_empty_slot_desc") || "Add another layout slot before duplicating this image.",
       });
       return;
     }
@@ -838,7 +834,7 @@ const VisionBoardEditorPro = () => {
       [availableSlot.id]: {
         ...sourceImage,
         slotIndex: availableSlot.id,
-        name: `${sourceImage.name || `Image ${slotId + 1}`} Copy`,
+        name: `${sourceImage.name || `${t("vision_board.image")} ${slotId + 1}`} ${t("vision_board.copy")}`,
         position: { ...(sourceImage.position || { x: 0, y: 0 }) },
         zIndex: getNextLayerZIndex(),
       },
@@ -860,7 +856,7 @@ const VisionBoardEditorPro = () => {
       [id]: {
         ...sourceAsset,
         id,
-        name: `${sourceAsset.name} Copy`,
+        name: `${sourceAsset.name} ${t("vision_board.copy")}`,
         position: {
           x: Math.min((sourceAsset.position?.x || 50) + 6, 94),
           y: Math.min((sourceAsset.position?.y || 50) + 6, 94),
@@ -1109,8 +1105,8 @@ const VisionBoardEditorPro = () => {
             applySnapshot(parsedDraft.snapshot);
             lastSnapshotRef.current = parsedDraft.snapshot;
             toast({
-              title: "Draft Restored",
-              description: "Recovered your last in-progress vision board.",
+              title: t("vision_board.toast_draft_restored") || "Draft Restored",
+              description: t("vision_board.toast_draft_restored_desc") || "Recovered your last in-progress vision board.",
             });
           }
         }
@@ -1118,7 +1114,7 @@ const VisionBoardEditorPro = () => {
         console.error("Draft restore error:", error);
       }
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!isEditing || !boardId || boardLoadAttemptedRef.current || draftRestoredRef.current) {
@@ -1138,8 +1134,8 @@ const VisionBoardEditorPro = () => {
       } catch (error) {
         console.error("Vision board edit restore error:", error);
         toast({
-          title: "Unable to Load Board",
-          description: error.message || "We couldn't restore this saved vision board for editing.",
+          title: t("vision_board.toast_unable_load_board") || "Unable to Load Board",
+          description: error.message || t("vision_board.toast_unable_load_board_desc") || "We couldn't restore this saved vision board for editing.",
           variant: "destructive",
         });
         navigate("/vision-board-pro/gallery");
@@ -1147,7 +1143,7 @@ const VisionBoardEditorPro = () => {
     };
 
     loadBoardForEditing();
-  }, [boardId, isEditing, navigate, toast]);
+  }, [boardId, isEditing, navigate, toast, t]);
 
   useEffect(() => {
     if (!historyBootstrappedRef.current || !lastSnapshotRef.current) return;
@@ -1270,8 +1266,8 @@ const VisionBoardEditorPro = () => {
       // Check if moderation model is still loading
       if (isModelLoading) {
         toast({
-          title: "Safety System Initializing",
-          description: "Please wait a moment while we prepare the safety checks...",
+          title: t("vision_board.toast_safety_initializing") || "Safety System Initializing",
+          description: t("vision_board.toast_safety_initializing_desc") || "Please wait a moment while we prepare the safety checks...",
         });
       }
 
@@ -1300,8 +1296,8 @@ const VisionBoardEditorPro = () => {
       const titleCheck = await moderateTextAsync(trimmedTitle);
       if (!titleCheck.isClean) {
         toast({
-          title: "Inappropriate Content",
-          description: "Your vision board title contains inappropriate language. Please revise.",
+          title: t("vision_board.toast_inappropriate_content") || "Inappropriate Content",
+          description: t("vision_board.toast_title_inappropriate_desc") || "Your vision board title contains inappropriate language. Please revise.",
           variant: "destructive",
         });
         setIsSaving(false);
@@ -1311,8 +1307,8 @@ const VisionBoardEditorPro = () => {
       const descCheck = await moderateTextAsync(trimmedDescription);
       if (!descCheck.isClean) {
         toast({
-          title: "Inappropriate Content",
-          description: "Your vision board description contains inappropriate language. Please revise.",
+          title: t("vision_board.toast_inappropriate_content") || "Inappropriate Content",
+          description: t("vision_board.toast_desc_inappropriate_desc") || "Your vision board description contains inappropriate language. Please revise.",
           variant: "destructive",
         });
         setIsSaving(false);
@@ -1322,7 +1318,7 @@ const VisionBoardEditorPro = () => {
       const overlaysCheck = await moderateTextOverlaysAsync(textOverlays);
       if (!overlaysCheck.isClean) {
         toast({
-          title: "Inappropriate Content",
+          title: t("vision_board.toast_inappropriate_content") || "Inappropriate Content",
           description: getModerationWarning(overlaysCheck.flaggedItems),
           variant: "destructive",
         });
@@ -1387,8 +1383,8 @@ const VisionBoardEditorPro = () => {
       const userStr = sessionStorage.getItem("user");
       if (!userStr || userStr === '{}' || userStr === 'undefined' || userStr === 'null') {
         toast({
-          title: "Authentication Required",
-          description: "Please log in to save your vision board",
+          title: t("vision_board.toast_auth_required_title") || "Authentication Required",
+          description: t("vision_board.toast_auth_save_desc") || "Please log in to save your vision board",
           variant: "destructive",
         });
         navigate("/", { replace: true });
@@ -1422,15 +1418,15 @@ const VisionBoardEditorPro = () => {
         await updateVisionBoard(boardId, boardData);
         setLastSavedAt(new Date());
         toast({
-          title: "Updated!",
-          description: "Vision board updated successfully",
+          title: t("vision_board.toast_updated") || "Updated!",
+          description: t("vision_board.toast_updated_desc") || "Vision board updated successfully",
         });
       } else {
         await createVisionBoard(boardData);
         setLastSavedAt(new Date());
         toast({
-          title: "Saved!",
-          description: "Vision board created successfully",
+          title: t("vision_board.toast_saved") || "Saved!",
+          description: t("vision_board.toast_saved_desc") || "Vision board created successfully",
         });
       }
 
@@ -1443,8 +1439,8 @@ const VisionBoardEditorPro = () => {
 
       if (error.message?.includes("not authenticated")) {
         toast({
-          title: "Session Expired",
-          description: "Please log in again to save your vision board",
+          title: t("vision_board.toast_session_expired") || "Session Expired",
+          description: t("vision_board.toast_session_expired_desc") || "Please log in again to save your vision board",
           variant: "destructive",
         });
         navigate("/", { replace: true });
@@ -1452,8 +1448,8 @@ const VisionBoardEditorPro = () => {
       }
 
       toast({
-        title: "Error",
-        description: error.message || "Failed to save vision board",
+        title: t("vision_board.toast_error") || "Error",
+        description: error.message || t("vision_board.toast_failed_save") || "Failed to save vision board",
         variant: "destructive",
       });
     } finally {
@@ -1583,12 +1579,7 @@ const VisionBoardEditorPro = () => {
         />
       </div>
 
-      {/* Bottom Bar */}
-      <EditorBottomBar
-        zoomLevel={zoomLevel}
-        setZoomLevel={setZoomLevel}
-        onFitToScreen={handleFitToScreen}
-      />
+
 
       {/* Modals */}
       <PreviewModal

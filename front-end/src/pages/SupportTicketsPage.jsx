@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, LifeBuoy, MessageSquare, History, Plus, Loader2, Clock, CheckCircle2, AlertCircle, Filter, RefreshCw } from 'lucide-react';
 import TicketForm from '@/components/tickets/TicketForm';
 import TicketDetail from '@/components/tickets/TicketDetail';
 import { getMyTickets } from '@/services/ticketApi';
 
 const SupportTicketsPage = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const conversationData = location.state;
@@ -86,7 +88,7 @@ const SupportTicketsPage = () => {
               className="flex items-center gap-2 text-slate-500 dark:text-slate-300 hover:text-[#1a3884] transition-colors mb-4"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back
+              {t("support_tickets_page.back")}
             </button>
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
@@ -95,9 +97,9 @@ const SupportTicketsPage = () => {
                   <LifeBuoy className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Support Center</h1>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{t("support_tickets_page.support_center")}</h1>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5 sm:mt-1">
-                    We're here to help you 24/7
+                    {t("support_tickets_page.we_are_here_to_help")}
                   </p>
                 </div>
               </div>
@@ -111,7 +113,7 @@ const SupportTicketsPage = () => {
                     : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
-                  <Plus size={15} /> New Ticket
+                  <Plus size={15} /> {t("support_tickets_page.new_ticket")}
                 </button>
                 <button
                   onClick={() => setActiveTab('history')}
@@ -120,7 +122,7 @@ const SupportTicketsPage = () => {
                     : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
-                  <History size={15} /> History
+                  <History size={15} /> {t("support_tickets_page.history")}
                 </button>
               </div>
             </div>
@@ -140,13 +142,13 @@ const SupportTicketsPage = () => {
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-indigo-400" />
                       <span className="text-sm font-semibold text-indigo-400">
-                        Ticket submitted successfully
+                        {t("support_tickets_page.ticket_submitted_success")}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-300 mt-1">
-                      Your ITSM reference number is{' '}
+                      {t("support_tickets_page.itsm_reference_prefix")}{' '}
                       <span className="font-mono text-indigo-400 font-bold">{successTicket.itsmTicketNumber}</span>
-                      . Use this to track your issue status.
+                      {t("support_tickets_page.itsm_reference_suffix")}
                     </p>
                   </div>
                 )}
@@ -157,11 +159,11 @@ const SupportTicketsPage = () => {
                     <div className="flex items-center gap-2 mb-2">
                       <MessageSquare className="w-4 h-4 text-[#1a3884]" />
                       <span className="text-sm font-semibold text-[#1a3884]">
-                        Chat conversation included
+                        {t("support_tickets_page.chat_included")}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-300">
-                      Your chat history will be automatically attached to this ticket.
+                      {t("support_tickets_page.chat_history_automatic")}
                     </p>
                   </div>
                 )}
@@ -193,7 +195,7 @@ const SupportTicketsPage = () => {
                         }`}
                     >
                       <Filter className="w-4 h-4" />
-                      Filters
+                      {t("support_tickets_page.filters")}
                       {statusFilter && (
                         <span className="px-2 py-0.5 text-xs rounded-full bg-[#1a3884]/20">1</span>
                       )}
@@ -211,7 +213,7 @@ const SupportTicketsPage = () => {
                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
-                    New Ticket
+                    {t("support_tickets_page.new_ticket")}
                   </button>
                 </div>
 
@@ -226,7 +228,7 @@ const SupportTicketsPage = () => {
                     >
                       <div className="p-4 rounded-xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
                         <div className="flex flex-wrap gap-2">
-                          <span className="text-sm text-gray-400 mr-2">Status:</span>
+                          <span className="text-sm text-gray-400 mr-2">{t("support_tickets_page.status")}:</span>
                           {['', 'open', 'in-progress', 'resolved', 'closed'].map((status) => (
                             <button
                               key={status}
@@ -236,7 +238,7 @@ const SupportTicketsPage = () => {
                                   : "bg-gray-100 dark:bg-[#002147] text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white"
                                 }`}
                             >
-                              {status || 'All'}
+                              {status ? t("support_tickets_page.status_" + status.replace('-', '_')) : t("support_tickets_page.all")}
                             </button>
                           ))}
                         </div>
@@ -248,16 +250,16 @@ const SupportTicketsPage = () => {
                 {loadingHistory ? (
                   <div className="py-20 flex flex-col items-center justify-center text-slate-400">
                     <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#1a3884]" />
-                    <p>Loading your tickets...</p>
+                    <p>{t("support_tickets_page.loading_tickets")}</p>
                   </div>
                 ) : tickets.length === 0 ? (
                   <div className="py-20 text-center bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm">
                     <div className="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <LifeBuoy className="w-8 h-8 text-slate-400" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Tickets Yet</h3>
-                    <p className="text-slate-500 dark:text-slate-300 mb-6">You haven't submitted any support requests.</p>
-                    <button onClick={() => setActiveTab('create')} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg font-bold shadow-lg shadow-[#1a3884]/20 hover:scale-105 transition-transform">Create Ticket</button>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{t("support_tickets_page.no_tickets_yet")}</h3>
+                    <p className="text-slate-500 dark:text-slate-300 mb-6">{t("support_tickets_page.no_tickets_desc")}</p>
+                    <button onClick={() => setActiveTab('create')} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg font-bold shadow-lg shadow-[#1a3884]/20 hover:scale-105 transition-transform">{t("support_tickets_page.create_ticket")}</button>
                   </div>
                 ) : (
                   tickets.map((ticket) => (
@@ -276,7 +278,7 @@ const SupportTicketsPage = () => {
                           <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white group-hover:text-[#1a3884] transition-colors">{ticket.title}</h3>
                         </div>
                         <span className={`px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold border ${statusColor(ticket.status)} capitalize shadow-sm flex-shrink-0`}>
-                          {ticket.status}
+                          {t("support_tickets_page.status_" + ticket.status.replace('-', '_'))}
                         </span>
                       </div>
 
@@ -288,12 +290,9 @@ const SupportTicketsPage = () => {
                         <span className="flex items-center gap-1">
                           <Clock size={14} /> {new Date(ticket.createdAt).toLocaleDateString()}
                         </span>
-                        {/* <span className="flex items-center gap-1 capitalize">
-                          <AlertCircle size={14} /> {ticket.priority} Priority
-                        </span> */}
                         {ticket.responses?.length > 0 && (
                           <span className="flex items-center gap-1 text-[#1a3884]">
-                            <MessageSquare size={14} /> {ticket.responses.length} Responses
+                            <MessageSquare size={14} /> {ticket.responses.length} {t("support_tickets_page.responses")}
                           </span>
                         )}
                       </div>
