@@ -350,10 +350,10 @@ const CertificateModal = ({ skillName, onConfirm, onClose }) => {
                         <div key={s} style={cmStyles.stepItem}>
                             <div style={{
                                 ...cmStyles.stepDot,
-                                background: step > i + 1 ? '#22c55e' : step === i + 1 ? 'var(--accent)' : 'var(--navy4)',
-                                border: step === i + 1 ? '2px solid var(--accent)' : step > i + 1 ? '2px solid #22c55e' : '2px solid var(--border)',
+                                background: step > i + 1 ? 'var(--accent)' : step === i + 1 ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
+                                border: step === i + 1 ? '2px solid var(--accent)' : step > i + 1 ? '2px solid var(--accent)' : '2px solid rgba(255,255,255,0.15)',
                             }}>
-                                {step > i + 1 ? <CheckCircle size={10} color="#fff" /> : <span style={{ fontSize: '0.6rem', fontWeight: 800, color: step === i + 1 ? '#fff' : 'var(--muted)' }}>{i + 1}</span>}
+                                {step > i + 1 ? <CheckCircle size={10} color="#fff" /> : <span style={{ fontSize: '0.6rem', fontWeight: 800, color: step === i + 1 ? '#fff' : '#64748b' }}>{i + 1}</span>}
                             </div>
                             <span style={{ ...cmStyles.stepLabel, color: step === i + 1 ? 'var(--text1)' : step > i + 1 ? '#22c55e' : 'var(--muted)' }}>{s}</span>
                             {i < 2 && <div style={{ ...cmStyles.stepLine, background: step > i + 1 ? '#22c55e' : 'var(--border)' }} />}
@@ -447,25 +447,23 @@ const CertificateModal = ({ skillName, onConfirm, onClose }) => {
 const cmStyles = {
     overlay: {
         position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,0.65)',
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+        background: 'rgba(0,0,0,0.75)',
         zIndex: 99999,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         padding: '1rem',
     },
     modal: {
-        background: 'var(--navy2)',
-        border: '1px solid var(--border)',
+        background: '#0f1729',
+        border: '1px solid rgba(79,142,247,0.3)',
         borderRadius: '20px',
         width: '100%', maxWidth: '460px',
         overflow: 'hidden',
-        boxShadow: '0 30px 60px -12px rgba(0,0,0,0.5)',
+        boxShadow: '0 30px 60px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(79,142,247,0.1)',
         position: 'relative',
     },
     accentBar: {
         height: '3px',
-        background: 'linear-gradient(90deg, var(--accent), #22c55e)',
+        background: 'linear-gradient(90deg, var(--accent), #818cf8)',
     },
     header: {
         display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
@@ -474,13 +472,13 @@ const cmStyles = {
     headerLeft: { display: 'flex', flexDirection: 'column', gap: '0.35rem' },
     headerTag: {
         display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-        fontSize: '0.6rem', fontWeight: 800, color: '#22c55e',
+        fontSize: '0.6rem', fontWeight: 800, color: 'var(--accent)',
         textTransform: 'uppercase', letterSpacing: '0.08em',
     },
-    headerSkill: { fontSize: '1.1rem', fontWeight: 900, color: 'var(--text1)', letterSpacing: '-0.01em' },
+    headerSkill: { fontSize: '1.1rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.01em' },
     closeBtn: {
-        background: 'var(--navy3)', border: '1px solid var(--border)',
-        cursor: 'pointer', color: 'var(--muted)',
+        background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
+        cursor: 'pointer', color: '#94a3b8',
         padding: '0.35rem', borderRadius: '8px', display: 'flex', alignItems: 'center',
         transition: 'all 0.15s',
     },
@@ -511,57 +509,57 @@ const cmStyles = {
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem',
         userSelect: 'none',
     },
-    uploadIcon: { marginBottom: '0.25rem', opacity: 0.6 },
-    dropText: { fontSize: '0.84rem', color: 'var(--text2)', lineHeight: 1.4 },
-    dropSub: { fontSize: '0.7rem', color: 'var(--muted)' },
+    uploadIcon: { marginBottom: '0.25rem', opacity: 0.8 },
+    dropText: { fontSize: '0.84rem', color: '#e2e8f0', lineHeight: 1.4 },
+    dropSub: { fontSize: '0.7rem', color: '#64748b' },
     fileName: { fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent)' },
-    fileSize: { fontSize: '0.7rem', color: 'var(--muted)' },
+    fileSize: { fontSize: '0.7rem', color: '#64748b' },
     verifiedIcon: { marginBottom: '0.25rem' },
-    verifiedTitle: { fontSize: '0.9rem', fontWeight: 800, color: '#22c55e' },
-    verifiedFile: { fontSize: '0.72rem', color: 'var(--muted)' },
+    verifiedTitle: { fontSize: '0.9rem', fontWeight: 800, color: 'var(--accent)' },
+    verifiedFile: { fontSize: '0.72rem', color: '#64748b' },
 
     /* Action row below drop zone */
     actionsRow: { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' },
     verifyBtn: {
         display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
         padding: '0.5rem 1rem',
-        background: 'rgba(79,142,247,0.1)', color: 'var(--accent)',
-        border: '1px solid rgba(79,142,247,0.3)', borderRadius: '8px',
+        background: 'rgba(79,142,247,0.15)', color: 'var(--accent)',
+        border: '1px solid rgba(79,142,247,0.4)', borderRadius: '8px',
         fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer',
     },
     skipBtn: {
         display: 'inline-flex', alignItems: 'center',
         padding: '0.5rem 0.9rem',
-        background: 'transparent', color: 'var(--muted)',
-        border: '1px solid var(--border)', borderRadius: '8px',
+        background: 'transparent', color: '#94a3b8',
+        border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px',
         fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer',
     },
     skipNote: {
-        fontSize: '0.72rem', color: 'var(--amber)',
+        fontSize: '0.72rem', color: '#f59e0b',
         padding: '0.4rem 0.75rem',
-        background: 'rgba(245,158,11,0.08)',
-        border: '1px solid rgba(245,158,11,0.2)',
+        background: 'rgba(245,158,11,0.1)',
+        border: '1px solid rgba(245,158,11,0.25)',
         borderRadius: '8px',
     },
 
     /* Footer */
     footer: {
         display: 'flex', gap: '0.65rem', padding: '1rem 1.4rem',
-        borderTop: '1px solid var(--border)', justifyContent: 'flex-end',
-        background: 'var(--navy3)',
+        borderTop: '1px solid rgba(255,255,255,0.08)', justifyContent: 'flex-end',
+        background: 'rgba(0,0,0,0.2)',
     },
     cancelBtn: {
         padding: '0.55rem 1.2rem',
-        background: 'transparent', color: 'var(--text2)',
-        border: '1px solid var(--border)', borderRadius: '8px',
+        background: 'transparent', color: '#94a3b8',
+        border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px',
         fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer',
     },
     confirmBtn: {
         display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
         padding: '0.55rem 1.3rem',
-        background: 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.15))',
-        color: '#22c55e',
-        border: '1px solid rgba(34,197,94,0.35)',
+        background: 'rgba(79,142,247,0.2)',
+        color: 'var(--accent)',
+        border: '1px solid rgba(79,142,247,0.4)',
         borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700,
         transition: 'all 0.2s',
     },

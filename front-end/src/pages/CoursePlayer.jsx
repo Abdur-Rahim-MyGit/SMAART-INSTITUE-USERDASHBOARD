@@ -127,6 +127,17 @@ const CoursePlayer = () => {
     setVideoWatched(false);
     setLoading(false);
     window.scrollTo(0, 0);
+
+    // ── Save last-watched course to localStorage for MyCourses page ──
+    if (courseId) {
+      const courseData = getCourseById(courseId);
+      if (courseData) {
+        localStorage.setItem('smaart_last_watched_course', courseId);
+        localStorage.setItem('smaart_last_watched_title', courseData.title || courseId);
+        localStorage.setItem('smaart_last_watched_lesson', courseData.title || courseId);
+        localStorage.setItem('smaart_course_progress', '0');
+      }
+    }
   }, [courseId]);
 
   const handleStartCourse = () => {
@@ -145,17 +156,28 @@ const CoursePlayer = () => {
   };
 
   const handleStepComplete = (stepNumber) => {
-    setCompletedSteps(prev => ({ ...prev, [stepNumber]: true }));
+    const newCompletedSteps = { ...completedSteps, [stepNumber]: true };
+    setCompletedSteps(newCompletedSteps);
+
+    // ── Save progress to localStorage for MyCourses continue watching ──
+    const stepsDone = Object.keys(newCompletedSteps).length;
+    const pct = Math.round((stepsDone / 9) * 100);
+    const courseData = getCourseById(courseId);
+    const currentStepData = getLearningFlowData(courseId)?.steps?.[stepNumber];
+    localStorage.setItem('smaart_course_progress', String(pct));
+    localStorage.setItem('smaart_last_watched_lesson',
+      currentStepData?.title || (courseData?.title + ' — Step ' + stepNumber) || courseId
+    );
 
     // Check if all 9 steps are completed
     const allSteps = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const newCompletedSteps = { ...completedSteps, [stepNumber]: true };
     const allCompleted = allSteps.every(step => newCompletedSteps[step]);
 
     if (allCompleted) {
       setIsCompleted(true);
       setShowCongratulation(true);
       setActiveStep(null);
+      localStorage.setItem('smaart_course_progress', '100');
     } else {
       // Auto-advance to next step
       const nextStep = (parseInt(stepNumber) + 1).toString();
