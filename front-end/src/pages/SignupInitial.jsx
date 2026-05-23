@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+
 import { apiCall } from "@/services/api";
 import { UserPlus, Mail, User, ArrowRight, Loader2 } from "lucide-react";
 import blueLogo from "@/assets/blue.png";
@@ -268,13 +269,13 @@ const SignupInitial = () => {
           <div className="px-8 pb-6 border-t border-gray-50">
             <p className="text-center text-[11px] text-gray-400 pt-5 leading-relaxed">
               By creating an account you agree to our{" "}
-              <span className="font-semibold text-gray-500 cursor-pointer hover:text-[#1a3884] transition-colors">
+              <Link to="/legal?tab=terms-of-service" className="font-semibold text-gray-500 cursor-pointer hover:text-[#1a3884] transition-colors">
                 Terms of Service
-              </span>{" "}
+              </Link>{" "}
               &{" "}
-              <span className="font-semibold text-gray-500 cursor-pointer hover:text-[#1a3884] transition-colors">
+              <Link to="/legal?tab=privacy-policy" className="font-semibold text-gray-500 cursor-pointer hover:text-[#1a3884] transition-colors">
                 Privacy Policy
-              </span>
+              </Link>
             </p>
           </div>
         </div>

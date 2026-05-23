@@ -49,6 +49,8 @@ const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
 const Performance = lazy(() => import('@/pages/Performance'));
 const SkillsVault = lazy(() => import('@/pages/SkillsVault'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
+const Legal = lazy(() => import('@/pages/Legal'));
+
 
 // Career Agent (Integrated from Career-Agent standalone system)
 const CareerAgentEntry = lazy(() => import('@/pages/CareerAgent/CareerAgentEntry'));
@@ -102,6 +104,7 @@ const AnimatedRoutes = () => {
                     <Route path="/verify-certificate/:certificateId" element={<VerifyCertificate />} />
                     <Route path="/verify-badge" element={<VerifyBadge />} />
                     <Route path="/verify-badge/:badgeId" element={<VerifyBadge />} />
+                    <Route path="/legal" element={<Legal />} />
 
                     {/* Signup Flow */}
                     <Route path="/signup-initial" element={<SignupInitial />} />
