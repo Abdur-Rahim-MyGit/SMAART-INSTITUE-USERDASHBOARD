@@ -1,224 +1,217 @@
-import React, { useState } from 'react';
-import { Award, ExternalLink, ShieldCheck, Clock, BookOpen, Star, ChevronRight, Cpu, BrainCircuit, Building2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Award, ExternalLink, ShieldCheck, Clock, BookOpen, Star, ChevronRight, Cpu, BrainCircuit, Building2, AlertCircle, RefreshCw } from 'lucide-react';
 
-const technicalCerts = [
-  {
-    id: 1,
-    name: "Meta Back-End Developer Professional Certificate",
-    provider: "Coursera",
-    skills: ["Python", "Django", "APIs", "Git", "SQL"],
-    url: "https://www.coursera.org/professional-certificates/meta-back-end-developer",
-    level: "Beginner",
-    duration: "8 Months",
-    color: "var(--accent)"
-  },
-  {
-    id: 2,
-    name: "IBM Full Stack Software Developer",
-    provider: "Coursera",
-    skills: ["React", "Express", "Node.js", "Python"],
-    url: "https://www.coursera.org/professional-certificates/ibm-full-stack-cloud-developer",
-    level: "Intermediate",
-    duration: "10 Months",
-    color: "var(--accent2)"
-  },
-  {
-    id: 3,
-    name: "AWS Certified Developer – Associate",
-    provider: "AWS Training",
-    skills: ["Serverless", "Security", "CI/CD", "Databases"],
-    url: "https://aws.amazon.com/certification/certified-developer-associate/",
-    level: "Intermediate",
-    duration: "130 Hours",
-    color: "var(--amber)"
-  },
-  {
-    id: 4,
-    name: "Microsoft Certified: Azure Developer",
-    provider: "Microsoft Learn",
-    skills: ["Azure", "Docker", "Cosmos DB", "C#"],
-    url: "https://learn.microsoft.com/en-us/certifications/azure-developer/",
-    level: "Intermediate",
-    duration: "Self-Paced",
-    color: "#00a4ef"
-  },
-  {
-    id: 5,
-    name: "Google Professional Cloud Developer",
-    provider: "Google Cloud",
-    skills: ["Kubernetes", "Cloud Native", "Performance"],
-    url: "https://cloud.google.com/certification/cloud-developer",
-    level: "Advanced",
-    duration: "Self-Paced",
-    color: "#34a853"
-  },
-  {
-    id: 6,
-    name: "Meta Front-End Developer",
-    provider: "Coursera",
-    skills: ["React", "JavaScript", "UI/UX", "CSS"],
-    url: "https://www.coursera.org/professional-certificates/meta-front-end-developer",
-    level: "Beginner",
-    duration: "7 Months",
-    color: "var(--accent)"
-  },
-  {
-    id: 7,
-    name: "Oracle Certified Professional: Java SE",
-    provider: "Oracle",
-    skills: ["Java", "OOP", "Concurrency"],
-    url: "https://education.oracle.com/java-se-11-developer/pexam_1Z0-819",
-    level: "Intermediate",
-    duration: "Self-Paced",
-    color: "#e34f26"
-  },
-  {
-    id: 8,
-    name: "Certified Kubernetes App Developer",
-    provider: "Linux Foundation",
-    skills: ["Kubernetes", "Microservices", "Containers"],
-    url: "https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/",
-    level: "Advanced",
-    duration: "Self-Paced",
-    color: "#326ce5"
+// ─── Static fallback colours per provider ────────────────────────────────────
+const PROVIDER_COLORS = {
+  'Coursera': 'var(--accent)',
+  'AWS Training': 'var(--amber)',
+  'AWS': 'var(--amber)',
+  'Microsoft Learn': '#00a4ef',
+  'Microsoft': '#00a4ef',
+  'Google Cloud': '#34a853',
+  'Google': '#34a853',
+  'DeepLearning.AI': '#ff6f00',
+  'IBM': 'var(--accent2)',
+  'GitHub': '#24292f',
+  'GitHub (Microsoft)': '#24292f',
+  'LinkedIn Learning': '#0a66c2',
+  'Oracle': '#e34f26',
+  'Linux Foundation': '#326ce5',
+  'Hugging Face': '#ff9d00',
+  'PMI': '#5b248a',
+  'Scrum Alliance': '#00558c',
+  'Axelos': '#008a9f',
+  'MeitY (India)': '#1d6c3c',
+  'Udemy': '#a435f0',
+};
+
+const getProviderColor = (provider) => {
+  if (!provider) return 'var(--accent)';
+  for (const [key, color] of Object.entries(PROVIDER_COLORS)) {
+    if (provider.toLowerCase().includes(key.toLowerCase())) return color;
   }
-];
+  return 'var(--accent)';
+};
 
-const aiCerts = [
-  {
-    id: 11,
-    name: "DeepLearning.AI TensorFlow Developer",
-    provider: "Coursera",
-    skills: ["TensorFlow", "Deep Learning", "CNNs", "NLP"],
-    url: "https://www.coursera.org/professional-certificates/tensorflow-in-practice",
-    level: "Intermediate",
-    duration: "4 Months",
-    color: "#ff6f00"
-  },
-  {
-    id: 12,
-    name: "IBM AI Engineering Professional Certificate",
-    provider: "Coursera",
-    skills: ["Machine Learning", "PyTorch", "Computer Vision"],
-    url: "https://www.coursera.org/professional-certificates/ai-engineer",
-    level: "Intermediate",
-    duration: "8 Months",
-    color: "var(--accent2)"
-  },
-  {
-    id: 13,
-    name: "Microsoft Certified: Azure AI Engineer",
-    provider: "Microsoft Learn",
-    skills: ["Azure AI", "Cognitive Services", "NLP"],
-    url: "https://learn.microsoft.com/en-us/certifications/azure-ai-engineer/",
-    level: "Intermediate",
-    duration: "Self-Paced",
-    color: "#00a4ef"
-  },
-  {
-    id: 14,
-    name: "AWS Certified AI Practitioner",
-    provider: "AWS Training",
-    skills: ["Generative AI", "Foundational Models", "Prompt Eng"],
-    url: "https://aws.amazon.com/certification/certified-ai-practitioner/",
-    level: "Beginner",
-    duration: "60 Hours",
-    color: "var(--amber)"
-  },
-  {
-    id: 15,
-    name: "Google Cloud Professional ML Engineer",
-    provider: "Google Cloud",
-    skills: ["MLOps", "Model Architecture", "Data Pipelines"],
-    url: "https://cloud.google.com/certification/machine-learning-engineer",
-    level: "Advanced",
-    duration: "Self-Paced",
-    color: "#34a853"
-  },
-  {
-    id: 16,
-    name: "Andrew Ng's Machine Learning Specialization",
-    provider: "DeepLearning.AI",
-    skills: ["Supervised ML", "Unsupervised IT", "Recommender Systems"],
-    url: "https://www.coursera.org/specializations/machine-learning-introduction",
-    level: "Beginner",
-    duration: "2 Months",
-    color: "var(--accent)"
-  }
-];
+// ─── Extract provider short-name from issuing_body string ────────────────────
+const extractProvider = (issuingBody) => {
+  if (!issuingBody) return 'Online Platform';
+  // e.g. "Google / Coursera" → "Google / Coursera" (truncate at first " – ")
+  const trimmed = issuingBody.split(' – ')[0].trim();
+  return trimmed.length > 30 ? trimmed.slice(0, 30) + '…' : trimmed;
+};
 
-const domainCerts = [
-  {
-    id: 21,
-    name: "Certified ScrumMaster (CSM)",
-    provider: "Scrum Alliance",
-    skills: ["Agile", "Scrum", "Team Facilitation"],
-    url: "https://www.scrumalliance.org/get-certified/scrum-master-track/certified-scrummaster",
-    level: "Beginner",
-    duration: "2 Days",
-    color: "#00558c"
-  },
-  {
-    id: 22,
-    name: "Project Management Professional (PMP)",
-    provider: "PMI",
-    skills: ["Project Mgmt", "Risk Analysis", "Resource Allocation"],
-    url: "https://www.pmi.org/certifications/project-management-pmp",
-    level: "Advanced",
-    duration: "Self-Paced",
-    color: "#5b248a"
-  },
-  {
-    id: 23,
-    name: "ITIL 4 Foundation",
-    provider: "Axelos",
-    skills: ["IT Service Mgmt", "Process Optimization", "Value Co-creation"],
-    url: "https://www.axelos.com/certifications/itil-service-management",
-    level: "Beginner",
-    duration: "Self-Paced",
-    color: "#008a9f"
-  },
-  {
-    id: 24,
-    name: "AWS Certified Cloud Practitioner",
-    provider: "AWS Training",
-    skills: ["Cloud Economics", "Business Strategy", "High-Level Architecture"],
-    url: "https://aws.amazon.com/certification/certified-cloud-practitioner/",
-    level: "Beginner",
-    duration: "10 Hours",
-    color: "var(--amber)"
-  },
-  {
-    id: 25,
-    name: "TOGAF 9 Foundation",
-    provider: "The Open Group",
-    skills: ["Enterprise Architecture", "Business IT Alignment"],
-    url: "https://www.opengroup.org/certifications/togaf",
-    level: "Intermediate",
-    duration: "Self-Paced",
-    color: "#ab1c20"
-  }
-];
+// ─── CertCard ─────────────────────────────────────────────────────────────────
+const CertCard = ({ cert, hoveredId, onEnter, onLeave }) => {
+  const color = getProviderColor(cert.provider);
+  const isHovered = hoveredId === cert.id;
+  const provider = extractProvider(cert.provider);
 
+  return (
+    <a
+      href={cert.url || '#'}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => onEnter(cert.id)}
+      onMouseLeave={() => onLeave()}
+      style={{
+        textDecoration: 'none',
+        background: 'var(--navy2)',
+        border: `1px solid ${isHovered ? color : 'var(--border)'}`,
+        borderRadius: '16px',
+        padding: '1.5rem',
+        transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
+        boxShadow: isHovered ? `0 12px 24px -8px ${color}40` : '0 4px 12px rgba(0,0,0,0.05)',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Glow blob */}
+      <div style={{
+        position: 'absolute', top: '-50px', right: '-50px',
+        width: '100px', height: '100px',
+        background: color,
+        filter: 'blur(40px)',
+        opacity: isHovered ? 0.3 : 0.05,
+        transition: 'opacity 0.4s',
+      }} />
+
+      {/* Provider & link */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+          background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.7rem',
+          borderRadius: '8px', fontSize: '0.75rem', fontWeight: '600',
+          color: 'var(--text2)', border: '1px solid var(--border)',
+        }}>
+          <ShieldCheck size={14} color={color} />
+          {provider}
+        </div>
+        <div style={{
+          color: isHovered ? 'var(--text)' : 'var(--muted)',
+          transition: 'color 0.3s',
+          display: 'flex', alignItems: 'center', gap: '0.3rem',
+          fontSize: '0.75rem', fontWeight: 600,
+        }}>
+          View Course <ExternalLink size={14} />
+        </div>
+      </div>
+
+      {/* Certificate name */}
+      <h4 style={{
+        fontSize: '1rem',
+        color: 'var(--text)',
+        marginBottom: '1rem',
+        lineHeight: '1.45',
+        flex: 1,
+      }}>
+        {cert.name || cert.skillName || 'Certification'}
+      </h4>
+
+      {/* Fee badge */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.2rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
+          <Star size={14} color="var(--amber)" />
+          {cert.fee || 'Check Website'}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
+          <Clock size={14} color="var(--accent)" />
+          Self-Paced
+        </div>
+      </div>
+
+      {/* Skill covered */}
+      {cert.skillName && (
+        <div style={{
+          display: 'flex', flexWrap: 'wrap', gap: '0.4rem',
+          marginTop: 'auto', paddingTop: '1rem',
+          borderTop: '1px dashed var(--border)',
+        }}>
+          <div style={{
+            width: '100%', fontSize: '0.7rem', textTransform: 'uppercase',
+            letterSpacing: '0.05em', color: 'var(--muted)', marginBottom: '0.2rem',
+            fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem',
+          }}>
+            <BookOpen size={12} /> Skill Covered
+          </div>
+          <span style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid var(--border2)',
+            color: 'var(--text2)',
+            padding: '0.2rem 0.6rem',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: '500',
+          }}>
+            {cert.skillName}
+          </span>
+        </div>
+      )}
+
+      {/* Hover arrow */}
+      <div style={{
+        position: 'absolute', bottom: '1rem', right: '1rem',
+        opacity: isHovered ? 1 : 0,
+        transform: isHovered ? 'translateX(0)' : 'translateX(-10px)',
+        transition: 'all 0.3s ease',
+        color,
+      }}>
+        <ChevronRight size={20} />
+      </div>
+    </a>
+  );
+};
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 const Certifications = ({ roleName }) => {
   const [activeTab, setActiveTab] = useState('technical');
   const [hoveredId, setHoveredId] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [certsData, setCertsData] = useState({ technical: [], ai: [], domain: [] });
+  const lastRole = useRef(null);
 
   const tabs = [
     { id: 'technical', label: 'Technical Skills', icon: <Cpu size={16} /> },
-    { id: 'ai', label: 'AI & Data Skills', icon: <BrainCircuit size={16} /> },
-    { id: 'domain', label: 'Domain Skills', icon: <Building2 size={16} /> }
+    { id: 'ai',        label: 'AI & Data Skills', icon: <BrainCircuit size={16} /> },
+    { id: 'domain',    label: 'Domain Skills',    icon: <Building2 size={16} /> },
   ];
 
-  const getDisplayCerts = () => {
-    switch (activeTab) {
-      case 'ai': return aiCerts;
-      case 'domain': return domainCerts;
-      default: return technicalCerts;
-    }
-  };
+  // ── Fetch certifications for the current role ──────────────────────────────
+  useEffect(() => {
+    if (!roleName || roleName === lastRole.current) return;
+    lastRole.current = roleName;
 
-  const displayCerts = getDisplayCerts();
+    let cancelled = false;
+    const fetchCerts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/career-agent/certifications/${encodeURIComponent(roleName)}`);
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const data = await res.json();
+        if (!cancelled) {
+          setCertsData({
+            technical: data.technical || [],
+            ai:        data.ai        || [],
+            domain:    data.domain    || [],
+          });
+        }
+      } catch (e) {
+        if (!cancelled) setError(e.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchCerts();
+    return () => { cancelled = true; };
+  }, [roleName]);
+
+  const displayCerts = certsData[activeTab] || [];
 
   return (
     <div style={{ marginTop: '1rem', animation: 'fadeIn 0.5s ease-out' }}>
@@ -235,7 +228,7 @@ const Certifications = ({ roleName }) => {
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '2rem',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
           <div style={{
@@ -243,7 +236,7 @@ const Certifications = ({ roleName }) => {
             background: 'rgba(79, 142, 247, 0.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, border: '2px solid rgba(79,142,247,0.4)',
-            boxShadow: '0 0 20px rgba(79, 142, 247, 0.2)'
+            boxShadow: '0 0 20px rgba(79, 142, 247, 0.2)',
           }}>
             <Award size={28} color="var(--accent)" />
           </div>
@@ -252,28 +245,28 @@ const Certifications = ({ roleName }) => {
               Top Recommended Certifications
             </h3>
             <p style={{ color: 'var(--muted)', fontSize: '0.85rem', lineHeight: '1.5', margin: 0, maxWidth: '550px' }}>
-              Boost your profile as a <strong style={{ color: 'var(--text2)' }}>{roleName || 'Software Developer'}</strong> by acquiring these industry-recognized credentials.
+              Boost your profile as a <strong style={{ color: 'var(--text2)' }}>{roleName || 'Software Developer'}</strong> by acquiring these industry-recognised credentials — sourced directly from the SMAART Career Agent Database.
             </p>
           </div>
         </div>
 
-        {/* Tabs - Now aligned next to title */}
+        {/* Tabs */}
         <div style={{
-          display: 'flex',
-          gap: '0.6rem',
+          display: 'flex', gap: '0.6rem',
           background: 'linear-gradient(135deg, rgba(79, 142, 247, 0.12), rgba(167, 139, 250, 0.08))',
           border: '1px solid rgba(79, 142, 247, 0.2)',
-          padding: '0.45rem',
-          borderRadius: '12px',
+          padding: '0.45rem', borderRadius: '12px',
           width: 'fit-content',
-          boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.05)'
+          boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.05)',
         }}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
-                background: activeTab === tab.id ? 'linear-gradient(135deg, var(--accent), var(--accent2))' : 'transparent',
+                background: activeTab === tab.id
+                  ? 'linear-gradient(135deg, var(--accent), var(--accent2))'
+                  : 'transparent',
                 color: activeTab === tab.id ? '#ffffff' : 'var(--text2)',
                 border: 'none',
                 padding: '0.55rem 1.1rem',
@@ -281,150 +274,110 @@ const Certifications = ({ roleName }) => {
                 fontSize: '0.8rem',
                 fontWeight: activeTab === tab.id ? 700 : 600,
                 cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
+                display: 'flex', alignItems: 'center', gap: '0.5rem',
                 transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
                 boxShadow: activeTab === tab.id ? '0 4px 14px rgba(79, 142, 247, 0.4)' : 'none',
-                transform: activeTab === tab.id ? 'translateY(-1px)' : 'none'
+                transform: activeTab === tab.id ? 'translateY(-1px)' : 'none',
               }}
             >
               {tab.icon}
               {tab.label}
+              {/* Count badge */}
+              {certsData[tab.id]?.length > 0 && (
+                <span style={{
+                  background: activeTab === tab.id ? 'rgba(255,255,255,0.25)' : 'rgba(79,142,247,0.15)',
+                  color: activeTab === tab.id ? '#fff' : 'var(--accent)',
+                  fontSize: '0.65rem', fontWeight: 800,
+                  padding: '0.1rem 0.45rem', borderRadius: '100px',
+                  minWidth: '18px', textAlign: 'center',
+                }}>
+                  {certsData[tab.id].length}
+                </span>
+              )}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Grid Layout */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-        gap: '1.5rem',
-        paddingBottom: '2rem'
-      }}>
-        {displayCerts.map((cert) => (
-          <a
-            key={cert.id}
-            href={cert.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onMouseEnter={() => setHoveredId(cert.id)}
-            onMouseLeave={() => setHoveredId(null)}
+      {/* Loading State */}
+      {loading && (
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', minHeight: '280px', gap: '1rem',
+        }}>
+          <div style={{
+            width: '40px', height: '40px', borderRadius: '50%',
+            border: '3px solid var(--border)', borderTopColor: 'var(--accent)',
+            animation: 'spin 0.8s linear infinite',
+          }} />
+          <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
+            Fetching certifications for <strong style={{ color: 'var(--text2)' }}>{roleName}</strong>…
+          </p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {!loading && error && (
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', minHeight: '200px', gap: '0.75rem',
+          background: 'var(--navy2)', borderRadius: '16px',
+          border: '1px solid rgba(239,68,68,0.25)', padding: '2rem',
+        }}>
+          <AlertCircle size={32} color="var(--red)" />
+          <h4 style={{ color: 'var(--text)', fontSize: '0.95rem', fontWeight: 700 }}>Could not load certifications</h4>
+          <p style={{ color: 'var(--muted)', fontSize: '0.82rem', textAlign: 'center', maxWidth: '360px' }}>{error}</p>
+          <button
+            onClick={() => { lastRole.current = null; setCertsData({ technical: [], ai: [], domain: [] }); }}
             style={{
-              textDecoration: 'none',
-              background: 'var(--navy2)',
-              border: `1px solid ${hoveredId === cert.id ? cert.color : 'var(--border)'}`,
-              borderRadius: '16px',
-              padding: '1.5rem',
-              transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
-              transform: hoveredId === cert.id ? 'translateY(-4px)' : 'translateY(0)',
-              boxShadow: hoveredId === cert.id ? `0 12px 24px -8px ${cert.color}40` : '0 4px 12px rgba(0,0,0,0.05)',
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'relative',
-              overflow: 'hidden'
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              padding: '0.5rem 1rem', borderRadius: '8px',
+              background: 'var(--accent)', color: '#fff',
+              border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600,
             }}
           >
-            {/* Top Badge Overlay Glow */}
-            <div style={{
-              position: 'absolute',
-              top: '-50px',
-              right: '-50px',
-              width: '100px',
-              height: '100px',
-              background: cert.color,
-              filter: 'blur(40px)',
-              opacity: hoveredId === cert.id ? 0.3 : 0.05,
-              transition: 'opacity 0.4s'
-            }}></div>
+            <RefreshCw size={14} /> Retry
+          </button>
+        </div>
+      )}
 
-            {/* Provider & Icon */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.7rem',
-                borderRadius: '8px', fontSize: '0.75rem', fontWeight: '600',
-                color: 'var(--text2)', border: '1px solid var(--border)'
-              }}>
-                <ShieldCheck size={14} color={cert.color} />
-                {cert.provider}
-              </div>
-              <div style={{
-                color: hoveredId === cert.id ? 'var(--text)' : 'var(--muted)',
-                transition: 'color 0.3s',
-                display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', fontWeight: 600
-              }}>
-                View Course <ExternalLink size={14} />
-              </div>
-            </div>
+      {/* Empty State */}
+      {!loading && !error && displayCerts.length === 0 && (
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', minHeight: '250px',
+          background: 'var(--navy2)', borderRadius: '16px',
+          border: '1px solid var(--border)', padding: '2rem', textAlign: 'center',
+        }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '1rem', opacity: 0.4 }}>🎓</div>
+          <h3 style={{ color: 'var(--text2)', marginBottom: '0.5rem', fontSize: '0.95rem', fontWeight: 700 }}>
+            No {activeTab === 'ai' ? 'AI & Data' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} certifications found for "{roleName}"
+          </h3>
+          <p style={{ color: 'var(--muted)', fontSize: '0.82rem', maxWidth: '360px', lineHeight: 1.6 }}>
+            The database doesn't have mapped certifications for this skill category yet. Try switching to another category.
+          </p>
+        </div>
+      )}
 
-            {/* Certificate Title */}
-            <h4 style={{
-              fontSize: '1.1rem',
-              color: 'var(--text)',
-              marginBottom: '1rem',
-              lineHeight: '1.4',
-              flex: 1
-            }}>
-              {cert.name}
-            </h4>
-
-            {/* Meta Tags */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                <Star size={14} color="var(--amber)" />
-                {cert.level}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                <Clock size={14} color="var(--accent)" />
-                {cert.duration}
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.4rem',
-              marginTop: 'auto',
-              paddingTop: '1rem',
-              borderTop: '1px dashed var(--border)'
-            }}>
-              <div style={{ width: '100%', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--muted)', marginBottom: '0.2rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <BookOpen size={12} /> Skills Covered
-              </div>
-              {cert.skills.map((skill, idx) => (
-                <span key={idx} style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid var(--border2)',
-                  color: 'var(--text2)',
-                  padding: '0.2rem 0.6rem',
-                  borderRadius: '6px',
-                  fontSize: '0.75rem',
-                  fontWeight: '500'
-                }}>
-                  {skill}
-                </span>
-              ))}
-            </div>
-
-            {/* Hover arrow indicator */}
-            <div style={{
-              position: 'absolute',
-              bottom: '1rem',
-              right: '1rem',
-              opacity: hoveredId === cert.id ? 1 : 0,
-              transform: hoveredId === cert.id ? 'translateX(0)' : 'translateX(-10px)',
-              transition: 'all 0.3s ease',
-              color: cert.color
-            }}>
-              <ChevronRight size={20} />
-            </div>
-
-          </a>
-        ))}
-      </div>
+      {/* Certifications Grid */}
+      {!loading && !error && displayCerts.length > 0 && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+          gap: '1.5rem',
+          paddingBottom: '2rem',
+        }}>
+          {displayCerts.map((cert) => (
+            <CertCard
+              key={cert.id}
+              cert={cert}
+              hoveredId={hoveredId}
+              onEnter={setHoveredId}
+              onLeave={() => setHoveredId(null)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

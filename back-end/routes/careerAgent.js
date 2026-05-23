@@ -953,4 +953,134 @@ router.post('/user-skills/progress', async (req, res) => {
   }
 });
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CERTIFICATIONS ENDPOINT (career-agent-certifaction collection)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * GET /api/career-agent/certifications/:roleTitle
+ *
+ * Fetches role-specific certifications from the career-agent-certifaction collection.
+ *
+ * Strategy:
+ *  1. Try exact match on roleskillslist 'Job Role'
+ *  2. If no match → look up careerdirections to find job roles for this direction name,
+ *     then aggregate skills across all those roles
+ *  3. Cross-reference Skill IDs with career-agent-certifaction
+ *  4. Group results by category: Technical, AI-Tool, Domain
+ *  5. Fallback: if any category is still empty, pull generic certs of that type
+ */
+router.get('/certifications/:roleTitle', async (req, res) => {
+  try {
+    const rawTitle = decodeURIComponent(req.params.roleTitle).trim();
+    const db = require('mongoose').connection.db;
+
+    // ── Helper: escape special chars for regex ─────────────────────────────
+    const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // ── Step 1: Try exact match in roleskillslist ──────────────────────────
+    let roleSkillRows = await db.collection('roleskillslist')
+      .find({ 'Job Role': { $regex: new RegExp(`^${escapeRegex(rawTitle)}$`, 'i') } })
+      .toArray();
+
+    // ── Step 2: If no exact match, try partial keyword match ───────────────
+    if (!roleSkillRows.length) {
+      const stopWords = new Set(['and', 'with', 'for', 'the', 'of', 'in', 'at', 'on', 'ai', '&']);
+      const keywords = rawTitle
+        .replace(/[&/\\]/g, ' ')
+        .split(/\s+/)
+        .filter(w => w.length > 3 && !stopWords.has(w.toLowerCase()));
+
+      if (keywords.length > 0) {
+        const kw = keywords[0];
+        roleSkillRows = await db.collection('roleskillslist')
+          .find({ 'Job Role': { $regex: new RegExp(escapeRegex(kw), 'i') } })
+          .toArray();
+      }
+    }
+
+    // ── Step 3: If still no match, look up direction in careerdirections ───
+    if (!roleSkillRows.length) {
+      const dirDoc = await db.collection('careerdirections').findOne({
+        'Career Direction': { $regex: new RegExp(escapeRegex(rawTitle), 'i') }
+      });
+
+      if (dirDoc) {
+        const dirRoles = [];
+        for (let i = 1; i <= 10; i++) {
+          const r = dirDoc[`Job Role ${i}`];
+          if (r && typeof r === 'string' && r.trim()) dirRoles.push(r.trim());
+        }
+        if (dirRoles.length > 0) {
+          roleSkillRows = await db.collection('roleskillslist')
+            .find({ 'Job Role': { $in: dirRoles } })
+            .toArray();
+        }
+      }
+    }
+
+    // ── Step 4: Extract unique Skill IDs ──────────────────────────────────
+    const skillIdSet = new Set(roleSkillRows.map(r => r['Skill ID']).filter(Boolean));
+    const skillIds = [...skillIdSet];
+
+    // ── Step 5: Fetch matching certs ──────────────────────────────────────
+    let certs = [];
+    if (skillIds.length > 0) {
+      certs = await db.collection('career-agent-certifaction')
+        .find({ skill_id: { $in: skillIds } })
+        .toArray();
+    }
+
+    // ── Step 6: Fill missing categories with generic certs ─────────────────
+    const hasTechnical = certs.some(c => c.category === 'Technical');
+    const hasAI        = certs.some(c => c.category === 'AI-Tool');
+    const hasDomain    = certs.some(c => c.category === 'Domain');
+
+    if (!hasTechnical || !hasAI || !hasDomain) {
+      const missingCategories = [];
+      if (!hasTechnical) missingCategories.push('Technical');
+      if (!hasAI)        missingCategories.push('AI-Tool');
+      if (!hasDomain)    missingCategories.push('Domain');
+
+      if (missingCategories.length > 0) {
+        const fallbackCerts = await db.collection('career-agent-certifaction')
+          .find({ category: { $in: missingCategories } })
+          .limit(missingCategories.length * 6)
+          .toArray();
+        certs = [...certs, ...fallbackCerts];
+      }
+    }
+
+    // Step 5: Map & group by category
+    const mapCert = (c) => ({
+      id: String(c._id),
+      skillId:   c.skill_id   || c.skillId   || '',
+      skillName: c.skill_name || c.skillName  || '',
+      name:      c.suggested_certificates || c.suggestedCertificates || '',
+      provider:  c.issuing_body || c.issuingBody || '',
+      url:       c.official_url || c.officialUrl || '#',
+      fee:       c.fee || 'Check Website',
+      category:  c.category || 'Technical',
+    });
+
+    const technical = certs.filter(c => c.category === 'Technical').map(mapCert);
+    const ai        = certs.filter(c => c.category === 'AI-Tool').map(mapCert);
+    const domain    = certs.filter(c => c.category === 'Domain').map(mapCert);
+
+    return res.json({
+      roleTitle:          rawTitle,
+      found:              certs.length > 0,
+      totalSkillsMatched: skillIds.length,
+      technical,
+      ai,
+      domain,
+    });
+  } catch (err) {
+    console.error('[career-agent] Error in /certifications/:roleTitle:', err.message);
+    res.status(500).json({ error: 'Failed to fetch certifications', details: err.message });
+  }
+});
+
 module.exports = router;
+
