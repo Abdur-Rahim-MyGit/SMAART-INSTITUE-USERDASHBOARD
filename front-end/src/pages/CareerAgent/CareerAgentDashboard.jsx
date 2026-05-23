@@ -750,9 +750,14 @@ const CareerAgentDashboard = () => {
                     {activePanel === 'certs' && (
                         <div className="panel animate-fade-in">
                             <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Award size={22} color="var(--accent)" /> Certifications</h2>
-                            <Certifications roleName={currentData.tab1.role_name} />
+                            <Certifications
+                                roleName={currentData.tab1.role_name}
+                                directionName={currentData?.direction?.directionName || ''}
+                                directionRoles={(currentData?.direction?.roles || []).map(r => typeof r === 'string' ? r : r.role)}
+                            />
                         </div>
                     )}
+
 
                     {/* Placeholders for remaining panels */}
                     {!['direction', 'overview', 'roledetail', 'market', 'skills', 'roadmap', 'future', 'ai', 'projects', 'interview', 'resume', 'certs'].includes(activePanel) && (
