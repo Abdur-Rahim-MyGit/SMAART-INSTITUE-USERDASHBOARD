@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Play, BookOpen, ChevronRight, Clock, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import CourseStructure from "@/components/CourseStructure";
 import useUser from "@/hooks/useUser";
 import { coursesAPI } from "@/services/api";
 
 /* ─── Continue Watching Card ─── */
 const ContinueWatchingCard = ({ course, progress, onResume }) => {
+  const { t } = useTranslation();
   if (!course) return null;
   const pct = progress || 0;
 
@@ -34,24 +36,24 @@ const ContinueWatchingCard = ({ course, progress, onResume }) => {
             {/* Label */}
             <div className="flex items-center gap-2 mb-1">
               <span className="text-[9px] font-black uppercase tracking-[0.25em] text-blue-400">
-                Continue Watching
+                {t("my_courses_page.continue_watching")}
               </span>
               <span className="w-1 h-1 rounded-full bg-blue-400/50" />
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
-                {pct}% Complete
+                {t("my_courses_page.pct_complete", { pct })}
               </span>
             </div>
 
             {/* Course title */}
             <h2 className="text-xl md:text-2xl font-extrabold text-white leading-tight mb-1" style={{ letterSpacing: "-0.02em" }}>
-              {course.title || "Your Current Course"}
+              {course.title || t("my_courses_page.your_current_course")}
             </h2>
 
             {/* Subtitle / last lesson */}
             {course.lastWatchedLesson && (
               <p className="text-[13px] text-slate-400 font-medium flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" />
-                Last watched: <span className="text-slate-300">{course.lastWatchedLesson}</span>
+                {t("my_courses_page.last_watched")} <span className="text-slate-300">{course.lastWatchedLesson}</span>
               </p>
             )}
 
@@ -67,11 +69,11 @@ const ContinueWatchingCard = ({ course, progress, onResume }) => {
               </div>
               <div className="flex items-center justify-between mt-1">
                 <span className="text-[10px] text-slate-500 font-medium">
-                  {course.completedModules || 0}/{course.totalModules || (course.modules?.length || 0)} modules
+                  {t("my_courses_page.modules_count", { completed: course.completedModules || 0, total: course.totalModules || (course.modules?.length || 0) })}
                 </span>
                 {pct === 100 && (
                   <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Completed
+                    <CheckCircle2 className="w-3 h-3" /> {t("my_courses_page.completed")}
                   </span>
                 )}
               </div>
@@ -85,7 +87,7 @@ const ContinueWatchingCard = ({ course, progress, onResume }) => {
           className="flex items-center gap-3 px-6 py-3.5 bg-white text-[#112b6b] font-extrabold text-sm rounded-xl hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex-shrink-0 whitespace-nowrap"
         >
           <Play className="w-4 h-4 fill-[#112b6b]" />
-          Resume Course
+          {t("my_courses_page.resume_course")}
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
@@ -97,6 +99,7 @@ const ContinueWatchingCard = ({ course, progress, onResume }) => {
 const MyCourses = () => {
   const navigate = useNavigate();
   const { user } = useUser();
+  const { t } = useTranslation();
 
   const [currentCourse, setCurrentCourse] = useState(null);
   const [currentProgress, setCurrentProgress] = useState(0);
@@ -157,7 +160,7 @@ const MyCourses = () => {
           // Fallback: show minimal info from localStorage
           setCurrentCourse({
             _id: lastWatched,
-            title: localStorage.getItem("smaart_last_watched_title") || "Your Course",
+            title: localStorage.getItem("smaart_last_watched_title") || t("my_courses_page.your_course"),
             lastWatchedLesson: lastWatchedLesson || null,
             completedModules: 0,
             totalModules: 0,
@@ -184,7 +187,7 @@ const MyCourses = () => {
     };
 
     loadCurrentCourse();
-  }, []);
+  }, [t]);
 
   const handleCourseClick = (courseId) => {
     navigate(`/dashboard/courses/${courseId}/player`);

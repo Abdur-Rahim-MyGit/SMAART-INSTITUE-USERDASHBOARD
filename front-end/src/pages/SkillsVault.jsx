@@ -13,6 +13,7 @@ import BadgeGallery from "@/components/badges/BadgeGallery";
 import CertificateVerification from "@/components/landing/CertificateVerification";
 import { toast } from "sonner";
 import PageHero from "@/components/ui/PageHero";
+import { useTranslation } from "react-i18next";
 
 /* ══════════════════════════════════════
    Skills Vault – Your Professional Vault
@@ -27,6 +28,7 @@ const TABS = [
 ];
 
 const SkillsVault = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { user, loading: userLoading } = useUser();
     const [activeTab, setActiveTab] = useState("overview");
@@ -67,19 +69,19 @@ const SkillsVault = () => {
     const completedAssessments = Object.values(stageStatus).filter(s => s?.completed).length;
 
     const certificateTypes = [
-        { id: "capacity", title: "Certificate in Capacity & Work Readiness", code: "CAP", level: "Level 1" },
-        { id: "capability", title: "Advanced Certificate in Applied Capability", code: "APC", level: "Level 2" },
-        { id: "leadership", title: "Diploma in Employability & Leadership", code: "ELR", level: "Level 3" },
-        { id: "combined", title: "Master Diploma in Comprehensive Readiness", code: "MPD", level: "Master" },
+        { id: "capacity", title: t("skills_vault.certificates.names.capacity", "Certificate in Capacity & Work Readiness"), code: "CAP", level: t("skills_vault.certificates.levels.capacity", "Level 1") },
+        { id: "capability", title: t("skills_vault.certificates.names.capability", "Advanced Certificate in Applied Capability"), code: "APC", level: t("skills_vault.certificates.levels.capability", "Level 2") },
+        { id: "leadership", title: t("skills_vault.certificates.names.leadership", "Diploma in Employability & Leadership"), code: "ELR", level: t("skills_vault.certificates.levels.leadership", "Level 3") },
+        { id: "combined", title: t("skills_vault.certificates.names.combined", "Master Diploma in Comprehensive Readiness"), code: "MPD", level: t("skills_vault.certificates.levels.combined", "Master") },
     ];
 
     const defaultFlashcards = [
-        { term: "Cognitive Reasoning (CRQ)", definition: "The ability to analyze, synthesize, and evaluate information to derive meaningful conclusions and solve complex problems.", category: "Quotient" },
-        { term: "Self-Regulation (SRQ)", definition: "The capacity to manage emotions, thoughts, and behaviors effectively across different situations and towards goals.", category: "Quotient" },
-        { term: "Learning Agility (LQ)", definition: "The willingness and ability to learn from experience and then apply those lessons in new and first-time situations.", category: "Quotient" },
-        { term: "Social Interaction (SIQ)", definition: "The skill of navigating social environments with emotional intelligence, empathy, and effective communication.", category: "Quotient" },
-        { term: "Professional Execution (PEQ)", definition: "The competence to deliver professional outcomes with accountability, precision, and stakeholder orientation.", category: "Quotient" },
-        { term: "Digital & AI Literacy (DAQ)", definition: "The ability to leverage digital tools and artificial intelligence to enhance productivity and innovation.", category: "Quotient" },
+        { term: t("skills_vault.flashcards.cards.crq.term", "Cognitive Reasoning (CRQ)"), definition: t("skills_vault.flashcards.cards.crq.definition", "The ability to analyze, synthesize, and evaluate information to derive meaningful conclusions and solve complex problems."), category: t("skills_vault.flashcards.category.Quotient", "Quotient") },
+        { term: t("skills_vault.flashcards.cards.srq.term", "Self-Regulation (SRQ)"), definition: t("skills_vault.flashcards.cards.srq.definition", "The capacity to manage emotions, thoughts, and behaviors effectively across different situations and towards goals."), category: t("skills_vault.flashcards.category.Quotient", "Quotient") },
+        { term: t("skills_vault.flashcards.cards.lq.term", "Learning Agility (LQ)"), definition: t("skills_vault.flashcards.cards.lq.definition", "The willingness and ability to learn from experience and then apply those lessons in new and first-time situations."), category: t("skills_vault.flashcards.category.Quotient", "Quotient") },
+        { term: t("skills_vault.flashcards.cards.siq.term", "Social Interaction (SIQ)"), definition: t("skills_vault.flashcards.cards.siq.definition", "The skill of navigating social environments with emotional intelligence, empathy, and effective communication."), category: t("skills_vault.flashcards.category.Quotient", "Quotient") },
+        { term: t("skills_vault.flashcards.cards.peq.term", "Professional Execution (PEQ)"), definition: t("skills_vault.flashcards.cards.peq.definition", "The competence to deliver professional outcomes with accountability, precision, and stakeholder orientation."), category: t("skills_vault.flashcards.category.Quotient", "Quotient") },
+        { term: t("skills_vault.flashcards.cards.daq.term", "Digital & AI Literacy (DAQ)"), definition: t("skills_vault.flashcards.cards.daq.definition", "The ability to leverage digital tools and artificial intelligence to enhance productivity and innovation."), category: t("skills_vault.flashcards.category.Quotient", "Quotient") },
     ];
 
     if (userLoading) {
@@ -103,28 +105,29 @@ const SkillsVault = () => {
 
                     {/* ── Standardized PageHero ── */}
                     <PageHero
-                        badge="Secure Professional Vault"
-                        title="Skills Vault"
-                        subtitle="Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault."
+                        badge={t("skills_vault.hero_badge", "Secure Professional Vault")}
+                        title={t("skills_vault.hero_title", "Skills Vault")}
+                        subtitle={t("skills_vault.hero_subtitle", "Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault.")}
                     />
 
                     {/* ── Glassmorphic Tab Navigation ── */}
-                    <div className="flex justify-center sticky top-4 z-50">
-                        <div className="inline-flex bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[24px] p-2 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] border border-slate-200/50 dark:border-slate-700/50 overflow-x-auto max-w-full no-scrollbar">
+                    <div className="flex justify-center sticky top-4 z-50 px-2 sm:px-0">
+                        <div className="inline-flex bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[24px] p-1.5 sm:p-2 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] border border-slate-200/50 dark:border-slate-700/50 overflow-x-auto max-w-full no-scrollbar">
                             {TABS.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
+                                const tabLabel = t(`skills_vault.tabs.${tab.id}`, tab.label);
                                 return (
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-2.5 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isActive
+                                        className={`flex items-center gap-1.5 sm:gap-2.5 px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isActive
                                             ? "bg-[#1a3884] text-white shadow-lg shadow-blue-900/20 scale-105"
                                             : "text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/50"
                                             }`}
                                     >
-                                        <Icon className={`w-4 h-4 ${isActive ? 'scale-110' : ''}`} />
-                                        {tab.label}
+                                        <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isActive ? 'scale-110' : ''}`} />
+                                        {tabLabel}
                                     </button>
                                 );
                             })}
@@ -147,52 +150,61 @@ const SkillsVault = () => {
                                     {/* Quick Stats */}
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                         {[
-                                            { label: "Certificates", value: certificateTypes.length, icon: Award, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
-                                            { label: "Badges Earned", value: badges.length, icon: Trophy, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
-                                            { label: "Courses", value: courses.length, icon: BookOpen, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
-                                            { label: "Assessments", value: `${completedAssessments}/4`, icon: Brain, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-900/20" },
-                                        ].map((stat, i) => (
-                                            <motion.div
-                                                key={i}
-                                                initial={{ opacity: 0, y: 16 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: i * 0.08 }}
-                                                className="bg-white dark:bg-slate-900/40 rounded-[24px] p-6 border border-slate-100 dark:border-white/8 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all group"
-                                            >
-                                                <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
-                                                    <stat.icon className="w-6 h-6" />
-                                                </div>
-                                                <h3 className="text-3xl font-black text-slate-950 dark:text-white leading-none">{stat.value}</h3>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{stat.label}</p>
-                                            </motion.div>
-                                        ))}
+                                            { key: "certificates", label: "Certificates", value: certificateTypes.length, icon: Award, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-900/20" },
+                                            { key: "badges", label: "Badges Earned", value: badges.length, icon: Trophy, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-900/20" },
+                                            { key: "courses", label: "Courses", value: courses.length, icon: BookOpen, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-900/20" },
+                                            { key: "assessments", label: "Assessments", value: `${completedAssessments}/4`, icon: Brain, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-900/20" },
+                                        ].map((stat, i) => {
+                                            const label = t(`skills_vault.overview.stats.${stat.key}`, stat.label);
+                                            return (
+                                                <motion.div
+                                                    key={i}
+                                                    initial={{ opacity: 0, y: 16 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: i * 0.08 }}
+                                                    className="bg-white dark:bg-slate-900/40 rounded-[24px] p-4 sm:p-6 border border-slate-100 dark:border-white/8 shadow-[0_15px_35px_-15px_rgba(0,0,0,0.05)] hover:shadow-xl transition-all group"
+                                                >
+                                                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
+                                                        <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                                                    </div>
+                                                    <h3 className="text-2xl sm:text-3xl font-black text-slate-950 dark:text-white leading-none">{stat.value}</h3>
+                                                    <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{label}</p>
+                                                </motion.div>
+                                            );
+                                        })}
                                     </div>
 
                                     {/* What's in your wallet */}
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <div className="mb-8">
-                                            <h3 className="text-xl font-black text-slate-950 dark:text-white mb-2">What's in your Skills Vault?</h3>
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-5 sm:p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="mb-6 sm:mb-8">
+                                            <h3 className="text-xl font-black text-slate-950 dark:text-white mb-2">
+                                                {t("skills_vault.overview.title", "What's in your Skills Vault?")}
+                                            </h3>
                                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl">
-                                                Your Skills Vault is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources.
+                                                {t("skills_vault.overview.subtitle", "Your Skills Vault is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources.")}
                                             </p>
                                         </div>
-                                        <div className="grid sm:grid-cols-2 gap-5">
+                                        <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
                                             {[
-                                                { icon: Award, title: "Certificates", desc: "Verified professional credentials issued upon completing programme milestones — Capacity, Capability, Leadership, and the Master Diploma." },
-                                                { icon: Trophy, title: "Badges & Achievements", desc: "Micro-credentials earned through course activities, assessments, and engagement — each one verifiable and shareable." },
-                                                { icon: BookOpen, title: "Course Overview", desc: "A dashboard view of all your enrolled courses, modules completed, and overall progress across the SMAART curriculum." },
-                                                { icon: Zap, title: "Flashcards & Key Terms", desc: "Quick-reference cards for the six core quotients and other essential professional terminology from your learning journey." },
-                                            ].map((item, i) => (
-                                                <div key={i} className="flex gap-5 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 hover:border-[#1a3884]/20 transition-all group">
-                                                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
-                                                        <item.icon className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
+                                                { key: "certificates", icon: Award, title: "Certificates", desc: "Verified professional credentials issued upon completing programme milestones — Capacity, Capability, Leadership, and the Master Diploma." },
+                                                { key: "badges", icon: Trophy, title: "Badges & Achievements", desc: "Micro-credentials earned through course activities, assessments, and engagement — each one verifiable and shareable." },
+                                                { key: "courses", icon: BookOpen, title: "Course Overview", desc: "A dashboard view of all your enrolled courses, modules completed, and overall progress across the SMAART curriculum." },
+                                                { key: "flashcards", icon: Zap, title: "Flashcards & Key Terms", desc: "Quick-reference cards for the six core quotients and other essential professional terminology from your learning journey." },
+                                            ].map((item, i) => {
+                                                const title = t(`skills_vault.overview.items.${item.key}.title`, item.title);
+                                                const desc = t(`skills_vault.overview.items.${item.key}.desc`, item.desc);
+                                                return (
+                                                    <div key={i} className="flex gap-4 sm:gap-5 p-4 sm:p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 hover:border-[#1a3884]/20 transition-all group">
+                                                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
+                                                            <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#1a3884] dark:text-blue-400" />
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-[14px] sm:text-[15px] font-black text-slate-900 dark:text-white mb-1">{title}</h4>
+                                                            <p className="text-[12px] sm:text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <h4 className="text-[15px] font-black text-slate-900 dark:text-white mb-1">{item.title}</h4>
-                                                        <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed">{item.desc}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </div>
@@ -200,25 +212,29 @@ const SkillsVault = () => {
 
                             {/* ════════ CERTIFICATES TAB ════════ */}
                             {activeTab === "certificates" && (
-                                <div className="space-y-8">
-                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+                                <div className="space-y-6 sm:space-y-8">
+                                    <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-5 sm:p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-6 sm:mb-8">
                                             <div>
                                                 <div className="flex items-center gap-3 mb-1">
-                                                    <Award className="w-6 h-6 text-amber-500" />
-                                                    <h3 className="text-xl font-black text-slate-950 dark:text-white">Professional Credentials</h3>
+                                                    <Award className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500" />
+                                                    <h3 className="text-lg sm:text-xl font-black text-slate-950 dark:text-white">
+                                                        {t("skills_vault.certificates.title", "Professional Credentials")}
+                                                    </h3>
                                                 </div>
-                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Your verified SMAART Institute certifications</p>
+                                                <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">
+                                                    {t("skills_vault.certificates.desc", "Your verified SMAART Institute certifications")}
+                                                </p>
                                             </div>
                                             <button
                                                 onClick={() => navigate("/dashboard/certificate")}
-                                                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] active:scale-95 transition-all"
+                                                className="inline-flex items-center justify-center gap-2 px-5 py-3 sm:px-6 sm:py-3.5 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] active:scale-95 transition-all"
                                             >
-                                                <Download className="w-4 h-4" /> Download Centre
+                                                <Download className="w-4 h-4" /> {t("skills_vault.certificates.download_centre", "Download Centre")}
                                             </button>
                                         </div>
 
-                                        <div className="grid sm:grid-cols-2 gap-5">
+                                        <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
                                             {certificateTypes.map((cert, i) => (
                                                 <motion.div
                                                     key={cert.id}
@@ -226,17 +242,17 @@ const SkillsVault = () => {
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: i * 0.08 }}
                                                     onClick={() => navigate("/dashboard/certificate")}
-                                                    className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800/80 p-6 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-xl hover:bg-white dark:hover:bg-slate-900 transition-all group"
+                                                    className="bg-slate-50/50 dark:bg-slate-800/20 rounded-[28px] border border-slate-100 dark:border-slate-800/80 p-4 sm:p-6 cursor-pointer hover:border-[#1a3884]/40 dark:hover:border-blue-500/30 hover:shadow-xl hover:bg-white dark:hover:bg-slate-900 transition-all group"
                                                 >
-                                                    <div className="flex items-start gap-5">
-                                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                                                            <Award className="w-7 h-7 text-white" />
+                                                    <div className="flex items-start gap-4 sm:gap-5">
+                                                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                                                            <Award className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
-                                                            <h4 className="text-[15px] font-black text-slate-900 dark:text-white leading-snug mb-2 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
+                                                            <h4 className="text-[14px] sm:text-[15px] font-black text-slate-900 dark:text-white leading-snug mb-1.5 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
                                                                 {cert.title}
                                                             </h4>
-                                                            <div className="flex items-center gap-2 mt-3">
+                                                            <div className="flex items-center gap-2 mt-2">
                                                                 <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-white dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-100 dark:border-white/10">
                                                                     {cert.code}
                                                                 </span>
@@ -245,7 +261,7 @@ const SkillsVault = () => {
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <div className="hidden sm:flex w-10 h-10 rounded-xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-white/10 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                             <ChevronRight className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
                                                         </div>
                                                     </div>
@@ -258,12 +274,14 @@ const SkillsVault = () => {
 
                                     {/* Verification Section */}
                                     <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 overflow-hidden shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                        <div className="p-8 border-b border-slate-50 dark:border-white/8">
-                                            <h3 className="text-xl font-black text-slate-950 dark:text-white flex items-center gap-3">
-                                                <Shield className="w-6 h-6 text-emerald-500" />
-                                                Credential Verification
+                                        <div className="p-5 sm:p-8 border-b border-slate-50 dark:border-white/8">
+                                            <h3 className="text-lg sm:text-xl font-black text-slate-950 dark:text-white flex items-center gap-3">
+                                                <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
+                                                {t("skills_vault.certificates.verification_title", "Credential Verification")}
                                             </h3>
-                                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Verify any SMAART certificate using its unique ID or QR code.</p>
+                                            <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
+                                                {t("skills_vault.certificates.verification_desc", "Verify any SMAART certificate using its unique ID or QR code.")}
+                                            </p>
                                         </div>
                                         <div className="p-2">
                                             <CertificateVerification />
@@ -274,8 +292,8 @@ const SkillsVault = () => {
 
                             {/* ════════ BADGES TAB ════════ */}
                             {activeTab === "badges" && (
-                                <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
-                                    <BadgeGallery badges={badges} userName={user?.fullName || "Student"} />
+                                <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-4 sm:p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                    <BadgeGallery badges={badges} userName={user?.fullName || t("skills_vault.student", "Student")} />
                                 </div>
                             )}
 
@@ -283,12 +301,14 @@ const SkillsVault = () => {
                             {activeTab === "courses" && (
                                 <div className="space-y-5">
                                     <div className="flex items-center justify-between mb-2">
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Course Overview</h3>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                            {t("skills_vault.courses.overview", "Course Overview")}
+                                        </h3>
                                         <button
                                             onClick={() => navigate("/dashboard/courses")}
                                             className="text-sm font-semibold text-[#1a3884] dark:text-blue-400 hover:underline flex items-center gap-1"
                                         >
-                                            Go to Courses <ChevronRight className="w-4 h-4" />
+                                            {t("skills_vault.courses.go_to_courses", "Go to Courses")} <ChevronRight className="w-4 h-4" />
                                         </button>
                                     </div>
 
@@ -304,7 +324,7 @@ const SkillsVault = () => {
                                                     className="bg-white dark:bg-slate-900/40 rounded-[30px] border border-slate-100 dark:border-white/8 overflow-hidden cursor-pointer hover:shadow-2xl hover:border-[#1a3884]/30 dark:hover:border-blue-500/30 transition-all group"
                                                 >
                                                     {/* Thumbnail */}
-                                                    <div className="h-40 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] relative overflow-hidden">
+                                                    <div className="h-36 sm:h-40 bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] relative overflow-hidden">
                                                         {course.thumbnail && (
                                                             <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                                         )}
@@ -319,21 +339,21 @@ const SkillsVault = () => {
                                                         </div>
                                                     </div>
 
-                                                    <div className="p-6">
-                                                        <h4 className="text-[17px] font-black text-slate-950 dark:text-white mb-2 line-clamp-1 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
+                                                    <div className="p-4 sm:p-6">
+                                                        <h4 className="text-[16px] sm:text-[17px] font-black text-slate-950 dark:text-white mb-2 line-clamp-1 group-hover:text-[#1a3884] dark:group-hover:text-blue-400 transition-colors">
                                                             {course.title}
                                                         </h4>
-                                                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2 mb-5 leading-relaxed">
+                                                        <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 sm:mb-5 leading-relaxed">
                                                             {course.description || "Professional development course"}
                                                         </p>
-                                                        <div className="flex items-center gap-4 text-[11px] font-black uppercase tracking-widest text-slate-400">
+                                                        <div className="flex items-center gap-4 text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-400">
                                                             <span className="flex items-center gap-1.5">
                                                                 <BookOpen className="w-3.5 h-3.5" />
-                                                                {course.modules?.length || 0} Modules
+                                                                {course.modules?.length || 0} {t("skills_vault.courses.modules", "Modules")}
                                                             </span>
                                                             <span className="flex items-center gap-1.5">
                                                                 <Clock className="w-3.5 h-3.5" />
-                                                                {course.duration || "Self-paced"}
+                                                                {course.duration ? t("skills_vault.courses.duration", { duration: course.duration }) : t("skills_vault.courses.self_paced", "Self-paced")}
                                                             </span>
                                                         </div>
                                                     </div>
@@ -341,19 +361,21 @@ const SkillsVault = () => {
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-12 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
+                                        <div className="bg-white dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-6 sm:p-12 text-center shadow-[0_20px_50px_-20px_rgba(0,0,0,0.05)]">
                                             <div className="w-20 h-20 mx-auto mb-6 rounded-[24px] bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 flex items-center justify-center shadow-sm">
                                                 <BookOpen className="w-10 h-10 text-slate-300 dark:text-slate-600" />
                                             </div>
-                                            <h4 className="text-xl font-black text-slate-950 dark:text-white mb-2">No Enrolled Courses</h4>
+                                            <h4 className="text-xl font-black text-slate-950 dark:text-white mb-2">
+                                                {t("skills_vault.courses.no_courses_title", "No Enrolled Courses")}
+                                            </h4>
                                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
-                                                You haven't enrolled in any courses. Visit the core programme to get started on your journey.
+                                                {t("skills_vault.courses.no_courses_desc", "You haven't enrolled in any courses. Visit the core programme to get started on your journey.")}
                                             </p>
                                             <button
                                                 onClick={() => navigate("/dashboard/courses")}
                                                 className="mt-8 inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-xs font-black uppercase tracking-widest hover:shadow-xl transform hover:scale-[1.02] transition-all"
                                             >
-                                                Browse Core Programme
+                                                {t("skills_vault.courses.browse_btn", "Browse Core Programme")}
                                             </button>
                                         </div>
                                     )}
@@ -364,9 +386,11 @@ const SkillsVault = () => {
                             {activeTab === "flashcards" && (
                                 <div className="space-y-5">
                                     <div className="mb-2">
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">Key Flashcards</h3>
+                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
+                                            {t("skills_vault.flashcards.title", "Key Flashcards")}
+                                        </h3>
                                         <p className="text-sm text-slate-500 dark:text-slate-400">
-                                            Quick-reference cards covering the six core SMAART quotients and essential professional terminology.
+                                            {t("skills_vault.flashcards.desc", "Quick-reference cards covering the six core SMAART quotients and essential professional terminology.")}
                                         </p>
                                     </div>
 
@@ -378,13 +402,13 @@ const SkillsVault = () => {
 
                                     <div className="bg-slate-50/50 dark:bg-slate-900/40 rounded-[32px] border border-slate-100 dark:border-white/8 p-8 text-center">
                                         <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">
-                                            More flashcards are available within each course module to help you master professional terminology.
+                                            {t("skills_vault.flashcards.more_desc", "More flashcards are available within each course module to help you master professional terminology.")}
                                         </p>
                                         <button
                                             onClick={() => navigate("/dashboard/courses")}
                                             className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl border-2 border-[#1a3884] dark:border-blue-500 text-[#1a3884] dark:text-blue-400 text-xs font-black uppercase tracking-widest hover:bg-[#1a3884] hover:text-white dark:hover:bg-blue-500 dark:hover:text-white transition-all transform hover:scale-[1.02]"
                                         >
-                                            <BookOpen className="w-4 h-4" /> Explore Course Flashcards
+                                            <BookOpen className="w-4 h-4" /> {t("skills_vault.flashcards.explore_btn", "Explore Course Flashcards")}
                                         </button>
                                     </div>
                                 </div>
@@ -402,6 +426,7 @@ const SkillsVault = () => {
 
 /* ── Flashcard Card Component ── */
 const FlashcardItem = ({ card, index }) => {
+    const { t } = useTranslation();
     const [flipped, setFlipped] = useState(false);
 
     return (
@@ -443,13 +468,13 @@ const FlashcardItem = ({ card, index }) => {
                     </div>
                     <div className="flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-[#1a3884] transition-colors">
                         <Zap className="w-3 h-3 group-hover:animate-pulse" />
-                        Tap to reveal
+                        {t("skills_vault.flashcards.tap_reveal", "Tap to reveal")}
                     </div>
                 </motion.div>
 
                 {/* Back - Solid Background with Opacity Control */}
                 <motion.div
-                    className="absolute inset-0 bg-slate-900 rounded-[28px] p-8 flex flex-col justify-center text-white shadow-2xl overflow-hidden"
+                    className="absolute inset-0 bg-slate-900 rounded-[28px] p-6 sm:p-8 flex flex-col justify-center text-white shadow-2xl overflow-hidden"
                     style={{
                         backfaceVisibility: "hidden",
                         WebkitBackfaceVisibility: "hidden",
@@ -470,7 +495,7 @@ const FlashcardItem = ({ card, index }) => {
                         {card.definition}
                     </p>
                     <div className="mt-8 pt-6 border-t border-white/10 flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-blue-200/50 relative z-10">
-                        Flip Back
+                        {t("skills_vault.flashcards.flip_back", "Flip Back")}
                     </div>
                 </motion.div>
             </div>

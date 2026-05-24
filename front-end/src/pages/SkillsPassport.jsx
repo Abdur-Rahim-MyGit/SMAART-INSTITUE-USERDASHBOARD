@@ -204,56 +204,59 @@ const getBadgeClass = (value, fallback = "SELF DECLARED") => {
     return badgeClasses[key] || badgeClasses[String(fallback).toUpperCase()] || badgeClasses["SELF DECLARED"];
 };
 
-const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => (
-    <motion.div
-        whileHover={{ y: -12, scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        className="group relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] p-6 shadow-lg transition-all duration-500 hover:shadow-xl"
-    >
-        <div className="absolute inset-0 bg-gradient-to-br from-teal/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        <div className="absolute inset-x-12 top-0 h-[2px] bg-gradient-to-r from-transparent via-teal/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => {
+    const { t } = useTranslation();
+    return (
+        <motion.div
+            whileHover={{ y: -12, scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            className="group relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] p-6 shadow-lg transition-all duration-500 hover:shadow-xl"
+        >
+            <div className="absolute inset-0 bg-gradient-to-br from-teal/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-x-12 top-0 h-[2px] bg-gradient-to-r from-transparent via-teal/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
 
-        <div className="flex items-start justify-between gap-5 relative z-10">
-            <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-[#1a3884]/20 group-hover:scale-110 group-hover:bg-[#1a3884] group-hover:text-white transition-all duration-500">
-                        <AccentIcon className="h-5 w-5" />
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-bold leading-tight text-slate-900 dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-blue-300 transition-colors duration-300">{item.title}</h3>
-                        <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-500 transition-colors">
-                            {item.platform}
-                        </p>
+            <div className="flex items-start justify-between gap-5 relative z-10">
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-[#1a3884]/20 group-hover:scale-110 group-hover:bg-[#1a3884] group-hover:text-white transition-all duration-500">
+                            <AccentIcon className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-bold leading-tight text-slate-900 dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-blue-300 transition-colors duration-300">{item.title}</h3>
+                            <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-500 transition-colors">
+                                {item.platform}
+                            </p>
+                        </div>
                     </div>
                 </div>
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                    <span
+                        className={`rounded-xl px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] shadow-sm ${getBadgeClass(item.level, "BEGINNER")}`}
+                    >
+                        {item.level}
+                    </span>
+                    <span className={`rounded-xl px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 shadow-sm`}>
+                        {t('badge_gallery.verified')}
+                    </span>
+                </div>
             </div>
-            <div className="flex shrink-0 flex-col items-end gap-2">
-                <span
-                    className={`rounded-xl px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] shadow-sm ${getBadgeClass(item.level, "BEGINNER")}`}
-                >
-                    {item.level}
-                </span>
-                <span className={`rounded-xl px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 shadow-sm`}>
-                    Verified
-                </span>
-            </div>
-        </div>
 
-        <div className="mt-6 flex items-center justify-between gap-4 pt-6 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-10">
-            <div className="flex -space-x-2">
-                {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-6 w-6 rounded-full border-2 border-white dark:border-[#1a3884]/30 bg-slate-200 dark:bg-[#003170] overflow-hidden">
-                        <div className="h-full w-full bg-gradient-to-br from-slate-400 to-slate-500 opacity-20" />
-                    </div>
-                ))}
+            <div className="mt-6 flex items-center justify-between gap-4 pt-6 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-10">
+                <div className="flex -space-x-2">
+                    {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-6 w-6 rounded-full border-2 border-white dark:border-[#1a3884]/30 bg-slate-200 dark:bg-[#003170] overflow-hidden">
+                            <div className="h-full w-full bg-gradient-to-br from-slate-400 to-slate-500 opacity-20" />
+                        </div>
+                    ))}
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                    <ShieldCheck className="w-3 h-3" />
+                    <span>{t('skills_passport.proficiency.gold_standard')}</span>
+                </div>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-                <ShieldCheck className="w-3 h-3" />
-                <span>SMAART Verified Record</span>
-            </div>
-        </div>
-    </motion.div>
-);
+        </motion.div>
+    );
+};
 
 
 
@@ -292,7 +295,7 @@ const SkillBadge = ({ skill, verified = false }) => (
 // --- Main Page Component ---
 
 const SkillsPassport = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { theme } = useTheme();
     const navigate = useNavigate();
     const containerRef = useRef(null);
@@ -639,26 +642,26 @@ const SkillsPassport = () => {
 
     const tabCollections = {
         smart: {
-            title: "Completed SMAART Courses",
-            description: "Verified learning pathways completed through the SMAART ecosystem.",
+            title: t('skills_passport.tabs.smart'),
+            description: t('skills_passport.hero_desc'),
             items: smaartCourses,
             icon: Sparkles
         },
         other: {
-            title: "Technical Skills",
-            description: "Hands-on technical abilities, projects, and supporting certifications.",
+            title: t('skills_passport.tabs.other'),
+            description: t('skills_passport.other_courses.title'),
             items: technicalSkills,
             icon: Briefcase
         },
         certificates: {
-            title: "AI Skills",
-            description: "AI tool fluency, workflows, and verified adoption across practical work.",
+            title: t('skills_passport.tabs.certificates'),
+            description: t('skills_passport.certificates.title'),
             items: aiSkills,
             icon: Monitor
         },
         projects: {
-            title: "Domain Skills",
-            description: "Subject-matter strengths and domain-specific professional depth.",
+            title: t('skills_passport.tabs.projects'),
+            description: t('skills_passport.projects.title'),
             items: domainSkills,
             icon: Layout
         }
@@ -667,7 +670,7 @@ const SkillsPassport = () => {
         "Cognitive Analysis", "Digital Literacy", "Agile Learning",
         "Professional Execution", "Ethics & Sustainability", "Social Intelligence"
     ];
-    const verificationTimestamp = new Date().toLocaleString("en-IN", {
+    const verificationTimestamp = new Date().toLocaleString(i18n.language || "en-IN", {
         day: "2-digit",
         month: "short",
         year: "numeric",
@@ -711,9 +714,9 @@ const SkillsPassport = () => {
             >
                 {/* Standardized PageHero */}
                 <PageHero
-                    badge="Digital Skills Passport"
-                    title="Skills Passport"
-                    subtitle="Your secure, AI-verified credential of capability. Designed for employers who demand proof, and professionals who seek growth."
+                    badge={t('skills_passport.title')}
+                    title={t('skills_passport.title')}
+                    subtitle={t('skills_passport.hero_desc')}
                 >
                     <div className="flex flex-wrap items-center gap-3">
                         <motion.button
@@ -724,7 +727,7 @@ const SkillsPassport = () => {
                             className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl px-5 text-sm font-bold text-white bg-[#1a3884] hover:bg-[#132c6b] shadow-lg transition-all disabled:opacity-70"
                         >
                             <Download className="h-4 w-4" />
-                            {isExporting ? "Exporting..." : "Get Passport PDF"}
+                            {isExporting ? t('common.processing') : t('skills_passport.get_pdf')}
                         </motion.button>
                         <motion.button
                             whileHover={{ scale: 1.02 }}
@@ -732,15 +735,15 @@ const SkillsPassport = () => {
                             onClick={async () => {
                                 try {
                                     await navigator.clipboard.writeText(passportShareUrl);
-                                    sonnerToast.success("Passport link copied!");
+                                    sonnerToast.success(t('skills_passport.copied_msg', 'Passport link copied!'));
                                 } catch {
-                                    sonnerToast.error("Unable to copy passport link.");
+                                    sonnerToast.error(t('skills_passport.copy_err', 'Unable to copy passport link.'));
                                 }
                             }}
                             className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl border border-slate-200 dark:border-[#1a3884]/25 bg-white dark:bg-[#002147] px-5 text-sm font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-[#002A5C]"
                         >
                             <Share2 className="h-4 w-4" />
-                            Share Identity
+                            {t('skills_passport.share')}
                         </motion.button>
                     </div>
                 </PageHero>
@@ -767,7 +770,7 @@ const SkillsPassport = () => {
                                                 <Sparkles className="w-4 h-4" />
                                             </div>
                                             <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
-                                                Skills Passport
+                                                {t('skills_passport.title')}
                                             </div>
                                         </div>
                                     </div>
@@ -862,9 +865,9 @@ const SkillsPassport = () => {
                                 className="mx-auto max-w-5xl rounded-[24px] border border-slate-200/70 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] px-6 py-6 sm:px-8 shadow-[0_18px_42px_-24px_rgba(15,23,42,0.2)]"
                             >
                                 <div className="mb-6">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Ten Professional Standards</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">{t('skills_passport.standards_title')}</p>
                                     <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                                        Professional Standards Matrix
+                                        {t('skills_passport.standards_matrix')}
                                     </h2>
                                 </div>
 
@@ -882,10 +885,10 @@ const SkillsPassport = () => {
                                                 <Sparkles className="w-12 h-12" />
                                             </div>
                                             <p className="text-xs font-bold leading-snug tracking-[0.1em] text-[#1a3884] dark:text-blue-400 uppercase mb-3">
-                                                {standard.title}
+                                                {t(`skills_passport.standards.${standard.title.toLowerCase()}.title`, standard.title)}
                                             </p>
                                             <p className="min-h-[48px] text-[11px] leading-snug font-medium text-slate-500 dark:text-slate-400">
-                                                {standard.description}
+                                                {t(`skills_passport.standards.${standard.title.toLowerCase()}.desc`, standard.description)}
                                             </p>
                                             <div className="mt-5 flex items-center justify-between">
                                                 <div className="flex items-center gap-1">
@@ -900,7 +903,7 @@ const SkillsPassport = () => {
                                                     })}
                                                 </div>
                                                 <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                                                    Rating: {standard.stars}.0
+                                                    {t('skills_passport.rating')}: {standard.stars}.0
                                                 </p>
                                             </div>
                                         </motion.div>
@@ -911,10 +914,10 @@ const SkillsPassport = () => {
                             <div className="max-w-5xl mx-auto px-2 sm:px-4">
                                 <div className="flex sm:flex-wrap justify-start sm:justify-center gap-2 p-2 bg-slate-100/50 dark:bg-[#001A38] backdrop-blur-xl rounded-[28px] border border-slate-200 dark:border-[#1a3884]/20 shadow-inner overflow-x-auto no-scrollbar">
                                     {[
-                                        { id: 'smart', label: 'SMAART Courses', icon: Sparkles },
-                                        { id: 'other', label: 'Technical Skills', icon: Briefcase },
-                                        { id: 'certificates', label: 'AI Skills', icon: Monitor },
-                                        { id: 'projects', label: 'Domain Skills', icon: Layout }
+                                        { id: 'smart', label: t('skills_passport.tabs.smart'), icon: Sparkles },
+                                        { id: 'other', label: t('skills_passport.tabs.other'), icon: Briefcase },
+                                        { id: 'certificates', label: t('skills_passport.tabs.certificates'), icon: Monitor },
+                                        { id: 'projects', label: t('skills_passport.tabs.projects'), icon: Layout }
                                     ].map((tab) => (
                                         <button
                                             key={tab.id}
@@ -952,7 +955,7 @@ const SkillsPassport = () => {
                                             <div className="flex items-center gap-3">
                                                 <div className="h-1.5 w-10 rounded-full bg-teal" />
                                                 <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400">
-                                                    Institutional Registry
+                                                    {t('skills_passport.institutional_registry')}
                                                 </p>
                                             </div>
                                             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -964,7 +967,7 @@ const SkillsPassport = () => {
                                         </div>
                                         <div className="flex flex-col items-center justify-center rounded-[32px] bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-[#1a3884]/20 px-8 py-6 shadow-sm">
                                             <span className="text-4xl font-bold text-teal dark:text-teal-light">{tabCollections[activeTab].items.length}</span>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">Verified Records</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">{t('skills_passport.verified_records')}</span>
                                         </div>
                                     </div>
                                 </div>

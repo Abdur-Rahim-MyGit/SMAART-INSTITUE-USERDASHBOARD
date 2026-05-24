@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import MCQPractice from "@/components/MCQPractice";
 import FlashcardTask from "@/components/FlashcardTask";
@@ -73,24 +74,24 @@ const getCourseById = (courseId) => {
 
 const getStageAndTrackInfo = (courseId) => {
   if (STAGE_1_COURSES.find(c => c.id === courseId)) {
-    return { stage: 'Stage 1', stageName: 'Capacity', type: 'Stage 1 Capacity' };
+    return { stageKey: 'course_player.stages.stage_1', stageNameKey: 'course_player.stages.capacity', typeKey: 'course_player.stages.type_s1' };
   }
   if (STAGE_2_COURSES.find(c => c.id === courseId)) {
-    return { stage: 'Stage 2', stageName: 'Capability', type: 'Stage 2 Capability' };
+    return { stageKey: 'course_player.stages.stage_2', stageNameKey: 'course_player.stages.capability', typeKey: 'course_player.stages.type_s2' };
   }
   if (STAGE_3_COURSES.find(c => c.id === courseId)) {
-    return { stage: 'Stage 3', stageName: 'Leadership', type: 'Stage 3 Leadership' };
+    return { stageKey: 'course_player.stages.stage_3', stageNameKey: 'course_player.stages.leadership', typeKey: 'course_player.stages.type_s3' };
   }
   if (PIQ_TRACK.find(c => c.id === courseId)) {
-    return { stage: 'PIQ Track', stageName: 'Personal Intelligence', type: 'PIQ Track' };
+    return { stageKey: 'course_player.stages.piq_track', stageNameKey: 'course_player.stages.personal_intelligence', typeKey: 'course_player.stages.type_piq' };
   }
   if (AIQ_TRACK.find(c => c.id === courseId)) {
-    return { stage: 'AIQ Track', stageName: 'AI Readiness', type: 'AIQ Track' };
+    return { stageKey: 'course_player.stages.aiq_track', stageNameKey: 'course_player.stages.ai_readiness', typeKey: 'course_player.stages.type_aiq' };
   }
   if (SQ_TRACK.find(c => c.id === courseId)) {
-    return { stage: 'SQ Track', stageName: 'Sustainability', type: 'SQ Track' };
+    return { stageKey: 'course_player.stages.sq_track', stageNameKey: 'course_player.stages.sustainability', typeKey: 'course_player.stages.type_sq' };
   }
-  return { stage: 'Unknown', stageName: 'Unknown', type: 'Unknown' };
+  return { stageKey: 'course_player.stages.unknown', stageNameKey: 'course_player.stages.unknown', typeKey: 'course_player.stages.unknown' };
 };
 
 const CoursePlayer = () => {
@@ -109,9 +110,10 @@ const CoursePlayer = () => {
   const [showCongratulation, setShowCongratulation] = useState(false);
   const [congratulationAcknowledged, setCongratulationAcknowledged] = useState(false);
   const [videoWatched, setVideoWatched] = useState(false);
+  const { t } = useTranslation();
 
   const course = getCourseById(courseId);
-  const { stage, stageName, type } = getStageAndTrackInfo(courseId);
+  const { stageKey, stageNameKey, typeKey } = getStageAndTrackInfo(courseId);
   const videoUrl = COURSE_VIDEOS[courseId];
   const learningFlowData = getLearningFlowData(courseId);
 
@@ -151,7 +153,7 @@ const CoursePlayer = () => {
       setActiveStep(activeStep === stepNumber ? null : stepNumber);
       setVideoWatched(false);
     } else {
-      toast.error(`Please complete Step ${parseInt(stepNumber) - 1} first!`);
+      toast.error(t("course_player.step_locked_warning", { step: parseInt(stepNumber) - 1 }));
     }
   };
 
@@ -297,7 +299,7 @@ const CoursePlayer = () => {
                   )}
                   <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
                     <BookOpen size={14} className={activeTab === 'preview' ? 'text-white' : 'text-slate-400'} />
-                    Preview
+                    {t("course_player.preview")}
                   </span>
                 </button>
                 <button
@@ -316,7 +318,7 @@ const CoursePlayer = () => {
                   )}
                   <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
                     <FileText size={14} className={activeTab === 'transcription' ? 'text-white' : 'text-slate-400'} />
-                    Transcription
+                    {t("course_player.transcription")}
                   </span>
                 </button>
               </div>
@@ -333,18 +335,18 @@ const CoursePlayer = () => {
                     className="p-3 sm:p-6"
                   >
                     <div className="bg-[#F8FAFC] rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Lesson Preview</h4>
+                      <h4 className="font-semibold text-gray-900 mb-3">{t("course_player.lesson_preview")}</h4>
                       <p className="text-gray-600 leading-relaxed">
-                        {stepData.content || 'Watch this lesson to continue your learning journey.'}
+                        {stepData.content || t("course_player.lesson_preview_desc")}
                       </p>
                       <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
-                          <span>{stepData.duration || '5-10 min'}</span>
+                          <span>{stepData.duration || t("course_player.five_ten_min")}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <PlayCircle className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
-                          <span>Video Lesson</span>
+                          <span>{t("course_player.video_lesson")}</span>
                         </div>
                       </div>
                     </div>
@@ -360,12 +362,12 @@ const CoursePlayer = () => {
                     className="p-3 sm:p-6"
                   >
                     <div className="bg-[#F8FAFC] rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Video Transcription</h4>
+                      <h4 className="font-semibold text-gray-900 mb-3">{t("course_player.video_transcription")}</h4>
                       <p className="text-gray-600 leading-relaxed italic">
-                        Transcription will be available here once the video content is processed.
+                        {t("course_player.transcription_coming_soon")}
                       </p>
                       <p className="text-gray-500 dark:text-slate-450 text-[11px] sm:text-xs mt-3 sm:mt-4 leading-relaxed">
-                        This feature allows you to read along with the video content, making it easier to follow along and review key points.
+                        {t("course_player.transcription_desc")}
                       </p>
                     </div>
                   </motion.div>
@@ -446,13 +448,13 @@ const CoursePlayer = () => {
       <div className="min-h-screen bg-white dark:bg-[#00152E] flex items-center justify-center">
         <div className="text-center p-8">
           <Lock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-[#112b6b] dark:text-white mb-2">Course Not Found</h2>
-          <p className="text-gray-500 mb-6">The course you are looking for could not be found.</p>
+          <h2 className="text-2xl font-bold text-[#112b6b] dark:text-white mb-2">{t("course_player.course_not_found")}</h2>
+          <p className="text-gray-500 mb-6">{t("course_player.course_not_found_desc")}</p>
           <button
             onClick={handleBack}
             className="px-6 py-3 bg-[#1a3884] hover:bg-[#002147] text-white rounded-xl font-bold transition-all"
           >
-            Back to Courses
+            {t("course_player.back_to_courses")}
           </button>
         </div>
       </div>
@@ -478,15 +480,15 @@ const CoursePlayer = () => {
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center border border-slate-200 group-hover:border-[#1a3884]/30 group-hover:bg-[#1a3884]/5 transition-all">
                     <ArrowLeft className="w-4 h-4" />
                   </div>
-                  <span>Back to Overview</span>
+                  <span>{t("course_player.back_to_overview")}</span>
                 </button>
                 <div className="h-5 w-px bg-slate-200 dark:bg-[#003170]" />
                 <div className="flex items-center gap-3">
                   <Badge variant="secondary" className="bg-slate-100 text-[#1a3884] border-transparent font-bold px-3 py-0.5 text-[10px]">
-                    {stage}
+                    {t(stageKey)}
                   </Badge>
                   <span className="text-xs font-bold text-slate-900 dark:text-slate-200">
-                    {stageName}
+                    {t(stageNameKey)}
                   </span>
                 </div>
               </div>
@@ -516,7 +518,7 @@ const CoursePlayer = () => {
                       {isCompleted && (
                         <span className="flex items-center gap-1.5 text-[10px] font-bold text-green-600">
                           <CheckCircle2 className="w-3 h-3" />
-                          Completed
+                          {t("course_player.completed")}
                         </span>
                       )}
                     </div>
@@ -553,21 +555,21 @@ const CoursePlayer = () => {
                       <div className="bg-[#F8FAFC] rounded-xl p-5 mb-6 border border-gray-200">
                         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                           <Sparkles className="w-3.5 h-3.5" />
-                          Course Details
+                          {t("course_player.course_details")}
                         </h3>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">Course ID</p>
+                            <p className="text-xs font-medium text-gray-400">{t("course_player.course_id")}</p>
                             <p className="text-sm font-bold text-[#002147]">{course.id}</p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">Type</p>
-                            <p className="text-sm font-bold text-[#002147]">{type}</p>
+                            <p className="text-xs font-medium text-gray-400">{t("course_player.type")}</p>
+                            <p className="text-sm font-bold text-[#002147]">{t(typeKey)}</p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">Duration</p>
-                            <p className="text-sm font-bold text-[#002147]">45 min</p>
+                            <p className="text-xs font-medium text-gray-400">{t("course_player.duration")}</p>
+                            <p className="text-sm font-bold text-[#002147]">{t("course_player.forty_five_min")}</p>
                           </div>
                         </div>
 
@@ -583,7 +585,7 @@ const CoursePlayer = () => {
                           onClick={handleStartCourse}
                           className="group flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-[#1a3884] to-[#112b6b] hover:from-[#112b6b] hover:to-[#002147] text-white rounded-2xl font-black text-sm transition-all duration-300 shadow-xl shadow-[#1a3884]/30 hover:shadow-[#1a3884]/40 transform hover:-translate-y-1 active:scale-95"
                         >
-                          Start Learning Journey
+                          {t("course_player.start_learning_journey")}
                           <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
                         </button>
                       </div>
@@ -597,7 +599,7 @@ const CoursePlayer = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="text-center p-12">
-                        <p className="text-gray-500">Please select a step from the learning flow to begin.</p>
+                        <p className="text-gray-500">{t("course_player.select_step_prompt")}</p>
                       </div>
                     </motion.div>
                   ) : (
@@ -616,13 +618,13 @@ const CoursePlayer = () => {
                           </div>
                           <div>
                             <h3 className="font-bold text-lg sm:text-2xl text-slate-900 dark:text-white leading-tight">
-                              {learningFlowData?.steps[activeStep]?.title || `Step ${activeStep}`}
+                              {learningFlowData?.steps[activeStep]?.title || `${t("course_player.curriculum")} ${activeStep}`}
                             </h3>
-                            <p className="text-[10px] sm:text-xs text-blue-600 font-bold uppercase tracking-wider">Active Session</p>
+                            <p className="text-[10px] sm:text-xs text-blue-600 font-bold uppercase tracking-wider">{t("course_player.active_session")}</p>
                           </div>
                         </div>
                         <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl text-xs font-bold text-slate-500 border border-slate-100 dark:border-white/10">
-                          {learningFlowData?.steps[activeStep]?.duration || '5-10 min'}
+                          {learningFlowData?.steps[activeStep]?.duration || t("course_player.five_ten_min")}
                         </div>
                       </div>
 
@@ -631,13 +633,13 @@ const CoursePlayer = () => {
                       ) : (
                         <div className="p-8 text-center bg-[#F8FAFC] rounded-xl">
                           <Sparkles className="w-12 h-12 text-[#1a3884]/20 mx-auto mb-4" />
-                          <h4 className="font-bold text-gray-400">Content Coming Soon</h4>
-                          <p className="text-sm text-gray-400">Step {activeStep} content is being prepared.</p>
+                          <h4 className="font-bold text-gray-400">{t("course_player.content_coming_soon")}</h4>
+                          <p className="text-sm text-gray-400">{t("course_player.step_preparing", { step: activeStep })}</p>
                           <button
                             onClick={() => handleStepComplete(activeStep)}
                             className="mt-6 px-6 py-2 bg-[#1a3884] text-white rounded-lg font-bold"
                           >
-                            Complete Step
+                            {t("course_player.complete_step")}
                           </button>
                         </div>
                       )}
@@ -653,7 +655,7 @@ const CoursePlayer = () => {
                             }}
                             className="px-8 py-3.5 rounded-xl bg-[#1a3884] text-white font-bold text-sm transition-all duration-300 flex items-center gap-2 hover:bg-[#112b6b] shadow-md active:scale-95 group"
                           >
-                            Continue
+                            {t("course_player.continue")}
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </div>
@@ -664,7 +666,7 @@ const CoursePlayer = () => {
                           onClick={handleNextLesson}
                           className="w-full px-6 py-5 bg-[#1a3884] hover:bg-[#002147] text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] mt-4"
                         >
-                          Unlock Next Course
+                          {t("course_player.unlock_next_course")}
                           <ChevronRight className="w-4 h-4" />
                         </button>
                       )}
@@ -689,13 +691,13 @@ const CoursePlayer = () => {
                       <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] flex items-center justify-center border border-slate-200 dark:border-white/10">
                         <Target className="w-5 h-5 text-[#1a3884]" />
                       </div>
-                      Progress
+                      {t("course_player.progress")}
                     </h3>
 
                     <div className="space-y-6">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-                          <span>Content Progress</span>
+                          <span>{t("course_player.content_progress")}</span>
                           <span className="text-[#1a3884]">
                             {Math.round((videoProgress / 100) * 100)}%
                           </span>
@@ -712,7 +714,7 @@ const CoursePlayer = () => {
 
                       <div className="space-y-2">
                         <div className="flex items-center justify-between text-xs font-bold text-slate-500">
-                          <span>Steps Completed</span>
+                          <span>{t("course_player.steps_completed")}</span>
                           <span className="text-[#0D7377]">
                             {Object.keys(completedSteps).length}/9
                           </span>
@@ -737,8 +739,8 @@ const CoursePlayer = () => {
                             <Trophy className="w-5 h-5" />
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-green-900 dark:text-green-400">Course Completed</p>
-                            <p className="text-[10px] text-green-700 dark:text-green-500 font-medium">All steps validated</p>
+                            <p className="text-sm font-bold text-green-900 dark:text-green-400">{t("course_player.course_completed")}</p>
+                            <p className="text-[10px] text-green-700 dark:text-green-500 font-medium">{t("course_player.all_steps_validated")}</p>
                           </div>
                         </motion.div>
                       )}
@@ -752,7 +754,7 @@ const CoursePlayer = () => {
                         <div className="w-10 h-10 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] flex items-center justify-center border border-slate-200 dark:border-white/10">
                           <PlayCircle className="w-5 h-5 text-[#1a3884]" />
                         </div>
-                        Curriculum
+                        {t("course_player.curriculum")}
                       </h3>
                       <div className="px-3 py-1 bg-slate-100 dark:bg-[#002A5C] rounded-lg text-xs font-bold text-slate-500">
                         {Object.keys(completedSteps).length}/9
@@ -794,12 +796,12 @@ const CoursePlayer = () => {
 
                             <div className="flex-1 text-left min-w-0">
                               <h4 className={`font-bold text-sm truncate ${isActive ? 'text-white' : 'text-slate-900 dark:text-slate-200'}`}>
-                                {stepData?.title || 'Step ' + step}
+                                {stepData?.title || `${t("course_player.curriculum")} ${step}`}
                               </h4>
                               <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400">
                                 <Clock size={12} className={isActive ? 'text-white/60' : 'text-slate-400'} />
                                 <span className={isActive ? 'text-white/70' : ''}>
-                                  {stepData?.duration || '5-10 min'}
+                                  {stepData?.duration || t("course_player.five_ten_min")}
                                 </span>
                               </div>
                             </div>
@@ -866,7 +868,7 @@ const CoursePlayer = () => {
                     transition={{ delay: 0.3 }}
                     className="text-3xl font-bold text-[#002147] mb-2"
                   >
-                    Congratulations! 🎉
+                    {t("course_player.congratulations")}
                   </motion.h2>
                   <motion.p
                     initial={{ opacity: 0, y: 10 }}
@@ -874,7 +876,7 @@ const CoursePlayer = () => {
                     transition={{ delay: 0.4 }}
                     className="text-gray-600"
                   >
-                    You've completed all 9 learning steps for this lesson!
+                    {t("course_player.congratulations_desc")}
                   </motion.p>
                 </div>
 
@@ -886,8 +888,8 @@ const CoursePlayer = () => {
                   className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 mb-6 border border-green-200 dark:border-green-800"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-green-700 dark:text-green-300">Your Progress</span>
-                    <span className="text-sm font-bold text-green-700 dark:text-green-300">9/9 Steps</span>
+                    <span className="text-sm font-semibold text-green-700 dark:text-green-300">{t("course_player.your_progress")}</span>
+                    <span className="text-sm font-bold text-green-700 dark:text-green-300">{t("course_player.nine_nine_steps")}</span>
                   </div>
                   <div className="flex gap-1">
                     {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((step, idx) => (
@@ -929,7 +931,7 @@ const CoursePlayer = () => {
                   onClick={handleNextLesson}
                   className="w-full py-4 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                 >
-                  Continue to Next Lesson
+                  {t("course_player.continue_to_next_lesson")}
                   <ChevronRight className="w-4 h-4" />
                 </motion.button>
               </motion.div>

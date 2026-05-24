@@ -565,7 +565,7 @@ const Profile = () => {
             <main className="container mx-auto px-4 py-6 max-w-6xl">
               {/* Header section with page title */}
               <div className="mb-8 flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">My Profile</h1>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t("profile_page.my_profile")}</h1>
               </div>
 
               {/* Profile Overview Card */}
@@ -600,27 +600,27 @@ const Profile = () => {
                 <div className="text-center md:text-left flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row items-center md:items-end gap-2 md:gap-4 mb-2 flex-wrap justify-center md:justify-start">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate max-w-full">
-                      {formData.nickname || formData.name || "Student"}
+                      {formData.nickname || formData.name || t("profile_page.student")}
                     </h2>
-                    
+
                     {/* Active Status Badge - Responsive next to name */}
                     <div className="inline-flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-2.5 py-1 rounded-lg">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                      <span className="text-[10px] font-black text-green-700 dark:text-green-400 uppercase tracking-widest">Active</span>
+                      <span className="text-[10px] font-black text-green-700 dark:text-green-400 uppercase tracking-widest">{t("profile_page.active")}</span>
                     </div>
                   </div>
                   <p className="font-medium text-lg text-slate-500 dark:text-slate-400">
-                    Student
+                    {t("profile_page.student")}
                   </p>
-                  
+
                   <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-6 mt-4">
                     <div className="flex items-center gap-1.5 text-center md:text-left min-w-0">
                       <MapPin className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
-                      <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.address || "Not specified"}</span>
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.address || t("profile_page.not_specified")}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-center md:text-left min-w-0">
                       <Building className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
-                      <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.institution || "Institution not set"}</span>
+                      <span className="text-sm font-medium text-slate-600 dark:text-slate-300 truncate">{formData.institution || t("profile_page.institution_not_set")}</span>
                     </div>
                   </div>
                 </div>
@@ -655,20 +655,20 @@ const Profile = () => {
                         })}
                         className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                       >
-                        Edit <Edit2 className="w-4 h-4" />
+                        {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
                       </button>
                     </div>
                     <hr className="my-6 border-gray-200 dark:border-white/10" />
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-8 gap-x-12">
-                      <InfoField label="Full Name" value={formData.name} />
-                      <InfoField label="Email Address" value={formData.email} />
-                      <InfoField label="Phone Number" value={formData.phone || "Not set"} />
-                      <InfoField label="Date of Birth" value={formatDate(formData.dateOfBirth)} />
-                      <InfoField label="Gender" value={formData.gender || "Not set"} />
-                      <InfoField label="User Role" value="Student" />
-                      <InfoField label="Member Since" value={memberSince || "Not available"} />
-                      <InfoField label="Education Level" value={formData.educationLevel || "Not set"} />
-                      <InfoField label="Department" value={formData.department || "Not set"} />
+                      <InfoField label={t("profile_page.full_name")} value={formData.name} />
+                      <InfoField label={t("profile_page.email_address")} value={formData.email} />
+                      <InfoField label={t("profile_page.phone_number")} value={formData.phone || t("profile_page.not_set")} />
+                      <InfoField label={t("profile_page.date_of_birth")} value={formatDate(formData.dateOfBirth)} />
+                      <InfoField label={t("profile_page.gender")} value={formData.gender || t("profile_page.not_set")} />
+                      <InfoField label={t("profile_page.user_role")} value={t("profile_page.student")} />
+                      <InfoField label={t("profile_page.member_since")} value={memberSince || t("profile_page.not_available")} />
+                      <InfoField label={t("profile_page.education_level")} value={formData.educationLevel || t("profile_page.not_set")} />
+                      <InfoField label={t("profile_page.department")} value={formData.department || t("profile_page.not_set")} />
                     </div>
                   </div>
 
@@ -679,7 +679,7 @@ const Profile = () => {
                         <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
                           <MapPinHouse className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Address</h3>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.address")}</h3>
                       </div>
                       <button
                         onClick={() => handleOpenEditModal('address', {
@@ -690,15 +690,15 @@ const Profile = () => {
                         })}
                         className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                       >
-                        Edit <Edit2 className="w-4 h-4" />
+                        {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
                       </button>
                     </div>
                     <hr className="my-6 border-gray-200 dark:border-white/10" />
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-8 gap-x-12">
-                      <InfoField label="Street" value={formData.street || "Not specified"} />
-                      <InfoField label="City" value={formData.city || "Not specified"} />
-                      <InfoField label="State" value={formData.state || "Not specified"} />
-                      <InfoField label="Country" value={formData.country || "Not specified"} />
+                      <InfoField label={t("profile_page.street")} value={formData.street || t("profile_page.not_specified")} />
+                      <InfoField label={t("profile_page.city")} value={formData.city || t("profile_page.not_specified")} />
+                      <InfoField label={t("profile_page.state")} value={formData.state || t("profile_page.not_specified")} />
+                      <InfoField label={t("profile_page.country")} value={formData.country || t("profile_page.not_specified")} />
                     </div>
                   </div>
 
@@ -728,24 +728,24 @@ const Profile = () => {
                                 <p className="text-sm text-gray-500 dark:text-slate-300">
                                   {edu.degreeFullName || edu.degree} {edu.specialization && <span>• {edu.specialization}</span>}
                                 </p>
-                                <p className="text-xs text-gray-400 mt-1">Passing Year: {edu.yearOfPassing} • Grade: {edu.cgpaPercentage}%</p>
+                                <p className="text-xs text-gray-400 mt-1">{t("profile_page.passing_year")}: {edu.yearOfPassing} • {t("profile_page.grade")}: {edu.cgpaPercentage}%</p>
                               </div>
                               <button
                                 onClick={() => handleOpenEditModal('higherEducation', formData.higherEducation)}
                                 className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
                               >
-                                Edit <Edit2 className="w-3 h-3" />
+                                {t("profile_page.edit")} <Edit2 className="w-3 h-3" />
                               </button>
                             </div>
                           ))
                         ) : (
                           <div className="p-6 bg-gray-50/50 dark:bg-slate-800/30 rounded-2xl border-2 border-dashed border-gray-100 dark:border-white/8 flex flex-col items-center justify-center text-center">
-                            <p className="text-sm text-gray-500 dark:text-slate-300 mb-3">No higher education details added yet.</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-300 mb-3">{t("profile_page.no_higher_education")}</p>
                             <button
                               onClick={() => handleOpenEditModal('higherEducation', [])}
                               className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm"
                             >
-                              <Plus className="w-4 h-4" /> Add Higher Education
+                              <Plus className="w-4 h-4" /> {t("profile_page.add_higher_education")}
                             </button>
                           </div>
                         )}
@@ -754,7 +754,7 @@ const Profile = () => {
                           {formData.twelfthDetails && (
                             <div className="flex justify-between items-start p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8 w-full">
                               <div className="flex-1">
-                                <h4 className="font-bold text-gray-900 dark:text-white">12th Standard</h4>
+                                <h4 className="font-bold text-gray-900 dark:text-white">{t("profile_page.twelfth_standard")}</h4>
                                 <hr className="my-3 border-gray-200 dark:border-white/10" />
                                 <p className="text-sm text-gray-500 dark:text-slate-300">{formData.twelfthDetails.schoolName}</p>
                                 <p className="text-xs text-gray-400 mt-1">{formData.twelfthDetails.percentage}% • {formData.twelfthDetails.yearOfPassing}</p>
@@ -763,14 +763,14 @@ const Profile = () => {
                                 onClick={() => handleOpenEditModal('twelfthDetails', formData.twelfthDetails)}
                                 className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
                               >
-                                Edit <Edit2 className="w-3 h-3" />
+                                {t("profile_page.edit")} <Edit2 className="w-3 h-3" />
                               </button>
                             </div>
                           )}
                           {formData.tenthDetails && (
                             <div className="flex justify-between items-start p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8 w-full">
                               <div className="flex-1">
-                                <h4 className="font-bold text-gray-900 dark:text-white">10th Standard</h4>
+                                <h4 className="font-bold text-gray-900 dark:text-white">{t("profile_page.tenth_standard")}</h4>
                                 <hr className="w-full my-3 border-gray-200 dark:border-white/10" />
                                 <p className="text-sm text-gray-500 dark:text-slate-300">{formData.tenthDetails.schoolName}</p>
                                 <p className="text-xs text-gray-400 mt-1">{formData.tenthDetails.percentage}% • {formData.tenthDetails.yearOfPassing}</p>
@@ -779,7 +779,7 @@ const Profile = () => {
                                 onClick={() => handleOpenEditModal('tenthDetails', formData.tenthDetails)}
                                 className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-4 py-1.5 rounded-xl flex items-center gap-2 text-xs font-bold transition-colors shadow-sm shrink-0"
                               >
-                                Edit <Edit2 className="w-3 h-3" />
+                                {t("profile_page.edit")} <Edit2 className="w-3 h-3" />
                               </button>
                             </div>
                           )}
@@ -802,8 +802,8 @@ const Profile = () => {
                         <button
                           onClick={() => handleOpenEditModal('workExperience', formData.workExperience)}
                           className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
-                        > Edit
-                          <Edit2 className="w-4 h-4" />
+                        >
+                          {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="space-y-4">
@@ -816,7 +816,7 @@ const Profile = () => {
                               <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{exp.role || exp.title}</p>
                               <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                                 <Clock className="w-3 h-3" />
-                                <span>{exp.duration || "Duration not set"}</span>
+                                <span>{exp.duration || t("profile_page.not_set")}</span>
                               </div>
                               {exp.description && (
                                 <p className="text-xs text-gray-600 dark:text-slate-300 mt-2 line-clamp-2">{exp.description}</p>
@@ -824,7 +824,7 @@ const Profile = () => {
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-gray-500 italic">No work experience added yet.</p>
+                          <p className="text-sm text-gray-500 italic">{t("profile_page.no_work_experience")}</p>
                         )}
                       </div>
                     </div>
@@ -836,13 +836,13 @@ const Profile = () => {
                           <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
                             <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Projects</h3>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.projects")}</h3>
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('projects', formData.projects)}
                           className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          Edit <Edit2 className="w-4 h-4" />
+                          {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="space-y-4">
@@ -852,14 +852,14 @@ const Profile = () => {
                               <h4 className="font-bold text-gray-900 dark:text-white">{project.title}</h4>
                               {project.link && (
                                 <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 mt-1">
-                                  View Project <Plus className="w-2 h-2" />
+                                  {t("profile_page.view_project")} <Plus className="w-2 h-2" />
                                 </a>
                               )}
                               <p className="text-xs text-gray-600 dark:text-slate-300 mt-2">{project.description}</p>
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-gray-500 italic">No projects showcased yet.</p>
+                          <p className="text-sm text-gray-500 italic">{t("profile_page.no_projects")}</p>
                         )}
                       </div>
                     </div>
@@ -869,13 +869,13 @@ const Profile = () => {
                           <div className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-xl">
                             <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Certifications</h3>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.certifications")}</h3>
                         </div>
                         <button
                           onClick={() => handleOpenCertificateModal()}
                           className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-[#859DF4] px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          Upload <Upload className="w-4 h-4" />
+                          {t("profile_page.add")} <Plus className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -886,7 +886,7 @@ const Profile = () => {
                                 <button
                                   onClick={() => handleOpenCertificateModal(idx)}
                                   className="p-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:scale-105 transition-transform"
-                                  title="Edit Certificate"
+                                  title={t("profile_page.edit_certificate")}
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
@@ -900,29 +900,29 @@ const Profile = () => {
                               </div>
                               <h4 className="font-bold text-gray-900 dark:text-white text-sm pr-12 truncate">{cert.title}</h4>
                               <p className="text-xs text-gray-500 mt-1">{cert.issuer || cert.issuingOrg}</p>
-                              
+
                               <div className="mt-3 flex flex-wrap gap-2 text-[10px] text-gray-400">
                                 {cert.issueDate && (
                                   <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
-                                    Issued: {new Date(cert.issueDate).toLocaleDateString()}
+                                    {t("profile_page.issued")}: {new Date(cert.issueDate).toLocaleDateString()}
                                   </span>
                                 )}
                                 {cert.qrCodeIdentifier && (
                                   <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
-                                    ID: {cert.qrCodeIdentifier}
+                                    {t("profile_page.id")}: {cert.qrCodeIdentifier}
                                   </span>
                                 )}
                               </div>
 
                               {(cert.certificateFile || cert.link) && (
                                 <a href={getPreviewUrl(cert.certificateFile || cert.link)} target="_blank" rel="noopener noreferrer" className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mt-3 inline-block hover:underline">
-                                  View Certificate
+                                  {t("profile_page.view_certificate")}
                                 </a>
                               )}
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-gray-500 italic col-span-2">No certificates listed yet.</p>
+                          <p className="text-sm text-gray-500 italic col-span-2">{t("profile_page.no_certificates")}</p>
                         )}
                       </div>
                     </div>
@@ -934,13 +934,13 @@ const Profile = () => {
                           <div className="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-xl flex-shrink-0">
                             <Users className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                           </div>
-                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">Extracurricular</h3>
+                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">{t("profile_page.extracurricular")}</h3>
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('extracurricular', formData.extracurricular)}
                           className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 text-xs sm:text-sm font-bold transition-colors shadow-sm flex-shrink-0"
                         >
-                          Edit <Edit2 className="w-3.5 h-3.5" />
+                          {t("profile_page.edit")} <Edit2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                       <div className="flex flex-col gap-4">
@@ -970,7 +970,7 @@ const Profile = () => {
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-gray-500 italic">No extracurricular activities mentioned.</p>
+                          <p className="text-sm text-gray-500 italic">{t("profile_page.no_extracurricular")}</p>
                         )}
                       </div>
                     </div>
@@ -982,13 +982,13 @@ const Profile = () => {
                           <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl">
                             <Building className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Career Preferences</h3>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.career_preferences")}</h3>
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('jobPreferences', formData.jobPreferences)}
                           className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          Edit <Edit2 className="w-4 h-4" />
+                          {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="space-y-4">
@@ -998,18 +998,18 @@ const Profile = () => {
                               <h4 className="font-bold text-gray-900 dark:text-white">{job.preferredRole}</h4>
                               <div className="grid grid-cols-2 gap-4 mt-3">
                                 <div>
-                                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Job Type</p>
+                                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{t("profile_page.job_type")}</p>
                                   <p className="text-xs font-semibold text-gray-700 dark:text-slate-100">{job.jobType}</p>
                                 </div>
                                 <div>
-                                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Location</p>
+                                  <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{t("profile_page.preferred_location")}</p>
                                   <p className="text-xs font-semibold text-gray-700 dark:text-slate-100">{job.preferredLocation}</p>
                                 </div>
                               </div>
                             </div>
                           ))
                         ) : (
-                          <p className="text-sm text-gray-500 italic">No job preferences set.</p>
+                          <p className="text-sm text-gray-500 italic">{t("profile_page.no_job_preferences")}</p>
                         )}
                       </div>
                     </div>
@@ -1021,21 +1021,21 @@ const Profile = () => {
                           <div className="p-2 bg-cyan-50 dark:bg-cyan-900/30 rounded-xl">
                             <Rocket className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Career Goals</h3>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.career_goals")}</h3>
                         </div>
                         <button
                           onClick={() => handleOpenEditModal('careerGoals', formData.careerGoals)}
                           className="bg-white dark:bg-[#002A5C] border border-gray-200 dark:border-white/10 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] text-gray-700 dark:text-slate-100 px-5 py-2 rounded-xl flex items-center gap-2 text-sm font-bold transition-colors shadow-sm"
                         >
-                          Edit <Edit2 className="w-4 h-4" />
+                          {t("profile_page.edit")} <Edit2 className="w-4 h-4" />
                         </button>
                       </div>
                       <div className="space-y-4">
                         {formData.careerGoals ? (
                           <>
-                            <GoalItem label="Short Term" value={formData.careerGoals.shortTerm} />
-                            <GoalItem label="Medium Term" value={formData.careerGoals.mediumTerm} />
-                            <GoalItem label="Long Term" value={formData.careerGoals.longTerm} />
+                            <GoalItem label={t("profile_page.short_term")} value={formData.careerGoals.shortTerm} />
+                            <GoalItem label={t("profile_page.medium_term")} value={formData.careerGoals.mediumTerm} />
+                            <GoalItem label={t("profile_page.long_term")} value={formData.careerGoals.longTerm} />
                           </>
                         ) : null}
                       </div>
@@ -1062,7 +1062,7 @@ const Profile = () => {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Change Profile Photo</h3>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t("profile_page.change_profile_photo")}</h3>
                         <button onClick={() => setShowEditModal(false)} className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-[#002A5C] transition-colors">
                           <X className="w-5 h-5 text-gray-500" />
                         </button>
@@ -1079,9 +1079,9 @@ const Profile = () => {
                         </div>
                       </div>
                       <div className="flex gap-4">
-                        <button onClick={() => setShowEditModal(false)} className="flex-1 py-3 px-4 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-700 dark:text-slate-200 font-bold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors">Cancel</button>
+                        <button onClick={() => setShowEditModal(false)} className="flex-1 py-3 px-4 border border-gray-200 dark:border-white/10 rounded-2xl text-gray-700 dark:text-slate-200 font-bold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors">{t("profile_page.cancel")}</button>
                         <button onClick={handleSaveProfile} disabled={savingProfile || uploadingPhoto || !editData.profilePhoto} className="flex-1 py-3 px-4 bg-[#1a3884] text-white rounded-2xl font-bold hover:bg-[#277a84] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg">
-                          {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save
+                          {savingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {t("profile_page.save")}
                         </button>
                       </div>
                     </motion.div>
@@ -1108,7 +1108,7 @@ const Profile = () => {
                     >
                       <div className="flex items-center justify-between mb-6 sticky top-0 bg-white dark:bg-[#002147] z-10 pb-3 border-b border-gray-100 dark:border-white/8">
                         <div>
-                          <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">Edit {formatSectionTitle(activeEditSection)}</h3>
+                          <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">{t("profile_page.edit")} {formatSectionTitle(activeEditSection)}</h3>
                           <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5">Keep your profile up to date for better opportunities</p>
                         </div>
                         <button onClick={() => setShowSectionModal(false)} className="p-2 sm:p-3 rounded-2xl hover:bg-gray-100 dark:hover:bg-[#002A5C] transition-colors">
@@ -1220,14 +1220,14 @@ const Profile = () => {
                               }}
                               className="w-full py-4 border-2 border-dashed border-gray-200 dark:border-white/8 rounded-[20px] sm:rounded-[24px] text-gray-400 hover:text-blue-500 hover:border-blue-500 transition-all flex items-center justify-center gap-2 font-bold text-sm"
                             >
-                              <Plus className="w-5 h-5" /> Add Another Item
+                              <Plus className="w-5 h-5" /> {t("profile_page.add_another_item")}
                             </button>
                           </div>
                         )}
                       </div>
                       <div className="mt-8 flex flex-col sm:flex-row gap-3 sticky bottom-0 bg-white dark:bg-[#002147] pt-3 border-t border-gray-100 dark:border-white/8">
-                        <button onClick={() => setShowSectionModal(false)} className="py-3 px-6 rounded-[16px] font-black text-slate-500 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all text-sm order-2 sm:order-1">Cancel</button>
-                        <button onClick={handleSaveSection} disabled={savingProfile} className="flex-1 py-3 px-6 bg-[#1a3884] text-white rounded-[16px] font-black hover:bg-[#132c6b] transition-all shadow-xl flex items-center justify-center gap-2 text-sm order-1 sm:order-2">{savingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} Save Changes</button>
+                        <button onClick={() => setShowSectionModal(false)} className="py-3 px-6 rounded-[16px] font-black text-slate-500 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all text-sm order-2 sm:order-1">{t("profile_page.cancel")}</button>
+                        <button onClick={handleSaveSection} disabled={savingProfile} className="flex-1 py-3 px-6 bg-[#1a3884] text-white rounded-[16px] font-black hover:bg-[#132c6b] transition-all shadow-xl flex items-center justify-center gap-2 text-sm order-1 sm:order-2">{savingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />} {t("profile_page.save_changes")}</button>
                       </div>
                     </motion.div>
                   </motion.div>
@@ -1253,13 +1253,13 @@ const Profile = () => {
                           </div>
                           <div>
                             <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-                              {editingCertIndex !== null ? "Edit Certificate" : "Upload Certificate"}
+                              {editingCertIndex !== null ? t("profile_page.edit_certificate") : t("profile_page.upload_certificate")}
                             </h3>
-                            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-slate-400">Add a new credential to your vault</p>
+                            <p className="text-[10px] sm:text-xs text-gray-500 dark:text-slate-400">{t("profile_page.add_credential_vault")}</p>
                           </div>
                         </div>
-                        <button 
-                          onClick={() => setShowCertModal(false)} 
+                        <button
+                          onClick={() => setShowCertModal(false)}
                           type="button"
                           className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-full transition-colors text-slate-400"
                         >
@@ -1272,7 +1272,7 @@ const Profile = () => {
                           {/* Left Column: Form Fields */}
                           <div className="space-y-4 sm:space-y-5">
                             <div>
-                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate Title</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.certificate_title")}</label>
                               <input
                                 required
                                 type="text"
@@ -1284,7 +1284,7 @@ const Profile = () => {
                             </div>
 
                             <div>
-                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issuing Organization</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.issuer")}</label>
                               <input
                                 required
                                 type="text"
@@ -1297,7 +1297,7 @@ const Profile = () => {
 
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Issue Date</label>
+                                <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.issue_date")}</label>
                                 <input
                                   required
                                   type="date"
@@ -1307,7 +1307,7 @@ const Profile = () => {
                                 />
                               </div>
                               <div>
-                                <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Expiry (Optional)</label>
+                                <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.expiry_optional")}</label>
                                 <input
                                   type="date"
                                   value={certFormData.expiryDate}
@@ -1318,7 +1318,7 @@ const Profile = () => {
                             </div>
 
                             <div>
-                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification URL</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.verification_url")}</label>
                               <div className="relative">
                                 <LinkIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
@@ -1332,7 +1332,7 @@ const Profile = () => {
                             </div>
 
                             <div>
-                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Verification Code / QR ID</label>
+                              <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.verification_code_qr")}</label>
                               <div className="relative">
                                 <QrCode className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
@@ -1348,17 +1348,16 @@ const Profile = () => {
 
                           {/* Right Column: File Upload */}
                           <div className="flex flex-col h-full">
-                            <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Certificate File (PDF/Image)</label>
+                            <label className="block text-[10px] sm:text-[11px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider mb-1.5 ml-1">{t("profile_page.certificate_file_pdf")}</label>
                             <div
                               onDragEnter={handleCertDrag}
                               onDragLeave={handleCertDrag}
                               onDragOver={handleCertDrag}
                               onDrop={handleCertDrop}
-                              className={`relative flex-1 min-h-[160px] sm:min-h-[220px] md:min-h-[300px] border-2 border-dashed rounded-[20px] sm:rounded-3xl flex flex-col items-center justify-center p-5 sm:p-6 transition-all ${
-                                certDragActive
+                              className={`relative flex-1 min-h-[160px] sm:min-h-[220px] md:min-h-[300px] border-2 border-dashed rounded-[20px] sm:rounded-3xl flex flex-col items-center justify-center p-5 sm:p-6 transition-all ${certDragActive
                                   ? "border-[#859DF4] bg-blue-50/50 dark:bg-blue-900/10"
                                   : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#001E3D] hover:border-[#859DF4] dark:hover:border-[#859DF4]/50"
-                              }`}
+                                }`}
                             >
                               {certFormData.certificateFile ? (
                                 <div className="text-center p-4">
@@ -1368,13 +1367,13 @@ const Profile = () => {
                                   <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-white mb-1 truncate max-w-[180px] sm:max-w-[220px]">
                                     {certFormData.certificateFile.split('/').pop()}
                                   </p>
-                                  <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500">File attached successfully</p>
+                                  <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500">{t("profile_page.file_attached_success")}</p>
                                   <button
                                     type="button"
                                     onClick={() => setCertFormData({ ...certFormData, certificateFile: "" })}
                                     className="mt-4 sm:mt-5 text-[10px] sm:text-xs font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 dark:bg-red-950/20 px-3 py-1.5 rounded-lg"
                                   >
-                                    Remove File
+                                    {t("profile_page.remove_file")}
                                   </button>
                                 </div>
                               ) : (
@@ -1387,11 +1386,11 @@ const Profile = () => {
                                     )}
                                   </div>
                                   <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 mb-1">
-                                    {uploadingCertFile ? "Uploading certificate..." : "Drag and drop file here"}
+                                    {uploadingCertFile ? "Uploading certificate..." : t("profile_page.drag_drop_file")}
                                   </p>
                                   <p className="text-[10px] text-slate-400 dark:text-slate-500 mb-3 sm:mb-5 font-medium">PDF, JPG, PNG or WEBP (Max 10MB)</p>
                                   <label className="cursor-pointer px-4 py-2 rounded-xl bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-[10px] sm:text-xs font-bold text-gray-700 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all shadow-sm">
-                                    Browse Files
+                                    {t("profile_page.browse_files")}
                                     <input type="file" className="hidden" accept=".pdf,image/*" onChange={handleCertFileSelect} disabled={uploadingCertFile} />
                                   </label>
                                 </div>
@@ -1407,7 +1406,7 @@ const Profile = () => {
                             onClick={() => setShowCertModal(false)}
                             className="px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl border border-slate-200 dark:border-white/10 text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-all order-2 sm:order-1"
                           >
-                            Cancel
+                            {t("profile_page.cancel")}
                           </button>
                           <button
                             type="submit"
@@ -1417,12 +1416,12 @@ const Profile = () => {
                             {savingProfile ? (
                               <>
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                Saving...
+                                {t("profile_page.saving")}
                               </>
                             ) : (
                               <>
                                 <Shield className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                                Save Credential
+                                {t("profile_page.save_credential")}
                               </>
                             )}
                           </button>
@@ -1441,62 +1440,77 @@ const Profile = () => {
 };
 
 // Helper Components for the redesigned layout
-const InfoField = ({ label, value }) => (
-  <div className="flex flex-col min-w-0">
-    <span className="text-gray-400 dark:text-slate-400 text-[11px] uppercase font-bold tracking-wider mb-1">{label}</span>
-    <span className="text-gray-900 dark:text-white text-sm sm:text-base font-semibold break-words" title={value}>
-      {value || "Not set"}
-    </span>
-  </div>
-);
+const InfoField = ({ label, value }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col min-w-0">
+      <span className="text-gray-400 dark:text-slate-400 text-[11px] uppercase font-bold tracking-wider mb-1">{label}</span>
+      <span className="text-gray-900 dark:text-white text-sm sm:text-base font-semibold break-words" title={value}>
+        {value || t("profile_page.not_set")}
+      </span>
+    </div>
+  );
+};
 
-const GoalItem = ({ label, value }) => (
-  <div className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
-    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">{label}</p>
-    <p className="text-xs font-semibold text-gray-700 dark:text-slate-100 leading-relaxed">{value || "No goal set yet."}</p>
-  </div>
-);
+const GoalItem = ({ label, value }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="p-4 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-white/8">
+      <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1">{label}</p>
+      <p className="text-xs font-semibold text-gray-700 dark:text-slate-100 leading-relaxed">{value || t("profile_page.no_goal_set")}</p>
+    </div>
+  );
+};
 
-const ModalInput = ({ label, value, onChange, type = "text" }) => (
-  <div className="space-y-1.5">
-    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
-    <input
-      type={type}
-      value={value || ""}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none"
-      placeholder={`Enter ${label.toLowerCase()}`}
-    />
-  </div>
-);
+const ModalInput = ({ label, value, onChange, type = "text" }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
+      <input
+        type={type}
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none"
+        placeholder={`${t("profile_page.enter")} ${label}`}
+      />
+    </div>
+  );
+};
 
-const ModalSelect = ({ label, value, options, onChange }) => (
-  <div className="space-y-1.5">
-    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
-    <select
-      value={value || ""}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none appearance-none"
-    >
-      <option value="">Select {label}</option>
-      {options.map((opt) => (
-        <option key={opt} value={opt.toLowerCase()}>{opt}</option>
-      ))}
-    </select>
-  </div>
-);
+const ModalSelect = ({ label, value, options, onChange }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
+      <select
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none appearance-none"
+      >
+        <option value="">{t("profile_page.select")} {label}</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt.toLowerCase()}>{opt}</option>
+        ))}
+      </select>
+    </div>
+  );
+};
 
-const ModalTextarea = ({ label, value, onChange }) => (
-  <div className="space-y-1.5">
-    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
-    <textarea
-      value={value || ""}
-      onChange={(e) => onChange(e.target.value)}
-      rows={3}
-      className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none resize-none"
-      placeholder={`Enter your ${label.toLowerCase()}...`}
-    />
-  </div>
-);
+const ModalTextarea = ({ label, value, onChange }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-slate-400 ml-1">{label}</label>
+      <textarea
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        rows={3}
+        className="w-full bg-[#F8FAFC] dark:bg-[#002A5C] border-2 border-transparent focus:border-blue-500 dark:focus:border-blue-500 rounded-2xl px-5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all outline-none resize-none"
+        placeholder={`${t("profile_page.enter_your")} ${label}...`}
+      />
+    </div>
+  );
+};
 
 export default Profile;

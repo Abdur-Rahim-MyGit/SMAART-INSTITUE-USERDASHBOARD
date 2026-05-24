@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
     ArrowRight,
     Award,
@@ -78,6 +79,7 @@ const fadeUp = {
 
 const AssessmentsDashboard = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [stageStatus, setStageStatus] = useState({});
     const [loading, setLoading] = useState(true);
 
@@ -116,7 +118,7 @@ const AssessmentsDashboard = () => {
     const pct = Math.round((completedCount / STAGES.length) * 100);
 
     const handleResetAll = async () => {
-        if (!window.confirm("Are you sure you want to reset all 4 assessments? This will permanently delete your scores and progress, and you will have to restart T1 Baseline.")) {
+        if (!window.confirm(t("assessments_dashboard.reset_confirm", "Are you sure you want to reset all 4 assessments? This will permanently delete your scores and progress, and you will have to restart T1 Baseline."))) {
             return;
         }
 
@@ -124,26 +126,26 @@ const AssessmentsDashboard = () => {
             setLoading(true);
             const userData = sessionStorage.getItem("user");
             if (!userData) {
-                toast.error("User data not found. Please log in again.");
+                toast.error(t("assessments_dashboard.error_user_not_found", "User data not found. Please log in again."));
                 return;
             }
             const parsedUser = JSON.parse(userData);
             const userId = parsedUser.id || parsedUser._id;
             if (!userId) {
-                toast.error("User ID not found. Please log in again.");
+                toast.error(t("assessments_dashboard.error_id_not_found", "User ID not found. Please log in again."));
                 return;
             }
 
             const res = await assessmentApi.resetAllStages(userId);
             if (res.success) {
                 setStageStatus({});
-                toast.success("Successfully reset all 4 assessments!");
+                toast.success(t("assessments_dashboard.success_reset", "Successfully reset all 4 assessments!"));
             } else {
-                toast.error(res.error || "Failed to reset assessments");
+                toast.error(res.error || t("assessments_dashboard.error_reset", "Failed to reset assessments"));
             }
         } catch (err) {
             console.error("Error resetting assessments:", err);
-            toast.error("An error occurred while resetting assessments.");
+            toast.error(t("assessments_dashboard.error_generic", "An error occurred while resetting assessments."));
         } finally {
             setLoading(false);
         }
@@ -163,9 +165,9 @@ const AssessmentsDashboard = () => {
             <main className="px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
                 <div className="mx-auto max-w-7xl space-y-8 lg:space-y-10">
                     <PageHero
-                        badge="Assessment Journey"
-                        title="Assessments Centre"
-                        subtitle="Experience a structured pathway to mastery. Track your progress, complete each stage with confidence, and unlock your performance insights."
+                        badge={t("assessments_dashboard.badge", "Assessment Journey")}
+                        title={t("assessments_dashboard.title", "Assessments Centre")}
+                        subtitle={t("assessments_dashboard.subtitle", "Experience a structured pathway to mastery. Track your progress, complete each stage with confidence, and unlock your performance insights.")}
                     >
                         <motion.button
                             whileHover={{ scale: 1.02 }}
@@ -174,7 +176,7 @@ const AssessmentsDashboard = () => {
                             className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-5 text-sm font-bold text-rose-700 shadow-sm transition-all hover:bg-rose-100 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-950/40"
                         >
                             <RotateCcw className="h-4 w-4" />
-                            Reset Assessments
+                            {t("assessments_dashboard.reset_assessments", "Reset Assessments")}
                         </motion.button>
                     </PageHero>
 
@@ -210,66 +212,78 @@ const AssessmentsDashboard = () => {
     );
 };
 
-const GuidelinesSection = () => (
-    <motion.div
-        {...fadeUp}
-        className="group relative overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm dark:border-slate-700/70 dark:bg-[#002147]"
-    >
-        <div className="relative z-10 flex flex-col items-start gap-8 p-6 sm:p-8 lg:flex-row lg:gap-10 lg:p-9">
-            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[22px] border border-slate-100 bg-[#F8FAFC] text-[#1a3884] shadow-sm dark:border-white/8 dark:bg-slate-800/50 dark:text-blue-300">
-                <Info className="h-8 w-8" />
-            </div>
+const GuidelinesSection = () => {
+    const { t } = useTranslation();
 
-            <div className="flex-1 space-y-4 sm:space-y-6">
-                <h4 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
-                    Assessment Protocol & Guidelines
-                </h4>
+    return (
+        <motion.div
+            {...fadeUp}
+            className="group relative overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm dark:border-slate-700/70 dark:bg-[#002147]"
+        >
+            <div className="relative z-10 flex flex-col items-start gap-8 p-6 sm:p-8 lg:flex-row lg:gap-10 lg:p-9">
+                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[22px] border border-slate-100 bg-[#F8FAFC] text-[#1a3884] shadow-sm dark:border-white/8 dark:bg-slate-800/50 dark:text-blue-300">
+                    <Info className="h-8 w-8" />
+                </div>
 
-                <div className="grid gap-x-8 gap-y-4 sm:gap-y-6 sm:grid-cols-2">
-                    {[
-                        {
-                            title: "DYNAMIC QUESTIONS",
-                            desc: "Each stage contains unique questions assessing all 6 quotients.",
-                        },
-                        {
-                            title: "REAL-TIME PERSISTENCE",
-                            desc: "Answers are saved in real-time - resume anytime if disconnected.",
-                        },
-                        {
-                            title: "SINGLE ATTEMPT",
-                            desc: "Retakes are not allowed by default. Contact admin for exceptions.",
-                        },
-                        {
-                            title: "INTEGRITY MONITORING",
-                            desc: "Screen recording, copy-paste and tab-switching are monitored.",
-                        },
-                    ].map((item, index) => (
-                        <motion.div
-                            key={item.title}
-                            initial={{ opacity: 0, y: 12 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true, amount: 0.4 }}
-                            transition={{ delay: index * 0.06, duration: 0.35 }}
-                            whileHover={{ x: 2 }}
-                            className="flex gap-3 sm:gap-4"
-                        >
-                            <div className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#1a3884]" />
-                            <div className="space-y-1">
-                                <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-slate-700 dark:text-slate-300">
-                                    {item.title}
-                                </p>
-                                <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">{item.desc}</p>
-                            </div>
-                        </motion.div>
-                    ))}
+                <div className="flex-1 space-y-4 sm:space-y-6">
+                    <h4 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
+                        {t("assessments_dashboard.guidelines_title", "Assessment Protocol & Guidelines")}
+                    </h4>
+
+                    <div className="grid gap-x-8 gap-y-4 sm:gap-y-6 sm:grid-cols-2">
+                        {[
+                            {
+                                key: "dynamic_questions",
+                                title: "DYNAMIC QUESTIONS",
+                                desc: "Each stage contains unique questions assessing all 6 quotients.",
+                            },
+                            {
+                                key: "real_time_persistence",
+                                title: "REAL-TIME PERSISTENCE",
+                                desc: "Answers are saved in real-time - resume anytime if disconnected.",
+                            },
+                            {
+                                key: "single_attempt",
+                                title: "SINGLE ATTEMPT",
+                                desc: "Retakes are not allowed by default. Contact admin for exceptions.",
+                            },
+                            {
+                                key: "integrity_monitoring",
+                                title: "INTEGRITY MONITORING",
+                                desc: "Screen recording, copy-paste and tab-switching are monitored.",
+                            },
+                        ].map((item, index) => (
+                            <motion.div
+                                key={item.key}
+                                initial={{ opacity: 0, y: 12 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, amount: 0.4 }}
+                                transition={{ delay: index * 0.06, duration: 0.35 }}
+                                whileHover={{ x: 2 }}
+                                className="flex gap-3 sm:gap-4"
+                            >
+                                <div className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#1a3884]" />
+                                <div className="space-y-1">
+                                    <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-slate-700 dark:text-slate-300">
+                                        {t(`assessments_dashboard.${item.key}_title`, item.title)}
+                                    </p>
+                                    <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+                                        {t(`assessments_dashboard.${item.key}_desc`, item.desc)}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
-    </motion.div>
-);
+        </motion.div>
+    );
+};
 
 const StageCard = ({ stage, index, completed, stageData, onAction }) => {
+    const { t } = useTranslation();
     const score = stageData?.score;
+    const durationLabel = stage.duration.replace("min", t("assessments_dashboard.min", "min"));
 
     return (
         <motion.div
@@ -300,10 +314,10 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
 
                             <div className="min-w-0 pt-0.5">
                                 <h3 className="text-base sm:text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-100">
-                                    {stage.title}
+                                    {t(`assessments_dashboard.stages.${stage.key}.title`, stage.title)}
                                 </h3>
                                 <p className="mt-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                                    {stage.subtitle}
+                                    {t(`assessments_dashboard.stages.${stage.key}.subtitle`, stage.subtitle)}
                                 </p>
                             </div>
                         </div>
@@ -312,24 +326,26 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                             <div className="flex-shrink-0 pt-0.5">
                                 <span className="inline-flex items-center gap-1 rounded-full border border-emerald-100 bg-[linear-gradient(180deg,_#ecfdf5_0%,_#dcfce7_100%)] px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300 shadow-sm">
                                     <CheckCircle2 className="h-3.5 w-3.5" />
-                                    Verified
+                                    {t("assessments_dashboard.verified", "Verified")}
                                 </span>
                             </div>
                         )}
                     </div>
 
-                    <p className="mb-4 sm:mb-5 text-xs sm:text-sm font-medium leading-relaxed sm:leading-6 text-slate-500 dark:text-slate-350">{stage.description}</p>
+                    <p className="mb-4 sm:mb-5 text-xs sm:text-sm font-medium leading-relaxed sm:leading-6 text-slate-500 dark:text-slate-350">
+                        {t(`assessments_dashboard.stages.${stage.key}.description`, stage.description)}
+                    </p>
 
                     <div className="mb-5 sm:mb-6 flex flex-wrap items-center gap-2">
-                        <InfoChip icon={FileText} label={`${stage.totalQuestions} Qs`} />
-                        <InfoChip icon={Clock} label={stage.duration} />
+                        <InfoChip icon={FileText} label={`${stage.totalQuestions} ${t("assessments_dashboard.questions", "Qs")}`} />
+                        <InfoChip icon={Clock} label={durationLabel} />
                     </div>
 
                     {completed && score !== undefined && (
                         <div className="mb-6 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-4 shadow-sm dark:border-white/10 dark:bg-slate-800/50">
                             <div className="mb-3 flex items-center justify-between">
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-                                    Your Performance
+                                    {t("assessments_dashboard.performance", "Your Performance")}
                                 </span>
                                 <span className="text-lg font-bold text-[#1a3884] dark:text-white sm:text-2xl">
                                     {score}
@@ -360,13 +376,13 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         {completed ? (
                             <>
                                 <Eye className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
-                                View Performance Report
+                                {t("assessments_dashboard.view_report", "View Performance Report")}
                                 <ChevronRight className="ml-auto h-4 w-4 sm:h-5 sm:w-5 opacity-40" />
                             </>
                         ) : (
                             <>
                                 <Play className="h-4.5 w-4.5 sm:h-5 sm:w-5 fill-white" />
-                                Start Stage Assessment
+                                {t("assessments_dashboard.start_stage", "Start Stage Assessment")}
                                 <ArrowRight className="ml-auto h-4 w-4 sm:h-5 sm:w-5 opacity-80 transition-transform group-hover:translate-x-1" />
                             </>
                         )}

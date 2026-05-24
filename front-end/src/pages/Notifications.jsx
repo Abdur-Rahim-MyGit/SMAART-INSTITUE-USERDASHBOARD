@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Bell,
   Check,
@@ -38,19 +39,20 @@ const ICON_MAP = {
 };
 
 const TYPE_LABELS = {
-  badge: 'Badges',
-  assessment: 'Assessments',
-  course: 'Courses',
-  achievement: 'Achievements',
-  community: 'Community',
-  coaching: 'Coaching',
-  support: 'Support',
-  task: 'Tasks',
-  certificate: 'Certificates',
-  system: 'System',
+  badge: 'notifications.types.badge',
+  assessment: 'notifications.types.assessment',
+  course: 'notifications.types.course',
+  achievement: 'notifications.types.achievement',
+  community: 'notifications.types.community',
+  coaching: 'notifications.types.coaching',
+  support: 'notifications.types.support',
+  task: 'notifications.types.task',
+  certificate: 'notifications.types.certificate',
+  system: 'notifications.types.system',
 };
 
 const Notifications = () => {
+  const { t, i18n } = useTranslation();
   const {
     notifications,
     unreadCount,
@@ -128,11 +130,12 @@ const Notifications = () => {
     for (const [unit, secondsInUnit] of Object.entries(intervals)) {
       const interval = Math.floor(seconds / secondsInUnit);
       if (interval >= 1) {
-        return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+        const key = interval > 1 ? `${unit}_plural` : unit;
+        return t(`notifications.time.${key}`, { count: interval }, `${interval} ${unit}${interval > 1 ? 's' : ''} ago`);
       }
     }
 
-    return 'Just now';
+    return t('notifications.time.just_now', 'Just now');
   };
 
   const groupByDate = useCallback((items) => {
@@ -145,11 +148,11 @@ const Notifications = () => {
       let label;
 
       if (date === today) {
-        label = 'Today';
+        label = t('notifications.groups.today', 'Today');
       } else if (date === yesterday) {
-        label = 'Yesterday';
+        label = t('notifications.groups.yesterday', 'Yesterday');
       } else {
-        label = new Date(notification.createdAt).toLocaleDateString('en-US', {
+        label = new Date(notification.createdAt).toLocaleDateString(i18n.language || 'en-US', {
           weekday: 'long',
           month: 'long',
           day: 'numeric',
@@ -163,7 +166,7 @@ const Notifications = () => {
     });
 
     return groups;
-  }, []);
+  }, [t, i18n.language]);
 
   const groupedNotifications = useMemo(
     () => groupByDate(notifications),
@@ -187,9 +190,9 @@ const Notifications = () => {
                   <Bell className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-slate-900 dark:text-white">Notifications</h1>
+                  <h1 className="text-xl font-bold text-slate-900 dark:text-white">{t('notifications.title', 'Notifications')}</h1>
                   <p className="text-sm text-slate-500 dark:text-slate-400">
-                    {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All caught up!'}
+                    {unreadCount > 0 ? t('notifications.unread_count', '{{count}} unread notifications', { count: unreadCount }) : t('notifications.all_caught_up', 'All caught up!')}
                   </p>
                 </div>
               </div>
@@ -207,16 +210,16 @@ const Notifications = () => {
                   />
                   <span>
                     {wsStatus === 'connected'
-                      ? 'Live updates on'
+                      ? t('notifications.ws.live_updates', 'Live updates on')
                       : wsStatus === 'connecting'
-                        ? 'Connecting'
-                        : 'Realtime offline'}
+                        ? t('notifications.ws.connecting', 'Connecting')
+                        : t('notifications.ws.offline', 'Realtime offline')}
                   </span>
                 </div>
                 <button
                   onClick={handleRefresh}
                   className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-slate-200"
-                  title="Refresh"
+                  title={t('notifications.actions.refresh', 'Refresh')}
                 >
                   <RefreshCw className="h-5 w-5" />
                 </button>
@@ -226,7 +229,7 @@ const Notifications = () => {
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
                   >
                     <CheckCheck className="h-4 w-4" />
-                    <span className="hidden sm:inline">Mark all read</span>
+                    <span className="hidden sm:inline">{t('notifications.actions.mark_all_read', 'Mark all read')}</span>
                   </button>
                 )}
                 {notifications.length > 0 && (
@@ -235,7 +238,7 @@ const Notifications = () => {
                     className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     <Trash2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Clear all</span>
+                    <span className="hidden sm:inline">{t('notifications.actions.clear_all', 'Clear all')}</span>
                   </button>
                 )}
               </div>
@@ -250,7 +253,7 @@ const Notifications = () => {
                     : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#002A5C]'
                 }`}
               >
-                All
+                {t('notifications.filters.all', 'All')}
               </button>
               <button
                 onClick={() => setFilter('unread')}
@@ -260,7 +263,7 @@ const Notifications = () => {
                     : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#002A5C]'
                 }`}
               >
-                Unread
+                {t('notifications.filters.unread', 'Unread')}
                 {unreadCount > 0 && (
                   <span
                     className={`rounded-full px-1.5 py-0.5 text-xs ${
@@ -287,14 +290,16 @@ const Notifications = () => {
             <div className="rounded-xl border border-blue-800 bg-gradient-to-br from-blue-900 to-indigo-800 p-5 text-white shadow-lg dark:border-white/10 dark:from-slate-800 dark:to-slate-800">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-white">Welcome back, {summary.fullName}!</h2>
-                  <p className="mt-1 text-sm text-blue-200 dark:text-slate-400">Here's your daily summary</p>
+                  <h2 className="text-lg font-semibold text-white">{t('notifications.summary.welcome', 'Welcome back, {{name}}!', { name: summary.fullName })}</h2>
+                  <p className="mt-1 text-sm text-blue-200 dark:text-slate-400">{t('notifications.summary.subtitle', "Here's your daily summary")}</p>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-blue-100 dark:text-slate-300">
                   <Clock className="h-4 w-4" />
                   <span>
-                    Current Session: {new Date(summary.currentLogin).toLocaleString('en-US', {
-                      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                    {t('notifications.summary.current_session', 'Current Session: {{time}}', {
+                      time: new Date(summary.currentLogin).toLocaleString(i18n.language || 'en-US', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                      })
                     })}
                   </span>
                 </div>
@@ -302,18 +307,18 @@ const Notifications = () => {
 
               <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div className="rounded-lg bg-white/10 p-3 dark:bg-slate-700/50">
-                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">Last Login</div>
+                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">{t('notifications.summary.last_login', 'Last Login')}</div>
                   <div className="mt-1 font-semibold text-white">
                     {summary.lastLogin
-                      ? new Date(summary.lastLogin).toLocaleString('en-US', {
+                      ? new Date(summary.lastLogin).toLocaleString(i18n.language || 'en-US', {
                           month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                         })
-                      : 'First login!'}
+                      : t('notifications.summary.first_login', 'First login!')}
                   </div>
                 </div>
 
                 <div className="rounded-lg bg-white/10 p-3 dark:bg-slate-700/50">
-                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">Badges Earned</div>
+                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">{t('notifications.summary.badges_earned', 'Badges Earned')}</div>
                   <div className="mt-1 flex items-center gap-2 font-semibold text-white">
                     <Award className="h-4 w-4" />
                     {summary.badgesEarned}
@@ -321,15 +326,15 @@ const Notifications = () => {
                 </div>
 
                 <div className="rounded-lg bg-white/10 p-3 dark:bg-slate-700/50">
-                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">Today's Sessions</div>
+                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">{t('notifications.summary.today_sessions', "Today's Sessions")}</div>
                   <div className="mt-1 flex items-center gap-2 font-semibold text-white">
                     <BookOpen className="h-4 w-4" />
-                    {summary.todayCompletedSessions} completed
+                    {t('notifications.summary.sessions_completed', '{{count}} completed', { count: summary.todayCompletedSessions })}
                   </div>
                 </div>
 
                 <div className="rounded-lg bg-white/10 p-3 dark:bg-slate-700/50">
-                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">Enrolled Courses</div>
+                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">{t('notifications.summary.enrolled_courses', 'Enrolled Courses')}</div>
                   <div className="mt-1 font-semibold text-white">{summary.totalEnrollments}</div>
                 </div>
               </div>
@@ -350,12 +355,12 @@ const Notifications = () => {
                 <Bell className="h-12 w-12 text-slate-400 dark:text-slate-500" />
               </div>
               <h2 className="mb-2 text-xl font-semibold text-slate-900 dark:text-white">
-                {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
+                {filter === 'unread' ? t('notifications.empty.no_unread', 'No unread notifications') : t('notifications.empty.no_notifications', 'No notifications yet')}
               </h2>
               <p className="max-w-sm text-slate-500 dark:text-slate-400">
                 {filter === 'unread'
-                  ? "You're all caught up! Check back later for new updates."
-                  : "When you get notifications, they'll appear here. Stay tuned!"}
+                  ? t('notifications.empty.unread_desc', "You're all caught up! Check back later for new updates.")
+                  : t('notifications.empty.notifications_desc', "When you get notifications, they'll appear here. Stay tuned!")}
               </p>
             </div>
           </motion.div>
@@ -402,7 +407,7 @@ const Notifications = () => {
                                 <div>
                                   <p className="font-semibold text-slate-900 dark:text-white">{notification.title}</p>
                                   <span className="text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                                    {TYPE_LABELS[notification.type] || notification.type}
+                                    {t(TYPE_LABELS[notification.type] || notification.type, notification.type)}
                                   </span>
                                 </div>
                                 <div className="flex-shrink-0 text-right">
@@ -426,18 +431,18 @@ const Notifications = () => {
                                   markRead(notification._id);
                                 }}
                                 className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-                                title="Mark as read"
+                                title={t('notifications.actions.mark_as_read', 'Mark as read')}
                               >
                                 <Check className="h-4 w-4" />
                               </button>
                             )}
                             <button
                               onClick={(event) => {
-                                event.stopPropagation();
-                                deleteNotification(notification._id);
+                                  event.stopPropagation();
+                                  deleteNotification(notification._id);
                               }}
                               className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
-                              title="Delete"
+                              title={t('notifications.actions.delete', 'Delete')}
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -456,7 +461,7 @@ const Notifications = () => {
                   onClick={loadMore}
                   className="rounded-xl border border-slate-200 bg-white px-6 py-3 font-medium text-slate-700 shadow-sm transition-colors hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#002A5C]"
                 >
-                  Load more notifications
+                  {t('notifications.actions.load_more', 'Load more notifications')}
                 </button>
               </div>
             )}

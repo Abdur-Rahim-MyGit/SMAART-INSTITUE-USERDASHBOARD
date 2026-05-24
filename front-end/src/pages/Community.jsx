@@ -42,7 +42,7 @@ const Community = () => {
                 animate={{ opacity: 1, x: 0 }}
                 className="text-xl sm:text-2xl md:text-3xl font-black text-[#002147] dark:text-white tracking-tight leading-tight"
               >
-                Community Announcements
+                {t("community_page.title")}
               </motion.h1>
               <motion.div
                 initial={{ opacity: 0 }}
@@ -51,7 +51,7 @@ const Community = () => {
                 className="flex items-center gap-2 mt-0.5 sm:mt-1"
               >
                 <p className="text-gray-500 dark:text-slate-300 font-medium text-sm">
-                  Official notices and updates from your institution
+                  {t("community_page.subtitle")}
                 </p>
               </motion.div>
             </div>
