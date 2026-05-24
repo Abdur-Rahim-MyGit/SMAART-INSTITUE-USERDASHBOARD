@@ -105,7 +105,7 @@ const Footer = () => {
                             {["Privacy Policy", "Terms of Service", "Cookie Policy", "Data Protection"].map((item) => (
                                 <li key={item}>
                                     <Link
-                                        to="#"
+                                        to={`/legal?tab=${item.toLowerCase().replace(/\s+/g, "-")}`}
                                         className={`text-sm transition-colors flex items-center gap-3 group font-medium hover:text-[#C0C0C0]`}
                                     >
                                         <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-[#C0C0C0]/50 group-hover:bg-[#C0C0C0]' : 'bg-[#1a3884]/30 group-hover:bg-[#C0C0C0]'}`} />

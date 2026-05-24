@@ -146,14 +146,22 @@ const MarketIntelligence = ({ roleName, allDirections = [], activeTabIndex = 0 }
             {!loading && !error && roleProfile && (
                 <div style={S.contentGrid}>
 
-                    {/* LEFT: Narratives + Salary */}
+                    {/* LEFT: Role Header + AI Narrative */}
                     <div style={S.mainCol}>
 
-                        {/* Role Header */}
+                        {/* Role Header — name LEFT, entry salary RIGHT */}
                         <div style={S.roleHeader}>
-                            <div style={S.roleTitleArea}>
-                                <h1 style={S.roleTitleText}>{roleProfile.roleTitle}</h1>
-                                {roleProfile.roleId && <span style={S.roleIdBadge}>{roleProfile.roleId}</span>}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                                <div style={S.roleTitleArea}>
+                                    <h1 style={S.roleTitleText}>{roleProfile.roleTitle}</h1>
+                                </div>
+                                {roleProfile.salaryYear0_1 && (
+                                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                        <div style={{ fontSize: '0.62rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.25rem' }}>Entry-Level Salary</div>
+                                        <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#60a5fa', letterSpacing: '-0.02em', lineHeight: 1 }}>{roleProfile.salaryYear0_1}</div>
+                                        <div style={{ fontSize: '0.58rem', color: 'var(--muted)', marginTop: '0.2rem' }}>per annum (LPA)</div>
+                                    </div>
+                                )}
                             </div>
                             {roleProfile.jobFamily && (
                                 <p style={S.roleFamilyLabel}>
@@ -162,47 +170,40 @@ const MarketIntelligence = ({ roleName, allDirections = [], activeTabIndex = 0 }
                             )}
                         </div>
 
-                        {/* Role Intelligence Overview */}
-                        {(roleProfile.whatRoleDoes || roleProfile.howAiChanging || roleProfile.whoShouldConsider) && (
+                        {/* How AI Is Changing This Role */}
+                        {roleProfile.howAiChanging && (
                             <div style={S.sectionBlock}>
-                                <div style={S.sectionHeading}><Zap size={16} color="var(--accent)" /> Role Intelligence Overview</div>
+                                <div style={S.sectionHeading}><Zap size={16} color="var(--accent)" /> How AI is Changing This Role</div>
                                 <div style={S.narrativeBox}>
-                                    {roleProfile.whatRoleDoes && (
-                                        <div style={S.narrativeItem}><strong>Context: </strong>{roleProfile.whatRoleDoes}</div>
-                                    )}
-                                    {roleProfile.howAiChanging && (
-                                        <div style={S.narrativeItem}><strong>AI Evolution: </strong>{roleProfile.howAiChanging}</div>
-                                    )}
-                                    {roleProfile.whoShouldConsider && (
-                                        <div style={S.narrativeItem}><strong>Ideal Candidate: </strong>{roleProfile.whoShouldConsider}</div>
-                                    )}
+                                    <div style={S.narrativeItem}>{roleProfile.howAiChanging}</div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Salary Progression */}
-                        {(roleProfile.salaryYear0_1 || roleProfile.salaryYear2_3 || roleProfile.salaryYear4_5 || roleProfile.salaryYear6plus) && (
+                        {/* English & Communication — moved from sidebar */}
+                        {roleProfile.englishRequirement && (
                             <div style={S.sectionBlock}>
-                                <div style={S.sectionHeading}><TrendingUp size={16} color="var(--green)" /> Salary Progression (LPA)</div>
-                                <div style={S.salaryTimeline}>
-                                    {[
-                                        { label: 'Entry (0–1y)',  value: roleProfile.salaryYear0_1,  color: '#60a5fa' },
-                                        { label: 'Growth (2–3y)', value: roleProfile.salaryYear2_3,  color: '#34d399' },
-                                        { label: 'Mid (4–5y)',    value: roleProfile.salaryYear4_5,  color: '#fbbf24' },
-                                        { label: 'Expert (6+y)', value: roleProfile.salaryYear6plus, color: '#f87171' },
-                                    ].filter(s => s.value).map(({ label, value, color }) => (
-                                        <div key={label} style={S.salaryPoint}>
-                                            <div style={{ ...S.salaryDot, background: color }} />
-                                            <div style={S.salaryLabel}>{label}</div>
-                                            <div style={{ ...S.salaryValue, color }}>{value}</div>
-                                        </div>
-                                    ))}
+                                <div style={S.sectionHeading}><Globe size={16} color="var(--accent)" /> English &amp; Communication</div>
+                                <div style={{ marginBottom: '0.6rem' }}>
+                                    <span style={S.reqBadge}>{roleProfile.englishRequirement}</span>
+                                </div>
+                                {roleProfile.englishContext && <p style={{ ...S.narrativeItem, marginTop: 0 }}>{roleProfile.englishContext}</p>}
+                            </div>
+                        )}
+
+                        {/* Career Growth Path — moved from sidebar */}
+                        {roleProfile.careerGrowthPath && (
+                            <div style={S.sectionBlock}>
+                                <div style={S.sectionHeading}><BarChart3 size={16} color="var(--accent)" /> Career Growth Path</div>
+                                <div style={S.narrativeBox}>
+                                    <div style={S.narrativeItem}>{roleProfile.careerGrowthPath}</div>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    {/* RIGHT: AI Gauge + Human Value + English + Growth */}
+
+                    {/* RIGHT: AI Gauge + Human Value only */}
                     <div style={S.sideCol}>
 
                         {roleProfile.aiExposurePct > 0 && (
@@ -226,21 +227,6 @@ const MarketIntelligence = ({ roleName, allDirections = [], activeTabIndex = 0 }
                             <div style={S.sideBlock}>
                                 <div style={S.sideLabel}><UserCheck size={14} /> Irreplaceable Human Value</div>
                                 <p style={S.sideDetail}>{roleProfile.humanValueTasks}</p>
-                            </div>
-                        )}
-
-                        {roleProfile.englishRequirement && (
-                            <div style={S.sideBlock}>
-                                <div style={S.sideLabel}><Globe size={14} /> English &amp; Communication</div>
-                                <div style={S.reqBadge}>{roleProfile.englishRequirement}</div>
-                                {roleProfile.englishContext && <p style={S.sideDetail}>{roleProfile.englishContext}</p>}
-                            </div>
-                        )}
-
-                        {roleProfile.careerGrowthPath && (
-                            <div style={S.sideBlock}>
-                                <div style={S.sideLabel}><BarChart3 size={14} /> Career Growth Path</div>
-                                <p style={S.sideDetail}>{roleProfile.careerGrowthPath}</p>
                             </div>
                         )}
                     </div>
@@ -293,8 +279,16 @@ const S = {
     narrativeBox: { display: 'flex', flexDirection: 'column', gap: '0.9rem' },
     narrativeItem: { fontSize: '0.88rem', lineHeight: 1.65, color: 'var(--text2)' },
 
-    /* Salary */
-    salaryTimeline: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem', marginTop: '0.5rem' },
+    /* Entry salary card */
+    entryCard: { display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem', background: 'rgba(96,165,250,0.06)', border: '1px solid rgba(96,165,250,0.2)', borderRadius: '12px', marginBottom: '0.75rem', marginTop: '0.5rem' },
+    entryDot: { width: '10px', height: '10px', borderRadius: '50%', background: '#60a5fa', flexShrink: 0 },
+    entryContent: { flex: 1 },
+    entryLabel: { fontSize: '0.62rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.2rem' },
+    entryValue: { fontSize: '1.45rem', fontWeight: 900, color: '#60a5fa', letterSpacing: '-0.02em' },
+    entryNote: { fontSize: '0.6rem', fontWeight: 600, color: 'var(--muted)', textAlign: 'right', flexShrink: 0 },
+
+    /* Salary progression (non-entry levels) */
+    salaryTimeline: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem', marginTop: '0.5rem' },
     salaryPoint: { padding: '1rem 0.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '12px', textAlign: 'center' },
     salaryDot: { width: '8px', height: '8px', borderRadius: '50%', margin: '0 auto 0.6rem' },
     salaryLabel: { fontSize: '0.58rem', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '0.25rem' },

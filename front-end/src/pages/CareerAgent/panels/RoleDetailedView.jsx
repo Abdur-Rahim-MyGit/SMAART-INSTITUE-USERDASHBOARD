@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { ChevronRight } from 'lucide-react';
 
 /**
  * RoleDetailedView
@@ -112,10 +113,6 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
         );
     }
 
-    const hasSalary = roleProfile && (
-        roleProfile.salaryYear0_1 || roleProfile.salaryYear2_3 ||
-        roleProfile.salaryYear4_5 || roleProfile.salaryYear6plus
-    );
 
     /* ── Main render ─────────────────────────────────────────────────────── */
     return (
@@ -132,22 +129,9 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                 }
             `}</style>
 
-            {/* ── Role selector tabs ── */}
+            {/* ── Role Selector Tabs ── */}
             {familyRoles.length > 0 && (
-                <div
-                    className="custom-scrollbar"
-                    style={{
-                        display: 'flex', gap: '0.5rem', overflowX: 'auto',
-                        paddingBottom: '0.8rem', borderBottom: '1px solid var(--border)',
-                        msOverflowStyle: 'none',
-                    }}
-                >
-                    <style>{`
-                        .custom-scrollbar::-webkit-scrollbar { height: 4px; }
-                        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 10px; }
-                        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-                        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-                    `}</style>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', paddingBottom: '0.75rem', borderBottom: '1px solid var(--border)' }}>
                     {familyRoles.map(role => {
                         const isSel = selectedRole === role;
                         return (
@@ -155,19 +139,23 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                                 key={role}
                                 onClick={() => setSelectedRole(role)}
                                 style={{
-                                    padding: '0.5rem 1.1rem', borderRadius: '8px',
-                                    fontSize: '0.72rem', fontWeight: 700,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '0.42rem 0.95rem',
                                     background: isSel ? 'var(--accent)' : 'var(--navy3)',
                                     border: '1px solid',
                                     borderColor: isSel ? 'var(--accent)' : 'var(--border)',
+                                    borderRadius: '100px',
+                                    fontSize: '0.74rem',
+                                    fontWeight: 600,
                                     color: isSel ? 'white' : 'var(--text2)',
-                                    cursor: 'pointer', whiteSpace: 'nowrap',
+                                    cursor: 'pointer',
                                     transition: 'all 0.2s',
-                                    boxShadow: isSel ? '0 4px 12px rgba(37,99,235,0.2)' : 'none',
-                                    flexShrink: 0,
+                                    boxShadow: isSel ? '0 4px 12px rgba(37,99,235,0.25)' : 'none',
                                 }}
                             >
                                 {role}
+                                {isSel && <ChevronRight size={13} style={{ marginLeft: '3px' }} />}
                             </button>
                         );
                     })}
@@ -193,7 +181,7 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                 </div>
             ) : roleProfile ? (
                 <>
-                    {/* ── 4-section grid ── */}
+                    {/* ── 2-section grid (What This Role Does + Who Should Consider) ── */}
                     <div className="rdv-box-grid">
 
                         {/* BOX 1 – What This Role Actually Does */}
@@ -209,50 +197,9 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                                 <p style={styles.missingText}>Narrative not available for this role.</p>
                             )}
 
-                            {/* Salary mini-grid */}
-                            {hasSalary && (
-                                <div style={styles.salaryGrid}>
-                                    {[
-                                        { label: 'Year 0–1', value: roleProfile.salaryYear0_1 },
-                                        { label: 'Year 2–3', value: roleProfile.salaryYear2_3 },
-                                        { label: 'Year 4–5', value: roleProfile.salaryYear4_5 },
-                                        { label: 'Year 6+',  value: roleProfile.salaryYear6plus },
-                                    ].filter(s => s.value).map(({ label, value }) => (
-                                        <div key={label} style={styles.salaryItem}>
-                                            <div style={styles.salaryLabel}>{label}</div>
-                                            <div style={styles.salaryValue}>{value}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                         </div>
 
-                        {/* BOX 2 – How AI Is Changing This Role */}
-                        <div style={{ ...styles.box, ...styles.boxAccent }}>
-                            <div style={styles.boxHeader}>
-                                <span style={styles.boxIconWrap}>💹</span>
-                                <div style={styles.boxTitle}>How AI Is Changing This Role</div>
-                            </div>
-                            <div style={styles.boxDivider} />
-                            {roleProfile.howAiChanging ? (
-                                <p style={styles.boxText}>{roleProfile.howAiChanging}</p>
-                            ) : (
-                                <p style={styles.missingText}>AI evolution narrative not available for this role.</p>
-                            )}
-
-                            {/* AI Exposure badge */}
-                            {roleProfile.aiExposureLevel && (
-                                <div style={styles.aiBadge}>
-                                    <span style={styles.aiBadgeDot} />
-                                    <span style={styles.aiBadgeText}>
-                                        AI Exposure: {roleProfile.aiExposureLevel}
-                                        {roleProfile.aiExposurePct > 0 && ` (${roleProfile.aiExposurePct}%)`}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* BOX 3 – Who Should Consider This Role */}
+                        {/* BOX 2 – Who Should Consider This Role */}
                         <div style={styles.box}>
                             <div style={styles.boxHeader}>
                                 <span style={styles.boxIconWrap}>🧑‍💼</span>
@@ -265,45 +212,8 @@ const RoleDetailedView = ({ roleName, mongoRoleData, direction }) => {
                                 <p style={styles.missingText}>Suitability narrative not available for this role.</p>
                             )}
                         </div>
-
-                        {/* BOX 4 – Career Growth Path */}
-                        <div style={{ ...styles.box, ...styles.boxGrowth }}>
-                            <div style={styles.boxHeader}>
-                                <span style={styles.boxIconWrap}>📈</span>
-                                <div style={styles.boxTitle}>Career Growth Path</div>
-                            </div>
-                            <div style={styles.boxDivider} />
-                            {roleProfile.careerGrowthPath ? (
-                                <p style={styles.boxText}>{roleProfile.careerGrowthPath}</p>
-                            ) : (
-                                <p style={styles.missingText}>
-                                    Career growth path data is not yet available for this role in the database.
-                                </p>
-                            )}
-
-                            {/* Human value tasks */}
-                            {roleProfile.humanValueTasks && (
-                                <div style={styles.humanValueBox}>
-                                    <div style={styles.humanValueLabel}>🧠 What AI Cannot Replace</div>
-                                    <p style={{ ...styles.boxText, marginTop: '0.4rem', fontSize: '0.82rem' }}>
-                                        {roleProfile.humanValueTasks}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
                     </div>
 
-                    {/* ── English requirement chip ── */}
-                    {roleProfile.englishRequirement && (
-                        <div style={styles.englishRow}>
-                            <span style={styles.englishChip}>
-                                🌐 English Requirement: <strong>{roleProfile.englishRequirement}</strong>
-                            </span>
-                            {roleProfile.englishContext && (
-                                <span style={styles.englishContext}> — {roleProfile.englishContext}</span>
-                            )}
-                        </div>
-                    )}
                 </>
             ) : null}
         </div>

@@ -160,8 +160,8 @@
   --s-text-inverse:   #0F172A;
 
   /* Borders */
-  --s-border:         rgba(255, 255, 255, 0.08);
-  --s-border-strong:  rgba(255, 255, 255, 0.16);
+  --s-border:         transparent;
+  --s-border-strong:  transparent;
   --s-border-focus:   rgba(100, 160, 255, 0.5);
 
   /* Semantic colors */

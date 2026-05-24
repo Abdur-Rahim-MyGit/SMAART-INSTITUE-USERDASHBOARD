@@ -1,0 +1,64 @@
+# Exclude local node modules
+node_modules/
+back-end/node_modules/
+front-end/node_modules/
+
+# Exclude git directories and metadata
+.git/
+.gitignore
+.github/
+
+# Exclude secrets and configurations
+.env
+.env.backup
+*.env
+*.pem
+*.key
+credentials.json
+
+# Exclude testing, logs, and development files
+logs/
+back-end/logs/
+back-end/tmp/
+back-end/uploads/*
+!back-end/uploads/.gitkeep
+tests/
+testsprite_tests/
+scratch/
+docs/
+front-end/
+
+# Exclude documentation files
+*.md
+*.pdf
+*.docx
+commits.txt
+session_sync_update_log.md
+collections_list.txt
+AUDIT_REPORT.md
+404_error_audit.md
+AWS_DEPLOYMENT_GUIDE.md
+PRODUCTION_AWS_GUIDE.md
+PRODUCTION_AWS_GUIDE 2.md
+COMPREHENSIVE_IMPROVEMENT_PLAN.md
+CAREER_INTELLIGENCE_AGENT.md
+DASHBOARD_IMPROVEMENTS.md
+FILES_TO_UPDATE.md
+FINAL_DECISION_NEEDED.md
+IMPLEMENTATION_SUMMARY.md
+LOGIN_DASHBOARD_FIXES.md
+LOGIN_ISSUES_FIXED.md
+MODEL_ISSUE_DETECTED.md
+QUICK_START_AI_COACH.md
+REGISTRATION_FIELDS.md
+SMAART_MINDS_COMPLETE_USER_JOURNEY.md
+SYSTEM_END_TO_END_FLOW_DOCUMENTATION.md
+SYSTEM_IMPROVEMENT_ROADMAP_50_TASKS.md
+TESTING_GUIDE.md
+VISION_BOARD_TECHNICAL_DOCUMENTATION.md
+VISION_BOARD_USER_GUIDE.md
+api_routing_audit.md
+audit.md
+package-lock.json
+package.json
+c:/Users/Vickram/Documents/SMAART/aws-deployment/

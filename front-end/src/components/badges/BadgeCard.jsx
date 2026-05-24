@@ -1,5 +1,6 @@
 import { Trophy, Award, Sparkles, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 // Clean category styling matching standard quotient card colors
 const tierStyles = {
@@ -34,6 +35,7 @@ const cleanTitle = (title) => {
 };
 
 const BadgeCard = ({ badge, onClick }) => {
+    const { t } = useTranslation();
     const tier = badge.tier?.toLowerCase() || 'standard';
     const style = tierStyles[tier] || tierStyles.standard;
 
@@ -53,7 +55,7 @@ const BadgeCard = ({ badge, onClick }) => {
             {/* Verified Pill Status - Positioned at the absolute top-right, collapsing beautifully on mobile */}
             <span className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 p-1 sm:px-2 sm:py-0.5 rounded-md border border-emerald-100/50 dark:border-emerald-900/30 z-10">
                 <CheckCircle2 className="w-3.5 h-3.5 sm:w-3 h-3 text-emerald-500" />
-                <span className="hidden sm:inline">Verified</span>
+                <span className="hidden sm:inline">{t('badge_gallery.verified')}</span>
             </span>
 
             <div className="flex flex-col h-full justify-between min-h-[140px]">
@@ -79,11 +81,13 @@ const BadgeCard = ({ badge, onClick }) => {
                             +{badge.xp} XP
                         </span>
                     ) : (
-                        <span className="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500">Unlocked</span>
+                        <span className="text-[8px] sm:text-[10px] text-slate-400 dark:text-slate-500">
+                            {t('badge_gallery.unlocked')}
+                        </span>
                     )}
 
                     <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
-                        View
+                        {t('badge_gallery.view')}
                     </span>
                 </div>
             </div>

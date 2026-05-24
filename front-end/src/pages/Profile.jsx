@@ -602,7 +602,7 @@ const Profile = () => {
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate max-w-full">
                       {formData.nickname || formData.name || t("profile_page.student")}
                     </h2>
-                    
+
                     {/* Active Status Badge - Responsive next to name */}
                     <div className="inline-flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-2.5 py-1 rounded-lg">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
@@ -612,7 +612,7 @@ const Profile = () => {
                   <p className="font-medium text-lg text-slate-500 dark:text-slate-400">
                     {t("profile_page.student")}
                   </p>
-                  
+
                   <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center md:justify-start gap-3 sm:gap-6 mt-4">
                     <div className="flex items-center gap-1.5 text-center md:text-left min-w-0">
                       <MapPin className="w-4 h-4 text-gray-400 dark:text-slate-400 flex-shrink-0" />
@@ -900,7 +900,7 @@ const Profile = () => {
                               </div>
                               <h4 className="font-bold text-gray-900 dark:text-white text-sm pr-12 truncate">{cert.title}</h4>
                               <p className="text-xs text-gray-500 mt-1">{cert.issuer || cert.issuingOrg}</p>
-                              
+
                               <div className="mt-3 flex flex-wrap gap-2 text-[10px] text-gray-400">
                                 {cert.issueDate && (
                                   <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
@@ -1088,7 +1088,7 @@ const Profile = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
- 
+
               {/* Global Section Edit Modal */}
               <AnimatePresence>
                 {showSectionModal && (
@@ -1115,7 +1115,7 @@ const Profile = () => {
                           <X className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" />
                         </button>
                       </div>
- 
+
                       <div className="space-y-5 sm:space-y-6">
                         {activeEditSection === 'personalDetails' && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
@@ -1258,8 +1258,8 @@ const Profile = () => {
                             <p className="text-[10px] sm:text-xs text-gray-500 dark:text-slate-400">{t("profile_page.add_credential_vault")}</p>
                           </div>
                         </div>
-                        <button 
-                          onClick={() => setShowCertModal(false)} 
+                        <button
+                          onClick={() => setShowCertModal(false)}
                           type="button"
                           className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-full transition-colors text-slate-400"
                         >
@@ -1354,11 +1354,10 @@ const Profile = () => {
                               onDragLeave={handleCertDrag}
                               onDragOver={handleCertDrag}
                               onDrop={handleCertDrop}
-                              className={`relative flex-1 min-h-[160px] sm:min-h-[220px] md:min-h-[300px] border-2 border-dashed rounded-[20px] sm:rounded-3xl flex flex-col items-center justify-center p-5 sm:p-6 transition-all ${
-                                certDragActive
+                              className={`relative flex-1 min-h-[160px] sm:min-h-[220px] md:min-h-[300px] border-2 border-dashed rounded-[20px] sm:rounded-3xl flex flex-col items-center justify-center p-5 sm:p-6 transition-all ${certDragActive
                                   ? "border-[#859DF4] bg-blue-50/50 dark:bg-blue-900/10"
                                   : "border-slate-200 dark:border-white/10 bg-white dark:bg-[#001E3D] hover:border-[#859DF4] dark:hover:border-[#859DF4]/50"
-                              }`}
+                                }`}
                             >
                               {certFormData.certificateFile ? (
                                 <div className="text-center p-4">

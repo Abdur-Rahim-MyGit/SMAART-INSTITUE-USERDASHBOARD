@@ -32,7 +32,8 @@
     "help": "Help & Support",
     "save_changes": "Save Changes",
     "cancel": "Cancel",
-    "language_region": "Language & Region"
+    "language_region": "Language & Region",
+    "customisation": "Customisation"
   },
   "dashboard": {
     "good_morning": "Good Morning",
@@ -348,10 +349,10 @@
     "secure_protocol": "Secure Trust Protocol",
     "verification_live": "Public Verification is Live",
     "tabs": {
-      "smart": "Smart Course",
-      "other": "Other Course",
-      "certificates": "Certificates",
-      "projects": "Projects"
+      "smart": "SMAART Courses",
+      "other": "Technical Skills",
+      "certificates": "AI Skills",
+      "projects": "Domain Skills"
     },
     "stats": {
       "growth_delta": "Growth Delta",
@@ -383,7 +384,54 @@
     "projects": {
       "title": "Projects Showcase",
       "none": "No projects showcased yet."
-    }
+    },
+    "standards": {
+      "understand": {
+        "title": "UNDERSTAND",
+        "desc": "Comprehends context, intent, and priorities clearly."
+      },
+      "structure": {
+        "title": "STRUCTURE",
+        "desc": "Organizes thinking into clear frameworks and action."
+      },
+      "verify": {
+        "title": "VERIFY",
+        "desc": "Checks accuracy, quality, and evidence before delivery."
+      },
+      "adapt": {
+        "title": "ADAPT",
+        "desc": "Responds well to change, ambiguity, and new inputs."
+      },
+      "communicate": {
+        "title": "COMMUNICATE",
+        "desc": "Expresses ideas with clarity, brevity, and confidence."
+      },
+      "connect": {
+        "title": "CONNECT",
+        "desc": "Builds trust and collaborates effectively with others."
+      },
+      "own": {
+        "title": "OWN",
+        "desc": "Takes responsibility and follows through with accountability."
+      },
+      "create": {
+        "title": "CREATE",
+        "desc": "Generates useful ideas, solutions, and improvements."
+      },
+      "lead": {
+        "title": "LEAD",
+        "desc": "Guides others with initiative, judgment, and calm."
+      },
+      "grow": {
+        "title": "GROW",
+        "desc": "Learns from feedback and evolves continuously."
+      }
+    },
+    "standards_title": "Ten Professional Standards",
+    "standards_matrix": "Professional Standards Matrix",
+    "rating": "Rating",
+    "institutional_registry": "Institutional Registry",
+    "verified_records": "Verified Records"
   },
   "quotients": {
     "CRQ": {
@@ -509,6 +557,148 @@
       }
     }
   },
+  "my_courses_page": {
+    "continue_watching": "Continue Watching",
+    "pct_complete": "{{pct}}% Complete",
+    "your_current_course": "Your Current Course",
+    "last_watched": "Last watched:",
+    "modules_count": "{{completed}}/{{total}} modules",
+    "completed": "Completed",
+    "resume_course": "Resume Course",
+    "your_course": "Your Course",
+    "stage_n": "Stage {{n}}",
+    "progression": "Progression",
+    "courses_count": "{{completed}}/{{total}} Courses",
+    "specialization_track": "Specialization Track",
+    "back_to_overview": "Back to Overview",
+    "your_learning_journey": "Your Learning Journey",
+    "specialized_courses_count": "{{count}} Specialized Courses",
+    "stage_progress": "Stage Progress",
+    "mastered_count": "{{count}} Mastered",
+    "remaining_count": "{{count}} Remaining",
+    "assessment_required": "Assessment Required: {{gate}}",
+    "assessment_required_desc": "Complete all modules and achieve 70%+ to unlock next stage",
+    "status_passed": "Passed",
+    "status_locked": "Locked",
+    "learning_journey": "Learning Journey",
+    "programme": "Programme",
+    "programme_desc": "Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence.",
+    "completion": "Completion",
+    "human_intelligence_courses": "Human Intelligence Courses",
+    "readiness_tracks": "Readiness Tracks",
+    "stages": {
+      "1": {
+        "name": "Capacity",
+        "description": "Build the foundational skills and resources to perform at your best in any environment."
+      },
+      "2": {
+        "name": "Capability",
+        "description": "Develop core competencies and technical expertise to excel in your chosen field."
+      },
+      "3": {
+        "name": "Leadership",
+        "description": "Cultivate the mindset and vision to lead teams and drive meaningful change."
+      }
+    },
+    "tracks": {
+      "PIQ": {
+        "name": "Personal Intelligence Quotient",
+        "shortName": "PIQ",
+        "description": "Develop mindset, confidence, and personal effectiveness"
+      },
+      "AIQ": {
+        "name": "AI Readiness Quotient",
+        "shortName": "AIQ",
+        "description": "Master AI tools and work effectively with artificial intelligence"
+      },
+      "SQ": {
+        "name": "Sustainability Quotient",
+        "shortName": "SQ",
+        "description": "Build ethical thinking and sustainability awareness"
+      }
+    }
+  },
+  "course_player": {
+    "stages": {
+      "stage_1": "Stage 1",
+      "stage_2": "Stage 2",
+      "stage_3": "Stage 3",
+      "piq_track": "PIQ Track",
+      "aiq_track": "AIQ Track",
+      "sq_track": "SQ Track",
+      "capacity": "Capacity",
+      "capability": "Capability",
+      "leadership": "Leadership",
+      "personal_intelligence": "Personal Intelligence",
+      "ai_readiness": "AI Readiness",
+      "sustainability": "Sustainability",
+      "type_s1": "Stage 1 Capacity",
+      "type_s2": "Stage 2 Capability",
+      "type_s3": "Stage 3 Leadership",
+      "type_piq": "PIQ Track",
+      "type_aiq": "AIQ Track",
+      "type_sq": "SQ Track"
+    },
+    "step_locked_warning": "Please complete Step {{step}} first!",
+    "preview": "Preview",
+    "transcription": "Transcription",
+    "lesson_preview": "Lesson Preview",
+    "lesson_preview_desc": "Watch this lesson to continue your learning journey.",
+    "five_ten_min": "5-10 min",
+    "video_lesson": "Video Lesson",
+    "video_transcription": "Video Transcription",
+    "transcription_coming_soon": "Transcription will be available here once the video content is processed.",
+    "transcription_desc": "This feature allows you to read along with the video content, making it easier to follow along and review key points.",
+    "course_not_found": "Course Not Found",
+    "course_not_found_desc": "The course you are looking for could not be found.",
+    "back_to_courses": "Back to Courses",
+    "back_to_overview": "Back to Overview",
+    "completed": "Completed",
+    "course_details": "Course Details",
+    "course_id": "Course ID",
+    "type": "Type",
+    "duration": "Duration",
+    "forty_five_min": "45 min",
+    "start_learning_journey": "Start Learning Journey",
+    "select_step_prompt": "Please select a step from the learning flow to begin.",
+    "active_session": "Active Session",
+    "content_coming_soon": "Content Coming Soon",
+    "step_preparing": "Step {{step}} content is being prepared.",
+    "complete_step": "Complete Step",
+    "continue": "Continue",
+    "unlock_next_course": "Unlock Next Course",
+    "progress": "Progress",
+    "content_progress": "Content Progress",
+    "steps_completed": "Steps Completed",
+    "course_completed": "Course Completed",
+    "all_steps_validated": "All steps validated",
+    "curriculum": "Curriculum",
+    "congratulations": "Congratulations! 🎉",
+    "congratulations_desc": "You've completed all 9 learning steps for this lesson!",
+    "your_progress": "Your Progress",
+    "nine_nine_steps": "9/9 Steps",
+    "continue_to_next_lesson": "Continue to Next Lesson"
+  },
+  "my_assessments": {
+    "page_title": "MY ASSESSMENTS",
+    "baseline_title": "Base Line Test - T1",
+    "baseline_short": "Base Line - T1",
+    "questions_count": "300 Questions",
+    "duration_approx": "~45 mins",
+    "step": "Step",
+    "view_results": "View Results",
+    "start_assessment": "Start Assessment",
+    "welcome_back": "Welcome back, {{name}}! 🎉",
+    "welcome_back_desc": "Complete your base line assessment to unlock personalized insights.",
+    "skills_passport": "Skills Passport",
+    "detailed_results": "Detailed Results",
+    "readiness_profile": "Readiness Profile",
+    "current_band": "Current Band: {{band}}",
+    "download_pdf": "Download Detailed PDF Report",
+    "assessment_summary": "Assessment Summary",
+    "assessment_summary_desc": "You have completed the Base Line Test - T1. This assessment measures your fundamental understanding and provides a baseline for your growth journey.",
+    "category_assessment": "Assessment"
+  },
   "common": {
     "student": "Student",
     "save": "Save",
@@ -526,5 +716,546 @@
     "integrity_verified": "Integrity Verified",
     "success_export": "Successfully exported!",
     "error_export": "Export failed. Please try again."
+  },
+  "assessments_dashboard": {
+    "badge": "Assessment Journey",
+    "title": "Assessments Centre",
+    "subtitle": "Experience a structured pathway to mastery. Track your progress, complete each stage with confidence, and unlock your performance insights.",
+    "reset_assessments": "Reset Assessments",
+    "reset_confirm": "Are you sure you want to reset all 4 assessments? This will permanently delete your scores and progress, and you will have to restart T1 Baseline.",
+    "error_user_not_found": "User data not found. Please log in again.",
+    "error_id_not_found": "User ID not found. Please log in again.",
+    "success_reset": "Successfully reset all 4 assessments!",
+    "error_reset": "Failed to reset assessments",
+    "error_generic": "An error occurred while resetting assessments.",
+    "guidelines_title": "Assessment Protocol & Guidelines",
+    "dynamic_questions_title": "DYNAMIC QUESTIONS",
+    "dynamic_questions_desc": "Each stage contains unique questions assessing all 6 quotients.",
+    "real_time_persistence_title": "REAL-TIME PERSISTENCE",
+    "real_time_persistence_desc": "Answers are saved in real-time - resume anytime if disconnected.",
+    "single_attempt_title": "SINGLE ATTEMPT",
+    "single_attempt_desc": "Retakes are not allowed by default. Contact admin for exceptions.",
+    "integrity_monitoring_title": "INTEGRITY MONITORING",
+    "integrity_monitoring_desc": "Screen recording, copy-paste and tab-switching are monitored.",
+    "performance": "Your Performance",
+    "view_report": "View Performance Report",
+    "start_stage": "Start Stage Assessment",
+    "verified": "Verified",
+    "questions": "Qs",
+    "stages": {
+      "T1": {
+        "title": "T1 - Baseline",
+        "subtitle": "Foundation",
+        "description": "Establish your foundational understanding and baseline competency across all six quotients."
+      },
+      "T2": {
+        "title": "T2 - Capacity",
+        "subtitle": "Growth",
+        "description": "Measure your capacity for growth and development across cognitive and emotional domains."
+      },
+      "T3": {
+        "title": "T3 - Capability",
+        "subtitle": "Applied Skills",
+        "description": "Evaluate your applied capability and professional readiness with advanced challenges."
+      },
+      "T4": {
+        "title": "T4 - Leadership",
+        "subtitle": "Mastery",
+        "description": "Demonstrate your leadership potential and mastery across all competency dimensions."
+      }
+    }
+  },
+  "baseline_test": {
+    "back": "Back",
+    "time_left": "Time Left",
+    "time_almost_up": "Time Almost Up!",
+    "question_number": "Question {{current}} / {{total}}",
+    "wait_seconds": "Wait {{seconds}}s",
+    "next_question": "Next Question",
+    "answer_all_questions": "Answer All Questions",
+    "submit_test": "Submit Test",
+    "submitting": "Submitting...",
+    "question_map": "Question Map",
+    "answered": "Answered",
+    "remaining": "Remaining",
+    "clear_assessment_dev": "Clear Assessment (Dev)",
+    "clear_assessment_desc": "Development only. This clears the current attempt after the assessment has started.",
+    "auto_fill_dev": "⚡ Auto-Fill (Dev)",
+    "back_navigation_disabled": "Back navigation is disabled during the assessment.",
+    "right_click_disabled": "Right-click is disabled during the assessment.",
+    "copy_paste_disabled": "Copying or pasting is not allowed.",
+    "screenshot_detected": "Screenshot attempt detected!",
+    "navigated_away": "You navigated away from the test window.",
+    "terminated_violations": "Test terminated due to multiple violations.",
+    "warning_violations": "Warning {{count}}/{{max}}: {{message}}",
+    "one_minute_left": "Only 1 minute left!",
+    "time_up_submitting": "Time is up. Submitting your assessment...",
+    "time_up_ended": "Time is up. Your assessment was ended and we could not confirm the submission result.",
+    "failed_submit": "Failed to submit assessment.",
+    "confirm_restart": "Are you sure you want to cancel and restart this assessment? Your current progress will be lost.",
+    "failed_reset": "Failed to reset assessment",
+    "answer_all_toast": "Answer all questions before submitting the test.",
+    "loading_test": "Loading {{title}}...",
+    "error_loading": "Failed to load assessment. Please try refreshing the page.",
+    "back_to_assessments": "Back to Assessments",
+    "exit_warning_title": "Don't Leave Yet!",
+    "exit_warning_desc": "Back navigation is disabled while the assessment is in progress. If you leave now, you will return to the assessment dashboard.",
+    "leave_assessment": "Leave Assessment",
+    "continue_assessment": "Continue Assessment",
+    "baseline_established": "Baseline Established",
+    "assessment_complete": "{{name}} Assessment Complete",
+    "result_id": "Result ID: {{id}}",
+    "overall_score": "Overall Score",
+    "proficiency_level": "Proficiency Level",
+    "quotient_breakdown": "Quotient-Wise Breakdown",
+    "performance": "Performance",
+    "correct": "correct",
+    "download_report": "Download Report",
+    "continue_journey": "Continue My Journey",
+    "go_to_dashboard": "Go to Dashboard",
+    "all_assessments": "All Assessments",
+    "processing_profile": "Processing your profile...",
+    "badge_unlocked": "Badge Unlocked: {{title}}!",
+    "stage_titles": {
+      "T1": "Base Line Test",
+      "T2": "Capacity Test",
+      "T3": "Capability Test",
+      "T4": "Leadership Test"
+    },
+    "stage_names": {
+      "T1": "Baseline",
+      "T2": "Capacity",
+      "T3": "Capability",
+      "T4": "Leadership"
+    },
+    "bands": {
+      "Advanced": "Advanced",
+      "Strong": "Strong",
+      "Progressing": "Progressing",
+      "Developing": "Developing",
+      "Emerging": "Emerging"
+    },
+    "quotients": {
+      "CRQ": {
+        "name": "Cognitive Reasoning",
+        "fullName": "Cognitive Reasoning Quotient",
+        "desc": "Critical thinking & logical reasoning"
+      },
+      "SRQ": {
+        "name": "Self-regulation & Drive",
+        "fullName": "Self-regulation & Drive Quotient",
+        "desc": "Motivation, resilience & emotional control"
+      },
+      "LQ": {
+        "name": "Learning Agility",
+        "fullName": "Learning Agility Quotient",
+        "desc": "Adaptability & continuous learning"
+      },
+      "SIQ": {
+        "name": "Social Interaction",
+        "fullName": "Social Interaction Quotient",
+        "desc": "Collaboration, empathy & communication"
+      },
+      "PEQ": {
+        "name": "Professional Execution",
+        "fullName": "Professional Execution Quotient",
+        "desc": "Work ethic, reliability & delivery"
+      },
+      "DAQ": {
+        "name": "Digital & AI Literacy",
+        "fullName": "Digital & AI Literacy Quotient",
+        "desc": "Tech proficiency & AI readiness"
+      }
+    }
+  },
+  "toolkit": {
+    "hero_badge": "Intelligence Suite",
+    "hero_title": "SMAART Toolkit",
+    "hero_subtitle": "Explore our curated repository of career intelligence, wellness resources, and learning tools designed for your growth.",
+    "launch_cta": "Launch from your toolkit",
+    "usage_title": "Toolkit Usage & Resources",
+    "usage_items": {
+      "instant_access": {
+        "title": "INSTANT ACCESS",
+        "desc": "Explore all professional tools immediately without any prerequisites."
+      },
+      "ai_enhanced": {
+        "title": "AI ENHANCED",
+        "desc": "Leverage cutting-edge intelligence for your career and learning journey."
+      },
+      "secure_access": {
+        "title": "SECURE ACCESS",
+        "desc": "Your tools, resources, and learning progress are organized in one secure place."
+      },
+      "constant_updates": {
+        "title": "CONSTANT UPDATES",
+        "desc": "We are regularly adding new tools to help you succeed professionally."
+      }
+    },
+    "sections": {
+      "career_agent": {
+        "title": "Career Agent",
+        "description": "AI-powered career intelligence engine. Get matched to ideal career directions based on your degree, skills, and ambitions. Explore role analysis, market insights, skill gaps, certifications, and a personalized roadmap — all in one place.",
+        "badge": "AI Powered",
+        "cta": "Launch Career Agent",
+        "meta": "Career Intelligence",
+        "detail": "Role analysis · skill gap · roadmap · certifications"
+      },
+      "resume_builder": {
+        "title": "SMAART AI Resume Builder",
+        "description": "Craft ATS-optimized resumes that stand out. Leverage AI to generate impactful summaries and role-specific content that maximizes your interview chances.",
+        "badge": "Professional",
+        "cta": "Open Resume Builder",
+        "meta": "ATS + AI writing",
+        "detail": "Build polished resumes with guided AI support"
+      },
+      "dictionary": {
+        "title": "General Dictionary",
+        "description": "Master professional terminology with our interactive dictionary. Features real-time definitions, audio pronunciation, and daily vocabulary building tools.",
+        "badge": "Reference",
+        "cta": "Browse Dictionary",
+        "meta": "Definitions + audio",
+        "detail": "Search meanings, pronunciation, and vocabulary help"
+      },
+      "library": {
+        "title": "Library",
+        "description": "Unlock a curated repository of knowledge. Explore essential books, industry articles, and learning tracks tailored to accelerate your personal and professional growth.",
+        "badge": "Resources",
+        "cta": "Explore Library",
+        "meta": "Books + articles",
+        "detail": "Access curated reading for learning and career growth"
+      },
+      "notes": {
+        "title": "My Notes",
+        "description": "Capture, organize, and sync your thoughts. Keep track of course insights and personal breakthroughs in one secure, cloud-synced space.",
+        "badge": "Productivity",
+        "cta": "Open My Notes",
+        "meta": "Cloud Sync + Editor",
+        "detail": "Rich text notes with categorization and search"
+      }
+    }
+  },
+  "skills_vault": {
+    "hero_badge": "Secure Professional Vault",
+    "hero_title": "Skills Vault",
+    "hero_subtitle": "Manage your certificates, badges, course progress, and key learning flashcards in a single, high-security professional vault.",
+    "tabs": {
+      "overview": "Overview",
+      "certificates": "Certificates",
+      "badges": "Badges",
+      "courses": "Courses",
+      "flashcards": "Flashcards"
+    },
+    "overview": {
+      "stats": {
+        "certificates": "Certificates",
+        "badges": "Badges Earned",
+        "courses": "Courses",
+        "assessments": "Assessments"
+      },
+      "title": "What's in your Skills Vault?",
+      "subtitle": "Your Skills Vault is a centralized hub that securely stores and showcases all your professional achievements, learning progress, and key resources.",
+      "items": {
+        "certificates": {
+          "title": "Certificates",
+          "desc": "Verified professional credentials issued upon completing programme milestones — Capacity, Capability, Leadership, and the Master Diploma."
+        },
+        "badges": {
+          "title": "Badges & Achievements",
+          "desc": "Micro-credentials earned through course activities, assessments, and engagement — each one verifiable and shareable."
+        },
+        "courses": {
+          "title": "Course Overview",
+          "desc": "A dashboard view of all your enrolled courses, modules completed, and overall progress across the SMAART curriculum."
+        },
+        "flashcards": {
+          "title": "Flashcards & Key Terms",
+          "desc": "Quick-reference cards for the six core quotients and other essential professional terminology from your learning journey."
+        }
+      }
+    },
+    "certificates": {
+      "title": "Professional Credentials",
+      "desc": "Your verified SMAART Institute certifications",
+      "download_centre": "Download Centre",
+      "verification_title": "Credential Verification",
+      "verification_desc": "Verify any SMAART certificate using its unique ID or QR code.",
+      "names": {
+        "capacity": "Certificate in Capacity & Work Readiness",
+        "capability": "Advanced Certificate in Applied Capability",
+        "leadership": "Diploma in Employability & Leadership",
+        "combined": "Master Diploma in Comprehensive Readiness"
+      },
+      "levels": {
+        "capacity": "Level 1",
+        "capability": "Level 2",
+        "leadership": "Level 3",
+        "combined": "Master"
+      }
+    },
+    "courses": {
+      "overview": "Course Overview",
+      "go_to_courses": "Go to Courses",
+      "modules": "Modules",
+      "self_paced": "Self-paced",
+      "duration": "{{duration}}",
+      "no_courses_title": "No Enrolled Courses",
+      "no_courses_desc": "You haven't enrolled in any courses. Visit the core programme to get started on your journey.",
+      "browse_btn": "Browse Core Programme"
+    },
+    "flashcards": {
+      "title": "Key Flashcards",
+      "desc": "Quick-reference cards covering the six core SMAART quotients and essential professional terminology.",
+      "more_desc": "More flashcards are available within each course module to help you master professional terminology.",
+      "explore_btn": "Explore Course Flashcards",
+      "category": {
+        "Quotient": "Quotient"
+      },
+      "tap_reveal": "Tap to reveal",
+      "flip_back": "Flip Back",
+      "cards": {
+        "crq": {
+          "term": "Cognitive Reasoning (CRQ)",
+          "definition": "The ability to analyze, synthesize, and evaluate information to derive meaningful conclusions and solve complex problems."
+        },
+        "srq": {
+          "term": "Self-Regulation (SRQ)",
+          "definition": "The capacity to manage emotions, thoughts, and behaviors effectively across different situations and towards goals."
+        },
+        "lq": {
+          "term": "Learning Agility (LQ)",
+          "definition": "The willingness and ability to learn from experience and then apply those lessons in new and first-time situations."
+        },
+        "siq": {
+          "term": "Social Interaction (SIQ)",
+          "definition": "The skill of navigating social environments with emotional intelligence, empathy, and effective communication."
+        },
+        "peq": {
+          "term": "Professional Execution (PEQ)",
+          "definition": "The competence to deliver professional outcomes with accountability, precision, and stakeholder orientation."
+        },
+        "daq": {
+          "term": "Digital & AI Literacy (DAQ)",
+          "definition": "The ability to leverage digital tools and artificial intelligence to enhance productivity and innovation."
+        }
+      }
+    },
+    "student": "Student"
+  },
+  "badge_gallery": {
+    "achievements_cabinet": "Achievements Cabinet",
+    "no_achievements": "No achievements available",
+    "verified": "Verified",
+    "verified_credential": "Verified Credential",
+    "unlocked": "Unlocked",
+    "view": "View",
+    "recipient": "Recipient",
+    "xp_credit": "XP Credit",
+    "earned_date": "Earned Date",
+    "verification_code": "Verification Code",
+    "share_credential": "Share Credential",
+    "download_certificate": "Download Certificate",
+    "verify_badge": "Verify Badge",
+    "categories": {
+      "all": "All Categories",
+      "capability": "Capability",
+      "capacity": "Capacity",
+      "leadership": "Leadership"
+    },
+    "fallback": {
+      "module_master": {
+        "title": "Module Master",
+        "desc": "Awarded for completing a course module successfully."
+      },
+      "course_conqueror": {
+        "title": "Course Conqueror",
+        "desc": "Awarded for completing an entire course successfully."
+      }
+    }
+  },
+  "career_agent": {
+    "loading_title": "Synchronizing Intelligence...",
+    "loading_subtitle": "Mapping your career trajectory",
+    "panels": {
+      "direction": "Direction Overview",
+      "roledetail": "Role Detailed View",
+      "market": "Market Intel",
+      "skills": "Skill DNA",
+      "roadmap": "Career Roadmap",
+      "certs": "Certifications",
+      "future": "Future Scope",
+      "ai": "AI Implementation",
+      "interview": "Interview Prep",
+      "resume": "Resume Tips",
+      "projects": "Project Space"
+    },
+    "selection": {
+      "title": "Path Precision Selection",
+      "subtitle": "Confirm your interest level for each field.",
+      "primary_path": "Primary Path",
+      "secondary_path": "Secondary Path",
+      "tertiary_path": "Tertiary Path",
+      "roles": "ROLES:",
+      "no_roles": "No specific roles listed",
+      "interested": "Interested",
+      "not_interested": "Not Interested",
+      "confirm": "Confirm Selection & Lock In"
+    },
+    "welcome": {
+      "path_confirmed": "Path Confirmed",
+      "title": "Welcome to Your Journey",
+      "desc_multiple": "You've successfully locked in your chosen career paths. Your multi-track SMAART roadmaps are ready.",
+      "desc_single_start": "You've locked in ",
+      "desc_single_end": " as your career path. Your SMAART roadmap is ready.",
+      "closing": "Closing automatically…"
+    },
+    "header": {
+      "title_start": "Career ",
+      "title_span": "Intelligence",
+      "title_end": " Report",
+      "candidate": "CANDIDATE:",
+      "back": "← Back to Dashboard",
+      "path_locked": "Path Locked In",
+      "lock_path": "Lock This Path",
+      "new_analysis": "New Analysis"
+    },
+    "overview": {
+      "overall_match": "Overall Match",
+      "alignment_prob": "Alignment Probability",
+      "prep_time": "Preparation Time",
+      "reach_green": "To reach Green Zone",
+      "market_demand": "Market Demand",
+      "hiring_velocity": "Hiring Velocity",
+      "role_function": "What This Role Does",
+      "no_description": "No description available.",
+      "ml_fit_score": "ML FIT SCORE",
+      "ai_evolution": "AI Evolution",
+      "ai_pending": "AI assessment pending.",
+      "who_consider": "Who Should Consider",
+      "preparing_role": "Preparing for this role...",
+      "market_signal": "📍 Tier-1 India Market Signal",
+      "typical_employers": "Typical Employers",
+      "common_entry": "Common Entry"
+    },
+    "direction": {
+      "desc": "Your selected career direction and all roles within it — sourced from the SMAART Career Agent Database."
+    },
+    "roledetail": {
+      "desc_start": "Reviewing ",
+      "desc_end": " — confirm if this is your career path."
+    },
+    "market": {
+      "title": "Market Intelligence",
+      "desc_start": "Showing roles for ",
+      "desc_end": " — select a role below to view its market data."
+    },
+    "skills": {
+      "title": "Skills Overview"
+    },
+    "roadmap": {
+      "title": "SMAART Career Intelligence",
+      "desc_start": "Your personalized acceleration path for ",
+      "desc_end": ", matched against your educational background and skill profile."
+    },
+    "future": {
+      "title": "Future Trajectory & Growth",
+      "desc_start": "Salary progression, role evolution, and who this path suits best — based on "
+    },
+    "ai": {
+      "title": "AI Implementation in Role",
+      "desc_start": "How AI is reshaping ",
+      "desc_end": " — exposure analysis, AI-native skills, and what remains irreplaceably human."
+    },
+    "projects": {
+      "title": "Project Space",
+      "desc_start": "High-impact blueprint builds that prove your skills for ",
+      "unlocked": "Unlocked"
+    },
+    "interview": {
+      "title": "Interview Prep",
+      "desc_start": "Resources and questions tailored for ",
+      "desc_end": " — aptitude, domain, technical & HR rounds."
+    },
+    "resume": {
+      "title": "Resume Tips",
+      "desc_start": "Build a strong, ATS-ready resume for ",
+      "desc_end": " — structure, keywords, and an AI generator."
+    },
+    "certs": {
+      "title": "Certifications"
+    },
+    "placeholders": {
+      "processed_v7": "This intelligence vector is currently being processed by the v7 analysis engine."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread_count": "{{count}} unread notifications",
+    "all_caught_up": "All caught up!",
+    "ws": {
+      "live_updates": "Live updates on",
+      "connecting": "Connecting",
+      "offline": "Realtime offline"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "mark_all_read": "Mark all read",
+      "clear_all": "Clear all",
+      "mark_as_read": "Mark as read",
+      "delete": "Delete",
+      "load_more": "Load more notifications"
+    },
+    "filters": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "summary": {
+      "welcome": "Welcome back, {{name}}!",
+      "subtitle": "Here's your daily summary",
+      "current_session": "Current Session: {{time}}",
+      "last_login": "Last Login",
+      "first_login": "First login!",
+      "badges_earned": "Badges Earned",
+      "today_sessions": "Today's Sessions",
+      "sessions_completed": "{{count}} completed",
+      "enrolled_courses": "Enrolled Courses"
+    },
+    "empty": {
+      "no_unread": "No unread notifications",
+      "no_notifications": "No notifications yet",
+      "unread_desc": "You're all caught up! Check back later for new updates.",
+      "notifications_desc": "When you get notifications, they'll appear here. Stay tuned!"
+    },
+    "groups": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "time": {
+      "just_now": "Just now",
+      "year": "{{count}} year ago",
+      "year_plural": "{{count}} years ago",
+      "month": "{{count}} month ago",
+      "month_plural": "{{count}} months ago",
+      "week": "{{count}} week ago",
+      "week_plural": "{{count}} weeks ago",
+      "day": "{{count}} day ago",
+      "day_plural": "{{count}} days ago",
+      "hour": "{{count}} hour ago",
+      "hour_plural": "{{count}} hours ago",
+      "minute": "{{count}} minute ago",
+      "minute_plural": "{{count}} minutes ago"
+    },
+    "types": {
+      "badge": "Badges",
+      "assessment": "Assessments",
+      "course": "Courses",
+      "achievement": "Achievements",
+      "community": "Community",
+      "coaching": "Coaching",
+      "support": "Support",
+      "task": "Tasks",
+      "certificate": "Certificates",
+      "system": "System"
+    }
   }
 }

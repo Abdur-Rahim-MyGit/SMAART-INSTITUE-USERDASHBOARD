@@ -1,430 +1,298 @@
-import React, { useState } from 'react';
-import { Award, ExternalLink, ShieldCheck, Clock, BookOpen, Star, ChevronRight, Cpu, BrainCircuit, Building2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Award, BookOpen, Star, AlertCircle, RefreshCw, Cpu, BrainCircuit, Building2 } from 'lucide-react';
 
-const technicalCerts = [
-  {
-    id: 1,
-    name: "Meta Back-End Developer Professional Certificate",
-    provider: "Coursera",
-    skills: ["Python", "Django", "APIs", "Git", "SQL"],
-    url: "https://www.coursera.org/professional-certificates/meta-back-end-developer",
-    level: "Beginner",
-    duration: "8 Months",
-    color: "var(--accent)"
-  },
-  {
-    id: 2,
-    name: "IBM Full Stack Software Developer",
-    provider: "Coursera",
-    skills: ["React", "Express", "Node.js", "Python"],
-    url: "https://www.coursera.org/professional-certificates/ibm-full-stack-cloud-developer",
-    level: "Intermediate",
-    duration: "10 Months",
-    color: "var(--accent2)"
-  },
-  {
-    id: 3,
-    name: "AWS Certified Developer – Associate",
-    provider: "AWS Training",
-    skills: ["Serverless", "Security", "CI/CD", "Databases"],
-    url: "https://aws.amazon.com/certification/certified-developer-associate/",
-    level: "Intermediate",
-    duration: "130 Hours",
-    color: "var(--amber)"
-  },
-  {
-    id: 4,
-    name: "Microsoft Certified: Azure Developer",
-    provider: "Microsoft Learn",
-    skills: ["Azure", "Docker", "Cosmos DB", "C#"],
-    url: "https://learn.microsoft.com/en-us/certifications/azure-developer/",
-    level: "Intermediate",
-    duration: "Self-Paced",
-    color: "#00a4ef"
-  },
-  {
-    id: 5,
-    name: "Google Professional Cloud Developer",
-    provider: "Google Cloud",
-    skills: ["Kubernetes", "Cloud Native", "Performance"],
-    url: "https://cloud.google.com/certification/cloud-developer",
-    level: "Advanced",
-    duration: "Self-Paced",
-    color: "#34a853"
-  },
-  {
-    id: 6,
-    name: "Meta Front-End Developer",
-    provider: "Coursera",
-    skills: ["React", "JavaScript", "UI/UX", "CSS"],
-    url: "https://www.coursera.org/professional-certificates/meta-front-end-developer",
-    level: "Beginner",
-    duration: "7 Months",
-    color: "var(--accent)"
-  },
-  {
-    id: 7,
-    name: "Oracle Certified Professional: Java SE",
-    provider: "Oracle",
-    skills: ["Java", "OOP", "Concurrency"],
-    url: "https://education.oracle.com/java-se-11-developer/pexam_1Z0-819",
-    level: "Intermediate",
-    duration: "Self-Paced",
-    color: "#e34f26"
-  },
-  {
-    id: 8,
-    name: "Certified Kubernetes App Developer",
-    provider: "Linux Foundation",
-    skills: ["Kubernetes", "Microservices", "Containers"],
-    url: "https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/",
-    level: "Advanced",
-    duration: "Self-Paced",
-    color: "#326ce5"
-  }
+// ─── Category config ───────────────────────────────────────────────────────────
+const CATS = [
+  { key: 'technical', label: 'Technical Skills',  color: '#3b82f6', Icon: Cpu },
+  { key: 'ai',        label: 'AI & Data Skills',  color: '#8b5cf6', Icon: BrainCircuit },
+  { key: 'domain',    label: 'Domain Skills',      color: '#10b981', Icon: Building2 },
 ];
 
-const aiCerts = [
-  {
-    id: 11,
-    name: "DeepLearning.AI TensorFlow Developer",
-    provider: "Coursera",
-    skills: ["TensorFlow", "Deep Learning", "CNNs", "NLP"],
-    url: "https://www.coursera.org/professional-certificates/tensorflow-in-practice",
-    level: "Intermediate",
-    duration: "4 Months",
-    color: "#ff6f00"
-  },
-  {
-    id: 12,
-    name: "IBM AI Engineering Professional Certificate",
-    provider: "Coursera",
-    skills: ["Machine Learning", "PyTorch", "Computer Vision"],
-    url: "https://www.coursera.org/professional-certificates/ai-engineer",
-    level: "Intermediate",
-    duration: "8 Months",
-    color: "var(--accent2)"
-  },
-  {
-    id: 13,
-    name: "Microsoft Certified: Azure AI Engineer",
-    provider: "Microsoft Learn",
-    skills: ["Azure AI", "Cognitive Services", "NLP"],
-    url: "https://learn.microsoft.com/en-us/certifications/azure-ai-engineer/",
-    level: "Intermediate",
-    duration: "Self-Paced",
-    color: "#00a4ef"
-  },
-  {
-    id: 14,
-    name: "AWS Certified AI Practitioner",
-    provider: "AWS Training",
-    skills: ["Generative AI", "Foundational Models", "Prompt Eng"],
-    url: "https://aws.amazon.com/certification/certified-ai-practitioner/",
-    level: "Beginner",
-    duration: "60 Hours",
-    color: "var(--amber)"
-  },
-  {
-    id: 15,
-    name: "Google Cloud Professional ML Engineer",
-    provider: "Google Cloud",
-    skills: ["MLOps", "Model Architecture", "Data Pipelines"],
-    url: "https://cloud.google.com/certification/machine-learning-engineer",
-    level: "Advanced",
-    duration: "Self-Paced",
-    color: "#34a853"
-  },
-  {
-    id: 16,
-    name: "Andrew Ng's Machine Learning Specialization",
-    provider: "DeepLearning.AI",
-    skills: ["Supervised ML", "Unsupervised IT", "Recommender Systems"],
-    url: "https://www.coursera.org/specializations/machine-learning-introduction",
-    level: "Beginner",
-    duration: "2 Months",
-    color: "var(--accent)"
-  }
-];
-
-const domainCerts = [
-  {
-    id: 21,
-    name: "Certified ScrumMaster (CSM)",
-    provider: "Scrum Alliance",
-    skills: ["Agile", "Scrum", "Team Facilitation"],
-    url: "https://www.scrumalliance.org/get-certified/scrum-master-track/certified-scrummaster",
-    level: "Beginner",
-    duration: "2 Days",
-    color: "#00558c"
-  },
-  {
-    id: 22,
-    name: "Project Management Professional (PMP)",
-    provider: "PMI",
-    skills: ["Project Mgmt", "Risk Analysis", "Resource Allocation"],
-    url: "https://www.pmi.org/certifications/project-management-pmp",
-    level: "Advanced",
-    duration: "Self-Paced",
-    color: "#5b248a"
-  },
-  {
-    id: 23,
-    name: "ITIL 4 Foundation",
-    provider: "Axelos",
-    skills: ["IT Service Mgmt", "Process Optimization", "Value Co-creation"],
-    url: "https://www.axelos.com/certifications/itil-service-management",
-    level: "Beginner",
-    duration: "Self-Paced",
-    color: "#008a9f"
-  },
-  {
-    id: 24,
-    name: "AWS Certified Cloud Practitioner",
-    provider: "AWS Training",
-    skills: ["Cloud Economics", "Business Strategy", "High-Level Architecture"],
-    url: "https://aws.amazon.com/certification/certified-cloud-practitioner/",
-    level: "Beginner",
-    duration: "10 Hours",
-    color: "var(--amber)"
-  },
-  {
-    id: 25,
-    name: "TOGAF 9 Foundation",
-    provider: "The Open Group",
-    skills: ["Enterprise Architecture", "Business IT Alignment"],
-    url: "https://www.opengroup.org/certifications/togaf",
-    level: "Intermediate",
-    duration: "Self-Paced",
-    color: "#ab1c20"
-  }
-];
-
-const Certifications = ({ roleName }) => {
-  const [activeTab, setActiveTab] = useState('technical');
-  const [hoveredId, setHoveredId] = useState(null);
-
-  const tabs = [
-    { id: 'technical', label: 'Technical Skills', icon: <Cpu size={16} /> },
-    { id: 'ai', label: 'AI & Data Skills', icon: <BrainCircuit size={16} /> },
-    { id: 'domain', label: 'Domain Skills', icon: <Building2 size={16} /> }
-  ];
-
-  const getDisplayCerts = () => {
-    switch (activeTab) {
-      case 'ai': return aiCerts;
-      case 'domain': return domainCerts;
-      default: return technicalCerts;
-    }
-  };
-
-  const displayCerts = getDisplayCerts();
+// ─── Cert Card ─────────────────────────────────────────────────────────────────
+const CertCard = ({ cert, totalRoles }) => {
+  const [hovered, setHovered]         = useState(false);
+  const [rolesHovered, setRolesHover] = useState(false);
+  const catConf = CATS.find(c => {
+    if (cert.category === 'Technical') return c.key === 'technical';
+    if (cert.category === 'AI-Tool')   return c.key === 'ai';
+    return c.key === 'domain';
+  }) || CATS[0];
+  const color    = catConf.color;
+  const provider = (cert.provider || '').split(' – ')[0].split(' / ')[0].trim().slice(0, 24);
 
   return (
-    <div style={{ marginTop: '1rem', animation: 'fadeIn 0.5s ease-out' }}>
-
-      {/* Introduction Card */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(79, 142, 247, 0.1), rgba(79, 142, 247, 0.02))',
-        border: '1px solid rgba(79, 142, 247, 0.25)',
-        borderRadius: '16px',
-        padding: '1.5rem 2rem',
-        marginBottom: '2rem',
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: hovered ? 'var(--card-hover, rgba(26,56,132,0.06))' : 'var(--card-bg, rgba(255,255,255,0.9))',
+        border: `1px solid ${hovered ? color + '50' : 'var(--border, rgba(0,0,0,0.1))'}`,
+        borderRadius: '12px',
+        padding: '1rem 1.1rem 0.9rem',
+        transition: 'all 0.18s ease',
+        cursor: 'default',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '2rem',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1 }}>
-          <div style={{
-            width: '60px', height: '60px', borderRadius: '50%',
-            background: 'rgba(79, 142, 247, 0.2)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0, border: '2px solid rgba(79,142,247,0.4)',
-            boxShadow: '0 0 20px rgba(79, 142, 247, 0.2)'
+        flexDirection: 'column',
+        gap: '0.5rem',
+        minHeight: '110px',
+        position: 'relative',
+        boxShadow: hovered ? `0 4px 16px ${color}18` : '0 1px 4px rgba(0,0,0,0.06)',
+      }}
+    >
+      {/* Row 1: Cert name + X/10 Roles badge */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.6rem' }}>
+        <span style={{ fontSize: '0.87rem', fontWeight: 700, color: 'var(--text)', lineHeight: 1.45, flex: 1 }}>
+          {cert.name}
+        </span>
+
+        {/* Roles badge — hover shows tooltip with role names */}
+        <div
+          style={{ position: 'relative', flexShrink: 0 }}
+          onMouseEnter={e => { e.stopPropagation(); setRolesHover(true); }}
+          onMouseLeave={e => { e.stopPropagation(); setRolesHover(false); }}
+        >
+          <span style={{
+            display: 'inline-block',
+            padding: '0.15rem 0.5rem',
+            background: `${color}22`,
+            border: `1px solid ${color}50`,
+            borderRadius: '20px',
+            fontSize: '0.62rem', fontWeight: 700,
+            color, whiteSpace: 'nowrap',
           }}>
-            <Award size={28} color="var(--accent)" />
-          </div>
-          <div>
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.3rem', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              Top Recommended Certifications
-            </h3>
-            <p style={{ color: 'var(--muted)', fontSize: '0.85rem', lineHeight: '1.5', margin: 0, maxWidth: '550px' }}>
-              Boost your profile as a <strong style={{ color: 'var(--text2)' }}>{roleName || 'Software Developer'}</strong> by acquiring these industry-recognized credentials.
-            </p>
-          </div>
-        </div>
+            {cert.roleCount}/{totalRoles} Roles
+          </span>
 
-        {/* Tabs - Now aligned next to title */}
-        <div style={{
-          display: 'flex',
-          gap: '0.6rem',
-          background: 'linear-gradient(135deg, rgba(79, 142, 247, 0.12), rgba(167, 139, 250, 0.08))',
-          border: '1px solid rgba(79, 142, 247, 0.2)',
-          padding: '0.45rem',
-          borderRadius: '12px',
-          width: 'fit-content',
-          boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.05)'
-        }}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                background: activeTab === tab.id ? 'linear-gradient(135deg, var(--accent), var(--accent2))' : 'transparent',
-                color: activeTab === tab.id ? '#ffffff' : 'var(--text2)',
-                border: 'none',
-                padding: '0.55rem 1.1rem',
-                borderRadius: '8px',
-                fontSize: '0.8rem',
-                fontWeight: activeTab === tab.id ? 700 : 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                boxShadow: activeTab === tab.id ? '0 4px 14px rgba(79, 142, 247, 0.4)' : 'none',
-                transform: activeTab === tab.id ? 'translateY(-1px)' : 'none'
-              }}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Grid Layout */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-        gap: '1.5rem',
-        paddingBottom: '2rem'
-      }}>
-        {displayCerts.map((cert) => (
-          <a
-            key={cert.id}
-            href={cert.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onMouseEnter={() => setHoveredId(cert.id)}
-            onMouseLeave={() => setHoveredId(null)}
-            style={{
-              textDecoration: 'none',
-              background: 'var(--navy2)',
-              border: `1px solid ${hoveredId === cert.id ? cert.color : 'var(--border)'}`,
-              borderRadius: '16px',
-              padding: '1.5rem',
-              transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
-              transform: hoveredId === cert.id ? 'translateY(-4px)' : 'translateY(0)',
-              boxShadow: hoveredId === cert.id ? `0 12px 24px -8px ${cert.color}40` : '0 4px 12px rgba(0,0,0,0.05)',
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            {/* Top Badge Overlay Glow */}
+          {rolesHovered && cert.roles && cert.roles.length > 0 && (
             <div style={{
-              position: 'absolute',
-              top: '-50px',
-              right: '-50px',
-              width: '100px',
-              height: '100px',
-              background: cert.color,
-              filter: 'blur(40px)',
-              opacity: hoveredId === cert.id ? 0.3 : 0.05,
-              transition: 'opacity 0.4s'
-            }}></div>
-
-            {/* Provider & Icon */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.7rem',
-                borderRadius: '8px', fontSize: '0.75rem', fontWeight: '600',
-                color: 'var(--text2)', border: '1px solid var(--border)'
-              }}>
-                <ShieldCheck size={14} color={cert.color} />
-                {cert.provider}
-              </div>
-              <div style={{
-                color: hoveredId === cert.id ? 'var(--text)' : 'var(--muted)',
-                transition: 'color 0.3s',
-                display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', fontWeight: 600
-              }}>
-                View Course <ExternalLink size={14} />
-              </div>
-            </div>
-
-            {/* Certificate Title */}
-            <h4 style={{
-              fontSize: '1.1rem',
-              color: 'var(--text)',
-              marginBottom: '1rem',
-              lineHeight: '1.4',
-              flex: 1
+              position: 'absolute', top: 'calc(100% + 6px)', right: 0,
+              background: 'var(--tooltip-bg, #ffffff)',
+              border: `1px solid ${color}40`,
+              borderRadius: '10px',
+              padding: '0.65rem 0.85rem',
+              zIndex: 9999,
+              minWidth: '185px',
+              boxShadow: `0 10px 30px rgba(0,0,0,0.15), 0 0 0 1px ${color}20`,
+              pointerEvents: 'none',
             }}>
-              {cert.name}
-            </h4>
-
-            {/* Meta Tags */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                <Star size={14} color="var(--amber)" />
-                {cert.level}
+              <div style={{ fontSize: '0.6rem', fontWeight: 800, color, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>
+                Required by {cert.roles.length} roles
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--muted)' }}>
-                <Clock size={14} color="var(--accent)" />
-                {cert.duration}
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.4rem',
-              marginTop: 'auto',
-              paddingTop: '1rem',
-              borderTop: '1px dashed var(--border)'
-            }}>
-              <div style={{ width: '100%', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--muted)', marginBottom: '0.2rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <BookOpen size={12} /> Skills Covered
-              </div>
-              {cert.skills.map((skill, idx) => (
-                <span key={idx} style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid var(--border2)',
-                  color: 'var(--text2)',
-                  padding: '0.2rem 0.6rem',
-                  borderRadius: '6px',
-                  fontSize: '0.75rem',
-                  fontWeight: '500'
-                }}>
-                  {skill}
-                </span>
+              {cert.roles.map((r, i) => (
+                <div key={i} style={{ fontSize: '0.71rem', color: 'var(--text2)', paddingBottom: '0.26rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: color, flexShrink: 0, display: 'inline-block' }} />
+                  {r}
+                </div>
               ))}
             </div>
+          )}
+        </div>
+      </div>
 
-            {/* Hover arrow indicator */}
-            <div style={{
-              position: 'absolute',
-              bottom: '1rem',
-              right: '1rem',
-              opacity: hoveredId === cert.id ? 1 : 0,
-              transform: hoveredId === cert.id ? 'translateX(0)' : 'translateX(-10px)',
-              transition: 'all 0.3s ease',
-              color: cert.color
-            }}>
-              <ChevronRight size={20} />
-            </div>
+      {/* Row 2: Provider */}
+      {provider && (
+        <div style={{ fontSize: '0.72rem', color: 'var(--muted)' }}>{provider}</div>
+      )}
 
-          </a>
+      {/* Row 3: Skill name tag only */}
+      {cert.skillName && (
+        <div style={{ marginTop: 'auto' }}>
+          <span style={{
+            padding: '0.18rem 0.55rem',
+            background: `${color}12`,
+            border: `1px solid ${color}30`,
+            borderRadius: '5px',
+            fontSize: '0.68rem', color: 'var(--text2)',
+          }}>
+            {cert.skillName}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Section (Foundational / Specialization style) ────────────────────────────
+const CertSection = ({ catKey, label, color, Icon, certs, totalRoles }) => {
+  if (!certs || certs.length === 0) return null;
+  return (
+    <div style={{ marginBottom: '2.5rem' }}>
+      {/* Section header — same style as Career Roadmap */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '0.6rem',
+        marginBottom: '1.2rem',
+      }}>
+        <div style={{
+          width: '28px', height: '28px', borderRadius: '50%',
+          background: `${color}20`, border: `1px solid ${color}40`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Icon size={14} color={color} />
+        </div>
+        <span style={{ fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.07em', color: 'var(--text2)', textTransform: 'uppercase' }}>
+          {label}
+        </span>
+        <span style={{
+          padding: '0.1rem 0.5rem',
+          background: `${color}15`,
+          border: `1px solid ${color}30`,
+          borderRadius: '12px',
+          fontSize: '0.68rem', fontWeight: 700,
+          color,
+        }}>
+          {certs.length}
+        </span>
+      </div>
+
+      {/* Grid of cert cards — same as roadmap */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
+        gap: '0.85rem',
+      }}>
+        {certs.map((cert, i) => (
+          <CertCard key={cert.skillId || i} cert={cert} totalRoles={totalRoles} />
         ))}
       </div>
+    </div>
+  );
+};
+
+// ─── Main Certifications Component ────────────────────────────────────────────
+const Certifications = ({ roleName, directionName, directionRoles = [] }) => {
+  const [data, setData] = useState({ technical: [], ai: [], domain: [] });
+  const [loading, setLoading] = useState(false);
+  const [error, setError]   = useState(null);
+  const lastKey = useRef(null);
+
+  const roleList   = directionRoles.length > 0 ? directionRoles.filter(Boolean) : roleName ? [roleName] : [];
+  const totalRoles = roleList.length;
+
+  // ── Fetch ALL roles in parallel, deduplicate, count X/Y Roles ───────────────
+  useEffect(() => {
+    if (roleList.length === 0) return;
+    const key = roleList.join('|');
+    if (key === lastKey.current) return;
+    lastKey.current = key;
+
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    const fetchAll = async () => {
+      try {
+        const results = await Promise.all(
+          roleList.map(role =>
+            fetch(`/api/career-agent/certifications/${encodeURIComponent(role)}`, { credentials: 'include' })
+              .then(r => r.ok ? r.json() : { technical: [], ai: [], domain: [] })
+              .catch(() => ({ technical: [], ai: [], domain: [] }))
+          )
+        );
+
+        // Deduplicate by skillId, count roleCount AND track role names for tooltip
+        const techMap = {}, aiMap = {}, domMap = {};
+
+        const merge = (list, map, roleName) => {
+          (list || []).forEach(cert => {
+            const id = cert.skillId || cert.name;
+            if (!map[id]) {
+              map[id] = { ...cert, roleCount: 0, roles: [] };
+            }
+            map[id].roleCount++;
+            map[id].roles.push(roleName);   // ← push role name for tooltip
+          });
+        };
+
+        results.forEach((res, idx) => {
+          const roleName = roleList[idx];   // ← which role this result belongs to
+          merge(res.technical, techMap, roleName);
+          merge(res.ai,        aiMap,  roleName);
+          merge(res.domain,    domMap, roleName);
+        });
+
+
+        // Sort by roleCount DESC (most-common first — like foundational)
+        const sort = map => Object.values(map).sort((a, b) => b.roleCount - a.roleCount);
+
+        if (!cancelled) {
+          setData({ technical: sort(techMap), ai: sort(aiMap), domain: sort(domMap) });
+          setLoading(false);
+        }
+      } catch (e) {
+        if (!cancelled) { setError(e.message); setLoading(false); }
+      }
+    };
+
+    fetchAll();
+    return () => { cancelled = true; };
+  }, [roleList.join('|')]);
+
+  // Reset when direction changes
+  useEffect(() => {
+    lastKey.current = null;
+    setData({ technical: [], ai: [], domain: [] });
+  }, [directionName]);
+
+  const total = data.technical.length + data.ai.length + data.domain.length;
+
+  return (
+    <div style={{ padding: '0.5rem 0' }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: '1.8rem' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+          <Award size={22} color="var(--accent)" />
+          Certifications
+        </h2>
+        <p style={{ color: 'var(--muted)', fontSize: '0.84rem', maxWidth: '640px', lineHeight: 1.6 }}>
+          Industry-recognised certifications mapped across all <strong style={{ color: 'var(--text2)' }}>{totalRoles} roles</strong> in
+          {directionName ? <> the <strong style={{ color: 'var(--accent)' }}> {directionName}</strong> career path</> : ' this career path'}.
+          Each certificate shows how many roles recommend it.
+        </p>
+      </div>
+
+      {/* Loading */}
+      {loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '280px', gap: '1rem' }}>
+          <div style={{ width: '36px', height: '36px', border: '3px solid rgba(79,142,247,0.2)', borderTopColor: '#4f8ef7', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Loading certifications for all {totalRoles} roles…</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
+
+      {/* Error */}
+      {!loading && error && (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', minHeight: '220px', justifyContent: 'center' }}>
+          <AlertCircle size={32} color="#ef4444" />
+          <p style={{ color: '#ef4444', fontSize: '0.85rem' }}>Could not load certifications</p>
+          <button onClick={() => { lastKey.current = null; setData({ technical: [], ai: [], domain: [] }); }}
+            style={{ padding: '0.5rem 1.2rem', background: 'rgba(79,142,247,0.15)', border: '1px solid rgba(79,142,247,0.3)', borderRadius: '8px', color: '#4f8ef7', cursor: 'pointer', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <RefreshCw size={14} /> Retry
+          </button>
+        </div>
+      )}
+
+      {/* No data */}
+      {!loading && !error && total === 0 && (
+        <div style={{ textAlign: 'center', minHeight: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
+          <div style={{ fontSize: '2.5rem', opacity: 0.25 }}>🎓</div>
+          <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>No certifications found for this career path.</p>
+        </div>
+      )}
+
+      {/* Sections — Technical / AI / Domain — like Career Roadmap */}
+      {!loading && !error && total > 0 && CATS.map(cat => (
+        <CertSection
+          key={cat.key}
+          catKey={cat.key}
+          label={cat.label}
+          color={cat.color}
+          Icon={cat.Icon}
+          certs={data[cat.key]}
+          totalRoles={totalRoles}
+        />
+      ))}
+
     </div>
   );
 };

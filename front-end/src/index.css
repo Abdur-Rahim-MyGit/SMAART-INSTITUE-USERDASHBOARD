@@ -488,3 +488,16 @@
   mask-image: linear-gradient(to right, black 85%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
 }
+
+/* Remove white line borders on containers in dark mode globally */
+.dark [class*="dark:border-white/"],
+.dark [class*="dark:border-white-"],
+.dark [class*="border-gray-50"]:not([class*="dark:border-"]):not([class*="dark:border-white/"]),
+.dark [class*="border-gray-100"]:not([class*="dark:border-"]):not([class*="dark:border-white/"]),
+.dark [class*="border-gray-200"]:not([class*="dark:border-"]):not([class*="dark:border-white/"]),
+.dark [class*="border-slate-50"]:not([class*="dark:border-"]):not([class*="dark:border-white/"]),
+.dark [class*="border-slate-100"]:not([class*="dark:border-"]):not([class*="dark:border-white/"]),
+.dark [class*="border-slate-200"]:not([class*="dark:border-"]):not([class*="dark:border-white/"]),
+.dark [class*="border-slate-300"]:not([class*="dark:border-"]):not([class*="dark:border-white/"]) {
+  border-color: transparent !important;
+}

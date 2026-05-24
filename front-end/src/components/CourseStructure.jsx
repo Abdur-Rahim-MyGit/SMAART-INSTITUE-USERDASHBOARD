@@ -7,6 +7,7 @@ import {
   Brain, Bot, Leaf
 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { STAGES, TRACKS } from "@/data/courseStructureData";
 import PageHero from "@/components/ui/PageHero";
 
@@ -37,6 +38,7 @@ const STAGE_CONFIG = {
 
 /* ─── Category card (top-level view) ─── */
 const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }) => {
+  const { t } = useTranslation();
   const { Icon } = cfg;
   const total = stage.totalCourses;
   const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
@@ -101,7 +103,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"
                   }`}>
-                  {cfg.tag}
+                  {t("my_courses_page.stage_n", { n: stage.id })}
                 </span>
                 {!isUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
               </div>
@@ -110,21 +112,21 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
                 ? "text-[#112b6b] dark:text-white"
                 : "text-gray-400 dark:text-slate-400"
                 }`} style={{ letterSpacing: "-0.02em" }}>
-                {stage.name}
+                {t(`my_courses_page.stages.${stage.id}.name`, stage.name)}
               </h3>
               <p className="text-[13px] text-gray-500 mb-4 line-clamp-2 leading-relaxed font-medium">
-                {stage.description}
+                {t(`my_courses_page.stages.${stage.id}.description`, stage.description)}
               </p>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className={`text-[11px] font-bold uppercase tracking-wider ${isUnlocked ? "text-gray-700" : "text-gray-400"
                     }`}>
-                    Progression
+                    {t("my_courses_page.progression")}
                   </span>
                   <span className={`text-[11px] font-bold ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"
                     }`}>
-                    {completedCount}/{total} Courses
+                    {t("my_courses_page.courses_count", { completed: completedCount, total })}
                   </span>
                 </div>
 
@@ -152,6 +154,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
 
 /* ─── Track card (Parallel tracks) ─── */
 const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
+  const { t } = useTranslation();
   const total = track.totalCourses;
   const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
   const mouseX = useMotionValue(0);
@@ -217,7 +220,7 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
               <div className="flex items-center justify-between mb-3">
                 <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"
                   }`}>
-                  Specialization Track
+                  {t("my_courses_page.specialization_track")}
                 </span>
                 {!isUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
               </div>
@@ -226,21 +229,21 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
                 ? "text-[#112b6b] dark:text-white"
                 : "text-gray-400 dark:text-slate-400"
                 }`} style={{ letterSpacing: "-0.02em" }}>
-                {track.shortName}
+                {t(`my_courses_page.tracks.${track.id}.shortName`, track.shortName)}
               </h3>
               <p className="text-[13px] text-gray-500 mb-4 line-clamp-2 leading-relaxed font-medium">
-                {track.description}
+                {t(`my_courses_page.tracks.${track.id}.description`, track.description)}
               </p>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className={`text-[11px] font-bold uppercase tracking-wider ${isUnlocked ? "text-gray-700" : "text-gray-400"
                     }`}>
-                    Progression
+                    {t("my_courses_page.progression")}
                   </span>
                   <span className={`text-[11px] font-bold ${isUnlocked ? "text-[#1a3884]" : "text-gray-400"
                     }`}>
-                    {completedCount}/{total} Courses
+                    {t("my_courses_page.courses_count", { completed: completedCount, total })}
                   </span>
                 </div>
 
@@ -268,6 +271,7 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
 
 /* ─── Single course card inside the stage view ─── */
 const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick, delay }) => {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
@@ -321,10 +325,10 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
 
           <h4 className={`font-bold text-[15px] mb-1 leading-tight ${isUnlocked ? "text-[#112b6b] dark:text-white" : "text-gray-400 dark:text-slate-400"
             }`}>
-            {course.title}
+            {t(`my_courses_page.courses.${course.id}.title`, course.title)}
           </h4>
           <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-1 font-medium">
-            {course.subtitle}
+            {t(`my_courses_page.courses.${course.id}.subtitle`, course.subtitle)}
           </p>
         </div>
       </div>
@@ -334,6 +338,7 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
 
 /* ─── Stage detail view ─── */
 const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) => {
+  const { t } = useTranslation();
   const { Icon } = cfg;
   const completedCount = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
   const pct = Math.round((completedCount / stage.totalCourses) * 100);
@@ -365,7 +370,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
         <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
           <ArrowLeft className="w-4 h-4" />
         </div>
-        Back to Overview
+        {t("my_courses_page.back_to_overview")}
       </button>
 
       {/* Stage header - Refined and Sized Appropriately */}
@@ -380,19 +385,19 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
             </div>
             <div>
               <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">
-                Your Learning Journey <ChevronRight className="w-3 h-3" /> {cfg.tag}
+                {t("my_courses_page.your_learning_journey")} <ChevronRight className="w-3 h-3" /> {typeof stage.id === 'number' ? t("my_courses_page.stage_n", { n: stage.id }) : t(`my_courses_page.tracks.${stage.id}.name`, stage.name)}
               </div>
 
               <div className="mb-3 inline-flex items-center rounded-full border border-[#1a3884]/15 bg-[#1a3884]/6 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300 shadow-sm">
-                {stage.totalCourses} Specialized Courses
+                {t("my_courses_page.specialized_courses_count", { count: stage.totalCourses })}
               </div>
 
               <h1 className="text-2xl font-extrabold tracking-tight text-[#112b6b] dark:text-white md:text-3xl leading-[1.2]" style={{ letterSpacing: "-0.02em" }}>
-                {stage.name}
+                {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.name`, stage.name) : t(`my_courses_page.tracks.${stage.id}.name`, stage.name)}
               </h1>
 
               <p className="mt-2 text-[14px] text-slate-500 dark:text-slate-400 font-medium max-w-lg leading-relaxed">
-                {stage.description}
+                {typeof stage.id === 'number' ? t(`my_courses_page.stages.${stage.id}.description`, stage.description) : t(`my_courses_page.tracks.${stage.id}.description`, stage.description)}
               </p>
             </div>
           </div>
@@ -402,18 +407,18 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
             <div className="absolute -inset-1 bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] rounded-[24px] blur opacity-5 group-hover:opacity-10 transition duration-1000"></div>
             <div className="relative flex flex-col sm:flex-row items-center sm:items-stretch gap-4 sm:gap-6 bg-slate-50/50 dark:bg-[#001835] border border-slate-100 dark:border-white/5 rounded-[20px] p-5 sm:px-6 sm:py-5 shadow-sm overflow-hidden w-full">
               <div className="text-center flex-shrink-0">
-                <div className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">Stage Progress</div>
+                <div className="text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">{t("my_courses_page.stage_progress")}</div>
                 <div className="text-3xl font-black text-[#1a3884] dark:text-blue-400 leading-none tabular-nums">{pct}%</div>
               </div>
               <div className="hidden sm:block h-10 w-px bg-slate-200 dark:bg-white/10" />
               <div className="space-y-1 text-center sm:text-left flex flex-col justify-center w-full sm:w-auto">
                 <div className="flex items-center justify-center sm:justify-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  <span className="text-[12px] font-bold text-[#112b6b] dark:text-slate-200">{completedCount} Mastered</span>
+                  <span className="text-[12px] font-bold text-[#112b6b] dark:text-slate-200">{t("my_courses_page.mastered_count", { count: completedCount })}</span>
                 </div>
                 <div className="flex items-center justify-center sm:justify-start gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
-                  <span className="text-[12px] font-bold text-slate-400">{stage.totalCourses - completedCount} Remaining</span>
+                  <span className="text-[12px] font-bold text-slate-400">{t("my_courses_page.remaining_count", { count: stage.totalCourses - completedCount })}</span>
                 </div>
               </div>
             </div>
@@ -440,13 +445,13 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
             <TrendingUp className="w-6 h-6 text-[#1a3884]" />
           </div>
           <div className="flex-1">
-            <h4 className="font-bold text-[#112b6b] text-[15px]">Assessment Required: {stage.assessmentGate}</h4>
-            <p className="text-gray-500 text-[13px] font-medium">Complete all modules and achieve 70%+ to unlock next stage</p>
+            <h4 className="font-bold text-[#112b6b] text-[15px]">{t("my_courses_page.assessment_required", { gate: stage.assessmentGate })}</h4>
+            <p className="text-gray-500 text-[13px] font-medium">{t("my_courses_page.assessment_required_desc")}</p>
           </div>
           {userProgress.assessmentsPassed?.includes(stage.assessmentGate) ? (
-            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 uppercase tracking-wider">Passed</div>
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 uppercase tracking-wider">{t("my_courses_page.status_passed")}</div>
           ) : (
-            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#F8FAFC] text-gray-500 border border-slate-100 uppercase tracking-wider">Locked</div>
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#F8FAFC] text-gray-500 border border-slate-100 uppercase tracking-wider">{t("my_courses_page.status_locked")}</div>
           )}
         </div>
       )}
@@ -482,6 +487,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
 
 /* ─── Main Component ─── */
 const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
+  const { t } = useTranslation();
   const [selectedStageId, setSelectedStageId] = useState(null);
 
   const isStageUnlocked = (stage) => {
@@ -516,27 +522,27 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
         <div className="relative z-10 py-4">
           <div className="max-w-7xl mx-auto">
             <PageHero
-              badge="Learning Journey"
-              title="Programme"
+              badge={t("my_courses_page.learning_journey")}
+              title={t("my_courses_page.programme")}
               titleAccent="SMAART"
               accentFirst={true}
-              subtitle="Experience a structured pathway to mastery. Three transformative stages designed to elevate your professional capability and human intelligence."
+              subtitle={t("my_courses_page.programme_desc")}
             >
               {/* Progress stat card */}
               <div className="flex items-center gap-5 bg-white dark:bg-[#002147] border border-gray-100 dark:border-white/10 rounded-2xl px-6 py-4 shadow-sm">
                 <div className="text-center">
-                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Completion</div>
+                  <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{t("my_courses_page.completion")}</div>
                   <div className="text-3xl font-black text-[#1a3884] dark:text-blue-300 leading-none tabular-nums">{overallPct}%</div>
                 </div>
                 <div className="h-10 w-px bg-slate-200 dark:bg-white/10" />
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">{totalCompleted} Mastered</span>
+                    <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200">{t("my_courses_page.mastered_count", { count: totalCompleted })}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600" />
-                    <span className="text-[12px] font-bold text-slate-400 dark:text-slate-500">{totalCourses - totalCompleted} Remaining</span>
+                    <span className="text-[12px] font-bold text-slate-400 dark:text-slate-500">{t("my_courses_page.remaining_count", { count: totalCourses - totalCompleted })}</span>
                   </div>
                 </div>
               </div>
@@ -553,7 +559,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
             <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: -30 }} className="space-y-12">
               <div>
                 <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
-                  Human Intelligence Courses
+                  {t("my_courses_page.human_intelligence_courses")}
                   <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -581,7 +587,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {} }) => {
 
               <div>
                 <h2 className="text-xl font-bold text-[#112b6b] dark:text-white mb-6 px-1 flex items-center gap-3">
-                  Readiness Tracks
+                  {t("my_courses_page.readiness_tracks")}
                   <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">

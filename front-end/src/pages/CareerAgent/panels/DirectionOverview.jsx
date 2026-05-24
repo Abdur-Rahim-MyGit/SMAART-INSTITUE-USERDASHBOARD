@@ -69,32 +69,16 @@ const DirectionOverview = ({ directionData }) => {
                 </div>
             </div>
 
-            {/* ── Two info boxes: Description + Overview ── */}
-            <div style={styles.twoCol}>
-
-                {/* Direction Description */}
-                <div style={styles.infoBox}>
-                    <div style={styles.boxHeader}>
-                        <div style={{ background: 'rgba(79,142,247,0.15)', padding: '0.4rem', borderRadius: '8px', display: 'flex', fontSize: '1.2rem' }}>
-                            📌
-                        </div>
-                        <div style={styles.boxTitle}>Direction Description</div>
+            {/* ── Single info box: Direction Overview ── */}
+            <div style={styles.singleBox}>
+                <div style={styles.boxHeader}>
+                    <div style={{ background: 'rgba(79,142,247,0.15)', padding: '0.4rem', borderRadius: '8px', display: 'flex', fontSize: '1.2rem' }}>
+                        🗺️
                     </div>
-                    <div style={styles.boxDivider} />
-                    <p style={styles.boxText}>{directionDescription || '—'}</p>
+                    <div style={styles.boxTitle}>Direction Overview</div>
                 </div>
-
-                {/* Direction Overview */}
-                <div style={{ ...styles.infoBox, ...styles.infoBoxAccent }}>
-                    <div style={styles.boxHeader}>
-                        <div style={{ background: 'rgba(79,142,247,0.15)', padding: '0.4rem', borderRadius: '8px', display: 'flex', fontSize: '1.2rem' }}>
-                            🗺️
-                        </div>
-                        <div style={styles.boxTitle}>Direction Overview</div>
-                    </div>
-                    <div style={styles.boxDivider} />
-                    <p style={styles.boxText}>{directionOverview || '—'}</p>
-                </div>
+                <div style={styles.boxDivider} />
+                <p style={styles.boxText}>{directionOverview || directionDescription || '—'}</p>
             </div>
 
             {/* ── Core Roles – These are the possible ways ── */}
@@ -119,7 +103,6 @@ const DirectionOverview = ({ directionData }) => {
                                     <div style={styles.roleCardName}>
                                         {r.role}
                                     </div>
-                                    <div style={styles.roleCardId}>{r.id}</div>
                                 </div>
                             </div>
                         );
@@ -188,7 +171,14 @@ const styles = {
         letterSpacing: '0.03em',
     },
 
-    /* Info boxes */
+    /* Single full-width info box */
+    singleBox: {
+        background: 'linear-gradient(135deg, rgba(79,142,247,0.06) 0%, var(--navy2) 60%)',
+        border: '1px solid rgba(79,142,247,0.2)',
+        borderRadius: '16px',
+        padding: '1.5rem',
+    },
+    /* Legacy twoCol kept for reference but unused */
     twoCol: {
         display: 'grid',
         gridTemplateColumns: '1fr 1.5fr',

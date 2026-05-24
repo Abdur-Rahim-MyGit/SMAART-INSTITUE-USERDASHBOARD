@@ -32,7 +32,8 @@
     "help": "Aide et support",
     "save_changes": "Enregistrer les modifications",
     "cancel": "Annuler",
-    "language_region": "Langue et région"
+    "language_region": "Langue et région",
+    "customisation": "Personnalisation"
   },
   "dashboard": {
     "good_morning": "Bonjour",
@@ -509,6 +510,148 @@
       }
     }
   },
+  "my_courses_page": {
+    "continue_watching": "Continuer à regarder",
+    "pct_complete": "{{pct}}% Terminé",
+    "your_current_course": "Votre cours actuel",
+    "last_watched": "Dernière consultation :",
+    "modules_count": "{{completed}}/{{total}} modules",
+    "completed": "Terminé",
+    "resume_course": "Reprendre le cours",
+    "your_course": "Votre cours",
+    "stage_n": "Étape {{n}}",
+    "progression": "Progression",
+    "courses_count": "{{completed}}/{{total}} Cours",
+    "specialization_track": "Parcours de spécialisation",
+    "back_to_overview": "Retour à la vue d'ensemble",
+    "your_learning_journey": "Votre parcours d'apprentissage",
+    "specialized_courses_count": "{{count}} cours spécialisés",
+    "stage_progress": "Progression de l'étape",
+    "mastered_count": "{{count}} maîtrisé(s)",
+    "remaining_count": "{{count}} restant(s)",
+    "assessment_required": "Évaluation requise : {{gate}}",
+    "assessment_required_desc": "Complétez tous les modules et atteignez 70%+ pour débloquer l'étape suivante",
+    "status_passed": "Réussi",
+    "status_locked": "Verrouillé",
+    "learning_journey": "Parcours d'apprentissage",
+    "programme": "Programme",
+    "programme_desc": "Découvrez un parcours structuré vers la maîtrise. Trois étapes transformatrices conçues pour élever votre capacité professionnelle et votre intelligence humaine.",
+    "completion": "Complétion",
+    "human_intelligence_courses": "Cours d'intelligence humaine",
+    "readiness_tracks": "Parcours de préparation",
+    "stages": {
+      "1": {
+        "name": "Capacité (Capacity)",
+        "description": "Développez les compétences et ressources fondamentales pour donner le meilleur de vous-même dans n'importe quel environnement."
+      },
+      "2": {
+        "name": "Compétence (Capability)",
+        "description": "Développez les compétences clés et l'expertise technique pour exceller dans le domaine de votre choix."
+      },
+      "3": {
+        "name": "Leadership (Leadership)",
+        "description": "Cultivez l'état d'esprit et la vision nécessaires pour diriger des équipes et susciter des changements significatifs."
+      }
+    },
+    "tracks": {
+      "PIQ": {
+        "name": "Quotient d'Intelligence Personnelle",
+        "shortName": "PIQ",
+        "description": "Développez l'état d'esprit, la confiance et l'efficacité personnelle"
+      },
+      "AIQ": {
+        "name": "Quotient d'Aptitude à l'IA",
+        "shortName": "AIQ",
+        "description": "Maîtrisez les outils d'IA et collaborez efficacement avec l'intelligence artificielle"
+      },
+      "SQ": {
+        "name": "Quotient de Durabilité",
+        "shortName": "SQ",
+        "description": "Développez la réflexion éthique et la sensibilisation au développement durable"
+      }
+    }
+  },
+  "course_player": {
+    "stages": {
+      "stage_1": "Étape 1",
+      "stage_2": "Étape 2",
+      "stage_3": "Étape 3",
+      "piq_track": "Parcours PIQ",
+      "aiq_track": "Parcours AIQ",
+      "sq_track": "Parcours SQ",
+      "capacity": "Capacité",
+      "capability": "Compétence",
+      "leadership": "Leadership",
+      "personal_intelligence": "Intelligence personnelle",
+      "ai_readiness": "Aptitude à l'IA",
+      "sustainability": "Durabilité",
+      "type_s1": "Étape 1 Capacité",
+      "type_s2": "Étape 2 Compétence",
+      "type_s3": "Étape 3 Leadership",
+      "type_piq": "Parcours PIQ",
+      "type_aiq": "Parcours AIQ",
+      "type_sq": "Parcours SQ"
+    },
+    "step_locked_warning": "Veuillez d'abord compléter l'étape {{step}} !",
+    "preview": "Aperçu",
+    "transcription": "Transcription",
+    "lesson_preview": "Aperçu de la leçon",
+    "lesson_preview_desc": "Regardez cette leçon pour continuer votre parcours d'apprentissage.",
+    "five_ten_min": "5-10 min",
+    "video_lesson": "Leçon vidéo",
+    "video_transcription": "Transcription vidéo",
+    "transcription_coming_soon": "La transcription sera disponible ici une fois le contenu vidéo traité.",
+    "transcription_desc": "Cette fonctionnalité vous permet de lire en même temps que le contenu vidéo, facilitant le suivi et la révision des points clés.",
+    "course_not_found": "Cours non trouvé",
+    "course_not_found_desc": "Le cours que vous recherchez n'a pas pu être trouvé.",
+    "back_to_courses": "Retour aux cours",
+    "back_to_overview": "Retour à la vue d'ensemble",
+    "completed": "Terminé",
+    "course_details": "Détails du cours",
+    "course_id": "ID du cours",
+    "type": "Type",
+    "duration": "Durée",
+    "forty_five_min": "45 min",
+    "start_learning_journey": "Commencer le parcours d'apprentissage",
+    "select_step_prompt": "Veuillez sélectionner une étape du flux d'apprentissage pour commencer.",
+    "active_session": "Session active",
+    "content_coming_soon": "Contenu disponible bientôt",
+    "step_preparing": "Le contenu de l'étape {{step}} est en cours de préparation.",
+    "complete_step": "Compléter l'étape",
+    "continue": "Continuer",
+    "unlock_next_course": "Débloquer le cours suivant",
+    "progress": "Progression",
+    "content_progress": "Progression du contenu",
+    "steps_completed": "Étapes complétées",
+    "course_completed": "Cours terminé",
+    "all_steps_validated": "Toutes les étapes validées",
+    "curriculum": "Programme",
+    "congratulations": "Félicitations ! 🎉",
+    "congratulations_desc": "Vous avez complété les 9 étapes d'apprentissage de cette leçon !",
+    "your_progress": "Votre progression",
+    "nine_nine_steps": "9/9 Étapes",
+    "continue_to_next_lesson": "Continuer vers la leçon suivante"
+  },
+  "my_assessments": {
+    "page_title": "MES ÉVALUATIONS",
+    "baseline_title": "Test de Référence - T1",
+    "baseline_short": "Référence - T1",
+    "questions_count": "300 Questions",
+    "duration_approx": "~45 min",
+    "step": "Étape",
+    "view_results": "Voir les Résultats",
+    "start_assessment": "Démarrer l'Évaluation",
+    "welcome_back": "Bon retour, {{name}} ! 🎉",
+    "welcome_back_desc": "Complétez votre évaluation de référence pour débloquer des informations personnalisées.",
+    "skills_passport": "Passeport de Compétences",
+    "detailed_results": "Résultats Détaillés",
+    "readiness_profile": "Profil d'Aptitude",
+    "current_band": "Niveau Actuel : {{band}}",
+    "download_pdf": "Télécharger le Rapport PDF Détaillé",
+    "assessment_summary": "Résumé de l'Évaluation",
+    "assessment_summary_desc": "Vous avez terminé le Test de Référence - T1. Cette évaluation mesure votre compréhension fondamentale et fournit une base de référence pour votre parcours de développement.",
+    "category_assessment": "Évaluation"
+  },
   "common": {
     "student": "Étudiant",
     "save": "Enregistrer",
@@ -526,5 +669,642 @@
     "integrity_verified": "Intégrité vérifiée",
     "success_export": "Exportation réussie !",
     "error_export": "L'exportation a échoué. Veuillez réessayer."
+  },
+  "assessments_dashboard": {
+    "badge": "Parcours d'Évaluation",
+    "title": "Centre d'Évaluations",
+    "subtitle": "Découvrez un chemin structuré vers la maîtrise. Suivez vos progrès, complétez chaque étape avec confiance et débloquez vos analyses de performance.",
+    "reset_assessments": "Réinitialiser les Évaluations",
+    "reset_confirm": "Êtes-vous sûr de vouloir réinitialiser les 4 évaluations ? Cela supprimera définitivement vos scores et votre progression, et vous devrez recommencer à partir de la référence T1.",
+    "error_user_not_found": "Données utilisateur non trouvées. Veuillez vous reconnecter.",
+    "error_id_not_found": "ID utilisateur non trouvé. Veuillez vous reconnecter.",
+    "success_reset": "Réinitialisation réussie des 4 évaluations !",
+    "error_reset": "Échec de la réinitialisation des évaluations",
+    "error_generic": "Une erreur est survenue lors de la réinitialisation des évaluations.",
+    "guidelines_title": "Protocole d'Évaluation & Directives",
+    "dynamic_questions_title": "QUESTIONS DYNAMIQUES",
+    "dynamic_questions_desc": "Chaque étape contient des questions uniques évaluant les 6 quotients.",
+    "real_time_persistence_title": "PERSISTANCE EN TEMPS RÉEL",
+    "real_time_persistence_desc": "Les réponses sont enregistrées en temps réel - reprenez à tout moment en cas de déconnexion.",
+    "single_attempt_title": "TENTATIVE UNIQUE",
+    "single_attempt_desc": "Les tentatives multiples ne sont pas autorisées par défaut. Contactez l'administrateur pour des exceptions.",
+    "integrity_monitoring_title": "SURVEILLANCE DE L'INTÉGRITÉ",
+    "integrity_monitoring_desc": "L'enregistrement d'écran, le copier-coller et le changement d'onglet sont surveillés.",
+    "performance": "Votre Performance",
+    "view_report": "Voir le Rapport de Performance",
+    "start_stage": "Démarrer l'Évaluation de l'Étape",
+    "verified": "Vérifié",
+    "questions": "Qs",
+    "stages": {
+      "T1": {
+        "title": "T1 - Référence",
+        "subtitle": "Fondation",
+        "description": "Établissez votre compréhension fondamentale et votre compétence de référence à travers les six quotients."
+      },
+      "T2": {
+        "title": "T2 - Capacité",
+        "subtitle": "Croissance",
+        "description": "Mesurez votre capacité de croissance et de développement à travers les domaines cognitifs et émotionnels."
+      },
+      "T3": {
+        "title": "T3 - Compétence",
+        "subtitle": "Compétences Appliquées",
+        "description": "Évaluez vos compétences appliquées et votre préparation professionnelle avec des défis avancés."
+      },
+      "T4": {
+        "title": "T4 - Leadership",
+        "subtitle": "Maîtrise",
+        "description": "Démontrez votre potentiel de leadership et votre maîtrise à travers toutes les dimensions de compétences."
+      }
+    }
+  },
+  "baseline_test": {
+    "back": "Retour",
+    "time_left": "Temps Restant",
+    "time_almost_up": "Temps presque écoulé !",
+    "question_number": "Question {{current}} / {{total}}",
+    "wait_seconds": "Attendez {{seconds}}s",
+    "next_question": "Question Suivante",
+    "answer_all_questions": "Répondre à Toutes les Questions",
+    "submit_test": "Soumettre le Test",
+    "submitting": "Soumission...",
+    "question_map": "Carte des Questions",
+    "answered": "Répondu",
+    "remaining": "Restant",
+    "clear_assessment_dev": "Effacer l'Évaluation (Dev)",
+    "clear_assessment_desc": "Développement uniquement. Cela efface la tentative actuelle après le début de l'évaluation.",
+    "auto_fill_dev": "⚡ Remplissage Auto (Dev)",
+    "back_navigation_disabled": "Le retour en arrière est désactivé pendant l'évaluation.",
+    "right_click_disabled": "Le clic droit est désactivé pendant l'évaluation.",
+    "copy_paste_disabled": "Copier ou coller n'est pas autorisé.",
+    "screenshot_detected": "Tentative de capture d'écran détectée !",
+    "navigated_away": "Vous avez quitté la fenêtre de test.",
+    "terminated_violations": "Test interrompu en raison de violations multiples.",
+    "warning_violations": "Avertissement {{count}}/{{max}} : {{message}}",
+    "one_minute_left": "Plus qu'une minute !",
+    "time_up_submitting": "Le temps est écoulé. Soumission de votre évaluation...",
+    "time_up_ended": "Le temps est écoulé. Votre évaluation a été interrompue et nous n'avons pas pu confirmer la soumission.",
+    "failed_submit": "Échec de la soumission de l'évaluation.",
+    "confirm_restart": "Êtes-vous sûr de vouloir annuler et recommencer cette évaluation ? Votre progression actuelle sera perdue.",
+    "failed_reset": "Échec de la réinitialisation de l'évaluation",
+    "answer_all_toast": "Veuillez répondre à toutes les questions avant de soumettre le test.",
+    "loading_test": "Chargement de {{title}}...",
+    "error_loading": "Échec du chargement de l'évaluation. Veuillez rafraîchir la page.",
+    "back_to_assessments": "Retour aux Évaluations",
+    "exit_warning_title": "Ne Partez Pas Encore !",
+    "exit_warning_desc": "Le retour en arrière est désactivé pendant l'évaluation. Si vous partez maintenant, vous retournerez au tableau de bord.",
+    "leave_assessment": "Quitter l'Évaluation",
+    "continue_assessment": "Continuer l'Évaluation",
+    "baseline_established": "Référence Établie",
+    "assessment_complete": "Évaluation de {{name}} Terminée",
+    "result_id": "ID Résultat : {{id}}",
+    "overall_score": "Score Global",
+    "proficiency_level": "Niveau de Compétence",
+    "quotient_breakdown": "Répartition par Quotient",
+    "performance": "Performance",
+    "correct": "correctes",
+    "download_report": "Télécharger le Rapport",
+    "continue_journey": "Continuer Mon Parcours",
+    "go_to_dashboard": "Aller au Tableau de Bord",
+    "all_assessments": "Toutes les Évaluations",
+    "processing_profile": "Traitement de votre profil...",
+    "badge_unlocked": "Badge Débloqué : {{title}} !",
+    "stage_titles": {
+      "T1": "Test de Référence",
+      "T2": "Test de Capacité",
+      "T3": "Test de Compétence",
+      "T4": "Test de Leadership"
+    },
+    "stage_names": {
+      "T1": "Référence",
+      "T2": "Capacité",
+      "T3": "Compétence",
+      "T4": "Leadership"
+    },
+    "bands": {
+      "Advanced": "Avancé",
+      "Strong": "Fort",
+      "Progressing": "En Progression",
+      "Developing": "En Développement",
+      "Emerging": "Émergent"
+    },
+    "quotients": {
+      "CRQ": {
+        "name": "Raisonnement Cognitif",
+        "fullName": "Quotient de Raisonnement Cognitif",
+        "desc": "Pensée critique et raisonnement logique"
+      },
+      "SRQ": {
+        "name": "Autorégulation & Motivation",
+        "fullName": "Quotient d'Autorégulation & Motivation",
+        "desc": "Motivation, résilience et contrôle émotionnel"
+      },
+      "LQ": {
+        "name": "Agilité d'Apprentissage",
+        "fullName": "Quotient d'Agilité d'Apprentissage",
+        "desc": "Adaptabilité et apprentissage continu"
+      },
+      "SIQ": {
+        "name": "Interaction Sociale",
+        "fullName": "Quotient d'Interaction Sociale",
+        "desc": "Collaboration, empathie et communication"
+      },
+      "PEQ": {
+        "name": "Exécution Professionnelle",
+        "fullName": "Quotient d'Exécution Professionnelle",
+        "desc": "Éthique de travail, fiabilité et livraison"
+      },
+      "DAQ": {
+        "name": "Littératie Numérique & IA",
+        "fullName": "Quotient de Littératie Numérique & IA",
+        "desc": "Compétence technologique et préparation à l'IA"
+      }
+    }
+  },
+  "toolkit": {
+    "hero_badge": "Suite d'Intelligence",
+    "hero_title": "Boîte à Outils SMAART",
+    "hero_subtitle": "Explorez notre répertoire sélectionné d'intelligence de carrière, de ressources de bien-être et d'outils d'apprentissage conçus pour votre croissance.",
+    "launch_cta": "Lancer depuis votre boîte à outils",
+    "usage_title": "Utilisation de la Boîte à Outils & Ressources",
+    "usage_items": {
+      "instant_access": {
+        "title": "ACCÈS INSTANTANÉ",
+        "desc": "Explorez immédiatement tous les outils professionnels sans aucun prérequis."
+      },
+      "ai_enhanced": {
+        "title": "AMÉLIORÉ PAR L'IA",
+        "desc": "Tirez parti d'une intelligence de pointe pour votre carrière et votre parcours d'apprentissage."
+      },
+      "secure_access": {
+        "title": "ACCÈS SÉCURISÉ",
+        "desc": "Vos outils, ressources et progrès d'apprentissage sont organisés dans un endroit sécurisé."
+      },
+      "constant_updates": {
+        "title": "MISES À JOUR CONSTANTES",
+        "desc": "Nous ajoutons régulièrement de nouveaux outils pour vous aider à réussir professionnellement."
+      }
+    },
+    "sections": {
+      "career_agent": {
+        "title": "Agent de Carrière",
+        "description": "Moteur d'intelligence de carrière alimenté par l'IA. Soyez jumelé aux directions de carrière idéales en fonction de votre diplôme, de vos compétences et de vos ambitions. Explorez l'analyse des rôles, les perspectives du marché, les lacunes en compétences, les certifications et une feuille de route personnalisée — le tout en un seul endroit.",
+        "badge": "Propulsé par l'IA",
+        "cta": "Lancer l'Agent de Carrière",
+        "meta": "Intelligence de Carrière",
+        "detail": "Analyse des rôles · lacunes en compétences · feuille de route · certifications"
+      },
+      "resume_builder": {
+        "title": "Générateur de CV SMAART IA",
+        "description": "Créez des CV optimisés pour les ATS qui se démarquent. Tirez parti de l'IA pour générer des résumés percutants et un contenu spécifique au rôle qui maximise vos chances d'entretien.",
+        "badge": "Professionnel",
+        "cta": "Ouvrir le Générateur de CV",
+        "meta": "ATS + Rédaction IA",
+        "detail": "Créez des CV soignés avec un soutien guidé par l'IA"
+      },
+      "dictionary": {
+        "title": "Dictionnaire Général",
+        "description": "Maîtrisez la terminologie professionnelle avec notre dictionnaire interactif. Comprend des définitions en temps réel, la prononciation audio et des outils quotidiens de renforcement du vocabulaire.",
+        "badge": "Référence",
+        "cta": "Parcourir le Dictionnaire",
+        "meta": "Définitions + audio",
+        "detail": "Recherche de significations, prononciation et aide au vocabulaire"
+      },
+      "library": {
+        "title": "Bibliothèque",
+        "description": "Débloquez un répertoire de connaissances sélectionné. Explorez des livres essentiels, des articles de l'industrie et des parcours d'apprentissage conçus pour accélérer votre croissance personnelle et professionnelle.",
+        "badge": "Ressources",
+        "cta": "Explorer la Bibliothèque",
+        "meta": "Livres + articles",
+        "detail": "Accédez à des lectures sélectionnées pour l'apprentissage et la croissance"
+      },
+      "notes": {
+        "title": "Mes Notes",
+        "description": "Capturez, organisez et synchronisez vos pensées. Gardez une trace des idées de cours et des percées personnelles dans un espace sécurisé et synchronisé dans le cloud.",
+        "badge": "Productivity",
+        "cta": "Ouvrir Mes Notes",
+        "meta": "Synchro Cloud + Éditeur",
+        "detail": "Notes textuelles riches avec catégorisation et recherche"
+      }
+    }
+  },
+  "skills_vault": {
+    "hero_badge": "Coffre-fort Professionnel Sécurisé",
+    "hero_title": "Coffre-fort de Compétences",
+    "hero_subtitle": "Gérez vos certificats, badges, progression de cours et cartes d'apprentissage clés dans un seul coffre-fort professionnel hautement sécurisé.",
+    "tabs": {
+      "overview": "Aperçu",
+      "certificates": "Certificats",
+      "badges": "Badges",
+      "courses": "Cours",
+      "flashcards": "Cartes mémoire"
+    },
+    "overview": {
+      "stats": {
+        "certificates": "Certificats",
+        "badges": "Badges Obtenus",
+        "courses": "Cours",
+        "assessments": "Évaluations"
+      },
+      "title": "Qu'y a-t-il dans votre Coffre-fort ?",
+      "subtitle": "Votre coffre-fort de compétences est un espace centralisé qui stocke et présente en toute sécurité toutes vos réussites professionnelles, vos progrès d'apprentissage et vos ressources clés.",
+      "items": {
+        "certificates": {
+          "title": "Certificats",
+          "desc": "Titres professionnels vérifiés délivrés lors de l'achèvement des étapes du programme — Capacité, Compétence, Leadership et Diplôme de Master."
+        },
+        "badges": {
+          "title": "Badges & Réussites",
+          "desc": "Micro-certifications obtenues grâce aux activités de cours, aux évaluations et à l'engagement — chacune étant vérifiable et partageable."
+        },
+        "courses": {
+          "title": "Aperçu des Cours",
+          "desc": "Une vue tableau de bord de tous vos cours inscrits, modules complétés et progression globale dans le programme SMAART."
+        },
+        "flashcards": {
+          "title": "Cartes mémoire & Termes clés",
+          "desc": "Cartes de référence rapide pour les six quotients de base et d'autres terminologies professionnelles essentielles de votre parcours d'apprentissage."
+        }
+      }
+    },
+    "certificates": {
+      "title": "Titres Professionnels",
+      "desc": "Vos certifications vérifiées de l'Institut SMAART",
+      "download_centre": "Centre de Téléchargement",
+      "verification_title": "Vérification des Titres",
+      "verification_desc": "Vérifiez n'importe quel certificat SMAART à l'aide de son identifiant unique ou de son code QR.",
+      "names": {
+        "capacity": "Certificat en Capacité et Préparation au Travail",
+        "capability": "Certificat Approfondi en Compétences Appliquées",
+        "leadership": "Diplôme en Employabilité et Leadership",
+        "combined": "Master Diplôme en Préparation Globale"
+      },
+      "levels": {
+        "capacity": "Niveau 1",
+        "capability": "Niveau 2",
+        "leadership": "Niveau 3",
+        "combined": "Master"
+      }
+    },
+    "courses": {
+      "overview": "Aperçu des Cours",
+      "go_to_courses": "Aller aux Cours",
+      "modules": "Modules",
+      "self_paced": "À votre rythme",
+      "duration": "{{duration}}",
+      "no_courses_title": "Aucun Cours Inscrit",
+      "no_courses_desc": "Vous ne vous êtes inscrit à aucun cours. Visitez le programme principal pour commencer votre parcours.",
+      "browse_btn": "Parcourir le Programme Principal"
+    },
+    "flashcards": {
+      "title": "Cartes mémoire Clés",
+      "desc": "Cartes de référence rapide couvrant les six quotients SMAART fondamentaux et la terminologie professionnelle essentielle.",
+      "more_desc": "Plus de cartes mémoire sont disponibles dans chaque module de cours pour vous aider à maîtriser la terminologie professionnelle.",
+      "explore_btn": "Explorer les Cartes mémoire du Cours",
+      "category": {
+        "Quotient": "Quotient"
+      },
+      "tap_reveal": "Appuyez pour révéler",
+      "flip_back": "Retourner la carte",
+      "cards": {
+        "crq": {
+          "term": "Raisonnement Cognitif (CRQ)",
+          "definition": "La capacité d'analyser, synthétiser et évaluer des informations pour en tirer des conclusions significatives et résoudre des problèmes complexes."
+        },
+        "srq": {
+          "term": "Autorégulation (SRQ)",
+          "definition": "La capacité de gérer efficacement ses émotions, ses pensées et ses comportements dans différentes situations et en vue d'objectifs précis."
+        },
+        "lq": {
+          "term": "Agilité d'Apprentissage (LQ)",
+          "definition": "La volonté et la capacité d'apprendre de l'expérience, puis d'appliquer ces leçons dans des situations nouvelles."
+        },
+        "siq": {
+          "term": "Interaction Sociale (SIQ)",
+          "definition": "L'art de naviguer dans les environnements sociaux avec intelligence émotionnelle, empathie et communication efficace."
+        },
+        "peq": {
+          "term": "Exécution Professionnelle (PEQ)",
+          "definition": "La compétence à fournir des résultats professionnels avec responsabilité, précision et orientation vers les parties prenantes."
+        },
+        "daq": {
+          "term": "Littératie Numérique & IA (DAQ)",
+          "definition": "La capacité à tirer parti des outils numériques et de l'intelligence artificielle pour améliorer la productivité et l'innovation."
+        }
+      }
+    },
+    "student": "Étudiant"
+  },
+  "badge_gallery": {
+    "achievements_cabinet": "Cabinet des réalisations",
+    "no_achievements": "Aucune réalisation disponible",
+    "verified": "Vérifié",
+    "verified_credential": "Identifiant vérifié",
+    "unlocked": "Débloqué",
+    "view": "Voir",
+    "recipient": "Récipiendaire",
+    "xp_credit": "Crédit XP",
+    "earned_date": "Date d'obtention",
+    "verification_code": "Code de vérification",
+    "share_credential": "Partager l'identifiant",
+    "download_certificate": "Télécharger le certificat",
+    "verify_badge": "Vérifier le badge",
+    "categories": {
+      "all": "Toutes les catégories",
+      "capability": "Compétence (Capability)",
+      "capacity": "Capacité (Capacity)",
+      "leadership": "Leadership (Leadership)"
+    },
+    "fallback": {
+      "module_master": {
+        "title": "Maître de module",
+        "desc": "Décerné pour avoir réussi un module de cours."
+      },
+      "course_conqueror": {
+        "title": "Conquérant de cours",
+        "desc": "Décerné pour avoir réussi un cours complet."
+      }
+    }
+  },
+  "skills_passport": {
+    "title": "Passeport de compétences numériques",
+    "verifiable": "Vérifiable par l'employeur",
+    "hero_title": "L'avenir des talents vérifiés.",
+    "hero_desc": "Votre identifiant de capacité sécurisé et vérifié par l'IA. Conçu pour les employeurs qui exigent des preuves et les professionnels en quête de croissance.",
+    "get_pdf": "Obtenir le PDF du passeport",
+    "share": "Partager l'identité",
+    "global_readiness": "Préparation globale",
+    "plvi_band": "Bande PLVI",
+    "secure_protocol": "Protocole de confiance sécurisé",
+    "verification_live": "La vérification publique est en ligne",
+    "tabs": {
+      "smart": "Cours SMAART",
+      "other": "Compétences techniques",
+      "certificates": "Compétences IA",
+      "projects": "Compétences de domaine"
+    },
+    "stats": {
+      "growth_delta": "Delta de croissance",
+      "momentum": "Score d'élan",
+      "badges": "Badges de compétences",
+      "trust": "Indice de confiance"
+    },
+    "dna": {
+      "title": "ADN des compétences",
+      "desc": "Une analyse multidimensionnelle de vos forces cognitives et professionnelles vérifiées."
+    },
+    "proficiency": {
+      "title": "Compétence vérifiée",
+      "gold_standard": "Certifié Gold Standard"
+    },
+    "timeline": {
+      "title": "Chronologie",
+      "baseline": "Référence",
+      "assessment": "Évaluation"
+    },
+    "other_courses": {
+      "title": "Autres cours de l'institut",
+      "none": "Aucun cours externe trouvé."
+    },
+    "certificates": {
+      "title": "Certificats obtenus",
+      "none": "Aucun certificat obtenu pour le moment."
+    },
+    "projects": {
+      "title": "Vitrine des projets",
+      "none": "Aucun projet présenté pour le moment."
+    },
+    "standards": {
+      "understand": {
+        "title": "COMPRENDRE",
+        "desc": "Comprend clairement le contexte, l'intention et les priorités."
+      },
+      "structure": {
+        "title": "STRUCTURER",
+        "desc": "Organise la pensée en cadres et actions clairs."
+      },
+      "verify": {
+        "title": "VÉRIFIER",
+        "desc": "Vérifie l'exactitude, la qualité et les preuves avant la livraison."
+      },
+      "adapt": {
+        "title": "S'ADAPTER",
+        "desc": "Réagit bien au changement, à l'ambiguïté et aux nouveaux éléments."
+      },
+      "communicate": {
+        "title": "COMMUNIQUER",
+        "desc": "Exprime des idées avec clarté, brièveté et confiance."
+      },
+      "connect": {
+        "title": "CONNECTER",
+        "desc": "Établit la confiance et collabore efficacement avec les autres."
+      },
+      "own": {
+        "title": "ASSUMER",
+        "desc": "Assume la responsabilité et assure le suivi avec responsabilisation."
+      },
+      "create": {
+        "title": "CRÉER",
+        "desc": "Génère des idées utiles, des solutions et des améliorations."
+      },
+      "lead": {
+        "title": "DIRIGER",
+        "desc": "Guide les autres avec initiative, jugement et calme."
+      },
+      "grow": {
+        "title": "GRANDIR",
+        "desc": "Apprend des commentaires et évolue continuellement."
+      }
+    },
+    "standards_title": "Dix normes professionnelles",
+    "standards_matrix": "Matrice des normes professionnelles",
+    "rating": "Évaluation",
+    "institutional_registry": "Registre institutionnel",
+    "verified_records": "Dossiers vérifiés"
+  },
+  "career_agent": {
+    "loading_title": "Synchronisation de l'intelligence...",
+    "loading_subtitle": "Cartographie de votre trajectoire de carrière",
+    "panels": {
+      "direction": "Aperçu de la direction",
+      "roledetail": "Vue détaillée du rôle",
+      "market": "Infos marché",
+      "skills": "ADN des compétences",
+      "roadmap": "Feuille de route de carrière",
+      "certs": "Certifications",
+      "future": "Perspectives d'avenir",
+      "ai": "Intégration de l'IA",
+      "interview": "Préparation à l'entretien",
+      "resume": "Conseils pour le CV",
+      "projects": "Espace projet"
+    },
+    "selection": {
+      "title": "Sélection de précision de parcours",
+      "subtitle": "Confirmez votre niveau d'intérêt pour chaque domaine.",
+      "primary_path": "Parcours principal",
+      "secondary_path": "Parcours secondaire",
+      "tertiary_path": "Parcours tertiaire",
+      "roles": "RÔLES :",
+      "no_roles": "Aucun rôle spécifique répertorié",
+      "interested": "Intéressé",
+      "not_interested": "Pas intéressé",
+      "confirm": "Confirmer la sélection et verrouiller"
+    },
+    "welcome": {
+      "path_confirmed": "Parcours confirmé",
+      "title": "Bienvenue dans votre parcours",
+      "desc_multiple": "Vous avez verrouillé vos parcours de carrière avec succès. Vos feuilles de route SMAART sont prêtes.",
+      "desc_single_start": "Vous avez verrouillé ",
+      "desc_single_end": " comme parcours de carrière. Votre feuille de route SMAART est prête.",
+      "closing": "Fermeture automatique…"
+    },
+    "header": {
+      "title_start": "Rapport de ",
+      "title_span": "carrière",
+      "title_end": " intelligent",
+      "candidate": "CANDIDAT :",
+      "back": "← Retour au tableau de bord",
+      "path_locked": "Parcours verrouillé",
+      "lock_path": "Verrouiller ce parcours",
+      "new_analysis": "Nouvelle analyse"
+    },
+    "overview": {
+      "overall_match": "Adéquation globale",
+      "alignment_prob": "Probabilité d'alignement",
+      "prep_time": "Temps de préparation",
+      "reach_green": "Pour atteindre la zone verte",
+      "market_demand": "Demande du marché",
+      "hiring_velocity": "Vitesse d'embauche",
+      "role_function": "Ce que fait ce rôle",
+      "no_description": "Aucune description disponible.",
+      "ml_fit_score": "SCORE D'ADÉQUATION ML",
+      "ai_evolution": "Évolution de l'IA",
+      "ai_pending": "Évaluation de l'IA en attente.",
+      "who_consider": "Qui devrait y penser",
+      "preparing_role": "Préparation pour ce rôle...",
+      "market_signal": "📍 Signal du marché Tier-1 Inde",
+      "typical_employers": "Employeurs typiques",
+      "common_entry": "Entrée commune"
+    },
+    "direction": {
+      "desc": "Votre direction de carrière sélectionnée et tous les rôles associés — issus de la base de données SMAART Career Agent."
+    },
+    "roledetail": {
+      "desc_start": "Analyse de ",
+      "desc_end": " — confirmez s'il s'agit de votre parcours."
+    },
+    "market": {
+      "title": "Intelligence du marché",
+      "desc_start": "Affichage des rôles pour ",
+      "desc_end": " — sélectionnez un rôle ci-dessous pour voir ses données de marché."
+    },
+    "skills": {
+      "title": "Aperçu des compétences"
+    },
+    "roadmap": {
+      "title": "Intelligence de carrière SMAART",
+      "desc_start": "Votre chemin d'accélération personnalisé pour ",
+      "desc_end": ", adapté à votre parcours éducatif et à votre profil de compétences."
+    },
+    "future": {
+      "title": "Trajectoire future et croissance",
+      "desc_start": "Salary progression, role evolution, and who this path suits best — based on "
+    },
+    "ai": {
+      "title": "Intégration de l'IA dans le rôle",
+      "desc_start": "Comment l'IA redéfinit ",
+      "desc_end": " — analyse d'exposition, compétences natives de l'IA et ce qui reste irremplaçablement humain."
+    },
+    "projects": {
+      "title": "Espace projet",
+      "desc_start": "Projets phares prouvant vos compétences pour ",
+      "unlocked": "Débloqué"
+    },
+    "interview": {
+      "title": "Préparation à l'entretien",
+      "desc_start": "Ressources et questions adaptées pour ",
+      "desc_end": " — questions d'aptitude, domaine, technique et RH."
+    },
+    "resume": {
+      "title": "Conseils pour le CV",
+      "desc_start": "Rédigez un CV solide et prêt pour l'ATS pour ",
+      "desc_end": " — structure, mots-clés et générateur d'IA."
+    },
+    "certs": {
+      "title": "Certifications"
+    },
+    "placeholders": {
+      "processed_v7": "Ce vecteur d'intelligence est actuellement traité par le moteur d'analyse v7."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unread_count": "{{count}} notification(s) non lue(s)",
+    "all_caught_up": "Tout est à jour !",
+    "ws": {
+      "live_updates": "Mises à jour en direct actives",
+      "connecting": "Connexion en cours",
+      "offline": "Temps réel hors ligne"
+    },
+    "actions": {
+      "refresh": "Actualiser",
+      "mark_all_read": "Tout marquer comme lu",
+      "clear_all": "Tout effacer",
+      "mark_as_read": "Marquer comme lu",
+      "delete": "Supprimer",
+      "load_more": "Charger plus de notifications"
+    },
+    "filters": {
+      "all": "Toutes",
+      "unread": "Non lues"
+    },
+    "summary": {
+      "welcome": "Bon retour, {{name}} !",
+      "subtitle": "Voici votre résumé quotidien",
+      "current_session": "Session actuelle : {{time}}",
+      "last_login": "Dernière connexion",
+      "first_login": "Première connexion !",
+      "badges_earned": "Badges obtenus",
+      "today_sessions": "Sessions d'aujourd'hui",
+      "sessions_completed": "{{count}} complétée(s)",
+      "enrolled_courses": "Cours suivis"
+    },
+    "empty": {
+      "no_unread": "Aucune notification non lue",
+      "no_notifications": "Aucune notification pour le moment",
+      "unread_desc": "Tout est à jour ! Revenez plus tard pour les nouvelles mises à jour.",
+      "notifications_desc": "Lorsque vous recevrez des notifications, elles apparaîtront ici. Restez connectés !"
+    },
+    "groups": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier"
+    },
+    "time": {
+      "just_now": "À l'instant",
+      "year": "Il y a {{count}} an",
+      "year_plural": "Il y a {{count}} ans",
+      "month": "Il y a {{count}} mois",
+      "month_plural": "Il y a {{count}} mois",
+      "week": "Il y a {{count}} semaine",
+      "week_plural": "Il y a {{count}} semaines",
+      "day": "Il y a {{count}} jour",
+      "day_plural": "Il y a {{count}} jours",
+      "hour": "Il y a {{count}} heure",
+      "hour_plural": "Il y a {{count}} heures",
+      "minute": "Il y a {{count}} minute",
+      "minute_plural": "Il y a {{count}} minutes"
+    },
+    "types": {
+      "badge": "Badges",
+      "assessment": "Évaluations",
+      "course": "Cours",
+      "achievement": "Succès",
+      "community": "Communauté",
+      "coaching": "Coaching",
+      "support": "Assistance",
+      "task": "Tâches",
+      "certificate": "Certificats",
+      "system": "Système"
+    }
   }
 }

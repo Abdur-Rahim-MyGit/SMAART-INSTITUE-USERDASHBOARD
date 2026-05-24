@@ -953,4 +953,175 @@ router.post('/user-skills/progress', async (req, res) => {
   }
 });
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CERTIFICATIONS ENDPOINT (career-agent-certifaction collection)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Generates a real URL from the certification name and issuing body.
+ * All documents have the same placeholder official_url so we derive the real
+ * one from the cert name / issuing body text.
+ */
+function deriveUrl(certName, issuingBody) {
+  const c = (certName  || '').toLowerCase();
+  const p = (issuingBody || '').toLowerCase();
+
+  // GitHub
+  if (p.includes('github') || c.includes('github'))          return 'https://learn.microsoft.com/en-us/certifications/github/';
+  // Google
+  if (p.includes('google') && c.includes('it automation'))   return 'https://www.coursera.org/professional-certificates/google-it-automation';
+  if (p.includes('google') && c.includes('data analytics'))  return 'https://www.coursera.org/professional-certificates/google-data-analytics';
+  if (p.includes('google') && c.includes('project'))         return 'https://www.coursera.org/professional-certificates/google-project-management';
+  if (p.includes('google') && c.includes('ux'))              return 'https://www.coursera.org/professional-certificates/google-ux-design';
+  if (p.includes('google') && c.includes('cybersecurity'))   return 'https://www.coursera.org/professional-certificates/google-cybersecurity';
+  if (p.includes('google cloud') || c.includes('google cloud')) return 'https://cloud.google.com/learn/certification';
+  if (p.includes('google') && c.includes('technical writing')) return 'https://developers.google.com/tech-writing';
+  if (p.includes('google'))                                  return 'https://grow.google/certificates/';
+  // AWS
+  if (p.includes('aws') || c.includes('aws'))                return 'https://aws.amazon.com/certification/';
+  // Microsoft / Azure
+  if (p.includes('microsoft') && c.includes('azure'))        return 'https://learn.microsoft.com/en-us/certifications/browse/?products=azure';
+  if (p.includes('microsoft') && c.includes('teams'))        return 'https://learn.microsoft.com/en-us/training/modules/m365-teams-collab/';
+  if (p.includes('microsoft'))                               return 'https://learn.microsoft.com/en-us/certifications/';
+  // DeepLearning.AI
+  if (p.includes('deeplearning') || c.includes('deeplearning')) return 'https://www.deeplearning.ai/courses/';
+  // Hugging Face
+  if (p.includes('hugging face') || c.includes('hugging face')) return 'https://huggingface.co/learn';
+  // Docker / Mirantis
+  if (p.includes('docker') || p.includes('mirantis') || c.includes('docker')) return 'https://training.mirantis.com/dca-certification-exam/';
+  // Kubernetes / CKA / CKAD
+  if (c.includes('cka') || c.includes('ckad') || c.includes('kubernetes') || p.includes('linux foundation')) return 'https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/';
+  // Oracle
+  if (p.includes('oracle') || c.includes('oracle'))          return 'https://education.oracle.com/certification';
+  // IBM
+  if (p.includes('ibm') || c.includes('ibm'))                return 'https://www.ibm.com/training/certifications';
+  // Atlassian / Jira
+  if (p.includes('atlassian') || c.includes('atlassian') || c.includes('jira')) return 'https://university.atlassian.com/';
+  if (c.includes('agile') && c.includes('coursera'))         return 'https://www.coursera.org/learn/agile-atlassian-jira';
+  // Coursera general
+  if (p.includes('coursera') || c.includes('coursera'))      return 'https://www.coursera.org/';
+  // Udemy
+  if (p.includes('udemy') || c.includes('udemy'))            return 'https://www.udemy.com/';
+  // PMI / PMP
+  if (p.includes('pmi') || c.includes('pmp') || c.includes('pmi')) return 'https://www.pmi.org/certifications';
+  // Scrum Alliance / PSM
+  if (p.includes('scrum') || c.includes('scrum') || c.includes('psm')) return 'https://www.scrumalliance.org/get-certified';
+  // Axelos / ITIL / Prince2
+  if (p.includes('axelos') || c.includes('itil') || c.includes('prince2')) return 'https://www.axelos.com/certifications';
+  // CompTIA
+  if (p.includes('comptia') || c.includes('comptia'))        return 'https://www.comptia.org/certifications';
+  // Cisco
+  if (p.includes('cisco') || c.includes('cisco') || c.includes('ccna')) return 'https://www.cisco.com/c/en/us/training-events/training-certifications/certifications.html';
+  // MeitY / India Govt
+  if (p.includes('meity') || c.includes('dpdp') || c.includes('meity')) return 'https://meity.gov.in/';
+  // NITI Aayog
+  if (c.includes('niti aayog') || p.includes('niti'))        return 'https://www.niti.gov.in/';
+  // LinkedIn Learning
+  if (p.includes('linkedin') || c.includes('linkedin'))      return 'https://www.linkedin.com/learning/';
+  // Salesforce
+  if (p.includes('salesforce') || c.includes('salesforce'))  return 'https://trailhead.salesforce.com/credentials/overview';
+  // Tableau
+  if (p.includes('tableau') || c.includes('tableau'))        return 'https://www.tableau.com/learn/certification';
+  // Meta / Facebook
+  if (p.includes('meta') || c.includes('meta') || c.includes('facebook')) return 'https://www.coursera.org/professional-certificates/meta-front-end-developer';
+  // Anthropic / Claude
+  if (p.includes('anthropic') || c.includes('anthropic') || c.includes('claude')) return 'https://www.anthropic.com/api';
+  // Codeium / Windsurf
+  if (p.includes('codeium') || c.includes('codeium') || c.includes('windsurf')) return 'https://codeium.com/';
+  // Perplexity AI
+  if (p.includes('perplexity') || c.includes('perplexity')) return 'https://www.perplexity.ai/';
+  // freeCodeCamp
+  if (p.includes('freecodecamp') || c.includes('freecodecamp')) return 'https://www.freecodecamp.org/learn';
+  // Scrum.org
+  if (p.includes('scrum.org') || c.includes('scrum.org'))    return 'https://www.scrum.org/professional-scrum-certifications';
+  // Educative
+  if (p.includes('educative') || c.includes('educative'))    return 'https://www.educative.io/';
+  // Pluralsight
+  if (p.includes('pluralsight') || c.includes('pluralsight')) return 'https://www.pluralsight.com/';
+  // edX
+  if (p.includes('edx') || c.includes('edx'))               return 'https://www.edx.org/';
+  // Default: Google search so user can still find the cert
+  return `https://www.google.com/search?q=${encodeURIComponent(certName)}`;
+}
+
+/**
+ * GET /api/career-agent/certifications/:roleTitle
+ *
+ * Fetches certifications for a SPECIFIC job role (e.g. "Computer Vision Engineer").
+ * Uses exact Skill ID match: roleskillslist → career-agent-certifaction.
+ *
+ * Strategy:
+ *  1. Exact match on roleskillslist 'Job Role' column
+ *  2. Get all Skill IDs for that role (T-xxxxx, A-xxxxx, D-xxxxx)
+ *  3. Fetch ALL matching certs from career-agent-certifaction using skill_id field
+ *  4. Group by category: Technical | AI-Tool | Domain
+ *  5. Generate real URLs (DB has same placeholder for all records)
+ */
+router.get('/certifications/:roleTitle', async (req, res) => {
+  try {
+    const roleTitle = decodeURIComponent(req.params.roleTitle).trim();
+    const db = require('mongoose').connection.db;
+
+    const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // ── Step 1: Get skills for this EXACT role from roleskillslist ────────────
+    const roleSkillRows = await db.collection('roleskillslist')
+      .find({ 'Job Role': { $regex: new RegExp(`^${escapeRegex(roleTitle)}$`, 'i') } })
+      .toArray();
+
+    if (!roleSkillRows.length) {
+      return res.json({ roleTitle, found: false, technical: [], ai: [], domain: [], totalSkillsMatched: 0 });
+    }
+
+    // ── Step 2: Collect unique Skill IDs ──────────────────────────────────────
+    const skillIds = [...new Set(roleSkillRows.map(r => r['Skill ID']).filter(Boolean))];
+
+    // ── Step 3: Fetch ALL certs matching these Skill IDs ─────────────────────
+    // NOTE: DB field is "skill_id" (snake_case) — matches roleskillslist "Skill ID"
+    const certs = await db.collection('career-agent-certifaction')
+      .find({ skill_id: { $in: skillIds } })
+      .toArray();
+
+    // ── Step 4: Map to clean output ───────────────────────────────────────────
+    // Use official_url directly from DB. If DB still has the known placeholder
+    // (all records were imported with the same Coursera URL), use deriveUrl as fallback.
+    const PLACEHOLDER = 'https://www.coursera.org/professional-certificates/google-it-automation';
+    const mapCert = (c) => {
+      const dbUrl = c.official_url || c.officialUrl || '';
+      const url = dbUrl && dbUrl !== PLACEHOLDER
+        ? dbUrl
+        : deriveUrl(c.suggested_certificates, c.issuing_body);
+      return {
+        id:        String(c._id),
+        skillId:   c.skill_id   || '',
+        skillName: c.skill_name || '',
+        name:      c.suggested_certificates || '',
+        provider:  c.issuing_body || '',
+        url,
+        fee:       c.fee || 'Check Website',
+        category:  c.category || 'Technical',
+      };
+    };
+
+
+    const technical = certs.filter(c => c.category === 'Technical').map(mapCert);
+    const ai        = certs.filter(c => c.category === 'AI-Tool').map(mapCert);
+    const domain    = certs.filter(c => c.category === 'Domain').map(mapCert);
+
+    return res.json({
+      roleTitle,
+      found:              certs.length > 0,
+      totalSkillsMatched: skillIds.length,
+      technical,
+      ai,
+      domain,
+    });
+  } catch (err) {
+    console.error('[career-agent] Error in /certifications/:roleTitle:', err.message);
+    res.status(500).json({ error: 'Failed to fetch certifications', details: err.message });
+  }
+});
+
 module.exports = router;
+

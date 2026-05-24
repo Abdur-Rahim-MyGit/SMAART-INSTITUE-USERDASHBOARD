@@ -44,14 +44,12 @@ const MindCareSessions = () => {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState("sessions"); // sessions | request
   const [sessions, setSessions] = useState([]);
-  const [coaches, setCoaches] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   // Request form state
   const [selectedDomain, setSelectedDomain] = useState(null);
-  const [selectedCoach, setSelectedCoach] = useState("");
   const [issueDescription, setIssueDescription] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
@@ -86,25 +84,9 @@ const MindCareSessions = () => {
     }
   };
 
-  // Fetch available coaches with Fallback
-  const fetchCoaches = async () => {
-    try {
-      const response = await apiCall(`/coaches?status=active`);
-      if (response.success && response.data && response.data.length > 0) {
-        setCoaches(response.data);
-      } else {
-        setCoaches(MOCK_COACHES);
-      }
-    } catch (error) {
-      console.error("Error fetching coaches, using mock data:", error);
-      setCoaches(MOCK_COACHES);
-    }
-  };
-
   useEffect(() => {
     if (user) {
       fetchMySessions();
-      fetchCoaches();
     }
   }, [user]);
 
@@ -113,7 +95,7 @@ const MindCareSessions = () => {
     e.preventDefault();
 
     if (!selectedDomain) {
-      toast.error("Please select a coaching domain");
+      toast.error("Please select a session domain");
       return;
     }
     if (!issueDescription.trim()) {
@@ -133,7 +115,6 @@ const MindCareSessions = () => {
         student: studentId,
         domain: selectedDomain,
         notes: issueDescription,
-        coach: selectedCoach || undefined,
         college: user?.college?._id || user?.college || "000000000000000000000000",
         scheduledDate: preferredDate && preferredTime ? new Date(`${preferredDate}T${preferredTime}`) : undefined,
         status: "requested"
@@ -148,7 +129,6 @@ const MindCareSessions = () => {
         toast.success("Care session requested successfully!");
         setIssueDescription("");
         setSelectedDomain(null);
-        setSelectedCoach("");
         setPreferredDate("");
         setPreferredTime("");
         setActiveTab("sessions");
@@ -280,7 +260,7 @@ const MindCareSessions = () => {
                   <div className="flex flex-col items-center justify-center py-12 rounded-xl bg-white border border-gray-200">
                     <Inbox className="w-12 h-12 text-gray-300 mb-3" />
                     <h3 className="text-[#002147] font-medium mb-1">No sessions yet</h3>
-                    <p className="text-gray-500 text-sm mb-4">Request a coaching session to get started</p>
+                    <p className="text-gray-500 text-sm mb-4">Request a MindCare session to get started</p>
                     <button
                       onClick={() => setActiveTab("request")}
                       className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1a3884] text-white hover:bg-[#1a3884]/90 transition-colors"
@@ -323,12 +303,6 @@ const MindCareSessions = () => {
                                   <Calendar className="w-4 h-4" />
                                   {formatDate(session.scheduledDate || session.requestDate)}
                                 </span>
-                                {session.coach && (
-                                  <span className="flex items-center gap-1">
-                                    <User className="w-4 h-4" />
-                                    {session.coach.name || "Assigned Coach"}
-                                  </span>
-                                )}
                               </div>
                             </div>
 
@@ -380,7 +354,7 @@ const MindCareSessions = () => {
               >
                 <div className="rounded-2xl bg-white border border-gray-200 p-6">
                   <div className="mb-6">
-                    <h2 className="text-xl font-bold text-[#002147] mb-1">Request a Coaching Session</h2>
+                    <h2 className="text-xl font-bold text-[#002147] mb-1">Request a MindCare Session</h2>
                     <p className="text-gray-500 text-sm">Select a domain and describe what you need help with</p>
                   </div>
 
@@ -433,27 +407,6 @@ const MindCareSessions = () => {
                         className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-gray-200 text-[#002147] placeholder-gray-400 focus:border-[#1a3884] focus:outline-none transition-colors resize-none"
                       />
                     </div>
-
-                    {/* Coach Selection (Optional) */}
-                    {coaches.length > 0 && (
-                      <div>
-                        <label className="block text-sm font-medium text-[#002147] mb-2">
-                          Preferred Coach (Optional)
-                        </label>
-                        <select
-                          value={selectedCoach}
-                          onChange={(e) => setSelectedCoach(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] border border-gray-200 text-[#002147] focus:border-[#1a3884] focus:outline-none transition-colors"
-                        >
-                          <option value="">Any available coach</option>
-                          {coaches.map((coach) => (
-                            <option key={coach._id} value={coach._id}>
-                              {coach.name} - {coach.specialization}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
 
                     {/* Preferred Date/Time (Optional) */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -532,7 +485,7 @@ const MindCareSessions = () => {
               className="w-full max-w-md bg-white rounded-2xl p-6 shadow-xl"
             >
               <h3 className="text-xl font-bold text-[#002147] mb-2">Rate Your Session</h3>
-              <p className="text-gray-500 text-sm mb-6">How was your coaching experience?</p>
+              <p className="text-gray-500 text-sm mb-6">How was your session experience?</p>
 
               {/* Star Rating */}
               <div className="flex justify-center gap-2 mb-6">
