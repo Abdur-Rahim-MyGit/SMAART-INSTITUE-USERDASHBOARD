@@ -254,7 +254,7 @@ const Certifications = ({ roleName, directionName, directionRoles = [] }) => {
       {/* Loading */}
       {loading && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '280px', gap: '1rem' }}>
-          <div style={{ width: '36px', height: '36px', border: '3px solid rgba(79,142,247,0.2)', borderTopColor: '#4f8ef7', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <div style={{ width: '36px', height: '36px', border: '3px solid var(--accent-border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
           <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Loading certifications for all {totalRoles} roles…</p>
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
@@ -266,7 +266,7 @@ const Certifications = ({ roleName, directionName, directionRoles = [] }) => {
           <AlertCircle size={32} color="#ef4444" />
           <p style={{ color: '#ef4444', fontSize: '0.85rem' }}>Could not load certifications</p>
           <button onClick={() => { lastKey.current = null; setData({ technical: [], ai: [], domain: [] }); }}
-            style={{ padding: '0.5rem 1.2rem', background: 'rgba(79,142,247,0.15)', border: '1px solid rgba(79,142,247,0.3)', borderRadius: '8px', color: '#4f8ef7', cursor: 'pointer', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            style={{ padding: '0.5rem 1.2rem', background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '8px', color: 'var(--accent)', cursor: 'pointer', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <RefreshCw size={14} /> Retry
           </button>
         </div>

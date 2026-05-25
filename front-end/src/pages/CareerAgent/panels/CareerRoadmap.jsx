@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+﻿import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle } from 'lucide-react';
 
@@ -247,7 +247,7 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
             <div style={styles.skillTop}>
                 <span style={{ ...styles.skillName, color: isHovered ? 'var(--text1)' : 'var(--text2)' }}>{item.name}</span>
                 <div
-                    style={{ ...styles.overlapTag, background: `rgba(${color === 'var(--accent)' ? '79,142,247' : '34,211,238'}, 0.1)`, color: color, cursor: 'help', position: 'relative' }}
+                    style={{ ...styles.overlapTag, background: color === 'var(--accent)' ? 'var(--accent-tint)' : 'rgba(34,211,238, 0.1)', color: color, cursor: 'help', position: 'relative' }}
                     onMouseEnter={() => setShowTooltip(true)}
                     onMouseLeave={() => setShowTooltip(false)}
                 >
@@ -258,7 +258,7 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
                             <div style={styles.tooltipHeader}>Required for:</div>
                             <div style={styles.tooltipList}>
                                 {item.roles.map((r, i) => (
-                                    <div key={i} style={styles.tooltipItem}>• {r}</div>
+                                    <div key={i} style={styles.tooltipItem}>â€¢ {r}</div>
                                 ))}
                             </div>
                             <div style={styles.tooltipArrow} />
@@ -276,35 +276,40 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
                 )}
             </div>
 
-            <div style={{ ...styles.progressActions, opacity: isHovered ? 1 : 0, transform: isHovered ? 'translateY(0)' : 'translateY(5px)' }}>
-                {status !== 'In Progress' && status !== 'Completed' && (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'In Progress'); }}
-                        style={{ ...styles.actionBtn, background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.3)' }}
-                    >
-                        In Progress
-                    </button>
-                )}
-                {status !== 'Completed' && (
+            {status !== 'Completed' && (
+                <div style={{ ...styles.progressActions, opacity: isHovered ? 1 : 0, transform: isHovered ? 'translateY(0)' : 'translateY(5px)' }}>
+                    {status !== 'In Progress' && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'In Progress'); }}
+                            style={{ ...styles.actionBtn, background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.3)' }}
+                        >
+                            In Progress
+                        </button>
+                    )}
                     <button
                         onClick={(e) => { e.stopPropagation(); onStatusChange(item.name, 'Completed'); }}
                         style={{ ...styles.actionBtn, background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.3)' }}
                     >
-                        Completed
+                        Mark Done
                     </button>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };
 
-/* ── Certificate Modal ── */
+/* â”€â”€ Certificate Modal â”€â”€ */
 const CertificateModal = ({ skillName, onConfirm, onClose }) => {
     const [file, setFile] = useState(null);
     const [dragOver, setDragOver] = useState(false);
     const [verified, setVerified] = useState(false);
     const [skipCert, setSkipCert] = useState(false);
     const fileInputRef = useRef(null);
+
+    // Detect dark mode from <html> or <body> class
+    const isDark = document.documentElement.classList.contains('dark') ||
+        document.body.classList.contains('dark') ||
+        window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     const handleFile = (f) => {
         if (f && (f.type === 'application/pdf' || f.type.startsWith('image/'))) {
@@ -316,60 +321,168 @@ const CertificateModal = ({ skillName, onConfirm, onClose }) => {
 
     const handleVerify = () => { if (file) setVerified(true); };
     const canConfirm = verified || skipCert;
-
     const handleConfirm = () => { onConfirm(skillName, file); };
 
-    // Step display
     const step = !file && !skipCert ? 1 : (file && !verified) ? 2 : 3;
+
+    const C = {
+        bg:       isDark ? '#0f1729' : '#ffffff',
+        surface:  isDark ? '#141f35' : '#f8fafc',
+        border:   isDark ? 'rgba(255,255,255,0.09)' : '#e2e8f0',
+        text1:    isDark ? '#f1f5f9' : '#0f172a',
+        text2:    isDark ? '#94a3b8' : '#475569',
+        muted:    isDark ? '#64748b' : '#94a3b8',
+        accent:   'var(--accent)',
+        accentBg: isDark ? 'rgba(79,142,247,0.12)' : 'rgba(37,99,235,0.08)',
+        accentBorder: isDark ? 'rgba(79,142,247,0.3)' : 'rgba(37,99,235,0.25)',
+        dropBg:   isDark ? '#111827' : '#f8fafc',
+        btnBg:    isDark ? '#1e2d48' : '#f1f5f9',
+    };
+
+    const STEPS = ['Upload', 'Verify', 'Confirm'];
 
     return ReactDOM.createPortal(
         <div
-            style={cmStyles.overlay}
+            style={{
+                position: 'fixed', inset: 0,
+                background: 'rgba(0,0,0,0.65)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                zIndex: 99999,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '1rem',
+                animation: 'fadeIn 0.18s ease',
+            }}
             onClick={onClose}
         >
-            <div style={cmStyles.modal} onClick={e => e.stopPropagation()}>
-
-                {/* Top accent bar */}
-                <div style={cmStyles.accentBar} />
+            <div
+                style={{
+                    background: C.bg,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: '24px',
+                    width: '100%', maxWidth: '460px',
+                    overflow: 'hidden',
+                    boxShadow: isDark
+                        ? '0 40px 80px -20px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)'
+                        : '0 24px 60px -12px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)',
+                    position: 'relative',
+                    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+                    animation: 'slideUp 0.22s cubic-bezier(0.34,1.56,0.64,1)',
+                }}
+                onClick={e => e.stopPropagation()}
+            >
+                {/* Accent gradient bar */}
+                <div style={{
+                    height: '4px',
+                    background: 'linear-gradient(90deg, var(--accent), #818cf8, #06b6d4)',
+                }} />
 
                 {/* Header */}
-                <div style={cmStyles.header}>
-                    <div style={cmStyles.headerLeft}>
-                        <div style={cmStyles.headerTag}>
-                            <CheckCircle size={11} />
+                <div style={{
+                    display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+                    padding: '1.4rem 1.5rem 1.1rem',
+                    borderBottom: `1px solid ${C.border}`,
+                }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        {/* Tag pill */}
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '0.3rem',
+                            fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.1em',
+                            textTransform: 'uppercase', color: 'var(--accent)',
+                            background: C.accentBg,
+                            border: `1px solid ${C.accentBorder}`,
+                            padding: '0.22rem 0.6rem', borderRadius: '100px', width: 'fit-content',
+                        }}>
+                            <CheckCircle size={9} />
                             Mark as Completed
                         </div>
-                        <div style={cmStyles.headerSkill}>{skillName}</div>
+                        {/* Skill name */}
+                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: C.text1, letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+                            {skillName}
+                        </div>
                     </div>
-                    <button onClick={onClose} style={cmStyles.closeBtn}><X size={16} /></button>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            background: C.surface, border: `1px solid ${C.border}`,
+                            cursor: 'pointer', color: C.text2,
+                            padding: '0.4rem', borderRadius: '9px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'all 0.15s', flexShrink: 0, marginTop: '0.1rem',
+                        }}
+                    >
+                        <X size={15} />
+                    </button>
                 </div>
 
-                {/* Step indicator */}
-                <div style={cmStyles.steps}>
-                    {['Upload', 'Verify', 'Confirm'].map((s, i) => (
-                        <div key={s} style={cmStyles.stepItem}>
-                            <div style={{
-                                ...cmStyles.stepDot,
-                                background: step > i + 1 ? 'var(--accent)' : step === i + 1 ? 'var(--accent)' : 'rgba(255,255,255,0.06)',
-                                border: step === i + 1 ? '2px solid var(--accent)' : step > i + 1 ? '2px solid var(--accent)' : '2px solid rgba(255,255,255,0.15)',
-                            }}>
-                                {step > i + 1 ? <CheckCircle size={10} color="#fff" /> : <span style={{ fontSize: '0.6rem', fontWeight: 800, color: step === i + 1 ? '#fff' : '#64748b' }}>{i + 1}</span>}
-                            </div>
-                            <span style={{ ...cmStyles.stepLabel, color: step === i + 1 ? 'var(--text1)' : step > i + 1 ? '#22c55e' : 'var(--muted)' }}>{s}</span>
-                            {i < 2 && <div style={{ ...cmStyles.stepLine, background: step > i + 1 ? '#22c55e' : 'var(--border)' }} />}
-                        </div>
-                    ))}
+                {/* Step Tracker */}
+                <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '1rem 1.5rem',
+                    background: C.surface,
+                    borderBottom: `1px solid ${C.border}`,
+                    gap: '0',
+                }}>
+                    {STEPS.map((s, i) => {
+                        const isActive = step === i + 1;
+                        const isDone   = step > i + 1;
+                        return (
+                            <React.Fragment key={s}>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                                    <div style={{
+                                        width: '28px', height: '28px', borderRadius: '50%',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        transition: 'all 0.25s',
+                                        background: isDone ? '#22c55e' : isActive ? 'var(--accent)' : C.btnBg,
+                                        border: isDone ? '2px solid #22c55e' : isActive ? '2px solid var(--accent)' : `2px solid ${C.border}`,
+                                        boxShadow: isActive ? '0 0 0 4px rgba(79,142,247,0.18)' : 'none',
+                                    }}>
+                                        {isDone
+                                            ? <CheckCircle size={13} color="#fff" />
+                                            : <span style={{ fontSize: '0.65rem', fontWeight: 800, color: isActive ? '#fff' : C.muted }}>{i + 1}</span>
+                                        }
+                                    </div>
+                                    <span style={{
+                                        fontSize: '0.65rem', fontWeight: 700,
+                                        color: isDone ? '#22c55e' : isActive ? C.text1 : C.muted,
+                                        transition: 'color 0.2s',
+                                    }}>
+                                        {s}
+                                    </span>
+                                </div>
+                                {i < 2 && (
+                                    <div style={{
+                                        width: '48px', height: '2px',
+                                        margin: '0 0.4rem',
+                                        marginBottom: '1.1rem',
+                                        background: step > i + 1 ? '#22c55e' : C.border,
+                                        transition: 'background 0.3s',
+                                        borderRadius: '2px',
+                                    }} />
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
                 </div>
 
                 {/* Body */}
-                <div style={cmStyles.body}>
+                <div style={{ padding: '1.4rem 1.5rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
                     {/* Drop Zone */}
                     <div
                         style={{
-                            ...cmStyles.dropZone,
-                            borderColor: dragOver ? 'var(--accent)' : verified ? '#22c55e' : file ? 'rgba(34,197,94,0.4)' : 'var(--border)',
-                            background: verified ? 'rgba(34,197,94,0.05)' : dragOver ? 'rgba(79,142,247,0.05)' : 'var(--navy3)',
+                            border: `2px dashed ${dragOver ? 'var(--accent)' : verified ? '#22c55e' : file ? 'rgba(34,197,94,0.5)' : C.border}`,
+                            borderRadius: '16px',
+                            padding: '2.2rem 1.5rem',
+                            textAlign: 'center', cursor: verified ? 'default' : 'pointer',
+                            transition: 'all 0.2s',
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem',
+                            userSelect: 'none',
+                            background: verified
+                                ? 'rgba(34,197,94,0.06)'
+                                : dragOver
+                                    ? C.accentBg
+                                    : C.dropBg,
                         }}
                         onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                         onDragLeave={() => setDragOver(false)}
@@ -380,58 +493,129 @@ const CertificateModal = ({ skillName, onConfirm, onClose }) => {
 
                         {verified ? (
                             <>
-                                <div style={cmStyles.verifiedIcon}><CheckCircle size={32} color="#22c55e" /></div>
-                                <div style={cmStyles.verifiedTitle}>Certificate Verified ✓</div>
-                                <div style={cmStyles.verifiedFile}>{file.name}</div>
+                                <div style={{
+                                    width: '52px', height: '52px', borderRadius: '50%',
+                                    background: 'rgba(34,197,94,0.12)',
+                                    border: '2px solid rgba(34,197,94,0.35)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    <CheckCircle size={26} color="#22c55e" />
+                                </div>
+                                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#22c55e' }}>Certificate Verified âœ“</div>
+                                <div style={{ fontSize: '0.72rem', color: C.muted, maxWidth: '260px', wordBreak: 'break-all' }}>{file.name}</div>
                             </>
                         ) : file ? (
                             <>
-                                <div style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>📄</div>
-                                <div style={cmStyles.fileName}>{file.name}</div>
-                                <div style={cmStyles.fileSize}>{(file.size / 1024).toFixed(1)} KB · Click to change</div>
+                                <div style={{
+                                    width: '52px', height: '52px', borderRadius: '14px',
+                                    background: 'rgba(34,197,94,0.1)',
+                                    border: '1px solid rgba(34,197,94,0.3)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: '1.5rem',
+                                }}>ðŸ“„</div>
+                                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#22c55e' }}>{file.name}</div>
+                                <div style={{ fontSize: '0.72rem', color: C.muted }}>{(file.size / 1024).toFixed(1)} KB Â· Click to change</div>
                             </>
                         ) : (
                             <>
-                                <div style={cmStyles.uploadIcon}><Upload size={26} color="var(--muted)" /></div>
-                                <div style={cmStyles.dropText}>
+                                <div style={{
+                                    width: '56px', height: '56px', borderRadius: '16px',
+                                    background: C.btnBg,
+                                    border: `1px solid ${C.border}`,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    transition: 'all 0.2s',
+                                }}>
+                                    <Upload size={22} color={C.muted} />
+                                </div>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 600, color: C.text1, lineHeight: 1.4 }}>
                                     Drop your certificate here or{' '}
                                     <span style={{ color: 'var(--accent)', fontWeight: 700 }}>browse files</span>
                                 </div>
-                                <div style={cmStyles.dropSub}>PDF, JPG or PNG accepted</div>
+                                <div style={{ fontSize: '0.72rem', color: C.muted }}>PDF, JPG or PNG accepted</div>
                             </>
                         )}
                     </div>
 
-                    {/* Actions row */}
-                    <div style={cmStyles.actionsRow}>
+                    {/* Action row */}
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' }}>
                         {file && !verified && (
-                            <button onClick={handleVerify} style={cmStyles.verifyBtn}>
+                            <button
+                                onClick={handleVerify}
+                                style={{
+                                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                                    padding: '0.55rem 1.1rem',
+                                    background: C.accentBg, color: 'var(--accent)',
+                                    border: `1px solid ${C.accentBorder}`, borderRadius: '9px',
+                                    fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer',
+                                    transition: 'all 0.15s',
+                                }}
+                            >
                                 <CheckCircle size={13} /> Verify Certificate
                             </button>
                         )}
                         {!skipCert && !verified && (
-                            <button onClick={() => setSkipCert(true)} style={cmStyles.skipBtn}>
-                                Skip — Mark Without Certificate
+                            <button
+                                onClick={() => setSkipCert(true)}
+                                style={{
+                                    display: 'inline-flex', alignItems: 'center',
+                                    padding: '0.55rem 1rem',
+                                    background: 'transparent', color: C.text2,
+                                    border: `1px solid ${C.border}`, borderRadius: '9px',
+                                    fontSize: '0.74rem', fontWeight: 600, cursor: 'pointer',
+                                    transition: 'all 0.15s',
+                                }}
+                            >
+                                Skip â€” Mark Without Certificate
                             </button>
                         )}
                         {skipCert && (
-                            <div style={cmStyles.skipNote}>
-                                ⚠ Marking as complete without a certificate
+                            <div style={{
+                                fontSize: '0.74rem', color: '#f59e0b',
+                                padding: '0.45rem 0.8rem',
+                                background: 'rgba(245,158,11,0.08)',
+                                border: '1px solid rgba(245,158,11,0.22)',
+                                borderRadius: '9px',
+                                display: 'flex', alignItems: 'center', gap: '0.35rem',
+                            }}>
+                                âš  Marking as complete without a certificate
                             </div>
                         )}
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div style={cmStyles.footer}>
-                    <button onClick={onClose} style={cmStyles.cancelBtn}>Cancel</button>
+                <div style={{
+                    display: 'flex', gap: '0.65rem',
+                    padding: '1rem 1.5rem',
+                    borderTop: `1px solid ${C.border}`,
+                    justifyContent: 'flex-end',
+                    background: C.surface,
+                }}>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            padding: '0.6rem 1.3rem',
+                            background: C.btnBg, color: C.text2,
+                            border: `1px solid ${C.border}`, borderRadius: '10px',
+                            fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer',
+                            transition: 'all 0.15s',
+                        }}
+                    >
+                        Cancel
+                    </button>
                     <button
                         onClick={handleConfirm}
                         disabled={!canConfirm}
                         style={{
-                            ...cmStyles.confirmBtn,
-                            opacity: canConfirm ? 1 : 0.4,
+                            display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+                            padding: '0.6rem 1.4rem',
+                            background: canConfirm ? 'var(--accent)' : C.btnBg,
+                            color: canConfirm ? '#ffffff' : C.muted,
+                            border: canConfirm ? '1px solid var(--accent)' : `1px solid ${C.border}`,
+                            borderRadius: '10px', fontSize: '0.82rem', fontWeight: 700,
+                            transition: 'all 0.2s',
                             cursor: canConfirm ? 'pointer' : 'not-allowed',
+                            boxShadow: canConfirm ? '0 4px 14px rgba(79,142,247,0.35)' : 'none',
                         }}
                     >
                         <CheckCircle size={14} />
@@ -444,135 +628,13 @@ const CertificateModal = ({ skillName, onConfirm, onClose }) => {
     );
 };
 
-const cmStyles = {
-    overlay: {
-        position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,0.75)',
-        zIndex: 99999,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '1rem',
-    },
-    modal: {
-        background: '#0f1729',
-        border: '1px solid rgba(79,142,247,0.3)',
-        borderRadius: '20px',
-        width: '100%', maxWidth: '460px',
-        overflow: 'hidden',
-        boxShadow: '0 30px 60px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(79,142,247,0.1)',
-        position: 'relative',
-    },
-    accentBar: {
-        height: '3px',
-        background: 'linear-gradient(90deg, var(--accent), #818cf8)',
-    },
-    header: {
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-        padding: '1.25rem 1.4rem 0.85rem',
-    },
-    headerLeft: { display: 'flex', flexDirection: 'column', gap: '0.35rem' },
-    headerTag: {
-        display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-        fontSize: '0.6rem', fontWeight: 800, color: 'var(--accent)',
-        textTransform: 'uppercase', letterSpacing: '0.08em',
-    },
-    headerSkill: { fontSize: '1.1rem', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.01em' },
-    closeBtn: {
-        background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
-        cursor: 'pointer', color: '#94a3b8',
-        padding: '0.35rem', borderRadius: '8px', display: 'flex', alignItems: 'center',
-        transition: 'all 0.15s',
-    },
-
-    /* Step indicator */
-    steps: {
-        display: 'flex', alignItems: 'center',
-        padding: '0.6rem 1.4rem 0.85rem',
-        gap: 0,
-    },
-    stepItem: { display: 'flex', alignItems: 'center', gap: '0.4rem' },
-    stepDot: {
-        width: '20px', height: '20px', borderRadius: '50%',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        transition: 'all 0.2s', flexShrink: 0,
-    },
-    stepLabel: { fontSize: '0.68rem', fontWeight: 700, transition: 'color 0.2s' },
-    stepLine: { width: '28px', height: '1px', margin: '0 0.4rem', transition: 'background 0.3s' },
-
-    /* Body */
-    body: { padding: '0 1.4rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' },
-
-    dropZone: {
-        border: '1.5px dashed',
-        borderRadius: '14px', padding: '1.75rem 1.25rem',
-        textAlign: 'center', cursor: 'pointer',
-        transition: 'all 0.2s',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem',
-        userSelect: 'none',
-    },
-    uploadIcon: { marginBottom: '0.25rem', opacity: 0.8 },
-    dropText: { fontSize: '0.84rem', color: '#e2e8f0', lineHeight: 1.4 },
-    dropSub: { fontSize: '0.7rem', color: '#64748b' },
-    fileName: { fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent)' },
-    fileSize: { fontSize: '0.7rem', color: '#64748b' },
-    verifiedIcon: { marginBottom: '0.25rem' },
-    verifiedTitle: { fontSize: '0.9rem', fontWeight: 800, color: 'var(--accent)' },
-    verifiedFile: { fontSize: '0.72rem', color: '#64748b' },
-
-    /* Action row below drop zone */
-    actionsRow: { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem' },
-    verifyBtn: {
-        display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
-        padding: '0.5rem 1rem',
-        background: 'rgba(79,142,247,0.15)', color: 'var(--accent)',
-        border: '1px solid rgba(79,142,247,0.4)', borderRadius: '8px',
-        fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer',
-    },
-    skipBtn: {
-        display: 'inline-flex', alignItems: 'center',
-        padding: '0.5rem 0.9rem',
-        background: 'transparent', color: '#94a3b8',
-        border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px',
-        fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer',
-    },
-    skipNote: {
-        fontSize: '0.72rem', color: '#f59e0b',
-        padding: '0.4rem 0.75rem',
-        background: 'rgba(245,158,11,0.1)',
-        border: '1px solid rgba(245,158,11,0.25)',
-        borderRadius: '8px',
-    },
-
-    /* Footer */
-    footer: {
-        display: 'flex', gap: '0.65rem', padding: '1rem 1.4rem',
-        borderTop: '1px solid rgba(255,255,255,0.08)', justifyContent: 'flex-end',
-        background: 'rgba(0,0,0,0.2)',
-    },
-    cancelBtn: {
-        padding: '0.55rem 1.2rem',
-        background: 'transparent', color: '#94a3b8',
-        border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px',
-        fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer',
-    },
-    confirmBtn: {
-        display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-        padding: '0.55rem 1.3rem',
-        background: 'rgba(79,142,247,0.2)',
-        color: 'var(--accent)',
-        border: '1px solid rgba(79,142,247,0.4)',
-        borderRadius: '8px', fontSize: '0.8rem', fontWeight: 700,
-        transition: 'all 0.2s',
-    },
-};
-
-
 const styles = {
     loadingWrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px', padding: '2rem' },
-    spinner: { width: '42px', height: '42px', borderRadius: '50%', border: '3px solid rgba(79,142,247,0.1)', borderTopColor: 'var(--accent)', animation: 'spin 1s linear infinite' },
+    spinner: { width: '42px', height: '42px', borderRadius: '50%', border: '3px solid var(--accent-border)', borderTopColor: 'var(--accent)', animation: 'spin 1s linear infinite' },
     unavailableWrap: { background: 'var(--navy2)', border: '1px solid var(--border)', borderRadius: '16px', padding: '4rem 2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' },
     iconGhost: { color: 'var(--muted)', opacity: 0.3, marginBottom: '1.5rem' },
     roadmapHeader: { maxWidth: '800px' },
-    badge: { display: 'inline-flex', alignItems: 'center', padding: '0.4rem 0.8rem', borderRadius: '100px', background: 'rgba(79,142,247,0.08)', border: '1px solid rgba(79,142,247,0.2)', color: 'var(--accent)', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' },
+    badge: { display: 'inline-flex', alignItems: 'center', padding: '0.4rem 0.8rem', borderRadius: '100px', background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', color: 'var(--accent)', fontSize: '0.65rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '1rem' },
     title: { fontSize: '1.75rem', fontWeight: 900, color: 'var(--text1)', letterSpacing: '-0.02em', margin: '0 0 0.5rem 0' },
     subtitle: { color: 'var(--muted)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 },
     roadmapFlow: { display: 'flex', flexDirection: 'column', gap: '3rem', position: 'relative' },
@@ -674,3 +736,4 @@ const styles = {
 };
 
 export default CareerRoadmap;
+

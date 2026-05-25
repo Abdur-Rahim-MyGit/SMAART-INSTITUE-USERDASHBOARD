@@ -391,7 +391,7 @@ const CareerAgentDashboard = () => {
                     {/* Animated ring */}
                     <div style={{
                         width: '88px', height: '88px', borderRadius: '50%',
-                        border: '2px solid rgba(79,142,247,0.25)',
+                        border: '2px solid var(--accent-border)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         marginBottom: '1.75rem', position: 'relative',
                         animation: 'popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both',
@@ -502,9 +502,14 @@ const CareerAgentDashboard = () => {
             <div className="dash-body">
                 <aside className="sidebar">
                     <div className="sb-header">
+                        <div style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--muted)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+                            Active Direction
+                        </div>
                         <div className="sb-role-indicator">
                             <div className={`sb-role-dot ${activeRole === 1 ? 'green' : activeRole === 2 ? 'amber' : 'red'}`}></div>
-                            <div className="sb-role-name">{currentData?.tab1?.role_name || 'Loading...'}</div>
+                            <div className="sb-role-name" title={currentData?.tab1?.role_name || 'Loading...'}>
+                                {currentData?.tab1?.role_name || 'Loading...'}
+                            </div>
                         </div>
                     </div>
 

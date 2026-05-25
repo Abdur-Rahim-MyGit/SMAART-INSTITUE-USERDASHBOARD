@@ -306,7 +306,7 @@ const S = {
     sideBlock: { padding: '1.25rem', background: 'var(--navy2)', border: '1px solid var(--border)', borderRadius: '16px' },
     sideLabel: { fontSize: '0.68rem', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.65rem' },
     sideDetail: { margin: 0, fontSize: '0.82rem', lineHeight: 1.65, color: 'var(--text2)' },
-    reqBadge: { padding: '0.32rem 0.75rem', background: 'rgba(79,142,247,0.1)', color: 'var(--accent)', border: '1px solid rgba(79,142,247,0.25)', borderRadius: '6px', fontWeight: 800, fontSize: '0.74rem', display: 'inline-block', marginBottom: '0.6rem' },
+    reqBadge: { padding: '0.32rem 0.75rem', background: 'var(--accent-tint)', color: 'var(--accent)', border: '1px solid var(--accent-border)', borderRadius: '6px', fontWeight: 800, fontSize: '0.74rem', display: 'inline-block', marginBottom: '0.6rem' },
 };
 
 export default MarketIntelligence;

@@ -88,7 +88,7 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder = 
               style={{
                 padding: '0.25rem 0.75rem', fontSize: '0.72rem', borderRadius: '100px', cursor: 'pointer',
                 fontFamily: 'var(--font)', border: '1px solid',
-                background: selected.includes(opt) ? 'rgba(79,142,247,0.2)' : 'rgba(255,255,255,0.03)',
+                background: selected.includes(opt) ? 'rgba(var(--accent-rgb), 0.2)' : 'rgba(255,255,255,0.03)',
                 borderColor: selected.includes(opt) ? 'var(--accent)' : 'var(--border2)',
                 color: selected.includes(opt) ? 'var(--text)' : 'var(--text2)',
                 transition: 'all 0.15s',
@@ -218,7 +218,6 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
       {directions.map(dir => {
         const isSel = selected?.directionId === dir.directionId;
         const themeColor = 'var(--accent)';
-        const accentRgb = '79,142,247';
 
         return (
           <div key={dir.directionId} style={{ position: 'relative' }}>
@@ -229,36 +228,36 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
                 width: '100%', textAlign: 'left', padding: '1.2rem',
                 borderRadius: isSel ? '20px 20px 0 0' : '20px',
                 cursor: 'pointer', fontFamily: 'inherit',
-                border: isSel ? `1.5px solid #1a3884` : '1px solid #e2e8f0',
-                background: '#ffffff',
+                border: isSel ? `1.5px solid var(--accent)` : '1px solid var(--border)',
+                background: 'var(--card)',
                 transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                 display: 'flex', alignItems: 'center', gap: '1.2rem',
-                boxShadow: isSel ? `0 15px 35px -5px rgba(26,56,132,0.15)` : 'none'
+                boxShadow: isSel ? `0 15px 35px -5px rgba(var(--accent-rgb),0.15)` : 'none'
               }}
-              onMouseEnter={e => { if (!isSel) { e.currentTarget.style.borderColor = 'rgba(26,56,132,0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.05)'; e.currentTarget.querySelector('.icon-box').style.transform = 'scale(1.1)'; } }}
-              onMouseLeave={e => { if (!isSel) { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.querySelector('.icon-box').style.transform = 'scale(1)'; } }}
+              onMouseEnter={e => { if (!isSel) { e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb),0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.05)'; e.currentTarget.querySelector('.icon-box').style.transform = 'scale(1.1)'; } }}
+              onMouseLeave={e => { if (!isSel) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.querySelector('.icon-box').style.transform = 'scale(1)'; } }}
             >
               <div className="icon-box" style={{
                 width: '52px', height: '52px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                background: isSel ? 'var(--accent)' : '#f8fafc',
-                border: isSel ? '1px solid var(--accent)' : '1px solid #e2e8f0',
+                background: isSel ? 'var(--accent)' : 'var(--navy2)',
+                border: isSel ? '1px solid var(--accent)' : '1px solid var(--border)',
                 color: isSel ? '#ffffff' : 'var(--muted)',
-                boxShadow: isSel ? '0 4px 15px rgba(37,99,235,0.3)' : 'none'
+                boxShadow: isSel ? '0 4px 15px rgba(var(--accent-rgb),0.3)' : 'none'
               }}>
                 <Target size={24} />
               </div>
               
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: '0.7rem', fontWeight: 800, color: isSel ? 'var(--accent)' : 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.3rem', transition: 'color 0.3s ease' }}>Career Pathway</div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isSel ? '#112b6b' : 'var(--text)', marginBottom: '0.2rem', letterSpacing: '-0.02em' }}>{dir.directionName}</div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isSel ? 'var(--accent)' : 'var(--text)', marginBottom: '0.2rem', letterSpacing: '-0.02em' }}>{dir.directionName}</div>
                 <div style={{ fontSize: '0.78rem', color: 'var(--text2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{dir.directionDescription}</div>
               </div>
               
               <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                 {isSel && (
                   <div style={{
-                    background: 'rgba(37,99,235,0.1)', color: 'var(--accent)', borderRadius: '50%',
+                    background: 'var(--accent-tint)', color: 'var(--accent)', borderRadius: '50%',
                     width: '32px', height: '32px', display: 'flex',
                     alignItems: 'center', justifyContent: 'center'
                   }}>
@@ -271,7 +270,7 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                style={{ padding: '1.2rem 1.5rem', background: `rgba(26,56,132,0.01)`, border: `1.5px solid #1a3884`, borderTop: 'none', borderRadius: '0 0 20px 20px', overflow: 'hidden' }}
+                style={{ padding: '1.2rem 1.5rem', background: `rgba(var(--accent-rgb),0.01)`, border: `1.5px solid var(--accent)`, borderTop: 'none', borderRadius: '0 0 20px 20px', overflow: 'hidden' }}
               >
                 {dir.directionOverview && (
                   <p style={{ fontSize: '0.75rem', color: 'var(--text2)', lineHeight: 1.6, marginBottom: dir.roles?.length > 0 ? '0.8rem' : 0 }}>{dir.directionOverview}</p>
@@ -325,10 +324,10 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
 
   // Priority branding
   const theme = {
-    primary: { glow: 'rgba(37,99,235,0.08)', bg: 'rgba(37,99,235,0.1)', accent: 'var(--accent)', icon: <Trophy size={18} />, label: 'Primary Goal' },
+    primary: { glow: 'rgba(var(--accent-rgb), 0.08)', bg: 'rgba(var(--accent-rgb), 0.1)', accent: 'var(--accent)', icon: <Trophy size={18} />, label: 'Primary Goal' },
     secondary: { glow: 'rgba(34,211,238,0.06)', bg: 'rgba(34,211,238,0.08)', accent: 'var(--accent2)', icon: <Compass size={18} />, label: 'Secondary Path' },
     tertiary: { glow: 'rgba(167,139,250,0.06)', bg: 'rgba(167,139,250,0.08)', accent: '#a78bfa', icon: <Sparkles size={18} />, label: 'Tertiary Option' }
-  }[colorClass] || { glow: 'rgba(37,99,235,0.08)', bg: 'rgba(37,99,235,0.1)', accent: 'var(--accent)', icon: <Trophy size={18} />, label: 'Primary Goal' };
+  }[colorClass] || { glow: 'rgba(var(--accent-rgb), 0.08)', bg: 'rgba(var(--accent-rgb), 0.1)', accent: 'var(--accent)', icon: <Trophy size={18} />, label: 'Primary Goal' };
 
   const sectionLabelStyle = {
     fontSize: '0.7rem',
@@ -535,7 +534,7 @@ function SkillSection({ skills, onChange }) {
 
         {/* Row 2 (Optional): Verification Details */}
         {status === 'Verified' && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ background: 'rgba(79,142,247,0.03)', border: '1px solid rgba(79,142,247,0.15)', borderRadius: '10px', padding: '1.2rem' }}>
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '10px', padding: '1.2rem' }}>
             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><ShieldCheck size={14} /> Verification Details (Certification)</div>
             <div className="fgrid">
               <div className="fg">
@@ -573,7 +572,7 @@ function SkillSection({ skills, onChange }) {
         {skills.length === 0 && <p style={{ fontSize: '0.8rem', color: 'var(--muted)', textAlign: 'center', padding: '1rem' }}>No skills added yet. Add your verified and self-learnt skills above.</p>}
       </div>
 
-      <div style={{ marginTop: '1.2rem', padding: '0.9rem', background: 'rgba(79,142,247,0.05)', borderRadius: '10px', border: '1px solid rgba(79,142,247,0.1)', fontSize: '0.72rem', color: 'var(--text2)', display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+      <div style={{ marginTop: '1.2rem', padding: '0.9rem', background: 'var(--accent-tint)', borderRadius: '10px', border: '1px solid var(--accent-border)', fontSize: '0.72rem', color: 'var(--text2)', display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
         <ShieldCheck size={20} style={{ color: 'var(--accent)' }} />
         <span>Providing certification details for <strong>Verified</strong> skills significantly boosts your platform ranking and visibility to potential employers.</span>
       </div>
@@ -1138,7 +1137,7 @@ const CareerAgentOnboarding = () => {
       <div id="screen-loading" className="career-agent-page" style={{ background: 'var(--navy)', zIndex: 9999, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <div style={{ position: 'relative', marginBottom: '2.5rem' }}>
           <div className="pulse-ring"></div>
-          <div style={{ width: '100px', height: '100px', borderRadius: '25px', background: 'var(--navy2)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(37,99,235,0.15)', zIndex: 2, position: 'relative' }}>
+          <div style={{ width: '100px', height: '100px', borderRadius: '25px', background: 'var(--navy2)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(var(--accent-rgb),0.15)', zIndex: 2, position: 'relative' }}>
             <Sparkles size={48} color="var(--accent)" className="animate-pulse" />
           </div>
         </div>
@@ -1158,7 +1157,7 @@ const CareerAgentOnboarding = () => {
               initial={{ width: '0%' }}
               animate={{ width: `${(submittingStep + 1) * 16.6}%` }}
               transition={{ duration: 1.5, ease: "easeInOut" }}
-              style={{ height: '100%', background: 'linear-gradient(90deg, var(--accent), var(--accent2))', boxShadow: '0 0 15px rgba(37,99,235,0.3)' }}
+              style={{ height: '100%', background: 'linear-gradient(90deg, var(--accent), var(--accent2))', boxShadow: '0 0 15px rgba(var(--accent-rgb),0.3)' }}
             />
           </div>
           <motion.p
@@ -1233,7 +1232,7 @@ const CareerAgentOnboarding = () => {
                     background: isDone ? '#10b981' : isActive ? 'var(--accent)' : '#f1f5f9',
                     color: isDone || isActive ? '#fff' : '#94a3b8',
                     border: isActive ? '2px solid var(--accent)' : isDone ? '2px solid #10b981' : '2px solid #e2e8f0',
-                    boxShadow: isActive ? '0 0 0 4px rgba(37,99,235,0.12)' : 'none',
+                    boxShadow: isActive ? '0 0 0 4px rgba(var(--accent-rgb),0.12)' : 'none',
                     transform: isActive ? 'scale(1.08)' : 'scale(1)',
                   }}>
                     {isDone ? 'OK' : sn}
@@ -1265,12 +1264,12 @@ const CareerAgentOnboarding = () => {
 
 
             {user && (
-              <div style={{ background: 'rgba(26,56,132,0.05)', border: '1px solid rgba(26,56,132,0.1)', borderRadius: '16px', padding: '1rem 1.2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: '#1a3884', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1rem 1.2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <ShieldCheck size={16} />
                 </div>
-                <div style={{ fontSize: '0.82rem', color: '#1a3884', fontWeight: 600 }}>
-                  Profile Linked: <span style={{ color: '#475569', fontWeight: 500 }}>We've auto-filled your details from your SMAART profile.</span>
+                <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontWeight: 600 }}>
+                  Profile Linked: <span style={{ color: 'var(--text2)', fontWeight: 500 }}>We've auto-filled your details from your SMAART profile.</span>
                 </div>
               </div>
             )}
@@ -1336,10 +1335,10 @@ const CareerAgentOnboarding = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               {formData.education.map((edu, i) => (
-                <div key={i} style={{ background: 'rgba(26,56,132,0.02)', border: '1px solid rgba(26,56,132,0.08)', borderRadius: '18px', padding: '1.8rem', position: 'relative', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', transition: 'all 0.3s ease' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px dashed rgba(26,56,132,0.15)' }}>
+                <div key={i} style={{ background: 'rgba(var(--accent-rgb), 0.02)', border: '1px solid rgba(var(--accent-rgb), 0.08)', borderRadius: '18px', padding: '1.8rem', position: 'relative', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', transition: 'all 0.3s ease' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px dashed rgba(var(--accent-rgb), 0.15)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                      <div style={{ background: i === 0 ? 'var(--accent)' : 'var(--navy2)', color: i === 0 ? '#fff' : 'var(--text1)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, boxShadow: i === 0 ? '0 4px 10px rgba(37,99,235,0.3)' : 'none' }}>
+                      <div style={{ background: i === 0 ? 'var(--accent)' : 'var(--navy2)', color: i === 0 ? '#fff' : 'var(--text1)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, boxShadow: i === 0 ? '0 4px 10px rgba(var(--accent-rgb), 0.3)' : 'none' }}>
                         {i + 1}
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -1417,9 +1416,9 @@ const CareerAgentOnboarding = () => {
 
               {formData.education.length < 3 && (
                 <button type="button" onClick={addEdu} 
-                  style={{ background: 'rgba(37,99,235,0.04)', border: '1.5px dashed rgba(37,99,235,0.25)', color: 'var(--accent)', borderRadius: '16px', padding: '1.2rem', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'var(--font)', fontWeight: 700, width: '100%', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(37,99,235,0.08)'; e.currentTarget.style.borderColor = 'rgba(37,99,235,0.4)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(37,99,235,0.04)'; e.currentTarget.style.borderColor = 'rgba(37,99,235,0.25)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                  style={{ background: 'rgba(var(--accent-rgb), 0.04)', border: '1.5px dashed rgba(var(--accent-rgb), 0.25)', color: 'var(--accent)', borderRadius: '16px', padding: '1.2rem', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'var(--font)', fontWeight: 700, width: '100%', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(var(--accent-rgb), 0.08)'; e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb), 0.4)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(var(--accent-rgb), 0.04)'; e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb), 0.25)'; e.currentTarget.style.transform = 'translateY(0)'; }}
                 >
                   <span style={{ fontSize: '1.2rem', fontWeight: 400, lineHeight: 1 }}>+</span> Add Another Academic Qualification
                 </button>
@@ -1432,7 +1431,7 @@ const CareerAgentOnboarding = () => {
         {step === 3 && (
           <div className="form-card">
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(37,99,235,0.15), rgba(37,99,235,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(37,99,235,0.2)' }}>
+              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(var(--accent-rgb), 0.15), rgba(var(--accent-rgb), 0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(var(--accent-rgb), 0.2)' }}>
                 <Trophy size={22} color="var(--accent)" />
               </div>
               <div style={{ flex: 1 }}>
@@ -1506,7 +1505,7 @@ const CareerAgentOnboarding = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
 
               {/* Education Summary */}
-              <div style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.04), rgba(37,99,235,0.01))', border: '1px solid rgba(37,99,235,0.12)', borderRadius: '16px', padding: '1.2rem 1.5rem' }}>
+              <div style={{ background: 'linear-gradient(135deg, rgba(var(--accent-rgb), 0.04), rgba(var(--accent-rgb), 0.01))', border: '1px solid rgba(var(--accent-rgb), 0.12)', borderRadius: '16px', padding: '1.2rem 1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
                   <GraduationCap size={15} color="var(--accent)" />
                   <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Education History</span>
@@ -1546,12 +1545,12 @@ const CareerAgentOnboarding = () => {
               </div>
             )}
 
-            <div style={{ background: 'linear-gradient(135deg,rgba(37,99,235,0.06),rgba(34,211,238,0.03))', border: '1px solid rgba(37,99,235,0.15)', borderRadius: '14px', padding: '1rem 1.2rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+            <div style={{ background: 'linear-gradient(135deg,rgba(var(--accent-rgb),0.06),rgba(34,211,238,0.03))', border: '1px solid rgba(var(--accent-rgb),0.15)', borderRadius: '14px', padding: '1rem 1.2rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
               <Sparkles size={16} color="var(--accent)" style={{ flexShrink: 0 }} />
               Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This typically takes 15-30 seconds.
             </div>
 
-            <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, #1a3884, #2563eb)', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(26,56,132,0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}>
+            <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(var(--accent-rgb), 0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}>
               <Sparkles size={18} />
               {isSubmitting ? 'Generating Report...' : 'Generate Career Intelligence Report'}
             </button>
