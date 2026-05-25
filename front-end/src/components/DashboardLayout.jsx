@@ -997,12 +997,12 @@ const DashboardLayout = () => {
         )}
 
         {/* Page Content */}
-        <div className={isCareerAgentDashboard ? "p-0" : "p-4 sm:p-6 lg:p-8"}>
+        <div className={isCareerAgentDashboard ? "p-0 h-screen overflow-hidden" : "p-4 sm:p-6 lg:p-8"}>
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className={isCareerAgentDashboard ? "w-full" : "max-w-[1600px] mx-auto"}
+            className={isCareerAgentDashboard ? "w-full h-full" : "max-w-[1600px] mx-auto"}
           >
             <Outlet />
           </motion.div>

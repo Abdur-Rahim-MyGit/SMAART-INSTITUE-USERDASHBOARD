@@ -111,8 +111,8 @@ const box = {
     flexDirection: 'column',
 };
 const boxAccent = {
-    background: 'linear-gradient(135deg, rgba(79,142,247,0.06) 0%, var(--navy2) 60%)',
-    borderColor: 'rgba(79,142,247,0.2)',
+    background: 'linear-gradient(135deg, var(--accent-tint) 0%, var(--navy2) 60%)',
+    borderColor: 'var(--accent-border)',
 };
 const divider = { height: '1px', background: 'var(--border)', margin: '0.75rem 0 1rem' };
 

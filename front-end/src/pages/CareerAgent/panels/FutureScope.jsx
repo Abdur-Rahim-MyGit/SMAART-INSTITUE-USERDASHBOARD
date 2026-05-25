@@ -5,17 +5,17 @@ const FutureScope = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', animation: 'fadeIn 0.5s ease-out' }}>
             <div style={{
-                background: 'linear-gradient(135deg, rgba(79, 142, 247, 0.08) 0%, rgba(34, 211, 238, 0.02) 100%)',
-                border: '1px solid rgba(79, 142, 247, 0.2)',
+                background: 'linear-gradient(135deg, var(--accent-tint) 0%, rgba(34, 211, 238, 0.02) 100%)',
+                border: '1px solid var(--accent-border)',
                 borderRadius: '24px', padding: '3.5rem 2.5rem', textAlign: 'center', maxWidth: '550px',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.05)', position: 'relative', overflow: 'hidden'
             }}>
                 {/* Background glow effects */}
-                <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'radial-gradient(circle, rgba(79,142,247,0.3) 0%, transparent 70%)', filter: 'blur(30px)' }} />
+                <div style={{ position: 'absolute', top: '-50px', left: '-50px', width: '150px', height: '150px', background: 'radial-gradient(circle, var(--accent-tint) 0%, transparent 70%)', filter: 'blur(30px)' }} />
                 <div style={{ position: 'absolute', bottom: '-50px', right: '-50px', width: '150px', height: '150px', background: 'radial-gradient(circle, rgba(34,211,238,0.2) 0%, transparent 70%)', filter: 'blur(30px)' }} />
                 
                 <div style={{ position: 'relative', zIndex: 1 }}>
-                    <div style={{ display: 'inline-flex', padding: '1.2rem', background: 'rgba(79,142,247,0.1)', borderRadius: '24px', marginBottom: '1.5rem', boxShadow: 'inset 0 0 20px rgba(79,142,247,0.1)' }}>
+                    <div style={{ display: 'inline-flex', padding: '1.2rem', background: 'var(--accent-tint)', borderRadius: '24px', marginBottom: '1.5rem', boxShadow: 'inset 0 0 20px var(--accent-tint)' }}>
                         <Rocket size={44} color="var(--accent)" strokeWidth={1.5} />
                     </div>
                     

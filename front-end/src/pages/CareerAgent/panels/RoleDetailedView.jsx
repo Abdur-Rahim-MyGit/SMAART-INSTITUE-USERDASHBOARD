@@ -255,8 +255,8 @@ const styles = {
         display: 'flex', flexDirection: 'column', gap: 0,
     },
     boxAccent: {
-        background: 'linear-gradient(135deg, rgba(79,142,247,0.06) 0%, var(--navy2) 60%)',
-        borderColor: 'rgba(79,142,247,0.2)',
+        background: 'linear-gradient(135deg, var(--accent-tint) 0%, var(--navy2) 60%)',
+        borderColor: 'var(--accent-border)',
     },
     boxGrowth: {
         background: 'linear-gradient(135deg, rgba(16,185,129,0.05) 0%, var(--navy2) 60%)',
@@ -284,7 +284,7 @@ const styles = {
     },
     salaryItem: {
         textAlign: 'center', padding: '0.6rem 0.4rem',
-        background: 'rgba(79,142,247,0.05)',
+        background: 'var(--accent-tint)',
         border: '1px solid var(--border)', borderRadius: '10px',
     },
     salaryLabel: {
@@ -297,8 +297,8 @@ const styles = {
     aiBadge: {
         display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
         marginTop: '1rem', padding: '0.35rem 0.8rem',
-        background: 'rgba(79,142,247,0.08)', borderRadius: '20px',
-        border: '1px solid rgba(79,142,247,0.2)', width: 'fit-content',
+        background: 'var(--accent-tint)', borderRadius: '20px',
+        border: '1px solid var(--accent-border)', width: 'fit-content',
     },
     aiBadgeDot: {
         width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)',

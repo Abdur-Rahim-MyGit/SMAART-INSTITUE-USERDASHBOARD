@@ -72,7 +72,7 @@ const DirectionOverview = ({ directionData }) => {
             {/* ── Single info box: Direction Overview ── */}
             <div style={styles.singleBox}>
                 <div style={styles.boxHeader}>
-                    <div style={{ background: 'rgba(79,142,247,0.15)', padding: '0.4rem', borderRadius: '8px', display: 'flex', fontSize: '1.2rem' }}>
+                    <div style={{ background: 'var(--accent-tint)', padding: '0.4rem', borderRadius: '8px', display: 'flex', fontSize: '1.2rem' }}>
                         🗺️
                     </div>
                     <div style={styles.boxTitle}>Direction Overview</div>
@@ -80,7 +80,7 @@ const DirectionOverview = ({ directionData }) => {
                 <div style={styles.boxDivider} />
                 <p style={styles.boxText}>{directionOverview || directionDescription || '—'}</p>
             </div>
-
+ 
             {/* ── Core Roles – These are the possible ways ── */}
             <div style={styles.rolesSection}>
                 <div style={styles.rolesSectionHeader}>
@@ -88,19 +88,18 @@ const DirectionOverview = ({ directionData }) => {
                         <span style={styles.rolesSectionDot} />
                         Possible Job Roles for This Career Direction
                     </div>
-                    {/* <div style={styles.roleCount}>{validRoles.length} Options</div> */}
                 </div>
-
-                <div style={styles.rolesGrid}>
+ 
+                <div className="dir-roles-grid">
                     {validRoles.map((r, i) => {
                         return (
                             <div
                                 key={r.id || i}
-                                style={styles.roleCard}
+                                className="dir-role-card"
                             >
-                                <div style={styles.roleCardNumber}>{i + 1}</div>
+                                <div className="dir-role-card-number">{i + 1}</div>
                                 <div style={styles.roleCardBody}>
-                                    <div style={styles.roleCardName}>
+                                    <div className="dir-role-card-name">
                                         {r.role}
                                     </div>
                                 </div>
@@ -173,8 +172,8 @@ const styles = {
 
     /* Single full-width info box */
     singleBox: {
-        background: 'linear-gradient(135deg, rgba(79,142,247,0.06) 0%, var(--navy2) 60%)',
-        border: '1px solid rgba(79,142,247,0.2)',
+        background: 'linear-gradient(135deg, var(--accent-tint) 0%, var(--navy2) 60%)',
+        border: '1px solid var(--accent-border)',
         borderRadius: '16px',
         padding: '1.5rem',
     },
@@ -191,8 +190,8 @@ const styles = {
         padding: '1.5rem',
     },
     infoBoxAccent: {
-        background: 'linear-gradient(135deg, rgba(79,142,247,0.06) 0%, var(--navy2) 60%)',
-        borderColor: 'rgba(79,142,247,0.2)',
+        background: 'linear-gradient(135deg, var(--accent-tint) 0%, var(--navy2) 60%)',
+        borderColor: 'var(--accent-border)',
     },
     boxHeader: {
         display: 'flex', alignItems: 'center',
@@ -255,8 +254,8 @@ const styles = {
         flexShrink: 0,
         width: 28, height: 28,
         borderRadius: '50%',
-        background: 'rgba(79,142,247,0.1)',
-        border: '1px solid rgba(79,142,247,0.2)',
+        background: 'var(--accent-tint)',
+        border: '1px solid var(--accent-border)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: '0.68rem', fontWeight: 900,
         color: 'var(--accent)',

@@ -72,8 +72,8 @@ const ResumeTips = ({ roleName, candidateName }) => {
 
             {/* ── GENERATE RESUME CTA ── */}
             <div style={{
-                background: 'linear-gradient(135deg, rgba(79,142,247,0.12), rgba(167,139,250,0.08))',
-                border: '1px solid rgba(79,142,247,0.3)',
+                background: 'linear-gradient(135deg, var(--accent-tint), rgba(167,139,250,0.08))',
+                border: '1px solid var(--accent-border)',
                 borderRadius: '16px', padding: '1.5rem 1.6rem',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem',
             }}>
@@ -128,7 +128,7 @@ const ResumeTips = ({ roleName, candidateName }) => {
                         }}>
                             <div style={{
                                 width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, marginTop: '0.1rem',
-                                background: 'rgba(79,142,247,0.1)', border: '1px solid rgba(79,142,247,0.25)',
+                                background: 'var(--accent-tint)', border: '1px solid var(--accent-border)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 fontSize: '0.55rem', fontWeight: 900, color: 'var(--accent)',
                             }}>{i + 1}</div>

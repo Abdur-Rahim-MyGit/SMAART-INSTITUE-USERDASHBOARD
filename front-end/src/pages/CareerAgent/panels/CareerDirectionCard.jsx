@@ -143,7 +143,7 @@ const CareerDirectionCard = ({ roleName, mongoRoleData }) => {
                         <p style={{ fontSize: '0.88rem', color: 'var(--text2)', lineHeight: 1.6, margin: 0 }}>{data.direction.direction_description}</p>
                         
                         <div style={S.grid}>
-                            <div style={{ background: 'rgba(79,142,247,0.04)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(79,142,247,0.1)' }}>
+                            <div style={{ background: 'var(--accent-tint)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--accent-border)' }}>
                                 <div style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '0.3rem', marginBottom: '0.4rem' }}><TrendingUp size={12} /> STRATEGIC FIT</div>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--text2)', margin: 0, lineHeight: 1.5 }}>{data.direction.why_primary || data.direction.realistic_note}</p>
                             </div>
