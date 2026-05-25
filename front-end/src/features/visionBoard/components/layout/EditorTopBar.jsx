@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ChevronLeft,
   Undo2,
@@ -30,11 +31,13 @@ const EditorTopBar = ({
   lastSaved,
   handleInstantCheck
 }) => {
+  const { t } = useTranslation();
+
   const statusLabel = isSaving
-    ? "Saving"
+    ? t("vision_board.saving")
     : lastSaved
-      ? `Saved ${new Date(lastSaved).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
-      : "Ready";
+      ? t("vision_board.saved_at", { time: new Date(lastSaved).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) })
+      : t("vision_board.ready");
 
   return (
     <div className="flex h-16 items-center justify-between gap-2 border-b border-slate-200/50 bg-white/70 px-2 text-slate-900 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md dark:border-slate-800/50 dark:bg-[#00152E]/80 dark:text-white sm:px-3">
@@ -44,7 +47,7 @@ const EditorTopBar = ({
           className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:bg-[#002A5C]"
         >
           <ChevronLeft className="h-4 w-4" />
-          <span className="hidden sm:block">Boards</span>
+          <span className="hidden sm:block">{t("vision_board.boards")}</span>
         </Link>
 
         <div className="hidden items-center gap-1 rounded-2xl border border-slate-200 bg-slate-50/50 p-1 dark:border-white/10 dark:bg-slate-900/60 sm:flex">
@@ -61,7 +64,7 @@ const EditorTopBar = ({
                   <Undo2 className={`h-4 w-4 ${!canUndo ? 'opacity-40' : ''}`} />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Undo</TooltipContent>
+              <TooltipContent>{t("vision_board.undo")}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -78,7 +81,7 @@ const EditorTopBar = ({
                   <Redo2 className={`h-4 w-4 ${!canRedo ? 'opacity-40' : ''}`} />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Redo</TooltipContent>
+              <TooltipContent>{t("vision_board.redo")}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
@@ -94,7 +97,7 @@ const EditorTopBar = ({
                 if (handleInstantCheck) handleInstantCheck(e.target.value);
               }}
               className="h-8 border-0 bg-transparent px-0 text-left text-sm font-bold text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 dark:text-white dark:placeholder:text-slate-500"
-              placeholder="Untitled vision board"
+              placeholder={t("vision_board.untitled_board")}
             />
           </div>
           <div className="hidden flex-shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 shadow-sm transition-all dark:border-white/10 dark:bg-slate-900 dark:text-slate-400 xl:flex">
@@ -123,7 +126,7 @@ const EditorTopBar = ({
           ) : (
             <Save className="h-4 w-4" />
           )}
-          <span className="hidden sm:inline text-[11px] uppercase tracking-wider">Save</span>
+          <span className="hidden sm:inline text-[11px] uppercase tracking-wider">{t("vision_board.save")}</span>
         </Button>
 
         <Button
@@ -131,7 +134,7 @@ const EditorTopBar = ({
           onClick={onPreview}
         >
           <Eye className="h-4 w-4" />
-          <span className="hidden sm:inline text-[11px] uppercase tracking-wider">Preview</span>
+          <span className="hidden sm:inline text-[11px] uppercase tracking-wider">{t("vision_board.preview")}</span>
         </Button>
       </div>
     </div>

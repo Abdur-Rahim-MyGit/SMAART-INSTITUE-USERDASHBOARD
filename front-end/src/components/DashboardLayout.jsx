@@ -585,419 +585,415 @@ const DashboardLayout = () => {
 
       {/* Main Content Area */}
       <main
-        className={`transition-all duration-300 min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] ${
-          isCareerAgentDashboard ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]')
-        }`}
+        className={`transition-all duration-300 min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] ${isCareerAgentDashboard ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]')
+          }`}
       >
         {/* Top Header Bar - Premium AI SaaS Style */}
         {!isCareerAgentDashboard && (
           <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#002147]/90 backdrop-blur-xl border-none sm:border-b border-slate-200/30 dark:border-[#1a3884]/20 shadow-[0_1px_12px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_12px_rgba(0,0,0,0.30)] transition-colors duration-300">
-          <div className="flex items-center justify-between px-4 md:px-8 h-[70px] max-w-[1600px] mx-auto">
+            <div className="flex items-center justify-between px-4 md:px-8 h-[70px] max-w-[1600px] mx-auto">
 
-            {/* LEFT SECTION: Menu Toggle (Mobile) + Page Title & Breadcrumb */}
-            <div className="flex items-center gap-4">
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setIsMobileOpen(true)}
-                className="lg:hidden p-2 bg-white dark:bg-[#002A5C] rounded-xl shadow-sm border border-slate-200 dark:border-[#1a3884]/20 text-slate-600 dark:text-slate-300 hover:text-[#1a3884] transition-all"
-                aria-label="Open menu"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
-
-              <div className="flex flex-col min-w-0 shrink">
-                {/* Subtle Breadcrumb */}
-                <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 opacity-60">
-                  {(location.pathname === '/dashboard' || location.pathname === '/dashboard/') && (
-                    <>
-                      <span>SMAART</span>
-                      <ChevronRight className="w-2.5 h-2.5" />
-                    </>
-                  )}
-                  <span>Dashboard</span>
-                </div>
-
-                <div className="flex items-center gap-3.5 min-w-0">
-                  {/* Primary Accent Bar */}
-                  <div className="shrink-0 w-1.5 h-7 bg-[#1a3884] dark:bg-blue-500 rounded-full shadow-[0_0_8px_rgba(26,56,132,0.15)]" />
-                  <motion.h1
-                    key={pageTitle}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="text-xl sm:text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight font-sans transition-colors duration-300 truncate min-w-0"
-                    style={{ letterSpacing: '-0.02em' }}
-                  >
-                    {pageTitle}
-                  </motion.h1>
-                </div>
-              </div>
-            </div>
-
-            {/* CENTER SECTION: Premium Search Bar */}
-            <div className="hidden lg:flex flex-1 max-w-[480px] mx-10">
-              <div className="relative w-full group" ref={searchContainerRef}>
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-slate-400 group-focus-within:text-[#1a3884] transition-colors" />
-                </div>
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setShowSearchResults(true);
-                  }}
-                  onFocus={() => setShowSearchResults(true)}
-                  onKeyDown={handleSearchKeyDown}
-                  placeholder={t('dashboard.search_placeholder')}
-                  className="block w-full pl-11 pr-14 py-2.5 bg-[#F1F5F9] dark:bg-slate-800/40 border border-transparent focus:border-[#1a3884]/30 rounded-full text-sm placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/5 transition-all shadow-inner dark:text-white"
-                  aria-label="Search dashboard content"
-                  aria-expanded={showSearchResults}
-                  aria-controls="dashboard-search-results"
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2">
-                  {searchQuery && (
-                    <button
-                      onClick={() => {
-                        setSearchQuery("");
-                        searchInputRef.current?.focus();
-                      }}
-                      className="p-1 hover:bg-slate-200 dark:hover:bg-[#002A5C] rounded-full transition-colors"
-                    >
-                      <X className="w-3.5 h-3.5 text-slate-400" />
-                    </button>
-                  )}
-                  <div className="flex items-center gap-1 px-1.5 py-1 text-[10px] font-bold text-slate-400 bg-white/80 dark:bg-slate-700/50 rounded-lg border border-slate-200/50 dark:border-slate-600/50 shadow-sm">
-                    <Command className="w-2.5 h-2.5" />
-                    <span>K</span>
-                  </div>
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSearchQuery("");
-                        setShowSearchResults(false);
-                        searchInputRef.current?.focus();
-                      }}
-                      className="absolute inset-y-0 right-10 flex items-center pr-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                      aria-label="Clear search"
-                    >
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 dark:bg-[#003170] text-[10px] font-bold">✕</span>
-                    </button>
-                  )}
-                </div>
-
-                <AnimatePresence>
-                  {showSearchResults && searchQuery.trim() && (
-                    <motion.div
-                      id="dashboard-search-results"
-                      initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                      transition={{ duration: 0.18 }}
-                      className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/8 bg-white dark:bg-[#002147] shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.60)] backdrop-blur-xl"
-                    >
-                      <div className="border-b border-slate-200 dark:border-[#1a3884]/20 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                        Search results
-                      </div>
-
-                      {searchResults.length > 0 ? (
-                        <div className="max-h-[360px] overflow-y-auto py-2">
-                          {searchResults.map((item, index) => (
-                            <button
-                              key={item.id}
-                              type="button"
-                              onMouseEnter={() => setActiveSearchIndex(index)}
-                              onClick={() => handleSearchNavigation(item)}
-                              className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors ${index === activeSearchIndex
-                                ? "bg-blue-50 dark:bg-blue-900/20"
-                                : "hover:bg-slate-100 dark:hover:bg-slate-800/85"
-                                }`}
-                            >
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">
-                                    {item.title}
-                                  </span>
-                                  <span className="rounded-full bg-slate-100 dark:bg-[#002A5C] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
-                                    {item.type}
-                                  </span>
-                                </div>
-                                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
-                                  {item.subtitle}
-                                </p>
-                              </div>
-                              <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
-                            </button>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="px-4 py-6 text-center">
-                          <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                            No matching results found
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            Try a page name, course title, track, or assessment code.
-                          </p>
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            {/* RIGHT SECTION: Grouped Actions */}
-            <div className="flex items-center gap-5">
-
-              {/* 1. Live Time Widget */}
-              <div className="hidden xl:flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-800/20 border border-slate-100 dark:border-slate-700/50 rounded-full shadow-sm">
-                <div className="relative">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                  <div className="absolute inset-0 w-2 h-2 bg-emerald-500 rounded-full animate-ping opacity-75" />
-                </div>
-                <span className="text-[13px] font-bold text-slate-600 dark:text-slate-300 font-mono tracking-tight">
-                  {formatTime(currentTime)}
-                </span>
-              </div>
-
-              {/* 2. Icon Group Container */}
-              <div className="hidden sm:flex items-center gap-1 p-1 bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/30 dark:border-slate-700/30 rounded-2xl">
-                {/* Theme Toggle */}
+              {/* LEFT SECTION: Menu Toggle (Mobile) + Page Title & Breadcrumb */}
+              <div className="flex items-center gap-4">
+                {/* Mobile Menu Toggle */}
                 <button
-                  onClick={toggleTheme}
-                  className="p-2 rounded-xl text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-[#002A5C] transition-all hover:scale-105 active:scale-95"
-                  aria-label="Toggle Theme"
+                  onClick={() => setIsMobileOpen(true)}
+                  className="lg:hidden p-2 bg-white dark:bg-[#002A5C] rounded-xl shadow-sm border border-slate-200 dark:border-[#1a3884]/20 text-slate-600 dark:text-slate-300 hover:text-[#1a3884] transition-all"
+                  aria-label="Open menu"
                 >
-                  {theme === 'dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+                  <Menu className="w-5 h-5" />
                 </button>
 
-                {/* Notifications */}
-                <div className="relative" ref={notificationRef}>
-                  <button
-                    onClick={() => setShowNotifications(!showNotifications)}
-                    className={`relative p-2 rounded-xl transition-all hover:scale-105 active:scale-95 group ${showNotifications ? 'bg-white dark:bg-[#003170] text-[#1a3884]' : 'text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-[#002A5C]'
-                      }`}
-                    aria-label="Notifications"
-                  >
-                    <Bell className="w-4.5 h-4.5 group-hover:animate-[bounce_1s_infinite]" />
-                    {unreadCount > 0 && (
-                      <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 border-2 border-slate-50 dark:border-white/8 rounded-full shadow-sm animate-pulse"></span>
+                <div className="flex flex-col min-w-0 shrink">
+                  {/* Subtle Breadcrumb */}
+                  <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 opacity-60">
+                    {(location.pathname === '/dashboard' || location.pathname === '/dashboard/') && (
+                      <>
+                        <span>SMAART</span>
+                        <ChevronRight className="w-2.5 h-2.5" />
+                      </>
                     )}
-                  </button>
+                    <span>Dashboard</span>
+                  </div>
+
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    {/* Primary Accent Bar */}
+                    <div className="shrink-0 w-1.5 h-7 bg-[#1a3884] dark:bg-blue-500 rounded-full shadow-[0_0_8px_rgba(26,56,132,0.15)]" />
+                    <motion.h1
+                      key={pageTitle}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="text-xl sm:text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight font-sans transition-colors duration-300 truncate min-w-0"
+                      style={{ letterSpacing: '-0.02em' }}
+                    >
+                      {pageTitle}
+                    </motion.h1>
+                  </div>
+                </div>
+              </div>
+
+              {/* CENTER SECTION: Premium Search Bar */}
+              <div className="hidden lg:flex flex-1 max-w-[480px] mx-10">
+                <div className="relative w-full group" ref={searchContainerRef}>
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Search className="h-4 w-4 text-slate-400 group-focus-within:text-[#1a3884] transition-colors" />
+                  </div>
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setShowSearchResults(true);
+                    }}
+                    onFocus={() => setShowSearchResults(true)}
+                    onKeyDown={handleSearchKeyDown}
+                    placeholder={t('dashboard.search_placeholder')}
+                    className="block w-full pl-11 pr-14 py-2.5 bg-[#F1F5F9] dark:bg-slate-800/40 border border-transparent focus:border-[#1a3884]/30 rounded-full text-sm placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-[#1a3884]/5 transition-all shadow-inner dark:text-white"
+                    aria-label="Search dashboard content"
+                    aria-expanded={showSearchResults}
+                    aria-controls="dashboard-search-results"
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2">
+                    {searchQuery && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          searchInputRef.current?.focus();
+                        }}
+                        className="p-1 hover:bg-slate-200 dark:hover:bg-[#002A5C] rounded-full transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5 text-slate-400" />
+                      </button>
+                    )}
+                    <div className="flex items-center gap-1 px-1.5 py-1 text-[10px] font-bold text-slate-400 bg-white/80 dark:bg-slate-700/50 rounded-lg border border-slate-200/50 dark:border-slate-600/50 shadow-sm">
+                      <Command className="w-2.5 h-2.5" />
+                      <span>K</span>
+                    </div>
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setShowSearchResults(false);
+                          searchInputRef.current?.focus();
+                        }}
+                        className="absolute inset-y-0 right-10 flex items-center pr-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                        aria-label="Clear search"
+                      >
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 dark:bg-[#003170] text-[10px] font-bold">✕</span>
+                      </button>
+                    )}
+                  </div>
 
                   <AnimatePresence>
-                    {showNotifications && (
+                    {showSearchResults && searchQuery.trim() && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        id="dashboard-search-results"
+                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full right-0 mt-3 w-80 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-white/8 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.60)] overflow-hidden z-50"
+                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                        transition={{ duration: 0.18 }}
+                        className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/8 bg-white dark:bg-[#002147] shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.60)] backdrop-blur-xl"
                       >
-                        {/* Header */}
-                        <div className="px-5 py-4 bg-[#1a3884] flex items-center justify-between">
-                          <div className="flex items-center gap-2 text-white">
-                            <Bell className="w-4 h-4" />
-                            <span className="text-sm font-bold tracking-wide">Notifications</span>
-                          </div>
-                          {unreadCount > 0 && (
-                            <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full text-white backdrop-blur-sm">
-                              {unreadCount} New
-                            </span>
-                          )}
+                        <div className="border-b border-slate-200 dark:border-[#1a3884]/20 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                          Search results
                         </div>
 
-                        {/* Content */}
-                        <div className="max-h-[360px] overflow-y-auto bg-white dark:bg-[#002147]">
-                          {notifications.length > 0 ? (
-                            <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                              {notifications.slice(0, 5).map((n) => (
-                                <div
-                                  key={n._id}
-                                  onClick={() => {
-                                    markRead(n._id);
-                                    if (n.link) navigate(n.link);
-                                    setShowNotifications(false);
-                                  }}
-                                  className={`px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}`}
-                                >
-                                  <div className="flex gap-3">
-                                    <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-blue-100 text-blue-600' :
-                                      n.type === 'assessment' ? 'bg-purple-100 text-purple-600' :
-                                        'b  g-slate-100 text-slate-600'
-                                      }`}>
-                                      {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                      <p className={`text-xs leading-relaxed ${!n.isRead ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
-                                        {n.message}
-                                      </p>
-                                      <p className="text-[10px] text-slate-400 mt-1">
-                                        {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
-                                      </p>
+                        {searchResults.length > 0 ? (
+                          <div className="max-h-[360px] overflow-y-auto py-2">
+                            {searchResults.map((item, index) => (
+                              <button
+                                key={item.id}
+                                type="button"
+                                onMouseEnter={() => setActiveSearchIndex(index)}
+                                onClick={() => handleSearchNavigation(item)}
+                                className={`flex w-full items-start justify-between gap-3 px-4 py-3 text-left transition-colors ${index === activeSearchIndex
+                                  ? "bg-blue-50 dark:bg-blue-900/20"
+                                  : "hover:bg-slate-100 dark:hover:bg-slate-800/85"
+                                  }`}
+                              >
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">
+                                      {item.title}
+                                    </span>
+                                    <span className="rounded-full bg-slate-100 dark:bg-[#002A5C] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                                      {item.type}
+                                    </span>
+                                  </div>
+                                  <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                                    {item.subtitle}
+                                  </p>
+                                </div>
+                                <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="px-4 py-6 text-center">
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                              No matching results found
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                              Try a page name, course title, track, or assessment code.
+                            </p>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* RIGHT SECTION: Grouped Actions */}
+              <div className="flex items-center gap-5">
+
+                {/* 1. Live Time Widget */}
+                <div className="hidden xl:flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-800/20 border border-slate-100 dark:border-slate-700/50 rounded-full shadow-sm">
+                  <div className="relative">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                    <div className="absolute inset-0 w-2 h-2 bg-emerald-500 rounded-full animate-ping opacity-75" />
+                  </div>
+                  <span className="text-[13px] font-bold text-slate-600 dark:text-slate-300 font-mono tracking-tight">
+                    {formatTime(currentTime)}
+                  </span>
+                </div>
+
+                {/* 2. Icon Group Container */}
+                <div className="hidden sm:flex items-center gap-1 p-1 bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/30 dark:border-slate-700/30 rounded-2xl">
+                  {/* Theme Toggle */}
+                  <button
+                    onClick={toggleTheme}
+                    className="p-2 rounded-xl text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-[#002A5C] transition-all hover:scale-105 active:scale-95"
+                    aria-label="Toggle Theme"
+                  >
+                    {theme === 'dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+                  </button>
+
+                  {/* Notifications */}
+                  <div className="relative" ref={notificationRef}>
+                    <button
+                      onClick={() => setShowNotifications(!showNotifications)}
+                      className={`relative p-2 rounded-xl transition-all hover:scale-105 active:scale-95 group ${showNotifications ? 'bg-white dark:bg-[#003170] text-[#1a3884]' : 'text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-[#002A5C]'
+                        }`}
+                      aria-label="Notifications"
+                    >
+                      <Bell className="w-4.5 h-4.5 group-hover:animate-[bounce_1s_infinite]" />
+                      {unreadCount > 0 && (
+                        <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 border-2 border-slate-50 dark:border-white/8 rounded-full shadow-sm animate-pulse"></span>
+                      )}
+                    </button>
+
+                    <AnimatePresence>
+                      {showNotifications && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full right-0 mt-3 w-80 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-white/8 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.60)] overflow-hidden z-50"
+                        >
+                          {/* Header */}
+                          <div className="px-5 py-4 bg-[#1a3884] flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-white">
+                              <Bell className="w-4 h-4" />
+                              <span className="text-sm font-bold tracking-wide">Notifications</span>
+                            </div>
+                            {unreadCount > 0 && (
+                              <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full text-white backdrop-blur-sm">
+                                {unreadCount} New
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Content */}
+                          <div className="max-h-[360px] overflow-y-auto bg-white dark:bg-[#002147]">
+                            {notifications.length > 0 ? (
+                              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                                {notifications.slice(0, 5).map((n) => (
+                                  <div
+                                    key={n._id}
+                                    onClick={() => {
+                                      markRead(n._id);
+                                      if (n.link) navigate(n.link);
+                                      setShowNotifications(false);
+                                    }}
+                                    className={`px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}`}
+                                  >
+                                    <div className="flex gap-3">
+                                      <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-blue-100 text-blue-600' :
+                                        n.type === 'assessment' ? 'bg-purple-100 text-purple-600' :
+                                          'b  g-slate-100 text-slate-600'
+                                        }`}>
+                                        {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className={`text-xs leading-relaxed ${!n.isRead ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
+                                          {n.message}
+                                        </p>
+                                        <p className="text-[10px] text-slate-400 mt-1">
+                                          {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
+                                        </p>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="py-12 flex flex-col items-center justify-center text-slate-400">
-                              <div className="w-16 h-16 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
-                                <Bell className="w-8 h-8 text-slate-200 dark:text-slate-700" />
+                                ))}
                               </div>
-                              <p className="text-sm font-medium">No notifications yet</p>
-                            </div>
-                          )}
-                        </div>
+                            ) : (
+                              <div className="py-12 flex flex-col items-center justify-center text-slate-400">
+                                <div className="w-16 h-16 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
+                                  <Bell className="w-8 h-8 text-slate-200 dark:text-slate-700" />
+                                </div>
+                                <p className="text-sm font-medium">No notifications yet</p>
+                              </div>
+                            )}
+                          </div>
 
-                        {/* Footer */}
-                        <button
-                          onClick={() => {
-                            navigate('/notifications');
-                            setShowNotifications(false);
-                          }}
-                          className="w-full py-3 bg-[#F8FAFC] dark:bg-slate-800/50 border-t border-slate-100 dark:border-[#1a3884]/15 text-xs font-bold text-[#1a3884] dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2"
+                          {/* Footer */}
+                          <button
+                            onClick={() => {
+                              navigate('/notifications');
+                              setShowNotifications(false);
+                            }}
+                            className="w-full py-3 bg-[#F8FAFC] dark:bg-slate-800/50 border-t border-slate-100 dark:border-[#1a3884]/15 text-xs font-bold text-[#1a3884] dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2"
+                          >
+                            View all notifications
+                            <ExternalLink className="w-3 h-3" />
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Language Switcher */}
+                  <div className="relative" ref={languageRef}>
+                    <button
+                      onClick={() => setShowLanguages(!showLanguages)}
+                      className={`relative flex items-center gap-2 rounded-xl border px-2.5 py-2 transition-all hover:scale-[1.02] active:scale-95 group ${showLanguages
+                        ? 'border-[#1a3884]/20 bg-white text-[#1a3884] shadow-sm dark:border-[#5ea0ff]/20 dark:bg-[#003170]'
+                        : 'border-transparent text-slate-500 hover:border-slate-100 hover:bg-white hover:text-[#1a3884] dark:hover:border-white/10 dark:hover:bg-[#002A5C]'
+                        }`}
+                      aria-label="Change Language"
+                    >
+                      <div className={`flex h-8 w-8 items-center justify-center transition-colors`}>
+                        <Globe2 className="w-4.5 h-4.5" strokeWidth={2} />
+                      </div>
+                      <span className="hidden md:inline text-[11px] font-bold tracking-[0.18em] text-slate-400 group-hover:text-[#1a3884] dark:text-slate-500 dark:group-hover:text-slate-200">
+                        {activeLanguage.shortLabel}
+                      </span>
+                      <ChevronDown className={`hidden md:block w-3.5 h-3.5 transition-transform duration-200 ${showLanguages ? 'rotate-180 text-[#1a3884]' : 'text-slate-400 group-hover:text-[#1a3884]'}`} />
+                    </button>
+
+                    <AnimatePresence>
+                      {showLanguages && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-50"
                         >
-                          View all notifications
-                          <ExternalLink className="w-3 h-3" />
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                          <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-white/8 dark:bg-white/[0.03]">
+                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
+                              Language
+                            </p>
+                            <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                              {activeLanguage.name}
+                            </p>
+                          </div>
+                          <div className="p-2 space-y-1">
+                            {languageOptions.map((lang) => (
+                              <button
+                                key={lang.code}
+                                onClick={() => {
+                                  i18n.changeLanguage(lang.code);
+                                  setShowLanguages(false);
+                                }}
+                                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeLanguageCode === lang.code
+                                  ? 'bg-[#1a3884] text-white'
+                                  : 'text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
+                                  }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[10px] font-black tracking-[0.18em] ${activeLanguageCode === lang.code ? 'bg-white/16 text-white' : 'bg-slate-100 text-slate-500 dark:bg-white/8 dark:text-slate-300'}`}>
+                                    {lang.shortLabel}
+                                  </span>
+                                  <span>{lang.name}</span>
+                                </div>
+                                <span className="text-[10px] opacity-60 font-bold">{lang.native}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
 
-                {/* Language Switcher */}
-                <div className="relative" ref={languageRef}>
-                  <button
-                    onClick={() => setShowLanguages(!showLanguages)}
-                    className={`relative flex items-center gap-2 rounded-xl border px-2.5 py-2 transition-all hover:scale-[1.02] active:scale-95 group ${showLanguages
-                      ? 'border-[#1a3884]/20 bg-white text-[#1a3884] shadow-sm dark:border-[#5ea0ff]/20 dark:bg-[#003170]'
-                      : 'border-transparent text-slate-500 hover:border-slate-200 hover:bg-white hover:text-[#1a3884] dark:hover:border-white/10 dark:hover:bg-[#002A5C]'
-                      }`}
-                    aria-label="Change Language"
+                {/* 3. User Profile Card */}
+                <div
+                  className="relative"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <motion.div
+                    whileHover={{ y: -2, shadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
+                    className="flex items-center gap-3 pl-2 sm:pr-4 py-1.5 bg-white/50 sm:bg-white dark:bg-slate-800/50 dark:sm:bg-slate-800 border-none sm:border border-slate-100 dark:border-white/10 rounded-2xl shadow-none sm:shadow-sm cursor-pointer group transition-all"
+                    onClick={() => navigate('/profile')}
                   >
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-colors ${showLanguages
-                      ? 'border-[#1a3884]/15 bg-[#1a3884]/8 dark:border-[#5ea0ff]/20 dark:bg-white/10'
-                      : 'border-slate-200/80 bg-white/80 group-hover:border-[#1a3884]/15 group-hover:bg-[#1a3884]/5 dark:border-white/10 dark:bg-white/5'
-                      }`}>
-                      <Globe2 className="w-4.5 h-4.5" strokeWidth={2} />
+                    <div className="relative shrink-0">
+                      <div className="absolute -inset-0.5 bg-[#1a3884] rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
+                      <div className="relative p-[2px] bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 rounded-full">
+                        {(profilePhoto || user?.profileImage || user?.profilePicture) ? (
+                          <img
+                            src={profilePhoto || (user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${getBackendUrl()}/${user.profileImage}` : user?.profilePicture))}
+                            alt="Avatar"
+                            className="w-9 h-9 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a3884] to-[#112b6b] flex items-center justify-center text-white text-xs font-bold">
+                            {(user?.fullName || 'U').toUpperCase()}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <span className="hidden md:inline text-[11px] font-bold tracking-[0.18em] text-slate-400 group-hover:text-[#1a3884] dark:text-slate-500 dark:group-hover:text-slate-200">
-                      {activeLanguage.shortLabel}
-                    </span>
-                    <ChevronDown className={`hidden md:block w-3.5 h-3.5 transition-transform duration-200 ${showLanguages ? 'rotate-180 text-[#1a3884]' : 'text-slate-400 group-hover:text-[#1a3884]'}`} />
-                  </button>
 
+                    <div className="hidden sm:block text-left">
+                      <p className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500 leading-none mb-1">
+                        {t(`dashboard.${getGreeting().toLowerCase().replace(' ', '_')}`)}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#1a3884] transition-colors">
+                          {user?.nickname || user?.fullName || 'User'}
+                        </p>
+                        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-all duration-300 ${isProfileHovered ? 'rotate-180' : ''}`} />
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Hover Profile Card Modal */}
                   <AnimatePresence>
-                    {showLanguages && (
+                    {isProfileHovered && (
                       <motion.div
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-50"
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute top-full right-0 mt-2 z-[100] w-72 pointer-events-auto"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
                       >
-                        <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-white/8 dark:bg-white/[0.03]">
-                          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
-                            Language
-                          </p>
-                          <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                            {activeLanguage.name}
-                          </p>
-                        </div>
-                        <div className="p-2 space-y-1">
-                          {languageOptions.map((lang) => (
-                            <button
-                              key={lang.code}
-                              onClick={() => {
-                                i18n.changeLanguage(lang.code);
-                                setShowLanguages(false);
-                              }}
-                              className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeLanguageCode === lang.code
-                                ? 'bg-[#1a3884] text-white'
-                                : 'text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
-                                }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <span className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[10px] font-black tracking-[0.18em] ${activeLanguageCode === lang.code ? 'bg-white/16 text-white' : 'bg-slate-100 text-slate-500 dark:bg-white/8 dark:text-slate-300'}`}>
-                                  {lang.shortLabel}
-                                </span>
-                                <span>{lang.name}</span>
-                              </div>
-                              <span className="text-[10px] opacity-60 font-bold">{lang.native}</span>
-                            </button>
-                          ))}
-                        </div>
+                        <ProfileHoverCard user={user} avatarData={avatarData} onLogout={handleLogout} />
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
               </div>
-
-              {/* 3. User Profile Card */}
-              <div
-                className="relative"
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-              >
-                <motion.div
-                  whileHover={{ y: -2, shadow: "0 10px 25px -5px rgba(0,0,0,0.1)" }}
-                  className="flex items-center gap-3 pl-2 sm:pr-4 py-1.5 bg-white/50 sm:bg-white dark:bg-slate-800/50 dark:sm:bg-slate-800 border-none sm:border border-slate-100 dark:border-white/10 rounded-2xl shadow-none sm:shadow-sm cursor-pointer group transition-all"
-                  onClick={() => navigate('/profile')}
-                >
-                  <div className="relative shrink-0">
-                    <div className="absolute -inset-0.5 bg-[#1a3884] rounded-full opacity-0 group-hover:opacity-20 blur-sm transition-opacity" />
-                    <div className="relative p-[2px] bg-gradient-to-tr from-slate-200 to-slate-100 dark:from-slate-700 dark:to-slate-600 rounded-full">
-                      {(profilePhoto || user?.profileImage || user?.profilePicture) ? (
-                        <img
-                          src={profilePhoto || (user?.profileImage?.startsWith('http') ? user.profileImage : (user?.profileImage ? `${getBackendUrl()}/${user.profileImage}` : user?.profilePicture))}
-                          alt="Avatar"
-                          className="w-9 h-9 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a3884] to-[#112b6b] flex items-center justify-center text-white text-xs font-bold">
-                          {(user?.fullName || 'U').toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="hidden sm:block text-left">
-                    <p className="text-[9px] font-extrabold uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500 leading-none mb-1">
-                      {t(`dashboard.${getGreeting().toLowerCase().replace(' ', '_')}`)}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#1a3884] transition-colors">
-                        {user?.nickname || user?.fullName || 'User'}
-                      </p>
-                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-all duration-300 ${isProfileHovered ? 'rotate-180' : ''}`} />
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Hover Profile Card Modal */}
-                <AnimatePresence>
-                  {isProfileHovered && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: "easeOut" }}
-                      className="absolute top-full right-0 mt-2 z-[100] w-72 pointer-events-auto"
-                      onMouseEnter={handleMouseEnter}
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      <ProfileHoverCard user={user} avatarData={avatarData} onLogout={handleLogout} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
             </div>
-          </div>
-        </header>
+          </header>
         )}
 
         {/* Page Content */}

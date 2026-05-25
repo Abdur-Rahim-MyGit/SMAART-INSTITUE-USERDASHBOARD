@@ -45,6 +45,8 @@ const ResumeBuilder = () => {
 
     const [resumeId, setResumeId] = useState(null);
     const [currentStep, setCurrentStep] = useState(0);
+    const [scale, setScale] = useState(1);
+    const containerRef = useRef(null);
 
     const steps = [
         { id: 'personal', label: 'Profile', icon: User },
@@ -461,6 +463,30 @@ const ResumeBuilder = () => {
         }));
     };
 
+    useEffect(() => {
+        const handleResize = () => {
+            if (!containerRef.current) return;
+            const parentWidth = containerRef.current.getBoundingClientRect().width;
+            const canvasWidth = 794; // 210mm in pixels
+            const padding = window.innerWidth < 768 ? 24 : 64; // md:p-12 vs p-8
+            const availableWidth = parentWidth - padding;
+            
+            if (availableWidth < canvasWidth) {
+                setScale(availableWidth / canvasWidth);
+            } else {
+                setScale(1);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        const timer = setTimeout(handleResize, 100);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            clearTimeout(timer);
+        };
+    }, [currentStep, loading]);
+
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
             setCurrentStep(currentStep + 1);
@@ -590,7 +616,7 @@ const ResumeBuilder = () => {
                                                 <input type="text" placeholder="e.g. Senior Frontend Developer" value={resumeData.personalInfo.targetRole} onChange={(e) => handleNestedChange('personalInfo', 'targetRole', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
                                                 <div className="relative">
@@ -613,7 +639,7 @@ const ResumeBuilder = () => {
                                                 <input type="text" placeholder="City, State, Country" value={resumeData.personalInfo.location} onChange={(e) => handleNestedChange('personalInfo', 'location', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                             </div>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">LinkedIn URL</label>
                                                 <div className="relative">
@@ -630,7 +656,7 @@ const ResumeBuilder = () => {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Father's Name</label>
                                                 <input type="text" placeholder="Father's Name" value={resumeData.personalDetails?.fatherName} onChange={(e) => handleNestedChange('personalDetails', 'fatherName', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
@@ -641,7 +667,7 @@ const ResumeBuilder = () => {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div className="group">
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Date of Birth</label>
                                                 <input type="date" value={resumeData.personalDetails?.dob} onChange={(e) => handleNestedChange('personalDetails', 'dob', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
@@ -674,7 +700,7 @@ const ResumeBuilder = () => {
                                                         </button>
                                                     </div>
                                                     <div className="p-6 space-y-4">
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Company</label>
                                                                 <input type="text" placeholder="Company Name" value={exp.company} onChange={(e) => handleArrayChange('experience', idx, 'company', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
@@ -684,7 +710,7 @@ const ResumeBuilder = () => {
                                                                 <input type="text" placeholder="e.g. Project Associate" value={exp.role} onChange={(e) => handleArrayChange('experience', idx, 'role', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Duration</label>
                                                                 <input type="text" placeholder="e.g. 2021 - Present" value={exp.duration} onChange={(e) => handleArrayChange('experience', idx, 'duration', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
@@ -727,7 +753,7 @@ const ResumeBuilder = () => {
                                                             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Institution Name</label>
                                                             <input type="text" placeholder="College / University Name" value={edu.institution} onChange={(e) => handleArrayChange('education', idx, 'institution', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                         </div>
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Degree</label>
                                                                 <input type="text" placeholder="e.g. MCA or B.Tech" value={edu.degree} onChange={(e) => handleArrayChange('education', idx, 'degree', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
@@ -737,7 +763,7 @@ const ResumeBuilder = () => {
                                                                 <input type="text" placeholder="e.g. 2025" value={edu.year} onChange={(e) => handleArrayChange('education', idx, 'year', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
                                                             </div>
                                                         </div>
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Grade / CGPA</label>
                                                                 <input type="text" placeholder="e.g. 8.5 CGPA" value={edu.grade} onChange={(e) => handleArrayChange('education', idx, 'grade', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
@@ -772,7 +798,7 @@ const ResumeBuilder = () => {
                                                         </button>
                                                     </div>
                                                     <div className="p-6 space-y-4">
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Project Title</label>
                                                                 <input type="text" placeholder="Project Name" value={proj.title} onChange={(e) => handleArrayChange('projects', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
@@ -828,7 +854,7 @@ const ResumeBuilder = () => {
                                                         </button>
                                                     </div>
                                                     <div className="p-6 space-y-4">
-                                                        <div className="grid grid-cols-2 gap-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                             <div>
                                                                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Achievement Title</label>
                                                                 <input type="text" placeholder="e.g. Best Student Award" value={ach.title} onChange={(e) => handleArrayChange('achievements', idx, 'title', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/8 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500" />
@@ -877,8 +903,26 @@ const ResumeBuilder = () => {
                 </section>
 
                 {/* Preview Canvas (Shows on last step) */}
-                <section className={`flex-1 overflow-auto relative p-8 md:p-12 custom-scrollbar shadow-inner bg-slate-100 dark:bg-[#002147] ${currentStep === steps.length - 1 ? 'block' : 'hidden'}`}>
-                    <div id="resume-preview" className="mx-auto bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+                <section 
+                    ref={containerRef}
+                    className={`flex-1 overflow-auto relative p-4 md:p-12 custom-scrollbar shadow-inner bg-slate-100 dark:bg-[#002147] ${currentStep === steps.length - 1 ? 'block' : 'hidden'}`}
+                >
+                    <div 
+                        className="flex justify-center items-start w-full"
+                        style={{ 
+                            height: scale < 1 ? `${1122.5 * scale}px` : 'auto', 
+                            overflow: 'hidden' 
+                        }}
+                    >
+                        <div 
+                            id="resume-preview" 
+                            className="bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm" 
+                            style={{ 
+                                fontFamily: '"Times New Roman", Times, serif',
+                                transform: scale < 1 ? `scale(${scale})` : 'none',
+                                transformOrigin: 'top center'
+                            }}
+                        >
 
                         {/* Content Area */}
                         <div className="relative z-10">
@@ -1013,6 +1057,7 @@ const ResumeBuilder = () => {
                             </div>
                             <span className="text-[10px] font-bold tracking-[0.45em] !text-black uppercase mt-1">INSTITUTE</span>
                         </div>
+                    </div>
                     </div>
                 </section>
             </main>

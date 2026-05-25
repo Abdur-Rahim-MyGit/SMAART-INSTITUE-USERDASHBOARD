@@ -14,9 +14,11 @@ import CareerDirectionCard from './panels/CareerDirectionCard';
 import Certifications from './panels/Certifications';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { Compass, ClipboardList, BarChart3, Dna, Map, Award, Rocket, Bot, Mic, FileText, Code, Lock, Unlock, CheckCircle, Trophy, Medal, Target, Sparkles, Sun, Moon, Monitor } from 'lucide-react';
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const { theme, setTheme } = useTheme();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
@@ -169,8 +171,8 @@ const CareerAgentDashboard = () => {
                 <div style={{ width: '70px', height: '70px', borderRadius: '18px', background: 'var(--navy2)', border: '2px solid var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(37,99,235,0.1)', position: 'relative', zIndex: 2 }}>
                     <Sparkles size={32} color="var(--accent)" className="animate-pulse" />
                 </div>
-                <h2 style={{ marginTop: '1.5rem', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text1)' }}>Synchronizing Intelligence...</h2>
-                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>Mapping your career trajectory</p>
+                <h2 style={{ marginTop: '1.5rem', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text1)' }}>{t('career_agent.loading_title', 'Synchronizing Intelligence...')}</h2>
+                <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>{t('career_agent.loading_subtitle', 'Mapping your career trajectory')}</p>
             </div>
         );
     }
@@ -228,17 +230,17 @@ const CareerAgentDashboard = () => {
     };
 
     const panels = [
-        { id: 'direction', label: 'Direction Overview', icon: <Compass size={18} /> },
-        { id: 'roledetail', label: 'Role Detailed View', icon: <ClipboardList size={18} /> },
-        { id: 'market', label: 'Market Intel', icon: <BarChart3 size={18} /> },
-        { id: 'skills', label: 'Skill DNA', icon: <Dna size={18} /> },
-        { id: 'roadmap', label: 'Career Roadmap', icon: <Map size={18} /> },
-        { id: 'certs', label: 'Certifications', icon: <Award size={18} /> },
-        { id: 'future', label: 'Future Scope', icon: <Rocket size={18} /> },
-        { id: 'ai', label: 'AI Implementation', icon: <Bot size={18} /> },
-        { id: 'interview', label: 'Interview Prep', icon: <Mic size={18} /> },
-        { id: 'resume', label: 'Resume Tips', icon: <FileText size={18} /> },
-        { id: 'projects', label: 'Project Space', icon: <Code size={18} /> }
+        { id: 'direction', label: t('career_agent.panels.direction', 'Direction Overview'), icon: <Compass size={18} /> },
+        { id: 'roledetail', label: t('career_agent.panels.roledetail', 'Role Detailed View'), icon: <ClipboardList size={18} /> },
+        { id: 'market', label: t('career_agent.panels.market', 'Market Intel'), icon: <BarChart3 size={18} /> },
+        { id: 'skills', label: t('career_agent.panels.skills', 'Skill DNA'), icon: <Dna size={18} /> },
+        { id: 'roadmap', label: t('career_agent.panels.roadmap', 'Career Roadmap'), icon: <Map size={18} /> },
+        { id: 'certs', label: t('career_agent.panels.certs', 'Certifications'), icon: <Award size={18} /> },
+        { id: 'future', label: t('career_agent.panels.future', 'Future Scope'), icon: <Rocket size={18} /> },
+        { id: 'ai', label: t('career_agent.panels.ai', 'AI Implementation'), icon: <Bot size={18} /> },
+        { id: 'interview', label: t('career_agent.panels.interview', 'Interview Prep'), icon: <Mic size={18} /> },
+        { id: 'resume', label: t('career_agent.panels.resume', 'Resume Tips'), icon: <FileText size={18} /> },
+        { id: 'projects', label: t('career_agent.panels.projects', 'Project Space'), icon: <Code size={18} /> }
     ];
 
     const matchScore = parseInt(currentData.match_explanation?.match(/\d+/) || 75);
@@ -262,8 +264,8 @@ const CareerAgentDashboard = () => {
                         animation: 'popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both'
                     }}>
                         <div style={{ textAlign: 'center', flexShrink: 0, animation: 'fadeIn 0.6s ease 0.1s both' }}>
-                            <h2 style={{ fontSize: '1.8rem', fontWeight: 950, color: 'white', marginBottom: '0.2rem', letterSpacing: '-0.02em' }}>Path Precision Selection</h2>
-                            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontWeight: 500 }}>Confirm your interest level for each field.</p>
+                            <h2 style={{ fontSize: '1.8rem', fontWeight: 950, color: 'white', marginBottom: '0.2rem', letterSpacing: '-0.02em' }}>{t('career_agent.selection.title', 'Path Precision Selection')}</h2>
+                            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontWeight: 500 }}>{t('career_agent.selection.subtitle', 'Confirm your interest level for each field.')}</p>
                         </div>
 
                         <div style={{ 
@@ -271,9 +273,9 @@ const CareerAgentDashboard = () => {
                             flex: 1, minHeight: 0
                         }}>
                             {[
-                                { key: 'primary', label: 'Primary Path', data: primary, title: prefPrimary, delay: '0.2s' },
-                                { key: 'secondary', label: 'Secondary Path', data: secondary, title: prefSecondary, delay: '0.3s' },
-                                { key: 'tertiary', label: 'Tertiary Path', data: tertiary, title: prefTertiary, delay: '0.4s' }
+                                { key: 'primary', label: t('career_agent.selection.primary_path', 'Primary Path'), data: primary, title: prefPrimary, delay: '0.2s' },
+                                { key: 'secondary', label: t('career_agent.selection.secondary_path', 'Secondary Path'), data: secondary, title: prefSecondary, delay: '0.3s' },
+                                { key: 'tertiary', label: t('career_agent.selection.tertiary_path', 'Tertiary Path'), data: tertiary, title: prefTertiary, delay: '0.4s' }
                             ].map((item, idx) => (
                                 <div key={item.key} style={{
                                     background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px',
@@ -294,7 +296,7 @@ const CareerAgentDashboard = () => {
                                         flex: 1, overflowY: 'auto', padding: '0.75rem', minHeight: '100px', maxHeight: '220px',
                                         background: 'var(--navy2)', borderRadius: '12px', border: '1px solid var(--border)'
                                     }} className="custom-scrollbar">
-                                        <div style={{ fontSize: '0.58rem', color: 'var(--text2)', marginBottom: '0.5rem', fontWeight: 800, letterSpacing: '0.05em' }}>ROLES:</div>
+                                        <div style={{ fontSize: '0.58rem', color: 'var(--text2)', marginBottom: '0.5rem', fontWeight: 800, letterSpacing: '0.05em' }}>{t('career_agent.selection.roles', 'ROLES:')}</div>
                                         {(item.data?.direction?.roles || []).length > 0 ? (
                                             (item.data?.direction?.roles || []).map((r, i) => (
                                                 <div key={i} style={{ fontSize: '0.78rem', color: 'var(--text)', padding: '0.45rem 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}>
@@ -303,7 +305,7 @@ const CareerAgentDashboard = () => {
                                                 </div>
                                             ))
                                         ) : (
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '1.5rem' }}>No specific roles listed</div>
+                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '1.5rem' }}>{t('career_agent.selection.no_roles', 'No specific roles listed')}</div>
                                         )}
                                     </div>
 
@@ -320,7 +322,7 @@ const CareerAgentDashboard = () => {
                                                 boxShadow: selectionStates[item.key] === 'interested' ? '0 4px 12px rgba(16, 185, 129, 0.1)' : 'none'
                                             }}
                                         >
-                                            Interested
+                                            {t('career_agent.selection.interested', 'Interested')}
                                         </button>
                                         <button 
                                             onClick={() => {
@@ -343,7 +345,7 @@ const CareerAgentDashboard = () => {
                                                 cursor: 'pointer', transition: 'all 0.2s',
                                             }}
                                         >
-                                            Not Interested
+                                            {t('career_agent.selection.not_interested', 'Not Interested')}
                                         </button>
                                     </div>
                                 </div>
@@ -359,7 +361,7 @@ const CareerAgentDashboard = () => {
                                     color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem'
                                 }}
                             >
-                                Cancel
+                                {t('common.cancel', 'Cancel')}
                             </button>
                             <button 
                                 disabled={!selectionStates.primary || !selectionStates.secondary || !selectionStates.tertiary}
@@ -373,7 +375,7 @@ const CareerAgentDashboard = () => {
                                     fontSize: '0.85rem'
                                 }}
                             >
-                                Confirm Selection & Lock In
+                                {t('career_agent.selection.confirm', 'Confirm Selection & Lock In')}
                             </button>
                         </div>
                     </div>
@@ -402,28 +404,28 @@ const CareerAgentDashboard = () => {
                         }} />
                         <span style={{ display: 'flex', color: 'var(--accent)' }}><Lock size={40} /></span>
                     </div>
-                    <div style={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.18em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '0.6rem', animation: 'fadeIn 0.4s ease 0.3s both' }}>Path Confirmed</div>
+                    <div style={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.18em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '0.6rem', animation: 'fadeIn 0.4s ease 0.3s both' }}>{t('career_agent.welcome.path_confirmed', 'Path Confirmed')}</div>
                     <div style={{ fontSize: '1.65rem', fontWeight: 900, color: 'var(--text1)', letterSpacing: '-0.02em', marginBottom: '0.5rem', textAlign: 'center', maxWidth: '480px', animation: 'fadeIn 0.4s ease 0.4s both' }}>
-                        Welcome to Your Journey
+                        {t('career_agent.welcome.title', 'Welcome to Your Journey')}
                     </div>
                     <div style={{ fontSize: '0.88rem', color: 'var(--muted)', textAlign: 'center', maxWidth: '360px', lineHeight: 1.65, animation: 'fadeIn 0.4s ease 0.5s both' }}>
                         {lockedRoles.length > 1 
-                            ? "You've successfully locked in your chosen career paths. Your multi-track SMAART roadmaps are ready."
-                            : <span>You've locked in <strong style={{ color: 'var(--text2)' }}>{lockedRoles[0]}</strong> as your career path. Your SMAART roadmap is ready.</span>
+                            ? t('career_agent.welcome.desc_multiple', "You've successfully locked in your chosen career paths. Your multi-track SMAART roadmaps are ready.")
+                            : <span>{t('career_agent.welcome.desc_single_start', "You've locked in ")}<strong style={{ color: 'var(--text2)' }}>{lockedRoles[0]}</strong>{t('career_agent.welcome.desc_single_end', " as your career path. Your SMAART roadmap is ready.")}</span>
                         }
                     </div>
                     <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', animation: 'fadeIn 0.4s ease 0.7s both' }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)', animation: 'pulse 1s ease infinite' }} />
-                        <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 600 }}>Closing automatically…</span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 600 }}>{t('career_agent.welcome.closing', 'Closing automatically…')}</span>
                     </div>
                 </div>
             )}
             <header className="dash-header">
                 <div className="dash-top">
                     <div>
-                        <div className="dash-name">Career <span>Intelligence</span> Report</div>
+                        <div className="dash-name">{t('career_agent.header.title_start', 'Career ')}<span>{t('career_agent.header.title_span', 'Intelligence')}</span>{t('career_agent.header.title_end', ' Report')}</div>
                         <div className="dash-meta">
-                            <span>CANDIDATE: {localStorage.getItem('smaart_student_name') || 'Student'}</span>
+                            <span>{t('career_agent.header.candidate', 'CANDIDATE:')} {localStorage.getItem('smaart_student_name') || 'Student'}</span>
                             <span>|</span>
                             <span>{localStorage.getItem('smaart_student_email')}</span>
                         </div>
@@ -434,7 +436,7 @@ const CareerAgentDashboard = () => {
                             onClick={() => navigate('/dashboard')}
                             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid var(--border)' }}
                         >
-                            ← Back to Dashboard
+                            {t('career_agent.header.back', '← Back to Dashboard')}
                         </button>
 
                         {/* ── Theme Switcher ── */}
@@ -468,7 +470,7 @@ const CareerAgentDashboard = () => {
                                 background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)',
                                 borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)',
                             }}>
-                                <Lock size={14} /> Path Locked In
+                                <Lock size={14} /> {t('career_agent.header.path_locked', 'Path Locked In')}
                             </div>
                         ) : (
                             <button
@@ -476,10 +478,10 @@ const CareerAgentDashboard = () => {
                                 onClick={() => handleLockPath(currentData?.tab1?.role_name)}
                                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                             >
-                                <Lock size={14} /> Lock This Path
+                                <Lock size={14} /> {t('career_agent.header.lock_path', 'Lock This Path')}
                             </button>
                         )}
-                        <button className="btn-primary" onClick={() => navigate('/dashboard/career-agent/onboarding')}>New Analysis</button>
+                        <button className="btn-primary" onClick={() => navigate('/dashboard/career-agent/onboarding')}>{t('career_agent.header.new_analysis', 'New Analysis')}</button>
                     </div>
                 </div>
 
@@ -533,50 +535,50 @@ const CareerAgentDashboard = () => {
                         <div className="panel animate-fade-in">
                             <div className="overview-hero">
                                 <div className={`oh-card ${activeRole === 1 ? 'zone-green-card' : activeRole === 2 ? 'zone-primary' : 'zone-red-card'}`}>
-                                    <div className="oh-card-label">Overall Match</div>
+                                    <div className="oh-card-label">{t('career_agent.overview.overall_match', 'Overall Match')}</div>
                                     <div className={`oh-pct ${getScoreClass(matchScore)}`}>{matchScore}%</div>
-                                    <div style={{ fontSize: '0.7rem', fontWeight: 600 }}>Alignment Probability</div>
+                                    <div style={{ fontSize: '0.7rem', fontWeight: 600 }}>{t('career_agent.overview.alignment_prob', 'Alignment Probability')}</div>
                                 </div>
                                 <div className="oh-card" style={{ background: 'var(--navy3)', border: '1px solid var(--border)' }}>
-                                    <div className="oh-card-label">Preparation Time</div>
+                                    <div className="oh-card-label">{t('career_agent.overview.prep_time', 'Preparation Time')}</div>
                                     <div className="oh-pct" style={{ fontSize: '1.5rem', marginTop: '0.3rem' }}>{currentData?.preparation_time || 'N/A'}</div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>To reach Green Zone</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{t('career_agent.overview.reach_green', 'To reach Green Zone')}</div>
                                 </div>
                                 <div className="oh-card" style={{ background: 'var(--navy3)', border: '1px solid var(--border)' }}>
-                                    <div className="oh-card-label">Market Demand</div>
+                                    <div className="oh-card-label">{t('career_agent.overview.market_demand', 'Market Demand')}</div>
                                     <div className="oh-pct" style={{ fontSize: '1.5rem', color: 'var(--accent)', marginTop: '0.3rem' }}>{currentData?.tab1?.job_demand || 'Stable'}</div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>Hiring Velocity</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--muted)' }}>{t('career_agent.overview.hiring_velocity', 'Hiring Velocity')}</div>
                                 </div>
                             </div>
                             <div className="ml-score-card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'flex-start' }}>
                                 <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div style={{ flex: 1 }}>
-                                        <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>What This Role Does</div>
-                                        <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para1 || currentData?.tab1?.role_description || 'No description available.'}</div>
+                                        <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.role_function', 'What This Role Does')}</div>
+                                        <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para1 || currentData?.tab1?.role_description || t('career_agent.overview.no_description', 'No description available.')}</div>
                                     </div>
                                     <div style={{ textAlign: 'right', marginLeft: '2rem' }}>
                                         <div className={`ml-score-num ${getScoreClass(matchScore)}`}>{matchScore}</div>
-                                        <div className="ri-label" style={{ fontSize: '0.55rem' }}>ML FIT SCORE</div>
+                                        <div className="ri-label" style={{ fontSize: '0.55rem' }}>{t('career_agent.overview.ml_fit_score', 'ML FIT SCORE')}</div>
                                     </div>
                                 </div>
                                 <div style={{ flex: 1, width: '100%' }}>
-                                    <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>AI Evolution</div>
-                                    <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para2 || currentData?.tab1?.ai_impact || 'AI assessment pending.'}</div>
+                                    <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.ai_evolution', 'AI Evolution')}</div>
+                                    <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para2 || currentData?.tab1?.ai_impact || t('career_agent.overview.ai_pending', 'AI assessment pending.')}</div>
                                 </div>
                                 <div style={{ flex: 1, width: '100%' }}>
-                                    <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>Who Should Consider</div>
-                                    <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para3 || `Preparing for this role...`}</div>
+                                    <div className="ri-label" style={{ color: 'var(--accent)', marginBottom: '0.4rem', fontSize: '1rem' }}>{t('career_agent.overview.who_consider', 'Who Should Consider')}</div>
+                                    <div style={{ fontSize: '0.95rem', lineHeight: 1.6 }}>{currentData?.tab1?.narrative_para3 || t('career_agent.overview.preparing_role', 'Preparing for this role...')}</div>
                                 </div>
                             </div>
                             <div className="region-box">
-                                <div className="ri-label">📍 Tier-1 India Market Signal</div>
+                                <div className="ri-label">{t('career_agent.overview.market_signal', '📍 Tier-1 India Market Signal')}</div>
                                 <div className="rb-stats">
                                     <div className="rb-stat">
-                                        <div className="oh-card-label">Typical Employers</div>
+                                        <div className="oh-card-label">{t('career_agent.overview.typical_employers', 'Typical Employers')}</div>
                                         <div className="rb-stat-num" style={{ fontSize: '0.8rem' }}>{currentData?.tab1?.typical_employers_india || 'MNCs & Startups'}</div>
                                     </div>
                                     <div className="rb-stat">
-                                        <div className="oh-card-label">Common Entry</div>
+                                        <div className="oh-card-label">{t('career_agent.overview.common_entry', 'Common Entry')}</div>
                                         <div className="rb-stat-num" style={{ fontSize: '0.8rem' }}>{currentData?.tab1?.common_entry_paths || 'Campus Placement'}</div>
                                     </div>
                                 </div>
@@ -590,10 +592,10 @@ const CareerAgentDashboard = () => {
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
                                 <div>
                                     <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Compass size={22} color="var(--accent)" /> Direction Overview
+                                        <Compass size={22} color="var(--accent)" /> {t('career_agent.panels.direction', 'Direction Overview')}
                                     </h2>
                                     <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
-                                        Your selected career direction and all roles within it — sourced from the SMAART Career Agent Database.
+                                        {t('career_agent.direction.desc', 'Your selected career direction and all roles within it — sourced from the SMAART Career Agent Database.')}
                                     </p>
                                 </div>
 
@@ -607,7 +609,7 @@ const CareerAgentDashboard = () => {
                                         fontSize: '0.78rem', fontWeight: 700, color: 'var(--green)',
                                         flexShrink: 0,
                                     }}>
-                                        <Lock size={14} /> Path Locked In
+                                        <Lock size={14} /> {t('career_agent.header.path_locked', 'Path Locked In')}
                                     </div>
                                 ) : null}
                             </div>
@@ -625,8 +627,8 @@ const CareerAgentDashboard = () => {
                             {/* Header row with lock button */}
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
                                 <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ClipboardList size={22} color="var(--accent)" /> Role Detailed View</h2>
-                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>Reviewing <strong style={{ color: 'var(--text2)' }}>{currentData.tab1.role_name}</strong> — confirm if this is your career path.</p>
+                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><ClipboardList size={22} color="var(--accent)" /> {t('career_agent.panels.roledetail', 'Role Detailed View')}</h2>
+                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>{t('career_agent.roledetail.desc_start', 'Reviewing ')}<strong style={{ color: 'var(--text2)' }}>{currentData.tab1.role_name}</strong>{t('career_agent.roledetail.desc_end', ' — confirm if this is your career path.')}</p>
                                 </div>
                             </div>
 
@@ -644,12 +646,12 @@ const CareerAgentDashboard = () => {
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                                 <div>
                                     <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <BarChart3 size={22} color="var(--accent)" /> Market Intelligence
+                                        <BarChart3 size={22} color="var(--accent)" /> {t('career_agent.market.title', 'Market Intelligence')}
                                     </h2>
                                     <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
-                                        Showing roles for <strong style={{ color: 'var(--text2)' }}>
+                                        {t('career_agent.market.desc_start', 'Showing roles for ')}<strong style={{ color: 'var(--text2)' }}>
                                             {activeRole === 1 ? prefPrimary : activeRole === 2 ? prefSecondary : prefTertiary}
-                                        </strong> — select a role below to view its market data.
+                                        </strong>{t('career_agent.market.desc_end', ' — select a role below to view its market data.')}
                                     </p>
                                 </div>
                             </div>
@@ -665,7 +667,7 @@ const CareerAgentDashboard = () => {
                     {/* Panel 3: Skills */}
                     {activePanel === 'skills' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Dna size={22} color="var(--accent)" /> Skills Overview</h2>
+                            <h2 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Dna size={22} color="var(--accent)" /> {t('career_agent.skills.title', 'Skills Overview')}</h2>
                             <SkillsPanel
                                 roleName={roleName}
                                 mongoRoleData={currentData}
@@ -680,10 +682,10 @@ const CareerAgentDashboard = () => {
                         <div className="panel animate-fade-in" style={{ padding: '1.75rem' }}>
                             <div style={{ marginBottom: '2rem' }}>
                                 <h2 style={{ fontSize: '1.4rem', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                                    <Compass size={24} color="var(--accent)" /> SMAART Career Intelligence
+                                    <Compass size={24} color="var(--accent)" /> {t('career_agent.roadmap.title', 'SMAART Career Intelligence')}
                                 </h2>
                                 <p style={{ color: 'var(--muted)', fontSize: '0.85rem', maxWidth: '600px' }}>
-                                    Your personalized acceleration path for <strong style={{ color: 'var(--text2)' }}>{roleName}</strong>, matched against your educational background and skill profile.
+                                    {t('career_agent.roadmap.desc_start', 'Your personalized acceleration path for ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>{t('career_agent.roadmap.desc_end', ', matched against your educational background and skill profile.')}
                                 </p>
                             </div>
 
@@ -705,9 +707,9 @@ const CareerAgentDashboard = () => {
                     {/* Panel 7: Future Scope */}
                     {activePanel === 'future' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Rocket size={22} color="var(--accent)" /> Future Trajectory & Growth</h2>
+                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Rocket size={22} color="var(--accent)" /> {t('career_agent.future.title', 'Future Trajectory & Growth')}</h2>
                             <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>
-                                Salary progression, role evolution, and who this path suits best — based on <strong style={{ color: 'var(--text2)' }}>{roleName}</strong>.
+                                {t('career_agent.future.desc_start', 'Salary progression, role evolution, and who this path suits best — based on ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>.
                             </p>
                             <FutureScope
                                 roleName={roleName}
@@ -721,8 +723,8 @@ const CareerAgentDashboard = () => {
                     {/* Panel 8: AI Implementation */}
                     {activePanel === 'ai' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Bot size={22} color="var(--accent)" /> AI Implementation in Role</h2>
-                            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>How AI is reshaping <strong style={{ color: 'var(--text2)' }}>{roleName}</strong> — exposure analysis, AI-native skills, and what remains irreplaceably human.</p>
+                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Bot size={22} color="var(--accent)" /> {t('career_agent.ai.title', 'AI Implementation in Role')}</h2>
+                            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>{t('career_agent.ai.desc_start', 'How AI is reshaping ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>{t('career_agent.ai.desc_end', ' — exposure analysis, AI-native skills, and what remains irreplaceably human.')}</p>
                             <AIImplementation
                                 roleName={roleName}
                                 mongoRoleData={currentData}
@@ -736,9 +738,9 @@ const CareerAgentDashboard = () => {
                         <div className="panel animate-fade-in">
                             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
                                 <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Code size={22} color="var(--accent)" /> Project Space</h2>
+                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Code size={22} color="var(--accent)" /> {t('career_agent.projects.title', 'Project Space')}</h2>
                                     <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
-                                        High-impact blueprint builds that prove your skills for <strong style={{ color: 'var(--text2)' }}>{roleName}</strong>.
+                                        {t('career_agent.projects.desc_start', 'High-impact blueprint builds that prove your skills for ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>.
                                     </p>
                                 </div>
                                 {lockedRoles.length > 0 && (
@@ -748,7 +750,7 @@ const CareerAgentDashboard = () => {
                                         background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)',
                                         borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--green)',
                                     }}>
-                                        <Unlock size={14} /> Unlocked
+                                        <Unlock size={14} /> {t('career_agent.projects.unlocked', 'Unlocked')}
                                     </div>
                                 )}
                             </div>
@@ -765,8 +767,8 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Interview Prep */}
                     {activePanel === 'interview' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Mic size={22} color="var(--accent)" /> Interview Prep</h2>
-                            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>Resources and questions tailored for <strong style={{ color: 'var(--text2)' }}>{roleName}</strong> — aptitude, domain, technical &amp; HR rounds.</p>
+                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Mic size={22} color="var(--accent)" /> {t('career_agent.interview.title', 'Interview Prep')}</h2>
+                            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>{t('career_agent.interview.desc_start', 'Resources and questions tailored for ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>{t('career_agent.interview.desc_end', ' — aptitude, domain, technical & HR rounds.')}</p>
                             <InterviewPrep roleName={roleName} />
                         </div>
                     )}
@@ -774,9 +776,9 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Resume Tips */}
                     {activePanel === 'resume' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FileText size={22} color="var(--accent)" /> Resume Tips</h2>
+                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><FileText size={22} color="var(--accent)" /> {t('career_agent.resume.title', 'Resume Tips')}</h2>
                             <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>
-                                Build a strong, ATS-ready resume for <strong style={{ color: 'var(--text2)' }}>{currentData.tab1.role_name}</strong> — structure, keywords, and an AI generator.
+                                {t('career_agent.resume.desc_start', 'Build a strong, ATS-ready resume for ')}<strong style={{ color: 'var(--text2)' }}>{currentData.tab1.role_name}</strong>{t('career_agent.resume.desc_end', ' — structure, keywords, and an AI generator.')}
                             </p>
                             <ResumeTips roleName={currentData.tab1.role_name} />
                         </div>
@@ -785,7 +787,7 @@ const CareerAgentDashboard = () => {
                     {/* Panel: Certifications */}
                     {activePanel === 'certs' && (
                         <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Award size={22} color="var(--accent)" /> Certifications</h2>
+                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Award size={22} color="var(--accent)" /> {t('career_agent.certs.title', 'Certifications')}</h2>
                             <Certifications
                                 roleName={currentData.tab1.role_name}
                                 directionName={currentData?.direction?.directionName || ''}
@@ -800,7 +802,7 @@ const CareerAgentDashboard = () => {
                         <div className="panel animate-fade-in" style={{ textAlign: 'center', padding: '5rem 0' }}>
                             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔧</div>
                             <h3>{panels.find(p => p.id === activePanel)?.label} Panel</h3>
-                            <p style={{ color: 'var(--muted)', marginTop: '0.5rem' }}>This intelligence vector is currently being processed by the v7 analysis engine.</p>
+                            <p style={{ color: 'var(--muted)', marginTop: '0.5rem' }}>{t('career_agent.placeholders.processed_v7', 'This intelligence vector is currently being processed by the v7 analysis engine.')}</p>
                         </div>
                     )}
                 </main>

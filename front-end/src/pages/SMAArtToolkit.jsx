@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { BookOpen, BookText, ArrowRight, FileText, Sparkles, Info, StickyNote, Compass, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PageHero from "@/components/ui/PageHero";
+import { useTranslation } from "react-i18next";
 
 
 const toolkitHighlights = [
@@ -80,8 +81,23 @@ const toolkitSections = [
 ];
 
 const ToolkitCard = ({ section, index }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const Icon = section.icon;
+
+  let sectionKey = "";
+  if (section.path.includes("career-agent")) sectionKey = "career_agent";
+  else if (section.path.includes("resume-builder")) sectionKey = "resume_builder";
+  else if (section.path.includes("dictionary")) sectionKey = "dictionary";
+  else if (section.path.includes("library")) sectionKey = "library";
+  else if (section.path.includes("notes")) sectionKey = "notes";
+
+  const title = t(`toolkit.sections.${sectionKey}.title`, section.title);
+  const description = t(`toolkit.sections.${sectionKey}.description`, section.description);
+  const badge = t(`toolkit.sections.${sectionKey}.badge`, section.badge);
+  const cta = t(`toolkit.sections.${sectionKey}.cta`, section.cta);
+  const meta = t(`toolkit.sections.${sectionKey}.meta`, section.meta);
+  const detail = t(`toolkit.sections.${sectionKey}.detail`, section.detail);
 
   return (
     <motion.div
@@ -113,25 +129,25 @@ const ToolkitCard = ({ section, index }) => {
             </div>
 
             <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#1a3884] dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
-              {section.badge}
+              {badge}
             </span>
           </div>
 
           <div className="mb-5 flex-1">
             <div className="rounded-2xl border border-slate-100/90 bg-white/75 p-4 dark:border-slate-700/40 dark:bg-slate-900/20">
               <div className="space-y-2">
-                <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400">{section.meta}</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-400">{meta}</p>
                 <h3 className="text-base font-semibold leading-snug tracking-[-0.02em] text-[#0f172a] transition-colors group-hover:text-[#1a3884] dark:text-white">
-                  {section.title}
+                  {title}
                 </h3>
                 <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">
-                  {section.description}
+                  {description}
                 </p>
               </div>
 
               <div className="mt-4 border-t border-slate-100 pt-3 dark:border-slate-700/40">
                 <p className="text-xs font-medium leading-5 text-slate-500 dark:text-slate-400">
-                  {section.detail}
+                  {detail}
                 </p>
               </div>
             </div>
@@ -140,10 +156,10 @@ const ToolkitCard = ({ section, index }) => {
           <button className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50/90 px-4 py-3 text-left transition-all duration-300 group-hover:border-[#1a3884] group-hover:bg-[#1a3884] active:scale-[0.98] dark:border-slate-600/40 dark:bg-slate-700/40">
             <div className="space-y-0.5">
               <p className="text-sm font-semibold text-slate-700 transition-colors group-hover:text-white dark:text-slate-200">
-                {section.cta}
+                {cta}
               </p>
               <p className="text-xs text-slate-400 transition-colors group-hover:text-blue-100 dark:text-slate-400">
-                Launch from your toolkit
+                {t("toolkit.launch_cta", "Launch from your toolkit")}
               </p>
             </div>
             <ArrowRight className="h-4 w-4 flex-shrink-0 text-slate-400 transition-all group-hover:translate-x-1 group-hover:text-white" />
@@ -155,15 +171,17 @@ const ToolkitCard = ({ section, index }) => {
 };
 
 const SMAArtToolkit = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-6">
       <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
         <div className="mx-auto max-w-7xl space-y-8">
           {/* ── Standardized PageHero ── */}
           <PageHero
-            badge="Intelligence Suite"
-            title="SMAART Toolkit"
-            subtitle="Explore our curated repository of career intelligence, wellness resources, and learning tools designed for your growth."
+            badge={t("toolkit.hero_badge", "Intelligence Suite")}
+            title={t("toolkit.hero_title", "SMAART Toolkit")}
+            subtitle={t("toolkit.hero_subtitle", "Explore our curated repository of career intelligence, wellness resources, and learning tools designed for your growth.")}
           />
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -191,22 +209,28 @@ const SMAArtToolkit = () => {
               </div>
 
               <div className="flex-1 space-y-5">
-                <h4 className="text-lg font-semibold tracking-[-0.03em] text-[#0f172a] dark:text-white">Toolkit Usage & Resources</h4>
+                <h4 className="text-lg font-semibold tracking-[-0.03em] text-[#0f172a] dark:text-white">
+                  {t("toolkit.usage_title", "Toolkit Usage & Resources")}
+                </h4>
                 <div className="grid gap-x-10 gap-y-5 sm:grid-cols-2">
                   {[
-                    { title: "INSTANT ACCESS", desc: "Explore all professional tools immediately without any prerequisites." },
-                    { title: "AI ENHANCED", desc: "Leverage cutting-edge intelligence for your career and learning journey." },
-                    { title: "SECURE ACCESS", desc: "Your tools, resources, and learning progress are organized in one secure place." },
-                    { title: "CONSTANT UPDATES", desc: "We are regularly adding new tools to help you succeed professionally." },
-                  ].map((item, i) => (
-                    <div key={i} className="flex gap-4">
-                      <div className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#4f46e5]" />
-                      <div className="space-y-1.5">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0f172a] dark:text-slate-100">{item.title}</p>
-                        <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">{item.desc}</p>
+                    { key: "instant_access", title: "INSTANT ACCESS", desc: "Explore all professional tools immediately without any prerequisites." },
+                    { key: "ai_enhanced", title: "AI ENHANCED", desc: "Leverage cutting-edge intelligence for your career and learning journey." },
+                    { key: "secure_access", title: "SECURE ACCESS", desc: "Your tools, resources, and learning progress are organized in one secure place." },
+                    { key: "constant_updates", title: "CONSTANT UPDATES", desc: "We are regularly adding new tools to help you succeed professionally." },
+                  ].map((item, i) => {
+                    const localizedTitle = t(`toolkit.usage_items.${item.key}.title`, item.title);
+                    const localizedDesc = t(`toolkit.usage_items.${item.key}.desc`, item.desc);
+                    return (
+                      <div key={i} className="flex gap-4">
+                        <div className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#4f46e5]" />
+                        <div className="space-y-1.5">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0f172a] dark:text-slate-100">{localizedTitle}</p>
+                          <p className="text-sm leading-6 text-slate-600 dark:text-slate-400">{localizedDesc}</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>

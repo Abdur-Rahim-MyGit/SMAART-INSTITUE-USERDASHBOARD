@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
   Palette,
@@ -159,6 +160,7 @@ const EditorDrawer = ({
 }) => {
   if (!activePanel) return null;
 
+  const { t } = useTranslation();
   const closeDrawer = () => setActivePanel(null);
   const currentMeta = PANEL_META[activePanel];
   const HeaderIcon = currentMeta?.icon || LayoutTemplate;
@@ -203,7 +205,7 @@ const EditorDrawer = ({
         {activePanel === "templates" && (
           <div className="space-y-4">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
-              Template Library
+              {t("vision_board.template_library")}
             </p>
             <TemplateSelector
               selectedTemplate={templateId}
@@ -215,7 +217,7 @@ const EditorDrawer = ({
         {activePanel === "text" && (
           <div className="space-y-4">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
-              Typography
+              {t("vision_board.typography")}
             </p>
             <TypographyPanel
               onAddText={handleAddText}
@@ -231,7 +233,7 @@ const EditorDrawer = ({
         {activePanel === "assets" && (
           <div className="space-y-4">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
-              Assets
+              {t("vision_board.assets")}
             </p>
             <AssetsPanel
               userUploads={userUploads}
@@ -245,7 +247,7 @@ const EditorDrawer = ({
         {activePanel === "style" && (
           <div className="space-y-4">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
-              Style
+              {t("vision_board.style")}
             </p>
             <StylePanel
               backgroundColor={backgroundColor}
@@ -264,7 +266,7 @@ const EditorDrawer = ({
         {activePanel === "layers" && (
           <div className="space-y-4">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
-              Layers
+              {t("vision_board.layers")}
             </p>
             <LayersPanel
               layers={layers}
@@ -295,7 +297,7 @@ const EditorDrawer = ({
           <div className="space-y-6">
             <div>
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
-                Aspect Ratio
+                {t("vision_board.aspect_ratio")}
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 {Object.entries(ASPECT_RATIOS).map(([key, ratio]) => (
@@ -317,41 +319,41 @@ const EditorDrawer = ({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-600 dark:border-white/8 dark:bg-slate-900/50 dark:text-slate-300">
-              <p className="mb-1 font-semibold text-slate-900 dark:text-white">Current Output</p>
-              <p>{currentRatio?.width} x {currentRatio?.height} px</p>
-            </div>
-          </div>
-        )}
-
-        {/* {activePanel === "goals" && (
-          <div className="space-y-6">
-            <GoalList
-              title="Short Term Goals"
-              description="Near-term targets for the next one to six months."
-              goals={shortTermGoals}
-              setGoals={setShortTermGoals}
-              placeholder="Enter short-term goal..."
-              accentClass="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-blue-400/10 dark:text-blue-300"
-            />
-
-            <GoalList
-              title="Long Term Goals"
-              description="Bigger milestones that anchor the broader vision."
-              goals={longTermGoals}
-              setGoals={setLongTermGoals}
-              placeholder="Enter long-term goal..."
-              accentClass="bg-emerald-500/8 text-emerald-700 hover:bg-emerald-500/12 dark:bg-emerald-500/10 dark:text-emerald-300"
-            />
-          </div>
-        )} */}
-      </div>
-
-      <div
-        className="absolute top-1/2 -right-3 z-0 hidden h-12 w-3 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-r-md border border-l-0 border-slate-200 bg-white text-slate-400 shadow-sm hover:text-slate-600 dark:border-white/8 dark:bg-[#0d1626] lg:flex"
-        onClick={closeDrawer}
-        title="Close Panel"
-      >
+             <div className="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-600 dark:border-white/8 dark:bg-slate-900/50 dark:text-slate-300">
+               <p className="mb-1 font-semibold text-slate-900 dark:text-white">{t("vision_board.current_output")}</p>
+               <p>{currentRatio?.width} x {currentRatio?.height} px</p>
+             </div>
+           </div>
+         )}
+ 
+         {/* {activePanel === "goals" && (
+           <div className="space-y-6">
+             <GoalList
+               title="Short Term Goals"
+               description="Near-term targets for the next one to six months."
+               goals={shortTermGoals}
+               setGoals={setShortTermGoals}
+               placeholder="Enter short-term goal..."
+               accentClass="bg-primary/10 text-primary hover:bg-primary/20 dark:bg-blue-400/10 dark:text-blue-300"
+             />
+ 
+             <GoalList
+               title="Long Term Goals"
+               description="Bigger milestones that anchor the broader vision."
+               goals={longTermGoals}
+               setGoals={setLongTermGoals}
+               placeholder="Enter long-term goal..."
+               accentClass="bg-emerald-500/8 text-emerald-700 hover:bg-emerald-500/12 dark:bg-emerald-500/10 dark:text-emerald-300"
+             />
+           </div>
+         )} */}
+       </div>
+ 
+       <div
+         className="absolute top-1/2 -right-3 z-0 hidden h-12 w-3 -translate-y-1/2 transform cursor-pointer items-center justify-center rounded-r-md border border-l-0 border-slate-200 bg-white text-slate-400 shadow-sm hover:text-slate-600 dark:border-white/8 dark:bg-[#0d1626] lg:flex"
+         onClick={closeDrawer}
+         title={t("vision_board.close_panel")}
+       >
         <ChevronLeft className="h-3 w-3" />
       </div>
     </motion.div>
