@@ -856,20 +856,7 @@ const BaseLineTest = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 dark:border-white/8">
-                <button
-                  type="button"
-                  disabled={loading || submitting || interactionLocked || timeExpired || !resultId}
-                  onClick={handleRestart}
-                  className="w-full py-3 px-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold hover:bg-rose-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  {t("baseline_test.clear_assessment_dev", "Clear Assessment (Dev)")}
-                </button>
-                <p className="mt-2 text-[11px] leading-5 text-slate-400 dark:text-slate-500 text-center">
-                  {t("baseline_test.clear_assessment_desc", "Development only. This clears the current attempt after the assessment has started.")}
-                </p>
-              </div>
+
 
               {/* DEV: Auto Answer */}
               <div className="pt-4 border-t border-dashed border-slate-200 dark:border-white/8 opacity-50 hover:opacity-100 transition-opacity">
