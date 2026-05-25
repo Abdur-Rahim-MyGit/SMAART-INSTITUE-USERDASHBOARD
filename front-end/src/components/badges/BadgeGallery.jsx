@@ -1,48 +1,50 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, ChevronDown, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
 import apiCall from '@/services/api';
 
-const categories = [
-    { id: 'all', label: 'All Categories' },
-    { id: 'capability', label: 'Capability' },
-    { id: 'capacity', label: 'Capacity' },
-    { id: 'leadership', label: 'Leadership' },
-];
-
-const fallbackBadges = [
-    {
-        id: 'MOD-COMPLETE',
-        badgeId: 'MOD-COMPLETE',
-        title: 'Module Master',
-        description: 'Awarded for completing a course module successfully.',
-        category: 'capability',
-        tier: 'silver',
-        xp: 300,
-        icon: 'Award',
-        color: '#C0C0C0'
-    },
-    {
-        id: 'CRS-COMPLETE',
-        badgeId: 'CRS-COMPLETE',
-        title: 'Course Conqueror',
-        description: 'Awarded for completing an entire course successfully.',
-        category: 'capacity',
-        tier: 'gold',
-        xp: 500,
-        icon: 'Trophy',
-        color: '#FFD700'
-    }
-];
-
 const BadgeGallery = ({ userName = 'Student' }) => {
+    const { t } = useTranslation();
     const [badges, setBadges] = useState([]);
     const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState('all');
     const [isLoading, setIsLoading] = useState(true);
+
+    const categories = [
+        { id: 'all', label: t('badge_gallery.categories.all') },
+        { id: 'capability', label: t('badge_gallery.categories.capability') },
+        { id: 'capacity', label: t('badge_gallery.categories.capacity') },
+        { id: 'leadership', label: t('badge_gallery.categories.leadership') },
+    ];
+
+    const fallbackBadges = [
+        {
+            id: 'MOD-COMPLETE',
+            badgeId: 'MOD-COMPLETE',
+            title: t('badge_gallery.fallback.module_master.title'),
+            description: t('badge_gallery.fallback.module_master.desc'),
+            category: 'capability',
+            tier: 'silver',
+            xp: 300,
+            icon: 'Award',
+            color: '#C0C0C0'
+        },
+        {
+            id: 'CRS-COMPLETE',
+            badgeId: 'CRS-COMPLETE',
+            title: t('badge_gallery.fallback.course_conqueror.title'),
+            description: t('badge_gallery.fallback.course_conqueror.desc'),
+            category: 'capacity',
+            tier: 'gold',
+            xp: 500,
+            icon: 'Trophy',
+            color: '#FFD700'
+        }
+    ];
 
     useEffect(() => {
         const fetchBadges = async () => {
@@ -60,20 +62,31 @@ const BadgeGallery = ({ userName = 'Student' }) => {
                 }
 
                 // Force all templates into an unlocked state!
-                const unlockedList = templates.map(b => ({
-                    id: b.badgeId || b.id || b._id,
-                    _id: b._id || b.id || b.badgeId,
-                    title: b.title || 'Badge',
-                    description: b.description || '',
-                    tier: b.tier || 'standard',
-                    xp: b.xp || 0,
-                    category: b.category || 'learning',
-                    earnedDate: b.createdAt ? new Date(b.createdAt) : new Date(),
-                    isEarned: true, // Force unlock
-                    progress: 100,  // Full progress meter
-                    icon: b.icon || 'Award',
-                    color: b.color || '#FFD700'
-                }));
+                const unlockedList = templates.map(b => {
+                    let title = b.title || 'Badge';
+                    let description = b.description || '';
+                    if (b.badgeId === 'MOD-COMPLETE') {
+                        title = t('badge_gallery.fallback.module_master.title');
+                        description = t('badge_gallery.fallback.module_master.desc');
+                    } else if (b.badgeId === 'CRS-COMPLETE') {
+                        title = t('badge_gallery.fallback.course_conqueror.title');
+                        description = t('badge_gallery.fallback.course_conqueror.desc');
+                    }
+                    return {
+                        id: b.badgeId || b.id || b._id,
+                        _id: b._id || b.id || b.badgeId,
+                        title,
+                        description,
+                        tier: b.tier || 'standard',
+                        xp: b.xp || 0,
+                        category: b.category || 'learning',
+                        earnedDate: b.createdAt ? new Date(b.createdAt) : new Date(),
+                        isEarned: true, // Force unlock
+                        progress: 100,  // Full progress meter
+                        icon: b.icon || 'Award',
+                        color: b.color || '#FFD700'
+                    };
+                });
 
                 setBadges(unlockedList);
             } catch (error) {
@@ -90,7 +103,7 @@ const BadgeGallery = ({ userName = 'Student' }) => {
         };
 
         fetchBadges();
-    }, []);
+    }, [t]);
 
     // Filter by category
     const filteredBadges = badges.filter((badge) => {
@@ -114,17 +127,19 @@ const BadgeGallery = ({ userName = 'Student' }) => {
         <div className="space-y-6">
             {/* Header with Filters */}
             <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 w-full sm:w-auto">
                     <Trophy className="w-5 h-5 text-[#1a3884]" />
-                    <span className="text-lg font-bold uppercase tracking-wider text-[#002147] dark:text-white">Achievements Cabinet</span>
+                    <span className="text-base sm:text-lg font-bold uppercase tracking-wider text-[#002147] dark:text-white">
+                        {t('badge_gallery.achievements_cabinet')}
+                    </span>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                    <div className="relative">
+
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-auto">
                         <select
                             value={activeCategory}
                             onChange={(e) => setActiveCategory(e.target.value)}
-                            className="appearance-none bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#002147] dark:text-white rounded-none px-4 py-2 pr-10 font-semibold text-sm cursor-pointer shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-[#1a3884] focus:ring-offset-2"
+                            className="appearance-none w-full sm:w-auto bg-white dark:bg-[#002A5C] border-2 border-[#1a3884] text-[#002147] dark:text-white rounded-none px-4 py-2 pr-10 font-semibold text-sm cursor-pointer shadow-md hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-[#1a3884] focus:ring-offset-2"
                         >
                             {categories.map((cat) => (
                                 <option key={cat.id} value={cat.id}>
@@ -139,7 +154,7 @@ const BadgeGallery = ({ userName = 'Student' }) => {
 
             {/* Badge Grid */}
             {filteredBadges.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                     {filteredBadges.map((badge, index) => (
                         <motion.div
                             key={badge.id}
@@ -159,7 +174,7 @@ const BadgeGallery = ({ userName = 'Student' }) => {
                 <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/10 rounded-2xl border border-dashed border-slate-200 dark:border-white/5">
                     <Trophy className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
                     <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-300 mb-2">
-                        No achievements available
+                        {t('badge_gallery.no_achievements')}
                     </h3>
                 </div>
             )}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { assessmentApi } from "@/services/assessmentApi";
 import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase, RefreshCw, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -104,12 +105,15 @@ const downloadReport = (user, testResults) => {
 
 
 const BaseLineTest = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { stage: urlStage } = useParams();
 
   // Determine which stage we're running
   const stageKey = (urlStage || 'T1').toUpperCase();
   const stageConfig = STAGE_MAP[stageKey] || STAGE_MAP.T1;
+  const translatedTitle = t(`baseline_test.stage_titles.${stageKey}`, stageConfig.title);
+  const translatedName = t(`baseline_test.stage_names.${stageKey}`, stageConfig.name);
   const assessmentCode = stageConfig.code;
   const questionLimit = stageConfig.questionLimit;
   const stageDurationSeconds = stageConfig.durationMinutes * 60;
@@ -145,7 +149,7 @@ const BaseLineTest = () => {
     if (submitted || loading || !resultId || timeExpired) return;
 
     const handleBeforeUnload = (e) => {
-      const msg = "Are you sure you want to leave? Your assessment progress will be lost.";
+      const msg = t("baseline_test.confirm_leave", "Are you sure you want to leave? Your assessment progress will be lost.");
       e.preventDefault();
       e.returnValue = msg;
       return msg;
@@ -154,7 +158,7 @@ const BaseLineTest = () => {
     const handlePopState = () => {
       window.history.pushState(null, "", window.location.pathname);
       setShowExitWarning(true);
-      toast.warning("Back navigation is disabled during the assessment.");
+      toast.warning(t("baseline_test.back_navigation_disabled", "Back navigation is disabled during the assessment."));
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
@@ -165,7 +169,7 @@ const BaseLineTest = () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [submitted, loading, resultId, timeExpired]);
+  }, [submitted, loading, resultId, timeExpired, t]);
 
   // Badge notification state
   const [earnedBadge, setEarnedBadge] = useState(null);
@@ -187,7 +191,7 @@ const BaseLineTest = () => {
       };
       setEarnedBadge(formattedBadge);
       setShowBadgeModal(true);
-      toast.success(`Badge Unlocked: ${formattedBadge.title}!`);
+      toast.success(t("baseline_test.badge_unlocked", "Badge Unlocked: {{title}}!", { title: formattedBadge.title }));
     }
   };
 
@@ -274,7 +278,7 @@ const BaseLineTest = () => {
         const userId = parsedUser.id || parsedUser._id;
 
         if (!userId) {
-          throw new Error("User ID not found. Please log in again.");
+          throw new Error(t("baseline_test.error_id_not_found", "User ID not found. Please log in again."));
         }
 
         // CRITICAL - If in report mode or if stage already completed, fetch results
@@ -291,7 +295,7 @@ const BaseLineTest = () => {
             return;
           } else {
             console.warn(`${stageKey} already completed. Redirecting...`);
-            toast.info(`You have already completed the ${stageConfig.title}.`);
+            toast.info(t("baseline_test.already_completed_toast", "You have already completed the {{title}}.", { title: translatedTitle }));
             navigate("/dashboard/assessment-centre", { replace: true });
             return;
           }
@@ -299,7 +303,7 @@ const BaseLineTest = () => {
 
         if (isReportMode) {
           clearTimerPersistence();
-          throw new Error(`Report not found for ${stageConfig.title}. Have you completed it yet?`);
+          throw new Error(t("baseline_test.report_not_found", "Report not found for {{title}}. Have you completed it yet?", { title: translatedTitle }));
         }
 
         // Fetch assessment by stage code
@@ -307,7 +311,7 @@ const BaseLineTest = () => {
         const assessmentResponse = await assessmentApi.getByCode(assessmentCode);
 
         if (!assessmentResponse.success) {
-          throw new Error(`Failed to fetch ${stageConfig.title} details`);
+          throw new Error(t("baseline_test.failed_fetch_details", "Failed to fetch {{title}} details", { title: translatedTitle }));
         }
 
         setAssessment(assessmentResponse.data);
@@ -315,7 +319,7 @@ const BaseLineTest = () => {
 
         // Start the assessment
         if (!assessmentResponse.data._id) {
-          throw new Error("Assessment ID is missing from response");
+          throw new Error(t("baseline_test.assessment_id_missing", "Assessment ID is missing from response"));
         }
 
         const assessmentId = assessmentResponse.data._id;
@@ -325,7 +329,7 @@ const BaseLineTest = () => {
         const startResponse = await assessmentApi.startAssessment(assessmentId);
 
         if (!startResponse.success) {
-          throw new Error(startResponse.error || "Failed to start assessment session");
+          throw new Error(startResponse.error || t("baseline_test.failed_start_session", "Failed to start assessment session"));
         }
 
         console.log("✅ Assessment session started, Result ID:", startResponse.data.resultId);
@@ -362,7 +366,7 @@ const BaseLineTest = () => {
 
       } catch (err) {
         console.error("❌ Error initializing assessment:", err);
-        setError(err.message || "Failed to load assessment. Please try refreshing the page.");
+        setError(err.message || t("baseline_test.error_loading", "Failed to load assessment. Please try refreshing the page."));
       } finally {
         setLoading(false);
         console.log("🏁 Initialization complete, loading set to false.");
@@ -370,7 +374,7 @@ const BaseLineTest = () => {
     };
 
     initializeAssessment();
-  }, [clearTimerPersistence, navigate, stageKey]);
+  }, [clearTimerPersistence, navigate, stageKey, t]);
 
   // Timer: Reset when question changes
   useEffect(() => {
@@ -433,7 +437,7 @@ const BaseLineTest = () => {
   const submit = useCallback(async ({ reason = "manual", redirectAfterSubmit = false, forceTimeoutCompletion = false } = {}) => {
     if (!resultId || submitting || submitted) return;
     if (reason === "manual" && !allQuestionsAnswered) {
-      toast.warning("Answer all questions before submitting the test.");
+      toast.warning(t("baseline_test.answer_all_toast", "Answer all questions before submitting the test."));
       return;
     }
 
@@ -486,10 +490,10 @@ const BaseLineTest = () => {
           }
         }
 
-        alert("Time is up. Your assessment was ended and we could not confirm the submission result.");
+        alert(t("baseline_test.time_up_ended", "Time is up. Your assessment was ended and we could not confirm the submission result."));
         navigate("/dashboard/assessment-centre", { replace: true });
       } else {
-        alert(err.message || "Failed to submit assessment.");
+        alert(err.message || t("baseline_test.failed_submit", "Failed to submit assessment."));
       }
     } finally {
       setSubmitting(false);
@@ -497,11 +501,11 @@ const BaseLineTest = () => {
         setInteractionLocked(false);
       }
     }
-  }, [allQuestionsAnswered, clearTimerPersistence, finalizeUnansweredQuestions, navigate, resultId, stageKey, submitted, submitting, user, assessmentToken]);
+  }, [allQuestionsAnswered, clearTimerPersistence, finalizeUnansweredQuestions, navigate, resultId, stageKey, submitted, submitting, user, assessmentToken, t]);
 
   const handleRestart = async () => {
     if (!resultId) return;
-    if (window.confirm("Are you sure you want to cancel and restart this assessment? Your current progress will be lost.")) {
+    if (window.confirm(t("baseline_test.confirm_restart", "Are you sure you want to cancel and restart this assessment? Your current progress will be lost."))) {
       try {
         setLoading(true);
         await assessmentApi.resetAssessment(resultId);
@@ -509,7 +513,7 @@ const BaseLineTest = () => {
         // For development, we reload to start clean
         window.location.reload();
       } catch (err) {
-        toast.error("Failed to reset assessment");
+        toast.error(t("baseline_test.failed_reset", "Failed to reset assessment"));
         setLoading(false);
       }
     }
@@ -541,8 +545,8 @@ const BaseLineTest = () => {
       if (nextRemainingSeconds <= 60 && nextRemainingSeconds > 0 && !oneMinuteAlertShownRef.current) {
         oneMinuteAlertShownRef.current = true;
         localStorage.setItem(timerWarningStorageKey, "1");
-        alert("Only 1 minute left!");
-        toast.warning("Only 1 minute left!");
+        alert(t("baseline_test.one_minute_left", "Only 1 minute left!"));
+        toast.warning(t("baseline_test.one_minute_left", "Only 1 minute left!"));
       }
 
       if (nextRemainingSeconds === 0 && !timeoutSubmitTriggeredRef.current) {
@@ -550,7 +554,7 @@ const BaseLineTest = () => {
         setTimeExpired(true);
         setInteractionLocked(true);
         setShowExitWarning(false);
-        toast.error("Time is up. Submitting your assessment...");
+        toast.error(t("baseline_test.time_up_submitting", "Time is up. Submitting your assessment..."));
         submit({ reason: "timeout", redirectAfterSubmit: true, forceTimeoutCompletion: true });
       }
     };
@@ -567,6 +571,7 @@ const BaseLineTest = () => {
     submit,
     timerStartStorageKey,
     timerWarningStorageKey,
+    t
   ]);
 
   // Proctoring Logic - Anti-Cheat
@@ -579,27 +584,27 @@ const BaseLineTest = () => {
     // 1. Prevent Right Click
     const handleContextMenu = (e) => {
       e.preventDefault();
-      toast.warning("Right-click is disabled during the assessment.");
+      toast.warning(t("baseline_test.right_click_disabled", "Right-click is disabled during the assessment."));
     };
 
     // 2. Prevent Copy/Cut/Paste
     const handleCopyCutPaste = (e) => {
       e.preventDefault();
-      toast.warning("Copying or pasting is not allowed.");
+      toast.warning(t("baseline_test.copy_paste_disabled", "Copying or pasting is not allowed."));
     };
 
     // 3. Detect PrintScreen / Special Keys
     const handleKeyDown = (e) => {
       if (e.key === "PrintScreen" || (e.ctrlKey && e.key === "p") || (e.metaKey && e.shiftKey && e.key === "3") || (e.metaKey && e.shiftKey && e.key === "4")) {
         e.preventDefault();
-        handleViolation("Screenshot attempt detected!");
+        handleViolation(t("baseline_test.screenshot_detected", "Screenshot attempt detected!"));
       }
     };
 
     // 4. Detect Focus Loss (Alt-Tab / Switching Windows)
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        handleViolation("You navigated away from the test window.");
+        handleViolation(t("baseline_test.navigated_away", "You navigated away from the test window."));
       }
     };
 
@@ -610,10 +615,10 @@ const BaseLineTest = () => {
         if (newCount >= MAX_WARNINGS) {
           // Force Submit
           submit({ reason: "violation", redirectAfterSubmit: true });
-          toast.error("Test terminated due to multiple violations.");
+          toast.error(t("baseline_test.terminated_violations", "Test terminated due to multiple violations."));
           return newCount;
         }
-        toast.error(`Warning ${newCount}/${MAX_WARNINGS}: ${message}`);
+        toast.error(t("baseline_test.warning_violations", "Warning {{count}}/{{max}}: {{message}}", { count: newCount, max: MAX_WARNINGS, message }));
         return newCount;
       });
     };
@@ -634,14 +639,14 @@ const BaseLineTest = () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [submitted, loading, submit]); // Added submit to dependencies if stable (or remove if causes loop, submit uses refs or is stable)
+  }, [submitted, loading, submit, t]); // Added submit to dependencies if stable (or remove if causes loop, submit uses refs or is stable)
 
 
   if (loading) return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center transition-colors duration-300">
       <div className="text-center">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#1a3884] mx-auto mb-4"></div>
-        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">Loading {stageConfig.title}...</p>
+        <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">{t("baseline_test.loading_test", "Loading {{title}}...", { title: translatedTitle })}</p>
       </div>
     </div>
   );
@@ -650,10 +655,10 @@ const BaseLineTest = () => {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center p-4 transition-colors duration-300">
       <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#002147] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
         <div className="text-red-500 text-5xl mb-4">⚠</div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Error</h2>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t("baseline_test.error", "Error")}</h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
         <button onClick={() => navigate("/dashboard/assessment-centre")} className="px-6 py-2 bg-[#1a3884] text-white rounded-lg hover:bg-[#277a84] font-medium transition-colors">
-          Back to Assessments
+          {t("baseline_test.back_to_assessments", "Back to Assessments")}
         </button>
       </div>
     </div>
@@ -679,20 +684,20 @@ const BaseLineTest = () => {
                       className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/40 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ArrowLeft className="w-4 h-4" />
-                      Back
+                      {t("baseline_test.back", "Back")}
                     </button>
-                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{stageConfig.title} <span className="text-[#1a3884]">{stageKey}</span></h2>
+                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{translatedTitle} <span className="text-[#1a3884]">{stageKey}</span></h2>
                   </div>
                   <div className="text-right">
                     <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Time Left:{" "}
+                      {t("baseline_test.time_left", "Time Left")}:{" "}
                       <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#1a3884]"}`}>
                         {formatCountdown(remainingSeconds)}
                       </span>
                     </div>
                     {isLastFiveMinutes && (
                       <p className="mt-1 text-[11px] md:text-xs font-bold uppercase tracking-wider text-red-500">
-                        Time Almost Up!
+                        {t("baseline_test.time_almost_up", "Time Almost Up!")}
                       </p>
                     )}
                   </div>
@@ -714,7 +719,7 @@ const BaseLineTest = () => {
               <div className="p-6 md:p-8 flex-1 relative z-10 flex flex-col justify-center">
                 <div className="mb-8 text-center">
                   <span className="inline-block px-3 py-1 rounded-full bg-[#1a3884]/10 text-[#1a3884] text-xs font-bold uppercase tracking-widest mb-3">
-                    Question {index + 1} / {questions.length}
+                    {t("baseline_test.question_number", "Question {{current}} / {{total}}", { current: index + 1, total: questions.length })}
                   </span>
                   <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
                     {current?.questionText}
@@ -767,12 +772,12 @@ const BaseLineTest = () => {
                       >
                         {timeElapsed < 5000 ? (
                           <>
-                            <span>Wait {Math.ceil((5000 - timeElapsed) / 1000)}s</span>
+                            <span>{t("baseline_test.wait_seconds", "Wait {{seconds}}s", { seconds: Math.ceil((5000 - timeElapsed) / 1000) })}</span>
                             <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                           </>
                         ) : (
                           <>
-                            Next Question <CheckCircle2 size={18} />
+                            {t("baseline_test.next_question", "Next Question")} <CheckCircle2 size={18} />
                           </>
                         )}
                       </motion.button>
@@ -794,17 +799,17 @@ const BaseLineTest = () => {
                   {submitting ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Submitting...
+                      {t("baseline_test.submitting", "Submitting...")}
                     </>
                   ) : !allQuestionsAnswered ? (
                     <>
                       <Lock className="w-5 h-5" />
-                      Answer All Questions
+                      {t("baseline_test.answer_all_questions", "Answer All Questions")}
                     </>
                   ) : (
                     <>
                       <CheckCircle2 className="w-5 h-5" />
-                      Submit Test
+                      {t("baseline_test.submit_test", "Submit Test")}
                     </>
                   )}
                 </button>
@@ -815,7 +820,7 @@ const BaseLineTest = () => {
             <div className="lg:w-80 bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
               <div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                  <Target className="text-[#1a3884]" size={20} /> Question Map
+                  <Target className="text-[#1a3884]" size={20} /> {t("baseline_test.question_map", "Question Map")}
                 </h4>
                 <div className="grid grid-cols-6 gap-2 max-h-[300px] md:max-h-[400px] overflow-y-auto p-1 custom-scrollbar">
                   {questions.map((q, idx) => (
@@ -842,11 +847,11 @@ const BaseLineTest = () => {
 
               <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/8">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884]" /> Answered</span>
+                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884]" /> {t("baseline_test.answered", "Answered")}</span>
                   <span className="font-bold text-slate-900 dark:text-white">{Object.keys(selectedAnswers).length}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-[#002A5C]" /> Remaining</span>
+                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-slate-200 dark:bg-[#002A5C]" /> {t("baseline_test.remaining", "Remaining")}</span>
                   <span className="font-bold text-slate-900 dark:text-white">{questions.length - Object.keys(selectedAnswers).length}</span>
                 </div>
               </div>
@@ -859,10 +864,10 @@ const BaseLineTest = () => {
                   className="w-full py-3 px-4 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold hover:bg-rose-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <RefreshCw className="w-4 h-4" />
-                  Clear Assessment (Dev)
+                  {t("baseline_test.clear_assessment_dev", "Clear Assessment (Dev)")}
                 </button>
                 <p className="mt-2 text-[11px] leading-5 text-slate-400 dark:text-slate-500 text-center">
-                  Development only. This clears the current attempt after the assessment has started.
+                  {t("baseline_test.clear_assessment_desc", "Development only. This clears the current attempt after the assessment has started.")}
                 </p>
               </div>
 
@@ -897,7 +902,7 @@ const BaseLineTest = () => {
                   }}
                   className="w-full py-2 bg-slate-200 dark:bg-[#002A5C] text-slate-600 dark:text-slate-400 rounded-lg text-[10px] uppercase font-bold tracking-wider hover:bg-slate-300 dark:hover:bg-[#002A5C] transition-colors"
                 >
-                  ⚡ Auto-Fill (Dev)
+                  {t("baseline_test.auto_fill_dev", "⚡ Auto-Fill (Dev)")}
                 </button>
               </div>
             </div>
@@ -916,17 +921,17 @@ const BaseLineTest = () => {
               <div className="absolute top-8 left-8 hidden sm:block text-left">
                 <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{user?.fullName}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">{user?.studentId}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{user?.college?.collegeName || user?.collegeName || 'Student'}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{user?.college?.collegeName || user?.collegeName || t("baseline_test.student", "Student")}</p>
               </div>
 
               {/* Header Section */}
               <div className="text-center mb-10 border-b border-slate-100 dark:border-white/8 pb-8 sm:mt-2">
 
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  {stageKey === 'T1' ? 'Baseline Established' : `${stageConfig.name} Assessment Complete`}
+                  {stageKey === 'T1' ? t("baseline_test.baseline_established", "Baseline Established") : t("baseline_test.assessment_complete", "{{name}} Assessment Complete", { name: translatedName })}
                 </h2>
                 <div className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
-                  <span>Result ID: {stageKey}-{user?.studentId || 'REF'}</span>
+                  <span>{t("baseline_test.result_id", "Result ID: {{id}}", { id: `${stageKey}-${user?.studentId || 'REF'}` })}</span>
                   <span>|</span>
                   <span>S_{stageConfig.name.toLowerCase()}</span>
                 </div>
@@ -935,7 +940,7 @@ const BaseLineTest = () => {
               {/* Professional Score Display */}
               <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-12 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-xl p-6 border border-slate-100 dark:border-white/10">
                 <div className="text-center md:text-right">
-                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Overall Score</div>
+                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">{t("baseline_test.overall_score", "Overall Score")}</div>
                   <div className="text-5xl font-bold text-slate-900 dark:text-white">
                     {testResults?.stageScore || testResults?.baselineScore}
                     <span className="text-2xl text-slate-400 ml-1">/100</span>
@@ -945,9 +950,9 @@ const BaseLineTest = () => {
                 <div className="hidden md:block w-px h-16 bg-slate-200 dark:bg-[#003170]" />
 
                 <div className="text-center md:text-left">
-                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Proficiency Level</div>
+                  <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">{t("baseline_test.proficiency_level", "Proficiency Level")}</div>
                   <div className={`text-2xl font-bold px-4 py-1 rounded-full inline-block ${getBandColor(testResults?.stageBand || 'Emerging').badge}`}>
-                    {testResults?.stageBand || 'Emerging'}
+                    {t(`baseline_test.bands.${testResults?.stageBand || 'Emerging'}`, testResults?.stageBand || 'Emerging')}
                   </div>
                 </div>
               </div>
@@ -960,13 +965,15 @@ const BaseLineTest = () => {
                   transition={{ delay: 0.6 }}
                   className="text-3xl font-black text-[#002147] dark:text-white text-center mb-8"
                 >
-                  Quotient-Wise Breakdown
+                  {t("baseline_test.quotient_breakdown", "Quotient-Wise Breakdown")}
                 </motion.h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {(testResults?.quotientProfile || testResults?.t1Profile) ? Object.entries(testResults?.quotientProfile || testResults?.t1Profile).map(([quotient, data], index) => {
                     const info = quotientInfo[quotient];
                     const colors = getBandColor(data.level);
+                    const qName = t(`baseline_test.quotients.${quotient}.name`, info.name);
+                    const qDesc = t(`baseline_test.quotients.${quotient}.desc`, info.desc);
 
                     return (
                       <motion.div
@@ -985,16 +992,16 @@ const BaseLineTest = () => {
                               </div>
                               <div>
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{quotient}</span>
-                                <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{info.name}</h4>
+                                <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">{qName}</h4>
                               </div>
                             </div>
                             <span className="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                              {data.level}
+                              {t(`baseline_test.bands.${data.level}`, data.level)}
                             </span>
                           </div>
 
                           {/* Description */}
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">{info.desc}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">{qDesc}</p>
 
                           {/* Score Display */}
                           <div className="flex items-end justify-between mb-4">
@@ -1005,9 +1012,9 @@ const BaseLineTest = () => {
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-xs text-slate-400 dark:text-slate-500 mb-1">Performance</div>
+                              <div className="text-xs text-slate-400 dark:text-slate-500 mb-1">{t("baseline_test.performance", "Performance")}</div>
                               <div className="text-sm font-bold text-slate-600 dark:text-slate-300">
-                                {data.earned}/{data.possible} correct
+                                {data.earned}/{data.possible} {t("baseline_test.correct", "correct")}
                               </div>
                             </div>
                           </div>
@@ -1043,7 +1050,7 @@ const BaseLineTest = () => {
                   }) : (
                     <div className="col-span-3 text-center py-12">
                       <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#1a3884] border-t-transparent mx-auto mb-4" />
-                      <p className="text-slate-400 text-lg">Processing your profile...</p>
+                      <p className="text-slate-400 text-lg">{t("baseline_test.processing_profile", "Processing your profile...")}</p>
                     </div>
                   )}
                 </div>
@@ -1061,7 +1068,7 @@ const BaseLineTest = () => {
                   className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
                 >
                   <Download className="w-4 h-4" />
-                  Download Report
+                  {t("baseline_test.download_report", "Download Report")}
                 </button>
 
                 <button
@@ -1074,21 +1081,21 @@ const BaseLineTest = () => {
                   className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1 w-full sm:w-auto"
                 >
                   <TrendingUp className="w-4 h-4" />
-                  Continue My Journey
+                  {t("baseline_test.continue_journey", "Continue My Journey")}
                 </button>
 
                 <button
                   onClick={() => navigate("/dashboard")}
                   className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
                 >
-                  Go to Dashboard
+                  {t("baseline_test.go_to_dashboard", "Go to Dashboard")}
                 </button>
 
                 <button
                   onClick={() => navigate("/dashboard/assessment-centre")}
                   className="px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto"
                 >
-                  All Assessments
+                  {t("baseline_test.all_assessments", "All Assessments")}
                 </button>
               </motion.div>
 
@@ -1106,18 +1113,18 @@ const BaseLineTest = () => {
               <div className="w-20 h-20 bg-amber-50 dark:bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                 <XCircle className="w-10 h-10 text-amber-500" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">Don't Leave Yet!</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-center mb-8">Back navigation is disabled while the assessment is in progress. If you leave now, you will return to the assessment dashboard.</p>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-4">{t("baseline_test.exit_warning_title", "Don't Leave Yet!")}</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-center mb-8">{t("baseline_test.exit_warning_desc", "Back navigation is disabled while the assessment is in progress. If you leave now, you will return to the assessment dashboard.")}</p>
               <div className="flex flex-col gap-3">
                 <button
                   onClick={leaveAssessmentPage}
                   className="w-full py-4 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-[#003170] transition-all shadow-sm"
                 >
-                  Leave Assessment
+                  {t("baseline_test.leave_assessment", "Leave Assessment")}
                 </button>
                 <button onClick={() => {
                   setShowExitWarning(false);
-                }} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">Continue Assessment</button>
+                }} className="w-full py-4 bg-[#1a3884] text-white rounded-xl font-bold hover:bg-[#277a84] transition-all shadow-md">{t("baseline_test.continue_assessment", "Continue Assessment")}</button>
               </div>
             </motion.div>
           </div>
@@ -1129,7 +1136,7 @@ const BaseLineTest = () => {
         isOpen={showBadgeModal}
         onClose={() => setShowBadgeModal(false)}
         badge={earnedBadge}
-        userName={user?.fullName || 'Student'}
+        userName={user?.fullName || t("baseline_test.student", "Student")}
       />
 
       <style dangerouslySetInnerHTML={{

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Sticker,
   Palette,
@@ -14,13 +15,15 @@ import {
 // Dark   → sidebar bg : #002147  |  active fill : #1a3884  |  idle icon : #94a3b8
 
 const EditorSidebar = ({ activePanel, setActivePanel }) => {
+  const { t } = useTranslation();
+
   const tabs = [
-    { id: "templates", icon: LayoutTemplate, label: "Design" },
-    { id: "assets", icon: Sticker, label: "Assets" },
-    { id: "text", icon: Type, label: "Text" },
-    { id: "style", icon: Palette, label: "Style" },
-    { id: "layers", icon: Layers3, label: "Layers" },
-    { id: "settings", icon: Settings2, label: "Canvas" },
+    { id: "templates", icon: LayoutTemplate, label: t("vision_board.tab_design") },
+    { id: "assets", icon: Sticker, label: t("vision_board.tab_assets") },
+    { id: "text", icon: Type, label: t("vision_board.tab_text") },
+    { id: "style", icon: Palette, label: t("vision_board.tab_style") },
+    { id: "layers", icon: Layers3, label: t("vision_board.tab_layers") },
+    { id: "settings", icon: Settings2, label: t("vision_board.tab_canvas") },
     // { id: "goals",     icon: Target,         label: "Goals"   },
   ];
 

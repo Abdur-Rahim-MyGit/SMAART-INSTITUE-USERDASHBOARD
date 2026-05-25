@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   Award, Target, X, CheckCircle2, Download, Shield, Share2,
   BarChart2, MapPin, Briefcase, Calendar, CheckCircle, ArrowLeft
@@ -28,6 +29,7 @@ const assessmentConfig = [
 
 // ----- Main MyAssessments Component -----
 const MyAssessments = () => {
+  const { t } = useTranslation();
   const { user: currentUser, loading: userLoading } = useUser();
   const userName = currentUser?.fullName || "";
   const [hasCompletedBaseLine, setHasCompletedBaseLine] = useState(false);
@@ -133,6 +135,11 @@ const MyAssessments = () => {
     const { isCompleted, isCurrent, isLocked, isTimerActive } = getAssessmentStatus(index, assessment.key);
     const IconComponent = assessment.icon;
 
+    const translatedTitle = t(`my_assessments.${assessment.key}_title`, { defaultValue: assessment.title });
+    const translatedCategory = t(`my_assessments.category_${assessment.category.toLowerCase()}`, { defaultValue: assessment.category });
+    const translatedQuestions = t(`my_assessments.questions_count`, { defaultValue: assessment.questions });
+    const translatedDuration = t(`my_assessments.duration_approx`, { defaultValue: assessment.duration });
+
     return (
       <motion.div
         key={assessment.key}
@@ -151,7 +158,7 @@ const MyAssessments = () => {
                   : "border-2 border-slate-100 bg-[#F8FAFC] text-slate-400 dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-500"
             }`}
           >
-            Step {index + 1}
+            {t("my_assessments.step")} {index + 1}
           </div>
         </div>
 
@@ -184,15 +191,15 @@ const MyAssessments = () => {
                 </div>
                 <div className="min-w-0 flex-1 pt-1">
                   <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${isCompleted || isCurrent ? "text-[#1a3884] dark:text-blue-400" : "text-slate-400 dark:text-slate-500"}`}>
-                    {assessment.category}
+                    {translatedCategory}
                   </span>
                   <h3 className={`truncate text-lg font-black sm:text-xl ${isLocked || isTimerActive ? "text-slate-500 dark:text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>
-                    {assessment.title}
+                    {translatedTitle}
                   </h3>
                   <div className="mt-1 flex flex-wrap gap-2">
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{assessment.questions}</span>
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{translatedQuestions}</span>
                     <span className="text-xs font-medium text-slate-400 dark:text-slate-600">•</span>
-                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{assessment.duration}</span>
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{translatedDuration}</span>
                   </div>
                 </div>
               </div>
@@ -201,22 +208,22 @@ const MyAssessments = () => {
                   <button
                     onClick={() => setSelectedAssessment({
                       id: assessment.key,
-                      title: assessment.title,
+                      title: translatedTitle,
                       icon: assessment.icon,
                       data: results[assessment.key],
-                      description: `View your ${assessment.title} results.`
+                      description: t("my_assessments.view_results_desc", { title: translatedTitle, defaultValue: `View your ${translatedTitle} results.` })
                     })}
                     className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-bold text-slate-600 shadow-sm transition-all hover:border-[#1a3884] hover:bg-[#1a3884] hover:text-white dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:border-blue-500 dark:hover:bg-[#1a3884]"
                   >
                     <CheckCircle2 className="h-4 w-4" />
-                    View Results
+                    {t("my_assessments.view_results")}
                   </button>
                 ) : (
                   <a
                     href={assessment.path}
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#1a3884] via-[#2b57c4] to-[#3b6de3] py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/15 transition-all hover:shadow-xl"
                   >
-                    Start Assessment
+                    {t("my_assessments.start_assessment")}
                   </a>
                 )}
               </div>
@@ -244,16 +251,16 @@ const MyAssessments = () => {
                       <div className="rounded-2xl bg-blue-50 p-3 text-[#1a3884] dark:bg-blue-500/10 dark:text-blue-300">
                         <Award className="h-6 w-6 sm:h-8 sm:w-8" />
                       </div>
-                      <h2 className="text-xl font-black text-slate-900 dark:text-slate-50 sm:text-2xl">Welcome back, {userName || "Student"}! 🎉</h2>
+                      <h2 className="text-xl font-black text-slate-900 dark:text-slate-50 sm:text-2xl">{t("my_assessments.welcome_back", { name: userName || t("common.student") })}</h2>
                     </div>
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300 sm:text-base">Complete your base line assessment to unlock personalized insights.</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300 sm:text-base">{t("my_assessments.welcome_back_desc")}</p>
                   </div>
                 </div>
               </motion.div>
             )}
 
             <div className="mb-6 sm:mb-8">
-              <AssessmentBanner title="MY ASSESSMENTS" />
+              <AssessmentBanner title={t("my_assessments.page_title")} />
             </div>
 
             {/* Skills Passport Button */}
@@ -265,7 +272,7 @@ const MyAssessments = () => {
                 className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm ring-1 ring-slate-200 transition-all hover:bg-[#F8FAFC] dark:bg-[#002147] dark:text-slate-200 dark:ring-slate-700 dark:hover:bg-[#002A5C]"
               >
                 <Shield className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
-                Skills Passport
+                {t("my_assessments.skills_passport")}
               </motion.button>
             </div>
 
@@ -297,7 +304,7 @@ const MyAssessments = () => {
                       </div>
                       <div>
                         <h2 className="text-xl font-black text-slate-900 dark:text-slate-50">{selectedAssessment.title}</h2>
-                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Detailed Results</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">{t("my_assessments.detailed_results")}</p>
                       </div>
                     </div>
                     <button onClick={() => setSelectedAssessment(null)} className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#002A5C] dark:hover:text-slate-300">
@@ -308,9 +315,9 @@ const MyAssessments = () => {
                     {selectedAssessment.id === 'baseline' && selectedAssessment.data && (
                       <div className="space-y-6">
                         <div className="rounded-2xl border border-slate-200/80 bg-white/60 p-8 text-center backdrop-blur-md dark:border-slate-700/80 dark:bg-slate-900/60">
-                          <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Readiness Profile</h3>
+                          <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{t("my_assessments.readiness_profile")}</h3>
                           <div className="inline-block rounded-full border border-blue-200 bg-blue-50 px-8 py-3 text-lg font-black uppercase tracking-widest text-[#1a3884] dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-400">
-                            Current Band: {selectedAssessment.data.stageBand || 'Emerging'}
+                            {t("my_assessments.current_band", { band: selectedAssessment.data.stageBand || 'Emerging' })}
                           </div>
                         </div>
                         <button
@@ -318,11 +325,11 @@ const MyAssessments = () => {
                           className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 py-4 font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:-translate-y-0.5 hover:shadow-xl"
                         >
                           <Download className="h-5 w-5" />
-                          Download Detailed PDF Report
+                          {t("my_assessments.download_pdf")}
                         </button>
                         <div className="rounded-2xl border border-slate-200/80 bg-white/60 p-6 backdrop-blur-md dark:border-slate-700/80 dark:bg-slate-900/60">
-                          <h4 className="mb-3 text-lg font-black text-slate-900 dark:text-slate-50">Assessment Summary</h4>
-                          <p className="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">You have completed the Base Line Test - T1. This assessment measures your fundamental understanding and provides a baseline for your growth journey.</p>
+                          <h4 className="mb-3 text-lg font-black text-slate-900 dark:text-slate-50">{t("my_assessments.assessment_summary")}</h4>
+                          <p className="text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">{t("my_assessments.assessment_summary_desc")}</p>
                         </div>
                       </div>
                     )}

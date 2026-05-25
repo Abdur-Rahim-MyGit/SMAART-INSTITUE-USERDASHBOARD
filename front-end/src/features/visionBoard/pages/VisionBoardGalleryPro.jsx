@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ import { moderateTextAsync, loadToxicityModel, moderateText } from "../utils/con
 // ═══════════════════════════════════════════════════════════════════════════
 
 const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsActive, onDeactivate, isCurrentVision, viewMode = "grid" }) => {
+  const { t } = useTranslation();
   const [showMenu, setShowMenu] = useState(false);
   const [isSettingActive, setIsSettingActive] = useState(false);
 
@@ -68,7 +70,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
       {isCurrentVision && (
         <div className="absolute left-5 top-5 z-10 inline-flex items-center gap-1.5 rounded-full border border-white/80 bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary shadow-lg backdrop-blur-md dark:border-white/10 dark:bg-[#081120]/90 dark:text-blue-300">
           <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-          Active Vision
+          {t("vision_board.active_vision")}
         </div>
       )}
 
@@ -95,7 +97,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
               className="rounded-full bg-white px-5 font-semibold text-slate-900 shadow-lg hover:bg-slate-100"
             >
               <Eye className="w-4 h-4 mr-2" />
-              Preview
+              {t("vision_board.preview")}
             </Button>
             <Button
               size="sm"
@@ -104,7 +106,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
               className="rounded-full border-white/60 bg-white/10 px-5 font-semibold text-white backdrop-blur hover:bg-white/20"
             >
               <Edit className="mr-2 h-4 w-4" />
-              Edit
+              {t("vision_board.edit")}
             </Button>
           </div>
         </div>
@@ -136,7 +138,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
                     }}
                     className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-slate-700/50"
                   >
-                    <Copy className="w-3.5 h-3.5" /> Duplicate
+                    <Copy className="w-3.5 h-3.5" /> {t("vision_board.duplicate")}
                   </button>
                   <button
                     onClick={(e) => {
@@ -146,7 +148,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
                     }}
                     className="flex w-full items-center gap-2 border-b border-slate-100 px-4 py-2.5 text-left text-xs text-slate-700 transition-colors hover:bg-slate-50 dark:border-white/10 dark:text-slate-200 dark:hover:bg-slate-700/50"
                   >
-                    <Edit className="w-3.5 h-3.5" /> Edit
+                    <Edit className="w-3.5 h-3.5" /> {t("vision_board.edit")}
                   </button>
 
                   <button
@@ -157,7 +159,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
                     }}
                     className="w-full text-left px-4 py-2.5 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors"
                   >
-                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                    <Trash2 className="w-3.5 h-3.5" /> {t("vision_board.delete")}
                   </button>
                 </div>
               </>
@@ -174,7 +176,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
                 ? "bg-primary/10 text-primary" 
                 : "bg-slate-100 text-slate-500 dark:bg-[#002A5C] dark:text-slate-300"
             }`}>
-              {isCurrentVision ? "Current Focus" : "Stored Vision"}
+              {isCurrentVision ? t("vision_board.current_focus") : t("vision_board.stored_vision")}
             </span>
             <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500">
               {formatDate(board.createdAt)}
@@ -184,7 +186,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
             {board.title}
           </h3>
           <p className="line-clamp-2 min-h-[2.5rem] text-[14px] leading-relaxed text-slate-500 dark:text-slate-400">
-            {board.description || "A curated board of visual goals and personal direction."}
+            {board.description || t("vision_board.default_board_desc")}
           </p>
         </div>
 
@@ -195,7 +197,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
             onClick={() => onPreview(board)}
             className="flex-1 rounded-[14px] border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:bg-[#002A5C]"
           >
-            Preview
+            {t("vision_board.preview")}
           </Button>
           <Button
             size="sm"
@@ -218,15 +220,15 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
             {isSettingActive ? (
               <>
                 <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                Updating
+                {t("vision_board.updating")}
               </>
             ) : isCurrentVision ? (
               <>
                 <CheckCircle2 className="mr-2 h-3.5 w-3.5" />
-                Active
+                {t("vision_board.active")}
               </>
             ) : (
-              "Set Active"
+              t("vision_board.set_active")
             )}
           </Button>
         </div>
@@ -240,6 +242,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
 // ═══════════════════════════════════════════════════════════════════════════
 
 const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   return (
@@ -262,11 +265,10 @@ const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
             <Trash2 className="w-6 h-6 text-red-600" />
           </div>
           <h3 className="text-xl font-black text-center mb-2 text-slate-900 dark:text-white uppercase tracking-tight">
-            Delete Vision Board?
+            {t("vision_board.delete_modal_title")}
           </h3>
           <p className="text-center mb-6 text-gray-500">
-            Are you sure you want to delete "{board?.title}"? This action cannot
-            be undone.
+            {t("vision_board.delete_modal_desc", { title: board?.title })}
           </p>
           <div className="flex gap-3">
             <Button
@@ -275,7 +277,7 @@ const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
               onClick={onCancel}
               disabled={isDeleting}
             >
-              Cancel
+              {t("vision_board.cancel")}
             </Button>
             <Button
               variant="destructive"
@@ -286,10 +288,10 @@ const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
               {isDeleting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Deleting...
+                  {t("vision_board.deleting")}
                 </>
               ) : (
-                "Delete"
+                t("vision_board.delete")
               )}
             </Button>
           </div>
@@ -304,6 +306,7 @@ const DeleteModal = ({ isOpen, board, onConfirm, onCancel, isDeleting }) => {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange }) => {
+  const { t } = useTranslation();
   const { toast } = useToast();
 
   if (!isOpen || !board) return null;
@@ -326,8 +329,8 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
       onVisionChange(board._id);
 
       toast({
-        title: "Vision Enabled!",
-        description: "Your vision board is now displayed on your dashboard.",
+        title: t("vision_board.toast_vision_enabled_title") || "Vision Enabled!",
+        description: t("vision_board.toast_vision_enabled_desc") || "Your vision board is now displayed on your dashboard.",
       });
       onClose();
     } catch (error) {
@@ -345,8 +348,8 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
       onVisionChange(null);
 
       toast({
-        title: "Vision Disabled",
-        description: "Vision board removed from dashboard.",
+        title: t("vision_board.toast_vision_disabled_title") || "Vision Disabled",
+        description: t("vision_board.toast_vision_disabled_desc") || "Vision board removed from dashboard.",
       });
       onClose();
     } catch (error) {
@@ -424,7 +427,7 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
                 className="bg-red-600 hover:bg-red-700 text-white font-semibold"
               >
                 <EyeOff className="w-4 h-4 mr-2" />
-                Disable Vision
+                {t("vision_board.disable_vision")}
               </Button>
             ) : (
               <Button
@@ -432,7 +435,7 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
                 className="bg-[#1a3884] hover:bg-[#132c6b] text-white font-semibold shadow-[0_0_15px_rgba(26,56,132,0.4)]"
               >
                 <Eye className="w-4 h-4 mr-2" />
-                Enable as Vision
+                {t("vision_board.enable_vision")}
               </Button>
             )}
             <Button
@@ -441,7 +444,7 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
               className="border-gray-200 text-[#002147] hover:bg-gray-50 bg-white"
             >
               <Download className="w-4 h-4 mr-2" />
-              Download
+              {t("vision_board.download")}
             </Button>
           </div>
         </motion.div>
@@ -455,6 +458,7 @@ const PreviewModal = ({ isOpen, board, onClose, currentVisionId, onVisionChange 
 // ═══════════════════════════════════════════════════════════════════════════
 
 const VisionBoardGalleryPro = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -797,14 +801,14 @@ const VisionBoardGalleryPro = () => {
       <div className="mx-auto max-w-[1600px] pb-6">
         {/* ── Standardized PageHero ── */}
         <PageHero
-          badge="Vision Journey"
-          title="Vision Board Gallery"
-          subtitle="Create detailed boards for your goals, track your aspirations with clarity, and keep your primary vision active on your dashboard to stay inspired."
+          badge={t("vision_board.vision_journey")}
+          title={t("vision_board.gallery_title")}
+          subtitle={t("vision_board.gallery_subtitle")}
         >
           <div className="flex flex-wrap items-center gap-3">
             <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-100 bg-white dark:bg-[#002147] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-white shadow-sm dark:border-white/10">
               <Grid3X3 className="h-3.5 w-3.5 text-[#1a3884] dark:text-blue-400" />
-              {boards.length} / {maxAllowed} SLOTS
+              {boards.length} / {maxAllowed} {t("vision_board.slots")}
             </div>
             <Button
               onClick={handleCreateNew}
@@ -816,7 +820,7 @@ const VisionBoardGalleryPro = () => {
               }`}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Create New Board
+              {t("vision_board.create_new_board")}
             </Button>
           </div>
         </PageHero>
@@ -825,27 +829,27 @@ const VisionBoardGalleryPro = () => {
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-32 space-y-4">
               <Loader2 className="h-12 w-12 animate-spin text-[#1a3884]" />
-              <p className="animate-pulse text-slate-400">Loading your boards...</p>
+              <p className="animate-pulse text-slate-400">{t("vision_board.loading_boards")}</p>
             </div>
           ) : boards.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-[28px] border border-dashed border-slate-300 bg-white py-24 text-center shadow-sm dark:border-white/10 dark:bg-[#0b1627]">
               <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#1a3884]/10">
                 <Images className="h-8 w-8 text-[#1a3884]" />
               </div>
-              <h3 className="mb-2 text-2xl font-semibold text-slate-900 dark:text-white">No boards yet</h3>
+              <h3 className="mb-2 text-2xl font-semibold text-slate-900 dark:text-white">{t("vision_board.no_boards")}</h3>
               <p className="mx-auto mb-8 max-w-md text-slate-500 dark:text-slate-400">
-                Start with one clear board, then add more as your goals branch into different areas.
+                {t("vision_board.no_boards_desc")}
               </p>
               <Button onClick={handleCreateNew} className="h-11 rounded-2xl bg-[#1a3884] px-8 font-semibold text-white hover:bg-[#132c6b]">
                 <Plus className="mr-2 h-4.5 w-4.5" />
-                Create Vision Board
+                {t("vision_board.create_vision_board")}
               </Button>
             </div>
           ) : filteredBoards.length === 0 ? (
             <div className="rounded-[28px] border border-slate-200 bg-white px-6 py-20 text-center shadow-sm dark:border-white/8 dark:bg-[#0b1627]">
               <Search className="mx-auto mb-4 h-10 w-10 text-slate-300 dark:text-slate-600" />
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">No boards match those filters</h3>
-              <p className="mt-2 text-slate-500 dark:text-slate-400">Try another search term or switch back to all boards.</p>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{t("vision_board.no_boards_match")}</h3>
+              <p className="mt-2 text-slate-500 dark:text-slate-400">{t("vision_board.no_boards_match_desc")}</p>
             </div>
           ) : (
             <div className={viewMode === "grid"
@@ -908,14 +912,14 @@ const VisionBoardGalleryPro = () => {
               className="bg-white dark:bg-[#00152E] rounded-2xl w-full max-w-md p-6 shadow-2xl border border-slate-200 dark:border-white/10"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-2">Manifest your Vision</h3>
-              <p className="text-[14px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 mb-8">Give your vision a name and a brief description to start manifesting your goals.
+              <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white mb-2">{t("vision_board.manifest_vision")}</h3>
+              <p className="text-[14px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 mb-8">{t("vision_board.manifest_desc")}
               </p>
 
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
-                    <label className="font-bold uppercase tracking-wider">Board Title</label>
+                    <label className="font-bold uppercase tracking-wider">{t("vision_board.board_title")}</label>
                     <span className={`font-bold ${newTitle.length >= TITLE_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
                       {newTitle.length}/{TITLE_CHAR_LIMIT}
                     </span>
@@ -927,14 +931,14 @@ const VisionBoardGalleryPro = () => {
                       setNewTitle(val);
                       handleInstantCheck(val, "title");
                     }}
-                    placeholder="e.g., My Professional Journey 2026"
+                    placeholder={t("vision_board.title_placeholder")}
                     maxLength={TITLE_CHAR_LIMIT}
                     className="h-12 bg-slate-50 dark:bg-[#002147] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-primary/20 rounded-xl font-medium"
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between text-[11px] text-slate-500 mb-2">
-                    <label className="font-bold uppercase tracking-wider">Aspiration Details</label>
+                    <label className="font-bold uppercase tracking-wider">{t("vision_board.aspiration_details")}</label>
                     <span className={`font-bold ${newDescription.length >= DESCRIPTION_CHAR_LIMIT ? "text-red-500" : "text-slate-400"}`}>
                       {newDescription.length}/{DESCRIPTION_CHAR_LIMIT}
                     </span>
@@ -947,7 +951,7 @@ const VisionBoardGalleryPro = () => {
                       handleInstantCheck(val, "description");
                     }}
                     rows={4}
-                    placeholder="Describe what you want to achieve and why it matters to you…"
+                    placeholder={t("vision_board.aspiration_placeholder")}
                     maxLength={DESCRIPTION_CHAR_LIMIT}
                     className="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-[#002147] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none font-medium leading-relaxed"
                   />
@@ -960,13 +964,13 @@ const VisionBoardGalleryPro = () => {
                   onClick={() => setShowCreateModal(false)}
                   className="h-12 border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 bg-white dark:bg-[#002A5C] hover:bg-slate-50 dark:hover:bg-[#002A5C] rounded-xl font-bold px-6"
                 >
-                  Cancel
+                  {t("vision_board.cancel")}
                 </Button>
                 <Button
                   onClick={handleConfirmCreate}
                   className="h-12 bg-primary hover:bg-primary/90 text-white font-bold shadow-xl shadow-primary/20 rounded-xl px-8"
                 >
-                  Start Creating <ArrowRight className="w-4 h-4 ml-2" />
+                  {t("vision_board.start_creating")} <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
               </motion.div>
