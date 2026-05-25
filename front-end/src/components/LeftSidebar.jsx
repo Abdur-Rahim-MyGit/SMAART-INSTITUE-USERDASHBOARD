@@ -124,30 +124,34 @@ const LeftSidebar = () => {
     return () => clearInterval(interval);
   }, [user?.college?.logo]);
 
-  // Fetch profile photo from Registration API
+  // Sync profile photo from context or API
   useEffect(() => {
-    const fetchProfilePhoto = async () => {
-      if (!user?.email) return;
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
-        if (response.ok) {
-          const data = await response.json();
-          // Check for profilePhoto at root level first (new structure), then fallback to otherDetails or user object
-          const photoUrl = data.profilePhoto || data.otherDetails?.profilePhoto || user?.profileImage || user?.profilePicture;
-          if (photoUrl) {
-            // If it's already a full URL (Cloudinary), use it directly; otherwise prepend backend URL
-            const fullUrl = photoUrl.startsWith('http') ? photoUrl : `${getBackendUrl()}/${photoUrl}`;
-            setProfilePhoto(fullUrl);
+    // 1. Try to get it from context first to avoid extra API calls
+    const photoUrl = user?.profilePhoto || user?.otherDetails?.profilePhoto || user?.profileImage || user?.profilePicture;
+    if (photoUrl) {
+      const fullUrl = photoUrl.startsWith('http') ? photoUrl : `${getBackendUrl()}/${photoUrl}`;
+      setProfilePhoto(fullUrl);
+    } else {
+      // 2. Fallback to API if not in context
+      const fetchProfilePhoto = async () => {
+        if (!user?.email) return;
+        try {
+          const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
+          if (response.ok) {
+            const data = await response.json();
+            const fetchedPhotoUrl = data.profilePhoto || data.otherDetails?.profilePhoto;
+            if (fetchedPhotoUrl) {
+              const fullUrl = fetchedPhotoUrl.startsWith('http') ? fetchedPhotoUrl : `${getBackendUrl()}/${fetchedPhotoUrl}`;
+              setProfilePhoto(fullUrl);
+            }
           }
+        } catch (error) {
+          console.error("Error fetching profile photo:", error);
         }
-      } catch (error) {
-        console.error("Error fetching profile photo:", error);
-      }
-    };
-
-    fetchProfilePhoto();
-  }, [user?.email, user?.profileImage, user?.profilePicture]);
+      };
+      fetchProfilePhoto();
+    }
+  }, [user?.email, user?.profilePhoto, user?.otherDetails?.profilePhoto, user?.profileImage, user?.profilePicture]);
 
   // Notifications state
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -319,11 +323,10 @@ const LeftSidebar = () => {
             <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-[#1a3884]/15">
               <div className="flex items-center gap-3">
                 <div className="flex flex-col items-start">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center">
                     <span className="text-2xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
                       SMAART
                     </span>
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
                   </div>
                   <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
                     Institute
@@ -487,12 +490,11 @@ const LeftSidebar = () => {
                 <span className="text-xl font-black text-white">S</span>
               </div>
             ) : (
-              <div className="flex flex-col items-start transition-all duration-300 transform hover:scale-105">
-                <div className="flex items-center gap-1">
+              <div className="flex flex-col items-start">
+                <div className="flex items-center">
                   <span className="text-2xl lg:text-3xl font-black tracking-tighter text-[#1a3884] dark:text-white leading-none">
                     SMAART
                   </span>
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
                 </div>
                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.3em]">
                   Institute
