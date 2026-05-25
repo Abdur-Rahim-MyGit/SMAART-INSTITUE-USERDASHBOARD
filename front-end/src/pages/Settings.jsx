@@ -37,20 +37,20 @@ const Settings = () => {
 
   const faqs = [
     {
-      question: "What is the SMAART Career Architecture Map™?",
-      answer: "A modern reference model that frames careers as a multi-stage continuum, helping individuals navigate longer working lives and frequent transitions."
+      question: t("settings_page.faq_q1"),
+      answer: t("settings_page.faq_a1")
     },
     {
-      question: "What is the Integrated Capability Framework™?",
-      answer: "Our proprietary framework that combines Skills (applied ability), Judgement (decision quality), and Adaptability (effectiveness) to build holistic professional capability."
+      question: t("settings_page.faq_q2"),
+      answer: t("settings_page.faq_a2")
     },
     {
-      question: "What are Future of Work insights?",
-      answer: "Research-backed analysis of trends like intelligent automation, job restructuring, and the shift from role-based to skill-based work."
+      question: t("settings_page.faq_q3"),
+      answer: t("settings_page.faq_a3")
     },
     {
-      question: "How can I access the Employment Readiness Report 2026?",
-      answer: "The report is available to our institutional partners and subscribers, offering deep dives into the changing demand for skills and capabilities."
+      question: t("settings_page.faq_q4"),
+      answer: t("settings_page.faq_a4")
     }
   ];
 
@@ -113,14 +113,14 @@ const Settings = () => {
       });
 
       if (response.ok) {
-        toast.success("Profile updated successfully");
+        toast.success(t("settings_page.profile_success"));
         await refreshUser();
       } else {
-        toast.error("Failed to update profile");
+        toast.error(t("settings_page.profile_failed"));
       }
     } catch (error) {
       console.error("Error saving profile:", error);
-      toast.error("Connection error. Please try again.");
+      toast.error(t("settings_page.connection_error"));
     } finally {
       setSaving(false);
     }
@@ -150,25 +150,25 @@ const Settings = () => {
       });
 
       if (response.ok) {
-        toast.success("Language & Region settings updated");
+        toast.success(t("settings_page.language_success"));
         await refreshUser();
       } else {
-        toast.error("Failed to update settings");
+        toast.error(t("settings_page.language_failed"));
       }
     } catch (error) {
       console.error("Error saving language settings:", error);
-      toast.error("Connection error. Please try again.");
+      toast.error(t("settings_page.connection_error"));
     } finally {
       setSaving(false);
     }
   };
 
   const settingsTabs = [
-    { id: "profile", label: t("settings.profile_settings"), icon: User, description: "Manage your personal information" },
-    { id: "notifications", label: t("settings.notifications"), icon: Bell, description: "Configure notification preferences" },
-    { id: "privacy", label: t("settings.privacy"), icon: Shield, description: "Manage your privacy settings" },
-    { id: "customisation", label: t("settings.customisation"), icon: Palette, description: "Customize theme, language, and regional settings" },
-    { id: "help", label: t("settings.help"), icon: HelpCircle, description: "Get help and contact support" },
+    { id: "profile", label: t("settings.profile_settings"), icon: User, description: t("settings_page.profile_desc") },
+    { id: "notifications", label: t("settings.notifications"), icon: Bell, description: t("settings_page.notifications_desc") },
+    { id: "privacy", label: t("settings.privacy"), icon: Shield, description: t("settings_page.privacy_desc") },
+    { id: "customisation", label: t("settings.customisation"), icon: Palette, description: t("settings_page.customisation_desc") },
+    { id: "help", label: t("settings.help"), icon: HelpCircle, description: t("settings_page.help_desc") },
   ];
 
   const renderTabContent = () => {
@@ -183,46 +183,46 @@ const Settings = () => {
             ) : (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">Display Name</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">{t("settings_page.display_name")}</label>
                   <input
                     type="text"
                     name="name"
                     value={profileFormData.name}
                     onChange={handleProfileChange}
-                    placeholder="Enter your display name"
+                    placeholder={t("settings_page.enter_display_name")}
                     className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">Email Address</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">{t("settings_page.email_address")}</label>
                   <input
                     type="email"
                     name="email"
                     value={profileFormData.email}
                     disabled
-                    placeholder="Enter your email"
+                    placeholder={t("settings_page.enter_email")}
                     className="w-full px-4 py-3 rounded-xl bg-gray-100 dark:bg-[#00152E] border border-gray-200 dark:border-white/10 text-gray-500 dark:text-slate-400 cursor-not-allowed focus:outline-none transition-colors"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Email address cannot be changed.</p>
+                  <p className="mt-1 text-xs text-gray-500">{t("settings_page.email_cannot_change")}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">Phone Number</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">{t("settings_page.phone_number")}</label>
                   <input
                     type="tel"
                     name="phone"
                     value={profileFormData.phone}
                     onChange={handleProfileChange}
-                    placeholder="Enter your phone number"
+                    placeholder={t("settings_page.enter_phone_number")}
                     className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">Bio</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">{t("settings_page.bio")}</label>
                   <textarea
                     name="bio"
                     value={profileFormData.bio}
                     onChange={handleProfileChange}
-                    placeholder="Tell us about yourself"
+                    placeholder={t("settings_page.tell_about_yourself")}
                     rows={4}
                     className="w-full px-4 py-3 rounded-xl bg-[#F8FAFC] dark:bg-dark-elevated border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 focus:border-[#1a3884] dark:focus:border-blue-400 focus:outline-none transition-colors resize-none"
                   />
@@ -230,15 +230,15 @@ const Settings = () => {
                 <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-gray-900 dark:text-white font-medium">Change Password</h4>
-                      <p className="text-gray-500 dark:text-slate-300 text-sm">Update your account password</p>
+                      <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.change_password")}</h4>
+                      <p className="text-gray-500 dark:text-slate-300 text-sm">{t("settings_page.update_password_desc")}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowChangePasswordModal(true)}
                       className="px-4 py-2 rounded-lg border border-[#1a3884] text-[#1a3884] font-medium hover:bg-[#1a3884]/10 transition-colors"
                     >
-                      Change
+                      {t("settings_page.change")}
                     </button>
                   </div>
                 </div>
@@ -251,9 +251,9 @@ const Settings = () => {
         return (
           <div className="space-y-6">
             {[
-              { label: "Email Notifications", description: "Receive updates via email" },
-              { label: "Push Notifications", description: "Get push notifications on your device" },
-              { label: "Community Activity", description: "Updates from community discussions" },
+              { label: t("settings_page.email_notifications"), description: t("settings_page.email_notifications_desc") },
+              { label: t("settings_page.push_notifications"), description: t("settings_page.push_notifications_desc") },
+              { label: t("settings_page.community_activity"), description: t("settings_page.community_activity_desc") },
             ].map((item, index) => (
               <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
                 <div>
@@ -275,11 +275,11 @@ const Settings = () => {
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-gray-900 dark:text-white font-medium">Two-Factor Authentication</h4>
-                  <p className="text-gray-500 dark:text-slate-300 text-sm">Add an extra layer of security</p>
+                  <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.two_factor_auth")}</h4>
+                  <p className="text-gray-500 dark:text-slate-300 text-sm">{t("settings_page.two_factor_desc")}</p>
                 </div>
                 <button type="button" className="px-4 py-2 rounded-lg bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors">
-                  Enable
+                  {t("settings_page.enable")}
                 </button>
               </div>
             </div>
@@ -288,31 +288,31 @@ const Settings = () => {
             <div className="p-5 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
               <h4 className="flex items-center gap-2 text-[#002147] dark:text-blue-200 font-semibold mb-3">
                 <Shield className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
-                SMAART Security & Privacy Guidelines
+                {t("settings_page.security_guidelines")}
               </h4>
               <ul className="space-y-3.5 text-sm text-gray-600 dark:text-slate-300">
                 <li className="flex gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                   <span>
-                    <strong>Cognitive & EQ Data Protection:</strong> Your baseline quotient test scores, EQ response data, and AI career coaching queries are encrypted and strictly used to personalize your learning roadmap.
+                    <strong>{t("settings_page.guideline_1_title")}</strong>{t("settings_page.guideline_1_desc")}
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                   <span>
-                    <strong>Academic Record Confidentiality:</strong> Your course progress, badges, and verified skills certificates are kept private and accessible only to you and authorized institutional administrators.
+                    <strong>{t("settings_page.guideline_2_title")}</strong>{t("settings_page.guideline_2_desc")}
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                   <span>
-                    <strong>Account Integrity:</strong> Ensure you do not share credentials. Enable Two-Factor Authentication to secure your diagnostic metrics and dynamic career roadmap.
+                    <strong>{t("settings_page.guideline_3_title")}</strong>{t("settings_page.guideline_3_desc")}
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                   <span>
-                    <strong>Community & Sharing:</strong> While peer group chats and public forum discussions are visible to other student members, all your assessment data remains strictly confidential.
+                    <strong>{t("settings_page.guideline_4_title")}</strong>{t("settings_page.guideline_4_desc")}
                   </span>
                 </li>
               </ul>
@@ -324,19 +324,22 @@ const Settings = () => {
         return (
           <div className="space-y-6">
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <h4 className="text-gray-900 dark:text-white font-medium mb-4">Theme</h4>
+              <h4 className="text-gray-900 dark:text-white font-medium mb-4">{t("settings_page.theme")}</h4>
               <div className="grid grid-cols-2 gap-3">
-                {["Light", "Dark"].map((themeOption) => (
+                {[
+                  { value: "Light", label: t("settings_page.light") },
+                  { value: "Dark", label: t("settings_page.dark") }
+                ].map((themeOption) => (
                   <button
-                    key={themeOption}
+                    key={themeOption.value}
                     type="button"
-                    onClick={() => setTheme(themeOption.toLowerCase())}
-                    className={`p-4 rounded-xl border-2 transition-all hover:scale-[1.02] ${currentTheme === themeOption.toLowerCase()
+                    onClick={() => setTheme(themeOption.value.toLowerCase())}
+                    className={`p-4 rounded-xl border-2 transition-all hover:scale-[1.02] ${currentTheme === themeOption.value.toLowerCase()
                       ? "border-[#1a3884] bg-[#1a3884]/10 dark:bg-[#1a3884]/20"
                       : "border-gray-200 dark:border-white/10 hover:border-[#1a3884]/50 dark:hover:border-[#1a3884]/60"
                       }`}
                   >
-                    <span className="text-gray-900 dark:text-white font-medium">{themeOption}</span>
+                    <span className="text-gray-900 dark:text-white font-medium">{themeOption.label}</span>
                   </button>
                 ))}
               </div>
@@ -357,7 +360,7 @@ const Settings = () => {
               </select>
             </div>
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <label className="block text-gray-900 dark:text-white font-medium mb-3">Timezone</label>
+              <label className="block text-gray-900 dark:text-white font-medium mb-3">{t("settings_page.timezone")}</label>
               <select
                 name="timezone"
                 value={languageFormData.timezone}
@@ -371,7 +374,7 @@ const Settings = () => {
               </select>
             </div>
             <div className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10">
-              <label className="block text-gray-900 dark:text-white font-medium mb-3">Date Format</label>
+              <label className="block text-gray-900 dark:text-white font-medium mb-3">{t("settings_page.date_format")}</label>
               <select
                 name="dateFormat"
                 value={languageFormData.dateFormat}
@@ -394,7 +397,7 @@ const Settings = () => {
                 onClick={() => setShowFAQ(false)}
                 className="flex items-center gap-2 text-[#1a3884] dark:text-blue-400 font-medium mb-4 hover:underline"
               >
-                ← Back to Help
+                {t("settings_page.back_to_help")}
               </button>
               {faqs.map((faq, index) => (
                 <div
@@ -435,53 +438,53 @@ const Settings = () => {
                 onClick={() => setShowDocs(false)}
                 className="flex items-center gap-2 text-[#1a3884] dark:text-blue-400 font-medium mb-4 hover:underline"
               >
-                ← Back to Help
+                {t("settings_page.back_to_help")}
               </button>
 
               <div className="prose dark:prose-invert max-w-none">
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 border-b border-gray-200 dark:border-white/10 pb-2">
-                  User Documentation
+                  {t("settings_page.user_documentation")}
                 </h3>
 
                 <section className="mb-8">
-                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">Getting Started</h4>
+                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">{t("settings_page.getting_started")}</h4>
                   <p className="text-gray-600 dark:text-slate-200 leading-relaxed">
-                    Welcome to SMAART Institute! Our platform is designed to help you navigate your career journey using advanced AI insights. Start by completing your profile and taking the baseline assessments.
+                    {t("settings_page.getting_started_desc")}
                   </p>
                 </section>
 
                 <section className="mb-8">
-                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">Core Frameworks</h4>
+                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">{t("settings_page.core_frameworks")}</h4>
                   <div className="space-y-4">
                     <div className="p-4 bg-[#F8FAFC] dark:bg-[#1a3884]/10 rounded-xl border border-gray-100 dark:border-white/10">
-                      <h5 className="font-bold text-gray-800 dark:text-slate-100 mb-1">Career Architecture Map™</h5>
+                      <h5 className="font-bold text-gray-800 dark:text-slate-100 mb-1">{t("settings_page.career_architecture_map")}</h5>
                       <p className="text-sm text-gray-600 dark:text-slate-300">
-                        A multi-stage model for lifelong career development, moving beyond traditional linear career paths.
+                        {t("settings_page.career_architecture_map_desc")}
                       </p>
                     </div>
                     <div className="p-4 bg-[#F8FAFC] dark:bg-[#1a3884]/10 rounded-xl border border-gray-100 dark:border-white/10">
-                      <h5 className="font-bold text-gray-800 dark:text-slate-100 mb-1">Capability Framework™</h5>
+                      <h5 className="font-bold text-gray-800 dark:text-slate-100 mb-1">{t("settings_page.capability_framework")}</h5>
                       <p className="text-sm text-gray-600 dark:text-slate-300">
-                        Balances technical skills with judgement and adaptability to build comprehensive professional capability.
+                        {t("settings_page.capability_framework_desc")}
                       </p>
                     </div>
                   </div>
                 </section>
 
                 <section className="mb-8">
-                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">Navigation Guide</h4>
+                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">{t("settings_page.navigation_guide")}</h4>
                   <ul className="list-disc pl-5 space-y-2 text-gray-600 dark:text-slate-200">
-                    <li><strong>Dashboard:</strong> Overview of your progress and upcoming tasks.</li>
-                    <li><strong>Skills Vault:</strong> A repository of your certified skills and achievements.</li>
-                    <li><strong>Vision Board:</strong> Visualize and track your long-term career aspirations.</li>
-                    <li><strong>Community:</strong> Connect with peers and mentors in your field.</li>
+                    <li><strong>{t("settings_page.nav_dashboard")}</strong>{t("settings_page.nav_dashboard_desc")}</li>
+                    <li><strong>{t("settings_page.nav_skills_vault")}</strong>{t("settings_page.nav_skills_vault_desc")}</li>
+                    <li><strong>{t("settings_page.nav_vision_board")}</strong>{t("settings_page.nav_vision_board_desc")}</li>
+                    <li><strong>{t("settings_page.nav_community")}</strong>{t("settings_page.nav_community_desc")}</li>
                   </ul>
                 </section>
 
                 <section>
-                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">Need More Help?</h4>
+                  <h4 className="text-lg font-semibold text-[#1a3884] dark:text-blue-400 mb-2">{t("settings_page.need_more_help")}</h4>
                   <p className="text-gray-600 dark:text-slate-200">
-                    If you can't find what you're looking for, please use the "Contact Support" option to reach out to our dedicated team.
+                    {t("settings_page.need_more_help_desc")}
                   </p>
                 </section>
               </div>
@@ -498,22 +501,22 @@ const Settings = () => {
               }}
               className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
             >
-              <h4 className="text-gray-900 dark:text-white font-medium">FAQ</h4>
-              <p className="text-gray-400 text-sm">Find answers to common questions</p>
+              <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.faq")}</h4>
+              <p className="text-gray-400 text-sm">{t("settings_page.faq_desc")}</p>
             </div>
             <div
               onClick={() => navigate("/dashboard/support")}
               className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
             >
-              <h4 className="text-gray-900 dark:text-white font-medium">Contact Support</h4>
-              <p className="text-gray-400 text-sm">Get in touch with our support team</p>
+              <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.contact_support")}</h4>
+              <p className="text-gray-400 text-sm">{t("settings_page.contact_support_desc")}</p>
             </div>
             <div
               onClick={() => navigate("/dashboard/support")}
               className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
             >
-              <h4 className="text-gray-900 dark:text-white font-medium">Report a Bug</h4>
-              <p className="text-gray-400 text-sm">Help us improve by reporting issues</p>
+              <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.report_bug")}</h4>
+              <p className="text-gray-400 text-sm">{t("settings_page.report_bug_desc")}</p>
             </div>
             <div
               onClick={() => {
@@ -522,8 +525,8 @@ const Settings = () => {
               }}
               className="p-4 rounded-xl bg-[#F8FAFC] dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] hover:shadow-md dark:hover:border-blue-400/50 transition-all cursor-pointer"
             >
-              <h4 className="text-gray-900 dark:text-white font-medium">Documentation</h4>
-              <p className="text-gray-400 text-sm">Read our user guides and tutorials</p>
+              <h4 className="text-gray-900 dark:text-white font-medium">{t("settings_page.documentation")}</h4>
+              <p className="text-gray-400 text-sm">{t("settings_page.documentation_desc")}</p>
             </div>
           </div>
         );
@@ -586,7 +589,7 @@ const Settings = () => {
             {(activeTab === "profile" || activeTab === "customisation") && (
               <div className="mt-8 flex justify-end gap-3">
                 <button className="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-[#1a3884]/50 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#1a3884] transition-colors">
-                  Cancel
+                  {t("settings_page.cancel")}
                 </button>
                 <button
                   onClick={activeTab === "profile" ? handleSaveProfile : handleSaveLanguage}
@@ -594,7 +597,7 @@ const Settings = () => {
                   className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Save Changes
+                  {t("settings_page.save_changes")}
                 </button>
               </div>
             )}
