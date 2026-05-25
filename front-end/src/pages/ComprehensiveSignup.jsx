@@ -97,7 +97,7 @@ const ComprehensiveSignup = () => {
 
       const queryString = new URLSearchParams(params).toString();
       const response = await apiCall(`${endpoint}?${queryString}`);
-      
+
       if (response?.success) {
         setDegreeOptions(prev => ({
           ...prev,
@@ -152,7 +152,6 @@ const ComprehensiveSignup = () => {
   }, []);
 
   const steps = [
-    { title: "Profile", icon: <User className="w-4 h-4" /> },
     { title: "Personal", icon: <User className="w-4 h-4" /> },
     { title: "10th", icon: <GraduationCap className="w-4 h-4" /> },
     { title: "12th", icon: <GraduationCap className="w-4 h-4" /> },
@@ -334,29 +333,27 @@ const ComprehensiveSignup = () => {
   const getSectionDataForStep = (step) => {
     switch (step) {
       case 0:
-        return { name: 'profilePhoto', data: { profilePhoto: personalDetails.profilePhoto } };
-      case 1:
         return { name: 'personalDetails', data: personalDetails };
-      case 2:
+      case 1:
         return { name: 'tenthDetails', data: tenthDetails };
-      case 3:
+      case 2:
         return { name: 'twelfthDetails', data: twelfthDetails };
-      case 4:
+      case 3:
         return { name: 'higherEducation', data: higherEducation };
-      case 5:
+      case 4:
         return { name: 'extracurricular', data: extracurricular.isApplicable ? extracurricular.items : [] };
-      case 6:
+      case 5:
         return { name: 'jobPreferences', data: jobPreferences.items };
-      case 7:
+      case 6:
         return { name: 'sectorPreferences', data: sectorPreferences };
-      case 8:
+      case 7:
         // Career goals alone - personal development goals handled together
         return { name: 'careerGoals', data: { ...careerGoals, personalDevelopmentGoals } };
-      case 9:
+      case 8:
         return { name: 'workExperience', data: workExperience.isApplicable ? workExperience.items : [] };
-      case 10:
+      case 9:
         return { name: 'projects', data: projects.isApplicable ? projects.items : [] };
-      case 11:
+      case 10:
         return { name: 'certificates', data: certificates.isApplicable ? certificates.items : [] };
       default:
         return null;
@@ -366,18 +363,17 @@ const ComprehensiveSignup = () => {
   const handleNextStep = async () => {
     let isValid = true;
     switch (currentStep) {
-      case 0: isValid = !!personalDetails.profilePhoto; if (!isValid) toast.error("Please upload a profile photo"); break;
-      case 1: isValid = validatePersonalDetails(); break;
-      case 2: isValid = validateTenthDetails(); break;
-      case 3: isValid = validateTwelfthDetails(); break;
-      case 4: isValid = validateHigherEducation(); break;
-      case 5: isValid = validateExtracurricular(); break;
-      case 6: isValid = validateJobPreferences(); break;
-      case 7: isValid = validateSectorPreferences(); break;
-      case 8: isValid = validateCareerGoals(); break;
-      case 9: isValid = validateWorkExperience(); break;
-      case 10: isValid = validateProjects(); break;
-      case 11: isValid = validateCertificates(); break;
+      case 0: isValid = validatePersonalDetails(); break;
+      case 1: isValid = validateTenthDetails(); break;
+      case 2: isValid = validateTwelfthDetails(); break;
+      case 3: isValid = validateHigherEducation(); break;
+      case 4: isValid = validateExtracurricular(); break;
+      case 5: isValid = validateJobPreferences(); break;
+      case 6: isValid = validateSectorPreferences(); break;
+      case 7: isValid = validateCareerGoals(); break;
+      case 8: isValid = validateWorkExperience(); break;
+      case 9: isValid = validateProjects(); break;
+      case 10: isValid = validateCertificates(); break;
       default: isValid = true;
     }
 
@@ -473,9 +469,9 @@ const ComprehensiveSignup = () => {
     } catch (error) { console.error("Submission error:", error); toast.error(error.message || "Failed to submit"); setIsLoading(false); }
   };
 
-  const inputClass = "w-full bg-[#002A5C] border border-white/10 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-white placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-[#003575] focus:border-[#1a3884] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#1a3884]/10 focus-visible:ring-offset-0";
-  const selectClass = "w-full bg-[#002A5C] border border-white/10 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-white transition-all duration-200 focus:bg-[#003575] focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 appearance-none";
-  const textareaClass = "w-full bg-[#002A5C] border border-white/10 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-white placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-[#003575] focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 resize-none";
+  const inputClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#1a3884]/10 focus-visible:ring-offset-0";
+  const selectClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 h-11 text-[13px] font-semibold text-slate-800 transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 appearance-none";
+  const textareaClass = "w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-[13px] font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition-all duration-200 focus:bg-white focus:border-[#1a3884] focus:outline-none focus:ring-4 focus:ring-[#1a3884]/10 resize-none";
   const yearOptions = Array.from({ length: 30 }, (_, i) => 2010 + i);
   const salaryRanges = ["0-3 LPA", "3-5 LPA", "5-8 LPA", "8-12 LPA", "12-18 LPA", "18-25 LPA", "25-35 LPA", "35-50 LPA", "50+ LPA", "Negotiable"];
   // Use Excel data sectors if available, otherwise fallback to defaults
@@ -485,14 +481,14 @@ const ComprehensiveSignup = () => {
 
   if (isSuccess) {
     return (
-      <div className="fixed inset-0 z-50 bg-[#00152E] flex items-center justify-center flex-col">
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 10 }} className="w-24 h-24 bg-[#1a3884] rounded-full flex items-center justify-center shadow-2xl">
+      <div className="fixed inset-0 z-50 bg-slate-50 flex items-center justify-center flex-col">
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 10 }} className="w-24 h-24 bg-[#1a3884] rounded-full flex items-center justify-center shadow-xl shadow-blue-500/10">
           <CheckCircle2 className="w-12 h-12 text-white" />
         </motion.div>
-        <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-3xl font-bold text-white mt-8">
+        <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-3xl font-bold text-slate-900 mt-8">
           Profile 100% Completed!
         </motion.h2>
-        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-slate-400 mt-2">
+        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-slate-500 mt-2">
           Redirecting to assessment...
         </motion.p>
       </div>
@@ -500,39 +496,51 @@ const ComprehensiveSignup = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#00152E] text-white font-sans selection:bg-[#1a3884]/20">
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-blue-100">
       {/* Premium Registration Navbar */}
-      <header className="bg-gradient-to-r from-[#001a3a] via-[#002147] to-[#001a3a] text-white sticky top-0 z-[100] shadow-lg border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
-          
-          {/* Left: Logo + Brand */}
+      <header className="backdrop-blur-md bg-white/80 sticky top-0 z-[100] border-b border-slate-200/50 transition-all duration-300">
+        {/* Subtle Decorative Edge Line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#1a3884]/40 to-transparent" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+
+          {/* Left: Brand Typography Matching Navbar */}
+          <div onClick={() => navigate("/")} className="flex flex-col items-start cursor-pointer group transition-all duration-300 transform hover:scale-105">
+            <div className="flex items-center gap-1">
+              <span className="text-3xl font-black tracking-tighter text-[#1a3884] leading-none transition-colors duration-300 group-hover:text-[#132c6b]">
+                SMAART
+              </span>
+              <div className="w-2 h-2 rounded-full bg-[#C0C0C0] animate-pulse" />
+            </div>
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-[0.3em] mt-0.5">
+              Institute
+            </span>
+          </div>
+
+          {/* Center: Current Step Status with Modern Capsule Design */}
+          <div className="hidden sm:flex items-center gap-3 bg-slate-50/70 border border-slate-200/60 rounded-2xl px-4 py-2.5 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300">
+            <div className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active:</span>
+              <span className="text-xs font-extrabold text-slate-700 tracking-wide uppercase">
+                {steps[currentStep].title}
+              </span>
+            </div>
+            <div className="h-4 w-[1px] bg-slate-200 mx-1" />
+            <span className="font-mono text-[10px] font-extrabold bg-[#1a3884] text-white px-2 py-0.5 rounded-lg">
+              {currentStep + 1} / {steps.length}
+            </span>
+          </div>
+
+          {/* Right: Clean Spacer & Mobile Step Indicator */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center bg-white/5 rounded-xl p-2 backdrop-blur-sm border border-white/10">
-              <img src={logoWhite} alt="SMAART INSTITUTE" className="h-9 w-auto" />
-            </div>
-            <div className="hidden sm:flex flex-col leading-none">
-              <span className="text-[13px] font-bold text-white tracking-wide uppercase">SMAART Institute</span>
-              <span className="text-[10px] text-white/50 tracking-widest mt-0.5 uppercase">Student Registration</span>
-            </div>
-          </div>
-
-          {/* Center: Current Step Badge */}
-          <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 backdrop-blur-sm">
-            <div className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
-            <span className="text-xs font-semibold text-white/90 tracking-wide uppercase">
-              {steps[currentStep].title}
-            </span>
-            <span className="text-[10px] text-white/40 ml-1">
-              {currentStep + 1}/{steps.length}
-            </span>
-          </div>
-
-          {/* Right: Tagline */}
-          <div className="hidden md:flex items-center gap-2">
-            <div className="text-right">
-              <p className="text-[11px] font-medium italic text-white/60 tracking-wide">
-                "Empower Your Future, Enroll Today!"
-              </p>
+            {/* Mobile indicator for step */}
+            <div className="flex sm:hidden items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs font-bold text-slate-700">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>{currentStep + 1}/{steps.length}</span>
             </div>
           </div>
 
@@ -542,708 +550,703 @@ const ComprehensiveSignup = () => {
       <div className="max-w-4xl mx-auto py-4 px-4 relative z-10">
         {/* Progress Bar */}
         <div className="mb-6 px-2">
-            <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">
-                <span>Step {currentStep + 1} of {steps.length}</span>
-                <span>{Math.round(((currentStep + 1) / steps.length) * 100)}% Complete</span>
-            </div>
-            <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                    className="h-full bg-gradient-to-r from-[#1a3884] to-[#2d5dc7] rounded-full"
-                />
-            </div>
+          <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
+            <span>Step {currentStep + 1} of {steps.length}</span>
+            <span>{Math.round(((currentStep + 1) / steps.length) * 100)}% Complete</span>
+          </div>
+          <div className="h-1.5 w-full bg-slate-200/70 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+              className="h-full bg-gradient-to-r from-[#1a3884] to-[#2d5dc7] rounded-full"
+            />
+          </div>
         </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          transition={{ duration: 0.5 }} 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
           className="relative"
         >
-          {/* Torn Paper Container */}
-          <div className="bg-[#002147] p-5 md:p-8 shadow-2xl border border-white/10 rounded-3xl relative">
-            
+          {/* Form Container */}
+          <div className="bg-white p-5 md:p-8 shadow-xl border border-slate-100 rounded-3xl relative">
+
             <AnimatePresence mode="wait">
-            {/* Step 0: Profile Photo */}
-            {currentStep === 0 && (
-              <motion.div key="profile" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold text-white mb-6">Profile Photo</h2>
-                <div className="flex justify-center">
-                  <FileUpload value={personalDetails.profilePhoto} onChange={(fid, fdata) => setPersonalDetails({ ...personalDetails, profilePhoto: fdata?.url || fid })} helperText="Upload a professional photo (Max 5MB)" />
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 1: Personal Details */}
-            {currentStep === 1 && (
-              <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Full Name</Label>
-                    <div className="relative group">
-                      <Input value={personalDetails.fullName} disabled={preFilledFields.fullName} onChange={(e) => setPersonalDetails({ ...personalDetails, fullName: e.target.value })} className={inputClass} />
-                    </div>
+              {/* Step 0: Personal Details */}
+              {currentStep === 0 && (
+                <motion.div key="personal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <div className="flex flex-col justify-start mb-8">
+                    <Label className="text-sm text-slate-500 font-medium mb-2">Profile Photo *</Label>
+                    <FileUpload value={personalDetails.profilePhoto} onChange={(fid, fdata) => setPersonalDetails({ ...personalDetails, profilePhoto: fdata?.url || fid })} helperText="Upload a professional photo (Max 5MB)" />
                   </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Nick Name *</Label>
-                    <div className="relative">
-                      <Input value={personalDetails.nickname} onChange={(e) => setPersonalDetails({ ...personalDetails, nickname: e.target.value })} className={inputClass} />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-white/10 rounded-full flex items-center justify-center text-white text-[10px] font-bold border border-white/20">+</div>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Date of Birth *</Label>
-                    <div className="relative">
-                      <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <User className="w-4 h-4 text-slate-400" />
+                  <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Full Name</Label>
+                      <div className="relative group">
+                        <Input value={personalDetails.fullName} disabled={preFilledFields.fullName} onChange={(e) => setPersonalDetails({ ...personalDetails, fullName: e.target.value })} className={inputClass} />
                       </div>
                     </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Gender *</Label>
-                    <div className="relative">
-                      <select value={personalDetails.gender} onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })} className={selectClass}>
-                        <option value="">Select</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                      </select>
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                        <span className="text-blue-500">♂</span>
-                        <span className="text-gray-300">/</span>
-                        <span className="text-red-500">♀</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Current Year of Study *</Label>
-                    <select value={personalDetails.yearOfStudy} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Year of Passing (Expected) *</Label>
-                    <select value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Mobile Number</Label>
-                    <div className="relative">
-                      <Input value={personalDetails.mobileNumber} disabled={preFilledFields.mobileNumber} onChange={(e) => setPersonalDetails({ ...personalDetails, mobileNumber: e.target.value })} className={inputClass} />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <FileText className="w-4 h-4 text-slate-400" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Email</Label>
-                    <Input value={personalDetails.email} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Institution</Label>
-                    <div className="relative">
-                      <Input value={personalDetails.institution} disabled={preFilledFields.institution} onChange={(e) => setPersonalDetails({ ...personalDetails, institution: e.target.value })} className={inputClass} />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                         <GraduationCap className="w-4 h-4 text-slate-400" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Chosen Career Domain *</Label>
-                    <div className="relative">
-                      <select value={personalDetails.educationLevel} onChange={(e) => setPersonalDetails({ ...personalDetails, educationLevel: e.target.value, customDomain: '' })} className={selectClass}>
-                        <option value="">Select Domain</option>
-                        {sectorOptions.map(opt => (
-                          <option key={opt} value={opt}>{opt}</option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-sm text-slate-400 font-medium">Department *</Label>
-                    <div className="relative">
-                      <Input value={personalDetails.department} disabled={preFilledFields.department} onChange={(e) => setPersonalDetails({ ...personalDetails, department: e.target.value })} className={inputClass} />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                         <Briefcase className="w-4 h-4 text-slate-400" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 2: 10th Details */}
-            {currentStep === 2 && (
-              <motion.div key="tenth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold text-white mb-6">Secondary School Level (Grade 10)</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2"><Label>School Name *</Label><Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} className={inputClass} /></div>
-                  <div><Label>Year of Passing *</Label><select value={tenthDetails.yearOfPassing} onChange={(e) => setTenthDetails({ ...tenthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                  <div><Label>Percentage / CGPA *</Label><Input type="number" max="100" value={tenthDetails.percentage} onChange={(e) => setTenthDetails({ ...tenthDetails, percentage: e.target.value })} className={inputClass} /></div>
-                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={tenthDetails.marksheet} onChange={(fid, fdata) => setTenthDetails({ ...tenthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original marksheet" /></div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 3: 12th Details */}
-            {currentStep === 3 && (
-              <motion.div key="twelfth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold text-white mb-6">Higher Secondary Level (Grade 12)</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2"><Label>School/College Name *</Label><Input value={twelfthDetails.schoolName} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, schoolName: e.target.value })} className={inputClass} /></div>
-                  <div><Label>Group *</Label><select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value, customStream: '' })} className={selectClass}><option value="">Select</option><option value="Science">Science</option><option value="Commerce">Commerce</option><option value="Arts">Arts</option><option value="Others">Others</option></select></div>
-                  {twelfthDetails.stream === "Others" && (
-                    <div><Label>Specify your group *</Label><Input value={twelfthDetails.customStream || ''} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, customStream: e.target.value })} className={inputClass} placeholder="Enter your group" /></div>
-                  )}
-                  <div><Label>Year of Passing *</Label><select value={twelfthDetails.yearOfPassing} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                  <div><Label>Percentage / CGPA *</Label><Input type="number" max="100" value={twelfthDetails.percentage} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, percentage: e.target.value })} className={inputClass} /></div>
-                  <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={twelfthDetails.marksheet} onChange={(fid, fdata) => setTwelfthDetails({ ...twelfthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original marksheet" /></div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 4: Higher Ed - Refined */}
-            {currentStep === 4 && (
-              <motion.div key="higher" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Higher Education</h2>
-                  <Button onClick={addHigherEd} variant="outline" size="sm" className="gap-2 bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add Degree</Button>
-                </div>
-                {higherEducation.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
-                    {higherEducation.length > 1 && <button onClick={() => removeHigherEd(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Degree #{index + 1}</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      {/* Degree Level */}
-                      <div>
-                        <Label>Degree Level *</Label>
-                        <select 
-                          value={item.qualificationLevel} 
-                          onChange={(e) => { 
-                            const val = e.target.value;
-                            const n = [...higherEducation]; 
-                            n[index].qualificationLevel = val;
-                            n[index].degree = "";
-                            n[index].degreeFullName = "";
-                            n[index].specialization = "";
-                            setHigherEducation(n); 
-                            if (val) fetchDegreeSubOptions('domains', { level: val }, index);
-                          }} 
-                          className={selectClass}
-                        >
-                          <option value="">Select Level</option>
-                          {degreeOptions.levels.map(l => <option key={l} value={l}>{l}</option>)}
-                        </select>
-                      </div>
-
-                      {/* Degree (Domain) */}
-                      <div>
-                        <Label>Domain Field *</Label>
-                        <select 
-                          value={item.degree} 
-                          disabled={!item.qualificationLevel}
-                          onChange={(e) => { 
-                            const val = e.target.value;
-                            const n = [...higherEducation]; 
-                            n[index].degree = val;
-                            n[index].degreeFullName = "";
-                            n[index].specialization = "";
-                            setHigherEducation(n); 
-                            if (val) fetchDegreeSubOptions('fullNames', { level: item.qualificationLevel, domain: val }, index);
-                          }} 
-                          className={selectClass}
-                        >
-                          <option value="">Select Degree</option>
-                          {(degreeOptions.domains[index] || []).map(d => <option key={d} value={d}>{d}</option>)}
-                        </select>
-                      </div>
-
-                      {/* Degree Full Name */}
-                      <div>
-                        <Label>Degree Full Name *</Label>
-                        <select 
-                          value={item.degreeFullName} 
-                          disabled={!item.degree}
-                          onChange={(e) => { 
-                            const val = e.target.value;
-                            const n = [...higherEducation]; 
-                            n[index].degreeFullName = val;
-                            n[index].specialization = "";
-                            setHigherEducation(n); 
-                            if (val) fetchDegreeSubOptions('specializations', { level: item.qualificationLevel, domain: item.degree, fullName: val }, index);
-                          }} 
-                          className={selectClass}
-                        >
-                          <option value="">Select Full Name</option>
-                          {(degreeOptions.fullNames[index] || []).map(f => <option key={f} value={f}>{f}</option>)}
-                        </select>
-                      </div>
-
-                      {/* Specialization */}
-                      <div>
-                        <Label>Specialization *</Label>
-                        <select 
-                          value={item.specialization} 
-                          disabled={!item.degreeFullName}
-                          onChange={(e) => { 
-                            const val = e.target.value;
-                            const n = [...higherEducation]; 
-                            n[index].specialization = val;
-                            setHigherEducation(n); 
-                          }} 
-                          className={selectClass}
-                        >
-                          <option value="">Select Specialization</option>
-                          {(degreeOptions.specializations[index] || []).map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                      </div>
-
-                      <div><Label>Institution *</Label><Input value={item.institutionName} onChange={(e) => { const n = [...higherEducation]; n[index].institutionName = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                      <div><Label>University *</Label><Input value={item.university} onChange={(e) => { const n = [...higherEducation]; n[index].university = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                      <div><Label>Year of Passing (Expected) *</Label><select value={item.yearOfPassing} onChange={(e) => { const n = [...higherEducation]; n[index].yearOfPassing = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
-                      <div><Label>CGPA / Percentage*</Label><Input type="number" max="100" value={item.cgpaPercentage} onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
-                      <div><Label>Status *</Label><select value={item.degreeStatus} onChange={(e) => { const n = [...higherEducation]; n[index].degreeStatus = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select</option><option value="pursuing">Pursuing</option><option value="completed">Completed</option></select></div>
-                      <div className="md:col-span-2"><Label>Upload Certificate *</Label><FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = [...higherEducation]; n[index].certificate = fdata?.url || fid; setHigherEducation(n); }} /></div>
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-
-            {/* Step 5: Activities */}
-            {currentStep === 5 && (
-              <motion.div key="activities" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Significant Accomplishments & Extracurricular Activities</h2>
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!extracurricular.isApplicable} onChange={(e) => setExtracurricular({ ...extracurricular, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
-                  </div>
-                </div>
-                {extracurricular.isApplicable ? extracurricular.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
-                    {extracurricular.items.length > 1 && <button onClick={() => removeExtracurricular(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Activity #{index + 1}</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Type *</Label><select value={item.activityType} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].activityType = e.target.value; n.items[index].customActivityType = ''; setExtracurricular(n); }} className={selectClass}><option value="">Select</option><option value="Sports">Sports</option><option value="Arts">Arts</option><option value="Volunteering">Volunteering</option><option value="Leadership roles">Leadership roles</option><option value="Others">Others</option></select></div>
-                      {item.activityType === "Others" && (
-                        <div><Label>Specify Activity Type *</Label><Input value={item.customActivityType || ''} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].customActivityType = e.target.value; setExtracurricular(n); }} className={inputClass} placeholder="Enter your activity type" /></div>
-                      )}
-                      <div><Label>Level *</Label><select value={item.level} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].level = e.target.value; setExtracurricular(n); }} className={selectClass}><option value="">Select</option><option value="School">School</option><option value="College">College</option><option value="District">District</option><option value="State">State</option><option value="National">National</option><option value="International">International</option></select></div>
-                      <div className="md:col-span-2"><Label>Achievements *</Label><Input value={item.achievements} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].achievements = e.target.value; setExtracurricular(n); }} className={inputClass} /></div>
-                      <div className="md:col-span-2"><Label>Description *</Label><textarea value={item.description} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].description = e.target.value; setExtracurricular(n); }} className={textareaClass} /></div>
-                    </div>
-                  </div>
-                )) : <div className="p-10 text-center text-slate-400">No activities to add.</div>}
-              </motion.div>
-            )}
-
-            {/* Step 6: Job Prefs - Refined Salary */}
-            {currentStep === 6 && (
-              <motion.div key="jobpref" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Job Preferences</h2>
-                  <Button onClick={addJobPref} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>
-                </div>
-                {jobPreferences.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
-                    {jobPreferences.items.length > 1 && <button onClick={() => removeJobPref(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Pref #{index + 1}</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Nick Name *</Label>
                       <div className="relative">
-                        <Label>Job Role / Position*</Label>
-                        <Input
-                          value={item.preferredRole}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            const n = { ...jobPreferences, items: [...jobPreferences.items] };
-                            n.items[index].preferredRole = val;
-                            setJobPreferences(n);
+                        <Input value={personalDetails.nickname} onChange={(e) => setPersonalDetails({ ...personalDetails, nickname: e.target.value })} className={inputClass} />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 bg-slate-200/50 rounded-full flex items-center justify-center text-slate-600 text-[10px] font-bold border border-slate-200">+</div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Date of Birth *</Label>
+                      <div className="relative">
+                        <Input type="date" value={personalDetails.dob} onChange={(e) => setPersonalDetails({ ...personalDetails, dob: e.target.value })} className={inputClass} />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <User className="w-4 h-4 text-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Gender *</Label>
+                      <div className="relative">
+                        <select value={personalDetails.gender} onChange={(e) => setPersonalDetails({ ...personalDetails, gender: e.target.value })} className={selectClass}>
+                          <option value="">Select</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
+                        {/* <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+                          <span className="text-blue-500">♂</span>
+                          <span className="text-gray-300">/</span>
+                          <span className="text-red-500">♀</span>
+                        </div> */}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Current Year of Study *</Label>
+                      <select value={personalDetails.yearOfStudy} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfStudy: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Year of Passing (Expected) *</Label>
+                      <select value={personalDetails.yearOfPassing} onChange={(e) => setPersonalDetails({ ...personalDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Mobile Number</Label>
+                      <div className="relative">
+                        <Input value={personalDetails.mobileNumber} disabled={preFilledFields.mobileNumber} onChange={(e) => setPersonalDetails({ ...personalDetails, mobileNumber: e.target.value })} className={inputClass} />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <FileText className="w-4 h-4 text-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Email</Label>
+                      <Input value={personalDetails.email} disabled className={inputClass + " opacity-60 cursor-not-allowed"} />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Institution</Label>
+                      <div className="relative">
+                        <Input value={personalDetails.institution} disabled={preFilledFields.institution} onChange={(e) => setPersonalDetails({ ...personalDetails, institution: e.target.value })} className={inputClass} />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <GraduationCap className="w-4 h-4 text-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Chosen Career Domain *</Label>
+                      <div className="relative">
+                        <select value={personalDetails.educationLevel} onChange={(e) => setPersonalDetails({ ...personalDetails, educationLevel: e.target.value, customDomain: '' })} className={selectClass}>
+                          <option value="">Select Domain</option>
+                          {sectorOptions.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm text-slate-500 font-medium">Department *</Label>
+                      <div className="relative">
+                        <Input value={personalDetails.department} disabled={preFilledFields.department} onChange={(e) => setPersonalDetails({ ...personalDetails, department: e.target.value })} className={inputClass} />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Briefcase className="w-4 h-4 text-slate-400" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
-                            // Update suggestions
-                            if (val.length > 1) {
-                              const matches = excelData.roles
-                                .filter(r => r.toLowerCase().includes(val.toLowerCase()))
-                                .slice(0, 10);
-                              setRoleSuggestions(matches);
-                              setActiveSearchIndex(index);
+              {/* Step 1: 10th Details */}
+              {currentStep === 1 && (
+                <motion.div key="tenth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <h2 className="text-2xl font-bold text-slate-800 mb-6">Secondary School Level (Grade 10)</h2>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2"><Label>School Name *</Label><Input value={tenthDetails.schoolName} onChange={(e) => setTenthDetails({ ...tenthDetails, schoolName: e.target.value })} className={inputClass} /></div>
+                    <div><Label>Year of Passing *</Label><select value={tenthDetails.yearOfPassing} onChange={(e) => setTenthDetails({ ...tenthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
+                    <div><Label>Percentage / CGPA *</Label><Input type="number" max="100" value={tenthDetails.percentage} onChange={(e) => setTenthDetails({ ...tenthDetails, percentage: e.target.value })} className={inputClass} /></div>
+                    <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={tenthDetails.marksheet} onChange={(fid, fdata) => setTenthDetails({ ...tenthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original marksheet" /></div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 2: 12th Details */}
+              {currentStep === 2 && (
+                <motion.div key="twelfth" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <h2 className="text-2xl font-bold text-slate-800 mb-6">Higher Secondary Level (Grade 12)</h2>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2"><Label>School/College Name *</Label><Input value={twelfthDetails.schoolName} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, schoolName: e.target.value })} className={inputClass} /></div>
+                    <div><Label>Group *</Label><select value={twelfthDetails.stream} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, stream: e.target.value, customStream: '' })} className={selectClass}><option value="">Select</option><option value="Science">Science</option><option value="Commerce">Commerce</option><option value="Arts">Arts</option><option value="Others">Others</option></select></div>
+                    {twelfthDetails.stream === "Others" && (
+                      <div><Label>Specify your group *</Label><Input value={twelfthDetails.customStream || ''} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, customStream: e.target.value })} className={inputClass} placeholder="Enter your group" /></div>
+                    )}
+                    <div><Label>Year of Passing *</Label><select value={twelfthDetails.yearOfPassing} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, yearOfPassing: e.target.value })} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
+                    <div><Label>Percentage / CGPA *</Label><Input type="number" max="100" value={twelfthDetails.percentage} onChange={(e) => setTwelfthDetails({ ...twelfthDetails, percentage: e.target.value })} className={inputClass} /></div>
+                    <div className="md:col-span-2"><Label>Upload Marksheet *</Label><FileUpload value={twelfthDetails.marksheet} onChange={(fid, fdata) => setTwelfthDetails({ ...twelfthDetails, marksheet: fdata?.url || fid })} helperText="Scan of original marksheet" /></div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 3: Higher Ed - Refined */}
+              {currentStep === 3 && (
+                <motion.div key="higher" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-slate-800">Higher Education</h2>
+                    <Button onClick={addHigherEd} variant="outline" size="sm" className="gap-2 bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add Degree</Button>
+                  </div>
+                  {higherEducation.map((item, index) => (
+                    <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 border border-slate-200 relative group">
+                      {higherEducation.length > 1 && <button onClick={() => removeHigherEd(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
+                      <h3 className="font-semibold mb-4 text-slate-900">Degree #{index + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        {/* Degree Level */}
+                        <div>
+                          <Label>Degree Level *</Label>
+                          <select
+                            value={item.qualificationLevel}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const n = [...higherEducation];
+                              n[index].qualificationLevel = val;
+                              n[index].degree = "";
+                              n[index].degreeFullName = "";
+                              n[index].specialization = "";
+                              setHigherEducation(n);
+                              if (val) fetchDegreeSubOptions('domains', { level: val }, index);
+                            }}
+                            className={selectClass}
+                          >
+                            <option value="">Select Level</option>
+                            {degreeOptions.levels.map(l => <option key={l} value={l}>{l}</option>)}
+                          </select>
+                        </div>
+
+                        {/* Degree (Domain) */}
+                        <div>
+                          <Label>Domain Field *</Label>
+                          <select
+                            value={item.degree}
+                            disabled={!item.qualificationLevel}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const n = [...higherEducation];
+                              n[index].degree = val;
+                              n[index].degreeFullName = "";
+                              n[index].specialization = "";
+                              setHigherEducation(n);
+                              if (val) fetchDegreeSubOptions('fullNames', { level: item.qualificationLevel, domain: val }, index);
+                            }}
+                            className={selectClass}
+                          >
+                            <option value="">Select Degree</option>
+                            {(degreeOptions.domains[index] || []).map(d => <option key={d} value={d}>{d}</option>)}
+                          </select>
+                        </div>
+
+                        {/* Degree Full Name */}
+                        <div>
+                          <Label>Degree Full Name *</Label>
+                          <select
+                            value={item.degreeFullName}
+                            disabled={!item.degree}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const n = [...higherEducation];
+                              n[index].degreeFullName = val;
+                              n[index].specialization = "";
+                              setHigherEducation(n);
+                              if (val) fetchDegreeSubOptions('specializations', { level: item.qualificationLevel, domain: item.degree, fullName: val }, index);
+                            }}
+                            className={selectClass}
+                          >
+                            <option value="">Select Full Name</option>
+                            {(degreeOptions.fullNames[index] || []).map(f => <option key={f} value={f}>{f}</option>)}
+                          </select>
+                        </div>
+
+                        {/* Specialization */}
+                        <div>
+                          <Label>Specialization *</Label>
+                          <select
+                            value={item.specialization}
+                            disabled={!item.degreeFullName}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const n = [...higherEducation];
+                              n[index].specialization = val;
+                              setHigherEducation(n);
+                            }}
+                            className={selectClass}
+                          >
+                            <option value="">Select Specialization</option>
+                            {(degreeOptions.specializations[index] || []).map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                        </div>
+
+                        <div><Label>Institution *</Label><Input value={item.institutionName} onChange={(e) => { const n = [...higherEducation]; n[index].institutionName = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
+                        <div><Label>University *</Label><Input value={item.university} onChange={(e) => { const n = [...higherEducation]; n[index].university = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
+                        <div><Label>Year of Passing (Expected) *</Label><select value={item.yearOfPassing} onChange={(e) => { const n = [...higherEducation]; n[index].yearOfPassing = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select Year</option>{yearOptions.map(y => <option key={y} value={y}>{y}</option>)}</select></div>
+                        <div><Label>CGPA / Percentage*</Label><Input type="number" max="100" value={item.cgpaPercentage} onChange={(e) => { const n = [...higherEducation]; n[index].cgpaPercentage = e.target.value; setHigherEducation(n); }} className={inputClass} /></div>
+                        <div><Label>Status *</Label><select value={item.degreeStatus} onChange={(e) => { const n = [...higherEducation]; n[index].degreeStatus = e.target.value; setHigherEducation(n); }} className={selectClass}><option value="">Select</option><option value="pursuing">Pursuing</option><option value="completed">Completed</option></select></div>
+                        <div className="md:col-span-2"><Label>Upload Certificate *</Label><FileUpload value={item.certificate} onChange={(fid, fdata) => { const n = [...higherEducation]; n[index].certificate = fdata?.url || fid; setHigherEducation(n); }} /></div>
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+
+              {/* Step 4: Activities */}
+              {currentStep === 4 && (
+                <motion.div key="activities" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-slate-800">Significant Accomplishments & Extracurricular Activities</h2>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!extracurricular.isApplicable} onChange={(e) => setExtracurricular({ ...extracurricular, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
+                      {extracurricular.isApplicable && <Button onClick={addExtracurricular} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
+                    </div>
+                  </div>
+                  {extracurricular.isApplicable ? extracurricular.items.map((item, index) => (
+                    <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 border border-slate-200 relative group">
+                      {extracurricular.items.length > 1 && <button onClick={() => removeExtracurricular(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
+                      <h3 className="font-semibold mb-4 text-slate-900">Activity #{index + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div><Label>Type *</Label><select value={item.activityType} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].activityType = e.target.value; n.items[index].customActivityType = ''; setExtracurricular(n); }} className={selectClass}><option value="">Select</option><option value="Sports">Sports</option><option value="Arts">Arts</option><option value="Volunteering">Volunteering</option><option value="Leadership roles">Leadership roles</option><option value="Others">Others</option></select></div>
+                        {item.activityType === "Others" && (
+                          <div><Label>Specify Activity Type *</Label><Input value={item.customActivityType || ''} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].customActivityType = e.target.value; setExtracurricular(n); }} className={inputClass} placeholder="Enter your activity type" /></div>
+                        )}
+                        <div><Label>Level *</Label><select value={item.level} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].level = e.target.value; setExtracurricular(n); }} className={selectClass}><option value="">Select</option><option value="School">School</option><option value="College">College</option><option value="District">District</option><option value="State">State</option><option value="National">National</option><option value="International">International</option></select></div>
+                        <div className="md:col-span-2"><Label>Achievements *</Label><Input value={item.achievements} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].achievements = e.target.value; setExtracurricular(n); }} className={inputClass} /></div>
+                        <div className="md:col-span-2"><Label>Description *</Label><textarea value={item.description} onChange={(e) => { const n = { ...extracurricular, items: [...extracurricular.items] }; n.items[index].description = e.target.value; setExtracurricular(n); }} className={textareaClass} /></div>
+                      </div>
+                    </div>
+                  )) : <div className="p-10 text-center text-slate-500">No activities to add.</div>}
+                </motion.div>
+              )}
+
+              {/* Step 5: Job Prefs - Refined Salary */}
+              {currentStep === 5 && (
+                <motion.div key="jobpref" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-slate-800">Job Preferences</h2>
+                    <Button onClick={addJobPref} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>
+                  </div>
+                  {jobPreferences.items.map((item, index) => (
+                    <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 border border-slate-200 relative group">
+                      {jobPreferences.items.length > 1 && <button onClick={() => removeJobPref(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
+                      <h3 className="font-semibold mb-4 text-slate-900">Pref #{index + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="relative">
+                          <Label>Job Role / Position*</Label>
+                          <Input
+                            value={item.preferredRole}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              const n = { ...jobPreferences, items: [...jobPreferences.items] };
+                              n.items[index].preferredRole = val;
+                              setJobPreferences(n);
+
+                              // Update suggestions
+                              if (val.length > 1) {
+                                const matches = excelData.roles
+                                  .filter(r => r.toLowerCase().includes(val.toLowerCase()))
+                                  .slice(0, 10);
+                                setRoleSuggestions(matches);
+                                setActiveSearchIndex(index);
+                              } else {
+                                setRoleSuggestions([]);
+                              }
+                            }}
+                            onFocus={() => setActiveSearchIndex(index)}
+                            className={inputClass}
+                            placeholder="Search or enter your preferred role"
+                          />
+                          {activeSearchIndex === index && roleSuggestions.length > 0 && (
+                            <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl max-h-[50vh] overflow-y-auto overscroll-contain no-scrollbar ring-1 ring-black/5">
+                              <div className="p-2 border-b border-slate-100 bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-3">
+                                SMAART Role Suggestions
+                              </div>
+                              {roleSuggestions.map((suggestion, sIdx) => (
+                                <button
+                                  key={sIdx}
+                                  className="w-full text-left px-4 py-3 text-sm hover:bg-slate-50 text-slate-800 border-b border-slate-100 last:border-0 transition-colors"
+                                  onClick={() => {
+                                    const n = { ...jobPreferences, items: [...jobPreferences.items] };
+                                    n.items[index].preferredRole = suggestion;
+                                    setJobPreferences(n);
+                                    setRoleSuggestions([]);
+                                  }}
+                                >
+                                  {suggestion}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div><Label>Type *</Label><select value={item.jobType} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].jobType = e.target.value; setJobPreferences(n); }} className={selectClass}>
+                          <option value="">Select</option>
+                          <option value="full-time">Full-Time</option>
+                          <option value="part-time">Part-Time</option>
+                          <option value="internship-full">Internship (Full-Time)</option>
+                          <option value="internship-part">Internship (Part-Time)</option>
+                          <option value="freelance">Freelance / Gig Work</option>
+                          <option value="remote">Fully Remote / Distributed</option>
+                        </select></div>
+                        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div><Label>Location Preference 1*</Label><Input value={item.preferredLocation1} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation1 = e.target.value; setJobPreferences(n); }} className={inputClass} placeholder="e.g. Remote" /></div>
+                          <div><Label>Location Preference 2</Label><Input value={item.preferredLocation2} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation2 = e.target.value; setJobPreferences(n); }} className={inputClass} placeholder="e.g. Bangalore" /></div>
+                          <div><Label>Location Preference 3</Label><Input value={item.preferredLocation3} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation3 = e.target.value; setJobPreferences(n); }} className={inputClass} placeholder="e.g. Mumbai" /></div>
+                        </div>
+                        <div><Label>Relocate *</Label><select value={item.willingToRelocate} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].willingToRelocate = e.target.value; setJobPreferences(n); }} className={selectClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+                        <div>
+                          <Label>Expected Salary *</Label>
+                          <select value={item.expectedSalary} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].expectedSalary = e.target.value; setJobPreferences(n); }} className={selectClass}>
+                            <option value="">Select Range</option>
+                            {salaryRanges.map(s => <option key={s} value={s}>{s}</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+
+              {/* Step 6: Sectors - Refined 7+ options */}
+              {currentStep === 6 && (
+                <motion.div key="sectors" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <h2 className="text-2xl font-bold text-slate-800">Sector Preferences</h2>
+                  <div>
+                    <Label>Preferred Sectors *</Label>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {sectorOptions.map(s => (
+                        <button key={s}
+                          onClick={() => {
+                            const isSelected = sectorPreferences.preferredSectors.includes(s);
+                            if (isSelected) {
+                              const updated = sectorPreferences.preferredSectors.filter(x => x !== s);
+                              setSectorPreferences({ ...sectorPreferences, preferredSectors: updated });
                             } else {
-                              setRoleSuggestions([]);
+                              if (sectorPreferences.preferredSectors.length >= 3) {
+                                toast.error("You can select maximum 3 choices");
+                                return;
+                              }
+                              setSectorPreferences({ ...sectorPreferences, preferredSectors: [...sectorPreferences.preferredSectors, s] });
                             }
                           }}
-                          onFocus={() => setActiveSearchIndex(index)}
-                          className={inputClass}
-                          placeholder="Search or enter your preferred role"
-                        />
-                        {activeSearchIndex === index && roleSuggestions.length > 0 && (
-                          <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-[#002A5C] border border-white/10 rounded-2xl shadow-2xl max-h-[50vh] overflow-y-auto overscroll-contain no-scrollbar ring-1 ring-black/5">
-                            <div className="p-2 border-b border-white/5 bg-white/5 text-[10px] font-bold text-slate-400 uppercase tracking-tighter px-3">
-                              SMAART Role Suggestions
-                            </div>
-                            {roleSuggestions.map((suggestion, sIdx) => (
-                              <button
-                                key={sIdx}
-                                className="w-full text-left px-4 py-3 text-sm hover:bg-white/5 text-white border-b border-white/5 last:border-0 transition-colors"
-                                onClick={() => {
-                                  const n = { ...jobPreferences, items: [...jobPreferences.items] };
-                                  n.items[index].preferredRole = suggestion;
-                                  setJobPreferences(n);
-                                  setRoleSuggestions([]);
-                                }}
-                              >
-                                {suggestion}
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                          className={`px-4 py-2 rounded-full border transition-colors ${sectorPreferences.preferredSectors.includes(s) ? "bg-[#1a3884] text-white border-[#1a3884]" : "bg-slate-50 border-slate-200 text-slate-600 hover:border-[#1a3884] hover:bg-white"}`}>
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                    {sectorPreferences.preferredSectors.includes("Other") && (
+                      <div className="mt-4">
+                        <Label>Specify Other Sector *</Label>
+                        <Input value={sectorPreferences.otherSector} onChange={(e) => setSectorPreferences({ ...sectorPreferences, otherSector: e.target.value })} className={inputClass} placeholder="e.g. Aerospace, Robotics" />
                       </div>
-                      <div><Label>Type *</Label><select value={item.jobType} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].jobType = e.target.value; setJobPreferences(n); }} className={selectClass}>
-                        <option value="">Select</option>
-                        <option value="full-time">Full-Time</option>
-                        <option value="part-time">Part-Time</option>
-                        <option value="internship-full">Internship (Full-Time)</option>
-                        <option value="internship-part">Internship (Part-Time)</option>
-                        <option value="freelance">Freelance / Gig Work</option>
-                        <option value="remote">Fully Remote / Distributed</option>
-                      </select></div>
-                      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div><Label>Location Preference 1*</Label><Input value={item.preferredLocation1} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation1 = e.target.value; setJobPreferences(n); }} className={inputClass} placeholder="e.g. Remote" /></div>
-                        <div><Label>Location Preference 2</Label><Input value={item.preferredLocation2} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation2 = e.target.value; setJobPreferences(n); }} className={inputClass} placeholder="e.g. Bangalore" /></div>
-                        <div><Label>Location Preference 3</Label><Input value={item.preferredLocation3} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].preferredLocation3 = e.target.value; setJobPreferences(n); }} className={inputClass} placeholder="e.g. Mumbai" /></div>
-                      </div>
-                      <div><Label>Relocate *</Label><select value={item.willingToRelocate} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].willingToRelocate = e.target.value; setJobPreferences(n); }} className={selectClass}><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 7: Goals - Refined Placeholders */}
+              {currentStep === 7 && (
+                <motion.div key="goals" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <h2 className="text-2xl font-bold text-slate-800">Career Goals</h2>
+                  <div>
+                    <Label>Short-term Goal (0-1 year) *</Label>
+                    <p className="text-sm text-slate-500 mt-1 mb-2">Goals that can be achieved in the near future and focus on building basic skills, habits, or immediate improvements.</p>
+                    <textarea value={careerGoals.shortTerm} onChange={(e) => setCareerGoals({ ...careerGoals, shortTerm: e.target.value })} className={textareaClass} placeholder="e.g. Gain hands-on experience through projects or internships, and secure an entry-level role." />
+                  </div>
+                  <div>
+                    <Label>Medium-term Goal (1-5 years) *</Label>
+                    <p className="text-sm text-slate-500 mt-1 mb-2">Goals planned for the next phase of growth that focus on strengthening abilities, gaining experience, and progressing toward bigger responsibilities.</p>
+                    <textarea value={careerGoals.mediumTerm} onChange={(e) => setCareerGoals({ ...careerGoals, mediumTerm: e.target.value })} className={textareaClass} placeholder="e.g. Build advanced role-specific skills, take ownership of key work responsibilities, and progress to a higher position or better organization." />
+                  </div>
+                  <div>
+                    <Label>Long-term Goal (5+ years) *</Label>
+                    <p className="text-sm text-slate-500 mt-1 mb-2">Goals set for the future that focus on overall direction, long-lasting impact, leadership, and sustained personal and professional growth.</p>
+                    <textarea value={careerGoals.longTerm} onChange={(e) => setCareerGoals({ ...careerGoals, longTerm: e.target.value })} className={textareaClass} placeholder="e.g. Move into leadership or specialist roles, continuously reskill with new technologies, and contribute to organizational and industry growth." />
+                  </div>
+
+                  <div className="pt-6 border-t border-slate-200">
+                    <h2 className="text-2xl font-bold text-slate-800">Personal Development Goals</h2>
+                    <div className="space-y-6 mt-6">
                       <div>
-                        <Label>Expected Salary *</Label>
-                        <select value={item.expectedSalary} onChange={(e) => { const n = { ...jobPreferences, items: [...jobPreferences.items] }; n.items[index].expectedSalary = e.target.value; setJobPreferences(n); }} className={selectClass}>
-                          <option value="">Select Range</option>
-                          {salaryRanges.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
+                        <Label>Short term (0–1 year) *</Label>
+                        <textarea
+                          value={personalDevelopmentGoals.shortTerm}
+                          onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, shortTerm: e.target.value })}
+                          className={textareaClass}
+                          placeholder="e.g. Improve spoken and written communication, manage time effectively, build self-confidence, and establish consistent daily routines."
+                        />
+                      </div>
+                      <div>
+                        <Label>Medium term (1–5 years) *</Label>
+                        <textarea
+                          value={personalDevelopmentGoals.mediumTerm}
+                          onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, mediumTerm: e.target.value })}
+                          className={textareaClass}
+                          placeholder="e.g. Develop leadership presence, manage stress and feedback constructively, strengthen decision-making, and adapt confidently to change at work."
+                        />
+                      </div>
+                      <div>
+                        <Label>Long term (5+ years) *</Label>
+                        <textarea
+                          value={personalDevelopmentGoals.longTerm}
+                          onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, longTerm: e.target.value })}
+                          className={textareaClass}
+                          placeholder="e.g. Demonstrate strong emotional intelligence, ethical judgment, resilience, and maintain a lifelong habit of continuous learning."
+                        />
                       </div>
                     </div>
                   </div>
-                ))}
-              </motion.div>
-            )}
+                </motion.div>
+              )}
 
-            {/* Step 7: Sectors - Refined 7+ options */}
-            {currentStep === 7 && (
-              <motion.div key="sectors" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold">Sector Preferences</h2>
-                <div>
-                  <Label>Preferred Sectors *</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {sectorOptions.map(s => (
-                      <button key={s}
-                        onClick={() => {
-                          const isSelected = sectorPreferences.preferredSectors.includes(s);
-                          if (isSelected) {
-                            const updated = sectorPreferences.preferredSectors.filter(x => x !== s);
-                            setSectorPreferences({ ...sectorPreferences, preferredSectors: updated });
-                          } else {
-                            if (sectorPreferences.preferredSectors.length >= 3) {
-                              toast.error("You can select maximum 3 choices");
-                              return;
-                            }
-                            setSectorPreferences({ ...sectorPreferences, preferredSectors: [...sectorPreferences.preferredSectors, s] });
-                          }
-                        }}
-                        className={`px-4 py-2 rounded-full border transition-colors ${sectorPreferences.preferredSectors.includes(s) ? "bg-[#1a3884] text-white border-[#1a3884]" : "bg-white/5 border-white/10 text-slate-400 hover:border-[#1a3884]"}`}>
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                  {sectorPreferences.preferredSectors.includes("Other") && (
-                    <div className="mt-4">
-                      <Label>Specify Other Sector *</Label>
-                      <Input value={sectorPreferences.otherSector} onChange={(e) => setSectorPreferences({ ...sectorPreferences, otherSector: e.target.value })} className={inputClass} placeholder="e.g. Aerospace, Robotics" />
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 8: Goals - Refined Placeholders */}
-            {currentStep === 8 && (
-              <motion.div key="goals" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-2xl font-bold">Career Goals</h2>
-                <div>
-                  <Label>Short-term Goal (0-1 year) *</Label>
-                  <p className="text-sm text-slate-400 mt-1 mb-2">Goals that can be achieved in the near future and focus on building basic skills, habits, or immediate improvements.</p>
-                  <textarea value={careerGoals.shortTerm} onChange={(e) => setCareerGoals({ ...careerGoals, shortTerm: e.target.value })} className={textareaClass} placeholder="e.g. Gain hands-on experience through projects or internships, and secure an entry-level role." />
-                </div>
-                <div>
-                  <Label>Medium-term Goal (1-5 years) *</Label>
-                  <p className="text-sm text-slate-400 mt-1 mb-2">Goals planned for the next phase of growth that focus on strengthening abilities, gaining experience, and progressing toward bigger responsibilities.</p>
-                  <textarea value={careerGoals.mediumTerm} onChange={(e) => setCareerGoals({ ...careerGoals, mediumTerm: e.target.value })} className={textareaClass} placeholder="e.g. Build advanced role-specific skills, take ownership of key work responsibilities, and progress to a higher position or better organization." />
-                </div>
-                <div>
-                  <Label>Long-term Goal (5+ years) *</Label>
-                  <p className="text-sm text-slate-400 mt-1 mb-2">Goals set for the future that focus on overall direction, long-lasting impact, leadership, and sustained personal and professional growth.</p>
-                  <textarea value={careerGoals.longTerm} onChange={(e) => setCareerGoals({ ...careerGoals, longTerm: e.target.value })} className={textareaClass} placeholder="e.g. Move into leadership or specialist roles, continuously reskill with new technologies, and contribute to organizational and industry growth." />
-                </div>
-
-                <div className="pt-6 border-t border-white/20 dark:border-white/10">
-                  <h2 className="text-2xl font-bold">Personal Development Goals</h2>
-                  <div className="space-y-6 mt-6">
-                    <div>
-                      <Label>Short term (0–1 year) *</Label>
-                      <textarea
-                        value={personalDevelopmentGoals.shortTerm}
-                        onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, shortTerm: e.target.value })}
-                        className={textareaClass}
-                        placeholder="e.g. Improve spoken and written communication, manage time effectively, build self-confidence, and establish consistent daily routines."
-                      />
-                    </div>
-                    <div>
-                      <Label>Medium term (1–5 years) *</Label>
-                      <textarea
-                        value={personalDevelopmentGoals.mediumTerm}
-                        onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, mediumTerm: e.target.value })}
-                        className={textareaClass}
-                        placeholder="e.g. Develop leadership presence, manage stress and feedback constructively, strengthen decision-making, and adapt confidently to change at work."
-                      />
-                    </div>
-                    <div>
-                      <Label>Long term (5+ years) *</Label>
-                      <textarea
-                        value={personalDevelopmentGoals.longTerm}
-                        onChange={(e) => setPersonalDevelopmentGoals({ ...personalDevelopmentGoals, longTerm: e.target.value })}
-                        className={textareaClass}
-                        placeholder="e.g. Demonstrate strong emotional intelligence, ethical judgment, resilience, and maintain a lifelong habit of continuous learning."
-                      />
+              {/* Step 8: Work */}
+              {currentStep === 8 && (
+                <motion.div key="work" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-slate-800">Work Experience</h2>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!workExperience.isApplicable} onChange={(e) => setWorkExperience({ ...workExperience, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
+                      {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 9: Work */}
-            {currentStep === 9 && (
-              <motion.div key="work" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Work Experience</h2>
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!workExperience.isApplicable} onChange={(e) => setWorkExperience({ ...workExperience, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {workExperience.isApplicable && <Button onClick={addWorkExperience} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
-                  </div>
-                </div>
-                {workExperience.isApplicable ? workExperience.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
-                    {workExperience.items.length > 1 && <button onClick={() => removeWorkExperience(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Exp #{index + 1}</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Experience Type *</Label><select value={item.experienceType} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].experienceType = e.target.value; setWorkExperience(n); }} className={selectClass}><option value="">Select</option><option value="full-time">Full-Time</option><option value="part-time">Part-Time</option><option value="internship">Internship</option><option value="freelance">Freelance</option><option value="volunteering">Volunteering</option></select></div>
-                      <div><Label>Organization Name *</Label><Input value={item.organizationName} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].organizationName = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder="e.g. Google, Startup Inc" /></div>
-                      <div><Label>Designation / Role *</Label><Input value={item.jobTitle} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].jobTitle = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder="e.g. Software Engineer" /></div>
-                      <div><Label>Industry / Sector *</Label><Input value={item.industry} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].industry = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder="e.g. IT, Healthcare" /></div>
-                      <div><Label>Start Date *</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].startDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
-                      {!item.currentlyWorking && <div><Label>End Date *</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].endDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>}
-                      <div className="md:col-span-2"><input type="checkbox" checked={item.currentlyWorking} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) n.items[index].endDate = ""; setWorkExperience(n); }} /> Currently working</div>
-                      <div className="md:col-span-2"><Label>Key Responsibilities *</Label><textarea value={item.keyResponsibilities} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].keyResponsibilities = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder="Outline your primary duties and the scope of your work in this role." /></div>
-                      <div className="md:col-span-2"><Label>Significant Accomplishments *</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder="Highlight major achievements, contributions, or impacts you made during your tenure." /></div>
-                      <div className="md:col-span-2 space-y-4">
-                        <Label>Document Type (Select all that apply) *</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl border border-white/20 dark:border-white/10 bg-white/5 dark:bg-white/5">
-                          {[
-                            { id: "offerLetter", label: "Offer Letter" },
-                            { id: "appointmentLetter", label: "Appointment Letter" },
-                            { id: "appreciationLetter", label: "Appreciation Letter" },
-                            { id: "experienceLetter", label: "Experience Letter" }
-                          ].map(doc => (
-                            <label key={doc.id} className="flex items-center gap-2 cursor-pointer group">
-                              <input
-                                type="checkbox"
-                                checked={item.selectedDocs.includes(doc.id)}
-                                onChange={(e) => {
-                                  const n = { ...workExperience, items: [...workExperience.items] };
-                                  if (e.target.checked) {
-                                    n.items[index].selectedDocs = [...n.items[index].selectedDocs, doc.id];
-                                  } else {
-                                    n.items[index].selectedDocs = n.items[index].selectedDocs.filter(t => t !== doc.id);
-                                    n.items[index].documents[doc.id] = null;
-                                  }
-                                  setWorkExperience(n);
-                                }}
-                                className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]"
-                              />
-                              <span className="text-sm font-medium text-slate-400 group-hover:text-[#1a3884] transition-colors">{doc.label}</span>
-                            </label>
-                          ))}
-                        </div>
-
-                        {item.selectedDocs.length > 0 && (
-                          <div className="grid md:grid-cols-2 gap-6 pt-2">
-                            {item.selectedDocs.map(docId => (
-                              <div key={docId} className="space-y-2 p-4 rounded-2xl border border-white/20 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm">
-                                <Label className="text-[#1a3884] dark:text-blue-400 font-semibold">
-                                  Upload {docId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} *
-                                </Label>
-                                <FileUpload
-                                  value={item.documents[docId]}
-                                  onChange={(fid, fdata) => {
+                  {workExperience.isApplicable ? workExperience.items.map((item, index) => (
+                    <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 border border-slate-200 relative group">
+                      {workExperience.items.length > 1 && <button onClick={() => removeWorkExperience(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
+                      <h3 className="font-semibold mb-4 text-slate-900">Exp #{index + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div><Label>Experience Type *</Label><select value={item.experienceType} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].experienceType = e.target.value; setWorkExperience(n); }} className={selectClass}><option value="">Select</option><option value="full-time">Full-Time</option><option value="part-time">Part-Time</option><option value="internship">Internship</option><option value="freelance">Freelance</option><option value="volunteering">Volunteering</option></select></div>
+                        <div><Label>Organization Name *</Label><Input value={item.organizationName} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].organizationName = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder="e.g. Google, Startup Inc" /></div>
+                        <div><Label>Designation / Role *</Label><Input value={item.jobTitle} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].jobTitle = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder="e.g. Software Engineer" /></div>
+                        <div><Label>Industry / Sector *</Label><Input value={item.industry} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].industry = e.target.value; setWorkExperience(n); }} className={inputClass} placeholder="e.g. IT, Healthcare" /></div>
+                        <div><Label>Start Date *</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].startDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>
+                        {!item.currentlyWorking && <div><Label>End Date *</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].endDate = e.target.value; setWorkExperience(n); }} className={inputClass} /></div>}
+                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) n.items[index].endDate = ""; setWorkExperience(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`current-${item.id}`} className="cursor-pointer">Currently working</Label></div>
+                        <div className="md:col-span-2"><Label>Key Responsibilities *</Label><textarea value={item.keyResponsibilities} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].keyResponsibilities = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder="Outline your primary duties and the scope of your work in this role." /></div>
+                        <div className="md:col-span-2"><Label>Significant Accomplishments *</Label><textarea value={item.significantAccomplishments} onChange={(e) => { const n = { ...workExperience, items: [...workExperience.items] }; n.items[index].significantAccomplishments = e.target.value; setWorkExperience(n); }} className={textareaClass} placeholder="Highlight major achievements, contributions, or impacts you made during your tenure." /></div>
+                        <div className="md:col-span-2 space-y-4">
+                          <Label>Document Type (Select all that apply) *</Label>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-2xl border border-slate-200 bg-slate-50/50">
+                            {[
+                              { id: "offerLetter", label: "Offer Letter" },
+                              { id: "appointmentLetter", label: "Appointment Letter" },
+                              { id: "appreciationLetter", label: "Appreciation Letter" },
+                              { id: "experienceLetter", label: "Experience Letter" }
+                            ].map(doc => (
+                              <label key={doc.id} className="flex items-center gap-2 cursor-pointer group">
+                                <input
+                                  type="checkbox"
+                                  checked={item.selectedDocs.includes(doc.id)}
+                                  onChange={(e) => {
                                     const n = { ...workExperience, items: [...workExperience.items] };
-                                    n.items[index].documents[docId] = fdata?.url || fid;
+                                    if (e.target.checked) {
+                                      n.items[index].selectedDocs = [...n.items[index].selectedDocs, doc.id];
+                                    } else {
+                                      n.items[index].selectedDocs = n.items[index].selectedDocs.filter(t => t !== doc.id);
+                                      n.items[index].documents[doc.id] = null;
+                                    }
                                     setWorkExperience(n);
                                   }}
+                                  className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]"
                                 />
-                              </div>
+                                <span className="text-sm font-medium text-slate-500 group-hover:text-[#1a3884] transition-colors">{doc.label}</span>
+                              </label>
                             ))}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )) : <div className="p-10 text-center text-slate-400">No experience to add.</div>}
-              </motion.div>
-            )}
 
-            {/* Step 10: Projects */}
-            {currentStep === 10 && (
-              <motion.div key="proj" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Projects</h2>
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!projects.isApplicable} onChange={(e) => setProjects({ ...projects, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
-                    {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
-                  </div>
-                </div>
-                {projects.isApplicable ? projects.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
-                    {projects.items.length > 1 && <button onClick={() => removeProject(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2"><Trash2 size={18} /></button>}
-                    <h3 className="font-semibold mb-4">Project #{index + 1}</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div><Label>Project Title *</Label><Input value={item.title} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].title = e.target.value; setProjects(n); }} className={inputClass} placeholder="e.g. E-commerce Website" /></div>
-                      <div><Label>Project developed in *</Label><select value={item.doneIn} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].doneIn = e.target.value; setProjects(n); }} className={selectClass}><option value="">Select</option><option value="Institution">Institution</option><option value="Organization">Organization</option><option value="Others">Others</option></select></div>
-                      {item.doneIn === 'Institution' && <div><Label>College / University Name *</Label><Input value={item.institution} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].institution = e.target.value; setProjects(n); }} className={inputClass} placeholder="e.g. Stanford University" /></div>}
-                      {item.doneIn === 'Organization' && <div><Label>Company / Organization Name *</Label><Input value={item.companyName} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].companyName = e.target.value; setProjects(n); }} className={inputClass} placeholder="e.g. Acme Corp" /></div>}
-                      <div><Label>Team Type *</Label><select value={item.teamType} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].teamType = e.target.value; setProjects(n); }} className={selectClass}><option value="">Select</option><option value="Individual">Individual</option><option value="Team">Team</option></select></div>
-                      <div><Label>Start Date *</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].startDate = e.target.value; setProjects(n); }} className={inputClass} /></div>
-                      {!item.currentlyWorking && <div><Label>End Date *</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].endDate = e.target.value; setProjects(n); }} className={inputClass} /></div>}
-                      <div className="md:col-span-2"><Label>Project Description *</Label><textarea value={item.description} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].description = e.target.value; setProjects(n); }} className={textareaClass} placeholder="Describe your role and the technologies used..." /></div>
-                      <div className="md:col-span-2"><Label>Significant Achievements *</Label><textarea value={item.significantAchievements} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].significantAchievements = e.target.value; setProjects(n); }} className={textareaClass} placeholder="Highlight key results, performance wins, or unique contributions..." /></div>
-                      <div className="md:col-span-2"><Label>Professional Project Link (GitHub / Google Docs Link Only)</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} className={inputClass} placeholder="e.g. github.com/username/repo or docs.google.com/..." /></div>
-                    </div>
-                  </div>
-                )) : <div className="p-10 text-center text-slate-400">No projects to add.</div>}
-              </motion.div>
-            )}
-            {/* Step 11: Certificates */}
-            {currentStep === 11 && (
-              <motion.div key="certs" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">Certificates</h2>
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={!certificates.isApplicable} 
-                        onChange={(e) => setCertificates({ ...certificates, isApplicable: !e.target.checked })} 
-                      />
-                      <span className="text-sm">Not Applicable</span>
-                    </label>
-                    {certificates.isApplicable && (
-                      <Button onClick={addCertificate} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all">
-                        <Plus size={16} /> Add
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                {certificates.isApplicable ? certificates.items.map((item, index) => (
-                  <div key={item.id} className="p-6 rounded-2xl bg-white/5 dark:bg-white/5 border border-white/10 dark:border-white/10 relative group">
-                    {certificates.items.length > 1 && (
-                      <button onClick={() => removeCertificate(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2">
-                        <Trash2 size={18} />
-                      </button>
-                    )}
-                    <h3 className="font-semibold mb-4 text-[#002147]">Cert #{index + 1}</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="md:col-span-2 p-4 rounded-2xl border border-white/20 dark:border-white/10 bg-white/5/50 dark:bg-white/5">
-                        <div className="grid md:grid-cols-2 gap-6 items-center">
-                          <div>
-                            <Label>Certificate Name / Title *</Label>
-                            <Input value={item.title} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].title = e.target.value; setCertificates(n); }} className={inputClass} placeholder="e.g. AWS Certified Solutions Architect" />
-                          </div>
-                          <div>
-                            <Label>Upload Certificate *</Label>
-                            <FileUpload value={item.certificateFile} onChange={(fid, fdata) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].certificateFile = fdata?.url || fid; setCertificates(n); }} />
-                          </div>
+                          {item.selectedDocs.length > 0 && (
+                            <div className="grid md:grid-cols-2 gap-6 pt-2">
+                              {item.selectedDocs.map(docId => (
+                                <div key={docId} className="space-y-2 p-4 rounded-2xl border border-slate-200 bg-slate-50/30 shadow-sm">
+                                  <Label className="text-[#1a3884] font-semibold">
+                                    Upload {docId.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} *
+                                  </Label>
+                                  <FileUpload
+                                    value={item.documents[docId]}
+                                    onChange={(fid, fdata) => {
+                                      const n = { ...workExperience, items: [...workExperience.items] };
+                                      n.items[index].documents[docId] = fdata?.url || fid;
+                                      setWorkExperience(n);
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <div>
-                        <Label>Issuing Organization *</Label>
-                        <Input value={item.issuingOrg} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].issuingOrg = e.target.value; setCertificates(n); }} className={inputClass} placeholder="e.g. Amazon Web Services, Coursera" />
-                      </div>
-                      <div>
-                        <Label>Year of Completion *</Label>
-                        <select value={item.yearOfCompletion} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].yearOfCompletion = e.target.value; setCertificates(n); }} className={selectClass}>
-                          <option value="">Select Year</option>
-                          {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <Label>Verification Mode *</Label>
-                        <select value={item.verificationType} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationType = e.target.value; setCertificates(n); }} className={selectClass}>
-                          <option value="">Select</option>
-                          <option value="url">Link / URL</option>
-                          <option value="qr">QR Code</option>
-                          <option value="none">None</option>
-                        </select>
-                      </div>
+                    </div>
+                  )) : <div className="p-10 text-center text-slate-500">No experience to add.</div>}
+                </motion.div>
+              )}
 
-                      {item.verificationType === "url" && (
-                        <div className="md:col-span-1">
-                          <Label>Verification Link / URL *</Label>
-                          <Input value={item.verificationUrl} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationUrl = e.target.value; setCertificates(n); }} className={inputClass} placeholder="https://..." />
-                        </div>
+              {/* Step 9: Projects */}
+              {currentStep === 9 && (
+                <motion.div key="proj" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-slate-800">Projects</h2>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={!projects.isApplicable} onChange={(e) => setProjects({ ...projects, isApplicable: !e.target.checked })} /><span className="text-sm">Not Applicable</span></label>
+                      {projects.isApplicable && <Button onClick={addProject} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all"><Plus size={16} /> Add</Button>}
+                    </div>
+                  </div>
+                  {projects.isApplicable ? projects.items.map((item, index) => (
+                    <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 border border-slate-200 relative group">
+                      {projects.items.length > 1 && <button onClick={() => removeProject(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-600 p-2"><Trash2 size={18} /></button>}
+                      <h3 className="font-semibold mb-4 text-slate-900">Project #{index + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div><Label>Project Title *</Label><Input value={item.title} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].title = e.target.value; setProjects(n); }} className={inputClass} placeholder="e.g. E-commerce Website" /></div>
+                        <div><Label>Project developed in *</Label><select value={item.doneIn} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].doneIn = e.target.value; setProjects(n); }} className={selectClass}><option value="">Select</option><option value="Institution">Institution</option><option value="Organization">Organization</option><option value="Others">Others</option></select></div>
+                        {item.doneIn === 'Institution' && <div><Label>College / University Name *</Label><Input value={item.institution} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].institution = e.target.value; setProjects(n); }} className={inputClass} placeholder="e.g. Stanford University" /></div>}
+                        {item.doneIn === 'Organization' && <div><Label>Company / Organization Name *</Label><Input value={item.companyName} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].companyName = e.target.value; setProjects(n); }} className={inputClass} placeholder="e.g. Acme Corp" /></div>}
+                        <div><Label>Team Type *</Label><select value={item.teamType} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].teamType = e.target.value; setProjects(n); }} className={selectClass}><option value="">Select</option><option value="Individual">Individual</option><option value="Team">Team</option></select></div>
+                        <div><Label>Start Date *</Label><Input type="date" value={item.startDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].startDate = e.target.value; setProjects(n); }} className={inputClass} /></div>
+                        {!item.currentlyWorking && <div><Label>End Date *</Label><Input type="date" value={item.endDate} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].endDate = e.target.value; setProjects(n); }} className={inputClass} /></div>}
+                        <div className="md:col-span-2 flex items-center gap-2"><input type="checkbox" id={`proj-current-${item.id}`} checked={item.currentlyWorking} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].currentlyWorking = e.target.checked; if (e.target.checked) n.items[index].endDate = ""; setProjects(n); }} className="w-4 h-4 rounded border-slate-300 text-[#1a3884] focus:ring-[#1a3884]" /> <Label htmlFor={`proj-current-${item.id}`} className="cursor-pointer">Currently working on project</Label></div>
+                        <div className="md:col-span-2"><Label>Project Description *</Label><textarea value={item.description} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].description = e.target.value; setProjects(n); }} className={textareaClass} placeholder="Describe your role and the technologies used..." /></div>
+                        <div className="md:col-span-2"><Label>Significant Achievements *</Label><textarea value={item.significantAchievements} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].significantAchievements = e.target.value; setProjects(n); }} className={textareaClass} placeholder="Highlight key results, performance wins, or unique contributions..." /></div>
+                        <div className="md:col-span-2"><Label>Professional Project Link (GitHub / Google Docs Link Only)</Label><Input value={item.projectUrl} onChange={(e) => { const n = { ...projects, items: [...projects.items] }; n.items[index].projectUrl = e.target.value; setProjects(n); }} className={inputClass} placeholder="e.g. github.com/username/repo or docs.google.com/..." /></div>
+                      </div>
+                    </div>
+                  )) : <div className="p-10 text-center text-slate-500">No projects to add.</div>}
+                </motion.div>
+              )}
+              {/* Step 10: Certificates */}
+              {currentStep === 10 && (
+                <motion.div key="certs" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-slate-800">Certificates</h2>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={!certificates.isApplicable}
+                          onChange={(e) => setCertificates({ ...certificates, isApplicable: !e.target.checked })}
+                        />
+                        <span className="text-sm">Not Applicable</span>
+                      </label>
+                      {certificates.isApplicable && (
+                        <Button onClick={addCertificate} variant="outline" size="sm" className="bg-[#1a3884] text-white border-white/20 hover:bg-[#112b6b] transition-all">
+                          <Plus size={16} /> Add
+                        </Button>
                       )}
                     </div>
                   </div>
-                )) : (
-                  <div className="p-10 text-center text-slate-400">No certificates to add.</div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  {certificates.isApplicable ? certificates.items.map((item, index) => (
+                    <div key={item.id} className="p-6 rounded-2xl bg-slate-50/50 border border-slate-200 relative group">
+                      {certificates.items.length > 1 && (
+                        <button onClick={() => removeCertificate(item.id)} className="absolute top-4 right-4 text-slate-400 hover:text-red-500 p-2">
+                          <Trash2 size={18} />
+                        </button>
+                      )}
+                      <h3 className="font-semibold mb-4 text-[#1a3884]">Cert #{index + 1}</h3>
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="md:col-span-2 p-4 rounded-2xl border border-slate-200 bg-slate-50/30">
+                          <div className="grid md:grid-cols-2 gap-6 items-center">
+                            <div>
+                              <Label>Certificate Name / Title *</Label>
+                              <Input value={item.title} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].title = e.target.value; setCertificates(n); }} className={inputClass} placeholder="e.g. AWS Certified Solutions Architect" />
+                            </div>
+                            <div>
+                              <Label>Upload Certificate *</Label>
+                              <FileUpload value={item.certificateFile} onChange={(fid, fdata) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].certificateFile = fdata?.url || fid; setCertificates(n); }} />
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <Label>Issuing Organization *</Label>
+                          <Input value={item.issuingOrg} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].issuingOrg = e.target.value; setCertificates(n); }} className={inputClass} placeholder="e.g. Amazon Web Services, Coursera" />
+                        </div>
+                        <div>
+                          <Label>Year of Completion *</Label>
+                          <select value={item.yearOfCompletion} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].yearOfCompletion = e.target.value; setCertificates(n); }} className={selectClass}>
+                            <option value="">Select Year</option>
+                            {yearOptions.map(y => <option key={y} value={y}>{y}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <Label>Verification Mode *</Label>
+                          <select value={item.verificationType} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationType = e.target.value; setCertificates(n); }} className={selectClass}>
+                            <option value="">Select</option>
+                            <option value="url">Link / URL</option>
+                            <option value="qr">QR Code</option>
+                            <option value="none">None</option>
+                          </select>
+                        </div>
 
-          {/* Redesigned Footer - Inside the torn paper card */}
-              <div className="w-full flex justify-between items-center mt-8 pt-6 border-t border-white/10">
-                  <div className="flex items-center gap-4">
-                    {currentStep > 0 && (
-                      <button 
-                        onClick={handlePrevStep}
-                        className="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:bg-white/5 transition-all"
-                      >
-                        Previous
-                      </button>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    {currentStep < steps.length - 1 ? (
-                      <button 
-                        onClick={handleNextStep}
-                        className="px-8 py-3 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-[#0d1f4d] transition-all shadow-lg shadow-blue-900/20 flex items-center gap-2"
-                      >
-                        Next
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    ) : (
-                      <button 
-                        onClick={handleSubmit}
-                        disabled={isLoading}
-                        className="relative px-8 py-3 rounded-xl text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 shadow-xl shadow-[#112b6b]/20 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                        style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
-                      >
-                        {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Complete Registration"}
-                      </button>
-                    )}
-                  </div>
+                        {item.verificationType === "url" && (
+                          <div className="md:col-span-1">
+                            <Label>Verification Link / URL *</Label>
+                            <Input value={item.verificationUrl} onChange={(e) => { const n = { ...certificates, items: [...certificates.items] }; n.items[index].verificationUrl = e.target.value; setCertificates(n); }} className={inputClass} placeholder="https://..." />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="p-10 text-center text-slate-500">No certificates to add.</div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Redesigned Footer */}
+            <div className="w-full flex justify-between items-center mt-8 pt-6 border-t border-slate-200/80">
+              <div className="flex items-center gap-4">
+                {currentStep > 0 && (
+                  <button
+                    onClick={handlePrevStep}
+                    className="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-100 transition-all"
+                  >
+                    Previous
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-4">
+                {currentStep < steps.length - 1 ? (
+                  <button
+                    onClick={handleNextStep}
+                    className="px-8 py-3 rounded-xl bg-[#1a3884] text-white text-sm font-bold hover:bg-[#132c6b] transition-all shadow-md shadow-blue-500/10 flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isLoading}
+                    className="relative px-8 py-3 rounded-xl text-white text-sm font-bold transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-[#112b6b]/20 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ background: "linear-gradient(135deg, #112b6b 0%, #1a3884 100%)" }}
+                  >
+                    {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Complete Registration"}
+                  </button>
+                )}
               </div>
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
-    );
+    </div>
+  );
 };
 
 export default ComprehensiveSignup;
