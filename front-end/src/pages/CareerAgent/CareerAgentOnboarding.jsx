@@ -1231,19 +1231,23 @@ const CareerAgentOnboarding = () => {
             const isDone = step > sn;
             const isActive = step === sn;
             const displayLabel = STEP_DISPLAY_LABELS[idx] || label;
-            return (
-              <React.Fragment key={sn}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.7rem', minWidth: '92px', flex: '0 0 92px' }}>
-                  <div style={{
-                    width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '0.8rem', fontWeight: 800, transition: 'all 0.3s',
-                    background: isDone ? '#10b981' : isActive ? 'var(--accent)' : '#f1f5f9',
-                    color: isDone || isActive ? '#fff' : '#94a3b8',
-                    border: isActive ? '2px solid var(--accent)' : isDone ? '2px solid #10b981' : '2px solid #e2e8f0',
-                    boxShadow: isActive ? '0 0 0 4px rgba(var(--accent-rgb),0.12)' : 'none',
-                    transform: isActive ? 'scale(1.08)' : 'scale(1)',
-                  }}>
-                    {isDone ? 'OK' : sn}
+              return (
+                <React.Fragment key={sn}>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.7rem', minWidth: '92px', flex: '0 0 92px' }}>
+                    <div style={{
+                      width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '0.8rem', fontWeight: 800, transition: 'all 0.3s',
+                      background: isDone ? '#10b981' : isActive ? 'var(--accent)' : '#f1f5f9',
+                      color: isDone || isActive ? '#fff' : '#94a3b8',
+                      border: isActive ? '2px solid var(--accent)' : isDone ? '2px solid #10b981' : '2px solid #e2e8f0',
+                      boxShadow: isActive ? '0 0 0 4px rgba(var(--accent-rgb),0.12)' : 'none',
+                      transform: isActive ? 'scale(1.08)' : 'scale(1)',
+                    }}>
+                      {isDone ? 'OK' : sn}
+                    </div>
+                    <div style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: isActive || isDone ? 'var(--text1)' : '#94a3b8', lineHeight: 1.2 }}>
+                      {displayLabel}
+                    </div>
                   </div>
                   {idx < STEPS.length - 1 && (
                     <div style={{ flex: 1, minWidth: '18px', height: '2px', background: step > sn ? '#10b981' : '#e2e8f0', borderRadius: '2px', marginTop: '18px', transition: 'background 0.3s' }} />
@@ -1275,7 +1279,8 @@ const CareerAgentOnboarding = () => {
                 <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontWeight: 600 }}>
                   Profile Linked: <span style={{ color: 'var(--text2)', fontWeight: 500 }}>We've auto-filled your details from your SMAART profile.</span>
                 </div>
-              )}
+              </div>
+            )}
 
               <div className="fgrid">
                 {/* Full Name */}
@@ -1430,23 +1435,6 @@ const CareerAgentOnboarding = () => {
           </div>
         )}
 
-        {/* STEP 3: PRIMARY PREFERENCE */}
-        {step === 3 && (
-          <div className="form-card">
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
-              <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(var(--accent-rgb), 0.15), rgba(var(--accent-rgb), 0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(var(--accent-rgb), 0.2)' }}>
-                <Trophy size={22} color="var(--accent)" />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Primary Preference</span>
-                  <span className="step-tag">STEP 3 / 6</span>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Your main career direction - used for your deepest intelligence analysis.</p>
-              </div>
-            </div>
-          )}
-
           {/* STEP 3: PRIMARY PREFERENCE */}
           {step === 3 && (
             <div className="form-card">
@@ -1504,21 +1492,19 @@ const CareerAgentOnboarding = () => {
             </div>
           )}
 
-            {/* Summary Cards */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
-
-              {/* Education Summary */}
-              <div style={{ background: 'linear-gradient(135deg, rgba(var(--accent-rgb), 0.04), rgba(var(--accent-rgb), 0.01))', border: '1px solid rgba(var(--accent-rgb), 0.12)', borderRadius: '16px', padding: '1.2rem 1.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
-                  <GraduationCap size={15} color="var(--accent)" />
-                  <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Education History</span>
+          {/* STEP 6: REVIEW & SUBMIT */}
+          {step === 6 && (
+            <div className="form-card">
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '1.8rem' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(16,185,129,0.2)' }}>
+                  <CheckCircle size={22} color="#10b981" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Review & Submit</span>
                     <span className="step-tag">STEP 6 / 6</span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem' }}>Review your profile before submitting. SMAART will generate your personalised career intelligence report.</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', marginTop: '0.25rem', fontWeight: 400 }}>Review your profile before submitting. SMAART will generate your personalised career intelligence report.</p>
                 </div>
               </div>
 
@@ -1571,18 +1557,12 @@ const CareerAgentOnboarding = () => {
                 Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This typically takes 15-30 seconds.
               </div>
 
-            <div style={{ background: 'linear-gradient(135deg,rgba(var(--accent-rgb),0.06),rgba(34,211,238,0.03))', border: '1px solid rgba(var(--accent-rgb),0.15)', borderRadius: '14px', padding: '1rem 1.2rem', marginBottom: '1.5rem', fontSize: '0.82rem', color: 'var(--text2)', display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-              <Sparkles size={16} color="var(--accent)" style={{ flexShrink: 0 }} />
-              Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This typically takes 15-30 seconds.
+              <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(var(--accent-rgb), 0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}>
+                <Sparkles size={18} />
+                {isSubmitting ? 'Generating Report...' : 'Generate Career Intelligence Report'}
+              </button>
             </div>
           )}
-
-            <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(var(--accent-rgb), 0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}>
-              <Sparkles size={18} />
-              {isSubmitting ? 'Generating Report...' : 'Generate Career Intelligence Report'}
-            </button>
-          </div>
-        )}
 
         {/* VALIDATION ERROR BANNER */}
         <AnimatePresence>
@@ -1601,9 +1581,10 @@ const CareerAgentOnboarding = () => {
                 <div className="validation-banner-content">
                   <div className="validation-banner-title">Complete all required fields to continue to the next step.</div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
           {/* NAVIGATION */}
           <div className="form-nav">

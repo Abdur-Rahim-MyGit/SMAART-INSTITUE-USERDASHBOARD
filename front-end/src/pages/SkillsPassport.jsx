@@ -1,1002 +1,1354 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-    Brain, Heart, BookOpen, Users, Briefcase, Monitor, Leaf, Download, Mail, Phone,
-    Shield, Share2, MapPin, Calendar, CheckCircle, ArrowLeft, X,
-    TrendingUp, Award, BadgeCheck, QrCode, Sparkles, BarChart3, ShieldCheck, Star,
-    Zap, Rocket, GraduationCap, Layout, FileText, ExternalLink
+    ArrowLeft,
+    Award,
+    BookOpen,
+    Briefcase,
+    Building2,
+    CheckCircle2,
+    Download,
+    GraduationCap,
+    Mail,
+    Monitor,
+    Phone,
+    Share2,
+    ShieldCheck,
+    Sparkles,
+    Star,
+    UserCircle2
 } from "lucide-react";
-import { assessmentApi } from "@/services/assessmentApi";
-import { API_BASE_URL, coursesAPI, courseEnrollmentAPI } from "@/services/api";
 import SkillsPassportSkeleton from "@/components/skeletons/SkillsPassportSkeleton";
-import { generateAssessmentReport } from "@/utils/reportGenerator";
+import { assessmentApi } from "@/services/assessmentApi";
+import { API_BASE_URL, courseEnrollmentAPI, coursesAPI, getBackendUrl } from "@/services/api";
+import { userCertificateApi } from "@/services/userCertificateApi";
 import { toast as sonnerToast } from "sonner";
-import { useTheme } from "@/contexts/ThemeContext";
-import { getBackendUrl } from "@/services/api";
-import { useTranslation } from "react-i18next";
+import blueLogo from "@/assets/blue.png";
 import spImage from "@/assets/sp.jpeg";
-import PageHero from "@/components/ui/PageHero";
-
-
-// --- Constants & Metadata ---
-
-
 
 const PROFESSIONAL_STANDARDS = [
-    { title: "UNDERSTAND", description: "Comprehends context, intent, and priorities clearly." },
-    { title: "STRUCTURE", description: "Organizes thinking into clear frameworks and action." },
-    { title: "VERIFY", description: "Checks accuracy, quality, and evidence before delivery." },
-    { title: "ADAPT", description: "Responds well to change, ambiguity, and new inputs." },
-    { title: "COMMUNICATE", description: "Expresses ideas with clarity, brevity, and confidence." },
-    { title: "CONNECT", description: "Builds trust and collaborates effectively with others." },
-    { title: "OWN", description: "Takes responsibility and follows through with accountability." },
-    { title: "CREATE", description: "Generates useful ideas, solutions, and improvements." },
-    { title: "LEAD", description: "Guides others with initiative, judgment, and calm." },
-    { title: "GROW", description: "Learns from feedback and evolves continuously." }
+    "UNDERSTAND",
+    "STRUCTURE",
+    "VERIFY",
+    "ADAPT",
+    "COMMUNICATE",
+    "CONNECT",
+    "OWN",
+    "CREATE",
+    "LEAD",
+    "GROW"
 ];
 
-const getStaticStars = (label) => {
-    const total = label.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    return 3 + (total % 3);
+const STANDARD_SCORE_MAP = {
+    UNDERSTAND: "CRQ",
+    STRUCTURE: "PEQ",
+    VERIFY: "DAQ",
+    ADAPT: "LQ",
+    COMMUNICATE: "SIQ",
+    CONNECT: "SIQ",
+    OWN: "SRQ",
+    CREATE: "CRQ",
+    LEAD: "PEQ",
+    GROW: "LQ"
 };
 
-const getFallbackData = (user) => {
-    const identityRef = (user?._id || user?.id || "SM-0000").toString().slice(-8).toUpperCase();
+const AI_KEYWORDS = [
+    "ai",
+    "artificial intelligence",
+    "machine learning",
+    "ml",
+    "llm",
+    "gpt",
+    "prompt",
+    "genai",
+    "generative",
+    "automation",
+    "chatbot",
+    "nlp"
+];
 
-    return {
-        fullName: user?.fullName || "Rahul",
-        email: user?.email || "rahul@smaart.in",
-        phone: user?.mobile || user?.mobileNumber || "+91 98765 43210",
-        passportId: `SM-${identityRef}-${new Date().getFullYear()}`,
-        degree: "Bachelor of Technology",
-        institution: "SMAART Institute",
-        verificationStatus: "VERIFIED",
-        profileImage: spImage
-    };
+const SOFT_KEYWORDS = [
+    "communication",
+    "leadership",
+    "critical thinking",
+    "teamwork",
+    "collaboration",
+    "problem solving",
+    "adaptability",
+    "presentation",
+    "ownership",
+    "strategy",
+    "creativity",
+    "negotiation",
+    "mentoring"
+];
+
+const TECH_KEYWORDS = [
+    "python",
+    "sql",
+    "excel",
+    "data",
+    "analytics",
+    "react",
+    "java",
+    "javascript",
+    "node",
+    "cloud",
+    "devops",
+    "web",
+    "frontend",
+    "backend",
+    "api",
+    "database",
+    "programming",
+    "software",
+    "coding",
+    "visualization",
+    "tableau",
+    "power bi",
+    "engineering",
+    "iot",
+    "cyber"
+];
+
+const PAGE_DIMENSIONS = {
+    width: "210mm",
+    minHeight: "297mm"
 };
 
-const resolveProfilePhoto = (...candidates) => {
-    const rawPath = candidates.find((value) => typeof value === "string" && value.trim().length > 0);
-    if (!rawPath) return spImage;
+const documentFont = {
+    fontFamily: '"Aptos", "Segoe UI", "Trebuchet MS", sans-serif'
+};
 
-    const cleanedPath = rawPath.trim().replace(/\\/g, "/");
-    if (cleanedPath.startsWith("http://") || cleanedPath.startsWith("https://") || cleanedPath.startsWith("data:")) {
-        return cleanedPath;
+const displayFont = {
+    fontFamily: '"Cambria", "Times New Roman", serif'
+};
+
+const normalizeList = (value) => {
+    if (Array.isArray(value)) {
+        return value.flatMap((item) => normalizeList(item));
     }
 
-    const normalizedPath = cleanedPath.startsWith("/") ? cleanedPath.slice(1) : cleanedPath;
-    return `${getBackendUrl()}/${normalizedPath}`;
+    if (typeof value === "string") {
+        return value
+            .split(/,|\/|\||;|\n/g)
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    if (value && typeof value === "object") {
+        return Object.values(value).flatMap((item) => normalizeList(item));
+    }
+
+    return [];
 };
 
-const getFallbackSkillCollections = (user) => ({
-    smaartCourses: [
-        {
-            id: "course-1",
-            title: "Data Analysis Fundamentals",
-            skillsAcquired: ["Excel", "Data Interpretation", "Statistical Modeling"],
-            platform: "SMAART Institute",
-            provider: "SMAART Institute",
-            level: "ADVANCED",
-            verificationStatus: "VERIFIED",
-            completionDate: "2026-03-18",
-            meta: "Completed credential"
-        },
-        {
-            id: "course-2",
-            title: "Professional Communication Studio",
-            skillsAcquired: ["Presentation", "Business Writing", "Client Readiness"],
-            platform: "SMAART Institute",
-            provider: "SMAART Institute",
-            level: "INTERMEDIATE",
-            verificationStatus: "VERIFIED",
-            completionDate: "2026-02-09",
-            meta: "Cohort pathway"
-        }
-    ],
-    technicalSkills: [
-        {
-            id: "tech-1",
-            title: "React Development",
-            skillsAcquired: ["Component Architecture", "State Management", "UI Delivery"],
-            platform: "Project Portfolio",
-            provider: user?.fullName || "Student Portfolio",
-            level: "ADVANCED",
-            verificationStatus: "VERIFIED",
-            meta: "4 projects",
-            supportingInfo: "Certifications: Frontend Specialization"
-        },
-        {
-            id: "tech-2",
-            title: "SQL & Data Querying",
-            skillsAcquired: ["Joins", "Dashboards", "Data Cleaning"],
-            platform: "Applied Projects",
-            provider: "SMAART Skills Vault",
-            level: "INTERMEDIATE",
-            verificationStatus: "SELF DECLARED",
-            meta: "2 projects",
-            supportingInfo: "Certifications: Database Essentials"
-        }
-    ],
-    aiSkills: [
-        {
-            id: "ai-1",
-            title: "ChatGPT Workflow Design",
-            skillsAcquired: ["Prompt Engineering", "Research Synthesis", "Automation"],
-            platform: "AI Practice Lab",
-            provider: "Open AI Tooling Track",
-            level: "ADVANCED",
-            verificationStatus: "VERIFIED",
-            meta: "Verified AI tool usage",
-            supportingInfo: "Tool: ChatGPT"
-        },
-        {
-            id: "ai-2",
-            title: "Canva AI Content",
-            skillsAcquired: ["Visual Drafting", "Creative Assistance", "Brand Iteration"],
-            platform: "Creative Workflow",
-            provider: "Self Practice",
-            level: "BEGINNER",
-            verificationStatus: "SELF DECLARED",
-            meta: "Emerging capability",
-            supportingInfo: "Tool: Canva AI"
-        }
-    ],
-    domainSkills: [
-        {
-            id: "domain-1",
-            title: "Applied Artificial Intelligence",
-            skillsAcquired: ["Model Thinking", "Responsible AI", "Use Case Mapping"],
-            platform: "Academic Domain",
-            provider: "SMAART Institute",
-            level: "ADVANCED",
-            verificationStatus: "VERIFIED",
-            meta: "Institution-aligned",
-            supportingInfo: "Expertise: Applied AI"
-        },
-        {
-            id: "domain-2",
-            title: "Product Strategy",
-            skillsAcquired: ["Roadmapping", "User Insights", "Execution Planning"],
-            platform: "Career Domain",
-            provider: "Learning Portfolio",
-            level: "INTERMEDIATE",
-            verificationStatus: "SELF DECLARED",
-            meta: "Practice-backed",
-            supportingInfo: "Expertise: Product & Growth"
-        }
-    ]
-});
+const sanitizeLabel = (value) =>
+    String(value || "")
+        .replace(/\s+/g, " ")
+        .replace(/^[\s,.;:/\\-]+|[\s,.;:/\\-]+$/g, "")
+        .trim();
+
+const isMeaningfulLabel = (value) => {
+    const label = sanitizeLabel(value);
+    if (!label) return false;
+    if (label.length < 2 || label.length > 52) return false;
+    return !["n/a", "none", "other", "na", "nil"].includes(label.toLowerCase());
+};
+
+const resolveMediaUrl = (value, fallback = "") => {
+    const raw = typeof value === "string" ? value.trim() : "";
+    if (!raw) return fallback;
+
+    const normalized = raw.replace(/\\/g, "/");
+    if (
+        normalized.startsWith("http://") ||
+        normalized.startsWith("https://") ||
+        normalized.startsWith("data:")
+    ) {
+        return normalized;
+    }
+
+    const cleaned = normalized.startsWith("/") ? normalized.slice(1) : normalized;
+    return `${getBackendUrl()}/${cleaned}`;
+};
 
 const formatDateLabel = (value) => {
     if (!value) return null;
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleDateString("en-IN", {
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return null;
+    return parsed.toLocaleDateString("en-IN", {
         day: "2-digit",
         month: "short",
         year: "numeric"
     });
 };
 
-const normalizeList = (value) => {
-    if (Array.isArray(value)) return value.filter(Boolean);
-    if (typeof value === "string") {
-        return value
-            .split(/,|\||;/)
-            .map((item) => item.trim())
-            .filter(Boolean);
+const getScoreMap = (profile) => {
+    if (!profile) {
+        return {
+            CRQ: 0,
+            SRQ: 0,
+            LQ: 0,
+            SIQ: 0,
+            PEQ: 0,
+            DAQ: 0,
+            SEQ: 0
+        };
     }
-    return [];
+
+    const readScore = (key) =>
+        Number(
+            profile?.[key]?.rawScore ??
+            profile?.[key]?.percentage ??
+            profile?.[key]?.score ??
+            0
+        );
+
+    return {
+        CRQ: readScore("CRQ"),
+        SRQ: readScore("SRQ"),
+        LQ: readScore("LQ"),
+        SIQ: readScore("SIQ"),
+        PEQ: readScore("PEQ"),
+        DAQ: readScore("DAQ"),
+        SEQ: readScore("SEQ")
+    };
 };
 
-const badgeClasses = {
-    VERIFIED: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20",
-    "SELF DECLARED": "bg-slate-100 dark:bg-dark-elevated text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10",
-    ADVANCED: "bg-teal dark:bg-teal text-white border-teal shadow-md",
-    INTERMEDIATE: "bg-navy-light dark:bg-dark-elevated text-white border-navy-light shadow-sm",
-    BEGINNER: "bg-slate-100 dark:bg-dark-elevated text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/5",
-    COMPLETED: "bg-teal dark:bg-teal text-white border-teal shadow-md"
+const toFiveScale = (score) => {
+    const bounded = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
+    return Math.max(1, Math.min(5, Number((bounded / 20).toFixed(1))));
 };
 
-const getBadgeClass = (value, fallback = "SELF DECLARED") => {
-    const key = String(value || fallback).toUpperCase();
-    return badgeClasses[key] || badgeClasses[String(fallback).toUpperCase()] || badgeClasses["SELF DECLARED"];
+const average = (values) => {
+    const numeric = values.filter((value) => Number.isFinite(value));
+    if (!numeric.length) return 0;
+    return numeric.reduce((sum, value) => sum + value, 0) / numeric.length;
 };
 
-const SkillPassportCard = ({ item, accentIcon: AccentIcon = Sparkles }) => {
-    const { t } = useTranslation();
-    return (
-        <motion.div
-            whileHover={{ y: -12, scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="group relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] p-6 shadow-lg transition-all duration-500 hover:shadow-xl"
+const classifySkill = (label, sourceBucket = "") => {
+    const normalized = sanitizeLabel(label).toLowerCase();
+    if (!normalized) return "domain";
+
+    if (sourceBucket) {
+        return sourceBucket;
+    }
+
+    if (AI_KEYWORDS.some((keyword) => normalized.includes(keyword))) return "ai";
+    if (SOFT_KEYWORDS.some((keyword) => normalized.includes(keyword))) return "soft";
+    if (TECH_KEYWORDS.some((keyword) => normalized.includes(keyword))) return "technical";
+    return "domain";
+};
+
+const deriveDifficulty = (enrollment, courseData) => {
+    const explicit = sanitizeLabel(
+        enrollment?.level ||
+        courseData?.level ||
+        courseData?.difficulty
+    ).toUpperCase();
+
+    if (["ADVANCED", "INTERMEDIATE", "BEGINNER"].includes(explicit)) {
+        return explicit;
+    }
+
+    const progress = Number(
+        enrollment?.progress ??
+        enrollment?.completionPercentage ??
+        enrollment?.progressPercentage ??
+        0
+    );
+
+    if (progress >= 80) return "ADVANCED";
+    if (progress >= 45) return "INTERMEDIATE";
+    return "BEGINNER";
+};
+
+const buildPassportId = (registrationProfile, currentUser) => {
+    const directId = sanitizeLabel(
+        registrationProfile?.passportId ||
+        registrationProfile?.studentId ||
+        currentUser?.studentId
+    );
+
+    if (directId) return directId.startsWith("SM-") ? directId : `SM-${directId}`;
+
+    const raw = String(currentUser?._id || currentUser?.id || "000000")
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .slice(-6)
+        .toUpperCase();
+
+    return `SM-${raw.padStart(6, "0")}`;
+};
+
+const extractYear = (...values) => {
+    const firstValid = values.find((value) => {
+        const raw = String(value || "").trim();
+        return /\b(19|20)\d{2}\b/.test(raw);
+    });
+
+    if (!firstValid) return String(new Date().getFullYear());
+    const match = String(firstValid).match(/\b(19|20)\d{2}\b/);
+    return match ? match[0] : String(new Date().getFullYear());
+};
+
+const createSkillBuckets = () => ({
+    technical: new Map(),
+    ai: new Map(),
+    domain: new Map(),
+    soft: new Map()
+});
+
+const collectEntryLabels = (items, fields = []) => {
+    if (typeof items === "string") {
+        return normalizeList(items);
+    }
+
+    if (!Array.isArray(items)) return [];
+
+    return items.flatMap((item) => {
+        if (typeof item === "string") {
+            return [item];
+        }
+
+        if (!item || typeof item !== "object") {
+            return [];
+        }
+
+        return fields.flatMap((field) => normalizeList(item?.[field]));
+    });
+};
+
+const pushSkill = (buckets, label, options = {}) => {
+    if (!isMeaningfulLabel(label)) return;
+
+    const cleaned = sanitizeLabel(label);
+    const bucket = classifySkill(cleaned, options.bucket);
+    const key = cleaned.toLowerCase();
+    const target = buckets[bucket];
+
+    if (!target) return;
+
+    const existing = target.get(key);
+    if (!existing) {
+        target.set(key, {
+            label: cleaned,
+            source: options.source || "Backend sync",
+            verified: options.verified !== false
+        });
+        return;
+    }
+
+    target.set(key, {
+        ...existing,
+        source: existing.source || options.source || "Backend sync",
+        verified: existing.verified || options.verified !== false
+    });
+};
+
+const PassportSectionTitle = ({ title, hint }) => (
+    <div className="flex items-end justify-between gap-4">
+        <div className="flex items-center gap-3">
+            <div className="h-px w-6 bg-[#163878]" />
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.36em] text-[#355894]" style={documentFont}>
+                {title}
+            </h2>
+        </div>
+        {hint ? (
+            <p className="text-[10px] font-medium text-slate-500" style={documentFont}>
+                {hint}
+            </p>
+        ) : null}
+    </div>
+);
+
+const InlinePager = ({ activePage, totalPages, onPrevious, onNext, dark = false }) => (
+    <div
+        className={`inline-flex h-[42px] w-full max-w-[210px] items-center justify-between rounded-[12px] border px-2 py-1 ${
+            dark
+                ? "border-white/20 bg-white/5"
+                : "border-[#d6dfef] bg-white/96 shadow-[0_4px_12px_-4px_rgba(15,23,42,0.12)]"
+        }`}
+    >
+        <button
+            type="button"
+            onClick={onPrevious}
+            disabled={activePage === 1}
+            className={`flex h-[30px] min-w-[56px] items-center justify-center rounded-[8px] px-3 text-[12px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30 ${
+                dark
+                    ? "border border-white/10 bg-white/20 text-white hover:bg-white/25 hover:border-white/30 active:bg-white/15"
+                    : "border border-[#cbd6ea] bg-white text-[#163878] hover:bg-[#eaf0fc] hover:border-[#adc4eb] hover:shadow-sm active:bg-[#dbe6f8]"
+            }`}
         >
-            <div className="absolute inset-0 bg-gradient-to-br from-teal/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="absolute inset-x-12 top-0 h-[2px] bg-gradient-to-r from-transparent via-teal/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+            Prev
+        </button>
+        <div className="flex flex-col items-center justify-center min-w-[58px] text-center leading-none">
+            <p className={`text-[8px] font-bold uppercase tracking-[0.2em] ${dark ? "text-blue-200/55" : "text-[#45639b]"}`}>Page</p>
+            <p className={`mt-0.5 text-[13px] font-semibold ${dark ? "text-white" : "text-[#10285a]"}`}>
+                {activePage} / {totalPages}
+            </p>
+        </div>
+        <button
+            type="button"
+            onClick={onNext}
+            disabled={activePage === totalPages}
+            className={`flex h-[30px] min-w-[56px] items-center justify-center rounded-[8px] px-3 text-[12px] font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-30 ${
+                dark
+                    ? "border border-[#27498d] bg-[#183b7f] text-white hover:bg-[#214893] active:bg-[#122c60] hover:shadow-[0_6px_12px_-8px_rgba(255,255,255,0.25)]"
+                    : "border border-[#163878] bg-[#163878] text-white hover:bg-[#102c66] active:bg-[#0b1e47] hover:shadow-[0_6px_12px_-8px_rgba(22,56,120,0.45)]"
+            }`}
+        >
+            Next
+        </button>
+    </div>
+);
 
-            <div className="flex items-start justify-between gap-5 relative z-10">
-                <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white dark:bg-[#002A5C] shadow-sm border border-slate-100 dark:border-[#1a3884]/20 group-hover:scale-110 group-hover:bg-[#1a3884] group-hover:text-white transition-all duration-500">
-                            <AccentIcon className="h-5 w-5" />
-                        </div>
-                        <div>
-                            <h3 className="text-xl font-bold leading-tight text-slate-900 dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-blue-300 transition-colors duration-300">{item.title}</h3>
-                            <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 group-hover:text-slate-500 transition-colors">
-                                {item.platform}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-2">
-                    <span
-                        className={`rounded-xl px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] shadow-sm ${getBadgeClass(item.level, "BEGINNER")}`}
-                    >
-                        {item.level}
-                    </span>
-                    <span className={`rounded-xl px-4 py-1.5 text-[9px] font-bold uppercase tracking-[0.2em] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 shadow-sm`}>
-                        {t('badge_gallery.verified')}
-                    </span>
+const PageRibbon = ({ title, subtitle, pageNumber }) => (
+    <div className="mb-6 flex items-start justify-between gap-6 border-b border-[#d5deef] pb-5">
+        <div>
+            <p
+                className="text-[10px] font-bold uppercase tracking-[0.34em] text-[#45639b]"
+                style={documentFont}
+            >
+                DIGITAL SKILLS PASSPORT
+            </p>
+            <h2 className="mt-2 text-[22px] font-semibold text-[#10285a]" style={displayFont}>
+                {title}
+            </h2>
+            <p className="mt-1 text-sm text-slate-600" style={documentFont}>
+                {subtitle}
+            </p>
+        </div>
+        <div className="flex min-w-[120px] flex-col items-end gap-3 pt-1 text-right">
+            <span className="text-[12px] font-bold uppercase tracking-[0.34em] text-slate-400" style={documentFont}>
+                Page {pageNumber} / 4
+            </span>
+        </div>
+    </div>
+);
+
+const PassportPage = ({
+    pageNumber,
+    title,
+    subtitle,
+    passportId,
+    children,
+    pageRef,
+    showRibbon = true,
+    showChrome = true
+}) => (
+    <section
+        ref={pageRef}
+        className="relative w-full overflow-hidden rounded-[28px] border border-[#cfd9ea] bg-[#f8fbff] px-5 py-5 text-slate-900 shadow-[0_24px_60px_-42px_rgba(15,23,42,0.32)] sm:px-8 sm:py-8"
+        style={{ ...PAGE_DIMENSIONS, ...documentFont }}
+    >
+        <div className="relative z-10 flex min-h-full flex-col">
+            {showRibbon ? (
+                <PageRibbon
+                    title={title}
+                    subtitle={subtitle}
+                    pageNumber={pageNumber}
+                />
+            ) : null}
+            <div className="flex-1">{children}</div>
+            <div className="mt-6 flex items-center justify-between border-t border-[#d5deef] pt-4">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#45639b]">
+                    {passportId} | SMAART INSTITUTE
+                </span>
+                <div className="flex items-center justify-end rounded-[12px] px-2 py-1">
+                    <img
+                        src={blueLogo}
+                        alt="SMAART Institute"
+                        className="h-16 w-auto object-contain opacity-100"
+                    />
                 </div>
             </div>
+        </div>
+    </section>
+);
 
-            <div className="mt-6 flex items-center justify-between gap-4 pt-6 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-10">
-                <div className="flex -space-x-2">
-                    {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-6 w-6 rounded-full border-2 border-white dark:border-[#1a3884]/30 bg-slate-200 dark:bg-[#003170] overflow-hidden">
-                            <div className="h-full w-full bg-gradient-to-br from-slate-400 to-slate-500 opacity-20" />
-                        </div>
-                    ))}
-                </div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-                    <ShieldCheck className="w-3 h-3" />
-                    <span>{t('skills_passport.proficiency.gold_standard')}</span>
-                </div>
-            </div>
-        </motion.div>
+const ActionButton = ({ icon: Icon, label, onClick, disabled = false, primary = false }) => (
+    <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+            primary
+                ? "border-[#163878] bg-[#163878] text-white hover:bg-[#102c66]"
+                : "border-[#cbd6ea] bg-white text-[#163878] hover:bg-[#f7faff]"
+        } disabled:cursor-not-allowed disabled:opacity-60`}
+        style={documentFont}
+    >
+        <Icon className="h-4 w-4" />
+        {label}
+    </button>
+);
+
+const StatCell = ({ label, value, isFirst = false }) => (
+    <div className={`flex flex-1 flex-col items-center justify-center px-3 py-3 text-center ${isFirst ? "" : "border-l border-white/10"}`}>
+        <span className="text-[18px] font-semibold text-white" style={displayFont}>
+            {value}
+        </span>
+        <span className="mt-1 text-[8px] font-bold uppercase tracking-[0.3em] text-blue-200/70" style={documentFont}>
+            {label}
+        </span>
+    </div>
+);
+
+const StandardCard = ({ title, rating }) => (
+    <div className="rounded-[18px] border border-[#d3def0] bg-[#f3f7fe] px-3 py-4 text-center">
+        <p className="text-[9px] font-bold uppercase tracking-[0.24em] text-[#20417e]">{title}</p>
+        <p className="mt-2 text-[22px] font-semibold text-[#10285a]" style={displayFont}>
+            {rating.toFixed(1)}
+        </p>
+    </div>
+);
+
+const BadgePill = ({ label, tone = "blue" }) => {
+    const tones = {
+        blue: "border-[#c8d6f0] bg-[#edf3ff] text-[#163878]",
+        emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        amber: "border-amber-200 bg-amber-50 text-amber-700"
+    };
+
+    return (
+        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.24em] ${tones[tone] || tones.blue}`}>
+            {label}
+        </span>
     );
 };
 
+const CredentialCard = ({ credential }) => (
+    <div className="flex h-full flex-col justify-between rounded-[22px] border border-[#cfdaee] bg-white px-4 py-4">
+        <div className="flex items-start gap-3">
+            <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-[#d5def0] bg-[#163878]/[0.03]">
+                {credential.icon ? (
+                    <img src={credential.icon} alt={credential.title} className="h-full w-full object-cover" />
+                ) : (
+                    <Award className="h-5 w-5 text-[#163878]" />
+                )}
+            </div>
+            <div className="min-w-0 flex-1">
+                <h3 className="text-[15px] font-semibold leading-snug text-[#10285a]" style={documentFont}>
+                    {credential.title}
+                </h3>
+                <p className="mt-1 text-[11px] text-slate-500" style={documentFont}>
+                    {credential.subtitle}
+                </p>
+            </div>
+        </div>
 
+        <div className="mt-4 flex flex-wrap gap-2">
+            <BadgePill
+                label={credential.difficulty}
+                tone={credential.difficulty === "ADVANCED" ? "blue" : credential.difficulty === "INTERMEDIATE" ? "emerald" : "amber"}
+            />
+            <BadgePill label="VERIFIED" tone="emerald" />
+            <BadgePill label="AI VERIFIED" tone="blue" />
+            <BadgePill label="SMAART VERIFIED" tone="blue" />
+        </div>
 
-// --- Sub-components ---
-
-const AnimatedBackground = () => (
-    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-teal/10 blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-navy/10 blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] rounded-full bg-teal/5 blur-[100px]" />
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#e5ecf7] pt-3 text-[11px]">
+            <span className="inline-flex items-center gap-1.5 font-semibold text-emerald-700">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                {credential.liveStatus}
+            </span>
+            <span className="text-slate-500">{credential.meta}</span>
+        </div>
     </div>
 );
 
-const IconBox = ({ children, className = "" }) => (
-    <div className={`p-3.5 rounded-2xl bg-slate-100 dark:bg-[#002A5C] text-2xl flex items-center justify-center transition-all duration-300 hover:scale-110 ${className}`}>
-        {children}
+const SkillChip = ({ label, source, verified = true, tone = "blue" }) => {
+    const tones = {
+        blue: "border-[#c9d7ef] bg-[#edf4ff] text-[#163878]",
+        teal: "border-teal-200 bg-teal-50 text-teal-800",
+        slate: "border-slate-200 bg-white text-slate-700"
+    };
+
+    return (
+        <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-[11px] font-semibold ${tones[tone] || tones.blue}`}>
+            {verified ? <ShieldCheck className="h-3.5 w-3.5" /> : <Sparkles className="h-3.5 w-3.5" />}
+            <span>{label}</span>
+            {source ? <span className="text-[9px] font-bold uppercase tracking-[0.18em] opacity-60">{source}</span> : null}
+        </div>
+    );
+};
+
+const EmptySkillState = ({ title }) => (
+    <div className="rounded-[22px] border border-dashed border-[#cfd9ea] bg-white/75 px-5 py-8 text-center">
+        <p className="text-sm font-semibold text-[#163878]">{title}</p>
+        <p className="mt-2 text-sm text-slate-500">No synced records are available for this category yet.</p>
     </div>
 );
-
-
-
-const SkillBadge = ({ skill, verified = false }) => (
-    <motion.div
-        whileHover={{ scale: 1.05 }}
-        className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold transition-all shadow-sm ${verified
-            ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 shimmer-effect"
-            : "bg-[#F8FAFC] dark:bg-dark-elevated text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/5"
-            }`}>
-        {verified && <ShieldCheck className="w-4 h-4" />}
-        {skill}
-    </motion.div>
-);
-
-
-
-// --- Main Page Component ---
 
 const SkillsPassport = () => {
-    const { t, i18n } = useTranslation();
-    const { theme } = useTheme();
     const navigate = useNavigate();
-    const containerRef = useRef(null);
-    const passportExportRef = useRef(null);
+    const activePageRef = useRef(null);
+    const TOTAL_PAGES = 4;
+
+    const [currentUser, setCurrentUser] = useState(null);
+    const [registrationProfile, setRegistrationProfile] = useState(null);
     const [baselineResult, setBaselineResult] = useState(null);
     const [stageResults, setStageResults] = useState({});
-    const [isLoading, setIsLoading] = useState(true);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [isExporting, setIsExporting] = useState(false);
-    const [hoveredQuotient, setHoveredQuotient] = useState(null);
-    const [activeTab, setActiveTab] = useState("smart");
-    const [registrationProfile, setRegistrationProfile] = useState(null);
-    const [profilePhotoUrl, setProfilePhotoUrl] = useState(null);
     const [courseEnrollments, setCourseEnrollments] = useState([]);
-    const [fullDetails, setFullDetails] = useState({
-        certificates: [],
-        projects: [],
-        workExperience: [],
-        otherCourses: []
-    });
-
-    // 3D Tilt Logic
-    const [rotateX, setRotateX] = useState(0);
-    const [rotateY, setRotateY] = useState(0);
-    const handleMouseMove = (e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        setRotateX((y - centerY) / 10);
-        setRotateY(-(x - centerX) / 10);
-    };
-    const handleMouseLeave = () => {
-        setRotateX(0);
-        setRotateY(0);
-    };
+    const [externalCertificates, setExternalCertificates] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isExporting, setIsExporting] = useState(false);
+    const [activePage, setActivePage] = useState(1);
 
     useEffect(() => {
-        const userStr = sessionStorage.getItem("user");
-        if (userStr) {
-            try { setCurrentUser(JSON.parse(userStr)); } catch { }
+        const rawUser = sessionStorage.getItem("user");
+        if (!rawUser) {
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            setCurrentUser(JSON.parse(rawUser));
+        } catch (error) {
+            console.error("Unable to parse current user from session storage:", error);
+            setIsLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
+        if (!currentUser) return;
+
+        const fetchPassportData = async () => {
+            setIsLoading(true);
+
             try {
-                const userStr = sessionStorage.getItem("user");
-                if (userStr) {
-                    const user = JSON.parse(userStr);
-                    const userId = user._id || user.id;
-                    const email = user.email;
+                const userId = currentUser?._id || currentUser?.id;
+                const email = currentUser?.email;
+                const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
-                    if (userId) {
-                        const [baselineRes, stageRes, enrollmentsRes] = await Promise.allSettled([
-                            assessmentApi.getBaseLineResults(userId),
-                            assessmentApi.getStageResults(userId),
-                            courseEnrollmentAPI.getByStudent(userId),
-                        ]);
+                const requests = [
+                    userId ? assessmentApi.getBaseLineResults(userId) : Promise.resolve(null),
+                    userId ? assessmentApi.getStageResults(userId) : Promise.resolve(null),
+                    userId ? courseEnrollmentAPI.getByStudent(userId) : Promise.resolve(null),
+                    userCertificateApi.getAll().catch(() => null),
+                    email
+                        ? fetch(`${API_BASE_URL}/users/register-details/${encodeURIComponent(email)}`, {
+                            headers: token ? { Authorization: `Bearer ${token}` } : {}
+                        })
+                        : Promise.resolve(null)
+                ];
 
-                        if (baselineRes.status === 'fulfilled' && baselineRes.value?.success) {
-                            setBaselineResult(baselineRes.value.data);
-                        }
-                        if (stageRes.status === 'fulfilled' && stageRes.value?.success) {
-                            setStageResults(stageRes.value.data || {});
-                        }
-                        if (enrollmentsRes.status === "fulfilled") {
-                            const enrollmentData = Array.isArray(enrollmentsRes.value)
-                                ? enrollmentsRes.value
-                                : Array.isArray(enrollmentsRes.value?.data)
-                                    ? enrollmentsRes.value.data
-                                    : [];
-                            const enrichedEnrollments = await Promise.all(
-                                enrollmentData.map(async (enrollment) => {
-                                    if (enrollment?.courseDetails || !enrollment?.course) return enrollment;
-                                    try {
-                                        const courseResponse = await coursesAPI.getById(enrollment.course);
-                                        const courseDetails = courseResponse?.data || courseResponse || null;
-                                        return { ...enrollment, courseDetails };
-                                    } catch {
-                                        return enrollment;
-                                    }
-                                })
-                            );
-                            setCourseEnrollments(enrichedEnrollments);
-                        }
-                    }
+                const [baselineRes, stageRes, enrollmentRes, userCertificatesRes, registrationRes] = await Promise.allSettled(requests);
 
-                    if (email) {
-                        const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-                        const response = await fetch(`${API_BASE_URL}/users/register-details/${email}`, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            setRegistrationProfile(data);
-                            setFullDetails({
-                                certificates: Array.isArray(data.certificates) ? data.certificates : [],
-                                projects: Array.isArray(data.projects) ? data.projects : [],
-                                workExperience: Array.isArray(data.workExperience) ? data.workExperience : [],
-                                otherCourses: Array.isArray(data.otherCourses) ? data.otherCourses : []
-                            });
-                        }
-                    }
+                if (baselineRes.status === "fulfilled" && baselineRes.value?.success) {
+                    setBaselineResult(baselineRes.value.data || null);
                 }
-            } catch (err) {
-                console.error('Skills Passport fetch error:', err);
+
+                if (stageRes.status === "fulfilled" && stageRes.value?.success) {
+                    setStageResults(stageRes.value.data || {});
+                }
+
+                if (enrollmentRes.status === "fulfilled" && enrollmentRes.value) {
+                    const rawEnrollments = Array.isArray(enrollmentRes.value)
+                        ? enrollmentRes.value
+                        : Array.isArray(enrollmentRes.value?.data)
+                            ? enrollmentRes.value.data
+                            : [];
+
+                    const enrichedEnrollments = await Promise.all(
+                        rawEnrollments.map(async (enrollment) => {
+                            const populatedCourse = enrollment?.course;
+                            const needsEnrichment =
+                                typeof populatedCourse === "string" ||
+                                !populatedCourse?.tags ||
+                                !populatedCourse?.banner;
+
+                            if (!needsEnrichment) {
+                                return { ...enrollment, courseDetails: populatedCourse };
+                            }
+
+                            const courseId =
+                                typeof populatedCourse === "string"
+                                    ? populatedCourse
+                                    : populatedCourse?._id || enrollment?.course?._id;
+
+                            if (!courseId) return enrollment;
+
+                            try {
+                                const courseResponse = await coursesAPI.getById(courseId);
+                                const courseDetails = courseResponse?.data || courseResponse || null;
+                                return { ...enrollment, courseDetails };
+                            } catch (error) {
+                                console.error("Failed to enrich course enrollment:", error);
+                                return enrollment;
+                            }
+                        })
+                    );
+
+                    setCourseEnrollments(enrichedEnrollments);
+                }
+
+                if (userCertificatesRes.status === "fulfilled") {
+                    const certificateData = Array.isArray(userCertificatesRes.value?.data)
+                        ? userCertificatesRes.value.data
+                        : [];
+                    setExternalCertificates(certificateData);
+                }
+
+                if (registrationRes.status === "fulfilled" && registrationRes.value?.ok) {
+                    const registrationData = await registrationRes.value.json();
+                    setRegistrationProfile(registrationData || null);
+                }
+            } catch (error) {
+                console.error("Skills Passport fetch failed:", error);
+                sonnerToast.error("Unable to load the skills passport right now.");
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchData();
-    }, []);
 
-    useEffect(() => {
-        const fetchProfilePhoto = async () => {
-            if (!currentUser?.email) return;
-            try {
-                const response = await fetch(`${API_BASE_URL}/users/register-details/${currentUser.email}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    const photoUrl =
-                        data.profilePhoto ||
-                        data.otherDetails?.profilePhoto ||
-                        currentUser?.profileImage ||
-                        currentUser?.profilePicture;
-                    if (photoUrl) {
-                        const fullUrl = photoUrl.startsWith("http") ? photoUrl : `${getBackendUrl()}/${photoUrl.replace(/^\/+/, "")}`;
-                        setProfilePhotoUrl(fullUrl);
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching profile photo:", error);
-            }
+        fetchPassportData();
+    }, [currentUser]);
+
+    const passportData = useMemo(() => {
+        const fallbackName = currentUser?.fullName || "SMAART Student";
+        const fallbackEmail = currentUser?.email || "student@smaart.in";
+        const fallbackPhone = currentUser?.mobile || currentUser?.mobileNumber || "+91 00000 00000";
+
+        const activeStageProfile =
+            stageResults?.T4?.quotientProfile ||
+            stageResults?.T4?.t1Profile ||
+            baselineResult?.quotientProfile ||
+            baselineResult?.t1Profile ||
+            null;
+
+        const scores = getScoreMap(activeStageProfile);
+        const standardRatings = PROFESSIONAL_STANDARDS.map((title) => {
+            const mappedScore = scores[STANDARD_SCORE_MAP[title]] ?? baselineResult?.baselineScore ?? 0;
+            return {
+                title,
+                rating: toFiveScale(mappedScore),
+                rawScore: mappedScore
+            };
+        });
+
+        const avgRating = Number(average(standardRatings.map((item) => item.rating)).toFixed(1)) || 0;
+
+        const fullName = registrationProfile?.fullName || fallbackName;
+        const degree =
+            registrationProfile?.higherEducation?.[0]?.degreeFullName ||
+            registrationProfile?.higherEducation?.[0]?.degree ||
+            registrationProfile?.department ||
+            registrationProfile?.educationLevel ||
+            "Professional Learning Track";
+        const institution =
+            registrationProfile?.college?.collegeName ||
+            registrationProfile?.institution ||
+            registrationProfile?.higherEducation?.[0]?.institutionName ||
+            "SMAART Institute";
+        const email = registrationProfile?.email || fallbackEmail;
+        const phone = registrationProfile?.mobileNumber || fallbackPhone;
+        const passportId = buildPassportId(registrationProfile, currentUser);
+        const cohort = extractYear(
+            registrationProfile?.yearOfPassing,
+            registrationProfile?.higherEducation?.[0]?.yearOfPassing,
+            currentUser?.createdAt,
+            registrationProfile?.createdAt
+        );
+        const profilePhoto = resolveMediaUrl(
+            registrationProfile?.profilePhoto ||
+            currentUser?.profilePhoto ||
+            currentUser?.profileImage ||
+            currentUser?.profilePicture,
+            spImage
+        );
+
+        const credentials = courseEnrollments
+            .map((enrollment, index) => {
+                const courseData = enrollment?.courseDetails || enrollment?.course || {};
+                const title = sanitizeLabel(courseData?.title || enrollment?.courseName || `SMAART Course ${index + 1}`);
+                const progress = Number(
+                    enrollment?.progress ??
+                    enrollment?.completionPercentage ??
+                    enrollment?.progressPercentage ??
+                    0
+                );
+
+                const tags = [
+                    ...normalizeList(courseData?.tags),
+                    ...normalizeList(courseData?.acquiredSkills),
+                    ...normalizeList(courseData?.skills),
+                    ...normalizeList(courseData?.modules?.map((module) => module?.title))
+                ].filter(isMeaningfulLabel);
+
+                const difficulty = deriveDifficulty(enrollment, courseData);
+                const isVerified = Boolean(enrollment?.certificateIssued) || enrollment?.status === "completed";
+                const issueLabel = formatDateLabel(
+                    enrollment?.certificateIssuedDate ||
+                    enrollment?.completionDate ||
+                    enrollment?.updatedAt
+                );
+
+                return {
+                    id: enrollment?._id || courseData?._id || `credential-${index}`,
+                    title,
+                    subtitle: `${institution} | ${sanitizeLabel(courseData?.courseCode || courseData?.category || "Verified Credential")}`,
+                    difficulty,
+                    liveStatus: isVerified ? "Live verified" : "Realtime sync",
+                    meta: issueLabel ? `Issued ${issueLabel}` : `${Math.max(0, Math.round(progress))}% progress`,
+                    verified: isVerified,
+                    tags,
+                    icon: resolveMediaUrl(courseData?.banner, "")
+                };
+            })
+            .sort((a, b) => Number(b.verified) - Number(a.verified));
+
+        const buckets = createSkillBuckets();
+
+        const addMany = (labels, options = {}) => {
+            labels.forEach((label) => pushSkill(buckets, label, options));
         };
 
-        fetchProfilePhoto();
-    }, [currentUser?.email, currentUser?.profileImage, currentUser?.profilePicture]);
+        addMany(
+            collectEntryLabels(registrationProfile?.skills, ["skillName", "name", "title", "tool"]),
+            { bucket: "technical", source: "Profile", verified: true }
+        );
+        addMany(
+            collectEntryLabels(registrationProfile?.aiSkills, ["title", "aiTool", "name", "tool", "skills", "workflows", "useCases"]),
+            { bucket: "ai", source: "Profile", verified: true }
+        );
+        addMany(
+            collectEntryLabels(registrationProfile?.domainSkills, ["domainName", "name", "expertise", "focusAreas"]),
+            { bucket: "domain", source: "Profile", verified: true }
+        );
 
-    const getScores = (profile) => {
-        if (!profile) return { CRQ: 0, SRQ: 0, LQ: 0, SIQ: 0, PEQ: 0, DAQ: 0, SEQ: 0 };
-        return {
-            CRQ: profile.CRQ?.rawScore ?? profile.CRQ?.percentage ?? 0,
-            SRQ: profile.SRQ?.rawScore ?? profile.SRQ?.percentage ?? 0,
-            LQ: profile.LQ?.rawScore ?? profile.LQ?.percentage ?? 0,
-            SIQ: profile.SIQ?.rawScore ?? profile.SIQ?.percentage ?? 0,
-            PEQ: profile.PEQ?.rawScore ?? profile.PEQ?.percentage ?? 0,
-            DAQ: profile.DAQ?.rawScore ?? profile.DAQ?.percentage ?? 0,
-            SEQ: profile.SEQ?.rawScore ?? profile.SEQ?.percentage ?? 0,
-        };
-    };
-
-    const currentScores = getScores(baselineResult?.t1Profile);
-    const latestScore = baselineResult?.baselineScore || 0;
-    const t4Result = stageResults['T4'];
-    const growth = t4Result ? (t4Result.stageScore - latestScore) : 0;
-
-    const handleExport = async () => {
-        if (!passportExportRef.current) return;
-        setIsExporting(true);
-        try {
-            const html2canvas = (await import('html2canvas')).default;
-            const { jsPDF } = await import('jspdf');
-
-            const canvas = await html2canvas(passportExportRef.current, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: theme === 'dark' ? '#00152e' : '#ffffff',
-                scrollX: 0,
-                scrollY: -window.scrollY,
+        credentials.forEach((credential) => {
+            addMany(credential.tags, {
+                source: "Course",
+                verified: credential.verified
             });
 
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-            const imgW = 210;
-            const pageH = 297;
-            const imgH = (canvas.height * imgW) / canvas.width;
+            pushSkill(buckets, credential.title, {
+                bucket: classifySkill(credential.title),
+                source: "Credential",
+                verified: credential.verified
+            });
+        });
 
-            if (imgH <= pageH) {
-                pdf.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
-            } else {
-                let heightLeft = imgH;
-                let position = 0;
-                pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH);
-                heightLeft -= pageH;
+        addMany(
+            (registrationProfile?.projects || []).flatMap((project) => [
+                project?.title,
+                project?.qualificationLevel,
+                project?.teamType
+            ]),
+            { source: "Project", verified: true }
+        );
 
-                while (heightLeft > 0) {
-                    position = heightLeft - imgH;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH);
-                    heightLeft -= pageH;
-                }
+        addMany(
+            (registrationProfile?.workExperience || []).flatMap((work) => [
+                work?.jobTitle,
+                work?.role,
+                work?.industry
+            ]),
+            { source: "Experience", verified: true }
+        );
+
+        addMany(
+            (registrationProfile?.certificates || []).flatMap((certificate) => [
+                certificate?.title,
+                certificate?.issuingOrg
+            ]),
+            { source: "Registration", verified: true }
+        );
+
+        externalCertificates.forEach((certificate) => {
+            pushSkill(buckets, certificate?.title, {
+                bucket: classifySkill(certificate?.title, classifySkill(certificate?.category)),
+                source: "Certificate",
+                verified: true
+            });
+
+            pushSkill(buckets, certificate?.category, {
+                bucket: classifySkill(certificate?.category),
+                source: "Certificate",
+                verified: true
+            });
+        });
+
+        addMany(
+            [
+                registrationProfile?.department,
+                registrationProfile?.educationLevel,
+                registrationProfile?.higherEducation?.[0]?.specialization,
+                registrationProfile?.higherEducation?.[0]?.degreeFullName,
+                registrationProfile?.higherEducation?.[0]?.degree
+            ],
+            { bucket: "domain", source: "Academic", verified: true }
+        );
+
+        addMany(
+            [
+                ...(registrationProfile?.jobPreferences || []).map((job) => job?.preferredRole),
+                ...(registrationProfile?.sectorPreferences?.preferredSectors || []),
+                ...(registrationProfile?.sectorPreferences?.secondarySectors || [])
+            ],
+            { bucket: "domain", source: "Career", verified: true }
+        );
+
+        return {
+            fullName,
+            degree,
+            institution,
+            email,
+            phone,
+            passportId,
+            cohort,
+            avgRating,
+            standardRatings,
+            credentials,
+            technicalSkills: Array.from(buckets.technical.values()).sort((a, b) => a.label.localeCompare(b.label)),
+            aiSkills: Array.from(buckets.ai.values()).sort((a, b) => a.label.localeCompare(b.label)),
+            domainSkills: Array.from(buckets.domain.values()).sort((a, b) => a.label.localeCompare(b.label)),
+            profilePhoto,
+            verificationDate: formatDateLabel(
+                stageResults?.T4?.updatedAt ||
+                baselineResult?.updatedAt ||
+                registrationProfile?.updatedAt ||
+                new Date()
+            ),
+            shareUrl: typeof window !== "undefined" ? window.location.href : ""
+        };
+    }, [baselineResult, courseEnrollments, currentUser, externalCertificates, registrationProfile, stageResults]);
+
+    const handleCopyLink = async () => {
+        try {
+            await navigator.clipboard.writeText(passportData.shareUrl);
+            sonnerToast.success("Passport link copied.");
+        } catch (error) {
+            console.error("Copy failed:", error);
+            sonnerToast.error("Unable to copy the passport link.");
+        }
+    };
+
+    const handleExport = async () => {
+        if (!activePageRef.current) return;
+
+        setIsExporting(true);
+        try {
+            const html2canvas = (await import("html2canvas")).default;
+            const { jsPDF } = await import("jspdf");
+            const pdf = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
+
+            const previousPage = activePage;
+
+            for (let pageNumber = 1; pageNumber <= TOTAL_PAGES; pageNumber += 1) {
+                setActivePage(pageNumber);
+                await new Promise((resolve) => window.setTimeout(resolve, 120));
+                const page = activePageRef.current;
+                if (!page) continue;
+
+                const canvas = await html2canvas(page, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: "#eef3fb",
+                    width: page.scrollWidth,
+                    height: page.scrollHeight,
+                    windowWidth: page.scrollWidth,
+                    windowHeight: page.scrollHeight
+                });
+
+                const imgData = canvas.toDataURL("image/png");
+                if (pageNumber > 1) pdf.addPage();
+                pdf.addImage(imgData, "PNG", 0, 0, 210, 297, undefined, "FAST");
             }
-            pdf.save(`SkillsPassport_${currentUser?.fullName || 'User'}.pdf`);
-            sonnerToast.success(t("common.success_export") || "Passport exported successfully!");
-        } catch (err) {
-            console.error('PDF export failed:', err);
-            sonnerToast.error(t("common.error_export") || "Export failed. Please try again.");
+
+            setActivePage(previousPage);
+
+            pdf.save(`SMAART_Skills_Passport_${passportData.fullName.replace(/\s+/g, "_")}.pdf`);
+            sonnerToast.success("Passport exported successfully.");
+        } catch (error) {
+            console.error("Passport export failed:", error);
+            sonnerToast.error("Export failed. Please try again.");
         } finally {
             setIsExporting(false);
         }
     };
 
-    if (isLoading) return <SkillsPassportSkeleton />;
-
-    const fallbackData = getFallbackData(currentUser);
-    const userName = registrationProfile?.fullName || currentUser?.fullName || fallbackData.fullName;
-    const passportEmail = registrationProfile?.email || currentUser?.email || fallbackData.email;
-    const passportPhone = registrationProfile?.mobileNumber || currentUser?.mobile || currentUser?.phone || fallbackData.phone;
-    const passportDegree =
-        registrationProfile?.higherEducation?.[0]?.degreeFullName ||
-        registrationProfile?.higherEducation?.[0]?.degree ||
-        registrationProfile?.department ||
-        registrationProfile?.educationLevel ||
-        fallbackData.degree;
-    const passportInstitution =
-        registrationProfile?.institution ||
-        registrationProfile?.higherEducation?.[0]?.institutionName ||
-        fallbackData.institution;
-    const verificationStatus =
-        registrationProfile?.verificationStatus ||
-        (registrationProfile?.status === "approved" ? "VERIFIED" : null) ||
-        fallbackData.verificationStatus;
-    const profilePhoto = profilePhotoUrl || resolveProfilePhoto(
-        registrationProfile?.profilePhoto,
-        registrationProfile?.profileImage,
-        registrationProfile?.otherDetails?.profilePhoto,
-        registrationProfile?.otherDetails?.profileImage,
-        registrationProfile?.avatar,
-        registrationProfile?.image,
-        currentUser?.profilePhoto,
-        currentUser?.profileImage,
-        currentUser?.profilePicture,
-        currentUser?.avatar,
-        currentUser?.image,
-        currentUser?.otherDetails?.profilePhoto,
-        currentUser?.otherDetails?.profileImage,
-        currentUser?.otherDetails?.profilePicture,
-        currentUser?.otherDetails?.avatar,
-        fallbackData.profileImage
-    );
-
-    const passportId = registrationProfile?.passportId || registrationProfile?.studentId || fallbackData.passportId;
-    const standardRatings = PROFESSIONAL_STANDARDS.map((standard) => ({
-        ...standard,
-        stars: getStaticStars(standard.title)
-    }));
-    const fallbackCollections = getFallbackSkillCollections(currentUser);
-    const smaartCourses = courseEnrollments.length > 0
-        ? courseEnrollments.map((enrollment, index) => {
-            const courseData = enrollment.courseDetails || enrollment.course || {};
-            const courseTitle = courseData.title || courseData.courseName || enrollment.courseName || `SMAART Course ${index + 1}`;
-            const acquiredSkills = normalizeList(
-                courseData.acquiredSkills ||
-                courseData.skills ||
-                enrollment.acquiredSkills ||
-                enrollment.skills
-            );
-            const progress = Number(
-                enrollment.completionPercentage ??
-                enrollment.progress ??
-                enrollment.progressPercentage ??
-                0
-            );
-
-            return {
-                id: enrollment._id || courseData._id || `course-${index}`,
-                title: courseTitle,
-                skillsAcquired: acquiredSkills.length > 0 ? acquiredSkills : ["Foundational competency", "Applied learning", "Outcome delivery"],
-                platform: "SMAART Course",
-                provider: courseData.provider || courseData.instructor || courseData.category || "SMAART Institute",
-                level: String(enrollment.level || courseData.level || (progress >= 80 ? "ADVANCED" : progress >= 45 ? "INTERMEDIATE" : "BEGINNER")).toUpperCase(),
-                verificationStatus: String(
-                    enrollment.verificationStatus ||
-                    (enrollment.completed || progress >= 100 ? "VERIFIED" : "SELF DECLARED")
-                ).toUpperCase(),
-                completionDate: enrollment.completedAt || enrollment.updatedAt || courseData.updatedAt || courseData.createdAt,
-                meta: progress ? `${Math.round(progress)}% completed` : "In learning path"
-            };
-        })
-        : fallbackCollections.smaartCourses;
-
-    const technicalSkillSource = Array.isArray(registrationProfile?.skills) && registrationProfile.skills.length > 0
-        ? registrationProfile.skills
-        : Array.isArray(fullDetails.projects) && fullDetails.projects.length > 0
-            ? fullDetails.projects
-            : null;
-
-    const technicalSkills = technicalSkillSource
-        ? technicalSkillSource.map((skill, index) => ({
-            id: `tech-${index}`,
-            title: skill.skillName || skill.name || skill.title || `Technical Skill ${index + 1}`,
-            skillsAcquired: normalizeList(skill.projects || skill.tools || skill.focusAreas || skill.significantAchievements || skill.description || skill.name || skill.title),
-            platform: "Technical Skills",
-            provider: skill.institution || skill.companyName || "Student Portfolio",
-            level: String(skill.proficiency || "INTERMEDIATE").toUpperCase(),
-            verificationStatus: String(skill.verificationStatus || "SELF DECLARED").toUpperCase(),
-            meta: skill.projects ? `Projects: ${Array.isArray(skill.projects) ? skill.projects.length : skill.projects}` : skill.teamType ? `Team Type: ${skill.teamType}` : null,
-            supportingInfo: skill.certifications ? `Certifications: ${normalizeList(skill.certifications).join(", ")}` : skill.projectUrl ? `Project Link Available` : null
-        }))
-        : fallbackCollections.technicalSkills;
-
-    const aiSkillSource = Array.isArray(registrationProfile?.aiSkills) && registrationProfile.aiSkills.length > 0
-        ? registrationProfile.aiSkills
-        : Array.isArray(fullDetails.certificates) && fullDetails.certificates.length > 0
-            ? fullDetails.certificates
-            : null;
-
-    const aiSkills = aiSkillSource
-        ? aiSkillSource.map((skill, index) => ({
-            id: `ai-${index}`,
-            title: skill.aiTool || skill.tool || skill.title || `AI Skill ${index + 1}`,
-            skillsAcquired: normalizeList(skill.useCases || skill.workflows || skill.skills || skill.description || skill.aiTool || skill.title),
-            platform: "AI Skills",
-            provider: skill.issuer || "AI Practice Stack",
-            level: String(skill.proficiency || "INTERMEDIATE").toUpperCase(),
-            verificationStatus: String(skill.verified ? "VERIFIED" : (skill.verificationStatus || "SELF DECLARED")).toUpperCase(),
-            meta: skill.verified ? "Verified AI capability" : "Self-declared AI capability",
-            supportingInfo: skill.aiTool ? `Tool: ${skill.aiTool}` : skill.issuer ? `Issuer: ${skill.issuer}` : null
-        }))
-        : fallbackCollections.aiSkills;
-
-    const domainSkillSource = Array.isArray(registrationProfile?.domainSkills) && registrationProfile.domainSkills.length > 0
-        ? registrationProfile.domainSkills
-        : passportDegree
-            ? [{ domainName: passportDegree, expertise: passportInstitution, verificationStatus }]
-            : null;
-
-    const domainSkills = domainSkillSource
-        ? domainSkillSource.map((skill, index) => ({
-            id: `domain-${index}`,
-            title: skill.domainName || skill.name || `Domain Skill ${index + 1}`,
-            skillsAcquired: normalizeList(skill.focusAreas || skill.expertise || skill.domainName),
-            platform: "Domain Skills",
-            provider: passportInstitution,
-            level: String(skill.level || "INTERMEDIATE").toUpperCase(),
-            verificationStatus: String(skill.verificationStatus || "SELF DECLARED").toUpperCase(),
-            meta: skill.expertise ? `Expertise: ${skill.expertise}` : "Domain-aligned capability",
-            supportingInfo: skill.domainName ? `Domain: ${skill.domainName}` : null
-        }))
-        : fallbackCollections.domainSkills;
-
-    const tabCollections = {
-        smart: {
-            title: t('skills_passport.tabs.smart'),
-            description: t('skills_passport.hero_desc'),
-            items: smaartCourses,
-            icon: Sparkles
-        },
-        other: {
-            title: t('skills_passport.tabs.other'),
-            description: t('skills_passport.other_courses.title'),
-            items: technicalSkills,
-            icon: Briefcase
-        },
-        certificates: {
-            title: t('skills_passport.tabs.certificates'),
-            description: t('skills_passport.certificates.title'),
-            items: aiSkills,
-            icon: Monitor
-        },
-        projects: {
-            title: t('skills_passport.tabs.projects'),
-            description: t('skills_passport.projects.title'),
-            items: domainSkills,
-            icon: Layout
-        }
-    };
-    const verifiedSkills = [
-        "Cognitive Analysis", "Digital Literacy", "Agile Learning",
-        "Professional Execution", "Ethics & Sustainability", "Social Intelligence"
-    ];
-    const verificationTimestamp = new Date().toLocaleString(i18n.language || "en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-    const passportShareUrl = `${window.location.origin}/verify/${passportId}`;
+    if (isLoading) {
+        return <SkillsPassportSkeleton />;
+    }
 
     return (
-        <div className="min-h-screen page-bg transition-colors p-3 md:p-8 relative overflow-x-hidden">
-            <AnimatedBackground />
-            <style>
-                {`
-                .passport-hex {
-                    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-                }
-                .shimmer-effect {
-                    position: relative;
-                    overflow: hidden;
-                }
-                .shimmer-effect::after {
-                    content: "";
-                    position: absolute;
-                    top: 0; right: 0; bottom: 0; left: 0;
-                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-                    transform: translateX(-100%);
-                    animation: shimmer 2s infinite;
-                }
-                @keyframes shimmer {
-                    100% { transform: translateX(100%); }
-                }
-                `}
-            </style>
-
+        <div className="min-h-screen bg-[#e8eff8] px-4 py-6 sm:px-6 sm:py-8" style={documentFont}>
             <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="max-w-6xl mx-auto space-y-8 md:space-y-10"
-                ref={containerRef}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+                className="mx-auto flex max-w-[235mm] flex-col gap-5"
             >
-                {/* Standardized PageHero */}
-                <PageHero
-                    badge={t('skills_passport.title')}
-                    title={t('skills_passport.title')}
-                    subtitle={t('skills_passport.hero_desc')}
-                >
-                    <div className="flex flex-wrap items-center gap-3">
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                <div className="flex flex-col gap-4 rounded-[24px] border border-[#d6dfef] bg-white/80 px-4 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">
+                            SMAART Skills Passport
+                        </p>
+                        <h1 className="mt-2 text-2xl font-semibold text-[#10285a]" style={displayFont}>
+                            Premium AI-Verified Credential Document
+                        </h1>
+                        <p className="mt-1 text-sm text-slate-600">
+                            Multi-page academic and professional identity passport synced from live backend records.
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <ActionButton icon={ArrowLeft} label="Back" onClick={() => navigate(-1)} />
+                        <ActionButton icon={Share2} label="Copy Link" onClick={handleCopyLink} />
+                        <ActionButton
+                            icon={Download}
+                            label={isExporting ? "Exporting..." : "Export PDF"}
                             onClick={handleExport}
                             disabled={isExporting}
-                            className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl px-5 text-sm font-bold text-white bg-[#1a3884] hover:bg-[#132c6b] shadow-lg transition-all disabled:opacity-70"
-                        >
-                            <Download className="h-4 w-4" />
-                            {isExporting ? t('common.processing') : t('skills_passport.get_pdf')}
-                        </motion.button>
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={async () => {
-                                try {
-                                    await navigator.clipboard.writeText(passportShareUrl);
-                                    sonnerToast.success(t('skills_passport.copied_msg', 'Passport link copied!'));
-                                } catch {
-                                    sonnerToast.error(t('skills_passport.copy_err', 'Unable to copy passport link.'));
-                                }
-                            }}
-                            className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl border border-slate-200 dark:border-[#1a3884]/25 bg-white dark:bg-[#002147] px-5 text-sm font-bold text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-[#002A5C]"
-                        >
-                            <Share2 className="h-4 w-4" />
-                            {t('skills_passport.share')}
-                        </motion.button>
+                            primary
+                        />
                     </div>
-                </PageHero>
+                </div>
 
-                <div
-                    ref={passportExportRef}
-                    className="rounded-3xl overflow-hidden shadow-2xl border border-slate-200/50 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] transition-all"
+                {activePage === 1 ? (
+                <div className="mx-auto w-full max-w-[210mm]">
+                    <div className="mb-2 flex justify-end">
+                        <InlinePager
+                            activePage={activePage}
+                            totalPages={TOTAL_PAGES}
+                            onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                            onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                        />
+                    </div>
+                <PassportPage
+                    pageNumber={1}
+                    title="Main Passport Overview"
+                    subtitle="Identity, standards matrix, and verified SMAART credentials"
+                    passportId={passportData.passportId}
+                    pageRef={activePageRef}
+                    showRibbon={false}
+                    showChrome={false}
                 >
-                    <div className="bg-[#F8FAFC] dark:bg-[#002147] p-6 sm:p-10 md:p-14 text-slate-900 dark:text-white relative transition-colors">
-                        <div className="absolute top-0 right-10 h-52 w-52 rounded-full bg-teal/10 blur-3xl pointer-events-none" />
-                        <div className="absolute bottom-8 left-20 h-36 w-36 rounded-full bg-navy/10 blur-3xl pointer-events-none" />
-
-                        <div className="max-w-5xl mx-auto relative z-10 space-y-8">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.55 }}
-                                className="relative mx-auto w-full max-w-4xl rounded-2xl border border-slate-200/70 dark:border-white/10 bg-white dark:bg-dark-elevated px-5 py-6 sm:px-7 md:px-8 shadow-xl"
-                            >
-                                <div className="space-y-5 lg:pr-[180px]">
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal text-white shadow-lg">
-                                                <Sparkles className="w-4 h-4" />
-                                            </div>
-                                            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
-                                                {t('skills_passport.title')}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight tracking-tight text-teal dark:text-white">
-                                            {userName}
-                                        </h1>
-
-                                        <div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 text-sm text-slate-600 dark:text-slate-300">
-                                            <div className="flex items-center gap-3">
-                                                <Mail className="w-4 h-4 text-slate-400" />
-                                                <span className="font-bold break-all">{passportEmail}</span>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <Phone className="w-4 h-4 text-slate-400" />
-                                                <span className="font-bold">{passportPhone}</span>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <ShieldCheck className="w-4 h-4 text-slate-400" />
-                                                <span className="font-bold">{passportId}</span>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <GraduationCap className="w-4 h-4 text-slate-400" />
-                                                <span className="font-bold">{passportDegree}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-8 flex justify-center lg:hidden">
-                                    <div className="space-y-4">
-                                        <div
-                                            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-                                            onMouseMove={handleMouseMove}
-                                            onMouseLeave={handleMouseLeave}
-                                            className="relative"
-                                        >
-                                            <div className="passport-hex flex h-28 w-28 items-center justify-center border border-slate-200/70 dark:border-white/10 bg-white/60 dark:bg-dark-elevated p-3 backdrop-blur-xl shadow-[0_18px_40px_-22px_rgba(15,23,42,0.22)]">
-                                                <div className="h-[72px] w-[72px] overflow-hidden rounded-sm border border-slate-200 bg-white shadow-[0_16px_30px_-18px_rgba(15,23,42,0.35)]">
-                                                    <img
-                                                        src={profilePhoto}
-                                                        alt={userName}
-                                                        className="block h-full w-full object-cover object-top"
-                                                        onError={(e) => { e.target.src = spImage; }}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white dark:border-white/8 bg-emerald-500 text-white shadow-lg">
-                                                <BadgeCheck className="h-3.5 w-3.5" />
-                                            </div>
-                                        </div>
-                                        <div className="w-32 rounded-[18px] border border-slate-200/70 dark:border-white/10 bg-slate-50/85 dark:bg-dark-elevated p-3 text-center">
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{passportInstitution}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="hidden lg:block absolute right-8 top-6">
-                                    <div className="space-y-4">
-                                        <div
-                                            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-                                            onMouseMove={handleMouseMove}
-                                            onMouseLeave={handleMouseLeave}
-                                            className="relative"
-                                        >
-                                            <div className="passport-hex flex h-28 w-28 items-center justify-center border border-slate-200/70 dark:border-white/10 bg-white/60 dark:bg-dark-elevated p-3 backdrop-blur-xl shadow-[0_18px_40px_-22px_rgba(15,23,42,0.22)]">
-                                                <div className="h-[72px] w-[72px] overflow-hidden rounded-sm border border-slate-200 bg-white shadow-[0_16px_30px_-18px_rgba(15,23,42,0.35)]">
-                                                    <img
-                                                        src={profilePhoto}
-                                                        alt={userName}
-                                                        className="block h-full w-full object-cover object-top"
-                                                        onError={(e) => { e.target.src = spImage; }}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="absolute -bottom-1 -right-1 flex h-9 w-9 items-center justify-center rounded-full border-4 border-white dark:border-white/8 bg-emerald-500 text-white shadow-lg">
-                                                <BadgeCheck className="h-3.5 w-3.5" />
-                                            </div>
-                                        </div>
-                                        <div className="w-32 rounded-[18px] border border-slate-200/70 dark:border-white/10 bg-slate-50/85 dark:bg-dark-elevated p-3 text-center">
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{passportInstitution}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </motion.div>
-                            <motion.div
-                                initial={{ opacity: 0, y: 18 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.08, duration: 0.5 }}
-                                className="mx-auto max-w-5xl rounded-[24px] border border-slate-200/70 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] px-6 py-6 sm:px-8 shadow-[0_18px_42px_-24px_rgba(15,23,42,0.2)]"
-                            >
-                                <div className="mb-6">
-                                    <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">{t('skills_passport.standards_title')}</p>
-                                    <h2 className="mt-1 text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                                        {t('skills_passport.standards_matrix')}
-                                    </h2>
-                                </div>
-
-                                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                                    {standardRatings.map((standard, index) => (
-                                        <motion.div
-                                            key={standard.title}
-                                            initial={{ opacity: 0, scale: 0.95 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            transition={{ delay: 0.05 * index }}
-                                            whileHover={{ y: -5 }}
-                                            className="group relative rounded-2xl border border-slate-200/80 dark:border-[#1a3884]/20 bg-white dark:bg-[#002A5C]/40 p-5 shadow-sm transition-all duration-300 hover:bg-slate-50 dark:hover:bg-[#002A5C]/60"
-                                        >
-                                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                                                <Sparkles className="w-12 h-12" />
-                                            </div>
-                                            <p className="text-xs font-bold leading-snug tracking-[0.1em] text-[#1a3884] dark:text-blue-400 uppercase mb-3">
-                                                {t(`skills_passport.standards.${standard.title.toLowerCase()}.title`, standard.title)}
-                                            </p>
-                                            <p className="min-h-[48px] text-[11px] leading-snug font-medium text-slate-500 dark:text-slate-400">
-                                                {t(`skills_passport.standards.${standard.title.toLowerCase()}.desc`, standard.description)}
-                                            </p>
-                                            <div className="mt-5 flex items-center justify-between">
-                                                <div className="flex items-center gap-1">
-                                                    {Array.from({ length: 5 }).map((_, starIndex) => {
-                                                        const active = starIndex < standard.stars;
-                                                        return (
-                                                            <Star
-                                                                key={`${standard.title}-${starIndex}`}
-                                                                className={`h-3 w-3 ${active ? "text-amber-400 fill-amber-400" : "text-slate-200 dark:text-slate-700"}`}
-                                                            />
-                                                        );
-                                                    })}
-                                                </div>
-                                                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
-                                                    {t('skills_passport.rating')}: {standard.stars}.0
-                                                </p>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </motion.div>
-
-                            <div className="max-w-5xl mx-auto px-2 sm:px-4">
-                                <div className="flex sm:flex-wrap justify-start sm:justify-center gap-2 p-2 bg-slate-100/50 dark:bg-[#001A38] backdrop-blur-xl rounded-[28px] border border-slate-200 dark:border-[#1a3884]/20 shadow-inner overflow-x-auto no-scrollbar">
-                                    {[
-                                        { id: 'smart', label: t('skills_passport.tabs.smart'), icon: Sparkles },
-                                        { id: 'other', label: t('skills_passport.tabs.other'), icon: Briefcase },
-                                        { id: 'certificates', label: t('skills_passport.tabs.certificates'), icon: Monitor },
-                                        { id: 'projects', label: t('skills_passport.tabs.projects'), icon: Layout }
-                                    ].map((tab) => (
-                                        <button
-                                            key={tab.id}
-                                            onClick={() => setActiveTab(tab.id)}
-                                            className={`flex-1 min-w-[160px] flex items-center justify-center gap-3 px-6 py-4 font-bold text-[10px] uppercase tracking-[0.2em] transition-all duration-300 rounded-[22px] relative overflow-hidden ${activeTab === tab.id
-                                                ? "bg-white dark:bg-dark-elevated text-teal shadow-md"
-                                                : "text-slate-500 dark:text-slate-300/70 hover:text-slate-700 dark:hover:text-white bg-transparent"
-                                                }`}
-                                        >
-                                            <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-teal animate-pulse" : ""}`} />
-                                            {tab.label}
-                                            {activeTab === tab.id && (
-                                                <motion.div
-                                                    layoutId="tab-indicator"
-                                                    className="absolute inset-0 border-2 border-teal-500/20 rounded-[22px]"
-                                                    initial={false}
-                                                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                                />
-                                            )}
-                                        </button>
-                                    ))}
+                    <div className="bg-[linear-gradient(135deg,_#102c66_0%,_#173d87_58%,_#1b4ba5_100%)] px-5 py-5 text-white sm:px-6 sm:py-5" style={{ borderRadius: "18px 18px 0 0" }}>
+                        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                            <div className="flex-1">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.34em] text-blue-200/75">
+                                    DIGITAL SKILLS PASSPORT
+                                </p>
+                                <h2 className="mt-2 text-[30px] leading-none text-white sm:text-[34px]" style={displayFont}>
+                                    {passportData.fullName}
+                                </h2>
+                                <p className="mt-2 text-[12px] font-semibold uppercase tracking-[0.24em] text-[#f5d88d]">
+                                    {passportData.degree}
+                                </p>
+                                <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px] text-blue-50/90">
+                                    <span className="inline-flex items-center gap-2">
+                                        <Mail className="h-3.5 w-3.5 text-blue-200" />
+                                        {passportData.email}
+                                    </span>
+                                    <span className="inline-flex items-center gap-2">
+                                        <Phone className="h-3.5 w-3.5 text-blue-200" />
+                                        {passportData.phone}
+                                    </span>
+                                    <span className="inline-flex items-center gap-2">
+                                        <ShieldCheck className="h-3.5 w-3.5 text-blue-200" />
+                                        {passportData.passportId}
+                                    </span>
                                 </div>
                             </div>
 
-                            <motion.div
-                                key={`passport-top-${activeTab}`}
-                                initial={{ opacity: 0, y: 16 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.35 }}
-                                className="mx-auto w-full max-w-5xl space-y-6"
-                            >
-                                <div className="rounded-[40px] border border-slate-200/60 dark:border-[#1a3884]/20 bg-white dark:bg-[#002147] p-8 md:p-12 shadow-sm">
-                                    <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                                        <div className="space-y-2">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-1.5 w-10 rounded-full bg-teal" />
-                                                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400">
-                                                    {t('skills_passport.institutional_registry')}
-                                                </p>
+                            <div className="flex min-w-[154px] flex-col items-center justify-start gap-2 md:min-w-[132px] md:items-center">
+                                <div className="relative">
+                                    <div className="relative h-22 w-[84px] overflow-hidden rounded-[20px] border border-white/15 bg-white/10">
+                                        {passportData.profilePhoto ? (
+                                            <img
+                                                src={passportData.profilePhoto}
+                                                alt={passportData.fullName}
+                                                className="h-full w-full object-cover"
+                                                onError={(event) => {
+                                                    event.currentTarget.src = spImage;
+                                                }}
+                                            />
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center">
+                                                <UserCircle2 className="h-16 w-16 text-white/80" />
                                             </div>
-                                            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-                                                {tabCollections[activeTab].title}
-                                            </h2>
-                                            <p className="max-w-2xl text-base font-bold text-slate-500 dark:text-slate-400 leading-relaxed">
-                                                {tabCollections[activeTab].description}
-                                            </p>
-                                        </div>
-                                        <div className="flex flex-col items-center justify-center rounded-[32px] bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-[#1a3884]/20 px-8 py-6 shadow-sm">
-                                            <span className="text-4xl font-bold text-teal dark:text-teal-light">{tabCollections[activeTab].items.length}</span>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">{t('skills_passport.verified_records')}</span>
-                                        </div>
+                                        )}
+                                    </div>
+                                    <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#173d87] bg-emerald-500 text-white shadow-lg">
+                                        <CheckCircle2 className="h-3.5 w-3.5" />
                                     </div>
                                 </div>
 
-                                <div className="grid gap-6 lg:grid-cols-2">
-                                    {tabCollections[activeTab].items.map((item) => (
-                                        <SkillPassportCard
-                                            key={`passport-${item.id}`}
-                                            item={item}
-                                            accentIcon={tabCollections[activeTab].icon}
-                                        />
-                                    ))}
-                                </div>
+                                <p className="pt-1 text-center text-[18px] font-semibold uppercase tracking-[0.04em] text-white/92" style={displayFont}>
+                                    {sanitizeLabel(passportData.institution).split(" ")[0] || passportData.institution}
+                                </p>
+                            </div>
+                        </div>
 
-
-                            </motion.div>
+                        <div className="mt-4 overflow-hidden rounded-[12px] border border-white/10 bg-white/5">
+                            <div className="flex flex-col sm:flex-row">
+                                <StatCell label="Avg Rating" value={passportData.avgRating.toFixed(1)} isFirst />
+                                <StatCell label="Standards" value={String(passportData.standardRatings.length)} />
+                                <StatCell label="Credentials" value={String(passportData.credentials.length)} />
+                                <StatCell label="Cohort" value={passportData.cohort} />
+                            </div>
                         </div>
                     </div>
 
+                    <div className="space-y-7 border-x border-b border-[#d9e3f2] bg-white px-5 py-7 sm:px-7">
+                        <div className="space-y-4">
+                            <PassportSectionTitle title="Professional Standards Matrix" hint="Assessment-aligned ratings" />
+                            <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+                                {passportData.standardRatings.map((item) => (
+                                    <StandardCard key={item.title} title={item.title} rating={item.rating} />
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <PassportSectionTitle
+                                title="Verified SMAART Credentials"
+                                hint={`${passportData.credentials.length} live credentials synced from backend`}
+                            />
+                            {passportData.credentials.length ? (
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    {passportData.credentials.map((credential) => (
+                                        <CredentialCard key={credential.id} credential={credential} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <EmptySkillState title="No SMAART credentials are available yet." />
+                            )}
+                        </div>
+                    </div>
+                </PassportPage>
                 </div>
+                ) : null}
 
+                {activePage === 2 ? (
+                <div className="mx-auto w-full max-w-[210mm]">
+                    <div className="mb-2 flex justify-end">
+                        <InlinePager
+                            activePage={activePage}
+                            totalPages={TOTAL_PAGES}
+                            onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                            onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                        />
+                    </div>
+                <PassportPage
+                    pageNumber={2}
+                    title="Technical Skills"
+                    subtitle="Backend-synced technical competencies and verified learning signals"
+                    passportId={passportData.passportId}
+                    pageRef={activePageRef}
+                >
+                    <div className="space-y-6">
+                        <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+                            <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#edf4ff] text-[#163878]">
+                                        <Monitor className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">Technical Ledger</p>
+                                        <h3 className="text-lg font-semibold text-[#10285a]" style={displayFont}>
+                                            Verified technical stack
+                                        </h3>
+                                    </div>
+                                </div>
+                                <p className="mt-4 text-sm leading-6 text-slate-600">
+                                    This page consolidates technical skills inferred from enrolled courses, submitted projects, course metadata,
+                                    and synced credential records.
+                                </p>
+                            </div>
 
+                            <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">Verification Status</p>
+                                <div className="mt-4 space-y-3 text-sm text-slate-600">
+                                    <div className="flex items-center gap-3">
+                                        <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                                        <span>Skills are rendered only from synced backend records.</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <Sparkles className="h-4 w-4 text-[#163878]" />
+                                        <span>Credential-linked course tags elevate skills to verified status.</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <Star className="h-4 w-4 text-amber-500" />
+                                        <span>Layout is optimized for export-ready A4 rendering.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <div className="text-center pb-20">
-
+                        <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
+                            <PassportSectionTitle title="Technical Skills" hint={`${passportData.technicalSkills.length} synced skills`} />
+                            {passportData.technicalSkills.length ? (
+                                <div className="mt-5 flex flex-wrap gap-3">
+                                    {passportData.technicalSkills.map((skill) => (
+                                        <SkillChip
+                                            key={`${skill.label}-${skill.source}`}
+                                            label={skill.label}
+                                            source={skill.source}
+                                            verified={skill.verified}
+                                            tone="blue"
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="mt-5">
+                                    <EmptySkillState title="No technical skills are synced yet." />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </PassportPage>
                 </div>
+                ) : null}
+
+                {activePage === 3 ? (
+                <div className="mx-auto w-full max-w-[210mm]">
+                    <div className="mb-2 flex justify-end">
+                        <InlinePager
+                            activePage={activePage}
+                            totalPages={TOTAL_PAGES}
+                            onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                            onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                        />
+                    </div>
+                <PassportPage
+                    pageNumber={3}
+                    title="AI Skills"
+                    subtitle="AI capability page with verified tools, prompts, and automation-oriented learning"
+                    passportId={passportData.passportId}
+                    pageRef={activePageRef}
+                >
+                    <div className="space-y-6">
+                        <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
+                            <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
+                                    <Sparkles className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">AI Competency Registry</p>
+                                    <h3 className="text-lg font-semibold text-[#10285a]" style={displayFont}>
+                                        AI-verified skill surface
+                                    </h3>
+                                </div>
+                            </div>
+                            <p className="mt-4 text-sm leading-6 text-slate-600">
+                                AI skills are grouped from course metadata, synced certificate categories, and profile-linked AI learning entries.
+                            </p>
+                        </div>
+
+                        <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
+                            <PassportSectionTitle title="AI Skills" hint={`${passportData.aiSkills.length} synced skills`} />
+                            {passportData.aiSkills.length ? (
+                                <div className="mt-5 flex flex-wrap gap-3">
+                                    {passportData.aiSkills.map((skill) => (
+                                        <SkillChip
+                                            key={`${skill.label}-${skill.source}`}
+                                            label={skill.label}
+                                            source={skill.source}
+                                            verified={skill.verified}
+                                            tone="teal"
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="mt-5">
+                                    <EmptySkillState title="No AI skills are synced yet." />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </PassportPage>
+                </div>
+                ) : null}
+
+                {activePage === 4 ? (
+                <div className="mx-auto w-full max-w-[210mm]">
+                    <div className="mb-2 flex justify-end">
+                        <InlinePager
+                            activePage={activePage}
+                            totalPages={TOTAL_PAGES}
+                            onPrevious={() => setActivePage((page) => Math.max(1, page - 1))}
+                            onNext={() => setActivePage((page) => Math.min(TOTAL_PAGES, page + 1))}
+                        />
+                    </div>
+                <PassportPage
+                    pageNumber={4}
+                    title="Domain Skills"
+                    subtitle="Academic domain signals and career-aligned specialization markers"
+                    passportId={passportData.passportId}
+                    pageRef={activePageRef}
+                    showChrome={false}
+                >
+                    <div className="rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#edf4ff] text-[#163878]">
+                                <Briefcase className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">Domain Skills</p>
+                                <h3 className="text-lg font-semibold text-[#10285a]" style={displayFont}>
+                                    Academic and career domains
+                                </h3>
+                            </div>
+                        </div>
+                        {passportData.domainSkills.length ? (
+                            <div className="mt-5 flex flex-wrap gap-3">
+                                {passportData.domainSkills.map((skill) => (
+                                    <SkillChip
+                                        key={`${skill.label}-${skill.source}`}
+                                        label={skill.label}
+                                        source={skill.source}
+                                        verified={skill.verified}
+                                        tone="blue"
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="mt-5">
+                                <EmptySkillState title="No domain skills are synced yet." />
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="mt-6 rounded-[24px] border border-[#cfdaee] bg-white px-5 py-5">
+                        <PassportSectionTitle title="Verification Summary" hint="Institutional digital identity profile" />
+                        <div className="mt-5 grid gap-4 md:grid-cols-3">
+                            <div className="rounded-[20px] border border-[#d8e1f1] bg-[#f8fbff] px-4 py-4">
+                                <div className="flex items-center gap-2 text-[#163878]">
+                                    <GraduationCap className="h-4 w-4" />
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.28em]">Institution</span>
+                                </div>
+                                <p className="mt-3 text-base font-semibold text-[#10285a]">{passportData.institution}</p>
+                            </div>
+                            <div className="rounded-[20px] border border-[#d8e1f1] bg-[#f8fbff] px-4 py-4">
+                                <div className="flex items-center gap-2 text-[#163878]">
+                                    <BookOpen className="h-4 w-4" />
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.28em]">Programme</span>
+                                </div>
+                                <p className="mt-3 text-base font-semibold text-[#10285a]">{passportData.degree}</p>
+                            </div>
+                            <div className="rounded-[20px] border border-[#d8e1f1] bg-[#f8fbff] px-4 py-4">
+                                <div className="flex items-center gap-2 text-[#163878]">
+                                    <ShieldCheck className="h-4 w-4" />
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.28em]">Verified On</span>
+                                </div>
+                                <p className="mt-3 text-base font-semibold text-[#10285a]">{passportData.verificationDate}</p>
+                            </div>
+                        </div>
+                    </div>
+                </PassportPage>
+                </div>
+                ) : null}
             </motion.div>
-            {/* Footer Promo */}
-
         </div>
     );
 };

@@ -1,8 +1,10 @@
-﻿import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { Network, Terminal, ShieldCheck, Zap, X, Upload, CheckCircle } from 'lucide-react';
+import { useTheme } from '../../../contexts/ThemeContext';
 
 const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
+    const { theme } = useTheme();
     const [roadmap, setRoadmap] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -186,6 +188,7 @@ const CareerRoadmap = ({ roleName, mongoRoleData, direction }) => {
                     skillName={certModal.skillName}
                     onConfirm={handleCertConfirm}
                     onClose={() => setCertModal(null)}
+                    theme={theme}
                 />
             )}
 
@@ -299,17 +302,15 @@ const SkillCard = ({ item, color, status, onStatusChange, totalRoles }) => {
 };
 
 /* â”€â”€ Certificate Modal â”€â”€ */
-const CertificateModal = ({ skillName, onConfirm, onClose }) => {
+const CertificateModal = ({ skillName, onConfirm, onClose, theme }) => {
     const [file, setFile] = useState(null);
     const [dragOver, setDragOver] = useState(false);
     const [verified, setVerified] = useState(false);
     const [skipCert, setSkipCert] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Detect dark mode from <html> or <body> class
-    const isDark = document.documentElement.classList.contains('dark') ||
-        document.body.classList.contains('dark') ||
-        window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Use the app's actual theme value; only fall back to OS for 'system' mode
+    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
     const handleFile = (f) => {
         if (f && (f.type === 'application/pdf' || f.type.startsWith('image/'))) {
@@ -565,7 +566,7 @@ const CertificateModal = ({ skillName, onConfirm, onClose }) => {
                                     transition: 'all 0.15s',
                                 }}
                             >
-                                Skip â€” Mark Without Certificate
+                                Skip - Mark Without Certificate
                             </button>
                         )}
                         {skipCert && (

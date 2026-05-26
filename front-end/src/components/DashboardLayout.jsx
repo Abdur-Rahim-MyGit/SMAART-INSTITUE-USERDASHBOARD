@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Globe2, X } from "lucide-react";
+import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Keyboard, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Globe2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -440,30 +440,34 @@ const DashboardLayout = () => {
     }
   };
 
-  // Fetch profile photo from Registration API
+  // Sync profile photo from context or API
   useEffect(() => {
-    const fetchProfilePhoto = async () => {
-      if (!user?.email) return;
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
-        if (response.ok) {
-          const data = await response.json();
-          // Check for profilePhoto at root level first (new structure), then fallback to otherDetails or user object
-          const photoUrl = data.profilePhoto || data.otherDetails?.profilePhoto || user?.profileImage || user?.profilePicture;
-          if (photoUrl) {
-            // If it's already a full URL (Cloudinary), use it directly; otherwise prepend backend URL
-            const fullUrl = photoUrl.startsWith('http') ? photoUrl : `${getBackendUrl()}/${photoUrl}`;
-            setProfilePhoto(fullUrl);
+    // 1. Try to get it from context first to avoid extra API calls
+    const photoUrl = user?.profilePhoto || user?.otherDetails?.profilePhoto || user?.profileImage || user?.profilePicture;
+    if (photoUrl) {
+      const fullUrl = photoUrl.startsWith('http') ? photoUrl : `${getBackendUrl()}/${photoUrl}`;
+      setProfilePhoto(fullUrl);
+    } else {
+      // 2. Fallback to API if not in context
+      const fetchProfilePhoto = async () => {
+        if (!user?.email) return;
+        try {
+          const response = await fetch(`${API_BASE_URL}/users/register-details/${user.email}`);
+          if (response.ok) {
+            const data = await response.json();
+            const fetchedPhotoUrl = data.profilePhoto || data.otherDetails?.profilePhoto;
+            if (fetchedPhotoUrl) {
+              const fullUrl = fetchedPhotoUrl.startsWith('http') ? fetchedPhotoUrl : `${getBackendUrl()}/${fetchedPhotoUrl}`;
+              setProfilePhoto(fullUrl);
+            }
           }
+        } catch (error) {
+          console.error("Error fetching profile photo:", error);
         }
-      } catch (error) {
-        console.error("Error fetching profile photo:", error);
-      }
-    };
-
-    fetchProfilePhoto();
-  }, [user?.email, user?.profilePicture]);
+      };
+      fetchProfilePhoto();
+    }
+  }, [user?.email, user?.profilePhoto, user?.otherDetails?.profilePhoto, user?.profileImage, user?.profilePicture]);
 
   // Update time every second
   useEffect(() => {
@@ -668,9 +672,12 @@ const DashboardLayout = () => {
                         <X className="w-3.5 h-3.5 text-slate-400" />
                       </button>
                     )}
-                    <div className="flex items-center gap-1 px-1.5 py-1 text-[10px] font-bold text-slate-400 bg-white/80 dark:bg-slate-700/50 rounded-lg border border-slate-200/50 dark:border-slate-600/50 shadow-sm">
-                      <Command className="w-2.5 h-2.5" />
-                      <span>K</span>
+                    <div className="group/key flex items-center justify-center px-2 py-1 text-[11px] font-extrabold text-slate-500 dark:text-slate-400 bg-white dark:bg-[#002147] rounded-md border border-slate-200 border-b-[3px] dark:border-[#1a3884]/30 shadow-sm transition-all duration-200 cursor-default hover:border-b hover:translate-y-[2px] hover:shadow-none hover:bg-slate-50 dark:hover:bg-[#002A5C]">
+                      <span className="hidden group-hover/key:block whitespace-nowrap leading-none mt-[1px]">Ctrl + K</span>
+                      <div className="flex items-center gap-1 group-hover/key:hidden">
+                        <Keyboard className="w-3 h-3 text-slate-400 dark:text-slate-500" />
+                        <span className="leading-none mt-[1px]">K</span>
+                      </div>
                     </div>
                     {searchQuery && (
                       <button
@@ -748,44 +755,46 @@ const DashboardLayout = () => {
                 </div>
               </div>
 
-              {/* RIGHT SECTION: Grouped Actions */}
-              <div className="flex items-center gap-5">
+              {/* RIGHT SECTION: Unified Dock */}
+              <div className="flex items-center gap-4">
 
-                {/* 1. Live Time Widget */}
-                <div className="hidden xl:flex items-center gap-3 px-4 py-2 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800/50 dark:to-slate-800/20 border border-slate-100 dark:border-slate-700/50 rounded-full shadow-sm">
-                  <div className="relative">
-                    <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                    <div className="absolute inset-0 w-2 h-2 bg-emerald-500 rounded-full animate-ping opacity-75" />
+                {/* Premium Glassmorphism Dock */}
+                <div className="hidden sm:flex items-center p-1.5 bg-white dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/60 rounded-full shadow-[0_4px_12px_-2px_rgba(0,0,0,0.05),0_2px_4px_-2px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)]">
+                  
+                  {/* 1. Live Time Widget */}
+                  <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-900/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.02)] border border-slate-100 dark:border-slate-700/50 mr-2">
+                    <div className="relative flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                      <div className="absolute w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping opacity-75" />
+                    </div>
+                    <span className="text-[12px] font-bold text-slate-700 dark:text-slate-200 font-mono tracking-tight mt-[1px]">
+                      {formatTime(currentTime)}
+                    </span>
                   </div>
-                  <span className="text-[13px] font-bold text-slate-600 dark:text-slate-300 font-mono tracking-tight">
-                    {formatTime(currentTime)}
-                  </span>
-                </div>
 
-                {/* 2. Icon Group Container */}
-                <div className="hidden sm:flex items-center gap-1 p-1 bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/30 dark:border-slate-700/30 rounded-2xl">
-                  {/* Theme Toggle */}
-                  <button
-                    onClick={toggleTheme}
-                    className="p-2 rounded-xl text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-[#002A5C] transition-all hover:scale-105 active:scale-95"
-                    aria-label="Toggle Theme"
-                  >
-                    {theme === 'dark' ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
-                  </button>
-
-                  {/* Notifications */}
-                  <div className="relative" ref={notificationRef}>
+                  <div className="flex items-center gap-1 pr-1">
+                    {/* 2. Theme Toggle */}
                     <button
-                      onClick={() => setShowNotifications(!showNotifications)}
-                      className={`relative p-2 rounded-xl transition-all hover:scale-105 active:scale-95 group ${showNotifications ? 'bg-white dark:bg-[#003170] text-[#1a3884]' : 'text-slate-500 hover:text-[#1a3884] hover:bg-white dark:hover:bg-[#002A5C]'
-                        }`}
-                      aria-label="Notifications"
+                      onClick={toggleTheme}
+                      className="p-1.5 rounded-full text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white transition-all active:scale-95"
+                      aria-label="Toggle Theme"
                     >
-                      <Bell className="w-4.5 h-4.5 group-hover:animate-[bounce_1s_infinite]" />
-                      {unreadCount > 0 && (
-                        <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 border-2 border-slate-50 dark:border-white/8 rounded-full shadow-sm animate-pulse"></span>
-                      )}
+                      {theme === 'dark' ? <Sun className="w-[18px] h-[18px] hover:rotate-45 transition-transform duration-300" strokeWidth={2.2} /> : <Moon className="w-[18px] h-[18px] hover:-rotate-12 transition-transform duration-300" strokeWidth={2.2} />}
                     </button>
+
+                    {/* 3. Notifications */}
+                    <div className="relative" ref={notificationRef}>
+                      <button
+                        onClick={() => setShowNotifications(!showNotifications)}
+                        className={`relative p-1.5 rounded-full transition-all active:scale-95 group ${showNotifications ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white'
+                          }`}
+                        aria-label="Notifications"
+                      >
+                        <Bell className="w-[18px] h-[18px] group-hover:rotate-12 transition-transform duration-300 origin-top" strokeWidth={2.2} />
+                        {unreadCount > 0 && (
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border border-white dark:border-slate-800 rounded-full shadow-sm animate-pulse"></span>
+                        )}
+                      </button>
 
                     <AnimatePresence>
                       {showNotifications && (
@@ -868,23 +877,21 @@ const DashboardLayout = () => {
                     </AnimatePresence>
                   </div>
 
-                  {/* Language Switcher */}
+                  {/* 4. Language Switcher */}
                   <div className="relative" ref={languageRef}>
                     <button
                       onClick={() => setShowLanguages(!showLanguages)}
-                      className={`relative flex items-center gap-2 rounded-xl border px-2.5 py-2 transition-all hover:scale-[1.02] active:scale-95 group ${showLanguages
-                        ? 'border-[#1a3884]/20 bg-white text-[#1a3884] shadow-sm dark:border-[#5ea0ff]/20 dark:bg-[#003170]'
-                        : 'border-transparent text-slate-500 hover:border-slate-100 hover:bg-white hover:text-[#1a3884] dark:hover:border-white/10 dark:hover:bg-[#002A5C]'
+                      className={`relative flex items-center gap-1.5 rounded-full px-2.5 py-1.5 transition-all active:scale-95 group ${showLanguages
+                        ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'
+                        : 'text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white'
                         }`}
                       aria-label="Change Language"
                     >
-                      <div className={`flex h-8 w-8 items-center justify-center transition-colors`}>
-                        <Globe2 className="w-4.5 h-4.5" strokeWidth={2} />
-                      </div>
-                      <span className="hidden md:inline text-[11px] font-bold tracking-[0.18em] text-slate-400 group-hover:text-[#1a3884] dark:text-slate-500 dark:group-hover:text-slate-200">
+                      <Globe2 className="w-[18px] h-[18px] group-hover:rotate-[24deg] transition-transform duration-300" strokeWidth={2.2} />
+                      <span className="hidden md:inline text-[11px] font-bold tracking-[0.1em] mt-[1px]">
                         {activeLanguage.shortLabel}
                       </span>
-                      <ChevronDown className={`hidden md:block w-3.5 h-3.5 transition-transform duration-200 ${showLanguages ? 'rotate-180 text-[#1a3884]' : 'text-slate-400 group-hover:text-[#1a3884]'}`} />
+                      <ChevronDown className={`hidden md:block w-3 h-3 transition-transform duration-200 ${showLanguages ? 'rotate-180 text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-400'}`} />
                     </button>
 
                     <AnimatePresence>
@@ -932,6 +939,7 @@ const DashboardLayout = () => {
                     </AnimatePresence>
                   </div>
                 </div>
+              </div>
 
                 {/* 3. User Profile Card */}
                 <div
@@ -954,8 +962,8 @@ const DashboardLayout = () => {
                             className="w-9 h-9 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a3884] to-[#112b6b] flex items-center justify-center text-white text-xs font-bold">
-                            {(user?.fullName || 'U').toUpperCase()}
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a3884] to-[#112b6b] flex items-center justify-center text-white text-[15px] font-bold pb-0.5">
+                            {(user?.fullName?.charAt(0) || user?.firstName?.charAt(0) || 'U').toUpperCase()}
                           </div>
                         )}
                       </div>
@@ -967,7 +975,7 @@ const DashboardLayout = () => {
                       </p>
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#1a3884] transition-colors">
-                          {user?.nickname || user?.fullName || 'User'}
+                          {user?.fullName || 'User'}
                         </p>
                         <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-[#1a3884] transition-all duration-300 ${isProfileHovered ? 'rotate-180' : ''}`} />
                       </div>

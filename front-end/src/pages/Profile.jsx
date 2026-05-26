@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   MapPin,
@@ -42,6 +42,7 @@ import useUser from "@/hooks/useUser";
 import ProfileSkeleton from '@/components/skeletons/ProfileSkeleton';
 import BadgeGallery from "@/components/badges/BadgeGallery";
 import PageTransition from "@/components/PageTransition";
+import ImageCropperModal from "@/components/ImageCropperModal";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -99,6 +100,9 @@ const Profile = () => {
   const [editData, setEditData] = useState({ name: "", profilePhoto: null });
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [cropperOpen, setCropperOpen] = useState(false);
+  const [cropperImageSrc, setCropperImageSrc] = useState("");
+  const fileInputRef = useRef(null);
 
   // Section Editing State
   const [activeEditSection, setActiveEditSection] = useState(null); // e.g., 'personal', 'address', 'education', etc.
@@ -418,6 +422,80 @@ const Profile = () => {
     }
   };
 
+  // Handle profile photo upload selection (pre-crop)
+  const handlePhotoSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropperImageSrc(reader.result);
+      setCropperOpen(true);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = ''; // Reset so the same file can be selected again
+  };
+
+  // Handle cropped image upload and save to profile
+  const handleCroppedPhotoUpload = async (croppedBlob) => {
+    setUploadingPhoto(true);
+    const formDataUpload = new FormData();
+    const file = new File([croppedBlob], "profile-photo.jpg", { type: "image/jpeg" });
+    formDataUpload.append('file', file);
+
+    try {
+      // 1. Upload the cropped image blob
+      const response = await fetch(`${API_BASE_URL}/upload`, {
+        method: 'POST',
+        body: formDataUpload
+      });
+      const data = await response.json();
+      
+      if (data.url) {
+        // 2. Save the uploaded photo path directly to the user profile
+        const saveResponse = await fetch(`${API_BASE_URL}/users/register-section`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+            section: 'profilePhoto',
+            data: {
+              profilePhoto: data.url
+            }
+          })
+        });
+
+        if (saveResponse.ok) {
+          const fullUrl = data.url.startsWith('http') ? data.url : `${getBackendUrl()}/${data.url}`;
+          setProfilePhoto(fullUrl);
+          await refreshUser();
+          setCropperOpen(false);
+          setShowEditModal(false);
+          toast.success('Profile photo updated successfully');
+        } else {
+          toast.error('Failed to save profile photo');
+        }
+      } else {
+        toast.error('Failed to upload cropped photo');
+      }
+    } catch (error) {
+      console.error('Error uploading cropped photo:', error);
+      toast.error('Failed to upload cropped photo');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
   // Handle profile photo upload
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -478,7 +556,8 @@ const Profile = () => {
       });
 
       if (response.ok) {
-        setProfilePhoto(editData.profilePhoto);
+        const fullUrl = editData.profilePhoto.startsWith('http') ? editData.profilePhoto : `${getBackendUrl()}/${editData.profilePhoto}`;
+        setProfilePhoto(fullUrl);
         await refreshUser();
         toast.success('Profile photo updated successfully');
         setShowEditModal(false);
@@ -590,17 +669,24 @@ const Profile = () => {
                     )}
                   </div>
                   <button
-                    onClick={() => { setEditData({ name: formData.name, profilePhoto: profilePhoto }); setShowEditModal(true); }}
+                    onClick={() => fileInputRef.current?.click()}
                     className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 w-8 h-8 bg-[#1a3884] dark:bg-[#1a3884] rounded-full flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform"
                   >
                     <Camera className="w-4 h-4" />
                   </button>
+                  <input 
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={handlePhotoSelect}
+                    className="hidden"
+                  />
                 </div>
 
                 <div className="text-center md:text-left flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row items-center md:items-end gap-2 md:gap-4 mb-2 flex-wrap justify-center md:justify-start">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate max-w-full">
-                      {formData.nickname || formData.name || t("profile_page.student")}
+                      {formData.name || t("profile_page.student")}
                     </h2>
 
                     {/* Active Status Badge - Responsive next to name */}
@@ -1070,11 +1156,19 @@ const Profile = () => {
                       <div className="flex flex-col items-center mb-8">
                         <div className="relative mb-4">
                           <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#1a3884] to-[#002147] flex items-center justify-center overflow-hidden border-4 border-white dark:border-white/8 shadow-xl">
-                            {editData.profilePhoto ? <img src={editData.profilePhoto} alt="Profile" className="w-full h-full object-cover" /> : <span className="text-4xl font-bold text-white">{getInitials(editData.name)}</span>}
+                            {editData.profilePhoto ? (
+                              <img 
+                                src={editData.profilePhoto.startsWith('http') ? editData.profilePhoto : `${getBackendUrl()}/${editData.profilePhoto}`} 
+                                alt="Profile" 
+                                className="w-full h-full object-cover" 
+                              />
+                            ) : (
+                              <span className="text-4xl font-bold text-white">{getInitials(editData.name)}</span>
+                            )}
                           </div>
                           <label className="absolute bottom-1 right-1 w-10 h-10 bg-[#1a3884] dark:bg-[#1a3884] rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg">
                             {uploadingPhoto ? <Loader2 className="w-5 h-5 text-white animate-spin" /> : <Camera className="w-5 h-5 text-white" />}
-                            <input type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhoto} />
+                            <input type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" disabled={uploadingPhoto} />
                           </label>
                         </div>
                       </div>
@@ -1088,6 +1182,15 @@ const Profile = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Image Cropper Modal */}
+              <ImageCropperModal
+                isOpen={cropperOpen}
+                imageSrc={cropperImageSrc}
+                onClose={() => setCropperOpen(false)}
+                onCrop={handleCroppedPhotoUpload}
+                isSaving={uploadingPhoto}
+              />
 
               {/* Global Section Edit Modal */}
               <AnimatePresence>
