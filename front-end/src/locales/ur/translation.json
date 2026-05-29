@@ -1485,5 +1485,65 @@
     "connection_error": "رابطے کی خرابی۔ براہ کرم دوبارہ کوشش کریں۔",
     "save_changes": "تبدیلیاں محفوظ کریں",
     "cancel": "منسوخ کریں"
+  },
+  "library": {
+    "search_placeholder": "عنوان، مصنف یا موضوع کے ذریعے تلاش کریں...",
+    "preview": "پریویو",
+    "no_books": "کوئی کتاب نہیں ملی",
+    "no_books_desc": "اپنی تلاش کی اصطلاحات کو تبدیل کرنے کی کوشش کریں",
+    "categories": {
+      "all": "تمام کتب",
+      "business": "کاروبار",
+      "psychology": "نفسیات",
+      "technology": "ٹیکنالوجی"
+    }
+  },
+  "my_notes": {
+    "toast": {
+      "empty_title": "خالی نوٹ",
+      "empty_desc": "براہ کرم عنوان یا مواد شامل کریں۔",
+      "created_title": "نوٹ بنایا گیا",
+      "updated_title": "نوٹ اپ ڈیٹ ہو گیا",
+      "saved_cloud": "آپ کا نوٹ کلاؤڈ میں محفوظ ہو گیا ہے۔",
+      "error_title": "خرابی",
+      "failed_save": "نوٹ کو ڈیٹا بیس میں محفوظ کرنے میں ناکامی۔",
+      "deleted_title": "نوٹ حذف ہو گیا",
+      "deleted_desc": "نوٹ آپ کے اکاؤنٹ سے ہٹا دیا گیا ہے۔",
+      "failed_delete": "نوٹ حذف نہیں ہو سکا۔"
+    },
+    "note_types": {
+      "untitled": "بغیر عنوان نوٹ",
+      "general_course": "عمومی کورس نوٹس",
+      "general_note": "عمومی نوٹ",
+      "course_prefix": "کورس: {{courseId}}"
+    },
+    "colors": {
+      "yellow": "پیلا",
+      "blue": "نیلا",
+      "green": "سبز",
+      "purple": "جامنی",
+      "rose": "گلابی"
+    },
+    "header": {
+      "badge": "ذاتی پیداواریت",
+      "title_my": "میرے",
+      "title_notes": "نوٹس",
+      "description": "اپنے خیالات، کورس کی بصیرت اور ذاتی کامیابیوں کو ایک محفوظ، کلاؤڈ-سنک ورک اسپیس میں منظم کریں۔",
+      "search_placeholder": "اپنی لائبریری میں تلاش کریں...",
+      "new_note": "نیا نوٹ"
+    },
+    "grid": {
+      "create_new": "نیا نوٹ بنائیں",
+      "delete_tooltip": "نوٹ حذف کریں",
+      "no_notes_matching": "\"{{query}}\" سے مماثل کوئی نوٹ نہیں ملا"
+    },
+    "editor": {
+      "edit_title": "نوٹ میں ترمیم کریں",
+      "new_title": "نیا نوٹ",
+      "placeholder_title": "عنوان",
+      "placeholder_content": "ٹائپ کرنا شروع کریں...",
+      "last_edited": "آخری ترمیم: {{date}}",
+      "save_note": "نوٹ محفوظ کریں"
+    }
   }
 }

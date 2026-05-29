@@ -15,7 +15,7 @@ import Certifications from './panels/Certifications';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { Compass, ClipboardList, BarChart3, Dna, Map, Award, Rocket, Bot, Mic, FileText, Code, Lock, Unlock, CheckCircle, Trophy, Medal, Target, Sparkles, Sun, Moon, Monitor } from 'lucide-react';
+import { Compass, ClipboardList, BarChart3, Dna, Map, Award, Rocket, Bot, Mic, FileText, Code, Lock, Unlock, CheckCircle, Trophy, Medal, Target, Sparkles, Sun, Moon, Monitor, ChevronDown, X, Menu } from 'lucide-react';
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
@@ -28,6 +28,7 @@ const CareerAgentDashboard = () => {
     const [showWelcome, setShowWelcome] = useState(false);
     const [showSelectionFlow, setShowSelectionFlow] = useState(false);
     const [selectionStates, setSelectionStates] = useState({ primary: null, secondary: null, tertiary: null });
+    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
     const handleLockPath = (roleName) => {
         // Instead of immediate lock, show the selection flow
@@ -250,28 +251,14 @@ const CareerAgentDashboard = () => {
 
             {/* ── Selection Flow Modal ── */}
             {showSelectionFlow && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 10000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(15, 23, 42, 0.94)', backdropFilter: 'blur(16px)',
-                    animation: 'fadeIn 0.3s ease',
-                    padding: '2rem'
-                }}>
-                    <div style={{ 
-                        width: '100%', maxWidth: '1180px', maxHeight: '96vh',
-                        display: 'flex', flexDirection: 'column', 
-                        gap: '1.25rem', position: 'relative',
-                        animation: 'popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both'
-                    }}>
+                <div className="selection-modal-overlay">
+                    <div className="selection-modal-content">
                         <div style={{ textAlign: 'center', flexShrink: 0, animation: 'fadeIn 0.6s ease 0.1s both' }}>
                             <h2 style={{ fontSize: '1.8rem', fontWeight: 950, color: 'white', marginBottom: '0.2rem', letterSpacing: '-0.02em' }}>{t('career_agent.selection.title', 'Path Precision Selection')}</h2>
                             <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontWeight: 500 }}>{t('career_agent.selection.subtitle', 'Confirm your interest level for each field.')}</p>
                         </div>
 
-                        <div style={{ 
-                            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem',
-                            flex: 1, minHeight: 0
-                        }}>
+                        <div className="selection-flow-grid">
                             {[
                                 { key: 'primary', label: t('career_agent.selection.primary_path', 'Primary Path'), data: primary, title: prefPrimary, delay: '0.2s' },
                                 { key: 'secondary', label: t('career_agent.selection.secondary_path', 'Secondary Path'), data: secondary, title: prefSecondary, delay: '0.3s' },
@@ -420,6 +407,48 @@ const CareerAgentDashboard = () => {
                     </div>
                 </div>
             )}
+            {/* ── Mobile Sidebar Drawer ── */}
+            {showMobileSidebar && (
+                <div 
+                    className="mobile-drawer-overlay"
+                    onClick={() => setShowMobileSidebar(false)}
+                >
+                    <div 
+                        className="mobile-drawer"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="mobile-drawer-header">
+                            <div>
+                                <div className="mobile-drawer-subtitle">{t('career_agent.drawer.title', 'SELECT SECTION')}</div>
+                                <div className="mobile-drawer-title">{currentData?.tab1?.role_name || 'Career Path'}</div>
+                            </div>
+                            <button 
+                                onClick={() => setShowMobileSidebar(false)}
+                                className="mobile-drawer-close"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="mobile-drawer-content">
+                            {panels.map(p => (
+                                <button
+                                    key={p.id}
+                                    className={`mobile-drawer-item ${activePanel === p.id ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setActivePanel(p.id);
+                                        setShowMobileSidebar(false);
+                                    }}
+                                >
+                                    <span className="drawer-icon-wrap">{p.icon}</span>
+                                    <span className="drawer-item-label">{p.label}</span>
+                                    {activePanel === p.id && <div className="drawer-active-indicator" />}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <header className="dash-header">
                 <div className="dash-top">
                     <div>
@@ -436,7 +465,8 @@ const CareerAgentDashboard = () => {
                             onClick={() => navigate('/dashboard')}
                             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid var(--border)' }}
                         >
-                            {t('career_agent.header.back', '← Back to Dashboard')}
+                            <span className="hide-mobile">{t('career_agent.header.back', '← Back to Dashboard')}</span>
+                            <span className="show-mobile-inline">← {t('common.back', 'Back')}</span>
                         </button>
 
                         {/* ── Theme Switcher ── */}
@@ -470,7 +500,9 @@ const CareerAgentDashboard = () => {
                                 background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)',
                                 borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)',
                             }}>
-                                <Lock size={14} /> {t('career_agent.header.path_locked', 'Path Locked In')}
+                                <Lock size={14} />
+                                <span className="hide-mobile">{t('career_agent.header.path_locked', 'Path Locked In')}</span>
+                                <span className="show-mobile-inline">{t('career_agent.header.locked', 'Locked')}</span>
                             </div>
                         ) : (
                             <button
@@ -478,10 +510,15 @@ const CareerAgentDashboard = () => {
                                 onClick={() => handleLockPath(currentData?.tab1?.role_name)}
                                 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                             >
-                                <Lock size={14} /> {t('career_agent.header.lock_path', 'Lock This Path')}
+                                <Lock size={14} />
+                                <span className="hide-mobile">{t('career_agent.header.lock_path', 'Lock This Path')}</span>
+                                <span className="show-mobile-inline">{t('career_agent.header.lock', 'Lock')}</span>
                             </button>
                         )}
-                        <button className="btn-primary" onClick={() => navigate('/dashboard/career-agent/onboarding')}>{t('career_agent.header.new_analysis', 'New Analysis')}</button>
+                        <button className="btn-primary" onClick={() => navigate('/dashboard/career-agent/onboarding')}>
+                            <span className="hide-mobile">{t('career_agent.header.new_analysis', 'New Analysis')}</span>
+                            <span className="show-mobile-inline">{t('career_agent.header.new', 'New')}</span>
+                        </button>
                     </div>
                 </div>
 
@@ -500,6 +537,24 @@ const CareerAgentDashboard = () => {
                     </button>
                 </div>
             </header>
+
+            {/* Mobile Navigation Trigger Sticky Bar */}
+            <div className="mobile-nav-bar">
+                <button 
+                    onClick={() => setShowMobileSidebar(true)} 
+                    className="mobile-nav-trigger"
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span className="mobile-nav-icon">
+                            {panels.find(p => p.id === activePanel)?.icon}
+                        </span>
+                        <span className="mobile-nav-label">
+                            {panels.find(p => p.id === activePanel)?.label}
+                        </span>
+                    </div>
+                    <ChevronDown size={16} className="mobile-nav-chevron" />
+                </button>
+            </div>
 
             <div className="dash-body">
                 <aside className="sidebar">

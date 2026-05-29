@@ -1342,5 +1342,65 @@
     "connection_error": "Connection error. Please try again.",
     "save_changes": "Save Changes",
     "cancel": "Cancel"
+  },
+  "library": {
+    "search_placeholder": "Search by title, author, or topic...",
+    "preview": "Preview",
+    "no_books": "No books found",
+    "no_books_desc": "Try adjusting your search terms",
+    "categories": {
+      "all": "All Books",
+      "business": "Business",
+      "psychology": "Psychology",
+      "technology": "Technology"
+    }
+  },
+  "my_notes": {
+    "toast": {
+      "empty_title": "Empty Note",
+      "empty_desc": "Please add a title or content.",
+      "created_title": "Note Created",
+      "updated_title": "Note Updated",
+      "saved_cloud": "Your note has been saved to the cloud.",
+      "error_title": "Error",
+      "failed_save": "Failed to save note to database.",
+      "deleted_title": "Note Deleted",
+      "deleted_desc": "The note has been removed from your account.",
+      "failed_delete": "Could not delete the note."
+    },
+    "note_types": {
+      "untitled": "Untitled Note",
+      "general_course": "General Course Notes",
+      "general_note": "General Note",
+      "course_prefix": "Course: {{courseId}}"
+    },
+    "colors": {
+      "yellow": "Yellow",
+      "blue": "Blue",
+      "green": "Green",
+      "purple": "Purple",
+      "rose": "Rose"
+    },
+    "header": {
+      "badge": "Personal Productivity",
+      "title_my": "My",
+      "title_notes": "Notes",
+      "description": "Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.",
+      "search_placeholder": "Search your library...",
+      "new_note": "New Note"
+    },
+    "grid": {
+      "create_new": "Create New Note",
+      "delete_tooltip": "Delete note",
+      "no_notes_matching": "No notes found matching \"{{query}}\""
+    },
+    "editor": {
+      "edit_title": "Edit Note",
+      "new_title": "New Note",
+      "placeholder_title": "Title",
+      "placeholder_content": "Start typing...",
+      "last_edited": "Last edited: {{date}}",
+      "save_note": "Save Note"
+    }
   }
 }

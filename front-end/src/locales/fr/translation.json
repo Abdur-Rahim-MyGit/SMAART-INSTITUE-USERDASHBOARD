@@ -1391,5 +1391,65 @@
     "connection_error": "Erreur de connexion. Veuillez reessayer.",
     "save_changes": "Enregistrer les modifications",
     "cancel": "Annuler"
+  },
+  "library": {
+    "search_placeholder": "Rechercher par titre, auteur ou sujet...",
+    "preview": "Aperçu",
+    "no_books": "Aucun livre trouvé",
+    "no_books_desc": "Essayez d'ajuster vos termes de recherche",
+    "categories": {
+      "all": "Tous les livres",
+      "business": "Affaires",
+      "psychology": "Psychologie",
+      "technology": "Technologie"
+    }
+  },
+  "my_notes": {
+    "toast": {
+      "empty_title": "Note vide",
+      "empty_desc": "Veuillez ajouter un titre ou du contenu.",
+      "created_title": "Note créée",
+      "updated_title": "Note mise à jour",
+      "saved_cloud": "Votre note a été enregistrée dans le cloud.",
+      "error_title": "Erreur",
+      "failed_save": "Échec de l'enregistrement de la note dans la base de données.",
+      "deleted_title": "Note supprimée",
+      "deleted_desc": "La note a été retirée de votre compte.",
+      "failed_delete": "Impossible de supprimer la note."
+    },
+    "note_types": {
+      "untitled": "Note sans titre",
+      "general_course": "Notes de cours généraux",
+      "general_note": "Note générale",
+      "course_prefix": "Cours : {{courseId}}"
+    },
+    "colors": {
+      "yellow": "Jaune",
+      "blue": "Bleu",
+      "green": "Vert",
+      "purple": "Violet",
+      "rose": "Rose"
+    },
+    "header": {
+      "badge": "Productivité personnelle",
+      "title_my": "Mes",
+      "title_notes": "Notes",
+      "description": "Organisez vos pensées, vos aperçus de cours et vos percées personnelles dans un espace de travail sécurisé et synchronisé avec le cloud.",
+      "search_placeholder": "Rechercher dans votre bibliothèque...",
+      "new_note": "Nouvelle note"
+    },
+    "grid": {
+      "create_new": "Créer une nouvelle note",
+      "delete_tooltip": "Supprimer la note",
+      "no_notes_matching": "Aucune note trouvée correspondant à « {{query}} »"
+    },
+    "editor": {
+      "edit_title": "Modifier la note",
+      "new_title": "Nouvelle note",
+      "placeholder_title": "Titre",
+      "placeholder_content": "Commencez à taper...",
+      "last_edited": "Dernière modification : {{date}}",
+      "save_note": "Enregistrer la note"
+    }
   }
 }

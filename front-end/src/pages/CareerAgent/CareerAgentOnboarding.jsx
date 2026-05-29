@@ -230,18 +230,7 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
             <button
               type="button"
               onClick={() => onChange(isSel ? null : dir)}
-              style={{
-                width: '100%', textAlign: 'left', padding: '1.2rem',
-                borderRadius: isSel ? '20px 20px 0 0' : '20px',
-                cursor: 'pointer', fontFamily: 'inherit',
-                border: isSel ? `1.5px solid var(--accent)` : '1px solid var(--border)',
-                background: 'var(--card)',
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                display: 'flex', alignItems: 'center', gap: '1.2rem',
-                boxShadow: isSel ? `0 15px 35px -5px rgba(var(--accent-rgb),0.15)` : 'none'
-              }}
-              onMouseEnter={e => { if (!isSel) { e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb),0.3)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(0,0,0,0.05)'; e.currentTarget.querySelector('.icon-box').style.transform = 'scale(1.1)'; } }}
-              onMouseLeave={e => { if (!isSel) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.querySelector('.icon-box').style.transform = 'scale(1)'; } }}
+              className={`direction-select-btn ${isSel ? 'selected' : ''}`}
             >
               <div className="icon-box" style={{
                 width: '52px', height: '52px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
@@ -351,17 +340,7 @@ function PrefBlock({ label, colorClass, data, onChange, directions = [], directi
   const fieldErrorClass = (key) => fieldErrors[key] ? 'field-error' : '';
 
   return (
-    <div style={{
-      background: '#ffffff',
-      border: '1px solid rgba(0,0,0,0.05)',
-      borderRadius: '28px',
-      padding: '2.5rem',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '2.5rem',
-      boxShadow: '0 15px 40px -10px rgba(0,0,0,0.04)',
-      position: 'relative'
-    }}>
+    <div className="pref-block-card">
       {/* Accent Line */}
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: theme.accent }}></div>
 
@@ -521,7 +500,7 @@ function SkillSection({ skills, onChange }) {
   };
 
   return (
-    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '18px', padding: '1.8rem' }}>
+    <div className="onboard-skill-section">
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
         {/* Row 1: Skill Name & Basic Status */}
@@ -1223,46 +1202,61 @@ const CareerAgentOnboarding = () => {
           </div>
         )}
 
-      {/* ── STEP PROGRESS INDICATOR (hidden in edit mode) ── */}
-      {!isEditMode && <div style={{ maxWidth: '680px', margin: '0 auto 2.5rem', padding: '0 1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-          {STEPS.map((label, idx) => {
-            const sn = idx + 1;
-            const isDone = step > sn;
-            const isActive = step === sn;
-            const displayLabel = STEP_DISPLAY_LABELS[idx] || label;
-              return (
-                <React.Fragment key={sn}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.7rem', minWidth: '92px', flex: '0 0 92px' }}>
-                    <div style={{
-                      width: '38px', height: '38px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: '0.8rem', fontWeight: 800, transition: 'all 0.3s',
-                      background: isDone ? '#10b981' : isActive ? 'var(--accent)' : '#f1f5f9',
-                      color: isDone || isActive ? '#fff' : '#94a3b8',
-                      border: isActive ? '2px solid var(--accent)' : isDone ? '2px solid #10b981' : '2px solid #e2e8f0',
-                      boxShadow: isActive ? '0 0 0 4px rgba(var(--accent-rgb),0.12)' : 'none',
-                      transform: isActive ? 'scale(1.08)' : 'scale(1)',
-                    }}>
-                      {isDone ? 'OK' : sn}
-                    </div>
-                    <div style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, color: isActive || isDone ? 'var(--text1)' : '#94a3b8', lineHeight: 1.2 }}>
-                      {displayLabel}
-                    </div>
-                  </div>
-                  {idx < STEPS.length - 1 && (
-                    <div style={{ flex: 1, minWidth: '18px', height: '2px', background: step > sn ? '#10b981' : '#e2e8f0', borderRadius: '2px', marginTop: '18px', transition: 'background 0.3s' }} />
-                  )}
-                </React.Fragment>
-              );
-            })}
+        {/* ── STEP PROGRESS INDICATOR (hidden in edit mode) ── */}
+        {!isEditMode && (
+          <div className="onboard-progress-container">
+            {/* Desktop progress bar (hidden on mobile) */}
+            <div className="onboard-progress-desktop hide-mobile">
+              <div className="onboard-progress-steps-row">
+                {STEPS.map((label, idx) => {
+                  const sn = idx + 1;
+                  const isDone = step > sn;
+                  const isActive = step === sn;
+                  const displayLabel = STEP_DISPLAY_LABELS[idx] || label;
+                  return (
+                    <React.Fragment key={sn}>
+                      <div className={`onboard-progress-step-item ${isActive ? 'active' : ''} ${isDone ? 'done' : ''}`}>
+                        <div className="onboard-progress-step-bubble">
+                          {isDone ? 'OK' : sn}
+                        </div>
+                        <div className="onboard-progress-step-label">
+                          {displayLabel}
+                        </div>
+                      </div>
+                      {idx < STEPS.length - 1 && (
+                        <div className={`onboard-progress-step-line ${step > sn ? 'done' : ''}`} />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Mobile progress bar (shown on mobile) */}
+            <div className="onboard-progress-mobile show-mobile-block">
+              <div className="onboard-progress-mobile-header">
+                <span className="onboard-progress-mobile-step">
+                  {t('career_agent.onboarding.step_num', 'STEP {{current}} of {{total}}', { current: step, total: 6 })}
+                </span>
+                <span className="onboard-progress-mobile-label">
+                  {STEPS[step - 1]}
+                </span>
+              </div>
+              <div className="onboard-progress-mobile-bar-wrap">
+                <div 
+                  className="onboard-progress-mobile-bar-fill"
+                  style={{ width: `${(step / 6) * 100}%` }}
+                />
+              </div>
+            </div>
           </div>
-        </div>}
+        )}
 
         <form onSubmit={handleSubmit}>
           {/* STEP 1: PERSONAL DETAILS */}
           {step === 1 && (
             <div className="form-card">
-              <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><User size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
+              <div className="step-title"><User size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>{t('career_agent.onboarding.personal_details', 'Personal Details')}</div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: '0.1rem', fontWeight: 400 }}>{t('career_agent.onboarding.personal_details_subtitle', 'Your basic information to personalise your career report.')}</div>
@@ -1271,16 +1265,16 @@ const CareerAgentOnboarding = () => {
               </div>
 
 
-            {user && (
-              <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1rem 1.2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <ShieldCheck size={16} />
+              {user && (
+                <div style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)', borderRadius: '16px', padding: '1rem 1.2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ background: 'var(--accent)', color: '#fff', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <ShieldCheck size={16} />
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontWeight: 600 }}>
+                    Profile Linked: <span style={{ color: 'var(--text2)', fontWeight: 500 }}>We've auto-filled your details from your SMAART profile.</span>
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.82rem', color: 'var(--accent)', fontWeight: 600 }}>
-                  Profile Linked: <span style={{ color: 'var(--text2)', fontWeight: 500 }}>We've auto-filled your details from your SMAART profile.</span>
-                </div>
-              </div>
-            )}
+              )}
 
               <div className="fgrid">
                 {/* Full Name */}
@@ -1333,7 +1327,7 @@ const CareerAgentOnboarding = () => {
           {/* STEP 2: EDUCATION */}
           {step === 2 && (
             <div className="form-card">
-              <div className="step-title" style={{ display: 'flex', alignItems: 'center' }}><GraduationCap size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
+              <div className="step-title"><GraduationCap size={22} style={{ color: 'var(--accent)', marginRight: '0.7rem', flexShrink: 0 }} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.02em' }}>Education</div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginTop: '0.1rem', fontWeight: 400 }}>Your academic background - you can add up to 3 qualifications.</div>
@@ -1341,99 +1335,99 @@ const CareerAgentOnboarding = () => {
                 <span className="step-tag">STEP 2 / 6</span>
               </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              {formData.education.map((edu, i) => (
-                <div key={i} style={{ background: 'rgba(var(--accent-rgb), 0.02)', border: '1px solid rgba(var(--accent-rgb), 0.08)', borderRadius: '18px', padding: '1.8rem', position: 'relative', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', transition: 'all 0.3s ease' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px dashed rgba(var(--accent-rgb), 0.15)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-                      <div style={{ background: i === 0 ? 'var(--accent)' : 'var(--navy2)', color: i === 0 ? '#fff' : 'var(--text1)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, boxShadow: i === 0 ? '0 4px 10px rgba(var(--accent-rgb), 0.3)' : 'none' }}>
-                        {i + 1}
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.01em' }}>
-                          Academic Record
-                        </span>
-                        {i === 0 && <span style={{ color: 'var(--accent)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Primary & Mandatory</span>}
-                      </div>
-                      {i > 0 && (
-                        <button type="button" onClick={() => removeEdu(i)} style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '8px', padding: '0.35rem 0.8rem', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
-                          Remove
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="fgrid">
-                      {/* Level */}
-                      <div className="fg">
-                        <label className="fl">Degree Level <span className="req">*</span></label>
-                        <select className={i === 0 ? getFieldErrorClass('education.0.level') : ''} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)}>
-                          <option value="">Select Level...</option>
-                          {Object.keys(eduData).map(l => <option key={l}>{l}</option>)}
-                        </select>
-                      </div>
-
-                      {/* Domain */}
-                      <div className="fg">
-                        <label className="fl">Domain <span className="req">*</span></label>
-                        <select className={i === 0 ? getFieldErrorClass('education.0.domain') : ''} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled={!edu.level}>
-                          <option value="">Select Domain...</option>
-                          {getDomains(eduData, edu.level).map(d => <option key={d}>{d}</option>)}
-                        </select>
-                      </div>
-
-                      {/* Degree Group */}
-                      <div className="fg">
-                        <label className="fl">Degree Group <span className="req">*</span></label>
-                        <select className={i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled={!edu.domain}>
-                          <option value="">Select Degree...</option>
-                          {getDegreeGroups(eduData, edu.level, edu.domain).map(d => <option key={d}>{d}</option>)}
-                        </select>
-                      </div>
-
-                      {/* Graduation Year */}
-                      <div className="fg">
-                        <label className="fl">Year of Graduation / Expected <span className="req">*</span></label>
-                        <input className={i === 0 ? getFieldErrorClass('education.0.graduationYear') : ''} type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} />
-                      </div>
-
-                      {/* Specialisation (Multi) */}
-                      <div className="fg">
-                        <label className="fl">Specialisation(s) <span className="req">*</span></label>
-                        <div className={i === 0 ? getFieldErrorClass('education.0.specialisation') : ''}>
-                          <MultiSelect
-                            options={getSpecialisations(eduData, edu.level, edu.domain, edu.degreeGroup)}
-                            selected={edu.specialisation || []}
-                            onChange={v => updateEdu(i, 'specialisation', v)}
-                            max={2}
-                            placeholder="Select specialisation(s)..."
-                          />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                {formData.education.map((edu, i) => (
+                  <div key={i} style={{ background: 'rgba(var(--accent-rgb), 0.02)', border: '1px solid rgba(var(--accent-rgb), 0.08)', borderRadius: '18px', padding: '1.8rem', position: 'relative', boxShadow: '0 4px 20px rgba(0,0,0,0.02)', transition: 'all 0.3s ease' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px dashed rgba(var(--accent-rgb), 0.15)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
+                        <div style={{ background: i === 0 ? 'var(--accent)' : 'var(--navy2)', color: i === 0 ? '#fff' : 'var(--text1)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, boxShadow: i === 0 ? '0 4px 10px rgba(var(--accent-rgb), 0.3)' : 'none' }}>
+                          {i + 1}
                         </div>
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--text1)', letterSpacing: '-0.01em' }}>
+                            Academic Record
+                          </span>
+                          {i === 0 && <span style={{ color: 'var(--accent)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Primary & Mandatory</span>}
+                        </div>
+                        {i > 0 && (
+                          <button type="button" onClick={() => removeEdu(i)} style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '8px', padding: '0.35rem 0.8rem', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+                            Remove
+                          </button>
+                        )}
                       </div>
 
-                      {/* Currently Pursuing */}
-                      <div className="fg" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text2)', fontWeight: 600, padding: '0.6rem 0', height: '42px' }}>
-                          <input type="checkbox" checked={edu.currentlyPursuing} onChange={e => updateEdu(i, 'currentlyPursuing', e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'pointer' }} />
-                          Currently Pursuing this degree
-                        </label>
+                      <div className="fgrid">
+                        {/* Level */}
+                        <div className="fg">
+                          <label className="fl">Degree Level <span className="req">*</span></label>
+                          <select className={i === 0 ? getFieldErrorClass('education.0.level') : ''} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)}>
+                            <option value="">Select Level...</option>
+                            {Object.keys(eduData).map(l => <option key={l}>{l}</option>)}
+                          </select>
+                        </div>
+
+                        {/* Domain */}
+                        <div className="fg">
+                          <label className="fl">Domain <span className="req">*</span></label>
+                          <select className={i === 0 ? getFieldErrorClass('education.0.domain') : ''} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled={!edu.level}>
+                            <option value="">Select Domain...</option>
+                            {getDomains(eduData, edu.level).map(d => <option key={d}>{d}</option>)}
+                          </select>
+                        </div>
+
+                        {/* Degree Group */}
+                        <div className="fg">
+                          <label className="fl">Degree Group <span className="req">*</span></label>
+                          <select className={i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled={!edu.domain}>
+                            <option value="">Select Degree...</option>
+                            {getDegreeGroups(eduData, edu.level, edu.domain).map(d => <option key={d}>{d}</option>)}
+                          </select>
+                        </div>
+
+                        {/* Graduation Year */}
+                        <div className="fg">
+                          <label className="fl">Year of Graduation / Expected <span className="req">*</span></label>
+                          <input className={i === 0 ? getFieldErrorClass('education.0.graduationYear') : ''} type="number" placeholder="e.g. 2024" min="2010" max="2040" value={edu.graduationYear} onChange={e => updateEdu(i, 'graduationYear', e.target.value)} />
+                        </div>
+
+                        {/* Specialisation (Multi) */}
+                        <div className="fg">
+                          <label className="fl">Specialisation(s) <span className="req">*</span></label>
+                          <div className={i === 0 ? getFieldErrorClass('education.0.specialisation') : ''}>
+                            <MultiSelect
+                              options={getSpecialisations(eduData, edu.level, edu.domain, edu.degreeGroup)}
+                              selected={edu.specialisation || []}
+                              onChange={v => updateEdu(i, 'specialisation', v)}
+                              max={2}
+                              placeholder="Select specialisation(s)..."
+                            />
+                          </div>
+                        </div>
+
+                        {/* Currently Pursuing */}
+                        <div className="fg" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text2)', fontWeight: 600, padding: '0.6rem 0', height: '42px' }}>
+                            <input type="checkbox" checked={edu.currentlyPursuing} onChange={e => updateEdu(i, 'currentlyPursuing', e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--accent)', cursor: 'pointer' }} />
+                            Currently Pursuing this degree
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-              {formData.education.length < 3 && (
-                <button type="button" onClick={addEdu} 
-                  style={{ background: 'rgba(var(--accent-rgb), 0.04)', border: '1.5px dashed rgba(var(--accent-rgb), 0.25)', color: 'var(--accent)', borderRadius: '16px', padding: '1.2rem', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'var(--font)', fontWeight: 700, width: '100%', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(var(--accent-rgb), 0.08)'; e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb), 0.4)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(var(--accent-rgb), 0.04)'; e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb), 0.25)'; e.currentTarget.style.transform = 'translateY(0)'; }}
-                >
-                  <span style={{ fontSize: '1.2rem', fontWeight: 400, lineHeight: 1 }}>+</span> Add Another Academic Qualification
-                </button>
-              )}
+                {formData.education.length < 3 && (
+                  <button type="button" onClick={addEdu}
+                    style={{ background: 'rgba(var(--accent-rgb), 0.04)', border: '1.5px dashed rgba(var(--accent-rgb), 0.25)', color: 'var(--accent)', borderRadius: '16px', padding: '1.2rem', cursor: 'pointer', fontSize: '0.85rem', fontFamily: 'var(--font)', fontWeight: 700, width: '100%', transition: 'all 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 15px rgba(0,0,0,0.01)' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(var(--accent-rgb), 0.08)'; e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb), 0.4)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(var(--accent-rgb), 0.04)'; e.currentTarget.style.borderColor = 'rgba(var(--accent-rgb), 0.25)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                  >
+                    <span style={{ fontSize: '1.2rem', fontWeight: 400, lineHeight: 1 }}>+</span> Add Another Academic Qualification
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
           {/* STEP 3: PRIMARY PREFERENCE */}
           {step === 3 && (
@@ -1557,34 +1551,34 @@ const CareerAgentOnboarding = () => {
                 Once submitted, SMAART's intelligence engine will compute your career mapping and personalized roadmap. This typically takes 15-30 seconds.
               </div>
 
-              <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(var(--accent-rgb), 0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}>
+              <button type="submit" style={{ width: '100%', padding: '1rem 2rem', fontSize: '0.95rem', fontWeight: 800, borderRadius: '14px', background: 'linear-gradient(135deg, var(--accent), var(--accent2))', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.7rem', boxShadow: '0 10px 30px rgba(var(--accent-rgb), 0.25)', transition: 'all 0.2s', fontFamily: 'var(--font)' }} disabled={isSubmitting} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
                 <Sparkles size={18} />
                 {isSubmitting ? 'Generating Report...' : 'Generate Career Intelligence Report'}
               </button>
             </div>
           )}
 
-        {/* VALIDATION ERROR BANNER */}
-        <AnimatePresence>
-          {validationState.messages.length > 0 && (
-            <motion.div
-              className="validation-banner"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            >
-              <div className="validation-banner-inner">
-                <div className="validation-banner-icon">
-                  <ShieldCheck size={20} />
+          {/* VALIDATION ERROR BANNER */}
+          <AnimatePresence>
+            {validationState.messages.length > 0 && (
+              <motion.div
+                className="validation-banner"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <div className="validation-banner-inner">
+                  <div className="validation-banner-icon">
+                    <ShieldCheck size={20} />
+                  </div>
+                  <div className="validation-banner-content">
+                    <div className="validation-banner-title">Complete all required fields to continue to the next step.</div>
+                  </div>
                 </div>
-                <div className="validation-banner-content">
-                  <div className="validation-banner-title">Complete all required fields to continue to the next step.</div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* NAVIGATION */}
           <div className="form-nav">

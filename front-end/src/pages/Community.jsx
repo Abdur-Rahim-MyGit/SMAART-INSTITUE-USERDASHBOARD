@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Megaphone, Bell } from "lucide-react";
+import { Megaphone, Bell, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import NoticesFeed from "@/components/community/NoticesFeed";
 
 const Community = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
 
   // Initialize current user from session storage
@@ -24,6 +26,17 @@ const Community = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] pb-24 selection:bg-[#002147]/20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+
+        {/* Back Button */}
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-8 hover:text-[#1a3884] transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+            <ArrowLeft className="w-4 h-4" />
+          </div>
+          {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+        </button>
 
         {/* ── Header Section ────────────────────────────────────────────── */}
         <div className="mb-6 sm:mb-10">
