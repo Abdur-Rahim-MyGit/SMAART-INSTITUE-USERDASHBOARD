@@ -25,6 +25,7 @@ import {
   ArrowRight,
   Edit,
   Sparkles,
+  ArrowLeft,
 } from "lucide-react";
 import PageHero from "@/components/ui/PageHero";
 import {
@@ -164,18 +165,17 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
                 </div>
               </>
             )}
-            </div>
           </div>
         </div>
+      </div>
 
       <div className="space-y-5 p-6 md:flex-1">
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2">
-            <span className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] ${
-              isCurrentVision 
-                ? "bg-primary/10 text-primary" 
-                : "bg-slate-100 text-slate-500 dark:bg-[#002A5C] dark:text-slate-300"
-            }`}>
+            <span className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] ${isCurrentVision
+              ? "bg-primary/10 text-primary"
+              : "bg-slate-100 text-slate-500 dark:bg-[#002A5C] dark:text-slate-300"
+              }`}>
               {isCurrentVision ? t("vision_board.current_focus") : t("vision_board.stored_vision")}
             </span>
             <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500">
@@ -797,8 +797,21 @@ const VisionBoardGalleryPro = () => {
 
 
   return (
-    <main className="min-h-screen w-full bg-[#F8FAFC] px-4 py-5 transition-colors duration-300 dark:bg-[#002147] md:px-8">
+    <main className="min-h-screen w-full bg-[#F8FAFC] px-4 py-5 transition-colors duration-300 dark:bg-[#00152E] md:px-8">
       <div className="mx-auto max-w-[1600px] pb-6">
+        {/* Back Button */}
+        <div className="mb-4">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+          >
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+              <ArrowLeft className="w-4 h-4" />
+            </div>
+            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+          </button>
+        </div>
+
         {/* ── Standardized PageHero ── */}
         <PageHero
           badge={t("vision_board.vision_journey")}
@@ -813,11 +826,10 @@ const VisionBoardGalleryPro = () => {
             <Button
               onClick={handleCreateNew}
               disabled={!canCreateMore}
-              className={`h-11 rounded-xl px-5 text-sm font-bold tracking-wide shadow-md transition-all active:scale-95 ${
-                canCreateMore
-                  ? "bg-[#1a3884] text-white hover:bg-[#132c6b]"
-                  : "cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-[#002A5C]"
-              }`}
+              className={`h-11 rounded-xl px-5 text-sm font-bold tracking-wide shadow-md transition-all active:scale-95 ${canCreateMore
+                ? "bg-[#1a3884] text-white hover:bg-[#132c6b]"
+                : "cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-[#002A5C]"
+                }`}
             >
               <Plus className="mr-2 h-4 w-4" />
               {t("vision_board.create_new_board")}
@@ -973,9 +985,9 @@ const VisionBoardGalleryPro = () => {
                   {t("vision_board.start_creating")} <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
-              </motion.div>
+            </motion.div>
           </motion.div>
-      )}
+        )}
       </AnimatePresence>
     </main>
   );

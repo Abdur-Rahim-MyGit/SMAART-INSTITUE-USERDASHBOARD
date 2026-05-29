@@ -674,24 +674,24 @@ const BaseLineTest = () => {
               {/* Background gradient effect */}
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3884]/5 rounded-full blur-[100px] pointer-events-none" />
 
-              <div className="p-6 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-dark-elevated/30 relative z-10">
+              <div className="p-6 border-b border-slate-150 dark:border-white/10 bg-slate-50/50 dark:bg-[#002a5c]/30 relative z-10">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() => setShowExitWarning(true)}
                       disabled={submitting || interactionLocked || timeExpired}
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/40 px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 transition-all hover:bg-slate-50 dark:hover:bg-[#003170] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       {t("baseline_test.back", "Back")}
                     </button>
-                    <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{translatedTitle} <span className="text-[#1a3884]">{stageKey}</span></h2>
+                    <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-[#112b6b] dark:text-white">{translatedTitle} <span className="text-[#1a3884] dark:text-blue-400">{stageKey}</span></h2>
                   </div>
                   <div className="text-right">
                     <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
                       {t("baseline_test.time_left", "Time Left")}:{" "}
-                      <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#1a3884]"}`}>
+                      <span className={`font-mono font-bold ${isLastFiveMinutes ? "text-red-500 animate-pulse" : "text-[#1a3884] dark:text-blue-400"}`}>
                         {formatCountdown(remainingSeconds)}
                       </span>
                     </div>
@@ -706,22 +706,22 @@ const BaseLineTest = () => {
                 <div className="flex items-center gap-4">
                   <div className="flex-1 h-2 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-[#1a3884]"
+                      className="h-full bg-gradient-to-r from-[#112b6b] to-[#1a3884] dark:from-blue-500 dark:to-blue-400"
                       initial={{ width: 0 }}
                       animate={{ width: `${progress}%` }}
                       transition={{ duration: 0.5 }}
                     />
                   </div>
-                  <span className="text-xs font-bold text-[#1a3884] min-w-[3rem] text-right">{progress}%</span>
+                  <span className="text-xs font-bold text-[#1a3884] dark:text-blue-400 min-w-[3rem] text-right">{progress}%</span>
                 </div>
               </div>
 
               <div className="p-6 md:p-8 flex-1 relative z-10 flex flex-col justify-center">
                 <div className="mb-8 text-center">
-                  <span className="inline-block px-3 py-1 rounded-full bg-[#1a3884]/10 text-[#1a3884] text-xs font-bold uppercase tracking-widest mb-3">
+                  <span className="inline-block px-3 py-1 rounded-full bg-[#1a3884]/10 dark:bg-blue-400/10 text-[#1a3884] dark:text-blue-300 text-xs font-bold uppercase tracking-widest mb-3">
                     {t("baseline_test.question_number", "Question {{current}} / {{total}}", { current: index + 1, total: questions.length })}
                   </span>
-                  <h3 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                  <h3 className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">
                     {current?.questionText}
                   </h3>
                 </div>
@@ -735,18 +735,18 @@ const BaseLineTest = () => {
                         onClick={() => selectOption(option.value)}
                         disabled={interactionLocked || submitting || timeExpired}
                         className={`group relative p-3 md:p-5 rounded-xl md:rounded-2xl border-2 transition-all duration-300 text-left hover:scale-[1.01] active:scale-[0.99] ${isSelected
-                          ? 'border-[#1a3884] bg-[#1a3884]/10 shadow-[0_0_30px_-10px_rgba(26,56,132,0.3)]'
-                          : 'border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800/50 hover:border-[#1a3884]/50 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
+                          ? 'border-[#1a3884] dark:border-blue-400 bg-[#1a3884]/10 dark:bg-blue-400/10 shadow-[0_0_30px_-10px_rgba(26,56,132,0.3)]'
+                          : 'border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] hover:border-[#1a3884]/50 dark:hover:border-blue-400/50 hover:bg-[#F8FAFC] dark:hover:bg-[#003170]'
                           }`}
                       >
                         <div className="flex items-center gap-3 md:gap-4">
                           <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full border-2 flex items-center justify-center font-bold text-sm md:text-base shrink-0 transition-colors shadow-sm ${isSelected
-                            ? 'bg-[#1a3884] border-[#1a3884] text-white'
-                            : 'border-slate-300 dark:border-white/15 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] group-hover:text-[#1a3884]'
+                            ? 'bg-[#1a3884] dark:bg-blue-500 border-[#1a3884] dark:border-blue-500 text-white'
+                            : 'border-slate-300 dark:border-white/15 text-slate-400 dark:text-slate-500 group-hover:border-[#1a3884] dark:group-hover:border-blue-400 group-hover:text-[#1a3884] dark:group-hover:text-blue-400'
                             }`}>
                             {option.value}
                           </div>
-                          <span className={`text-sm md:text-base font-medium transition-colors ${isSelected ? 'text-[#1a3884]' : 'text-slate-700 dark:text-slate-200'}`}>
+                          <span className={`text-sm md:text-base transition-colors ${isSelected ? 'text-[#1a3884] dark:text-blue-300 font-bold' : 'text-slate-700 dark:text-slate-200 font-medium'}`}>
                             {option.label}
                           </span>
                         </div>
@@ -765,9 +765,9 @@ const BaseLineTest = () => {
                         exit={{ opacity: 0, scale: 0.9 }}
                         onClick={nextQ}
                         disabled={timeElapsed < 5000 || interactionLocked || submitting || timeExpired}
-                        className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#1a3884]/20 transition-all flex items-center gap-2 ${timeElapsed < 5000
-                          ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 cursor-not-allowed'
-                          : 'bg-[#1a3884] text-white hover:bg-[#277a84] hover:shadow-2xl hover:-translate-y-1'
+                        className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#1a3884]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2 ${timeElapsed < 5000
+                          ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 dark:text-slate-550 cursor-not-allowed'
+                          : 'bg-[#1a3884] dark:bg-blue-600 text-white hover:bg-[#277a84] dark:hover:bg-blue-500 hover:shadow-2xl hover:-translate-y-1'
                           }`}
                       >
                         {timeElapsed < 5000 ? (
@@ -820,7 +820,7 @@ const BaseLineTest = () => {
             <div className="lg:w-80 bg-white dark:bg-[#002147] rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl p-6 h-fit shrink-0 lg:sticky lg:top-6 flex flex-col gap-6">
               <div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                  <Target className="text-[#1a3884]" size={20} /> {t("baseline_test.question_map", "Question Map")}
+                  <Target className="text-[#1a3884] dark:text-blue-450" size={20} /> {t("baseline_test.question_map", "Question Map")}
                 </h4>
                 <div className="grid grid-cols-6 gap-2 max-h-[300px] md:max-h-[400px] overflow-y-auto p-1 custom-scrollbar">
                   {questions.map((q, idx) => (
@@ -829,10 +829,10 @@ const BaseLineTest = () => {
                       onClick={() => { /* Optional: Allow navigating back to answered questions? For now kept disabled/visual only based on original code 'prevQ' disabled */ }}
                       className={`aspect-square rounded-lg flex items-center justify-center text-[10px] md:text-xs font-bold transition-all cursor-default relative group
                         ${index === idx
-                          ? 'bg-[#1a3884] text-white shadow-md scale-105 border-2 border-[#1a5f66]'
+                          ? 'bg-[#1a3884] dark:bg-blue-600 text-white shadow-md scale-105 border-2 border-emerald-500'
                           : selectedAnswers[q._id]
-                            ? 'bg-[#1a3884]/10 text-[#1a3884] border border-[#1a3884]/30'
-                            : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-transparent'
+                            ? 'bg-[#1a3884]/10 dark:bg-blue-500/15 text-[#1a3884] dark:text-blue-300 border border-[#1a3884]/20 dark:border-blue-400/20'
+                            : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 dark:text-slate-500 border border-slate-200/5 dark:border-white/5'
                         }`}
                     >
                       {idx + 1}
@@ -847,7 +847,7 @@ const BaseLineTest = () => {
 
               <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/8">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884]" /> {t("baseline_test.answered", "Answered")}</span>
+                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-[#1a3884] dark:bg-blue-500" /> {t("baseline_test.answered", "Answered")}</span>
                   <span className="font-bold text-slate-900 dark:text-white">{Object.keys(selectedAnswers).length}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -1018,7 +1018,7 @@ const BaseLineTest = () => {
                               initial={{ width: 0 }}
                               animate={{ width: `${data.rawScore}%` }}
                               transition={{ delay: 0.9 + index * 0.1, duration: 1.2, ease: "easeOut" }}
-                              className="h-full bg-[#002147] relative"
+                              className="h-full bg-gradient-to-r from-[#112b6b] to-[#1a3884] dark:from-blue-500 dark:to-blue-400 relative"
                             />
                           </div>
 

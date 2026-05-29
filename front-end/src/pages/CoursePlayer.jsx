@@ -334,9 +334,9 @@ const CoursePlayer = () => {
                     transition={{ duration: 0.2 }}
                     className="p-3 sm:p-6"
                   >
-                    <div className="bg-[#F8FAFC] rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">{t("course_player.lesson_preview")}</h4>
-                      <p className="text-gray-600 leading-relaxed">
+                    <div className="bg-[#F8FAFC] dark:bg-[#002A5C] border border-transparent dark:border-white/5 rounded-xl p-6 transition-colors duration-300">
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{t("course_player.lesson_preview")}</h4>
+                      <p className="text-gray-600 dark:text-slate-200 leading-relaxed">
                         {stepData.content || t("course_player.lesson_preview_desc")}
                       </p>
                       <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
@@ -361,12 +361,12 @@ const CoursePlayer = () => {
                     transition={{ duration: 0.2 }}
                     className="p-3 sm:p-6"
                   >
-                    <div className="bg-[#F8FAFC] rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">{t("course_player.video_transcription")}</h4>
-                      <p className="text-gray-600 leading-relaxed italic">
+                    <div className="bg-[#F8FAFC] dark:bg-[#002A5C] border border-transparent dark:border-white/5 rounded-xl p-6 transition-colors duration-300">
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{t("course_player.video_transcription")}</h4>
+                      <p className="text-gray-600 dark:text-slate-200 leading-relaxed italic">
                         {t("course_player.transcription_coming_soon")}
                       </p>
-                      <p className="text-gray-500 dark:text-slate-450 text-[11px] sm:text-xs mt-3 sm:mt-4 leading-relaxed">
+                      <p className="text-gray-500 dark:text-slate-400 text-[11px] sm:text-xs mt-3 sm:mt-4 leading-relaxed">
                         {t("course_player.transcription_desc")}
                       </p>
                     </div>
@@ -536,45 +536,45 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 1.05 }}
-                      className="p-6 bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative"
+                      className="p-6 bg-white dark:bg-[#002147] rounded-2xl border border-gray-200 dark:border-white/10 shadow-xl overflow-hidden relative transition-colors duration-300"
                     >
                       <div className="absolute top-0 left-0 w-full h-1 bg-[#1a3884]" />
 
                       <div className="text-center mb-6">
-                        <div className="w-14 h-14 bg-[#1a3884]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <BookOpen className="w-7 h-7 text-[#1a3884]" />
+                        <div className="w-14 h-14 bg-[#1a3884]/10 dark:bg-blue-400/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <BookOpen className="w-7 h-7 text-[#1a3884] dark:text-blue-400" />
                         </div>
-                        <h1 className="text-2xl font-bold text-[#002147] mb-2">
+                        <h1 className="text-2xl font-bold text-[#002147] dark:text-white mb-2">
                           {course.title}
                         </h1>
-                        <p className="text-sm text-gray-500 font-medium">
+                        <p className="text-sm text-gray-500 dark:text-slate-350 font-medium">
                           {course.subtitle}
                         </p>
                       </div>
 
-                      <div className="bg-[#F8FAFC] rounded-xl p-5 mb-6 border border-gray-200">
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                          <Sparkles className="w-3.5 h-3.5" />
+                      <div className="bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl p-5 mb-6 border border-gray-200 dark:border-white/10 transition-colors duration-300">
+                        <h3 className="text-xs font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                          <Sparkles className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
                           {t("course_player.course_details")}
                         </h3>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">{t("course_player.course_id")}</p>
-                            <p className="text-sm font-bold text-[#002147]">{course.id}</p>
+                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.course_id")}</p>
+                            <p className="text-sm font-bold text-[#002147] dark:text-white">{course.id}</p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">{t("course_player.type")}</p>
-                            <p className="text-sm font-bold text-[#002147]">{t(typeKey)}</p>
+                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.type")}</p>
+                            <p className="text-sm font-bold text-[#002147] dark:text-white">{t(typeKey)}</p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">{t("course_player.duration")}</p>
-                            <p className="text-sm font-bold text-[#002147]">{t("course_player.forty_five_min")}</p>
+                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.duration")}</p>
+                            <p className="text-sm font-bold text-[#002147] dark:text-white">{t("course_player.forty_five_min")}</p>
                           </div>
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                          <p className="text-gray-600 text-sm leading-relaxed">
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
+                          <p className="text-gray-650 dark:text-slate-200 text-sm leading-relaxed">
                             {learningFlowData?.overview || course.subtitle}
                           </p>
                         </div>
