@@ -30,7 +30,8 @@ import {
   Shield,
   QrCode,
   CheckCircle2,
-  Link as LinkIcon
+  Link as LinkIcon,
+  ArrowLeft
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -38,6 +39,7 @@ import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL, getBackendUrl } from "@/services/api";
 import useUser from "@/hooks/useUser";
+import useAvatar from "@/hooks/useAvatar";
 
 import ProfileSkeleton from '@/components/skeletons/ProfileSkeleton';
 import BadgeGallery from "@/components/badges/BadgeGallery";
@@ -48,6 +50,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user, loading: userLoading, refreshUser } = useUser();
+  const { avatarData } = useAvatar();
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
@@ -642,6 +645,19 @@ const Profile = () => {
             <ProfileSkeleton />
           ) : (
             <main className="container mx-auto px-4 py-6 max-w-6xl">
+              {/* Back Button */}
+              <div className="mb-4">
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                    <ArrowLeft className="w-4 h-4" />
+                  </div>
+                  {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                </button>
+              </div>
+
               {/* Header section with page title */}
               <div className="mb-8 flex justify-between items-center">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t("profile_page.my_profile")}</h1>
@@ -689,11 +705,26 @@ const Profile = () => {
                       {formData.name || t("profile_page.student")}
                     </h2>
 
-                    {/* Active Status Badge - Responsive next to name */}
+                     {/* Active Status Badge - Responsive next to name */}
                     <div className="inline-flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/30 px-2.5 py-1 rounded-lg">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
                       <span className="text-[10px] font-black text-green-700 dark:text-green-400 uppercase tracking-widest">{t("profile_page.active")}</span>
                     </div>
+
+                    {/* Milestone Badge */}
+                    {avatarData?.milestone && (
+                      <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest ${
+                        avatarData.milestone === 'Job-ready/Professional'
+                          ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-100 dark:border-amber-800/30'
+                          : avatarData.milestone === 'Master'
+                          ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 border-purple-100 dark:border-purple-800/30'
+                          : avatarData.milestone === 'Intermediate'
+                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-100 dark:border-blue-800/30'
+                          : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/30'
+                      }`}>
+                        {avatarData.milestone}
+                      </div>
+                    )}
                   </div>
                   <p className="font-medium text-lg text-slate-500 dark:text-slate-400">
                     {t("profile_page.student")}

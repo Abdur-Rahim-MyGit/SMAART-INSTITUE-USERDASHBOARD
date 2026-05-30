@@ -200,13 +200,12 @@ const Notifications = () => {
               <div className="flex items-center gap-2">
                 <div className="hidden items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-500 dark:border-white/10 dark:text-slate-400 sm:flex">
                   <span
-                    className={`h-2.5 w-2.5 rounded-full ${
-                      wsStatus === 'connected'
+                    className={`h-2.5 w-2.5 rounded-full ${wsStatus === 'connected'
                         ? 'bg-emerald-500'
                         : wsStatus === 'connecting'
                           ? 'bg-amber-500'
                           : 'bg-red-500'
-                    }`}
+                      }`}
                   />
                   <span>
                     {wsStatus === 'connected'
@@ -247,30 +246,27 @@ const Notifications = () => {
             <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4 dark:border-white/10">
               <button
                 onClick={() => setFilter('all')}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  filter === 'all'
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${filter === 'all'
                     ? 'bg-[#1a3884] text-white'
                     : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#002A5C]'
-                }`}
+                  }`}
               >
                 {t('notifications.filters.all', 'All')}
               </button>
               <button
                 onClick={() => setFilter('unread')}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  filter === 'unread'
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${filter === 'unread'
                     ? 'bg-[#1a3884] text-white'
                     : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#002A5C]'
-                }`}
+                  }`}
               >
                 {t('notifications.filters.unread', 'Unread')}
                 {unreadCount > 0 && (
                   <span
-                    className={`rounded-full px-1.5 py-0.5 text-xs ${
-                      filter === 'unread'
+                    className={`rounded-full px-1.5 py-0.5 text-xs ${filter === 'unread'
                         ? 'bg-white/20'
                         : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                    }`}
+                      }`}
                   >
                     {unreadCount}
                   </span>
@@ -311,8 +307,8 @@ const Notifications = () => {
                   <div className="mt-1 font-semibold text-white">
                     {summary.lastLogin
                       ? new Date(summary.lastLogin).toLocaleString(i18n.language || 'en-US', {
-                          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
-                        })
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                      })
                       : t('notifications.summary.first_login', 'First login!')}
                   </div>
                 </div>
@@ -382,11 +378,10 @@ const Notifications = () => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0, height: 0 }}
-                          className={`relative group transition-colors ${
-                            !notification.isRead
+                          className={`relative group transition-colors ${!notification.isRead
                               ? 'bg-blue-50/50 dark:bg-blue-900/10'
                               : 'bg-white dark:bg-[#002A5C]'
-                          } hover:bg-[#F8FAFC] dark:hover:bg-slate-700/50`}
+                            } hover:bg-[#F8FAFC] dark:hover:bg-slate-700/50`}
                         >
                           <button
                             onClick={() => handleNotificationClick(notification)}
@@ -438,8 +433,8 @@ const Notifications = () => {
                             )}
                             <button
                               onClick={(event) => {
-                                  event.stopPropagation();
-                                  deleteNotification(notification._id);
+                                event.stopPropagation();
+                                deleteNotification(notification._id);
                               }}
                               className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
                               title={t('notifications.actions.delete', 'Delete')}

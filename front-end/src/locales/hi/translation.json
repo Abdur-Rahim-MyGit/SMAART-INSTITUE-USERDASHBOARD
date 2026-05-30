@@ -7,6 +7,7 @@
     "results": "परिणाम",
     "assessments": "आकलन",
     "toolkit": "टूलकिट",
+    "performance": "प्रदर्शन",
     "skills_vault": "कौशल तिजोरी",
     "badges": "मेरे बैज",
     "skills_passport": "कौशल पासपोर्ट",
@@ -1485,5 +1486,65 @@
     "connection_error": "कनेक्शन त्रुटि। कृपया पुनः प्रयास करें।",
     "save_changes": "बदलाव सहेजें",
     "cancel": "रद्द करें"
+  },
+  "library": {
+    "search_placeholder": "शीर्षक, लेखक या विषय द्वारा खोजें...",
+    "preview": "पूर्वावलोकन",
+    "no_books": "कोई पुस्तक नहीं मिली",
+    "no_books_desc": "अपने खोज शब्दों को समायोजित करने का प्रयास करें",
+    "categories": {
+      "all": "सभी पुस्तकें",
+      "business": "व्यवसाय",
+      "psychology": "मनोविज्ञान",
+      "technology": "प्रौद्योगिकी"
+    }
+  },
+  "my_notes": {
+    "toast": {
+      "empty_title": "खाली नोट",
+      "empty_desc": "कृपया एक शीर्षक या सामग्री जोड़ें।",
+      "created_title": "नोट बनाया गया",
+      "updated_title": "नोट अपडेट किया गया",
+      "saved_cloud": "आपका नोट क्लाउड में सहेजा गया है।",
+      "error_title": "त्रुटि",
+      "failed_save": "नोट को डेटाबेस में सहेजने में विफल।",
+      "deleted_title": "नोट हटाया गया",
+      "deleted_desc": "नोट आपके खाते से हटा दिया गया है।",
+      "failed_delete": "नोट हटाया नहीं जा सका।"
+    },
+    "note_types": {
+      "untitled": "बिना शीर्षक नोट",
+      "general_course": "सामान्य पाठ्यक्रम नोट्स",
+      "general_note": "सामान्य नोट",
+      "course_prefix": "पाठ्यक्रम: {{courseId}}"
+    },
+    "colors": {
+      "yellow": "पीला",
+      "blue": "नीला",
+      "green": "हरा",
+      "purple": "बैंगनी",
+      "rose": "गुलाबी"
+    },
+    "header": {
+      "badge": "व्यक्तिगत उत्पादकता",
+      "title_my": "मेरे",
+      "title_notes": "नोट्स",
+      "description": "अपने विचारों, पाठ्यक्रम अंतर्दृष्टि और व्यक्तिगत सफलताओं को एक सुरक्षित, क्लाउड-सिंक कार्यक्षेत्र में व्यवस्थित करें।",
+      "search_placeholder": "अपनी लाइब्रेरी में खोजें...",
+      "new_note": "नया नोट"
+    },
+    "grid": {
+      "create_new": "नया नोट बनाएं",
+      "delete_tooltip": "नोट हटाएं",
+      "no_notes_matching": "\"{{query}}\" से मेल खाने वाला कोई नोट नहीं मिला"
+    },
+    "editor": {
+      "edit_title": "नोट संपादित करें",
+      "new_title": "नया नोट",
+      "placeholder_title": "शीर्षक",
+      "placeholder_content": "लिखना शुरू करें...",
+      "last_edited": "अंतिम बार संपादित: {{date}}",
+      "save_note": "नोट सहेजें"
+    }
   }
 }

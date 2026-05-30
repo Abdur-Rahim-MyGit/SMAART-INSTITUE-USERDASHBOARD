@@ -165,8 +165,20 @@ const AssessmentsDashboard = () => {
     };
 
     return (
-        <div className="space-y-6">
-            <main className="px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <div className="bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 min-h-screen pt-4 pb-8">
+            <div className="max-w-7xl mx-auto mb-4 px-4 sm:px-6 lg:px-8">
+                <button
+                    onClick={() => navigate("/dashboard")}
+                    className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                        <ArrowLeft className="w-4 h-4" />
+                    </div>
+                    {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                </button>
+            </div>
+
+            <main className="px-4 py-4 sm:px-6 lg:px-8">
                 <div className="mx-auto max-w-7xl space-y-8 lg:space-y-10">
                     <PageHero
                         badge={t("assessments_dashboard.badge", "Assessment Journey")}
@@ -383,8 +395,8 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
             <div
                 onClick={onAction}
                 className={`relative cursor-pointer overflow-hidden rounded-[30px] border bg-white transition-all duration-300 dark:bg-[#002147] ${completed
-                        ? "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
-                        : "border-slate-200 shadow-sm hover:border-[#1a3884]/30 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
+                    ? "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
+                    : "border-slate-200 shadow-sm hover:border-[#1a3884]/30 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
                     }`}
             >
                 <div className={`h-1 ${completed ? "bg-[#1a3884]" : "bg-slate-100 dark:bg-[#002A5C]"}`} />
@@ -393,8 +405,8 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         <div className="flex items-start gap-4 sm:gap-5">
                             <div
                                 className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-base font-bold ${completed
-                                        ? "bg-[#1a3884] text-white shadow-sm"
-                                        : "border border-slate-200 bg-[#F8FAFC] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-400"
+                                    ? "bg-[#1a3884] text-white shadow-sm"
+                                    : "border border-slate-200 bg-[#F8FAFC] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-400"
                                     }`}
                             >
                                 {completed ? <CheckCircle2 className="h-6 w-6" /> : `0${index + 1}`}
@@ -457,8 +469,8 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                             onAction();
                         }}
                         className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold transition-all duration-300 ${completed
-                                ? "border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#002A5C]"
-                                : "bg-[#1a3884] text-white shadow-md hover:bg-[#002147] hover:shadow-lg hover:-translate-y-0.5"
+                            ? "border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#002A5C]"
+                            : "bg-[#1a3884] text-white shadow-md hover:bg-[#002147] hover:shadow-lg hover:-translate-y-0.5"
                             }`}
                     >
                         {completed ? (

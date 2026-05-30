@@ -1158,9 +1158,22 @@ const ProfileHoverCard = ({ user, avatarData, onLogout }) => {
 
       {/* Profile Info & Actions */}
       <div className="relative z-10 p-4 space-y-3">
-        <div className="text-center space-y-0.5">
+        <div className="text-center space-y-0.5 flex flex-col items-center justify-center">
           <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{user?.fullName || 'Student'}</h3>
           <p className="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">{t(`common.${(user?.role || 'student').toLowerCase()}`)}</p>
+          {avatarData?.milestone && (
+            <div className={`mt-1.5 inline-flex items-center px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest border ${
+              avatarData.milestone === 'Job-ready/Professional'
+                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                : avatarData.milestone === 'Master'
+                ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
+                : avatarData.milestone === 'Intermediate'
+                ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+            }`}>
+              {avatarData.milestone}
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">

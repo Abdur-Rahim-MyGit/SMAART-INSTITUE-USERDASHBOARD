@@ -227,6 +227,7 @@ const AnimatedRoutes = () => {
                     <Route path="/assessment/:stage/report" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
                     <Route path="/analysis" element={<AssessmentFlowGuard><Analysis /></AssessmentFlowGuard>} />
                     <Route path="/motivational" element={<AssessmentFlowGuard><Motivational /></AssessmentFlowGuard>} />
+                    <Route path="/locked-out" element={<LockedOut />} />
 
                     {/* Fallback */}
                     <Route path="*" element={<NotFound />} />

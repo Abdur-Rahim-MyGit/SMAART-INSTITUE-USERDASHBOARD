@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BookOpen, BookText, ArrowRight, FileText, Sparkles, Info, StickyNote, Compass, Brain } from "lucide-react";
+import { BookOpen, BookText, ArrowLeft, ArrowRight, FileText, Sparkles, Info, StickyNote, Compass, Brain } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PageHero from "@/components/ui/PageHero";
 import { useTranslation } from "react-i18next";
@@ -107,7 +107,7 @@ const ToolkitCard = ({ section, index }) => {
       whileHover={{ y: -4 }}
       className="group"
     >
-    <div
+      <div
         onClick={() => {
           if (section.path === '/dashboard/career-agent') {
             const path = localStorage.getItem('smaart_analysis_id') ? '/dashboard/career-agent/dashboard' : '/dashboard/career-agent/onboarding';
@@ -172,10 +172,24 @@ const ToolkitCard = ({ section, index }) => {
 
 const SMAArtToolkit = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   return (
-    <div className="space-y-6">
-      <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <div className="bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 min-h-screen pt-4 pb-8">
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto mb-4 px-4 sm:px-6 lg:px-8">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="group flex items-center gap-3 text-[#112b6b] dark:text-slate-300 text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+            <ArrowLeft className="w-4 h-4" />
+          </div>
+          {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+        </button>
+      </div>
+
+      <main className="px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl space-y-8">
           {/* ── Standardized PageHero ── */}
           <PageHero

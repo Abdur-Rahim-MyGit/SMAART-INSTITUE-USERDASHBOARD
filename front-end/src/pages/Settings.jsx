@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Settings as SettingsIcon, Bell, Lock, User, Palette, Globe, Shield, HelpCircle, Loader2 } from "lucide-react";
+import { Settings as SettingsIcon, Bell, Lock, User, Palette, Globe, Shield, HelpCircle, Loader2, ArrowLeft } from "lucide-react";
 import useUser from "@/hooks/useUser";
 import { API_BASE_URL } from "@/services/api";
 import { toast } from "sonner";
@@ -543,6 +543,19 @@ const Settings = () => {
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
+      {/* Back Button */}
+      <div>
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+            <ArrowLeft className="w-4 h-4" />
+          </div>
+          {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+        </button>
+      </div>
+
       {/* Settings Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Sidebar Navigation */}

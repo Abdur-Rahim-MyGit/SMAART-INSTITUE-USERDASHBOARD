@@ -467,6 +467,42 @@ avatarSchema.methods.getStreakStatus = function () {
   };
 };
 
+/**
+ * Calculate user's overall average progress across all active CourseEnrollment records
+ * and translate it into a milestone level/tier.
+ */
+avatarSchema.methods.calculateMilestone = async function () {
+  const CourseEnrollment = mongoose.model('CourseEnrollment');
+  const enrollments = await CourseEnrollment.find({
+    student: this.userId,
+    status: { $in: ['enrolled', 'in_progress', 'completed'] }
+  });
+
+  if (!enrollments || enrollments.length === 0) {
+    return {
+      averageProgress: 0,
+      milestone: 'Beginner'
+    };
+  }
+
+  const totalProgress = enrollments.reduce((sum, e) => sum + (e.progress || 0), 0);
+  const averageProgress = Math.round(totalProgress / enrollments.length);
+
+  let milestone = 'Beginner';
+  if (averageProgress >= 75) {
+    milestone = 'Job-ready/Professional';
+  } else if (averageProgress >= 50) {
+    milestone = 'Master';
+  } else if (averageProgress >= 25) {
+    milestone = 'Intermediate';
+  }
+
+  return {
+    averageProgress,
+    milestone
+  };
+};
+
 // Static method to get or create avatar for user
 avatarSchema.statics.getOrCreate = async function (userId) {
   let avatar = await this.findOne({ userId });

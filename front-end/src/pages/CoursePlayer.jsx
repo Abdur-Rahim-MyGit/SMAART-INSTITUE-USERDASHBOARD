@@ -22,7 +22,8 @@ import { coursesAPI, courseEnrollmentAPI } from "@/services/api";
 import { buildFlowFromCourse, TEMP_VIDEO_URL } from "@/utils/courseStages";
 import { mergeAdminQuizzesIntoFlow } from "@/utils/microAssessmentUtils";
 import { markCourseCompleted } from "@/utils/courseProgressStorage";
-
+import useActivityRestrictions from "@/hooks/useActivityRestrictions";
+import ActivityWarningModal from "@/components/ActivityWarningModal";
 const getCourseById = (courseId) => {
   const allCourses = [
     ...STAGE_1_COURSES,
@@ -59,6 +60,7 @@ const getStageAndTrackInfo = (courseId) => {
 
 const CoursePlayer = () => {
   const { courseId } = useParams();
+  const { user: currentUser } = useUser();
   const navigate = useNavigate();
   const playerRef = useRef(null);
   const [videoProgress, setVideoProgress] = useState(0);
@@ -211,6 +213,18 @@ const CoursePlayer = () => {
     return () => { cancelled = true; };
   }, [currentUser, courseMeta.courseDbId]);
 
+  // Activity restrictions monitoring
+  const {
+    warningsCount,
+    maxWarnings,
+    isWarningVisible,
+    lastViolationType,
+    acknowledgeWarning
+  } = useActivityRestrictions({
+    courseId,
+    isActive: !loading && !!course
+  });
+
   useEffect(() => {
     setShowIntro(true);
     setActiveStep(null);
@@ -232,6 +246,55 @@ const CoursePlayer = () => {
     }
   }, [courseId, staticCourse, learningFlowData?.overviewTitle]);
 
+  // Load progress from database on mount or course/user change
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!currentUser || !courseId) return;
+      try {
+        console.log('[CoursePlayer] Fetching enrollment progress for user:', currentUser._id || currentUser.id);
+        const response = await courseEnrollmentAPI.getByStudent(currentUser._id || currentUser.id);
+        if (response.success && response.data) {
+          // Find the enrollment for this course
+          const enrollment = response.data.find(e => e.course && (e.course.courseNumber === courseId || e.course.courseCode === courseId));
+          if (enrollment && enrollment.moduleProgress && enrollment.moduleProgress.length > 0) {
+            const mProg = enrollment.moduleProgress[0];
+            const stepsMap = {};
+            
+            // From completedTasks
+            if (mProg.completedTasks) {
+              mProg.completedTasks.forEach(ct => {
+                stepsMap[String(ct.dayId)] = true;
+              });
+            }
+
+            // From videoProgress
+            if (mProg.videoProgress) {
+              mProg.videoProgress.forEach(vp => {
+                if (vp.isCompleted) {
+                  stepsMap[String(vp.dayId)] = true;
+                }
+              });
+            }
+
+            console.log('[CoursePlayer] Loaded steps progress:', stepsMap);
+            setCompletedSteps(stepsMap);
+            
+            const stepsDone = Object.keys(stepsMap).length;
+            const pct = Math.round((stepsDone / 9) * 100);
+            setVideoProgress(pct);
+
+            if (enrollment.status === 'completed') {
+              setIsCompleted(true);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error loading student course progress:", err);
+      }
+    };
+    fetchProgress();
+  }, [courseId, currentUser]);
+
   const handleStartCourse = () => {
     setShowIntro(false);
     setActiveStep('1');
@@ -248,7 +311,7 @@ const CoursePlayer = () => {
     }
   };
 
-  const handleStepComplete = (stepNumber) => {
+  const handleStepComplete = async (stepNumber) => {
     const newCompletedSteps = { ...completedSteps, [stepNumber]: true };
     setCompletedSteps(newCompletedSteps);
 
@@ -262,8 +325,23 @@ const CoursePlayer = () => {
       currentStepData?.title || (courseData?.title + ' — Step ' + stepNumber) || courseId
     );
 
-    const allCompleted = stepNumbers.every((step) => newCompletedSteps[step]);
+    // Sync to DB
+    if (currentUser) {
+      try {
+        await courseEnrollmentAPI.updateTaskProgress({
+          studentId: currentUser._id || currentUser.id,
+          courseCode: courseId,
+          moduleId: 1,
+          dayId: parseInt(stepNumber),
+          taskId: 1,
+          completed: true
+        });
+      } catch (err) {
+        console.error("Error saving step task progress to DB:", err);
+      }
+    }
 
+    const allCompleted = stepNumbers.every((step) => newCompletedSteps[step]);
     if (allCompleted) {
       setIsCompleted(true);
       setShowCongratulation(true);
@@ -293,10 +371,27 @@ const CoursePlayer = () => {
     navigate('/dashboard/courses');
   };
 
-  const handleVideoProgressUpdate = (maxTime, completed, duration) => {
+  const handleVideoProgressUpdate = async (maxTime, completed, duration) => {
     setVideoProgress(maxTime);
     if (completed) setVideoWatched(true);
     setIsCompleted(completed);
+
+    if (currentUser && activeStep) {
+      try {
+        await courseEnrollmentAPI.updateVideoProgress({
+          studentId: currentUser._id || currentUser.id,
+          courseCode: courseId,
+          moduleId: 1,
+          dayId: parseInt(activeStep),
+          stepId: 1,
+          maxWatchedTime: maxTime,
+          videoDuration: duration || 0,
+          isCompleted: completed
+        });
+      } catch (err) {
+        console.error("Error saving video progress to DB:", err);
+      }
+    }
   };
 
   const handleNextLesson = () => {
@@ -451,9 +546,9 @@ const CoursePlayer = () => {
                     transition={{ duration: 0.2 }}
                     className="p-3 sm:p-6"
                   >
-                    <div className="bg-[#F8FAFC] rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">{t("course_player.lesson_preview")}</h4>
-                      <p className="text-gray-600 leading-relaxed">
+                    <div className="bg-[#F8FAFC] dark:bg-[#002A5C] border border-transparent dark:border-white/5 rounded-xl p-6 transition-colors duration-300">
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{t("course_player.lesson_preview")}</h4>
+                      <p className="text-gray-600 dark:text-slate-200 leading-relaxed">
                         {stepData.content || t("course_player.lesson_preview_desc")}
                       </p>
                       <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
@@ -658,45 +753,45 @@ const CoursePlayer = () => {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 1.05 }}
-                      className="p-6 bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden relative"
+                      className="p-6 bg-white dark:bg-[#002147] rounded-2xl border border-gray-200 dark:border-white/10 shadow-xl overflow-hidden relative transition-colors duration-300"
                     >
                       <div className="absolute top-0 left-0 w-full h-1 bg-[#1a3884]" />
 
                       <div className="text-center mb-6">
-                        <div className="w-14 h-14 bg-[#1a3884]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <BookOpen className="w-7 h-7 text-[#1a3884]" />
+                        <div className="w-14 h-14 bg-[#1a3884]/10 dark:bg-blue-400/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <BookOpen className="w-7 h-7 text-[#1a3884] dark:text-blue-400" />
                         </div>
-                        <h1 className="text-2xl font-bold text-[#002147] mb-2">
+                        <h1 className="text-2xl font-bold text-[#002147] dark:text-white mb-2">
                           {course.title}
                         </h1>
-                        <p className="text-sm text-gray-500 font-medium">
+                        <p className="text-sm text-gray-500 dark:text-slate-350 font-medium">
                           {course.subtitle}
                         </p>
                       </div>
 
-                      <div className="bg-[#F8FAFC] rounded-xl p-5 mb-6 border border-gray-200">
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                          <Sparkles className="w-3.5 h-3.5" />
+                      <div className="bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl p-5 mb-6 border border-gray-200 dark:border-white/10 transition-colors duration-300">
+                        <h3 className="text-xs font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                          <Sparkles className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
                           {t("course_player.course_details")}
                         </h3>
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">{t("course_player.course_id")}</p>
-                            <p className="text-sm font-bold text-[#002147]">{course.id}</p>
+                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.course_id")}</p>
+                            <p className="text-sm font-bold text-[#002147] dark:text-white">{course.id}</p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">{t("course_player.type")}</p>
-                            <p className="text-sm font-bold text-[#002147]">{t(typeKey)}</p>
+                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.type")}</p>
+                            <p className="text-sm font-bold text-[#002147] dark:text-white">{t(typeKey)}</p>
                           </div>
                           <div className="space-y-1">
-                            <p className="text-xs font-medium text-gray-400">{t("course_player.duration")}</p>
-                            <p className="text-sm font-bold text-[#002147]">{t("course_player.forty_five_min")}</p>
+                            <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.duration")}</p>
+                            <p className="text-sm font-bold text-[#002147] dark:text-white">{t("course_player.forty_five_min")}</p>
                           </div>
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                          <p className="text-gray-600 text-sm leading-relaxed">
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
+                          <p className="text-gray-650 dark:text-slate-200 text-sm leading-relaxed">
                             {learningFlowData?.overview || course.subtitle}
                           </p>
                         </div>
@@ -1069,6 +1164,13 @@ const CoursePlayer = () => {
       </div>
       <FloatingDictionary />
       <FloatingNotes />
+      <ActivityWarningModal
+        isOpen={isWarningVisible}
+        warningsCount={warningsCount}
+        maxWarnings={maxWarnings}
+        lastViolationType={lastViolationType}
+        onAcknowledge={acknowledgeWarning}
+      />
     </div>
   );
 };

@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { STAGES, TRACKS } from "@/data/courseStructureData";
 import PageHero from "@/components/ui/PageHero";
 import {
@@ -371,12 +372,11 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
       exit={{ opacity: 0, x: -30 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      {/* Back button - Modernized */}
       <button
         onClick={onBack}
-        className="group flex items-center gap-3 text-[#112b6b] text-[11px] font-bold uppercase tracking-[0.2em] mb-10 hover:text-[#1a3884] transition-all"
+        className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-10 hover:text-[#1a3884] transition-all"
       >
-        <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
           <ArrowLeft className="w-4 h-4" />
         </div>
         {t("my_courses_page.back_to_overview")}
@@ -449,18 +449,18 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
 
       {/* Assessment gate banner */}
       {stage.assessmentGate && (
-        <div className="mb-8 flex items-center gap-5 p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-slate-100 flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="w-6 h-6 text-[#1a3884]" />
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 bg-white dark:bg-[#002147] border border-slate-150 dark:border-white/10 rounded-3xl shadow-sm transition-colors duration-300">
+          <div className="w-12 h-12 rounded-2xl bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <TrendingUp className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
           </div>
           <div className="flex-1">
-            <h4 className="font-bold text-[#112b6b] text-[15px]">{t("my_courses_page.assessment_required", { gate: stage.assessmentGate })}</h4>
-            <p className="text-gray-500 text-[13px] font-medium">{t("my_courses_page.assessment_required_desc")}</p>
+            <h4 className="font-extrabold text-[#112b6b] dark:text-white text-[15px]">{t("my_courses_page.assessment_required", { gate: stage.assessmentGate })}</h4>
+            <p className="text-gray-500 dark:text-slate-350 text-[13px] font-medium mt-0.5">{t("my_courses_page.assessment_required_desc")}</p>
           </div>
           {userProgress.assessmentsPassed?.includes(stage.assessmentGate) ? (
-            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-green-50 text-green-700 border border-green-100 uppercase tracking-wider">{t("my_courses_page.status_passed")}</div>
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-500/20 uppercase tracking-wider shadow-sm shrink-0 mt-3 sm:mt-0">{t("my_courses_page.status_passed")}</div>
           ) : (
-            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#F8FAFC] text-gray-500 border border-slate-100 uppercase tracking-wider">{t("my_courses_page.status_locked")}</div>
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#F8FAFC] dark:bg-[#002A5C] text-gray-500 dark:text-slate-400 border border-slate-100 dark:border-white/10 uppercase tracking-wider shadow-sm shrink-0 mt-3 sm:mt-0">{t("my_courses_page.status_locked")}</div>
           )}
         </div>
       )}
@@ -497,6 +497,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
 /* ─── Main Component ─── */
 const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [selectedStageId, setSelectedStageId] = useState(null);
 
   const isStageUnlocked = (stage) => checkStageUnlocked(stage, userProgress);
@@ -527,8 +528,20 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
 
       {/* Page header — standardized PageHero */}
       {!selectedStageId && (
-        <div className="relative z-10 py-4">
+        <div className="relative z-10 py-4 px-4 sm:px-6 md:px-12">
           <div className="max-w-7xl mx-auto">
+            {/* Back Button */}
+            <div className="mb-6">
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="group flex items-center gap-3 text-[#112b6b] dark:text-slate-300 text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                  <ArrowLeft className="w-4 h-4" />
+                </div>
+                {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+              </button>
+            </div>
             <PageHero
               badge={t("my_courses_page.learning_journey")}
               title={t("my_courses_page.programme")}
@@ -555,6 +568,15 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                 </div>
               </div>
             </PageHero>
+          </div>
+        </div>
+      )}
+
+      {/* Continue Watching Section below SMAART programme section */}
+      {!selectedStageId && continueWatching && (
+        <div className="relative z-10 px-4 sm:px-6 md:px-12 py-2">
+          <div className="max-w-7xl mx-auto">
+            {continueWatching}
           </div>
         </div>
       )}

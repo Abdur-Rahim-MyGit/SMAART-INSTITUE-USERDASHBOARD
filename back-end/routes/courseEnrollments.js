@@ -195,7 +195,12 @@ router.post('/task-progress', async (req, res) => {
 
 
         // Find course by code
-        const course = await Course.findOne({ courseCode });
+        const course = await Course.findOne({
+            $or: [
+                { courseCode: courseCode },
+                { courseNumber: courseCode }
+            ]
+        });
         if (!course) {
             console.error('Course not found for code:', courseCode);
             return res.status(404).json({ success: false, error: 'Course not found' });
@@ -329,7 +334,12 @@ router.post('/video-progress', async (req, res) => {
         const { studentId, courseCode, moduleId, dayId, stepId, maxWatchedTime, videoDuration, isCompleted } = req.body;
 
         // Find course
-        const course = await Course.findOne({ courseCode });
+        const course = await Course.findOne({
+            $or: [
+                { courseCode: courseCode },
+                { courseNumber: courseCode }
+            ]
+        });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
 
         // Find or create enrollment
@@ -457,7 +467,12 @@ router.post('/quiz-progress', async (req, res) => {
         const { studentId, courseCode, moduleId, dayId, quizId, score, totalPoints } = req.body;
 
         // Find course
-        const course = await Course.findOne({ courseCode });
+        const course = await Course.findOne({
+            $or: [
+                { courseCode: courseCode },
+                { courseNumber: courseCode }
+            ]
+        });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
 
         // Find or create enrollment
@@ -571,7 +586,12 @@ router.post('/task-result', async (req, res) => {
         const { studentId, courseCode, moduleId, dayId, stepId, score, totalPoints, responses } = req.body;
 
         // Find course
-        const course = await Course.findOne({ courseCode });
+        const course = await Course.findOne({
+            $or: [
+                { courseCode: courseCode },
+                { courseNumber: courseCode }
+            ]
+        });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
 
         // Find or create enrollment
@@ -682,9 +702,74 @@ router.post('/task-result', async (req, res) => {
         }
 
         res.json({ success: true, data: enrollment, badgesEarned });
-
     } catch (err) {
         console.error('Error updating task result:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Track active time spent (increments totalTimeSpent)
+router.post('/active-time', async (req, res) => {
+    try {
+        const studentId = req.user._id;
+        const { courseCode, incrementMinutes = 1 } = req.body;
+
+        let enrollment = null;
+
+        if (courseCode) {
+            // Find course
+            const course = await Course.findOne({
+                $or: [
+                    { courseCode: courseCode },
+                    { courseNumber: courseCode }
+                ]
+            });
+            if (course) {
+                enrollment = await CourseEnrollment.findOne({
+                    student: studentId,
+                    course: course._id
+                });
+            }
+        }
+
+        // Fallback: If no course specified or enrollment not found, find the most recently updated enrollment
+        if (!enrollment) {
+            enrollment = await CourseEnrollment.findOne({ student: studentId })
+                .sort({ updatedAt: -1 });
+        }
+
+        // If still no enrollment, create a default one for the first course
+        if (!enrollment) {
+            const firstCourse = await Course.findOne();
+            if (firstCourse) {
+                enrollment = new CourseEnrollment({
+                    student: studentId,
+                    course: firstCourse._id,
+                    status: 'in_progress',
+                    enrollmentDate: new Date(),
+                    progress: 0,
+                    moduleProgress: []
+                });
+            }
+        }
+
+        if (!enrollment) {
+            return res.status(404).json({ success: false, error: 'No active courses or enrollments found to track time.' });
+        }
+
+        // Increment totalTimeSpent in minutes
+        enrollment.totalTimeSpent = (enrollment.totalTimeSpent || 0) + incrementMinutes;
+        enrollment.lastAccessedAt = new Date();
+
+        await enrollment.save();
+
+        res.json({
+            success: true,
+            message: 'Active learning time updated successfully',
+            totalTimeSpent: enrollment.totalTimeSpent
+        });
+    } catch (err) {
+        console.error('Error tracking active time:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });

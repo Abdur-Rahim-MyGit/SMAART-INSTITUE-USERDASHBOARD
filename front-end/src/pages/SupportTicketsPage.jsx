@@ -82,15 +82,18 @@ const SupportTicketsPage = () => {
       <div className="pt-4">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
-          <div className="mb-8">
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-slate-500 dark:text-slate-300 hover:text-[#1a3884] transition-colors mb-4"
-            >
+          {/* Back Button */}
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-6 hover:text-[#1a3884] transition-all"
+          >
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
               <ArrowLeft className="w-4 h-4" />
-              {t("support_tickets_page.back")}
-            </button>
+            </div>
+            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+          </button>
 
+          <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
               <div className="flex items-center gap-4">
                 <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20 flex-shrink-0">

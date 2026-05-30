@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Plus,
@@ -12,7 +14,8 @@ import {
     Clock,
     Sparkles,
     Hash,
-    Cloud
+    Cloud,
+    ArrowLeft
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -21,6 +24,8 @@ import { CardSkeleton } from "@/components/SkeletonPatterns";
 import { notesAPI } from "@/services/api";
 
 const MyNotes = () => {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
     const { toast } = useToast();
     const [notes, setNotes] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
@@ -30,11 +35,11 @@ const MyNotes = () => {
     const [loading, setLoading] = useState(true);
 
     const colors = [
-        { name: "Yellow", value: "bg-yellow-100 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700/50" },
-        { name: "Blue", value: "bg-blue-100 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700/50" },
-        { name: "Green", value: "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-700/50" },
-        { name: "Purple", value: "bg-purple-100 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700/50" },
-        { name: "Rose", value: "bg-rose-100 dark:bg-rose-900/20 border-rose-200 dark:border-rose-700/50" },
+        { name: t("my_notes.colors.yellow", "Yellow"), value: "bg-yellow-100 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700/50" },
+        { name: t("my_notes.colors.blue", "Blue"), value: "bg-blue-100 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700/50" },
+        { name: t("my_notes.colors.green", "Green"), value: "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-700/50" },
+        { name: t("my_notes.colors.purple", "Purple"), value: "bg-purple-100 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700/50" },
+        { name: t("my_notes.colors.rose", "Rose"), value: "bg-rose-100 dark:bg-rose-900/20 border-rose-200 dark:border-rose-700/50" },
     ];
 
     useEffect(() => {
@@ -67,7 +72,7 @@ const MyNotes = () => {
                             displayTitle = "General Course Notes";
                         } else if (n.courseId.includes('-session-')) {
                             const [course, session] = n.courseId.split('-session-');
-                            const sessionDate = new Date(parseInt(session)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            const sessionDate = new Date(parseInt(session)).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                             const prefix = course === 'general' ? 'General Note' : `Course: ${course}`;
                             displayTitle = `${prefix} (${sessionDate})`;
                         } else {
@@ -113,7 +118,7 @@ const MyNotes = () => {
 
     const handleSaveNote = async () => {
         if (!currentNote.title.trim() && !currentNote.content.trim()) {
-            toast({ title: "Empty Note", description: "Please add a title or content.", variant: "destructive" });
+            toast({ title: t("my_notes.toast.empty_title", "Empty Note"), description: t("my_notes.toast.empty_desc", "Please add a title or content."), variant: "destructive" });
             return;
         }
 
@@ -126,8 +131,8 @@ const MyNotes = () => {
 
             if (response.success) {
                 toast({
-                    title: isNew ? "Note Created" : "Note Updated",
-                    description: "Your note has been saved to the cloud."
+                    title: isNew ? t("my_notes.toast.created_title", "Note Created") : t("my_notes.toast.updated_title", "Note Updated"),
+                    description: t("my_notes.toast.saved_cloud", "Your note has been saved to the cloud.")
                 });
 
                 // Reload notes to get the latest state from DB
@@ -137,7 +142,7 @@ const MyNotes = () => {
             }
         } catch (err) {
             console.error("Failed to save note:", err);
-            toast({ title: "Error", description: "Failed to save note to database.", variant: "destructive" });
+            toast({ title: t("my_notes.toast.error_title", "Error"), description: t("my_notes.toast.failed_save", "Failed to save note to database."), variant: "destructive" });
         }
     };
 
@@ -149,11 +154,11 @@ const MyNotes = () => {
             const response = await notesAPI.delete(noteToDelete.courseId);
             if (response.success) {
                 setNotes(notes.filter(n => n.id !== id));
-                toast({ title: "Note Deleted", description: "The note has been removed from your account." });
+                toast({ title: t("my_notes.toast.deleted_title", "Note Deleted"), description: t("my_notes.toast.deleted_desc", "The note has been removed from your account.") });
             }
         } catch (err) {
             console.error("Failed to delete note:", err);
-            toast({ title: "Error", description: "Could not delete the note.", variant: "destructive" });
+            toast({ title: t("my_notes.toast.error_title", "Error"), description: t("my_notes.toast.failed_delete", "Could not delete the note."), variant: "destructive" });
         }
     };
 
@@ -173,7 +178,7 @@ const MyNotes = () => {
     );
 
     const formatDate = (isoString) => {
-        return new Date(isoString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return new Date(isoString).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
 
     return (
@@ -181,7 +186,16 @@ const MyNotes = () => {
             <main className="w-full relative py-8 px-4 md:px-6">
                 <div className="max-w-7xl mx-auto pb-12">
 
-                    {/* Header */}
+                    {/* Back to Toolkit */}
+                    <button
+                        onClick={() => navigate("/dashboard/smaart-toolkit")}
+                        className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-6 hover:text-[#1a3884] transition-all animate-fade-in"
+                    >
+                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                            <ArrowLeft className="w-4 h-4" />
+                        </div>
+                        Back to Toolkit
+                    </button>
                     {/* Hero Section */}
                     <div className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-8 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.3)] dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 mb-8">
                         <div className="absolute inset-px rounded-[31px] border border-white/60 dark:border-white/5 pointer-events-none" />
@@ -191,13 +205,13 @@ const MyNotes = () => {
                             <div className="space-y-4">
                                 <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50 dark:text-blue-400">
                                     <Sparkles className="h-3 w-3" />
-                                    Personal Productivity
+                                    {t("my_notes.header.badge", "Personal Productivity")}
                                 </div>
                                 <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                                    My <span className="text-[#1a3884] dark:text-blue-500">Notes</span>
+                                    {t("my_notes.header.title_my", "My")} <span className="text-[#1a3884] dark:text-blue-500">{t("my_notes.header.title_notes", "Notes")}</span>
                                 </h1>
                                 <p className="max-w-xl text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-                                    Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.
+                                    {t("my_notes.header.description", "Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.")}
                                 </p>
                             </div>
 
@@ -207,7 +221,7 @@ const MyNotes = () => {
                                     <Input
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Search your library..."
+                                        placeholder={t("my_notes.header.search_placeholder", "Search your library...")}
                                         className="pl-12 h-12 bg-white/80 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-700/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
                                     />
                                 </div>
@@ -216,7 +230,7 @@ const MyNotes = () => {
                                     className="h-12 px-6 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-2xl shadow-lg shadow-blue-500/20 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95"
                                 >
                                     <Plus className="w-5 h-5" />
-                                    <span className="font-bold">New Note</span>
+                                    <span className="font-bold">{t("my_notes.header.new_note", "New Note")}</span>
                                 </Button>
                             </div>
                         </div>
@@ -239,7 +253,7 @@ const MyNotes = () => {
                                     <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#002A5C] flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                                         <Plus className="w-6 h-6 text-slate-400 group-hover:text-blue-500" />
                                     </div>
-                                    <p className="text-slate-500 font-medium group-hover:text-blue-600">Create New Note</p>
+                                    <p className="text-slate-500 font-medium group-hover:text-blue-600">{t("my_notes.grid.create_new", "Create New Note")}</p>
                                 </motion.div>
 
                                 {filteredNotes.map(note => (
@@ -263,7 +277,7 @@ const MyNotes = () => {
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id); }}
                                                 className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors"
-                                                title="Delete note"
+                                                title={t("my_notes.grid.delete_tooltip", "Delete note")}
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -276,7 +290,7 @@ const MyNotes = () => {
 
                     {filteredNotes.length === 0 && searchQuery && (
                         <div className="text-center py-20">
-                            <p className="text-slate-500">No notes found matching "{searchQuery}"</p>
+                            <p className="text-slate-500">{t("my_notes.grid.no_notes_matching", "No notes found matching \"{{query}}\"", { query: searchQuery })}</p>
                         </div>
                     )}
                 </div>
@@ -291,7 +305,7 @@ const MyNotes = () => {
                             {/* Modal Header */}
                             <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/10">
                                 <h2 className="font-bold text-lg text-slate-800 dark:text-white">
-                                    {currentNote.id ? "Edit Note" : "New Note"}
+                                    {currentNote.id ? t("my_notes.editor.edit_title", "Edit Note") : t("my_notes.editor.new_title", "New Note")}
                                 </h2>
                                 <div className="flex gap-2">
                                     {/* Color Picker */}
@@ -315,13 +329,13 @@ const MyNotes = () => {
                             <div className="p-6 flex-1 overflow-y-auto space-y-4">
                                 <input
                                     class="w-full text-2xl font-bold bg-transparent border-none placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none text-slate-800 dark:text-white"
-                                    placeholder="Title"
+                                    placeholder={t("my_notes.editor.placeholder_title", "Title")}
                                     value={currentNote.title}
                                     onChange={(e) => setCurrentNote({ ...currentNote, title: e.target.value })}
                                 />
                                 <textarea
                                     className="w-full h-64 bg-transparent border-none resize-none focus:outline-none text-slate-600 dark:text-slate-300 text-lg leading-relaxed placeholder:text-gray-300 dark:placeholder:text-gray-600"
-                                    placeholder="Start typing..."
+                                    placeholder={t("my_notes.editor.placeholder_content", "Start typing...")}
                                     value={currentNote.content}
                                     onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
                                 />
@@ -331,11 +345,11 @@ const MyNotes = () => {
                             <div className="p-4 border-t border-gray-100 dark:border-white/10 flex justify-between items-center bg-[#F8FAFC] dark:bg-black/20">
                                 <div className="flex items-center gap-4">
                                     <div className="text-xs text-slate-400">
-                                        {currentNote.updatedAt && `Last edited: ${formatDate(currentNote.updatedAt)}`}
+                                        {currentNote.updatedAt && t("my_notes.editor.last_edited", "Last edited: {{date}}", { date: formatDate(currentNote.updatedAt) })}
                                     </div>
                                 </div>
                                 <Button onClick={handleSaveNote} className="bg-[#1a3884] hover:bg-[#132c6b] text-white shadow-md">
-                                    <Save className="w-4 h-4 mr-2" /> Save Note
+                                    <Save className="w-4 h-4 mr-2" /> {t("my_notes.editor.save_note", "Save Note")}
                                 </Button>
                             </div>
                         </div>

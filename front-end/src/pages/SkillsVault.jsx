@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Award, Trophy, BookOpen, Layers, ChevronRight, Download,
     Shield, Star, CheckCircle2, Clock, FileText, Zap, Brain,
-    Upload, Link as LinkIcon, QrCode, Calendar, X, Play, Sparkles
+    Upload, Link as LinkIcon, QrCode, Calendar, X, Play, Sparkles, ArrowLeft
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useUser from "@/hooks/useUser";
@@ -98,6 +98,19 @@ const SkillsVault = () => {
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-[#1a3884]/5 rounded-full blur-[120px]" />
                 <div className="absolute top-[20%] -right-[5%] w-[30%] h-[50%] bg-blue-500/5 rounded-full blur-[130px]" />
+            </div>
+
+            {/* Back Button */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 relative z-20">
+                <button
+                    onClick={() => navigate("/dashboard")}
+                    className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                        <ArrowLeft className="w-4 h-4" />
+                    </div>
+                    {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                </button>
             </div>
 
             <main className="w-full relative z-10 py-6 px-4 sm:px-6 lg:px-8 lg:py-8">

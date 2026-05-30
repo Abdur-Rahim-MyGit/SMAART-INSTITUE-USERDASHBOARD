@@ -66,6 +66,7 @@ exports.getAvatar = async (req, res) => {
     }
 
     // Prepare response with only unlocked items
+    const milestoneData = await avatar.calculateMilestone();
     const response = {
       success: true,
       data: {
@@ -76,6 +77,8 @@ exports.getAvatar = async (req, res) => {
         levelProgress: avatar.levelProgress,
         streak: avatar.streak,
         streakStatus: avatar.getStreakStatus(),
+        averageProgress: milestoneData.averageProgress,
+        milestone: milestoneData.milestone,
         baseModel: avatar.baseModel || DEFAULT_ASSETS.baseModel,
         accessories: {
           shoes: {

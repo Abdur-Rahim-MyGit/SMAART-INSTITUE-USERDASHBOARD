@@ -43,7 +43,7 @@ const Loader = () => {
 };
 
 // Procedural Avatar - Fallback when no GLB is available
-const ProceduralAvatar = ({ accessories = {}, celebrating = false }) => {
+const ProceduralAvatar = ({ accessories = {}, celebrating = false, milestone = 'Beginner' }) => {
   const groupRef = useRef();
   const [hue, setHue] = useState(0);
   
@@ -62,8 +62,11 @@ const ProceduralAvatar = ({ accessories = {}, celebrating = false }) => {
   });
   
   const skinColor = "#f5d6bc";
-  const shirtColor = "#1a3884";
-  const pantsColor = "#002147";
+  const isProfessional = milestone === 'Job-ready/Professional';
+  const shirtColor = isProfessional ? "#ffffff" : "#1a3884";
+  const pantsColor = isProfessional ? "#0f172a" : "#002147";
+  const blazerColor = "#1e293b";
+  const tieColor = "#be123c";
   
   return (
     <group ref={groupRef} position={[0, -0.5, 0]}>
@@ -76,6 +79,50 @@ const ProceduralAvatar = ({ accessories = {}, celebrating = false }) => {
       <Cylinder args={[0.25, 0.3, 0.6, 16]} position={[0, 0.5, 0]}>
         <meshStandardMaterial color={shirtColor} />
       </Cylinder>
+
+      {/* Blazer Overlay for Professional Suit */}
+      {isProfessional && (
+        <group>
+          {/* Left suit jacket flap */}
+          <Box args={[0.12, 0.61, 0.26]} position={[-0.13, 0.5, 0.05]} rotation={[0, -0.1, 0]}>
+            <meshStandardMaterial color={blazerColor} roughness={0.6} />
+          </Box>
+          {/* Right suit jacket flap */}
+          <Box args={[0.12, 0.61, 0.26]} position={[0.13, 0.5, 0.05]} rotation={[0, 0.1, 0]}>
+            <meshStandardMaterial color={blazerColor} roughness={0.6} />
+          </Box>
+          {/* Back of suit jacket */}
+          <Box args={[0.26, 0.61, 0.12]} position={[0, 0.5, -0.1]}>
+            <meshStandardMaterial color={blazerColor} roughness={0.6} />
+          </Box>
+
+          {/* Left Lapel */}
+          <Box args={[0.05, 0.35, 0.04]} position={[-0.09, 0.62, 0.15]} rotation={[0, -0.2, -0.1]}>
+            <meshStandardMaterial color={blazerColor} roughness={0.8} />
+          </Box>
+          {/* Right Lapel */}
+          <Box args={[0.05, 0.35, 0.04]} position={[0.09, 0.62, 0.15]} rotation={[0, 0.2, 0.1]}>
+            <meshStandardMaterial color={blazerColor} roughness={0.8} />
+          </Box>
+
+          {/* Shirt Collar Wings */}
+          <Box args={[0.06, 0.04, 0.04]} position={[-0.07, 0.78, 0.14]} rotation={[0.1, -0.3, -0.2]}>
+            <meshStandardMaterial color="#ffffff" />
+          </Box>
+          <Box args={[0.06, 0.04, 0.04]} position={[0.07, 0.78, 0.14]} rotation={[0.1, 0.3, 0.2]}>
+            <meshStandardMaterial color="#ffffff" />
+          </Box>
+
+          {/* Tie Knot */}
+          <Sphere args={[0.03, 16, 16]} position={[0, 0.72, 0.15]} scale={[1.2, 1, 0.8]}>
+            <meshStandardMaterial color={tieColor} roughness={0.5} />
+          </Sphere>
+          {/* Tie Body */}
+          <Box args={[0.035, 0.3, 0.015]} position={[0, 0.56, 0.16]} rotation={[0.05, 0, 0]}>
+            <meshStandardMaterial color={tieColor} roughness={0.5} />
+          </Box>
+        </group>
+      )}
       
       {/* Legs */}
       <Cylinder args={[0.12, 0.12, 0.5, 16]} position={[-0.12, 0, 0]}>
@@ -86,12 +133,44 @@ const ProceduralAvatar = ({ accessories = {}, celebrating = false }) => {
       </Cylinder>
       
       {/* Arms */}
-      <Cylinder args={[0.08, 0.08, 0.4, 16]} position={[-0.35, 0.5, 0]} rotation={[0, 0, Math.PI / 6]}>
-        <meshStandardMaterial color={skinColor} />
-      </Cylinder>
-      <Cylinder args={[0.08, 0.08, 0.4, 16]} position={[0.35, 0.5, 0]} rotation={[0, 0, -Math.PI / 6]}>
-        <meshStandardMaterial color={skinColor} />
-      </Cylinder>
+      {isProfessional ? (
+        <group>
+          {/* Left sleeve */}
+          <Cylinder args={[0.08, 0.08, 0.35, 16]} position={[-0.32, 0.52, 0]} rotation={[0, 0, Math.PI / 6]}>
+            <meshStandardMaterial color={blazerColor} roughness={0.6} />
+          </Cylinder>
+          {/* Left white cuff */}
+          <Cylinder args={[0.085, 0.085, 0.02, 16]} position={[-0.41, 0.36, 0]} rotation={[0, 0, Math.PI / 6]}>
+            <meshStandardMaterial color="#ffffff" />
+          </Cylinder>
+          {/* Left hand */}
+          <Sphere args={[0.06, 16, 16]} position={[-0.43, 0.33, 0]}>
+            <meshStandardMaterial color={skinColor} />
+          </Sphere>
+
+          {/* Right sleeve */}
+          <Cylinder args={[0.08, 0.08, 0.35, 16]} position={[0.32, 0.52, 0]} rotation={[0, 0, -Math.PI / 6]}>
+            <meshStandardMaterial color={blazerColor} roughness={0.6} />
+          </Cylinder>
+          {/* Right white cuff */}
+          <Cylinder args={[0.085, 0.085, 0.02, 16]} position={[0.41, 0.36, 0]} rotation={[0, 0, -Math.PI / 6]}>
+            <meshStandardMaterial color="#ffffff" />
+          </Cylinder>
+          {/* Right hand */}
+          <Sphere args={[0.06, 16, 16]} position={[0.43, 0.33, 0]}>
+            <meshStandardMaterial color={skinColor} />
+          </Sphere>
+        </group>
+      ) : (
+        <group>
+          <Cylinder args={[0.08, 0.08, 0.4, 16]} position={[-0.35, 0.5, 0]} rotation={[0, 0, Math.PI / 6]}>
+            <meshStandardMaterial color={skinColor} />
+          </Cylinder>
+          <Cylinder args={[0.08, 0.08, 0.4, 16]} position={[0.35, 0.5, 0]} rotation={[0, 0, -Math.PI / 6]}>
+            <meshStandardMaterial color={skinColor} />
+          </Cylinder>
+        </group>
+      )}
       
       {/* Hair */}
       <Sphere args={[0.36, 16, 16]} position={[0, 1.2, 0]} scale={[1, 0.5, 1]}>
@@ -124,8 +203,8 @@ const ProceduralAvatar = ({ accessories = {}, celebrating = false }) => {
         </>
       )}
       
-      {/* Jacket - if unlocked */}
-      {accessories.jacket?.equipped && (
+      {/* Jacket - if unlocked (only if not professional) */}
+      {!isProfessional && accessories.jacket?.equipped && (
         <Cylinder args={[0.28, 0.33, 0.62, 16]} position={[0, 0.5, 0]}>
           <meshStandardMaterial color="#1a1a1a" />
         </Cylinder>
@@ -310,7 +389,8 @@ const Avatar3D = ({
       jacket: { unlocked: false, equipped: false, modelUrl: null },
       glasses: { unlocked: false, equipped: false, modelUrl: null }
     },
-    currentAnimation = 'idle'
+    currentAnimation = 'idle',
+    milestone = 'Beginner'
   } = avatarData;
   
   // Check if we have a valid GLB model URL
@@ -373,6 +453,7 @@ const Avatar3D = ({
             <ProceduralAvatar 
               accessories={accessories} 
               celebrating={celebrating}
+              milestone={milestone}
             />
           )}
           
