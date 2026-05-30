@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Target, Flag, ArrowRight, Loader2, Star, Sparkles } from "lucide-react";
+import { RiTargetLine, RiFlagLine, RiArrowRightLine, RiLoader4Line, RiStarLine, RiSparklingLine } from "@remixicon/react";
 import { getActiveVision } from "@/features/visionBoard/services/visionBoardProApi";
 import { useNavigate } from "react-router-dom";
 
@@ -28,7 +28,7 @@ const VisionGoalsWidget = () => {
   if (loading) {
     return (
       <div className="w-full h-64 bg-[#F8FAFC] dark:bg-slate-900/40 rounded-[32px] animate-pulse flex flex-col items-center justify-center border border-slate-100 dark:border-white/8">
-        <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+        <RiLoader4Line className="w-10 h-10 text-primary animate-spin mb-4" />
         <p className="text-slate-400 font-bold tracking-wide uppercase text-xs">Syncing your vision...</p>
       </div>
     );
@@ -50,7 +50,7 @@ const VisionGoalsWidget = () => {
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex-1 text-center md:text-left">
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 mb-8">
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              <RiSparklingLine className="w-4 h-4 text-amber-400" />
               <span className="text-amber-400 font-black uppercase tracking-[0.2em] text-[10px]">Set Your Intentions</span>
             </div>
             <h3 className="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-4 leading-tight tracking-tight">
@@ -65,7 +65,7 @@ const VisionGoalsWidget = () => {
             className="group/btn relative overflow-hidden px-10 py-5 bg-white text-navy font-black rounded-2xl shadow-2xl transition-all hover:scale-[1.02] active:scale-95 flex items-center gap-4 shrink-0"
           >
             <span className="relative z-10 uppercase tracking-widest text-xs">Create Vision Board</span>
-            <ArrowRight className="w-5 h-5 relative z-10 group-hover/btn:translate-x-1.5 transition-transform" />
+            <RiArrowRightLine className="w-5 h-5 relative z-10 group-hover/btn:translate-x-1.5 transition-transform" />
             <div className="absolute inset-0 bg-gradient-to-r from-white to-slate-50 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
           </button>
         </div>
@@ -104,7 +104,7 @@ const VisionGoalsWidget = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 dark:bg-blue-500/10 border border-primary/10 dark:border-blue-500/20 mb-6">
-              <Star className="w-3.5 h-3.5 text-primary dark:text-blue-400 fill-primary dark:fill-blue-400" />
+              <RiStarLine className="w-3.5 h-3.5 text-primary dark:text-blue-400" />
               <span className="text-primary dark:text-blue-400 font-black uppercase tracking-[0.2em] text-[10px]">Active Vision</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-3 leading-tight">
@@ -123,7 +123,7 @@ const VisionGoalsWidget = () => {
               onClick={() => navigate('/vision-board-pro/gallery')}
               className="group flex items-center gap-2.5 px-6 py-3 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] hover:border-slate-300 dark:hover:border-slate-600 transition-all active:scale-95 shadow-sm hover:shadow-lg"
             >
-              Gallery <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+              Gallery <RiArrowRightLine className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
             </button>
           </div>
         </div>
@@ -156,7 +156,7 @@ const VisionGoalsWidget = () => {
               </div>
             ) : (
                <div className="w-full aspect-square max-w-[320px] mx-auto rounded-3xl bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-300 dark:border-white/10 flex flex-col items-center justify-center p-8 text-center">
-                  <Star className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
+                  <RiStarLine className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
                   <button onClick={handleEdit} className="px-4 py-2 bg-[#1a3884] text-white rounded-full text-sm font-bold shadow-md hover:bg-blue-800 transition-colors">
                     Create Design
                   </button>
@@ -172,7 +172,7 @@ const VisionGoalsWidget = () => {
             
             <div className="flex items-center gap-5 mb-8">
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center shadow-inner ring-1 ring-primary/10">
-                <Target className="w-7 h-7 text-primary" />
+                <RiTargetLine className="w-7 h-7 text-primary" />
               </div>
               <div>
                 <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Short Term</h3>
@@ -210,7 +210,7 @@ const VisionGoalsWidget = () => {
             
             <div className="flex items-center gap-5 mb-8">
               <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center shadow-inner ring-1 ring-emerald-500/10">
-                <Flag className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+                <RiFlagLine className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
                 <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">Long Term</h3>

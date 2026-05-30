@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import Confetti from 'react-confetti';
 
-const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onNext, nextLabel = "Next Lesson" }, ref) => {
+const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initialMaxTime = 0, initialCompleted = false, autoPlay = false, onProgressUpdate, onTimeUpdate, onNext, nextLabel = "Next Lesson" }, ref) => {
 
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -84,6 +84,9 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
 
     const handleTimeUpdate = () => {
       setCurrentTime(video.currentTime);
+      if (onTimeUpdate) {
+        onTimeUpdate(video.currentTime, video.duration || 0);
+      }
       if (video.currentTime > maxTimeReached) {
         setMaxTimeReached(video.currentTime);
       }
@@ -152,7 +155,7 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
       video.removeEventListener('error', handleError);
       video.removeEventListener('ended', handleEnded);
     };
-  }, [maxTimeReached, isCompleted]);
+  }, [maxTimeReached, isCompleted, onTimeUpdate]);
 
   // Handle lesson switching
   useEffect(() => {

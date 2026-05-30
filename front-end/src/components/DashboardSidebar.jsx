@@ -11,7 +11,7 @@ import {
   Zap,
   Brain,
   Wallet,
-  Home,
+  LayoutDashboard,
   Settings,
   HelpCircle,
   Bell,
@@ -37,7 +37,7 @@ import whiteLogo from "@/assets/white.png";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const menuItems = [
-  { icon: Home, label: "Home", path: "/dashboard" },
+  { icon: LayoutDashboard, label: "Home", path: "/dashboard" },
   { icon: BookOpen, label: "My Courses", path: "/dashboard/courses" },
   { icon: Brain, label: "Assessment Centre", path: "/dashboard/assessment-centre" },
   { icon: Lightbulb, label: "Vision Boards", path: "/dashboard/vision-boards" },

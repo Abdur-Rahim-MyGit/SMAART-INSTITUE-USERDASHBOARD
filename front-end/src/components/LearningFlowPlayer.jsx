@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
+import SyncedTranscript from "@/components/SyncedTranscript";
+import { DEMO_VIDEO_URL, resolveLessonTranscriptUrl } from "@/constants/demoMedia";
 import MCQPractice from "@/components/MCQPractice";
 import FlashcardTask from "@/components/FlashcardTask";
 import AdvancedPractice from "@/components/AdvancedPractice";
@@ -43,6 +45,8 @@ const LearningFlowPlayer = ({
   const { courseId: urlCourseId } = useParams();
   const [activeStep, setActiveStep] = useState('A');
   const [completedSteps, setCompletedSteps] = useState({});
+  const [currentVideoTime, setCurrentVideoTime] = useState(0);
+  const videoPlayerRef = useRef(null);
 
   const steps = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
   const stepMetadata = {
@@ -58,6 +62,10 @@ const LearningFlowPlayer = ({
 
   const currentStepData = learningFlow?.steps?.[activeStep];
 
+  useEffect(() => {
+    setCurrentVideoTime(0);
+  }, [activeStep, selectedModule, selectedDay]);
+
   // Load completion status from parent's map
   useEffect(() => {
     const newCompleted = {};
@@ -68,6 +76,7 @@ const LearningFlowPlayer = ({
       }
     });
     setCompletedSteps(newCompleted);
+    setCurrentVideoTime(0);
 
     // Auto-select first incomplete step
     const firstIncomplete = steps.find(step => !videoCompletionMap[`${selectedModule}-${selectedDay}-${step}`]);
@@ -101,8 +110,10 @@ const LearningFlowPlayer = ({
           <div className="space-y-6">
             <div className="bg-white dark:bg-[#002147] rounded-2xl shadow-lg overflow-hidden border border-slate-200 dark:border-white/8">
               <CustomVideoPlayer
-                videoUrl={currentStepData.videoUrl || 'https://www.w3schools.com/html/mov_bbb.mp4'}
+                ref={videoPlayerRef}
+                videoUrl={currentStepData.videoUrl || DEMO_VIDEO_URL}
                 title={`${activeStep}: ${currentStepData.title}`}
+                onTimeUpdate={(time) => setCurrentVideoTime(time)}
                 onProgressUpdate={(time, completed, duration) => {
                   if (completed) handleStepComplete(activeStep);
                   if (onVideoProgressUpdate) {
@@ -118,6 +129,14 @@ const LearningFlowPlayer = ({
                 nextLabel={`Continue to ${nextStep ? stepMetadata[nextStep].title : 'Next'}`}
                 initialCompleted={completedSteps[activeStep]}
               />
+              <div className="p-4 sm:p-5 border-t border-slate-200 dark:border-white/8 bg-[#F8FAFC] dark:bg-[#00152E]">
+                <SyncedTranscript
+                  currentTime={currentVideoTime}
+                  transcriptUrl={resolveLessonTranscriptUrl(currentStepData)}
+                  transcriptText={currentStepData.transcriptText || currentStepData.transcription}
+                  onCueClick={(time) => videoPlayerRef.current?.seekTo(time)}
+                />
+              </div>
             </div>
             <Card className="border-none shadow-sm bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
               <CardContent className="p-6">

@@ -34,22 +34,65 @@ const CareerAgentDashboard = () => {
         setShowSelectionFlow(true);
     };
 
-    const handleFinalizeLock = () => {
+    const handleFinalizeLock = async () => {
         // "Not Interested" is handled immediately on button click (navigates directly).
         // This function only runs when user has marked all paths as "Interested" and clicks Confirm.
+        const { primary = {}, secondary = {}, tertiary = {} } = data || {};
+        const _draft = (() => { try { return JSON.parse(localStorage.getItem('smaart_onboarding_draft') || '{}'); } catch { return {}; } })();
+        const _dp = _draft?.preferences || {};
+        
+        const prefPrimary   = primary?.direction?.directionName   || localStorage.getItem('smaart_pref_primary')   || _dp.primary?.careerDirectionName   || _dp.primary?.role   || primary?.tab1?.role_name   || 'Primary';
+        const prefSecondary = secondary?.direction?.directionName || localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
+        const prefTertiary  = tertiary?.direction?.directionName  || localStorage.getItem('smaart_pref_tertiary')  || _dp.tertiary?.careerDirectionName  || _dp.tertiary?.role  || tertiary?.tab1?.role_name  || 'Tertiary';
+
         const newlyLocked = [];
         if (selectionStates.primary === 'interested')   newlyLocked.push(prefPrimary);
         if (selectionStates.secondary === 'interested') newlyLocked.push(prefSecondary);
         if (selectionStates.tertiary === 'interested')  newlyLocked.push(prefTertiary);
 
-        setLockedRoles(newlyLocked);
-        setShowSelectionFlow(false);
-        setShowWelcome(true);
-        setTimeout(() => setShowWelcome(false), 3200);
+        try {
+            const res = await fetch('/api/career-agent/final-pathway/lock', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include'
+            });
+            if (res.ok) {
+                setLockedRoles(newlyLocked);
+                setShowSelectionFlow(false);
+                setShowWelcome(true);
+                setTimeout(() => setShowWelcome(false), 3200);
+            } else {
+                console.error('Failed to lock final pathway in database');
+                setLockedRoles(newlyLocked);
+                setShowSelectionFlow(false);
+            }
+        } catch (e) {
+            console.error('Error locking final pathway:', e);
+            setLockedRoles(newlyLocked);
+            setShowSelectionFlow(false);
+        }
     };
 
     useEffect(() => {
-        const loadAnalysis = async () => {
+        const loadAnalysisAndLockStatus = async () => {
+            // Fetch final pathway lock status first
+            try {
+                const lockRes = await fetch('/api/career-agent/final-pathway', { credentials: 'include' });
+                if (lockRes.ok) {
+                    const lockPayload = await lockRes.json();
+                    if (lockPayload.found && lockPayload.is_locked) {
+                        const locked = [];
+                        if (lockPayload.primary_role) locked.push(lockPayload.primary_role);
+                        if (lockPayload.secondary_role) locked.push(lockPayload.secondary_role);
+                        if (lockPayload.tertiary_role) locked.push(lockPayload.tertiary_role);
+                        setLockedRoles(locked.length > 0 ? locked : ['Locked Pathway']);
+                        setSelectionStates({ primary: 'interested', secondary: 'interested', tertiary: 'interested' });
+                    }
+                }
+            } catch (e) {
+                console.warn('[Dashboard] Failed to fetch final pathway lock status:', e.message);
+            }
+
             try {
                 // 1️⃣ Try to load from MongoDB (per-user, persists across devices)
                 const res = await fetch('/api/career-agent/my-analysis', { credentials: 'include' });
@@ -83,7 +126,7 @@ const CareerAgentDashboard = () => {
             }
         };
 
-        loadAnalysis();
+        loadAnalysisAndLockStatus();
     }, [navigate]);
 
     // FIX: Direction Overview shows empty because the 'direction' field is missing from saved analyses.
@@ -200,6 +243,16 @@ const CareerAgentDashboard = () => {
     const prefPrimary   = primary?.direction?.directionName   || localStorage.getItem('smaart_pref_primary')   || _dp.primary?.careerDirectionName   || _dp.primary?.role   || primary?.tab1?.role_name   || 'Primary';
     const prefSecondary = secondary?.direction?.directionName || localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
     const prefTertiary  = tertiary?.direction?.directionName  || localStorage.getItem('smaart_pref_tertiary')  || _dp.tertiary?.careerDirectionName  || _dp.tertiary?.role  || tertiary?.tab1?.role_name  || 'Tertiary';
+
+    const userStr = sessionStorage.getItem("user");
+    const user = userStr ? JSON.parse(userStr) : null;
+    const displayName = user?.fullName || user?.name || localStorage.getItem('smaart_student_name') || 'Student';
+    const displayEmail = user?.email || localStorage.getItem('smaart_student_email') || '';
+    const regDate = user?.createdAt || user?.registrationDate || new Date();
+    const diffTime = Date.now() - new Date(regDate).getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const remainingDays = 14 - diffDays;
+    const showLockWarningBanner = lockedRoles.length === 0;
 
     // Build allDirections array for MarketIntelligence — includes roles from each direction
     const buildDirRoles = (roleData) => {
@@ -425,9 +478,9 @@ const CareerAgentDashboard = () => {
                     <div>
                         <div className="dash-name">{t('career_agent.header.title_start', 'Career ')}<span>{t('career_agent.header.title_span', 'Intelligence')}</span>{t('career_agent.header.title_end', ' Report')}</div>
                         <div className="dash-meta">
-                            <span>{t('career_agent.header.candidate', 'CANDIDATE:')} {localStorage.getItem('smaart_student_name') || 'Student'}</span>
+                            <span>{t('career_agent.header.candidate', 'CANDIDATE:')} {displayName}</span>
                             <span>|</span>
-                            <span>{localStorage.getItem('smaart_student_email')}</span>
+                            <span>{displayEmail}</span>
                         </div>
                     </div>
                     <div className="dash-actions">
@@ -500,6 +553,73 @@ const CareerAgentDashboard = () => {
                     </button>
                 </div>
             </header>
+
+            {/* Lock path warning/alert banner */}
+            {showLockWarningBanner && (
+                <div style={{
+                    margin: '0.5rem 2rem 1.25rem 2rem',
+                    padding: '1rem 1.5rem',
+                    borderRadius: '16px',
+                    background: remainingDays <= 0 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid',
+                    borderColor: remainingDays <= 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)',
+                    color: remainingDays <= 0 ? '#EF4444' : '#F59E0B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '1rem',
+                    flexWrap: 'wrap',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{
+                            padding: '0.5rem',
+                            borderRadius: '12px',
+                            background: remainingDays <= 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: remainingDays <= 0 ? '#EF4444' : '#F59E0B'
+                        }}>
+                            {remainingDays <= 0 ? <Bot size={20} /> : <Compass size={20} />}
+                        </div>
+                        <div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                {remainingDays <= 0 ? 'Urgent Career Lock Needed' : 'Action Required: Lock Career Path'}
+                            </div>
+                            <div style={{ fontSize: '0.78rem', opacity: 0.85, marginTop: '0.15rem', color: 'var(--text)' }}>
+                                {remainingDays <= 0
+                                    ? 'Still not set your Career Path! You have exceeded the 14-day limit. Please select and lock your path immediately.'
+                                    : `You have ${remainingDays} day${remainingDays !== 1 ? 's' : ''} left to select and lock your career path.`
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setShowSelectionFlow(true)}
+                        style={{
+                            padding: '0.6rem 1.25rem',
+                            borderRadius: '12px',
+                            background: remainingDays <= 0 ? '#EF4444' : '#F59E0B',
+                            color: 'white',
+                            border: 'none',
+                            fontWeight: 800,
+                            fontSize: '0.75rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            boxShadow: remainingDays <= 0 ? '0 4px 12px rgba(239, 68, 68, 0.3)' : '0 4px 12px rgba(245, 158, 11, 0.3)',
+                            transition: 'all 0.2s',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                    >
+                        <Lock size={12} />
+                        <span>Lock Career Path Now</span>
+                    </button>
+                </div>
+            )}
 
             <div className="dash-body">
                 <aside className="sidebar">

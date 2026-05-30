@@ -3,7 +3,30 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { assessmentApi } from "@/services/assessmentApi";
-import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase, RefreshCw, ArrowLeft } from "lucide-react";
+import {
+  RiCheckboxCircleLine as CheckCircle2,
+  RiCloseCircleLine as XCircle,
+  RiTargetLine as Target,
+  RiAlertLine as AlertTriangle,
+  RiLockLine as Lock,
+  RiDownloadLine as Download,
+  RiLineChartLine as TrendingUp,
+  RiAwardLine as Award,
+  RiSparklingLine as Sparkles,
+  RiBrainLine as Brain,
+  RiGroupLine as Users,
+  RiBookOpenLine as BookOpen,
+  RiHeartLine as Heart,
+  RiComputerLine as Monitor,
+  RiFlashlightLine as Zap,
+  RiShieldCheckLine as ShieldCheck,
+  RiTrophyLine as Trophy,
+  RiBarChartBoxLine as BarChart3,
+  RiPlantLine as Sprout,
+  RiBriefcaseLine as Briefcase,
+  RiRefreshLine as RefreshCw,
+  RiArrowLeftLine as ArrowLeft
+} from "@remixicon/react";
 import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";

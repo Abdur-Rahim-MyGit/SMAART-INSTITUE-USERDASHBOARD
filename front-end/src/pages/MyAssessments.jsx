@@ -2,9 +2,20 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
-  Award, Target, X, CheckCircle2, Download, Shield, Share2,
-  BarChart2, MapPin, Briefcase, Calendar, CheckCircle, ArrowLeft
-} from "lucide-react";
+  RiAwardLine as Award,
+  RiTargetLine as Target,
+  RiCloseLine as X,
+  RiCheckboxCircleLine as CheckCircle2,
+  RiDownloadLine as Download,
+  RiShieldCheckLine as Shield,
+  RiShareLine as Share2,
+  RiBarChartLine as BarChart2,
+  RiMapPinLine as MapPin,
+  RiBriefcaseLine as Briefcase,
+  RiCalendarLine as Calendar,
+  RiCheckboxCircleLine as CheckCircle,
+  RiArrowLeftLine as ArrowLeft
+} from "@remixicon/react";
 import AssessmentBanner from "@/components/AssessmentBanner";
 import { assessmentApi } from "@/services/assessmentApi";
 import { generateAssessmentReport } from "@/utils/reportGenerator";

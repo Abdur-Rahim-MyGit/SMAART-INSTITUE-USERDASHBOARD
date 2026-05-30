@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Keyboard, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Globe2, X } from "lucide-react";
+import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Keyboard, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Globe2, X, Lock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -380,6 +380,42 @@ const DashboardLayout = () => {
   ];
   const activeLanguageCode = (i18n.resolvedLanguage || i18n.language || 'en').split('-')[0];
   const activeLanguage = languageOptions.find((lang) => lang.code === activeLanguageCode) || languageOptions[0];
+
+  const [showCareerLockWarning, setShowCareerLockWarning] = useState(false);
+  const [careerLockDaysRemaining, setCareerLockDaysRemaining] = useState(14);
+
+  useEffect(() => {
+    const checkCareerLockStatus = async () => {
+      if (!user) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/career-agent/final-pathway`, { credentials: 'include' });
+        let isLocked = false;
+        if (res.ok) {
+          const payload = await res.json();
+          if (payload.found && payload.is_locked) {
+            isLocked = true;
+          }
+        }
+        
+        if (!isLocked) {
+          // Calculate remaining days based on user.createdAt
+          const regDate = user.createdAt || user.registrationDate || new Date();
+          const diffTime = Date.now() - new Date(regDate).getTime();
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+          const remaining = 14 - diffDays;
+          
+          setCareerLockDaysRemaining(remaining);
+          setShowCareerLockWarning(true);
+        } else {
+          setShowCareerLockWarning(false);
+        }
+      } catch (err) {
+        console.error('Error checking career lock status:', err);
+      }
+    };
+
+    checkCareerLockStatus();
+  }, [user, location.pathname]);
 
   const handleMouseEnter = () => {
     if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);

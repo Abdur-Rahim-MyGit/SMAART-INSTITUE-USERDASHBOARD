@@ -26,7 +26,21 @@ const resumeApi = {
     // Delete resume
     deleteResume: (id) => apiCall(`/resumes/${id}`, { 
         method: 'DELETE' 
-    })
+    }),
+
+    // Register secure export (rate limited server-side)
+    issueExport: (id) => apiCall(`/resumes/${id}/export`, {
+        method: 'POST',
+        body: JSON.stringify({}),
+    }),
+
+    // Public verification lookup
+    verifyResume: (resumePublicId, fingerprint) => {
+        const query = fingerprint ? `?h=${encodeURIComponent(fingerprint)}` : '';
+        return apiCall(`/resumes/verify/${encodeURIComponent(resumePublicId)}${query}`, {
+            method: 'GET',
+        });
+    },
 };
 
 export default resumeApi;

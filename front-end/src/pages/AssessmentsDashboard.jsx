@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
-    ArrowRight,
-    Award,
-    Brain,
-    CheckCircle2,
-    ChevronRight,
-    Clock,
-    Eye,
-    FileText,
-    Info,
-    Layers,
-    Play,
-    RotateCcw,
-    TrendingUp,
-} from "lucide-react";
+    RiArrowRightLine as ArrowRight,
+    RiAwardLine as Award,
+    RiBrainLine as Brain,
+    RiCheckboxCircleLine as CheckCircle2,
+    RiArrowRightSLine as ChevronRight,
+    RiTimeLine as Clock,
+    RiCloseLine as CloseIcon,
+    RiEyeLine as Eye,
+    RiFileListLine as FileText,
+    RiInformationLine as Info,
+    RiStackLine as Layers,
+    RiPlayFill as Play,
+    RiRestartLine as RotateCcw,
+    RiLineChartLine as TrendingUp,
+} from "@remixicon/react";
 import { assessmentApi } from "@/services/assessmentApi";
 import PageHero from "@/components/ui/PageHero";
 import { toast } from "sonner";
@@ -82,6 +83,8 @@ const AssessmentsDashboard = () => {
     const { t } = useTranslation();
     const [stageStatus, setStageStatus] = useState({});
     const [loading, setLoading] = useState(true);
+    const [selectedStage, setSelectedStage] = useState(null);
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     useEffect(() => {
         const fetchStatus = async () => {
@@ -157,7 +160,8 @@ const AssessmentsDashboard = () => {
             return;
         }
 
-        navigate(`/assessment/${stage.key}`);
+        setSelectedStage(stage);
+        setAgreedToTerms(false);
     };
 
     return (
@@ -203,82 +207,166 @@ const AssessmentsDashboard = () => {
                                 ))}
                             </div>
                         )}
-
-                        <GuidelinesSection />
                     </motion.section>
                 </div>
             </main>
+
+            {/* Assessment Guidelines popup modal */}
+            <AnimatePresence>
+                {selectedStage && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelectedStage(null)}
+                            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
+                        />
+
+                        {/* Modal container */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            transition={{ type: "spring", duration: 0.5, bounce: 0.15 }}
+                            className="relative z-10 w-full max-w-2xl overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-[#002147] flex flex-col max-h-[90vh]"
+                        >
+                            {/* Modal Header */}
+                            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5 dark:border-slate-800/80">
+                                <div>
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-[#003170] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a3884] dark:text-blue-300">
+                                        {t("assessments_dashboard.modal_badge", "Assessment Gate")}
+                                    </span>
+                                    <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-xl">
+                                        {t(`assessments_dashboard.stages.${selectedStage.key}.title`, selectedStage.title)}
+                                    </h3>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedStage(null)}
+                                    className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#002A5C] dark:hover:text-slate-200 transition-colors"
+                                >
+                                    <CloseIcon className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            {/* Modal Body */}
+                            <div className="overflow-y-auto px-6 py-6 sm:px-8 space-y-6 max-h-[calc(100vh-250px)]">
+                                {/* Stage description & summary */}
+                                <div className="rounded-2xl border border-slate-100 bg-[#F8FAFC] p-5 dark:border-white/10 dark:bg-slate-800/40">
+                                    <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-350">
+                                        {t(`assessments_dashboard.stages.${selectedStage.key}.description`, selectedStage.description)}
+                                    </p>
+                                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                                        <InfoChip icon={FileText} label={`${selectedStage.totalQuestions} ${t("assessments_dashboard.questions", "Qs")}`} />
+                                        <InfoChip icon={Clock} label={selectedStage.duration.replace("min", t("assessments_dashboard.min", "min"))} />
+                                    </div>
+                                </div>
+
+                                {/* Protocol & Guidelines section inside modal */}
+                                <div className="space-y-4">
+                                    <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-300">
+                                        {t("assessments_dashboard.guidelines_title", "Assessment Protocol & Guidelines")}
+                                    </h4>
+
+                                    <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
+                                        {[
+                                            {
+                                                key: "dynamic_questions",
+                                                title: "DYNAMIC QUESTIONS",
+                                                desc: "Each stage contains unique questions assessing all 6 quotients.",
+                                            },
+                                            {
+                                                key: "real_time_persistence",
+                                                title: "REAL-TIME PERSISTENCE",
+                                                desc: "Answers are saved in real-time - resume anytime if disconnected.",
+                                            },
+                                            {
+                                                key: "single_attempt",
+                                                title: "SINGLE ATTEMPT",
+                                                desc: "Retakes are not allowed by default. Contact admin for exceptions.",
+                                            },
+                                            {
+                                                key: "integrity_monitoring",
+                                                title: "INTEGRITY MONITORING",
+                                                desc: "Screen recording, copy-paste and tab-switching are monitored.",
+                                            },
+                                        ].map((item) => (
+                                            <div key={item.key} className="flex gap-3">
+                                                <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#1a3884] dark:bg-blue-400" />
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-700 dark:text-slate-300">
+                                                        {t(`assessments_dashboard.${item.key}_title`, item.title)}
+                                                    </p>
+                                                    <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                                        {t(`assessments_dashboard.${item.key}_desc`, item.desc)}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Checkbox agreement */}
+                                <div className="border-t border-slate-100 pt-5 dark:border-slate-800">
+                                    <label className="relative flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:bg-slate-100/50 dark:border-white/10 dark:bg-[#002A5C]/40 dark:hover:bg-[#002A5C]/60">
+                                        <input
+                                            type="checkbox"
+                                            checked={agreedToTerms}
+                                            onChange={(e) => setAgreedToTerms(e.target.checked)}
+                                            className="peer sr-only"
+                                        />
+                                        {/* Custom checkbox box */}
+                                        <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border border-slate-300 bg-white text-white transition-all peer-checked:border-[#1a3884] peer-checked:bg-[#1a3884] dark:border-slate-600 dark:bg-slate-800 dark:peer-checked:border-blue-500 dark:peer-checked:bg-blue-500 shadow-sm">
+                                            <svg
+                                                className={`h-3 w-3 stroke-current stroke-[3.5px] transition-opacity duration-200 ${agreedToTerms ? "opacity-100" : "opacity-0"}`}
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                            >
+                                                <polyline points="20 6 9 17 4 12" />
+                                            </svg>
+                                        </div>
+                                        <span className="text-xs font-semibold leading-relaxed text-slate-700 dark:text-slate-300 selection:bg-transparent">
+                                            {t("assessments_dashboard.terms_checkbox", "I have read the protocols and guidelines, and I agree to proceed with the assessment and integrity monitoring.")}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Modal Footer */}
+                            <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-[#F8FAFC] px-6 py-5 dark:border-slate-800/80 dark:bg-slate-900/60">
+                                <button
+                                    onClick={() => setSelectedStage(null)}
+                                    className="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-xs sm:text-sm font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-[#002147] dark:text-slate-300 dark:hover:bg-[#002A5C] transition-all"
+                                >
+                                    {t("common.cancel", "Cancel")}
+                                </button>
+                                <button
+                                    disabled={!agreedToTerms}
+                                    onClick={() => {
+                                        const stageKey = selectedStage.key;
+                                        setSelectedStage(null);
+                                        navigate(`/assessment/${stageKey}`);
+                                    }}
+                                    className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md transition-all duration-300 ${
+                                        agreedToTerms
+                                            ? "bg-[#1a3884] hover:bg-[#002147] hover:shadow-lg cursor-pointer hover:-translate-y-0.5"
+                                            : "bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed shadow-none"
+                                    }`}
+                                >
+                                    <Play className="h-4 w-4 fill-white" />
+                                    {t("assessments_dashboard.start_stage", "Start Stage Assessment")}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
 
-const GuidelinesSection = () => {
-    const { t } = useTranslation();
-
-    return (
-        <motion.div
-            {...fadeUp}
-            className="group relative overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm dark:border-slate-700/70 dark:bg-[#002147]"
-        >
-            <div className="relative z-10 flex flex-col items-start gap-8 p-6 sm:p-8 lg:flex-row lg:gap-10 lg:p-9">
-                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-[22px] border border-slate-100 bg-[#F8FAFC] text-[#1a3884] shadow-sm dark:border-white/8 dark:bg-slate-800/50 dark:text-blue-300">
-                    <Info className="h-8 w-8" />
-                </div>
-
-                <div className="flex-1 space-y-4 sm:space-y-6">
-                    <h4 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-2xl">
-                        {t("assessments_dashboard.guidelines_title", "Assessment Protocol & Guidelines")}
-                    </h4>
-
-                    <div className="grid gap-x-8 gap-y-4 sm:gap-y-6 sm:grid-cols-2">
-                        {[
-                            {
-                                key: "dynamic_questions",
-                                title: "DYNAMIC QUESTIONS",
-                                desc: "Each stage contains unique questions assessing all 6 quotients.",
-                            },
-                            {
-                                key: "real_time_persistence",
-                                title: "REAL-TIME PERSISTENCE",
-                                desc: "Answers are saved in real-time - resume anytime if disconnected.",
-                            },
-                            {
-                                key: "single_attempt",
-                                title: "SINGLE ATTEMPT",
-                                desc: "Retakes are not allowed by default. Contact admin for exceptions.",
-                            },
-                            {
-                                key: "integrity_monitoring",
-                                title: "INTEGRITY MONITORING",
-                                desc: "Screen recording, copy-paste and tab-switching are monitored.",
-                            },
-                        ].map((item, index) => (
-                            <motion.div
-                                key={item.key}
-                                initial={{ opacity: 0, y: 12 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, amount: 0.4 }}
-                                transition={{ delay: index * 0.06, duration: 0.35 }}
-                                whileHover={{ x: 2 }}
-                                className="flex gap-3 sm:gap-4"
-                            >
-                                <div className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#1a3884]" />
-                                <div className="space-y-1">
-                                    <p className="text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-slate-700 dark:text-slate-300">
-                                        {t(`assessments_dashboard.${item.key}_title`, item.title)}
-                                    </p>
-                                    <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-                                        {t(`assessments_dashboard.${item.key}_desc`, item.desc)}
-                                    </p>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-        </motion.div>
-    );
-};
+// GuidelinesSection component has been removed as it is now integrated into the start assessment modal gate
 
 const StageCard = ({ stage, index, completed, stageData, onAction }) => {
     const { t } = useTranslation();

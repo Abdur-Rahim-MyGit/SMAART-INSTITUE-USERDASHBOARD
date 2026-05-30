@@ -21,6 +21,8 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const AddDetails = lazy(() => import('@/pages/AddDetails'));
 const ModuleViewPage = lazy(() => import('@/pages/ModuleViewPage'));
 const CoursePlayer = lazy(() => import('@/pages/CoursePlayer'));
+const MicroAssessmentList = lazy(() => import('@/pages/MicroAssessmentList'));
+const MicroAssessmentPlayer = lazy(() => import('@/pages/MicroAssessmentPlayer'));
 const QuotientsGrid = lazy(() => import('@/pages/QuotientsGrid'));
 const VisionBoardGalleryPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardGalleryPro'));
 const VisionBoardEditorPro = lazy(() => import('@/features/visionBoard/pages/VisionBoardEditorPro'));
@@ -45,12 +47,16 @@ const Help = lazy(() => import('@/pages/Help'));
 const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));
+const VerifyPassport = lazy(() => import('@/pages/VerifyPassport'));
+const VerifyResume = lazy(() => import('@/pages/VerifyResume'));
 const VerifyBadge = lazy(() => import('@/components/badges/VerifyBadge'));
 const Badges = lazy(() => import('@/pages/Badges'));
 const Performance = lazy(() => import('@/pages/Performance'));
 const SkillsVault = lazy(() => import('@/pages/SkillsVault'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
 const Legal = lazy(() => import('@/pages/Legal'));
+const AdminCourses = lazy(() => import('@/pages/AdminCourses'));
+const AdminCourseForm = lazy(() => import('@/pages/AdminCourseForm'));
 
 
 // Career Agent (Integrated from Career-Agent standalone system)
@@ -103,6 +109,10 @@ const AnimatedRoutes = () => {
                     <Route path="/login" element={<Institution />} />
                     <Route path="/verify-certificate" element={<VerifyCertificate />} />
                     <Route path="/verify-certificate/:certificateId" element={<VerifyCertificate />} />
+                    <Route path="/verify-passport" element={<VerifyPassport />} />
+                    <Route path="/verify-passport/:passportId" element={<VerifyPassport />} />
+                    <Route path="/verify-resume" element={<VerifyResume />} />
+                    <Route path="/verify-resume/:resumeId" element={<VerifyResume />} />
                     <Route path="/verify-badge" element={<VerifyBadge />} />
                     <Route path="/verify-badge/:badgeId" element={<VerifyBadge />} />
                     <Route path="/legal" element={<Legal />} />
@@ -135,6 +145,8 @@ const AnimatedRoutes = () => {
                         <Route path="/dashboard/assessments" element={<Navigate to="/dashboard/assessment-centre" replace />} />
                         <Route path="/dashboard/assessment-centre" element={<AssessmentsDashboard />} />
                         <Route path="/dashboard/assessments/baseline" element={<BaseLineTest />} />
+                        <Route path="/dashboard/micro-assessments" element={<MicroAssessmentList />} />
+                        <Route path="/dashboard/micro-assessments/:id" element={<MicroAssessmentPlayer />} />
 
                         {/* Skills */}
                         <Route path="/skills-passport" element={<SkillsPassport />} />
@@ -178,6 +190,11 @@ const AnimatedRoutes = () => {
                         <Route path="/help" element={<Help />} />
                         <Route path="/tickets" element={<SupportTicketsPage />} />
                         <Route path="/dashboard/support" element={<SupportTicketsPage />} />
+
+                        {/* Admin — Course management */}
+                        <Route path="/dashboard/admin/courses" element={<AdminCourses />} />
+                        <Route path="/dashboard/admin/courses/create" element={<AdminCourseForm />} />
+                        <Route path="/dashboard/admin/courses/edit/:id" element={<AdminCourseForm />} />
 
                         {/* Profile */}
                         <Route path="/onboarding" element={<AddDetails />} />

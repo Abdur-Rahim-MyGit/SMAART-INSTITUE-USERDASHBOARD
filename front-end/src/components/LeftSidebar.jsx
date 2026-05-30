@@ -2,35 +2,33 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { LayoutDashboard } from "lucide-react";
 import {
-  Home,
-  BookOpen,
-  ClipboardCheck,
-  Wrench,
-  Award,
-  ShieldCheck,
-  Lightbulb,
-  Users,
-  Settings,
-  HelpCircle,
-  Bell,
-  Menu,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  Languages,
-
-  Star,
-  LogOut,
-  User,
-  Trophy,
-  X,
-  Sparkles,
-  CheckCheck,
-  Compass,
-  Sun,
-  Moon
-} from "lucide-react";
+  RiBookOpenLine as BookOpen,
+  RiFileList3Line as ClipboardCheck,
+  RiToolsLine as Wrench,
+  RiTrophyLine as Award,
+  RiShieldCheckLine as ShieldCheck,
+  RiLightbulbLine as Lightbulb,
+  RiGroupLine as Users,
+  RiSettings4Line as Settings,
+  RiQuestionLine as HelpCircle,
+  RiBellLine as Bell,
+  RiMenuLine as Menu,
+  RiArrowLeftSLine as ChevronLeft,
+  RiArrowRightSLine as ChevronRight,
+  RiArrowDownSLine as ChevronDown,
+  RiGlobalLine as Languages,
+  RiStarLine as Star,
+  RiLogoutBoxRLine as LogOut,
+  RiUserLine as User,
+  RiCloseLine as X,
+  RiSparklingLine as Sparkles,
+  RiCheckDoubleLine as CheckCheck,
+  RiCompassLine as Compass,
+  RiSunLine as Sun,
+  RiMoonLine as Moon,
+} from "@remixicon/react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSidebar } from "@/contexts/SidebarContext";
 import useUser from "@/hooks/useUser";
@@ -62,12 +60,12 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
 // SRM Logo URL
 const srmLogo = "";
 
-// Menu items configuration
+// Menu items configuration — Remix Icon (Line style, thematic per section)
 const menuGroups = [
   {
     title: "sidebar.group_main",
     items: [
-      { icon: Home, label: "sidebar.dashboard", path: "/dashboard", badge: null },
+      { icon: LayoutDashboard, label: "sidebar.dashboard", path: "/dashboard", badge: null },
       { icon: BookOpen, label: "sidebar.courses", path: "/dashboard/courses", badge: null },
       { icon: ClipboardCheck, label: "sidebar.assessments", path: "/dashboard/assessment-centre", badge: null },
       { icon: Wrench, label: "sidebar.toolkit", path: "/dashboard/smaart-toolkit", badge: null },
@@ -337,7 +335,7 @@ const LeftSidebar = () => {
                 onClick={() => setIsMobileOpen(false)}
                 className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors"
               >
-                <X className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                <X weight="bold" className="w-5 h-5 text-slate-500 dark:text-slate-400" />
               </button>
             </div>
 
@@ -350,9 +348,9 @@ const LeftSidebar = () => {
                   </p>
                   <div className="space-y-1">
                     {group.items.map((item, itemIndex) => {
+                      const active = isActive(item.path);
                       const Icon = item.isThemeToggle ? (theme === 'dark' ? Sun : Moon) : item.isLanguageToggle ? Languages : item.icon;
                       const label = item.isThemeToggle ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : item.isLanguageToggle ? 'Language' : t(item.label);
-                      const active = isActive(item.path);
 
                       const content = (
                         <>
@@ -526,9 +524,9 @@ const LeftSidebar = () => {
               <div className="space-y-1">
                 {group.items.map((item) => {
                   if (item.onlyMobile) return null;
+                  const active = isActive(item.path);
                   const Icon = item.isThemeToggle ? (theme === 'dark' ? Sun : Moon) : item.icon;
                   const label = item.isThemeToggle ? (theme === 'dark' ? 'Light Mode' : 'Dark Mode') : t(item.label);
-                  const active = isActive(item.path);
 
                   const content = (
                     <>
@@ -627,7 +625,7 @@ const LeftSidebar = () => {
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-[#1a3884] flex items-center justify-center border-2 border-slate-100 dark:border-[#1a3884]/30">
-                  <User className="w-5 h-5 text-white" />
+                  <User weight="duotone" className="w-6 h-6 text-white" />
                 </div>
               )}
             </div>
@@ -646,7 +644,7 @@ const LeftSidebar = () => {
 
             {/* Arrow Indicator */}
             {!isCollapsed && (
-              <ChevronRight className="w-4 h-4 text-slate-400" />
+              <ChevronRight weight="bold" className="w-4 h-4 text-slate-400" />
             )}
           </div>
         </div>

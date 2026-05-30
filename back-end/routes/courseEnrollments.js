@@ -165,7 +165,10 @@ router.delete('/:id', async (req, res) => {
 router.get('/student/:studentId', async (req, res) => {
     try {
         const enrollments = await CourseEnrollment.find({ student: req.params.studentId })
-            .populate('course', 'title courseCode duration status modules')
+            .populate({
+                path: 'course',
+                select: 'title courseCode duration status banner modules'
+            })
             .populate('college', 'name code')
             .sort({ enrollmentDate: -1 });
 

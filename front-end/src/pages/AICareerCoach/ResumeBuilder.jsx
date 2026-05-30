@@ -26,15 +26,64 @@ import {
     Calendar,
     Flag,
     Heart,
-    LinkIcon
+    LinkIcon,
+    QrCode,
+    ShieldCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import resumeApi from '@/services/resumeApi';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
-import { apiCall } from '@/services/api';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jspdf from 'jspdf';
+import QRCode from 'qrcode';
+import {
+    ORG_NAME,
+    normalizeText,
+    buildResumeFingerprint,
+    createResumePublicId,
+    buildVerificationUrl,
+} from '@/utils/resumeSecurity';
+
+/** Footer on each PDF page (body watermark is rendered once in the resume preview) */
+const applyPdfWatermarks = (pdf, pdfWidth, pdfHeight, resumePublicId, studentId) => {
+    const pageCount = pdf.getNumberOfPages();
+    const stuPart = studentId ? ` · STU ID: ${studentId}` : '';
+    for (let page = 1; page <= pageCount; page += 1) {
+        pdf.setPage(page);
+        pdf.setDrawColor(210, 210, 210);
+        pdf.setLineWidth(0.25);
+        pdf.line(14, pdfHeight - 16, pdfWidth - 14, pdfHeight - 16);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(7);
+        pdf.setTextColor(110, 110, 110);
+        pdf.text(
+            `${ORG_NAME} · Verified Securely${stuPart} · ${resumePublicId}`,
+            pdfWidth / 2,
+            pdfHeight - 9,
+            { align: 'center' }
+        );
+    }
+};
+
+const ResumeWatermark = () => (
+    <div
+        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden select-none"
+        aria-hidden
+    >
+        <span
+            className="font-black uppercase whitespace-nowrap !text-black -rotate-45"
+            style={{
+                fontSize: '72px',
+                letterSpacing: '0.18em',
+                opacity: 0.015,
+                fontFamily: 'Arial, Helvetica, sans-serif',
+            }}
+        >
+            SMAART INSTITUTE
+        </span>
+    </div>
+);
 
 const ResumeBuilder = () => {
     const navigate = useNavigate();
@@ -47,6 +96,11 @@ const ResumeBuilder = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [scale, setScale] = useState(1);
     const containerRef = useRef(null);
+    const [resumePublicId, setResumePublicId] = useState('');
+    const [resumeFingerprint, setResumeFingerprint] = useState('');
+    const [verificationUrl, setVerificationUrl] = useState('');
+    const [verificationQr, setVerificationQr] = useState('');
+    const [studentId, setStudentId] = useState('');
 
     const steps = [
         { id: 'personal', label: 'Profile', icon: User },
@@ -87,6 +141,31 @@ const ResumeBuilder = () => {
         }
     });
 
+    useEffect(() => {
+        const fingerprint = buildResumeFingerprint(resumeData);
+        const nextResumePublicId = resumePublicId || createResumePublicId(fingerprint);
+        const nextVerificationUrl = buildVerificationUrl(nextResumePublicId, fingerprint);
+
+        setResumeFingerprint(fingerprint);
+        if (!resumePublicId) {
+            setResumePublicId(nextResumePublicId);
+        }
+        setVerificationUrl(nextVerificationUrl);
+
+        QRCode.toDataURL(nextVerificationUrl, {
+            margin: 1,
+            width: 180,
+            color: {
+                dark: '#0f172a',
+                light: '#ffffff'
+            }
+        })
+            .then(setVerificationQr)
+            .catch(error => {
+                console.error('Failed to generate resume verification QR:', error);
+                setVerificationQr('');
+            });
+    }, [resumeData, resumePublicId]);
 
     const fetchData = async () => {
         try {
@@ -95,9 +174,26 @@ const ResumeBuilder = () => {
                 aiCareerCoachApi.getProfile().catch(() => ({ success: false }))
             ]);
 
+            // Always capture student ID from profile (used in PDF footer for both branches)
+            if (profileRes.success) {
+                const pData = profileRes.richProfile || {};
+                const pReg = profileRes.registration || {};
+                setStudentId(pData.studentId || pReg.studentId || profileRes.student?.studentId || '');
+            }
+
             if (resumeRes.success && resumeRes.data && resumeRes.data.length > 0) {
                 const r = resumeRes.data[0];
                 setResumeId(r._id);
+                if (r.verification?.resumePublicId) {
+                    setResumePublicId(r.verification.resumePublicId);
+                    setResumeFingerprint(r.verification.fingerprint || '');
+                    setVerificationUrl(
+                        buildVerificationUrl(
+                            r.verification.resumePublicId,
+                            r.verification.fingerprint || buildResumeFingerprint(r)
+                        )
+                    );
+                }
                 setResumeData({
                     personalInfo: r.personalInfo || {},
                     summary: r.summary || '',
@@ -111,6 +207,8 @@ const ResumeBuilder = () => {
             } else if (profileRes.success) {
                 const data = profileRes.richProfile || {};
                 const reg = profileRes.registration || {};
+                // Capture student ID for PDF footer
+                setStudentId(data.studentId || reg.studentId || profileRes.student?.studentId || '');
 
                 setResumeData(prev => ({
                     ...prev,
@@ -410,25 +508,72 @@ const ResumeBuilder = () => {
 
         setGenerating(true);
         try {
+            let activeResumeId = resumeId;
+            if (!activeResumeId) {
+                const created = await resumeApi.createResume(resumeData);
+                if (!created?.success) {
+                    throw new Error(created?.message || 'Save resume before exporting');
+                }
+                activeResumeId = created.data._id;
+                setResumeId(activeResumeId);
+            } else {
+                await resumeApi.updateResume(activeResumeId, resumeData);
+            }
+
+            const exportRes = await resumeApi.issueExport(activeResumeId);
+            if (!exportRes?.success) {
+                const retryMinutes = exportRes?.retryAfter || 60;
+                toast.error(
+                    exportRes?.error ||
+                        exportRes?.message ||
+                        `Export limit reached. Try again in ${retryMinutes} minutes.`
+                );
+                return;
+            }
+
+            const issued = exportRes.data;
+            setResumePublicId(issued.resumePublicId);
+            setResumeFingerprint(issued.fingerprint);
+            setVerificationUrl(issued.verificationUrl || buildVerificationUrl(issued.resumePublicId, issued.fingerprint));
+
+            await new Promise((resolve) => setTimeout(resolve, 150));
+
             const canvas = await html2canvas(element, {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
             });
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jspdf('p', 'mm', 'a4');
             const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`${resumeData.personalInfo.fullName || 'Resume'}.pdf`);
-            toast.success('Resume downloaded successfully!');
+            let heightLeft = pdfHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft > 0) {
+                position = heightLeft - pdfHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pageHeight;
+            }
+
+            applyPdfWatermarks(pdf, pdfWidth, pageHeight, issued.resumePublicId, studentId);
+
+            pdf.save(
+                `${normalizeText(resumeData.personalInfo.fullName) || 'Resume'}_${issued.resumePublicId}.pdf`
+            );
+            toast.success('Verified PDF downloaded with org watermark and QR.');
         } catch (error) {
             console.error('Download error:', error);
-            toast.error('Failed to generate PDF');
+            toast.error(error.message || 'Failed to generate PDF');
         } finally {
             setGenerating(false);
         }
@@ -524,7 +669,7 @@ const ResumeBuilder = () => {
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                     </button>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 ring-4 ring-blue-500/10">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#00152E] to-[#1a3884] flex items-center justify-center shadow-lg shadow-[#1a3884]/20 ring-4 ring-[#1a3884]/10">
                             <FileText className="w-5 h-5 text-white" />
                         </div>
                         <div>
@@ -538,6 +683,10 @@ const ResumeBuilder = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span className="text-[10px] font-black tracking-wider uppercase">{resumePublicId || 'Secure Resume'}</span>
+                    </div>
                     <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-[#002A5C] hover:bg-slate-200 dark:hover:bg-[#002A5C] text-slate-700 dark:text-slate-300 rounded-2xl transition-all font-bold text-sm border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm">
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                         <span className="hidden sm:inline">Save Progress</span>
@@ -923,8 +1072,8 @@ const ResumeBuilder = () => {
                                 transformOrigin: 'top center'
                             }}
                         >
+                        <ResumeWatermark />
 
-                        {/* Content Area */}
                         <div className="relative z-10">
                             {/* Header Section */}
                             <div className="flex flex-col items-center text-center relative z-10 mb-6">
@@ -933,9 +1082,35 @@ const ResumeBuilder = () => {
                                 </h1>
                                 <h2 className="text-lg font-semibold !text-gray-800 mt-1 uppercase tracking-widest">{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
 
+                                <div className="mt-4 w-full border border-slate-200 bg-slate-50/80 px-4 py-3 flex items-center justify-between gap-4 rounded-sm">
+                                    <div className="text-left min-w-0">
+                                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
+                                            <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
+                                            {ORG_NAME} verified resume
+                                        </div>
+                                        <p className="mt-1.5 text-[10px] !text-slate-600">
+                                            ID: <span className="font-semibold !text-black">{resumePublicId}</span>
+                                        </p>
+                                        <p className="text-[9px] !text-slate-500 mt-0.5">Scan QR to verify authenticity</p>
+                                    </div>
+                                    {verificationQr ? (
+                                        <img
+                                            src={verificationQr}
+                                            alt="Resume verification QR code"
+                                            className="w-14 h-14 border border-slate-200 bg-white p-1 shrink-0"
+                                        />
+                                    ) : (
+                                        <div className="w-14 h-14 border border-slate-200 bg-white flex items-center justify-center shrink-0">
+                                            <QrCode className="w-7 h-7 text-slate-400" />
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-3 text-[11px] !text-gray-700 max-w-[90%]">
                                     {resumeData.personalInfo.email && <span className="flex items-center">📧 {resumeData.personalInfo.email}</span>}
-                                    {resumeData.personalInfo.phone && <span className="flex items-center">📱 {resumeData.personalInfo.phone}</span>}
+                                    {(resumeData.personalInfo.mobile || resumeData.personalInfo.phone) && (
+                                        <span className="flex items-center">📱 {resumeData.personalInfo.mobile || resumeData.personalInfo.phone}</span>
+                                    )}
                                     {resumeData.personalInfo.location && <span className="flex items-center">📍 {resumeData.personalInfo.location}</span>}
                                 </div>
                             </div>
@@ -1049,13 +1224,14 @@ const ResumeBuilder = () => {
                             </div>
                         </div>
 
-                        {/* SMAART Watermark - Premium Bottom Right Position */}
-                        <div className="absolute bottom-10 right-10 pointer-events-none opacity-[0.12] z-0 flex flex-col items-start" style={{ fontFamily: 'sans-serif' }}>
-                            <div className="flex items-center gap-1">
-                                <span className="text-3xl font-black tracking-tighter !text-black leading-none" style={{ fontWeight: 900 }}>SMAART</span>
-                                <div className="w-2 h-2 rounded-full bg-black mt-1"></div>
-                            </div>
-                            <span className="text-[10px] font-bold tracking-[0.45em] !text-black uppercase mt-1">INSTITUTE</span>
+                        {/* Preview-only footer — pinned to bottom of A4, hidden during html2canvas PDF capture */}
+                        <div
+                            data-html2canvas-ignore="true"
+                            className="absolute bottom-[10mm] left-[15mm] right-[15mm] pt-2 border-t border-slate-200"
+                        >
+                            <p className="text-center text-[8px] !text-slate-400 tracking-wide">
+                                {ORG_NAME} &middot; Verified Securely{studentId ? ` \u00b7 STU ID: ${studentId}` : ''} &middot; {resumePublicId || 'Document ID pending'}
+                            </p>
                         </div>
                     </div>
                     </div>

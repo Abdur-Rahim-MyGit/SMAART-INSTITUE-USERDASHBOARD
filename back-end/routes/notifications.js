@@ -45,16 +45,69 @@ router.get('/', protect, async (req, res) => {
       Notification.getUnreadCount(userId),
     ]);
 
+    // Check career path lock status to dynamically inject warning notification if not locked
+    let modifiedNotifications = [...notifications];
+    let modifiedTotal = total;
+    let modifiedUnreadCount = unreadCount;
+
+    try {
+      const { FinalCareerPathwayModel } = require('../models/careerAgentModels');
+      const User = require('../models/User');
+      const Student = require('../models/Student');
+
+      const pathway = await FinalCareerPathwayModel.findOne({ userId }).lean();
+      const isLocked = pathway ? pathway.is_locked : false;
+
+      if (!isLocked) {
+        let userObj = await User.findById(userId).select('createdAt').lean();
+        if (!userObj) {
+          userObj = await Student.findById(userId).select('createdAt').lean();
+        }
+        const registrationDate = userObj?.createdAt || new Date();
+        const diffTime = Date.now() - new Date(registrationDate).getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const remainingDays = 14 - diffDays;
+
+        const warningNotification = {
+          _id: 'career-lock-warning',
+          userId: userId,
+          type: 'system',
+          title: remainingDays > 0 ? 'Lock Career Path Warning' : 'Career Path Alert',
+          message: remainingDays > 0
+            ? `You must select and lock your Career Path within ${remainingDays} day${remainingDays !== 1 ? 's' : ''}.`
+            : 'Still not set your Career Path! You have exceeded the 14-day limit. Please select and lock your path immediately.',
+          icon: remainingDays > 0 ? 'clock' : 'bell',
+          color: remainingDays > 0 ? '#F59E0B' : '#EF4444',
+          link: '/dashboard/career-agent/dashboard',
+          isRead: false,
+          read: false,
+          createdAt: new Date().toISOString()
+        };
+
+        modifiedTotal += 1;
+        modifiedUnreadCount += 1;
+
+        if (parseInt(page, 10) === 1) {
+          modifiedNotifications.unshift(warningNotification);
+          if (modifiedNotifications.length > parseInt(limit, 10)) {
+            modifiedNotifications = modifiedNotifications.slice(0, parseInt(limit, 10));
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error dynamic injection of career-lock notification:', err);
+    }
+
     res.json({
       success: true,
-      notifications,
+      notifications: modifiedNotifications,
       pagination: {
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
-        total,
-        pages: Math.ceil(total / parseInt(limit, 10)),
+        total: modifiedTotal,
+        pages: Math.ceil(modifiedTotal / parseInt(limit, 10)),
       },
-      unreadCount,
+      unreadCount: modifiedUnreadCount,
     });
   } catch (error) {
     console.error('Error fetching notifications:', error);
@@ -64,7 +117,21 @@ router.get('/', protect, async (req, res) => {
 
 router.get('/unread-count', protect, async (req, res) => {
   try {
-    const unreadCount = await Notification.getUnreadCount(getAuthenticatedUserId(req));
+    const userId = getAuthenticatedUserId(req);
+    let unreadCount = await Notification.getUnreadCount(userId);
+
+    try {
+      const { FinalCareerPathwayModel } = require('../models/careerAgentModels');
+      const pathway = await FinalCareerPathwayModel.findOne({ userId }).lean();
+      const isLocked = pathway ? pathway.is_locked : false;
+
+      if (!isLocked) {
+        unreadCount += 1;
+      }
+    } catch (err) {
+      console.error('Error checking pathway lock for unread-count:', err);
+    }
+
     res.json({ success: true, unreadCount });
   } catch (error) {
     console.error('Error getting unread count:', error);
@@ -75,6 +142,22 @@ router.get('/unread-count', protect, async (req, res) => {
 router.patch('/:id/read', protect, async (req, res) => {
   try {
     const userId = getAuthenticatedUserId(req);
+
+    if (req.params.id === 'career-lock-warning') {
+      return res.json({
+        success: true,
+        notification: {
+          _id: 'career-lock-warning',
+          userId,
+          isRead: true,
+          read: true,
+          type: 'system',
+          title: 'Career Path Warning',
+          message: 'Bypassed dynamic warning'
+        }
+      });
+    }
+
     const notification = await Notification.findOneAndUpdate(
       {
         _id: req.params.id,
@@ -144,6 +227,11 @@ router.delete('/clear-all', protect, async (req, res) => {
 router.delete('/:id', protect, async (req, res) => {
   try {
     const userId = getAuthenticatedUserId(req);
+
+    if (req.params.id === 'career-lock-warning') {
+      return res.json({ success: true, message: 'Notification deleted' });
+    }
+
     const notification = await Notification.findOneAndDelete({
       _id: req.params.id,
       $or: [{ userId }, { recipient: userId }]

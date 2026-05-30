@@ -164,6 +164,7 @@ const moduleSchema = new mongoose.Schema({
     dayId: Number,
     stepId: { type: Number, default: 2 }, // Default to step 2 (after video)
     title: String,
+    shuffleQuestions: { type: Boolean, default: true },
     questions: [quizSchema]
   }],
   passingCriteria: {
@@ -222,6 +223,18 @@ const courseSchema = new mongoose.Schema({
   },
   category: String,
   tags: [String],
+  /** Admin builder catalogue id e.g. S01, PIQ01 (SMAART-INSTITUTE-ADMIN) */
+  courseNumber: {
+    type: String,
+    trim: true,
+    sparse: true,
+    index: true,
+  },
+  /** 8-step learning flow from admin course builder */
+  learningFlow: {
+    type: mongoose.Schema.Types.Mixed,
+    default: undefined,
+  },
   preAssessment: {
     isEnabled: { type: Boolean, default: false },
     title: String,
@@ -263,12 +276,67 @@ courseSchema.index({ title: 'text', description: 'text' });
 courseSchema.index({ colleges: 1 });
 courseSchema.index({ createdBy: 1 });
 
-// Generate course code before saving
+// Generate course code and sync micro-assessments before saving
 courseSchema.pre('save', async function (next) {
   if (!this.courseCode) {
     const count = await mongoose.model('Course').countDocuments();
     this.courseCode = `CRS${String(count + 1).padStart(5, '0')}`;
   }
+
+  // Sync microAssessments from day quiz steps; keep manually set assessments when no quiz steps exist
+  if (this.modules && Array.isArray(this.modules)) {
+    this.modules.forEach((module, modIdx) => {
+      const fromDays = [];
+      if (module.days && Array.isArray(module.days)) {
+        module.days.forEach((day) => {
+          if (day.steps && Array.isArray(day.steps)) {
+            day.steps.forEach((step) => {
+              if (
+                step.type === 'quiz' &&
+                step.content &&
+                step.content.questions &&
+                step.content.questions.length > 0
+              ) {
+                fromDays.push({
+                  moduleId: module.sequence || modIdx + 1,
+                  dayId: day.dayNumber,
+                  stepId: step.stepNumber || 4,
+                  title: step.title || step.content?.title || 'Micro-Assessment',
+                  shuffleQuestions:
+                    step.content?.shuffleQuestions !== false &&
+                    step.content?.shuffle !== false,
+                  questions: step.content.questions,
+                });
+              }
+            });
+          }
+        });
+      }
+      const practiceFromFlow =
+        this.learningFlow?.stepD_Practice?.activityType === 'quiz' &&
+        (this.learningFlow.stepD_Practice.questions || []).length > 0
+          ? {
+              moduleId: module.sequence || modIdx + 1,
+              dayId: 4,
+              stepId: 4,
+              title: 'Practice',
+              shuffleQuestions:
+                this.learningFlow.stepD_Practice.randomizeQuestions !== false,
+              questions: this.learningFlow.stepD_Practice.questions,
+            }
+          : null;
+
+      if (fromDays.length > 0) {
+        module.microAssessments = fromDays;
+      } else if (practiceFromFlow) {
+        const kept = (module.microAssessments || []).filter(
+          (ma) => Number(ma.dayId) !== 4
+        );
+        module.microAssessments = [...kept, practiceFromFlow];
+      }
+    });
+  }
+
   next();
 });
 
