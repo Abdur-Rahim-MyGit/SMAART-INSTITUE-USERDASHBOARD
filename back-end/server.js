@@ -123,6 +123,7 @@ mongoose.connect(mongoURI, {
 // Existing Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/security', require('./routes/security'));
 app.use('/api/colleges', require('./routes/colleges'));
 app.use('/api/registrations', require('./routes/registrations'));
 app.use('/api/degrees', require('./routes/degrees'));
@@ -138,6 +139,7 @@ app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/courseEnrollments', require('./routes/courseEnrollments'));
 app.use('/api/questionBanks', require('./routes/questionBanks'));
 app.use('/api/notes', require('./routes/notes'));
+app.use('/api/analytics', require('./routes/analytics'));
 
 
 // People Management Routes
