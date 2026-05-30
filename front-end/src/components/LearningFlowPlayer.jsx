@@ -29,6 +29,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import FloatingDictionary from "@/components/FloatingDictionary";
 import FloatingNotes from "@/components/FloatingNotes";
+import useActivityRestrictions from "@/hooks/useActivityRestrictions";
+import ActivityWarningModal from "@/components/ActivityWarningModal";
 
 const LearningFlowPlayer = ({
   courseData,
@@ -41,6 +43,18 @@ const LearningFlowPlayer = ({
 }) => {
   const navigate = useNavigate();
   const { courseId: urlCourseId } = useParams();
+
+  // Activity restrictions monitoring
+  const {
+    warningsCount,
+    maxWarnings,
+    isWarningVisible,
+    lastViolationType,
+    acknowledgeWarning
+  } = useActivityRestrictions({
+    courseId: urlCourseId || courseData?._id,
+    isActive: !!courseData
+  });
   const [activeStep, setActiveStep] = useState('A');
   const [completedSteps, setCompletedSteps] = useState({});
 
@@ -434,6 +448,13 @@ const LearningFlowPlayer = ({
           </div>
         </div>
       </div>
+      <ActivityWarningModal
+        isOpen={isWarningVisible}
+        warningsCount={warningsCount}
+        maxWarnings={maxWarnings}
+        lastViolationType={lastViolationType}
+        onAcknowledge={acknowledgeWarning}
+      />
     </div>
   );
 };

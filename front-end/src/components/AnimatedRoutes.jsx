@@ -51,6 +51,7 @@ const Performance = lazy(() => import('@/pages/Performance'));
 const SkillsVault = lazy(() => import('@/pages/SkillsVault'));
 const CareerDataFetcher = lazy(() => import('@/pages/CareerDataFetcher'));
 const Legal = lazy(() => import('@/pages/Legal'));
+const LockedOut = lazy(() => import('@/pages/LockedOut'));
 
 
 // Career Agent (Integrated from Career-Agent standalone system)
@@ -210,6 +211,7 @@ const AnimatedRoutes = () => {
                     <Route path="/assessment/:stage/report" element={<AssessmentFlowGuard><BaseLineTest /></AssessmentFlowGuard>} />
                     <Route path="/analysis" element={<AssessmentFlowGuard><Analysis /></AssessmentFlowGuard>} />
                     <Route path="/motivational" element={<AssessmentFlowGuard><Motivational /></AssessmentFlowGuard>} />
+                    <Route path="/locked-out" element={<LockedOut />} />
 
                     {/* Fallback */}
                     <Route path="*" element={<NotFound />} />

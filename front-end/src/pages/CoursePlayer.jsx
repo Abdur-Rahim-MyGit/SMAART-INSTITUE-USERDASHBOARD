@@ -15,6 +15,10 @@ import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK
 import { getLearningFlowData } from "@/data/learningFlowData";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import useActivityRestrictions from "@/hooks/useActivityRestrictions";
+import ActivityWarningModal from "@/components/ActivityWarningModal";
+import useUser from "@/hooks/useUser";
+import { courseEnrollmentAPI } from "@/services/api";
 
 // Sample video URLs - replace with actual video URLs from your backend
 const COURSE_VIDEOS = {
@@ -96,6 +100,7 @@ const getStageAndTrackInfo = (courseId) => {
 
 const CoursePlayer = () => {
   const { courseId } = useParams();
+  const { user: currentUser } = useUser();
   const navigate = useNavigate();
   const playerRef = useRef(null);
   const [videoProgress, setVideoProgress] = useState(0);
@@ -116,6 +121,18 @@ const CoursePlayer = () => {
   const { stageKey, stageNameKey, typeKey } = getStageAndTrackInfo(courseId);
   const videoUrl = COURSE_VIDEOS[courseId];
   const learningFlowData = getLearningFlowData(courseId);
+
+  // Activity restrictions monitoring
+  const {
+    warningsCount,
+    maxWarnings,
+    isWarningVisible,
+    lastViolationType,
+    acknowledgeWarning
+  } = useActivityRestrictions({
+    courseId,
+    isActive: !loading && !!course
+  });
 
   useEffect(() => {
     // Reset all local state when course changes
@@ -142,6 +159,55 @@ const CoursePlayer = () => {
     }
   }, [courseId]);
 
+  // Load progress from database on mount or course/user change
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!currentUser || !courseId) return;
+      try {
+        console.log('[CoursePlayer] Fetching enrollment progress for user:', currentUser._id || currentUser.id);
+        const response = await courseEnrollmentAPI.getByStudent(currentUser._id || currentUser.id);
+        if (response.success && response.data) {
+          // Find the enrollment for this course
+          const enrollment = response.data.find(e => e.course && (e.course.courseNumber === courseId || e.course.courseCode === courseId));
+          if (enrollment && enrollment.moduleProgress && enrollment.moduleProgress.length > 0) {
+            const mProg = enrollment.moduleProgress[0];
+            const stepsMap = {};
+            
+            // From completedTasks
+            if (mProg.completedTasks) {
+              mProg.completedTasks.forEach(ct => {
+                stepsMap[String(ct.dayId)] = true;
+              });
+            }
+
+            // From videoProgress
+            if (mProg.videoProgress) {
+              mProg.videoProgress.forEach(vp => {
+                if (vp.isCompleted) {
+                  stepsMap[String(vp.dayId)] = true;
+                }
+              });
+            }
+
+            console.log('[CoursePlayer] Loaded steps progress:', stepsMap);
+            setCompletedSteps(stepsMap);
+            
+            const stepsDone = Object.keys(stepsMap).length;
+            const pct = Math.round((stepsDone / 9) * 100);
+            setVideoProgress(pct);
+
+            if (enrollment.status === 'completed') {
+              setIsCompleted(true);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error loading student course progress:", err);
+      }
+    };
+    fetchProgress();
+  }, [courseId, currentUser]);
+
   const handleStartCourse = () => {
     setShowIntro(false);
     setActiveStep('1');
@@ -157,7 +223,7 @@ const CoursePlayer = () => {
     }
   };
 
-  const handleStepComplete = (stepNumber) => {
+  const handleStepComplete = async (stepNumber) => {
     const newCompletedSteps = { ...completedSteps, [stepNumber]: true };
     setCompletedSteps(newCompletedSteps);
 
@@ -170,6 +236,22 @@ const CoursePlayer = () => {
     localStorage.setItem('smaart_last_watched_lesson',
       currentStepData?.title || (courseData?.title + ' — Step ' + stepNumber) || courseId
     );
+
+    // Sync to DB
+    if (currentUser) {
+      try {
+        await courseEnrollmentAPI.updateTaskProgress({
+          studentId: currentUser._id || currentUser.id,
+          courseCode: courseId,
+          moduleId: 1,
+          dayId: parseInt(stepNumber),
+          taskId: 1,
+          completed: true
+        });
+      } catch (err) {
+        console.error("Error saving step task progress to DB:", err);
+      }
+    }
 
     // Check if all 9 steps are completed
     const allSteps = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -203,10 +285,27 @@ const CoursePlayer = () => {
     navigate('/dashboard/courses');
   };
 
-  const handleVideoProgressUpdate = (maxTime, completed, duration) => {
+  const handleVideoProgressUpdate = async (maxTime, completed, duration) => {
     setVideoProgress(maxTime);
     if (completed) setVideoWatched(true);
     setIsCompleted(completed);
+
+    if (currentUser && activeStep) {
+      try {
+        await courseEnrollmentAPI.updateVideoProgress({
+          studentId: currentUser._id || currentUser.id,
+          courseCode: courseId,
+          moduleId: 1,
+          dayId: parseInt(activeStep),
+          stepId: 1,
+          maxWatchedTime: maxTime,
+          videoDuration: duration || 0,
+          isCompleted: completed
+        });
+      } catch (err) {
+        console.error("Error saving video progress to DB:", err);
+      }
+    }
   };
 
   const handleNextLesson = () => {
@@ -941,6 +1040,13 @@ const CoursePlayer = () => {
       </div>
       <FloatingDictionary />
       <FloatingNotes />
+      <ActivityWarningModal
+        isOpen={isWarningVisible}
+        warningsCount={warningsCount}
+        maxWarnings={maxWarnings}
+        lastViolationType={lastViolationType}
+        onAcknowledge={acknowledgeWarning}
+      />
     </div>
   );
 };
