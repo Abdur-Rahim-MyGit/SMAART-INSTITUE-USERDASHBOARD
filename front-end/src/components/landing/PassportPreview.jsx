@@ -1,10 +1,12 @@
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { FileText, Download, CheckCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 import whiteLogo from "@/assets/white.png";
 
 const PassportPreview = () => {
+  const { t } = useTranslation();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useTransform(y, [-100, 100], [5, -5]);
@@ -17,6 +19,12 @@ const PassportPreview = () => {
     x.set(event.clientX - centerX);
     y.set(event.clientY - centerY);
   }
+
+  const features = t("landing.passport.features", { returnObjects: true }) || [
+    "Verified Capability Profile",
+    "Universal Portability",
+    "Evidence-Based Progression"
+  ];
 
   return (
     <section className="py-16 sm:py-24 bg-white dark:bg-dark-card transition-colors duration-300 relative overflow-hidden">
@@ -59,12 +67,14 @@ const PassportPreview = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-[#1a3884] dark:text-white text-xl tracking-tight">SMAART Passport</h3>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-[#C0C0C0] font-black">Capability & Skills Record</p>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-[#C0C0C0] font-black">
+                        {t("landing.passport.badge")}
+                      </p>
                     </div>
                   </div>
                   <div className="px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest bg-[#C0C0C0]/10 border border-[#C0C0C0]/30 text-[#A8A8A8] dark:text-[#C0C0C0] flex items-center gap-2">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    VERIFIED
+                    {t("landing.passport.verified")}
                   </div>
                 </div>
 
@@ -107,7 +117,9 @@ const PassportPreview = () => {
                       <div className="h-10 w-10 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/10" />
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-slate-400 mb-1 font-bold">Issued By</p>
+                      <p className="text-[10px] uppercase tracking-widest text-gray-400 dark:text-slate-400 mb-1 font-bold">
+                        {t("landing.passport.issued_by")}
+                      </p>
                       <p className="font-bold text-[#C0C0C0] text-xl font-heading tracking-tight">SMAART Institute</p>
                     </div>
                   </div>
@@ -128,9 +140,9 @@ const PassportPreview = () => {
               viewport={{ once: true }}
               className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-[#1a3884] dark:text-white tracking-tight font-heading leading-tight"
             >
-              SMAART Capability & <br />
+              {t("landing.passport.title")} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#2a4d9e]">
-                Skills Passport™
+                {t("landing.passport.title_highlight")}
               </span>
             </motion.h2>
             <motion.p
@@ -140,10 +152,10 @@ const PassportPreview = () => {
               transition={{ delay: 0.2 }}
               className="text-base sm:text-lg mb-10 leading-relaxed text-gray-600 dark:text-slate-300 font-light max-w-2xl mx-auto lg:mx-0"
             >
-              A verifiable, lifelong record of capability development and progression. It captures not just what you know, but what you can do—providing trusted evidence of your readiness for the future of work.
+              {t("landing.passport.desc")}
             </motion.p>
             <ul className="space-y-4 mb-10 text-left max-w-md mx-auto lg:mx-0">
-              {["Verified Capability Profile", "Universal Portability", "Evidence-Based Progression"].map((item, index) => (
+              {features.map((item, index) => (
                 <motion.li
                   key={item}
                   initial={{ opacity: 0, x: 20 }}
@@ -174,7 +186,7 @@ const PassportPreview = () => {
                 className="bg-gradient-to-r from-[#1a3884] to-[#C0C0C0] hover:from-[#C0C0C0] hover:to-[#1a3884] text-white font-bold px-8 py-5 rounded-2xl shadow-xl shadow-[#1a3884]/20 text-lg transition-all duration-300 group"
               >
                 <Download className="mr-3 w-5 h-5 group-hover:-translate-y-1 transition-transform" />
-                Get Your Skills Passport
+                {t("landing.passport.btn")}
               </Button>
             </motion.div>
           </div>
@@ -186,5 +198,3 @@ const PassportPreview = () => {
 };
 
 export default PassportPreview;
-
-

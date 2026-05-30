@@ -1,28 +1,30 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const FAQAccordion = () => {
+  const { t } = useTranslation();
+  const [activeIndex, setActiveIndex] = useState(null);
+
   const faqs = [
     {
-      question: "What is the SMAART Career Architecture Map™?",
-      answer: "A modern reference model that frames careers as a multi-stage continuum, helping individuals navigate longer working lives and frequent transitions."
+      question: t("landing.faq.q1"),
+      answer: t("landing.faq.a1")
     },
     {
-      question: "What is the Integrated Capability Framework™?",
-      answer: "Our proprietary framework that combines Skills (applied ability), Judgement (decision quality), and Adaptability (effectiveness) to build holistic professional capability."
+      question: t("landing.faq.q2"),
+      answer: t("landing.faq.a2")
     },
     {
-      question: "What are Future of Work insights?",
-      answer: "Research-backed analysis of trends like intelligent automation, job restructuring, and the shift from role-based to skill-based work."
+      question: t("landing.faq.q3"),
+      answer: t("landing.faq.a3")
     },
     {
-      question: "How can I access the Employment Readiness Report 2026?",
-      answer: "The report is available to our institutional partners and subscribers, offering deep dives into the changing demand for skills and capabilities."
+      question: t("landing.faq.q4"),
+      answer: t("landing.faq.a4")
     }
   ];
-
-  const [activeIndex, setActiveIndex] = useState(null);
 
   const toggle = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
@@ -41,7 +43,8 @@ const FAQAccordion = () => {
             viewport={{ once: true }}
             className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading tracking-tight"
           >
-            Insights & <span className="text-[#C0C0C0]">Frameworks</span>
+            {t("landing.faq.title")}{" "}
+            <span className="text-[#C0C0C0]">{t("landing.faq.title_highlight")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -50,7 +53,7 @@ const FAQAccordion = () => {
             transition={{ delay: 0.2 }}
             className="text-lg text-gray-600 dark:text-gray-200 font-light"
           >
-            Understanding the future of work.
+            {t("landing.faq.subtitle")}
           </motion.p>
         </div>
 
@@ -106,4 +109,3 @@ const FAQAccordion = () => {
 };
 
 export default FAQAccordion;
-

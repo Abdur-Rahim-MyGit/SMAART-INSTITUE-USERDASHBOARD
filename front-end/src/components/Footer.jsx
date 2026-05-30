@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin, ArrowUp } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 const Footer = () => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const currentYear = new Date().getFullYear();
 
@@ -44,12 +46,12 @@ const Footer = () => {
                                     <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0]" />
                                 </div>
                                 <span className={`text-[10px] font-bold uppercase tracking-[0.3em] leading-none mt-1 transition-colors ${subTextColor}`}>
-                                    Institute
+                                    {t("landing.navbar.enquiry") === "Enquiry" ? "Institute" : t("landing.navbar.enquiry") === "Demande" ? "Institut" : t("landing.navbar.enquiry") === "पूछताछ" ? "संस्थान" : t("landing.navbar.enquiry") === "விசாரணை" ? "நிறுவனம்" : "ادارہ"}
                                 </span>
                             </div>
                         </Link>
                         <p className="text-sm leading-relaxed max-w-xs font-light">
-                            An Integrated Employability & Impact Ecosystem. Building capability for the changing world of work.
+                            {t("landing.footer.desc") || "An Integrated Employability & Impact Ecosystem. Building capability for the changing world of work."}
                         </p>
                         <div className="flex gap-3">
                             {[
@@ -73,16 +75,18 @@ const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>Quick Links</h3>
+                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>
+                            {t("landing.footer.links_title") || "Quick Links"}
+                        </h3>
                         <ul className="space-y-4">
                             {[
-                                { name: "Services", id: "services" },
-                                { name: "How It Works", id: "how-it-works" },
-                                { name: "Testimonials", id: "testimonials" },
-                                { name: "FAQ", id: "faq" },
-                                { name: "Contact", id: "contact" }
+                                { name: t("landing.navbar.services") || "Services", id: "services" },
+                                { name: t("landing.navbar.how_it_works") || "How It Works", id: "how-it-works" },
+                                { name: t("landing.navbar.testimonials") || "Testimonials", id: "testimonials" },
+                                { name: t("landing.navbar.faq") || "FAQ", id: "faq" },
+                                { name: t("landing.navbar.contact") || "Contact", id: "contact" }
                             ].map((item) => (
-                                <li key={item.name}>
+                                <li key={item.id}>
                                     <button
                                         onClick={() => {
                                             const element = document.getElementById(item.id);
@@ -100,16 +104,23 @@ const Footer = () => {
 
                     {/* Legal */}
                     <div>
-                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>Legal</h3>
+                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>
+                            {t("landing.footer.legal_title") || "Legal"}
+                        </h3>
                         <ul className="space-y-4">
-                            {["Privacy Policy", "Terms of Service", "Cookie Policy", "Data Protection"].map((item) => (
-                                <li key={item}>
+                            {[
+                                { name: t("landing.footer.privacy_policy") || "Privacy Policy", key: "privacy-policy" },
+                                { name: t("landing.footer.terms_of_service") || "Terms of Service", key: "terms-of-service" },
+                                { name: t("landing.footer.cookie_policy") || "Cookie Policy", key: "cookie-policy" },
+                                { name: t("landing.footer.data_protection") || "Data Protection", key: "data-protection" }
+                            ].map((item) => (
+                                <li key={item.key}>
                                     <Link
-                                        to={`/legal?tab=${item.toLowerCase().replace(/\s+/g, "-")}`}
+                                        to={`/legal?tab=${item.key}`}
                                         className={`text-sm transition-colors flex items-center gap-3 group font-medium hover:text-[#C0C0C0]`}
                                     >
                                         <span className={`w-1.5 h-1.5 rounded-full transition-colors ${theme === 'dark' ? 'bg-[#C0C0C0]/50 group-hover:bg-[#C0C0C0]' : 'bg-[#1a3884]/30 group-hover:bg-[#C0C0C0]'}`} />
-                                        {item}
+                                        {item.name}
                                     </Link>
                                 </li>
                             ))}
@@ -118,11 +129,15 @@ const Footer = () => {
 
                     {/* Contact Info */}
                     <div>
-                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>Contact Us</h3>
+                        <h3 className={`font-bold text-lg mb-8 ${headingColor}`}>
+                            {t("landing.footer.contact_title") || "Contact Us"}
+                        </h3>
                         <ul className="space-y-6">
                             <li className="flex items-start gap-4">
                                 <MapPin className="w-5 h-5 text-[#C0C0C0] shrink-0 mt-0.5" />
-                                <span className="text-sm leading-relaxed">Nungambakkam, Chennai<br />600034, India</span>
+                                <span className="text-sm leading-relaxed">
+                                    {t("landing.footer.visit_text") || "Nungambakkam, Chennai 600034, India"}
+                                </span>
                             </li>
                             <li className="flex items-center gap-4">
                                 <Mail className="w-5 h-5 text-[#C0C0C0] shrink-0" />
@@ -139,13 +154,13 @@ const Footer = () => {
                 {/* Bottom Bar */}
                 <div className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 ${borderColor}`}>
                     <p className={`text-xs ${subTextColor}`}>
-                        &copy; {currentYear} SMAART Institute. All rights reserved.
+                        &copy; {currentYear} SMAART Institute. {t("landing.footer.copyright") || "All rights reserved."}
                     </p>
                     <button
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         className={`text-xs font-semibold flex items-center gap-2 transition-colors ${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-[#1a3884] hover:text-[#C0C0C0]'}`}
                     >
-                        Back to Top <ArrowUp className="w-3 h-3" />
+                        {t("landing.footer.back_to_top") || "Back to Top"} <ArrowUp className="w-3 h-3" />
                     </button>
                 </div>
             </div>
@@ -154,4 +169,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
