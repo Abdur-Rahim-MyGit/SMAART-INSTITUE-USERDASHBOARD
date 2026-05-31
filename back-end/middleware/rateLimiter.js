@@ -73,10 +73,25 @@ const generalLimiter = rateLimit({
   legacyHeaders: false
 });
 
+// Resume PDF export — 3 exports per hour per authenticated user
+const resumeExportLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  message: {
+    success: false,
+    error: 'Resume export limit reached. You can generate up to 3 PDFs per hour.',
+    retryAfter: 60,
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => String(req.user?._id || req.ip || 'anonymous'),
+});
+
 module.exports = {
   loginLimiter,
   otpLimiter,
   passwordResetLimiter,
   searchLimiter,
-  generalLimiter
+  generalLimiter,
+  resumeExportLimiter,
 };

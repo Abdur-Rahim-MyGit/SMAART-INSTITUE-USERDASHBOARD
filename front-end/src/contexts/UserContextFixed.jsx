@@ -11,6 +11,23 @@ import { clearAssessmentTimerStorage } from '@/utils/assessmentTimerStorage';
 
 const UserContext = createContext(null);
 
+const clearCareerAgentStorage = () => {
+  [
+    'smaart_student_name',
+    'smaart_student_email',
+    'smaart_analysis',
+    'smaart_analysis_id',
+    'smaart_pref_primary',
+    'smaart_pref_secondary',
+    'smaart_pref_tertiary',
+    'smaart_onboarding_draft',
+    'smaart_user_degree',
+    'smaart_user_specialisation',
+    'smaart_user_skills',
+    'smaart_user',
+  ].forEach((key) => localStorage.removeItem(key));
+};
+
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -96,6 +113,7 @@ export const UserProvider = ({ children }) => {
         sessionStorage.clear();
         localStorage.removeItem("user");
         localStorage.removeItem("token");
+        clearCareerAgentStorage();
         clearAssessmentTimerStorage();
 
         // Set a flag so the LandingPage can show a clean toast message
@@ -119,6 +137,7 @@ export const UserProvider = ({ children }) => {
   const login = useCallback((userData, token) => {
     console.log('[UserContext] Login function called with user:', userData?.email);
     if (token) sessionStorage.setItem("token", token);
+    clearCareerAgentStorage();
     if (userData) {
       const userToStore = { ...userData };
       sessionStorage.setItem("user", JSON.stringify(userToStore));
@@ -150,6 +169,7 @@ export const UserProvider = ({ children }) => {
     sessionStorage.clear();
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    clearCareerAgentStorage();
     clearAssessmentTimerStorage();
 
     // Step 3: Set flag for clean logout message

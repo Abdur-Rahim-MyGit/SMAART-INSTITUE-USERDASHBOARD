@@ -152,6 +152,7 @@ export const apiCall = async (endpoint, options = {}) => {
         const publicRoutes = [
           '/verify-certificate',
           '/verify-badge',
+          '/verify-resume',
           '/signup-initial',
           '/verify-otp',
           '/signup',
@@ -298,8 +299,14 @@ export const visionBoardAPI = {
 // Courses API Functions
 export const coursesAPI = {
   // Get all courses
-  getAll: async () => {
-    return apiCall('/courses');
+  getAll: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiCall(query ? `/courses?${query}` : '/courses');
+  },
+
+  // Published courses for user dashboard
+  getPublished: async () => {
+    return apiCall('/courses?status=active&limit=100');
   },
 
   // Get course by code
@@ -307,14 +314,53 @@ export const coursesAPI = {
     return apiCall(`/courses/code/${courseCode}`);
   },
 
+  // Catalogue id (S01) or Mongo id — resolves admin builder course + quiz sync
+  getByCatalog: async (catalogId) => {
+    return apiCall(`/courses/catalog/${encodeURIComponent(catalogId)}`);
+  },
+
   // Get course by ID
   getById: async (id) => {
     return apiCall(`/courses/${id}`);
   },
 
+  // Get seven dynamic stages for a course
+  getStages: async (courseIdOrCode) => {
+    return apiCall(`/courses/${courseIdOrCode}/stages`);
+  },
+
   // Get modules for a course
   getModules: async (courseId) => {
     return apiCall(`/courses/${courseId}/modules`);
+  },
+
+  create: async (payload) => {
+    return apiCall('/courses', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  update: async (id, payload) => {
+    return apiCall(`/courses/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  publish: async (id, payload = {}) => {
+    return apiCall(`/courses/${id}/publish`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  delete: async (id) => {
+    return apiCall(`/courses/${id}`, { method: 'DELETE' });
+  },
+
+  syncDefaults: async () => {
+    return apiCall('/courses/sync-defaults', { method: 'POST' });
   },
 };
 

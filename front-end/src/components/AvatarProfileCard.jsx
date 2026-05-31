@@ -206,9 +206,22 @@ const AvatarProfileCard = ({ user = {}, className = "" }) => {
 
       {/* Profile Info & Actions */}
       <div className="relative z-10 p-5 space-y-4">
-        <div className="text-center space-y-1.5">
+        <div className="text-center space-y-1.5 flex flex-col items-center justify-center">
           <h3 className="text-2xl font-bold text-white tracking-tight">{user.fullName || 'Student'}</h3>
           <p className="text-purple-300 text-sm font-semibold uppercase tracking-wider">{t(`common.${(user.role || 'student').toLowerCase()}`)}</p>
+          {avatarData?.milestone && (
+            <div className={`mt-2 inline-flex items-center px-3 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-widest border ${
+              avatarData.milestone === 'Job-ready/Professional'
+                ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border-amber-500/30'
+                : avatarData.milestone === 'Master'
+                ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                : avatarData.milestone === 'Intermediate'
+                ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+            }`}>
+              {avatarData.milestone}
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">

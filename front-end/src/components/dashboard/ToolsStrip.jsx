@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Award, Shield, Sparkles, ArrowUp } from "lucide-react";
+import { RiTrophyLine, RiShieldCheckLine, RiSparklingLine, RiArrowUpLine } from "@remixicon/react";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_DELAYS, COLORS } from "@/constants/dashboard";
 
@@ -19,9 +19,9 @@ const ToolsStrip = memo(() => {
       >
         <span className="font-bold text-sm dark:text-white" style={{ color: COLORS.PRIMARY }}>Skills Vault</span>
         <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-white/10 pl-3">
-          <Award className="w-4 h-4" style={{ color: COLORS.SILVER }} />
-          <Shield className="w-4 h-4" style={{ color: COLORS.SILVER }} />
-          <Sparkles className="w-4 h-4" style={{ color: COLORS.SILVER }} />
+          <RiTrophyLine className="w-4 h-4" style={{ color: COLORS.SILVER }} />
+          <RiShieldCheckLine className="w-4 h-4" style={{ color: COLORS.SILVER }} />
+          <RiSparklingLine className="w-4 h-4" style={{ color: COLORS.SILVER }} />
         </div>
       </motion.button>
 
@@ -47,7 +47,7 @@ const ToolsStrip = memo(() => {
           onMouseLeave={(e) => e.target.style.backgroundColor = COLORS.PRIMARY}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          <ArrowUp className="w-5 h-5" />
+          <RiArrowUpLine className="w-5 h-5" />
         </motion.button>
       </div>
     </div>

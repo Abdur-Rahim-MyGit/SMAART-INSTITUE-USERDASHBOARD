@@ -19,6 +19,21 @@ async function recalculateAllPpi() {
 }
 
 function startCronJobs() {
+  // Initialize Daily Analytics Cron
+  const { initAnalyticsCron, runDailyRollup } = require('../services/cronService');
+  initAnalyticsCron();
+
+  // Run a startup rollup if no analytics data exists
+  const DailyAnalytics = require('../models/DailyAnalytics');
+  DailyAnalytics.countDocuments().then(count => {
+    if (count === 0) {
+      logger.info('[CRON] No daily analytics records found. Performing initial rollup...');
+      runDailyRollup(new Date());
+    }
+  }).catch(err => {
+    logger.error('[CRON] Failed checking daily analytics count:', err);
+  });
+
   // Every Sunday at 00:00
   cron.schedule('0 0 * * 0', async () => {
     try {

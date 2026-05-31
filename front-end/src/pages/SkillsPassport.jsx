@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { QRCodeSVG } from "qrcode.react";
 import {
     ArrowLeft,
     Award,
@@ -594,6 +595,7 @@ const SkillsPassport = () => {
     const [courseEnrollments, setCourseEnrollments] = useState([]);
     const [externalCertificates, setExternalCertificates] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
     const [isExporting, setIsExporting] = useState(false);
     const [activePage, setActivePage] = useState(1);
 
@@ -917,6 +919,21 @@ const SkillsPassport = () => {
         };
     }, [baselineResult, courseEnrollments, currentUser, externalCertificates, registrationProfile, stageResults]);
 
+    // Save passport data to localStorage for demo verification purposes
+    useEffect(() => {
+        if (passportData && passportData.passportId) {
+            try {
+                localStorage.setItem(`passport_demo_${passportData.passportId}`, JSON.stringify({
+                    fullName: passportData.fullName,
+                    profilePhoto: passportData.profilePhoto,
+                    institution: passportData.institution
+                }));
+            } catch (e) {
+                console.error("Failed to save passport to localStorage", e);
+            }
+        }
+    }, [passportData]);
+
     const handleCopyLink = async () => {
         try {
             await navigator.clipboard.writeText(passportData.shareUrl);
@@ -1060,32 +1077,45 @@ const SkillsPassport = () => {
                                 </div>
                             </div>
 
-                            <div className="flex min-w-[154px] flex-col items-center justify-start gap-2 md:min-w-[132px] md:items-center">
-                                <div className="relative">
-                                    <div className="relative h-22 w-[84px] overflow-hidden rounded-[20px] border border-white/15 bg-white/10">
-                                        {passportData.profilePhoto ? (
-                                            <img
-                                                src={passportData.profilePhoto}
-                                                alt={passportData.fullName}
-                                                className="h-full w-full object-cover"
-                                                onError={(event) => {
-                                                    event.currentTarget.src = spImage;
-                                                }}
-                                            />
-                                        ) : (
-                                            <div className="flex h-full w-full items-center justify-center">
-                                                <UserCircle2 className="h-16 w-16 text-white/80" />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#173d87] bg-emerald-500 text-white shadow-lg">
-                                        <CheckCircle2 className="h-3.5 w-3.5" />
-                                    </div>
+                            <div className="flex items-start gap-4">
+                                <div className="flex flex-col items-center justify-center rounded-[16px] bg-white p-2 shadow-lg h-[88px] w-[88px]">
+                                    <QRCodeSVG
+                                        value={`${typeof window !== "undefined" ? window.location.origin : ""}/verify-passport/${passportData.passportId}?name=${encodeURIComponent(passportData.fullName)}&institution=${encodeURIComponent(passportData.institution)}`}
+                                        size={56}
+                                        bgColor={"#ffffff"}
+                                        fgColor={"#102c66"}
+                                        level={"M"}
+                                    />
+                                    <span className="mt-1 text-[6px] font-bold uppercase tracking-[0.15em] text-[#102c66] whitespace-nowrap">
+                                        Scan to Verify
+                                    </span>
                                 </div>
-
-                                <p className="pt-1 text-center text-[18px] font-semibold uppercase tracking-[0.04em] text-white/92" style={displayFont}>
-                                    {sanitizeLabel(passportData.institution).split(" ")[0] || passportData.institution}
-                                </p>
+                                <div className="flex flex-col items-center justify-start gap-2 min-w-[100px]">
+                                    <div className="relative">
+                                        <div className="relative h-[88px] w-[88px] overflow-hidden rounded-[20px] border border-white/20 bg-white/10 shadow-md">
+                                            {passportData.profilePhoto ? (
+                                                <img
+                                                    src={passportData.profilePhoto}
+                                                    alt={passportData.fullName}
+                                                    className="h-full w-full object-cover"
+                                                    onError={(event) => {
+                                                        event.currentTarget.src = spImage;
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="flex h-full w-full items-center justify-center">
+                                                    <UserCircle2 className="h-16 w-16 text-white/80" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[#173d87] bg-emerald-500 text-white shadow-lg">
+                                            <CheckCircle2 className="h-3.5 w-3.5" />
+                                        </div>
+                                    </div>
+                                    <p className="pt-1 text-center text-[18px] font-semibold uppercase tracking-[0.04em] text-white/92 w-full" style={displayFont}>
+                                        {sanitizeLabel(passportData.institution).split(" ")[0] || passportData.institution}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 

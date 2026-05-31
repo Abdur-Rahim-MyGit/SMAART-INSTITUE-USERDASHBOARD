@@ -116,6 +116,14 @@ const resultSchema = new mongoose.Schema({
     attemptNumber: {
         type: Number,
         default: 1
+    },
+    lockedOut: {
+        type: Boolean,
+        default: false
+    },
+    lockoutReason: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true

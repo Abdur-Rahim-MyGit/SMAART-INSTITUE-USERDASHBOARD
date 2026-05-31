@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { coursesAPI, courseEnrollmentAPI } from '@/services/api';
+import { assessmentApi } from '@/services/assessmentApi';
 
 export const useLearningPaths = (userId) => {
   const [paths, setPaths] = useState([]);
@@ -56,10 +57,24 @@ export const useLearningPaths = (userId) => {
               const tertiarySub  = getDirectionSubtitle(analysis.tertiary,  preferences.tertiary);
 
               // Build path cards only for valid directions
+              let assessmentPct = 0;
+              if (userId) {
+                try {
+                  const statusRes = await assessmentApi.getStageStatus(userId);
+                  if (statusRes?.success && statusRes.data) {
+                    const stages = Object.values(statusRes.data);
+                    const done = stages.filter((s) => s?.completed).length;
+                    assessmentPct = stages.length > 0 ? Math.round((done / stages.length) * 100) : 0;
+                  }
+                } catch {
+                  /* keep 0 */
+                }
+              }
+
               const careerPaths = [
-                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   progress: 0, btnText: 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   navigateTo: '/dashboard/career-agent' },
-                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, progress: 0, btnText: 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', navigateTo: '/dashboard/career-agent' },
-                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  progress: 0, btnText: 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  navigateTo: '/dashboard/career-agent' },
+                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   progress: assessmentPct, btnText: 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   navigateTo: '/dashboard/career-agent' },
+                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, progress: assessmentPct, btnText: 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', navigateTo: '/dashboard/career-agent' },
+                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  progress: assessmentPct, btnText: 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  navigateTo: '/dashboard/career-agent' },
               ].filter(Boolean);
 
               if (careerPaths.length > 0) {

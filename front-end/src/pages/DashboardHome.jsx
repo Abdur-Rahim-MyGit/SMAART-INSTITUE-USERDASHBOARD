@@ -10,7 +10,7 @@ import { useLearningPaths } from "@/hooks/useLearningPaths";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
 import VisionGoalsWidget from "@/components/dashboard/VisionGoalsWidget";
-import { AlertCircle } from "lucide-react";
+import { RiAlertLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 
 const DashboardHome = () => {
@@ -87,7 +87,7 @@ const DashboardHome = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8FAFC] dark:bg-[#00152E] p-6 text-center">
         <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-4">
-          <AlertCircle className="w-8 h-8 text-red-500" />
+          <RiAlertLine className="w-8 h-8 text-red-500" />
         </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Connection Issues?</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mb-6">

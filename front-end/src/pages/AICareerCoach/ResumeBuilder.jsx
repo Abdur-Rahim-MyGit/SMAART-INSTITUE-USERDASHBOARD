@@ -26,15 +26,64 @@ import {
     Calendar,
     Flag,
     Heart,
-    LinkIcon
+    LinkIcon,
+    QrCode,
+    ShieldCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import resumeApi from '@/services/resumeApi';
 import aiCareerCoachApi from '@/services/aiCareerCoachApi';
-import { apiCall } from '@/services/api';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import jspdf from 'jspdf';
+import QRCode from 'qrcode';
+import {
+    ORG_NAME,
+    normalizeText,
+    buildResumeFingerprint,
+    createResumePublicId,
+    buildVerificationUrl,
+} from '@/utils/resumeSecurity';
+
+/** Footer on each PDF page (body watermark is rendered once in the resume preview) */
+const applyPdfWatermarks = (pdf, pdfWidth, pdfHeight, resumePublicId, studentId) => {
+    const pageCount = pdf.getNumberOfPages();
+    const stuPart = studentId ? ` · STU ID: ${studentId}` : '';
+    for (let page = 1; page <= pageCount; page += 1) {
+        pdf.setPage(page);
+        pdf.setDrawColor(210, 210, 210);
+        pdf.setLineWidth(0.25);
+        pdf.line(14, pdfHeight - 16, pdfWidth - 14, pdfHeight - 16);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(7);
+        pdf.setTextColor(110, 110, 110);
+        pdf.text(
+            `${ORG_NAME} · Verified Securely${stuPart} · ${resumePublicId}`,
+            pdfWidth / 2,
+            pdfHeight - 9,
+            { align: 'center' }
+        );
+    }
+};
+
+const ResumeWatermark = () => (
+    <div
+        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden select-none"
+        aria-hidden
+    >
+        <span
+            className="font-black uppercase whitespace-nowrap !text-black -rotate-45"
+            style={{
+                fontSize: '72px',
+                letterSpacing: '0.18em',
+                opacity: 0.015,
+                fontFamily: 'Arial, Helvetica, sans-serif',
+            }}
+        >
+            SMAART INSTITUTE
+        </span>
+    </div>
+);
 
 const ResumeBuilder = () => {
     const navigate = useNavigate();
@@ -47,6 +96,11 @@ const ResumeBuilder = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const [scale, setScale] = useState(1);
     const containerRef = useRef(null);
+    const [resumePublicId, setResumePublicId] = useState('');
+    const [resumeFingerprint, setResumeFingerprint] = useState('');
+    const [verificationUrl, setVerificationUrl] = useState('');
+    const [verificationQr, setVerificationQr] = useState('');
+    const [studentId, setStudentId] = useState('');
 
     const steps = [
         { id: 'personal', label: 'Profile', icon: User },
@@ -87,6 +141,31 @@ const ResumeBuilder = () => {
         }
     });
 
+    useEffect(() => {
+        const fingerprint = buildResumeFingerprint(resumeData);
+        const nextResumePublicId = resumePublicId || createResumePublicId(fingerprint);
+        const nextVerificationUrl = buildVerificationUrl(nextResumePublicId, fingerprint);
+
+        setResumeFingerprint(fingerprint);
+        if (!resumePublicId) {
+            setResumePublicId(nextResumePublicId);
+        }
+        setVerificationUrl(nextVerificationUrl);
+
+        QRCode.toDataURL(nextVerificationUrl, {
+            margin: 1,
+            width: 180,
+            color: {
+                dark: '#0f172a',
+                light: '#ffffff'
+            }
+        })
+            .then(setVerificationQr)
+            .catch(error => {
+                console.error('Failed to generate resume verification QR:', error);
+                setVerificationQr('');
+            });
+    }, [resumeData, resumePublicId]);
 
     const fetchData = async () => {
         try {
@@ -95,9 +174,26 @@ const ResumeBuilder = () => {
                 aiCareerCoachApi.getProfile().catch(() => ({ success: false }))
             ]);
 
+            // Always capture student ID from profile (used in PDF footer for both branches)
+            if (profileRes.success) {
+                const pData = profileRes.richProfile || {};
+                const pReg = profileRes.registration || {};
+                setStudentId(pData.studentId || pReg.studentId || profileRes.student?.studentId || '');
+            }
+
             if (resumeRes.success && resumeRes.data && resumeRes.data.length > 0) {
                 const r = resumeRes.data[0];
                 setResumeId(r._id);
+                if (r.verification?.resumePublicId) {
+                    setResumePublicId(r.verification.resumePublicId);
+                    setResumeFingerprint(r.verification.fingerprint || '');
+                    setVerificationUrl(
+                        buildVerificationUrl(
+                            r.verification.resumePublicId,
+                            r.verification.fingerprint || buildResumeFingerprint(r)
+                        )
+                    );
+                }
                 setResumeData({
                     personalInfo: r.personalInfo || {},
                     summary: r.summary || '',
@@ -111,6 +207,8 @@ const ResumeBuilder = () => {
             } else if (profileRes.success) {
                 const data = profileRes.richProfile || {};
                 const reg = profileRes.registration || {};
+                // Capture student ID for PDF footer
+                setStudentId(data.studentId || reg.studentId || profileRes.student?.studentId || '');
 
                 setResumeData(prev => ({
                     ...prev,
@@ -410,25 +508,72 @@ const ResumeBuilder = () => {
 
         setGenerating(true);
         try {
+            let activeResumeId = resumeId;
+            if (!activeResumeId) {
+                const created = await resumeApi.createResume(resumeData);
+                if (!created?.success) {
+                    throw new Error(created?.message || 'Save resume before exporting');
+                }
+                activeResumeId = created.data._id;
+                setResumeId(activeResumeId);
+            } else {
+                await resumeApi.updateResume(activeResumeId, resumeData);
+            }
+
+            const exportRes = await resumeApi.issueExport(activeResumeId);
+            if (!exportRes?.success) {
+                const retryMinutes = exportRes?.retryAfter || 60;
+                toast.error(
+                    exportRes?.error ||
+                        exportRes?.message ||
+                        `Export limit reached. Try again in ${retryMinutes} minutes.`
+                );
+                return;
+            }
+
+            const issued = exportRes.data;
+            setResumePublicId(issued.resumePublicId);
+            setResumeFingerprint(issued.fingerprint);
+            setVerificationUrl(issued.verificationUrl || buildVerificationUrl(issued.resumePublicId, issued.fingerprint));
+
+            await new Promise((resolve) => setTimeout(resolve, 150));
+
             const canvas = await html2canvas(element, {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
             });
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jspdf('p', 'mm', 'a4');
             const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save(`${resumeData.personalInfo.fullName || 'Resume'}.pdf`);
-            toast.success('Resume downloaded successfully!');
+            let heightLeft = pdfHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft > 0) {
+                position = heightLeft - pdfHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pageHeight;
+            }
+
+            applyPdfWatermarks(pdf, pdfWidth, pageHeight, issued.resumePublicId, studentId);
+
+            pdf.save(
+                `${normalizeText(resumeData.personalInfo.fullName) || 'Resume'}_${issued.resumePublicId}.pdf`
+            );
+            toast.success('Verified PDF downloaded with org watermark and QR.');
         } catch (error) {
             console.error('Download error:', error);
-            toast.error('Failed to generate PDF');
+            toast.error(error.message || 'Failed to generate PDF');
         } finally {
             setGenerating(false);
         }
@@ -516,24 +661,16 @@ const ResumeBuilder = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] font-sans selection:bg-[#1a3884]/30 selection:text-[#1a3884] transition-colors duration-300">
-            <main className="py-8 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto pb-16">
-                {/* Premium Back Button */}
-                <button
-                    onClick={() => navigate('/dashboard/smaart-toolkit')}
-                    className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-6 hover:text-[#1a3884] transition-all animate-fade-in"
-                >
-                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                        <ArrowLeft className="w-4 h-4" />
-                    </div>
-                    Back to Toolkit
-                </button>
-
-                {/* Page Title & Actions Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-gradient-to-br from-[#112b6b] to-[#1a3884] dark:from-blue-600 dark:to-indigo-650 rounded-2xl shadow-lg shadow-blue-500/20">
-                            <FileText className="w-8 h-8 text-white" />
+        <div className="flex flex-col h-screen bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-blue-500/30 selection:text-blue-200">
+            {/* Header */}
+            <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-50 shrink-0 shadow-sm">
+                <div className="flex items-center gap-4">
+                    <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-2xl transition-all group text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                        <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#00152E] to-[#1a3884] flex items-center justify-center shadow-lg shadow-[#1a3884]/20 ring-4 ring-[#1a3884]/10">
+                            <FileText className="w-5 h-5 text-white" />
                         </div>
                         <div>
                             <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Pro Resume Builder</h1>
@@ -587,20 +724,23 @@ const ResumeBuilder = () => {
                     </div>
                 </div>
 
-                {/* Wizard Forms & Preview Switch */}
-                {currentStep !== steps.length - 1 ? (
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3 tracking-tight">
-                                {steps[currentStep].label}
-                                <span className="text-blue-500">.</span>
-                            </h2>
-                            {currentStep === 0 && (
-                                <button onClick={handleSyncProfile} disabled={isSyncing} className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-550/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 text-[#1a3884] dark:text-blue-450 rounded-2xl transition-all font-bold text-xs border border-blue-100 dark:border-blue-500/20 shadow-sm">
-                                    {isSyncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} Sync with Profile
-                                </button>
-                            )}
-                        </div>
+                <div className="flex items-center gap-3">
+                    <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span className="text-[10px] font-black tracking-wider uppercase">{resumePublicId || 'Secure Resume'}</span>
+                    </div>
+                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-[#002A5C] hover:bg-slate-200 dark:hover:bg-[#002A5C] text-slate-700 dark:text-slate-300 rounded-2xl transition-all font-bold text-sm border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm">
+                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                        <span className="hidden sm:inline">Save Progress</span>
+                    </button>
+                    {currentStep === steps.length - 1 && (
+                        <button onClick={handleDownloadPDF} disabled={generating} className="flex items-center gap-2 px-5 py-2.5 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-2xl transition-all font-bold text-sm shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 disabled:opacity-50">
+                            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                            <span>Download PDF</span>
+                        </button>
+                    )}
+                </div>
+            </header>
 
                         <div className="min-h-[400px]">
                             {steps[currentStep].id === 'personal' && (
@@ -902,13 +1042,90 @@ const ResumeBuilder = () => {
                             </button>
                         </div>
                     </div>
-                ) : (
-                    /* Preview Canvas (Shows on last step) */
-                    <div ref={containerRef} className="space-y-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 p-6 rounded-3xl shadow-sm">
-                            <div>
-                                <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Review & Download</h2>
-                                <p className="text-slate-500 text-sm font-medium">Verify your final resume and generate the official PDF.</p>
+
+                    {/* Navigation Footer - Fixed at bottom of section */}
+                    <div className="p-6 bg-white dark:bg-[#002147] border-t border-slate-200 dark:border-white/8 flex justify-between items-center z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                        <button
+                            onClick={prevStep}
+                            disabled={currentStep === 0}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all ${currentStep === 0 ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#002A5C]'}`}
+                        >
+                            <ArrowLeft className="w-4 h-4" /> Previous
+                        </button>
+                        <button
+                            onClick={nextStep}
+                            className={`flex items-center gap-2 px-10 py-3 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-2xl font-black transition-all shadow-lg shadow-blue-600/20 group active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
+                        >
+                            Next Step
+                            <motion.div animate={{ x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} className="group-hover:translate-x-1 transition-transform">
+                                <Plus className="w-4 h-4 rotate-[-90deg]" />
+                            </motion.div>
+                        </button>
+                    </div>
+                </section>
+
+                {/* Preview Canvas (Shows on last step) */}
+                <section 
+                    ref={containerRef}
+                    className={`flex-1 overflow-auto relative p-4 md:p-12 custom-scrollbar shadow-inner bg-slate-100 dark:bg-[#002147] ${currentStep === steps.length - 1 ? 'block' : 'hidden'}`}
+                >
+                    <div 
+                        className="flex justify-center items-start w-full"
+                        style={{ 
+                            height: scale < 1 ? `${1122.5 * scale}px` : 'auto', 
+                            overflow: 'hidden' 
+                        }}
+                    >
+                        <div 
+                            id="resume-preview" 
+                            className="bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm" 
+                            style={{ 
+                                fontFamily: '"Times New Roman", Times, serif',
+                                transform: scale < 1 ? `scale(${scale})` : 'none',
+                                transformOrigin: 'top center'
+                            }}
+                        >
+                        <ResumeWatermark />
+
+                        <div className="relative z-10">
+                            {/* Header Section */}
+                            <div className="flex flex-col items-center text-center relative z-10 mb-6">
+                                <h1 className="text-4xl font-bold !text-black m-0 leading-tight uppercase tracking-tight" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+                                    {resumeData.personalInfo.fullName || 'FIRST LAST'}
+                                </h1>
+                                <h2 className="text-lg font-semibold !text-gray-800 mt-1 uppercase tracking-widest">{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
+
+                                <div className="mt-4 w-full border border-slate-200 bg-slate-50/80 px-4 py-3 flex items-center justify-between gap-4 rounded-sm">
+                                    <div className="text-left min-w-0">
+                                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
+                                            <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
+                                            {ORG_NAME} verified resume
+                                        </div>
+                                        <p className="mt-1.5 text-[10px] !text-slate-600">
+                                            ID: <span className="font-semibold !text-black">{resumePublicId}</span>
+                                        </p>
+                                        <p className="text-[9px] !text-slate-500 mt-0.5">Scan QR to verify authenticity</p>
+                                    </div>
+                                    {verificationQr ? (
+                                        <img
+                                            src={verificationQr}
+                                            alt="Resume verification QR code"
+                                            className="w-14 h-14 border border-slate-200 bg-white p-1 shrink-0"
+                                        />
+                                    ) : (
+                                        <div className="w-14 h-14 border border-slate-200 bg-white flex items-center justify-center shrink-0">
+                                            <QrCode className="w-7 h-7 text-slate-400" />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-3 text-[11px] !text-gray-700 max-w-[90%]">
+                                    {resumeData.personalInfo.email && <span className="flex items-center">📧 {resumeData.personalInfo.email}</span>}
+                                    {(resumeData.personalInfo.mobile || resumeData.personalInfo.phone) && (
+                                        <span className="flex items-center">📱 {resumeData.personalInfo.mobile || resumeData.personalInfo.phone}</span>
+                                    )}
+                                    {resumeData.personalInfo.location && <span className="flex items-center">📍 {resumeData.personalInfo.location}</span>}
+                                </div>
                             </div>
                             <button
                                 onClick={prevStep}
@@ -1010,93 +1227,14 @@ const ResumeBuilder = () => {
                                                 </div>
                                             )}
 
-                                            {/* Experience */}
-                                            {resumeData.experience.length > 0 && (
-                                                <div className="mb-6">
-                                                    <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Professional Experience</h3>
-                                                    <div className="space-y-4">
-                                                        {resumeData.experience.map((exp, idx) => (
-                                                            <div key={idx} className="flex flex-col">
-                                                                <div className="flex justify-between items-start">
-                                                                    <span className="font-bold text-[13px] !text-black">{exp.role}</span>
-                                                                    <span className="text-[11px] font-semibold !text-gray-700">{exp.duration}</span>
-                                                                </div>
-                                                                <span className="text-[12px] font-medium !text-gray-800 italic">{exp.company}</span>
-                                                                <p className="text-[11px] !text-gray-700 mt-1.5 leading-relaxed text-justify">{exp.description}</p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Projects */}
-                                            {resumeData.projects.length > 0 && (
-                                                <section>
-                                                    <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Projects</h3>
-                                                    <div className="space-y-3">
-                                                        {resumeData.projects.map((proj, i) => (
-                                                            <div key={i}>
-                                                                <div className="flex justify-between items-baseline">
-                                                                    <span className="font-bold text-[13px] !text-black">{proj.title}</span>
-                                                                    {proj.link && <span className="block italic text-blue-800 underline mt-0.5">{proj.link}</span>}
-                                                                </div>
-                                                                <p className="!text-gray-700 text-[11px] leading-normal mt-1 whitespace-pre-wrap pl-4 relative before:content-['•'] before:absolute before:left-0">
-                                                                    {proj.description}
-                                                                </p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </section>
-                                            )}
-
-                                            {/* Technical Skills */}
-                                            {(resumeData.skills.technical || resumeData.skills.soft || resumeData.skills.languages) && (
-                                                <section>
-                                                    <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Skills</h3>
-                                                    <div className="text-[11px] space-y-1 px-1 !text-gray-700">
-                                                        {resumeData.skills.technical && (
-                                                            <div><span className="font-bold !text-black">Technical Skills:</span> {resumeData.skills.technical}</div>
-                                                        )}
-                                                        {resumeData.skills.soft && (
-                                                            <div><span className="font-bold !text-black">Soft Skills:</span> {resumeData.skills.soft}</div>
-                                                        )}
-                                                        {resumeData.skills.languages && (
-                                                            <div><span className="font-bold !text-black">Languages:</span> {resumeData.skills.languages}</div>
-                                                        )}
-                                                    </div>
-                                                </section>
-                                            )}
-
-                                            {/* Achievements */}
-                                            {resumeData.achievements.length > 0 && (
-                                                <section>
-                                                    <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Achievements</h3>
-                                                    <div className="space-y-2">
-                                                        {resumeData.achievements.map((ach, i) => (
-                                                            <div key={i} className="text-[11px]">
-                                                                <div className="flex justify-between items-baseline">
-                                                                    <span className="font-bold !text-black">{ach.title}</span>
-                                                                    {ach.link && <span className="italic text-blue-800 underline text-[10px] ml-2">{ach.link}</span>}
-                                                                </div>
-                                                                <p className="italic !text-gray-700">{ach.description}</p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </section>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* SMAART Watermark - Premium Bottom Right Position */}
-                                    <div className="absolute bottom-10 right-10 pointer-events-none opacity-[0.12] z-0 flex flex-col items-start" style={{ fontFamily: 'sans-serif' }}>
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-3xl font-black tracking-tighter !text-black leading-none" style={{ fontWeight: 900 }}>SMAART</span>
-                                            <div className="w-2 h-2 rounded-full bg-black mt-1"></div>
-                                        </div>
-                                        <span className="text-[10px] font-bold tracking-[0.45em] !text-black uppercase mt-1">INSTITUTE</span>
-                                    </div>
-                                </div>
-                            </div>
+                        {/* Preview-only footer — pinned to bottom of A4, hidden during html2canvas PDF capture */}
+                        <div
+                            data-html2canvas-ignore="true"
+                            className="absolute bottom-[10mm] left-[15mm] right-[15mm] pt-2 border-t border-slate-200"
+                        >
+                            <p className="text-center text-[8px] !text-slate-400 tracking-wide">
+                                {ORG_NAME} &middot; Verified Securely{studentId ? ` \u00b7 STU ID: ${studentId}` : ''} &middot; {resumePublicId || 'Document ID pending'}
+                            </p>
                         </div>
                     </div>
                 )}

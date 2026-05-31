@@ -9,8 +9,11 @@ import FlashcardTask from "@/components/FlashcardTask";
 import AdvancedPractice from "@/components/AdvancedPractice";
 import CaseStudy from "@/components/CaseStudy";
 import Notes from "@/components/Notes";
+import MicroAssessment from "@/components/MicroAssessment";
+import useUser from "@/hooks/useUser";
 import FloatingDictionary from "@/components/FloatingDictionary";
 import FloatingNotes from "@/components/FloatingNotes";
+import SyncedTranscript from "@/components/SyncedTranscript";
 import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK } from "@/data/courseStructureData";
 import { getLearningFlowData } from "@/data/learningFlowData";
 import { Badge } from "@/components/ui/badge";
@@ -97,31 +100,174 @@ const getStageAndTrackInfo = (courseId) => {
 
 const CoursePlayer = () => {
   const { courseId } = useParams();
+  const { user: currentUser } = useUser();
   const navigate = useNavigate();
   const playerRef = useRef(null);
   const [videoProgress, setVideoProgress] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [dynamicFlow, setDynamicFlow] = useState(null);
+  const [totalSteps, setTotalSteps] = useState(9);
   const [showIntro, setShowIntro] = useState(true);
   const [activeStep, setActiveStep] = useState(null);
   const [completedSteps, setCompletedSteps] = useState({});
   const [showOverview, setShowOverview] = useState(true);
   const [showTranscription, setShowTranscription] = useState(false);
   const [activeTab, setActiveTab] = useState('preview');
+  const [currentVideoTime, setCurrentVideoTime] = useState(0);
   const [showCongratulation, setShowCongratulation] = useState(false);
   const [congratulationAcknowledged, setCongratulationAcknowledged] = useState(false);
   const [videoWatched, setVideoWatched] = useState(false);
   const { t } = useTranslation();
-
-  const course = getCourseById(courseId);
+  const { user: currentUser } = useUser();
+  const [courseMeta, setCourseMeta] = useState({ courseCode: null, courseDbId: null });
+  const [taskResultsByDay, setTaskResultsByDay] = useState({});
+  const staticCourse = getCourseById(courseId);
   const { stageKey, stageNameKey, typeKey } = getStageAndTrackInfo(courseId);
-  const videoUrl = COURSE_VIDEOS[courseId];
-  const learningFlowData = getLearningFlowData(courseId);
+  const staticFlow = getLearningFlowData(courseId);
+  const learningFlowData = dynamicFlow || staticFlow;
+  const course =
+    staticCourse ||
+    (dynamicFlow
+      ? {
+          id: courseId,
+          title: dynamicFlow.overviewTitle || courseId,
+          subtitle: dynamicFlow.overview || ''
+        }
+      : null);
+  const stepNumbers = Array.from({ length: totalSteps }, (_, i) => String(i + 1));
+  const lastStepKey = String(totalSteps);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCourseFromApi = async () => {
+      setLoading(true);
+      setDynamicFlow(null);
+      setTotalSteps(9);
+
+      try {
+        const isObjectId = /^[0-9a-fA-F]{24}$/.test(courseId);
+        const [courseRes, stagesRes] = await Promise.all([
+          coursesAPI.getByCatalog(courseId).catch(() =>
+            isObjectId
+              ? coursesAPI.getById(courseId).catch(() => null)
+              : coursesAPI.getByCode(courseId).catch(() => null)
+          ),
+          coursesAPI.getStages(courseId).catch(() => null),
+        ]);
+
+        if (cancelled) return;
+
+        const dbCourse = courseRes?.data;
+        const baseStaticFlow = getLearningFlowData(courseId);
+
+        if (dbCourse) {
+          let flow = baseStaticFlow
+            ? { ...baseStaticFlow, overviewTitle: dbCourse.title || baseStaticFlow.overviewTitle }
+            : buildFlowFromCourse(dbCourse);
+
+          if (dbCourse.status === 'active' && dbCourse.modules?.[0]?.days?.length) {
+            const dbFlow = buildFlowFromCourse(dbCourse);
+            flow = {
+              ...flow,
+              ...dbFlow,
+              overviewTitle: dbCourse.title || flow.overviewTitle,
+              steps: { ...(flow.steps || {}), ...dbFlow.steps },
+            };
+          }
+
+          flow = mergeAdminQuizzesIntoFlow(flow, dbCourse);
+          const stepCount = Object.keys(flow.steps || {}).length || 9;
+          setDynamicFlow(flow);
+          setTotalSteps(stepCount);
+          setCourseMeta({
+            courseCode: dbCourse.courseCode || courseId,
+            courseDbId: dbCourse._id,
+          });
+        } else if (stagesRes?.data?.length) {
+          const steps = {};
+          stagesRes.data.forEach((stage, index) => {
+            const stepKey = String(index + 1);
+            const isNotes = index === 6;
+            const videoUrl = stage.videoUrl || (isNotes ? null : TEMP_VIDEO_URL);
+            steps[stepKey] = {
+              title: stage.title,
+              duration: `${stage.duration || 5} min`,
+              contentType: isNotes ? 'notes' : 'video-text',
+              videoUrl,
+              content: stage.description || '',
+              transcription: stage.transcription || ''
+            };
+          });
+          setDynamicFlow({
+            overview: stagesRes.courseTitle || '',
+            overviewTitle: stagesRes.courseTitle,
+            steps,
+            totalSteps: stagesRes.stageCount || stagesRes.data.length
+          });
+          setTotalSteps(stagesRes.stageCount || stagesRes.data.length);
+        }
+      } catch (err) {
+        console.warn('Using static course flow:', err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    loadCourseFromApi();
+    return () => { cancelled = true; };
+  }, [courseId]);
+
+  useEffect(() => {
+    const studentId = currentUser?._id || currentUser?.id;
+    if (!studentId || !courseMeta.courseDbId) return;
+
+    let cancelled = false;
+
+    const loadEnrollmentResults = async () => {
+      try {
+        const res = await courseEnrollmentAPI.getByStudentAndCourse(
+          studentId,
+          courseMeta.courseDbId
+        );
+        if (cancelled || !res?.success || !res.data?.length) return;
+
+        const enrollment = res.data[0];
+        const byDay = {};
+        (enrollment.moduleProgress || []).forEach((mp) => {
+          (mp.taskResults || []).forEach((tr) => {
+            byDay[tr.dayId] = {
+              ...tr,
+              isCompleted: true,
+            };
+          });
+        });
+        setTaskResultsByDay(byDay);
+      } catch (err) {
+        console.warn('Could not load quiz results:', err.message);
+      }
+    };
+
+    loadEnrollmentResults();
+    return () => { cancelled = true; };
+  }, [currentUser, courseMeta.courseDbId]);
+
+  // Activity restrictions monitoring
+  const {
+    warningsCount,
+    maxWarnings,
+    isWarningVisible,
+    lastViolationType,
+    acknowledgeWarning
+  } = useActivityRestrictions({
+    courseId,
+    isActive: !loading && !!course
+  });
 
   const [userProgressData, setUserProgressData] = useState({});
 
   useEffect(() => {
-    // Reset all local state when course changes
     setShowIntro(true);
     setActiveStep(null);
     setCompletedSteps({});
@@ -129,18 +275,16 @@ const CoursePlayer = () => {
     setCongratulationAcknowledged(false);
     setIsCompleted(false);
     setVideoProgress(0);
+    setCurrentVideoTime(0);
     setVideoWatched(false);
     window.scrollTo(0, 0);
 
-    // ── Save last-watched course to localStorage for MyCourses page ──
     if (courseId) {
-      const courseData = getCourseById(courseId);
-      if (courseData) {
-        localStorage.setItem('smaart_last_watched_course', courseId);
-        localStorage.setItem('smaart_last_watched_title', courseData.title || courseId);
-        localStorage.setItem('smaart_last_watched_lesson', courseData.title || courseId);
-        localStorage.setItem('smaart_course_progress', '0');
-      }
+      const courseData = staticCourse || { title: learningFlowData?.overviewTitle || courseId };
+      localStorage.setItem("smaart_last_watched_course", courseId);
+      localStorage.setItem("smaart_last_watched_title", courseData.title || courseId);
+      localStorage.setItem("smaart_last_watched_lesson", courseData.title || courseId);
+      localStorage.setItem("smaart_course_progress", "0");
     }
 
     // ── Fetch detailed user progress from backend ──
@@ -286,23 +430,37 @@ const CoursePlayer = () => {
 
     // ── Save progress to localStorage for MyCourses continue watching ──
     const stepsDone = Object.keys(newCompletedSteps).length;
-    const pct = Math.round((stepsDone / 9) * 100);
-    const courseData = getCourseById(courseId);
-    const currentStepData = getLearningFlowData(courseId)?.steps?.[stepNumber];
+    const pct = Math.round((stepsDone / totalSteps) * 100);
+    const courseData = staticCourse || { title: courseId };
+    const currentStepData = learningFlowData?.steps?.[stepNumber];
     localStorage.setItem('smaart_course_progress', String(pct));
     localStorage.setItem('smaart_last_watched_lesson',
       currentStepData?.title || (courseData?.title + ' — Step ' + stepNumber) || courseId
     );
 
-    // Check if all 9 steps are completed
-    const allSteps = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    const allCompleted = allSteps.every(step => newCompletedSteps[step]);
+    // Sync to DB
+    if (currentUser) {
+      try {
+        await courseEnrollmentAPI.updateTaskProgress({
+          studentId: currentUser._id || currentUser.id,
+          courseCode: courseId,
+          moduleId: 1,
+          dayId: parseInt(stepNumber),
+          taskId: 1,
+          completed: true
+        });
+      } catch (err) {
+        console.error("Error saving step task progress to DB:", err);
+      }
+    }
 
+    const allCompleted = stepNumbers.every((step) => newCompletedSteps[step]);
     if (allCompleted) {
       setIsCompleted(true);
       setShowCongratulation(true);
       setActiveStep(null);
       localStorage.setItem('smaart_course_progress', '100');
+      markCourseCompleted(courseId);
     } else {
       // Auto-advance to next step
       const nextStep = (parseInt(stepNumber) + 1).toString();
@@ -406,23 +564,50 @@ const CoursePlayer = () => {
     setCongratulationAcknowledged(true);
   };
 
+  const renderMicroAssessment = (stepData, stepLetter, isStepCompleted) => {
+    const studentId = currentUser?._id || currentUser?.id;
+    if (!stepData?.assessmentData || !studentId || !courseMeta.courseCode) {
+      return (
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Sign in to take this micro-assessment, or ensure the course is published with quiz questions.
+        </p>
+      );
+    }
+
+    return (
+      <MicroAssessment
+        assessmentData={stepData.assessmentData}
+        courseCode={courseMeta.courseCode}
+        moduleId={stepData.moduleId || stepData.assessmentData.moduleId || 1}
+        dayId={stepData.dayId || stepData.assessmentData.dayId}
+        studentId={studentId}
+        initialResult={taskResultsByDay[stepData.dayId || stepData.assessmentData.dayId]}
+        onComplete={() => handleStepComplete(stepLetter)}
+      />
+    );
+  };
+
   const renderStepContent = (stepData, stepLetter) => {
     const contentType = stepData.contentType;
     const isStepCompleted = completedSteps[stepLetter];
 
     switch (contentType) {
-      case 'video-text':
+      case 'quiz':
+        return renderMicroAssessment(stepData, stepLetter, isStepCompleted);
+      case 'video-text': {
+        const playbackUrl = stepData.videoUrl || TEMP_VIDEO_URL;
         return (
           <div className="space-y-4">
-            {stepData.videoUrl && (
+            {playbackUrl && (
               <div className="rounded-xl overflow-hidden">
                 <CustomVideoPlayer
-                  videoUrl={stepData.videoUrl}
+                  videoUrl={playbackUrl}
                   title={stepData.title}
                   initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
                   initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
                   onProgressUpdate={handleVideoProgressUpdate}
-                  onNext={activeStep !== '9' ? () => {
+                  onTimeUpdate={(time) => setCurrentVideoTime(time)}
+                  onNext={activeStep !== lastStepKey ? () => {
                     const nextStep = (parseInt(activeStep) + 1).toString();
                     handleStepComplete(activeStep);
                     setActiveStep(nextStep);
@@ -514,21 +699,26 @@ const CoursePlayer = () => {
                     transition={{ duration: 0.2 }}
                     className="p-3 sm:p-6"
                   >
-                    <div className="bg-[#F8FAFC] dark:bg-[#002A5C] border border-transparent dark:border-white/5 rounded-xl p-6 transition-colors duration-300">
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{t("course_player.video_transcription")}</h4>
-                      <p className="text-gray-600 dark:text-slate-200 leading-relaxed italic">
-                        {t("course_player.transcription_coming_soon")}
-                      </p>
-                      <p className="text-gray-500 dark:text-slate-400 text-[11px] sm:text-xs mt-3 sm:mt-4 leading-relaxed">
-                        {t("course_player.transcription_desc")}
-                      </p>
-                    </div>
+                    <SyncedTranscript
+                      currentTime={currentVideoTime}
+                      transcriptUrl={stepData.transcriptUrl || stepData.transcriptionUrl || "/transcripts/sample-course.vtt"}
+                      transcriptText={stepData.transcriptText || stepData.captions}
+                      title={t("course_player.video_transcription")}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
+
+            {stepData.assessmentData && (videoWatched || isStepCompleted) && (
+              <div className="mt-6">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-3">Micro-Assessment</h4>
+                {renderMicroAssessment(stepData, stepLetter, isStepCompleted)}
+              </div>
+            )}
           </div>
         );
+      }
       case 'mcq':
         return (
           <MCQPractice
@@ -573,7 +763,7 @@ const CoursePlayer = () => {
             onComplete={() => handleStepComplete(stepLetter)}
             isCompleted={isStepCompleted}
             onNextLesson={handleNextLesson}
-            showNextLesson={congratulationAcknowledged && stepLetter === '9'}
+            showNextLesson={congratulationAcknowledged && stepLetter === lastStepKey}
             courseId={courseId}
           />
         );
@@ -596,7 +786,7 @@ const CoursePlayer = () => {
     );
   }
 
-  if (!course) {
+  if (!loading && !course && !dynamicFlow) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#00152E] flex items-center justify-center">
         <div className="text-center p-8">
@@ -776,9 +966,12 @@ const CoursePlayer = () => {
                             <p className="text-[10px] sm:text-xs text-blue-600 font-bold uppercase tracking-wider">{t("course_player.active_session")}</p>
                           </div>
                         </div>
-                        <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl text-xs font-bold text-slate-500 border border-slate-100 dark:border-white/10">
-                          {learningFlowData?.steps[activeStep]?.duration || t("course_player.five_ten_min")}
-                        </div>
+                        {learningFlowData?.steps[activeStep]?.contentType !== 'quiz' &&
+                          !learningFlowData?.steps[activeStep]?.assessmentData && (
+                          <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl text-xs font-bold text-slate-500 border border-slate-100 dark:border-white/10">
+                            {learningFlowData?.steps[activeStep]?.duration || t("course_player.five_ten_min")}
+                          </div>
+                        )}
                       </div>
 
                       {learningFlowData?.steps[activeStep] ? (
@@ -797,7 +990,10 @@ const CoursePlayer = () => {
                         </div>
                       )}
 
-                      {activeStep && activeStep !== '9' && (
+                      {activeStep &&
+                        activeStep !== lastStepKey &&
+                        learningFlowData?.steps[activeStep]?.contentType !== 'quiz' &&
+                        !learningFlowData?.steps[activeStep]?.assessmentData && (
                         <div className="mt-8 flex justify-end">
                           <button
                             onClick={() => {
@@ -814,7 +1010,7 @@ const CoursePlayer = () => {
                         </div>
                       )}
 
-                      {activeStep === '9' && congratulationAcknowledged && (
+                      {activeStep === lastStepKey && congratulationAcknowledged && (
                         <button
                           onClick={handleNextLesson}
                           className="w-full px-6 py-5 bg-[#1a3884] hover:bg-[#002147] text-white rounded-2xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] mt-4"
@@ -869,13 +1065,13 @@ const CoursePlayer = () => {
                         <div className="flex items-center justify-between text-xs font-bold text-slate-500">
                           <span>{t("course_player.steps_completed")}</span>
                           <span className="text-[#0D7377]">
-                            {Object.keys(completedSteps).length}/9
+                            {Object.keys(completedSteps).length}/{totalSteps}
                           </span>
                         </div>
                         <div className="h-2.5 bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${(Object.keys(completedSteps).length / 9) * 100}%` }}
+                            animate={{ width: `${(Object.keys(completedSteps).length / totalSteps) * 100}%` }}
                             className="h-full bg-[#0D7377] rounded-full"
                             transition={{ type: "spring", bounce: 0, duration: 1 }}
                           />
@@ -910,12 +1106,12 @@ const CoursePlayer = () => {
                         {t("course_player.curriculum")}
                       </h3>
                       <div className="px-3 py-1 bg-slate-100 dark:bg-[#002A5C] rounded-lg text-xs font-bold text-slate-500">
-                        {Object.keys(completedSteps).length}/9
+                        {Object.keys(completedSteps).length}/{totalSteps}
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((step) => {
+                      {stepNumbers.map((step) => {
                         const status = getStepStatus(step);
                         const stepData = learningFlowData?.steps[step];
                         const isActive = activeStep === step;
@@ -1094,6 +1290,13 @@ const CoursePlayer = () => {
       </div>
       <FloatingDictionary />
       <FloatingNotes />
+      <ActivityWarningModal
+        isOpen={isWarningVisible}
+        warningsCount={warningsCount}
+        maxWarnings={maxWarnings}
+        lastViolationType={lastViolationType}
+        onAcknowledge={acknowledgeWarning}
+      />
     </div>
   );
 };

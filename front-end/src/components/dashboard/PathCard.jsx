@@ -1,12 +1,12 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Code, Database, Cloud, BookOpen } from "lucide-react";
+import { RiCodeLine, RiDatabase2Line, RiCloudLine, RiBookOpenLine } from "@remixicon/react";
 import { COLORS, COURSE_COLORS } from "@/constants/dashboard";
 import { useNavigate } from "react-router-dom";
 
 const PathCard = memo(({ path }) => {
   const navigate = useNavigate();
-  const IconComponent = { Code, Database, Cloud, BookOpen }[path.icon] || BookOpen;
+  const IconComponent = { Code: RiCodeLine, Database: RiDatabase2Line, Cloud: RiCloudLine, BookOpen: RiBookOpenLine }[path.icon] || RiBookOpenLine;
   
   const getIconColor = (color) => {
     switch (color) {

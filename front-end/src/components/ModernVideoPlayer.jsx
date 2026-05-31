@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Play, 
@@ -12,6 +12,8 @@ import {
   ArrowLeft
 } from "lucide-react";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
+import SyncedTranscript from "@/components/SyncedTranscript";
+import { resolveLessonVideoUrl, resolveLessonTranscriptUrl } from "@/constants/demoMedia";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +35,8 @@ const ModernVideoPlayer = ({
   const [expandedModules, setExpandedModules] = useState({});
   const [activeLesson, setActiveLesson] = useState(null);
   const [activeTab, setActiveTab] = useState('preview');
+  const [currentVideoTime, setCurrentVideoTime] = useState(0);
+  const videoPlayerRef = useRef(null);
 
   // Initialize expanded modules
   useEffect(() => {
@@ -61,6 +65,7 @@ const ModernVideoPlayer = ({
 
   const handleLessonClick = (moduleIndex, dayIndex) => {
     setActiveLesson({ module: moduleIndex, day: dayIndex });
+    setCurrentVideoTime(0);
     if (onDaySelect) {
       onDaySelect(moduleIndex + 1, dayIndex + 1);
     }
@@ -131,10 +136,11 @@ const ModernVideoPlayer = ({
             </p>
           </div>
 
-          {/* Video Player */}
+          {/* Video Player + synced transcript */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
             <CustomVideoPlayer
-              videoUrl={currentDay?.videoUrl || ''}
+              ref={videoPlayerRef}
+              videoUrl={resolveLessonVideoUrl(currentDay?.videoUrl)}
               title={currentDay?.title || `Lesson ${selectedDay}`}
               duration={formatDuration(videoDurationMap[`${selectedModule}-${selectedDay}`])}
               initialMaxTime={videoProgressMap[`${selectedModule}-${selectedDay}`] || 0}
@@ -144,7 +150,16 @@ const ModernVideoPlayer = ({
                   onVideoProgressUpdate(selectedModule, selectedDay, time, completed, duration);
                 }
               }}
+              onTimeUpdate={(time) => setCurrentVideoTime(time)}
             />
+            <div className="p-4 sm:p-5 border-t border-gray-100 bg-[#F8FAFC]">
+              <SyncedTranscript
+                currentTime={currentVideoTime}
+                transcriptUrl={resolveLessonTranscriptUrl(currentDay)}
+                transcriptText={currentDay?.transcriptText || currentDay?.captions}
+                onCueClick={(time) => videoPlayerRef.current?.seekTo(time)}
+              />
+            </div>
           </div>
 
           {/* Transcription Section */}
@@ -212,15 +227,9 @@ const ModernVideoPlayer = ({
                     transition={{ duration: 0.2 }}
                     className="min-h-[200px]"
                   >
-                    <div className="bg-[#F8FAFC] rounded-xl p-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Video Transcription</h4>
-                      <p className="text-gray-600 leading-relaxed italic">
-                        Transcription will be available here once the video content is processed.
-                      </p>
-                      <p className="text-gray-500 text-sm mt-4">
-                        This feature allows you to read along with the video content, making it easier to follow along and review key points.
-                      </p>
-                    </div>
+                    <p className="text-gray-600 leading-relaxed">
+                      The synced transcript follows the video above. Use &quot;Full Transcript&quot; there for paragraph view, or click any line to jump playback.
+                    </p>
                   </motion.div>
                 )}
               </AnimatePresence>

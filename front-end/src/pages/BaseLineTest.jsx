@@ -3,11 +3,36 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { assessmentApi } from "@/services/assessmentApi";
-import { CheckCircle2, XCircle, Target, AlertTriangle, Lock, Download, TrendingUp, Award, Sparkles, Brain, Users, BookOpen, Heart, Monitor, Zap, ShieldCheck, Trophy, BarChart3, Sprout, Briefcase, RefreshCw, ArrowLeft } from "lucide-react";
+import {
+  RiCheckboxCircleLine as CheckCircle2,
+  RiCloseCircleLine as XCircle,
+  RiTargetLine as Target,
+  RiAlertLine as AlertTriangle,
+  RiLockLine as Lock,
+  RiDownloadLine as Download,
+  RiLineChartLine as TrendingUp,
+  RiAwardLine as Award,
+  RiSparklingLine as Sparkles,
+  RiBrainLine as Brain,
+  RiGroupLine as Users,
+  RiBookOpenLine as BookOpen,
+  RiHeartLine as Heart,
+  RiComputerLine as Monitor,
+  RiFlashlightLine as Zap,
+  RiShieldCheckLine as ShieldCheck,
+  RiTrophyLine as Trophy,
+  RiBarChartBoxLine as BarChart3,
+  RiPlantLine as Sprout,
+  RiBriefcaseLine as Briefcase,
+  RiRefreshLine as RefreshCw,
+  RiArrowLeftLine as ArrowLeft
+} from "@remixicon/react";
 import { toast } from "sonner";
 import { generateAssessmentReport } from "@/utils/reportGenerator";
 import BadgeModal from "@/components/badges/BadgeModal";
 import { buildAssessmentTimerStorageKeys, clearAssessmentTimerStorage } from "@/utils/assessmentTimerStorage";
+import useActivityRestrictions from "@/hooks/useActivityRestrictions";
+import ActivityWarningModal from "@/components/ActivityWarningModal";
 
 // Stage configuration map
 const STAGE_MAP = {
@@ -574,9 +599,17 @@ const BaseLineTest = () => {
     t
   ]);
 
-  // Proctoring Logic - Anti-Cheat
-  const [warnings, setWarnings] = useState(0);
-  const MAX_WARNINGS = 3;
+  // Proctoring Logic - Anti-Cheat (using useActivityRestrictions)
+  const {
+    warningsCount,
+    maxWarnings,
+    isWarningVisible,
+    lastViolationType,
+    acknowledgeWarning
+  } = useActivityRestrictions({
+    assessmentId: assessment?._id,
+    isActive: !loading && !submitted && !error && !!assessment
+  });
 
   useEffect(() => {
     if (submitted || loading) return;
@@ -597,30 +630,8 @@ const BaseLineTest = () => {
     const handleKeyDown = (e) => {
       if (e.key === "PrintScreen" || (e.ctrlKey && e.key === "p") || (e.metaKey && e.shiftKey && e.key === "3") || (e.metaKey && e.shiftKey && e.key === "4")) {
         e.preventDefault();
-        handleViolation(t("baseline_test.screenshot_detected", "Screenshot attempt detected!"));
+        toast.error(t("baseline_test.screenshot_detected", "Screenshot attempt detected!"));
       }
-    };
-
-    // 4. Detect Focus Loss (Alt-Tab / Switching Windows)
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        handleViolation(t("baseline_test.navigated_away", "You navigated away from the test window."));
-      }
-    };
-
-    // Violation Handler
-    const handleViolation = (message) => {
-      setWarnings(prev => {
-        const newCount = prev + 1;
-        if (newCount >= MAX_WARNINGS) {
-          // Force Submit
-          submit({ reason: "violation", redirectAfterSubmit: true });
-          toast.error(t("baseline_test.terminated_violations", "Test terminated due to multiple violations."));
-          return newCount;
-        }
-        toast.error(t("baseline_test.warning_violations", "Warning {{count}}/{{max}}: {{message}}", { count: newCount, max: MAX_WARNINGS, message }));
-        return newCount;
-      });
     };
 
     document.addEventListener("contextmenu", handleContextMenu);
@@ -628,8 +639,6 @@ const BaseLineTest = () => {
     document.addEventListener("cut", handleCopyCutPaste);
     document.addEventListener("paste", handleCopyCutPaste);
     document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    // Blur window detection is too aggressive sometimes, sticking to visibilitychange for now
 
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
@@ -637,9 +646,8 @@ const BaseLineTest = () => {
       document.removeEventListener("cut", handleCopyCutPaste);
       document.removeEventListener("paste", handleCopyCutPaste);
       document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [submitted, loading, submit, t]); // Added submit to dependencies if stable (or remove if causes loop, submit uses refs or is stable)
+  }, [submitted, loading, t]);
 
 
   if (loading) return (
@@ -1124,6 +1132,15 @@ const BaseLineTest = () => {
         onClose={() => setShowBadgeModal(false)}
         badge={earnedBadge}
         userName={user?.fullName || t("baseline_test.student", "Student")}
+      />
+
+      {/* Activity Restriction Warning Modal */}
+      <ActivityWarningModal
+        isOpen={isWarningVisible}
+        warningsCount={warningsCount}
+        maxWarnings={maxWarnings}
+        lastViolationType={lastViolationType}
+        onAcknowledge={acknowledgeWarning}
       />
 
       <style dangerouslySetInnerHTML={{

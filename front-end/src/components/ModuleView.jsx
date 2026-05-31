@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, ChevronRight, CheckCircle2, Circle, Clock, BookOpen, FileText, Video, ArrowLeft } from "lucide-react";
 import { coursesAPI, courseEnrollmentAPI } from "@/services/api";
 import { useParams, useNavigate } from "react-router-dom";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
+import SyncedTranscript from "@/components/SyncedTranscript";
+import { resolveLessonVideoUrl, resolveLessonTranscriptUrl } from "@/constants/demoMedia";
 
 const ModuleView = ({ courseId, onBack }) => {
   const { moduleId, dayId } = useParams();
@@ -18,6 +20,8 @@ const ModuleView = ({ courseId, onBack }) => {
   const [loading, setLoading] = useState(true);
   const [courseData, setCourseData] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [currentVideoTime, setCurrentVideoTime] = useState(0);
+  const videoPlayerRef = useRef(null);
 
   // Fetch course data based on courseId
   useEffect(() => {
@@ -108,6 +112,12 @@ const ModuleView = ({ courseId, onBack }) => {
                       return day.videoContent[0].transcription || '';
                     }
                     return day.videoContent?.transcription || '';
+                  })(),
+                  transcriptUrl: (() => {
+                    const videoItem =
+                      (day.VideoContent && day.VideoContent[0]) ||
+                      (day.videoContent && Array.isArray(day.videoContent) ? day.videoContent[0] : day.videoContent);
+                    return videoItem?.transcriptUrl || videoItem?.transcriptionUrl || videoItem?.captionsUrl || '';
                   })(),
                   tasks: day.tasks && day.tasks.length > 0
                     ? day.tasks.map((task, taskIndex) => ({
@@ -330,6 +340,10 @@ const ModuleView = ({ courseId, onBack }) => {
     return { completed, total: totalTasks };
   };
 
+  useEffect(() => {
+    setCurrentVideoTime(0);
+  }, [selectedModule, selectedDay]);
+
   const getDisplayDuration = (moduleId, dayId, defaultDuration) => {
     const key = `${moduleId}-${dayId}`;
     const actualSeconds = videoDurationMap[key];
@@ -388,12 +402,22 @@ const ModuleView = ({ courseId, onBack }) => {
               className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden w-full"
             >
               <CustomVideoPlayer 
-                videoUrl={day.videoUrl} 
+                ref={videoPlayerRef}
+                videoUrl={resolveLessonVideoUrl(day.videoUrl)} 
                 title={day.title}
                 duration={getDisplayDuration(selectedModule, selectedDay, day.duration)}
                 initialMaxTime={videoProgressMap[`${selectedModule}-${selectedDay}`] || 0}
+                onTimeUpdate={(time) => setCurrentVideoTime(time)}
                 onProgressUpdate={(time, completed, dur) => handleVideoProgressUpdate(selectedModule, selectedDay, time, completed, dur)}
               />
+              <div className="p-4 sm:p-5 border-t border-gray-100 bg-[#F8FAFC]">
+                <SyncedTranscript
+                  currentTime={currentVideoTime}
+                  transcriptUrl={resolveLessonTranscriptUrl(day)}
+                  transcriptText={day.transcription}
+                  onCueClick={(time) => videoPlayerRef.current?.seekTo(time)}
+                />
+              </div>
               <div className="p-4 sm:p-6">
                 {/* Tabs Header */}
                 <div className="flex border-b border-gray-100 mb-6">
@@ -445,14 +469,14 @@ const ModuleView = ({ courseId, onBack }) => {
                       <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3">
                         Video Transcription
                       </h2>
-                      <div className="text-sm sm:text-base text-gray-600 leading-relaxed max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                        {day.transcription || (
-                          <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-                            <FileText className="w-12 h-12 mb-2 opacity-20" />
-                            <p className="italic">No transcription available for this video.</p>
-                          </div>
-                        )}
-                      </div>
+                      <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                        Captions are synced below the player. Toggle &quot;Full Transcript&quot; there for paragraph view, or click a line to seek.
+                      </p>
+                      {day.transcription && (
+                        <p className="mt-4 text-sm text-gray-500 border-t border-gray-100 pt-4">
+                          {day.transcription}
+                        </p>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>

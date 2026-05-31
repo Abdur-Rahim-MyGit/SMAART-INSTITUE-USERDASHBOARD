@@ -1,7 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, CheckCircle2, XCircle, AlertCircle, ArrowRight, Trophy } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, ArrowRight, Trophy, BookOpen } from 'lucide-react';
 import { courseEnrollmentAPI } from '../services/api';
+import {
+  isAnswerCorrect,
+  prepareQuizSession,
+  computeQuizScore,
+  getOptionLabel,
+  getCorrectOptionIndex,
+  getMcqOptionClassName,
+  normalizeQuizQuestions,
+} from '../utils/microAssessmentUtils';
 
 const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentId, onComplete, initialResult }) => {
   const [step, setStep] = useState('intro'); // intro, quiz, result, review
@@ -10,62 +19,38 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
   const [userAnswers, setUserAnswers] = useState([]); // Track user's choices
   const [shuffledQuestions, setShuffledQuestions] = useState([]);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(90);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
-  const timerRef = useRef(null);
 
   useEffect(() => {
-    if (assessmentData && assessmentData.questions) {
+    if (assessmentData?.questions?.length) {
+      const allQuestions = normalizeQuizQuestions(assessmentData.questions);
       if (initialResult?.responses?.questionIndices) {
-        // Restore previous questions
-        const restored = initialResult.responses.questionIndices.map(idx => assessmentData.questions[idx]);
-        setShuffledQuestions(restored);
+        const restored = initialResult.responses.questionIndices.map((idx) => ({
+          ...allQuestions[idx],
+          _originalIndex: idx,
+        }));
+        setShuffledQuestions(restored.filter(Boolean));
         setUserAnswers(initialResult.responses.userAnswers || []);
       } else {
-        // Shuffle new questions
-        const indices = Array.from({ length: assessmentData.questions.length }, (_, i) => i);
-        const shuffledIndices = indices.sort(() => 0.5 - Math.random()).slice(0, 5);
-        const shuffled = shuffledIndices.map(idx => assessmentData.questions[idx]);
-        // Store indices in the question objects temporarily so we can save them later
-        shuffled.forEach((q, i) => q._originalIndex = shuffledIndices[i]);
-        setShuffledQuestions(shuffled);
-        setUserAnswers(new Array(shuffled.length).fill(null));
+        const shuffle = assessmentData.shuffleQuestions !== false;
+        const { picked } = prepareQuizSession(allQuestions, {
+          maxCount: allQuestions.length,
+          shuffle,
+        });
+        setShuffledQuestions(picked);
+        setUserAnswers(new Array(picked.length).fill(null));
       }
     }
   }, [assessmentData, initialResult]);
 
   // Check for existing result
   useEffect(() => {
-      if (initialResult && initialResult.isCompleted) {
-          setScore(initialResult.score);
+      if (initialResult && (initialResult.completedAt || initialResult.score != null)) {
+          setScore(initialResult.score ?? 0);
           setStep('result');
       }
   }, [initialResult]);
-
-  useEffect(() => {
-    if (step === 'quiz') {
-      setTimeLeft(90);
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            handleTimeout();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [step, currentQuestionIndex]);
-
-  const handleTimeout = () => {
-    clearInterval(timerRef.current);
-    // Auto-submit as incorrect if not answered
-    if (selectedAnswer === null) {
-        handleSubmitAnswer(null);
-    }
-  };
 
   const handleStart = () => {
     setStep('quiz');
@@ -77,15 +62,12 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
     if (showExplanation || isSubmitting) return; // Prevent double submission and rapid clicks
     
     setIsSubmitting(true); // Lock immediately to prevent race conditions
-    clearInterval(timerRef.current);
-    
+
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
     let isCorrect = false;
 
-    // Handle timeout (answerIndex is null)
     if (answerIndex !== null) {
-        const selectedOption = currentQuestion.options[answerIndex];
-        isCorrect = selectedOption === currentQuestion.correctAnswer;
+        isCorrect = isAnswerCorrect(currentQuestion, answerIndex);
     }
 
     if (isCorrect) {
@@ -116,16 +98,12 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
   };
 
   const finishQuiz = async () => {
+    const finalScore = computeQuizScore(shuffledQuestions, userAnswers);
+    const totalPoints = shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0);
+
+    setScore(finalScore);
     setStep('result');
     setIsSubmitting(true);
-    
-    // Calculate final score
-    // Note: score state might not be immediately updated if called directly after setScore
-    // allow a small render cycle or use a calculated value if needed. 
-    // Here we use the state 'score' which is updated on each answer.
-    
-    // However, since handleNextQuestion calls this, we need to be careful. 
-    // Actually, 'score' is updated in handleSubmitAnswer, so by the time we click "Next" (which calls handleNextQuestion), score is stable.
 
     try {
         await courseEnrollmentAPI.updateTaskResult({
@@ -133,13 +111,13 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
             courseCode,
             moduleId,
             dayId,
-            stepId: assessmentData.stepId || 2, // Map to correct step
-            score: score,
-            totalPoints: shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0),
+            stepId: assessmentData?.stepId || 2,
+            score: finalScore,
+            totalPoints,
             responses: {
-                questionIndices: shuffledQuestions.map(q => q._originalIndex),
-                userAnswers: userAnswers
-            }
+                questionIndices: shuffledQuestions.map((q) => q._originalIndex),
+                userAnswers,
+            },
         });
     } catch (error) {
         console.error("Failed to save progress", error);
@@ -148,41 +126,58 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
     }
   };
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  if (!shuffledQuestions.length) return <div>Loading Assessment...</div>;
+  if (!shuffledQuestions.length) {
+    return (
+      <div className="flex items-center justify-center py-12 text-slate-500 dark:text-slate-400 text-sm">
+        Loading assessment…
+      </div>
+    );
+  }
 
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
+  const headerSubtitle =
+    step === 'quiz'
+      ? `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`
+      : step === 'review'
+        ? 'Review your responses'
+        : step === 'result'
+          ? 'Summary'
+          : 'Practice quiz';
+
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white dark:bg-[#002147] rounded-2xl shadow-sm border border-gray-100 dark:border-white/8 overflow-hidden">
-      
-      {/* HEADER */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-3 md:p-6 text-white flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2 text-white">
-            <Trophy className="text-[#1a3884] drop-shadow-lg" size={28} />
-            {assessmentData.title || "Micro-Assessment"}
-          </h2>
-          <p className="text-white/80 text-[10px] md:text-sm mt-0.5 hidden sm:block">Test your knowledge</p>
+    <div className="w-full bg-white dark:bg-[#002147] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+      <div className="px-4 py-4 md:px-6 md:py-5 border-b border-slate-100 dark:border-white/10 bg-slate-50/80 dark:bg-[#001835]/50">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-[#1a3884]/10 flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-5 h-5 text-[#1a3884]" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white truncate">
+                {assessmentData.title || 'Practice'}
+              </h2>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{headerSubtitle}</p>
+            </div>
+          </div>
+          {step === 'quiz' && !showExplanation && (
+            <span className="text-xs font-semibold text-[#1a3884] bg-[#1a3884]/10 px-3 py-1 rounded-full w-fit">
+              Score: {score}
+            </span>
+          )}
         </div>
-        
         {step === 'quiz' && (
-           <div className={`
-             flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono font-bold text-base md:text-lg
-             ${timeLeft < 10 ? 'bg-red-500/20 text-red-400 animate-pulse' : 'bg-white/10 text-white'}
-           `}>
-             <Clock className="w-4 h-4 md:w-5 md:h-5" />
-             {formatTime(timeLeft)}
-           </div>
+          <div className="mt-3 h-1.5 bg-slate-200 dark:bg-[#003170] rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-[#1a3884] rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: `${((currentQuestionIndex + 1) / shuffledQuestions.length) * 100}%` }}
+            />
+          </div>
         )}
       </div>
 
-      <div className="p-3 md:p-8 min-h-[300px] md:min-h-[400px]">
+      <div className="p-4 md:p-8 min-h-[280px]">
         {/* INTRO STEP */}
         {step === 'intro' && (
           <div className="text-center space-y-3 md:space-y-6 py-4 md:py-8">
@@ -190,10 +185,12 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                <AlertCircle className="w-10 h-10 md:w-12 md:h-12" />
             </div>
             <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">Ready for the Assessment?</h3>
-            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-base md:text-lg">
-              You will have <strong>5 randomized questions</strong> to answer. 
-              You have <strong>90 seconds</strong> per question. 
-              Applying the CLEAR-5 framework is key.
+            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-sm md:text-base leading-relaxed">
+              You will answer <strong>{normalizeQuizQuestions(assessmentData?.questions || []).length} multiple-choice questions</strong>.
+              {assessmentData?.shuffleQuestions !== false
+                ? ' Questions appear in random order.'
+                : ' Questions appear in the order set by your instructor.'}
+              {' '}After each answer, you will see whether you were correct and a short explanation.
             </p>
             <button
               onClick={handleStart}
@@ -207,21 +204,6 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
         {/* QUIZ STEP */}
         {step === 'quiz' && (
           <div className="max-w-3xl mx-auto">
-             {/* Progress Bar */}
-             <div className="mb-4 md:mb-8">
-               <div className="flex justify-between text-sm text-gray-500 dark:text-slate-400 mb-2">
-                 <span>Question {currentQuestionIndex + 1} of {shuffledQuestions.length}</span>
-                 <span>Score: {score}</span>
-               </div>
-               <div className="h-2 bg-gray-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
-                 <motion.div 
-                   className="h-full bg-[#1a3884]"
-                   initial={{ width: 0 }}
-                   animate={{ width: `${((currentQuestionIndex + 1) / shuffledQuestions.length) * 100}%` }}
-                 />
-               </div>
-             </div>
-
              <motion.div
                key={currentQuestionIndex}
                initial={{ opacity: 0, x: 20 }}
@@ -236,18 +218,14 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                 <div className="space-y-2 md:space-y-3">
                   {currentQuestion.options.map((option, idx) => {
                      const isSelected = selectedAnswer === idx;
-                     const isCorrect = option === currentQuestion.correctAnswer;
-                     
-                     let btnClass = "w-full text-left p-2.5 md:p-4 rounded-xl border-2 transition-all ";
-                     if (showExplanation) {
-                        if (isCorrect) btnClass += "border-green-500 bg-green-50 text-green-800 dark:bg-green-500/10 dark:text-green-400";
-                        else if (isSelected) btnClass += "border-red-500 bg-red-50 text-red-800 dark:bg-red-500/10 dark:text-red-400";
-                        else btnClass += "border-gray-200 dark:border-white/8 opacity-50";
-                     } else {
-                        btnClass += isSelected 
-                          ? "border-[#1a3884] bg-[#1a3884]/10 text-[#0e5c65] dark:text-blue-300 dark:bg-[#1a3884]/20" 
-                          : "border-gray-200 dark:border-white/10 hover:border-[#1a3884]/50 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]";
-                     }
+                     const correctIdx = getCorrectOptionIndex(currentQuestion);
+                     const isCorrectOption = idx === correctIdx;
+                     const btnClass = `w-full text-left p-2.5 md:p-4 rounded-xl border-2 transition-all ${getMcqOptionClassName({
+                       showFeedback: showExplanation,
+                       index: idx,
+                       selectedIndex: selectedAnswer,
+                       question: currentQuestion,
+                     })}`;
 
                      return (
                        <button
@@ -258,15 +236,19 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                        >
                          <div className="flex items-center gap-3">
                            <div className={`
-                             w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
-                             ${showExplanation && isCorrect ? 'border-green-500 bg-green-500 text-white' : ''}
-                             ${showExplanation && isSelected && !isCorrect ? 'border-red-500 bg-red-500 text-white' : ''}
-                             ${!showExplanation && isSelected ? 'border-[#1a3884] bg-[#1a3884]' : 'border-gray-300 dark:border-slate-600'}
+                             w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold
+                             ${showExplanation && isCorrectOption ? 'border-green-500 bg-green-500 text-white' : ''}
+                             ${showExplanation && isSelected && !isCorrectOption ? 'border-red-500 bg-red-500 text-white' : ''}
+                             ${!showExplanation && isSelected ? 'border-[#1a3884] bg-[#1a3884] text-white' : 'border-gray-300 dark:border-slate-600 text-slate-500'}
                            `}>
-                              {showExplanation && isCorrect && <CheckCircle2 size={14} />}
-                              {showExplanation && isSelected && !isCorrect && <XCircle size={14} />}
+                              {showExplanation && isCorrectOption && <CheckCircle2 size={14} />}
+                              {showExplanation && isSelected && !isCorrectOption && <XCircle size={14} />}
+                              {!showExplanation && getOptionLabel(idx)}
                            </div>
-                           <span className="text-sm md:text-base dark:text-slate-300">{option}</span>
+                           <span className="text-sm md:text-base dark:text-slate-300">
+                             <span className="font-semibold text-slate-500 dark:text-slate-400 mr-2">{getOptionLabel(idx)}.</span>
+                             {option}
+                           </span>
                          </div>
                        </button>
                      );
@@ -306,17 +288,13 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
         {/* REVIEW STEP */}
         {step === 'review' && (
           <div className="max-w-3xl mx-auto">
-             <div className="flex justify-between items-center mb-6">
-                <button 
-                    onClick={() => setStep('result')}
-                    className="text-sm font-bold text-[#1a3884] flex items-center gap-1 hover:underline"
-                >
-                    Back to Results
-                </button>
-                <div className="text-sm font-medium text-slate-500">
-                    Question {currentQuestionIndex + 1} of {shuffledQuestions.length}
-                </div>
-             </div>
+             <button
+               type="button"
+               onClick={() => setStep('result')}
+               className="mb-6 text-sm font-semibold text-[#1a3884] hover:text-[#112b6b] transition-colors"
+             >
+               ← Back to results
+             </button>
 
              <motion.div
                key={currentQuestionIndex}
@@ -330,8 +308,9 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
                 <div className="space-y-3">
                   {shuffledQuestions[currentQuestionIndex].options.map((option, idx) => {
+                     const q = shuffledQuestions[currentQuestionIndex];
                      const isUserChoice = userAnswers[currentQuestionIndex] === idx;
-                     const isCorrect = option === shuffledQuestions[currentQuestionIndex].correctAnswer;
+                     const isCorrect = idx === getCorrectOptionIndex(q);
                      
                      let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between ";
                      if (isCorrect) btnClass += "border-green-500 bg-green-50 dark:bg-green-500/10 text-green-800 dark:text-green-400";
@@ -340,12 +319,21 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
                      return (
                        <div key={idx} className={btnClass}>
-                         <div className="flex items-center gap-3">
+                         <div className="flex items-center gap-3 min-w-0 flex-1">
+                           <span className="w-7 h-7 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold flex-shrink-0">
+                             {getOptionLabel(idx)}
+                           </span>
                            <span className="text-sm md:text-base">{option}</span>
                          </div>
-                         {isCorrect && <CheckCircle2 size={18} className="text-green-500" />}
-                         {isUserChoice && !isCorrect && <XCircle size={18} className="text-red-500" />}
-                         {isUserChoice && <span className="text-[10px] font-bold uppercase ml-2 px-2 py-0.5 bg-slate-200 dark:bg-[#003170] rounded text-slate-600 dark:text-slate-400">Your Answer</span>}
+                         <div className="flex items-center gap-2 flex-shrink-0">
+                           {isUserChoice && (
+                             <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-[#003170] text-slate-600 dark:text-slate-300">
+                               Your answer
+                             </span>
+                           )}
+                           {isCorrect && <CheckCircle2 size={18} className="text-green-500" />}
+                           {isUserChoice && !isCorrect && <XCircle size={18} className="text-red-500" />}
+                         </div>
                        </div>
                      );
                   })}

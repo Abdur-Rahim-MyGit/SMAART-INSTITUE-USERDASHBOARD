@@ -165,7 +165,10 @@ router.delete('/:id', async (req, res) => {
 router.get('/student/:studentId', async (req, res) => {
     try {
         const enrollments = await CourseEnrollment.find({ student: req.params.studentId })
-            .populate('course', 'title courseCode duration status modules')
+            .populate({
+                path: 'course',
+                select: 'title courseCode duration status banner modules'
+            })
             .populate('college', 'name code')
             .sort({ enrollmentDate: -1 });
 
@@ -192,7 +195,12 @@ router.post('/task-progress', async (req, res) => {
 
 
         // Find course by code
-        const course = await Course.findOne({ courseCode });
+        const course = await Course.findOne({
+            $or: [
+                { courseCode: courseCode },
+                { courseNumber: courseCode }
+            ]
+        });
         if (!course) {
             console.error('Course not found for code:', courseCode);
             return res.status(404).json({ success: false, error: 'Course not found' });
@@ -326,7 +334,12 @@ router.post('/video-progress', async (req, res) => {
         const { studentId, courseCode, moduleId, dayId, stepId, maxWatchedTime, videoDuration, isCompleted } = req.body;
 
         // Find course
-        const course = await Course.findOne({ courseCode });
+        const course = await Course.findOne({
+            $or: [
+                { courseCode: courseCode },
+                { courseNumber: courseCode }
+            ]
+        });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
 
         // Find or create enrollment
@@ -454,7 +467,12 @@ router.post('/quiz-progress', async (req, res) => {
         const { studentId, courseCode, moduleId, dayId, quizId, score, totalPoints } = req.body;
 
         // Find course
-        const course = await Course.findOne({ courseCode });
+        const course = await Course.findOne({
+            $or: [
+                { courseCode: courseCode },
+                { courseNumber: courseCode }
+            ]
+        });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
 
         // Find or create enrollment
@@ -568,7 +586,12 @@ router.post('/task-result', async (req, res) => {
         const { studentId, courseCode, moduleId, dayId, stepId, score, totalPoints, responses } = req.body;
 
         // Find course
-        const course = await Course.findOne({ courseCode });
+        const course = await Course.findOne({
+            $or: [
+                { courseCode: courseCode },
+                { courseNumber: courseCode }
+            ]
+        });
         if (!course) return res.status(404).json({ success: false, error: 'Course not found' });
 
         // Find or create enrollment
@@ -679,7 +702,6 @@ router.post('/task-result', async (req, res) => {
         }
 
         res.json({ success: true, data: enrollment, badgesEarned });
-
     } catch (err) {
         console.error('Error updating task result:', err);
         res.status(500).json({ success: false, error: err.message });

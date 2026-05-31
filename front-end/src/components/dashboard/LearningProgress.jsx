@@ -1,6 +1,6 @@
 import { memo, useMemo } from "react";
 import { motion } from "framer-motion";
-import { BookOpen } from "lucide-react";
+import { RiBookOpenLine } from "@remixicon/react";
 import { useNavigate } from "react-router-dom";
 import { ANIMATION_DELAYS, COLORS } from "@/constants/dashboard";
 import { useTranslation } from "react-i18next";
@@ -27,7 +27,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
       <div className="p-8 border-b border-gray-50 dark:border-slate-800/50 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-5">
           <div className="w-14 h-14 bg-white dark:bg-[#002A5C] rounded-2xl flex items-center justify-center border border-gray-100/80 dark:border-[#1a3884]/20 shadow-sm">
-            <BookOpen className="w-7 h-7 text-[#1a3884] dark:text-blue-400" />
+            <RiBookOpenLine className="w-7 h-7 text-[#1a3884] dark:text-blue-400" />
           </div>
           <div>
             <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400">{t("dashboard.continue_learning")}</h3>
@@ -93,7 +93,7 @@ const LearningProgress = memo(({ paths, loading, error }) => {
           </div>
         ) : paths.length === 0 ? (
           <div className="text-center py-8">
-            <BookOpen className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+            <RiBookOpenLine className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
               Complete your career analysis to see your registered career directions here.
             </p>

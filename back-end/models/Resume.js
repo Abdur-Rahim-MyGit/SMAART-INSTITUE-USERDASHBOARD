@@ -51,6 +51,11 @@ const resumeSchema = new mongoose.Schema({
         motherName: String,
         dob: String,
         nationality: String
+    },
+    verification: {
+        resumePublicId: String,
+        fingerprint: String,
+        lastExportedAt: Date
     }
 }, {
     timestamps: true

@@ -104,11 +104,14 @@ const Certificate = () => {
             });
 
             if (response.success) {
-                const { certificateId, verificationUrl } = response.certificate;
+                const { certificateId } = response.certificate;
                 setCertId(certificateId);
 
+                // Always use dynamic local origin so scanning the QR in dev points to localhost
+                const dynamicUrl = `${window.location.origin}/verify-certificate/${certificateId}`;
+
                 // Generate QR code with verification URL
-                const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+                const qrDataUrl = await QRCode.toDataURL(dynamicUrl, {
                     width: 150,
                     margin: 1,
                     color: {
@@ -459,7 +462,7 @@ const Certificate = () => {
                                     )}
                                     <div className="verify-info">
                                         <span className="verify-label">Verify this credential at:</span>
-                                        <span className="verify-url">https://verify.smaart.in</span>
+                                        <span className="verify-url">{typeof window !== "undefined" ? `${window.location.host}/verify-certificate` : 'https://verify.smaart.in'}</span>
                                         <span className="cert-id-tag">REF: {certId}</span>
                                     </div>
                                 </div>

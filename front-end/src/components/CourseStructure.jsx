@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
-  BookOpen, Target, Crown, Lock, CheckCircle2,
+  BookOpen, Target, Crown, CheckCircle2,
   ArrowLeft, Zap, TrendingUp,
   Play, GraduationCap, ArrowRight, ChevronRight,
   Brain, Bot, Leaf
@@ -11,6 +11,12 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { STAGES, TRACKS } from "@/data/courseStructureData";
 import PageHero from "@/components/ui/PageHero";
+import {
+  isStageUnlocked as checkStageUnlocked,
+  isTrackUnlocked as checkTrackUnlocked,
+  isCourseUnlockedInStage,
+  isCapacityDevUnlock,
+} from "@/utils/courseUnlock";
 
 /* ─── Stage visual config ─── */
 const STAGE_CONFIG = {
@@ -106,7 +112,6 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
                   }`}>
                   {t("my_courses_page.stage_n", { n: stage.id })}
                 </span>
-                {!isUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
               </div>
 
               <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${isUnlocked
@@ -223,7 +228,6 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
                   }`}>
                   {t("my_courses_page.specialization_track")}
                 </span>
-                {!isUnlocked && <Lock className="w-4 h-4 text-gray-400" />}
               </div>
 
               <h3 className={`text-xl font-extrabold tracking-tight mb-2 ${isUnlocked
@@ -305,8 +309,6 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
           }`}>
           {isCompleted ? (
             <CheckCircle2 className="w-5 h-5" />
-          ) : !isUnlocked ? (
-            <Lock className="w-5 h-5" />
           ) : isCurrent ? (
             <Play className="w-5 h-5" />
           ) : (
@@ -338,15 +340,22 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
 };
 
 /* ─── Stage detail view ─── */
-const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) => {
+const filterPublishedCourses = (courses, publishedCourseCodes) => {
+  if (isCapacityDevUnlock()) return courses;
+  if (!publishedCourseCodes || publishedCourseCodes.size === 0) {
+    return courses;
+  }
+  const filtered = courses.filter((c) => publishedCourseCodes.has(c.id));
+  return filtered.length > 0 ? filtered : courses;
+};
+
+const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publishedCourseCodes }) => {
   const { t } = useTranslation();
   const { Icon } = cfg;
   const completedCount = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
   const pct = Math.round((completedCount / stage.totalCourses) * 100);
 
-  const isCourseUnlocked = (courseId) => {
-    return true; // Unlocked all for testing
-  };
+  const isCourseUnlocked = (courseId) => isCourseUnlockedInStage(courseId, stage, userProgress);
 
   const handleCourseClick = (course, courseUnlocked) => {
     if (!courseUnlocked) {
@@ -458,7 +467,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
 
       {/* Course grid - Strictly sequential visibility */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stage.courses.map((course, idx) => {
+        {filterPublishedCourses(stage.courses, publishedCourseCodes).map((course, idx) => {
           const isCompleted = userProgress.completedCourses?.includes(course.id);
           const isUnlocked = isCourseUnlocked(course.id);
           const isCurrent = userProgress.currentCourse === course.id || (!isCompleted && isUnlocked && !userProgress.currentCourse);
@@ -486,14 +495,12 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick }) =>
 };
 
 /* ─── Main Component ─── */
-const CourseStructure = ({ onCourseClick, userProgress = {}, continueWatching }) => {
+const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedStageId, setSelectedStageId] = useState(null);
 
-  const isStageUnlocked = (stage) => {
-    return true; // Unlocked all for testing
-  };
+  const isStageUnlocked = (stage) => checkStageUnlocked(stage, userProgress);
 
   const selectedStage = STAGES.find(s => s.id === selectedStageId) || TRACKS.find(t => t.id === selectedStageId);
   const selectedCfg = STAGE_CONFIG[selectedStageId] || {
@@ -507,7 +514,8 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, continueWatching })
   const overallPct = Math.round((totalCompleted / totalCourses) * 100);
 
   const isTrackUnlocked = (trackId) => {
-    return true; // Unlocked all for testing
+    const track = TRACKS.find((t) => t.id === trackId);
+    return track ? checkTrackUnlocked(track, userProgress) : false;
   };
 
   return (
@@ -642,6 +650,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, continueWatching })
                 userProgress={userProgress}
                 onBack={() => setSelectedStageId(null)}
                 onCourseClick={onCourseClick}
+                publishedCourseCodes={publishedCourseCodes}
               />
             </motion.div>
           )}
