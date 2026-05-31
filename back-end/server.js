@@ -138,6 +138,7 @@ app.use('/api/enrollments', require('./routes/enrollments'));
 app.use('/api/courseEnrollments', require('./routes/courseEnrollments'));
 app.use('/api/questionBanks', require('./routes/questionBanks'));
 app.use('/api/notes', require('./routes/notes'));
+app.use('/api/todos', require('./routes/todos'));
 
 
 // People Management Routes
@@ -231,6 +232,8 @@ app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/upload', require('./routes/uploadRoutes')); // New upload route
 app.use('/api/badges', require('./routes/badges')); // Badges & Achievement System
 app.use('/api/notifications', require('./routes/notifications')); // Notification System
+app.use('/api/streaks', require('./routes/streaks')); // Streaks & Vouchers System
+
 
 
 

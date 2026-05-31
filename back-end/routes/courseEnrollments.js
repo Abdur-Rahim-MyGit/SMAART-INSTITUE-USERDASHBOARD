@@ -686,4 +686,70 @@ router.post('/task-result', async (req, res) => {
     }
 });
 
+// --- USER PROGRESS CORE LOGIC ENDPOINTS ---
+const UserProgress = require('../models/UserProgress');
+
+// Get all progress for a course by active user
+router.get('/user-progress/:courseCode', async (req, res) => {
+    try {
+        const progressList = await UserProgress.find({
+            user: req.user.id,
+            courseCode: req.params.courseCode
+        });
+        res.json({ success: true, data: progressList });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Save or update user progress entry
+router.post('/user-progress/save', async (req, res) => {
+    try {
+        const {
+            courseCode,
+            moduleId,
+            dayId,
+            stepId,
+            last_timestamp,
+            videoDuration,
+            videoCompleted,
+            assignmentStatus,
+            assignmentProgress,
+            testScore,
+            testTotalPoints,
+            testCompleted
+        } = req.body;
+
+        if (!courseCode || !moduleId || dayId === undefined || stepId === undefined) {
+            return res.status(400).json({ success: false, error: 'Missing required parameters' });
+        }
+
+        const updateData = {};
+        if (last_timestamp !== undefined) updateData.last_timestamp = Number(last_timestamp);
+        if (videoDuration !== undefined) updateData.videoDuration = Number(videoDuration);
+        if (videoCompleted !== undefined) updateData.videoCompleted = Boolean(videoCompleted);
+        if (assignmentStatus !== undefined) updateData.assignmentStatus = String(assignmentStatus);
+        if (assignmentProgress !== undefined) updateData.assignmentProgress = Number(assignmentProgress);
+        if (testScore !== undefined) updateData.testScore = testScore === null ? null : Number(testScore);
+        if (testTotalPoints !== undefined) updateData.testTotalPoints = testTotalPoints === null ? null : Number(testTotalPoints);
+        if (testCompleted !== undefined) updateData.testCompleted = Boolean(testCompleted);
+
+        const progress = await UserProgress.findOneAndUpdate(
+            {
+                user: req.user.id,
+                courseCode,
+                moduleId: String(moduleId),
+                dayId: Number(dayId),
+                stepId: Number(stepId)
+            },
+            { $set: updateData },
+            { new: true, upsert: true }
+        );
+
+        res.json({ success: true, data: progress });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 module.exports = router;

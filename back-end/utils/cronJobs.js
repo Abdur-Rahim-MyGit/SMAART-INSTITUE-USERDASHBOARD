@@ -43,6 +43,40 @@ function startCronJobs() {
       }
     }
   });
+
+  // Every minute: check for todo reminders
+  cron.schedule('* * * * *', async () => {
+    try {
+      const Todo = require('../models/Todo');
+      const Notification = require('../models/Notification');
+      const now = new Date();
+      // Find todos that are uncompleted, due date has passed or is now, and reminder has not been triggered
+      const overdueTodos = await Todo.find({
+        completed: false,
+        reminderTriggered: false,
+        dueDate: { $lte: now }
+      });
+
+      for (const todo of overdueTodos) {
+        // Trigger in-app notification reminder
+        await Notification.createNotification({
+          userId: todo.user,
+          type: 'task',
+          title: 'Task Due',
+          message: `Your task "${todo.title}" is due now!`,
+          icon: 'clipboard-check',
+          color: '#f59e0b', // amber
+          link: '/dashboard/notes' // navigate to productivity page
+        });
+
+        // Mark reminder as triggered
+        todo.reminderTriggered = true;
+        await todo.save();
+      }
+    } catch (err) {
+      logger.error('[CRON] Todo reminders check failed:', err);
+    }
+  });
 }
 
 module.exports = { startCronJobs, recalculateAllPpi };

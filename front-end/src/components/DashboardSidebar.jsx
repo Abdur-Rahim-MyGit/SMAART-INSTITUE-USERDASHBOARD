@@ -21,7 +21,8 @@ import {
   Users,
   ClipboardCheck,
   ChevronDown,
-  Languages
+  Languages,
+  ListTodo
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ProfileDropdown from "@/components/ProfileDropdown";
@@ -45,6 +46,7 @@ const menuItems = [
   { icon: Wallet, label: "Skills Vault", path: "/dashboard/skills-vault" },
   { icon: Users, label: "Community", path: "/dashboard/community" },
   { icon: ClipboardCheck, label: "My Notes", path: "/dashboard/notes" },
+  { icon: ListTodo, label: "To-Do & Calendar", path: "/dashboard/todos" },
 ];
 
 const bottomMenuItems = [

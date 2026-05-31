@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BookOpen, BookText, ArrowLeft, ArrowRight, FileText, Sparkles, Info, StickyNote, Compass, Brain } from "lucide-react";
+import { BookOpen, BookText, ArrowLeft, ArrowRight, FileText, Sparkles, Info, StickyNote, Compass, Brain, ListTodo } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PageHero from "@/components/ui/PageHero";
 import { useTranslation } from "react-i18next";
@@ -78,6 +78,19 @@ const toolkitSections = [
     meta: "Cloud Sync + Editor",
     detail: "Rich text notes with categorization and search",
   },
+  {
+    id: 9,
+    title: "To-Do & Calendar",
+    description:
+      "Stay on top of your daily schedules and study deadlines. Add tasks, toggle active states, set automated reminders, and view everything dynamically inside an interactive monthly calendar sync.",
+    icon: ListTodo,
+    path: "/dashboard/todos",
+    color: "#1a3884",
+    badge: "Productivity",
+    cta: "Launch Tracker",
+    meta: "Task list + Calendar sync",
+    detail: "Manage due tasks, trigger alert notifications, and view date-by-date schedules",
+  },
 ];
 
 const ToolkitCard = ({ section, index }) => {
@@ -91,6 +104,7 @@ const ToolkitCard = ({ section, index }) => {
   else if (section.path.includes("dictionary")) sectionKey = "dictionary";
   else if (section.path.includes("library")) sectionKey = "library";
   else if (section.path.includes("notes")) sectionKey = "notes";
+  else if (section.path.includes("todos")) sectionKey = "todos";
 
   const title = t(`toolkit.sections.${sectionKey}.title`, section.title);
   const description = t(`toolkit.sections.${sectionKey}.description`, section.description);

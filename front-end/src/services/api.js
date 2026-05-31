@@ -353,6 +353,19 @@ export const courseEnrollmentAPI = {
       body: JSON.stringify(data),
     });
   },
+
+  // Get all user progress items for a course
+  getUserProgress: async (courseCode) => {
+    return apiCall(`/courseEnrollments/user-progress/${courseCode}`);
+  },
+
+  // Save user progress item
+  saveUserProgress: async (data) => {
+    return apiCall('/courseEnrollments/user-progress/save', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 // Notes API Functions
@@ -378,6 +391,37 @@ export const notesAPI = {
   // Delete a note
   delete: async (courseId) => {
     return apiCall(`/notes/${courseId}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Todos API Functions
+export const todosAPI = {
+  // Get all todos for the current user
+  getAll: async () => {
+    return apiCall('/todos');
+  },
+
+  // Create a new todo task
+  create: async (title, dueDate) => {
+    return apiCall('/todos', {
+      method: 'POST',
+      body: JSON.stringify({ title, dueDate }),
+    });
+  },
+
+  // Update a todo task (toggle complete, rename, change due date)
+  update: async (id, updates) => {
+    return apiCall(`/todos/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+  },
+
+  // Delete a todo task
+  delete: async (id) => {
+    return apiCall(`/todos/${id}`, {
       method: 'DELETE',
     });
   },
