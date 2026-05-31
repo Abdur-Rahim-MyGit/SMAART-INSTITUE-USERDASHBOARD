@@ -137,9 +137,6 @@ const DashboardHome = () => {
             userName={user?.firstName || user?.fullName || "User"}
           />
 
-          {/* Vision Goals Widget - Temporarily Hidden per request */}
-          {/* <VisionGoalsWidget /> */}
-
           {/* College Banners */}
           <CollegeBanners />
 

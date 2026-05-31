@@ -1403,5 +1403,254 @@
       "last_edited": "Last edited: {{date}}",
       "save_note": "Save Note"
     }
+  },
+  "landing": {
+    "navbar": {
+      "services": "Services",
+      "how_it_works": "How It Works",
+      "testimonials": "Testimonials",
+      "faq": "FAQ",
+      "verify_certificate": "Verify Certificate",
+      "contact": "Contact",
+      "login": "Log in",
+      "enquiry": "Enquiry"
+    },
+    "hero": {
+      "badge": "Skills Passport Integration Live",
+      "title_main": "An Integrated",
+      "title_sub": "Employability & Impact Ecosystem",
+      "title_desc": "for the changing world of work.",
+      "description": "Unlock your full potential with our comprehensive AI Career Coach. Integrating EQ, cognitive skills, and academic performance.",
+      "get_started": "Get Started",
+      "book_demo": "Book a Demo",
+      "learn_more": "Learn More"
+    },
+    "marquee": {
+      "trusted_by": "Trusted by Leading Institutions"
+    },
+    "services": {
+      "title": "Building Capability for the",
+      "title_highlight": "Changing World of Work",
+      "subtitle": "We develop capabilities that enable employability, career progression, and sustained career longevity.",
+      "card_work_ready_title": "Work-Ready & Adaptive Capability",
+      "card_work_ready_desc": "We develop capabilities that enable employability, career progression, and sustained career longevity — supporting individuals from entry into work through growth and transition.",
+      "card_work_ready_features": [
+        "Employability",
+        "Career Progression",
+        "Sustained Longevity"
+      ],
+      "card_impact_title": "Impact-Oriented Capability",
+      "card_impact_desc": "We develop capabilities for innovation, entrepreneurship, and sustainable value creation — enabling individuals and institutions to create enduring economic and societal impact.",
+      "card_impact_features": [
+        "Innovation",
+        "Entrepreneurship",
+        "Value Creation"
+      ],
+      "card_map_title": "SMAART Career Architecture Map™",
+      "card_map_desc": "A modern reference model for careers, framing them as a multi-stage continuum rather than a single transition, reflecting longer careers and technological change.",
+      "card_map_features": [
+        "Multi-stage Continuum",
+        "Technological Change",
+        "Repeated Transitions"
+      ],
+      "learn_more_btn": "Learn More"
+    },
+    "deep_dive": {
+      "section1_badge": "Professional & Technical Capability™",
+      "section1_title": "Campus to Career™",
+      "section1_desc": "Preparing learners for entry into the workforce and aligning their capability with professional practice. We bridge the gap between academic theory and workplace reality.",
+      "point1_title": "Practice-Aligned Learning",
+      "point1_desc": "Real-world simulations and industry-standard tools that mirror the actual work environment.",
+      "point2_title": "Employability Focus",
+      "point2_desc": "Direct pathways to meaningful early-career roles with verified capability evidence.",
+      "section2_badge": "Innovation & Impact Capability™",
+      "section2_title": "Career to Life™",
+      "section2_desc": "Supporting long-term progression, leadership transition, and the ability to create value through innovation. For those ready to shape the future.",
+      "point3_title": "Leadership Transition",
+      "point3_desc": "Moving from individual contributor to strategic leader with advanced decision-making skills.",
+      "point4_title": "Value Creation",
+      "point4_desc": "Entrepreneurial skills and innovation frameworks for the new economy.",
+      "analysis_view": "Professional & Technical Capability View",
+      "analysis_live": "Live AI Analysis",
+      "analytics_view": "Leadership & Innovation Analytics"
+    },
+    "how_it_works": {
+      "title": "SMAART Integrated",
+      "title_highlight": "Capability Framework™",
+      "subtitle": "How capability is built for modern work. Integrating skills, judgement, and adaptability.",
+      "step1_title": "Skills",
+      "step1_desc": "Applied ability. Ensuring learning translates into real-world application not just qualification.",
+      "step2_title": "Judgement",
+      "step2_desc": "Decision quality in real situations. Developing the ability to make effective choices in complex environments.",
+      "step3_title": "Adaptability",
+      "step3_desc": "Effectiveness as conditions change. Building resilience and flexibility for a restructured world of work.",
+      "unlocked": "Unlocked",
+      "locked": "Locked"
+    },
+    "passport": {
+      "title": "SMAART Capability &",
+      "title_highlight": "Skills Passport™",
+      "desc": "A verifiable, lifelong record of capability development and progression. It captures not just what you know, but what you can do—providing trusted evidence of your readiness for the future of work.",
+      "features": [
+        "Verified Capability Profile",
+        "Universal Portability",
+        "Evidence-Based Progression"
+      ],
+      "btn": "Get Your Skills Passport",
+      "badge": "Capability & Skills Record",
+      "verified": "VERIFIED",
+      "issued_by": "Issued By"
+    },
+    "testimonials": {
+      "title": "Impact &",
+      "title_highlight": "Values",
+      "subtitle": "Guided by the SMAART Values Framework",
+      "quote1": "Impact is measured by capability and progression, not just activity. We look at the whole system.",
+      "author1": "Systems Thinking",
+      "role1": "Core Value",
+      "quote2": "Focus on real-world outcomes that improve lives and economies. Evidence is our currency.",
+      "author2": "Measurable Impact",
+      "role2": "Core Value",
+      "quote3": "Preparing for the restructured world of work requires constant evolution and flexibility.",
+      "author3": "Adaptability",
+      "role3": "Core Value"
+    },
+    "pricing": {
+      "title": "Partnerships",
+      "subtitle": "We form long-term, institutional partnerships to drive ecosystem-wide impact.",
+      "popular": "Most Popular",
+      "plan1_title": "Universities & Colleges",
+      "plan1_price": "Academic",
+      "plan1_desc": "Partner with us to enhance student employability and align curriculum with industry needs.",
+      "plan1_features": [
+        "Curriculum Alignment",
+        "Student Employability",
+        "Faculty Development"
+      ],
+      "plan1_cta": "Partner With Us",
+      "plan2_title": "Employers & Workforce",
+      "plan2_price": "Industry",
+      "plan2_desc": "Access a pipeline of work-ready talent and upskill your existing workforce.",
+      "plan2_features": [
+        "Talent Pipeline",
+        "Workforce Upskilling",
+        "Capability Frameworks",
+        "Recruitment Solutions"
+      ],
+      "plan2_cta": "Hire Talent",
+      "plan3_title": "Government & CSR",
+      "plan3_price": "Impact",
+      "plan3_desc": "Collaborate on large-scale skilling initiatives to drive social and economic impact.",
+      "plan3_features": [
+        "Large-scale Skilling",
+        "Social Impact",
+        "Economic Development",
+        "Policy Support"
+      ],
+      "plan3_cta": "Collaborate"
+    },
+    "faq": {
+      "title": "Insights &",
+      "title_highlight": "Frameworks",
+      "subtitle": "Understanding the future of work.",
+      "q1": "What is the SMAART Career Architecture Map™?",
+      "a1": "A modern reference model that frames careers as a multi-stage continuum, helping individuals navigate longer working lives and frequent transitions.",
+      "q2": "What is the Integrated Capability Framework™?",
+      "a2": "Our proprietary framework that combines Skills (applied ability), Judgement (decision quality), and Adaptability (effectiveness) to build holistic professional capability.",
+      "q3": "What are Future of Work insights?",
+      "a3": "Research-backed analysis of trends like intelligent automation, job restructuring, and the shift from role-based to skill-based work.",
+      "q4": "How can I access the Employment Readiness Report 2026?",
+      "a4": "The report is available to our institutional partners and subscribers, offering deep dives into the changing demand for skills and capabilities."
+    },
+    "verify": {
+      "badge": "Official Records",
+      "title": "Certificate",
+      "title_highlight": "Verification",
+      "desc": "Verify the authenticity of SMAART Institute credentials instantly. Our secure blockchain-backed verification system ensures trust and credibility.",
+      "f1_title": "Tamper Proof",
+      "f1_info": "Blockchain Secured",
+      "f1_sub": "Immutable verification records",
+      "f2_title": "Instant Check",
+      "f2_info": "Real-time Validation",
+      "f2_sub": "Verify in seconds",
+      "f3_title": "Global Access",
+      "f3_info": "Centralized Registry",
+      "f3_sub": "Access anywhere, anytime",
+      "card_title": "Credential Check",
+      "tab_manual": "Manual ID",
+      "tab_scan": "Scan QR",
+      "scan_title": "Select a QR code image",
+      "scan_desc": "Pick a photo of the certificate from your gallery or files",
+      "btn_choose": "Choose Image",
+      "input_label": "Certificate Identifier",
+      "placeholder": "e.g. SMAART-CAP-2025-ABC12",
+      "btn_auth": "Authenticate Now",
+      "btn_verifying": "Transmitting Message...",
+      "failed_title": "Verification Failed",
+      "btn_try": "Try Again",
+      "valid_title": "Valid Certificate",
+      "issue_title": "Issue Detected",
+      "recipient": "Recipient",
+      "credential": "Credential",
+      "issued": "Issued",
+      "band": "Band"
+    },
+    "contact": {
+      "badge": "Get In Touch",
+      "title": "Engage with",
+      "title_highlight": "SMAART Institute",
+      "desc": "Ready to transform your institution? Our team is here to guide you through the implementation of SMAART Institute. Let's build something extraordinary together.",
+      "email_title": "Email Us",
+      "email_sub": "Response within 24 hours",
+      "call_title": "Call Us",
+      "call_sub": "Mon-Fri from 9am to 6pm",
+      "visit_title": "Visit Us",
+      "visit_sub": "600034, India",
+      "form_title": "Send us a message",
+      "form_subtitle": "Tell us about your institution's needs.",
+      "label_name": "Full Name",
+      "label_institution": "Institution",
+      "label_email": "Email Address",
+      "label_phone": "Phone Number",
+      "label_query": "How can we help?",
+      "placeholder_name": "John Smith",
+      "placeholder_institution": "University of Excellence",
+      "placeholder_email": "john.smith@edu.com",
+      "placeholder_phone": "+91-0000000000",
+      "placeholder_query": "I'm interested in implementing SMAART Institute for our students...",
+      "btn_send": "Send Enquiry",
+      "btn_sending": "Transmitting Message...",
+      "success_title": "Message Received!",
+      "success_desc": "Thank you for reaching out. A specialist from our team will contact you within one business day.",
+      "btn_another": "Send Another Inquiry"
+    },
+    "newsletter": {
+      "title": "Stay Ahead of the Curve",
+      "desc": "Get exclusive Future of Work insights, career trends, and capability building strategies delivered to your inbox.",
+      "placeholder": "Enter your email",
+      "btn": "Subscribe Now",
+      "no_spam": "No spam, unsubscribe anytime.",
+      "toast_title": "Subscribed!",
+      "toast_desc": "You've been added to our insider list."
+    },
+    "footer": {
+      "desc": "An Integrated Employability & Impact Ecosystem. Building capability for the changing world of work.",
+      "links_title": "Quick Links",
+      "legal_title": "Legal",
+      "contact_title": "Contact Us",
+      "visit_text": "Nungambakkam, Chennai 600034, India",
+      "copyright": "All rights reserved.",
+      "back_to_top": "Back to Top",
+      "privacy_policy": "Privacy Policy",
+      "terms_of_service": "Terms of Service",
+      "cookie_policy": "Cookie Policy",
+      "data_protection": "Data Protection"
+    },
+    "stats": {
+      "partner_institutions": "Partner Institutions",
+      "students_assessed": "Students Assessed",
+      "placement_rate": "Placement Rate",
+      "corporate_partners": "Corporate Partners"
+    }
   }
 }

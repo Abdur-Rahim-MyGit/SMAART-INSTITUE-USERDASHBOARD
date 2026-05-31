@@ -4,9 +4,11 @@ import { ArrowRight, Play, CheckCircle } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 import { useTheme } from "@/contexts/ThemeContext";
 import NeuralBackground from "@/components/ui/NeuralBackground";
+import { useTranslation } from "react-i18next";
 
 const HeroSection = ({ onSignupClick, onLoginClick }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <section className="relative min-h-screen flex items-center pt-32 pb-32 overflow-hidden bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:bg-none dark:bg-dark-card text-gray-900 dark:text-white transition-colors duration-500">
@@ -42,7 +44,9 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#1a3884] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1a3884]"></span>
               </span>
-              <span className="text-sm font-semibold text-[#1a3884] dark:text-[#67e8f5] tracking-wide">Skills Passport Integration Live</span>
+              <span className="text-sm font-semibold text-[#1a3884] dark:text-[#67e8f5] tracking-wide">
+                {t("landing.hero.badge")}
+              </span>
             </motion.div>
 
             <motion.h1
@@ -51,12 +55,12 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-8 font-heading leading-tight text-[#1a3884] dark:text-white"
             >
-              An Integrated <br className="hidden sm:block" />
-              <span className="text-3xl sm:text-4xl md:text-5xl block mt-2 mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#C0C0C0] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300 drop-shadow-sm">
-                Employability & Impact Ecosystem
+              {t("landing.hero.title_main")} <br className="hidden sm:block" />
+              <span className="text-3xl sm:text-4xl md:text-5xl block mt-2 mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#C0C0C0] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300 drop-shadow-sm leading-tight py-1">
+                {t("landing.hero.title_sub")}
               </span>
               <span className="text-xl sm:text-3xl text-gray-600 dark:text-slate-200 font-bold block mt-2">
-                for the changing world of work.
+                {t("landing.hero.title_desc")}
               </span>
             </motion.h1>
 
@@ -66,11 +70,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="text-sm sm:text-base text-gray-600 dark:text-slate-200 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light"
             >
-              Responding to intelligent automation, job restructuring, and capability shift.
-              <br />
-              <span className="font-medium text-gray-800 dark:text-gray-100 mt-2 block sm:inline-block">
-                One ecosystem | Multiple careers | Every sector
-              </span>
+              {t("landing.hero.description")}
             </motion.p>
 
             <motion.div
@@ -92,7 +92,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </div>
                 <span className="relative flex items-center justify-center gap-2">
-                  Explore Our Programmes
+                  {t("landing.hero.get_started")}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
@@ -102,7 +102,7 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
                 className="group px-8 py-4 rounded-xl font-semibold text-base transition-all duration-300 hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2 border border-gray-200 dark:border-white/20 hover:bg-gray-100 dark:hover:bg-white/5 text-gray-700 dark:text-gray-200 backdrop-blur-sm"
               >
                 <Play className="w-4 h-4 fill-current" />
-                Institution Demo
+                {t("landing.hero.book_demo")}
               </button>
             </motion.div>
 
@@ -115,11 +115,11 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
             >
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-[#C0C0C0]" />
-                <span>Holistic Skill Profiling</span>
+                <span>{t("landing.pricing.plan1_features.1") || t("landing.pricing.plan1_features[1]") || "Student Employability"}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-[#C0C0C0]" />
-                <span>AI-Driven Career Pathways</span>
+                <span>{t("landing.pricing.plan2_features.2") || t("landing.pricing.plan2_features[2]") || "Capability Frameworks"}</span>
               </div>
             </motion.div>
           </motion.div>
@@ -184,5 +184,3 @@ const HeroSection = ({ onSignupClick, onLoginClick }) => {
 };
 
 export default HeroSection;
-
-

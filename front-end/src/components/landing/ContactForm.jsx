@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 // Dynamic API URL based on hostname
 const getApiBaseUrl = () => {
@@ -19,6 +20,7 @@ const getApiBaseUrl = () => {
 const API_BASE_URL = getApiBaseUrl();
 
 const ContactForm = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     institution: "",
@@ -51,7 +53,7 @@ const ContactForm = () => {
 
       if (data.success) {
         setIsSuccess(true);
-        toast.success(data.message || "Message sent successfully! We'll be in touch soon.");
+        toast.success(data.message || t("landing.contact.success_desc") || "Message sent successfully! We'll be in touch soon.");
         setFormData({ name: "", institution: "", email: "", phone: "", query: "" });
       } else {
         toast.error(data.error || "Failed to send message. Please try again.");
@@ -83,23 +85,23 @@ const ContactForm = () => {
                 transition={{ duration: 0.8 }}
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a3884]/10 dark:bg-[#C0C0C0]/10 border border-[#1a3884]/20 dark:border-[#C0C0C0]/20 text-[#1a3884] dark:text-[#C0C0C0] text-xs font-bold uppercase tracking-widest mb-8">
-                  Get In Touch
+                  {t("landing.contact.badge")}
                 </div>
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading leading-tight tracking-tight">
-                  Engage with <br />
+                  {t("landing.contact.title")} <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#C0C0C0] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300">
-                    SMAART Institute
+                    {t("landing.contact.title_highlight")}
                   </span>
                 </h2>
                 <p className="text-gray-600 dark:text-slate-200 text-base mb-10 leading-relaxed max-w-md font-light">
-                  Ready to transform your institution? Our team is here to guide you through the implementation of SMAART Institute. Let's build something extraordinary together.
+                  {t("landing.contact.desc")}
                 </p>
 
                 <div className="space-y-6">
                   {[
-                    { icon: Mail, title: "Email Us", info: "hello@smaartinstitute.org", sub: "Response within 24 hours" },
-                    { icon: Phone, title: "Call Us", info: "+91-6383930215", sub: "Mon-Fri from 9am to 6pm" },
-                    { icon: MapPin, title: "Visit Us", info: "Nungambakkam, Chennai", sub: "600034, India" }
+                    { icon: Mail, title: t("landing.contact.email_title") || "Email Us", info: "hello@smaartinstitute.org", sub: t("landing.contact.email_sub") || "Response within 24 hours" },
+                    { icon: Phone, title: t("landing.contact.call_title") || "Call Us", info: "+91-6383930215", sub: t("landing.contact.call_sub") || "Mon-Fri from 9am to 6pm" },
+                    { icon: MapPin, title: t("landing.contact.visit_title") || "Visit Us", info: "Nungambakkam, Chennai", sub: t("landing.contact.visit_sub") || "600034, India" }
                   ].map((item, idx) => (
                     <motion.div
                       key={idx}
@@ -146,41 +148,53 @@ const ContactForm = () => {
                       <div className="w-24 h-24 bg-[#1a3884]/20 rounded-full flex items-center justify-center mb-8 border border-[#1a3884]/30 shadow-lg shadow-[#1a3884]/20">
                         <CheckCircle className="w-12 h-12 text-[#1a3884] dark:text-[#C0C0C0]" />
                       </div>
-                      <h3 className="text-3xl font-bold text-[#002147] dark:text-white mb-4 tracking-tight">Message Received!</h3>
-                      <p className="text-gray-600 dark:text-slate-200 mb-10 max-w-sm mx-auto text-lg leading-relaxed font-light">Thank you for reaching out. A specialist from our team will contact you within one business day.</p>
+                      <h3 className="text-3xl font-bold text-[#002147] dark:text-white mb-4 tracking-tight">
+                        {t("landing.contact.success_title")}
+                      </h3>
+                      <p className="text-gray-600 dark:text-slate-200 mb-10 max-w-sm mx-auto text-lg leading-relaxed font-light">
+                        {t("landing.contact.success_desc")}
+                      </p>
                       <Button onClick={() => setIsSuccess(false)} variant="outline" className="border-gray-200 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 px-10 py-6 rounded-2xl transition-all duration-300 text-lg font-bold">
-                        Send Another Inquiry
+                        {t("landing.contact.btn_another")}
                       </Button>
                     </motion.div>
                   ) : (
                     <div className="flex-grow">
                       <div className="mb-8">
-                        <h3 className="text-xl font-bold text-[#002147] dark:text-white mb-1">Send us a message</h3>
-                        <p className="text-sm text-gray-500 dark:text-slate-300 font-light">Tell us about your institution's needs.</p>
+                        <h3 className="text-xl font-bold text-[#002147] dark:text-white mb-1">
+                          {t("landing.contact.form_title")}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-slate-300 font-light">
+                          {t("landing.contact.form_subtitle")}
+                        </p>
                       </div>
 
                       <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="grid md:grid-cols-2 gap-8">
                           <div className="space-y-3">
-                            <Label htmlFor="name" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">Full Name</Label>
+                            <Label htmlFor="name" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">
+                              {t("landing.contact.label_name")}
+                            </Label>
                             <Input
                               id="name"
                               name="name"
                               value={formData.name}
                               onChange={handleChange}
-                              placeholder="John Smith"
+                              placeholder={t("landing.contact.placeholder_name") || "John Smith"}
                               required
                               className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 h-14 rounded-2xl px-6"
                             />
                           </div>
                           <div className="space-y-3">
-                            <Label htmlFor="institution" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">Institution</Label>
+                            <Label htmlFor="institution" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">
+                              {t("landing.contact.label_institution")}
+                            </Label>
                             <Input
                               id="institution"
                               name="institution"
                               value={formData.institution}
                               onChange={handleChange}
-                              placeholder="University of Excellence"
+                              placeholder={t("landing.contact.placeholder_institution") || "University of Excellence"}
                               className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 h-14 rounded-2xl px-6"
                             />
                           </div>
@@ -188,40 +202,46 @@ const ContactForm = () => {
 
                         <div className="grid md:grid-cols-2 gap-8">
                           <div className="space-y-3">
-                            <Label htmlFor="email" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">Email Address</Label>
+                            <Label htmlFor="email" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">
+                              {t("landing.contact.label_email")}
+                            </Label>
                             <Input
                               id="email"
                               name="email"
                               type="email"
                               value={formData.email}
                               onChange={handleChange}
-                              placeholder="john.smith@edu.com"
+                              placeholder={t("landing.contact.placeholder_email") || "john.smith@edu.com"}
                               required
                               className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 h-14 rounded-2xl px-6"
                             />
                           </div>
                           <div className="space-y-3">
-                            <Label htmlFor="phone" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">Phone Number</Label>
+                            <Label htmlFor="phone" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">
+                              {t("landing.contact.label_phone")}
+                            </Label>
                             <Input
                               id="phone"
                               name="phone"
                               type="tel"
                               value={formData.phone}
                               onChange={handleChange}
-                              placeholder="+91-0000000000"
+                              placeholder={t("landing.contact.placeholder_phone") || "+91-0000000000"}
                               className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 h-14 rounded-2xl px-6"
                             />
                           </div>
                         </div>
 
                         <div className="space-y-3">
-                          <Label htmlFor="query" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">How can we help?</Label>
+                          <Label htmlFor="query" className="text-gray-900 dark:text-slate-200 font-bold text-xs uppercase tracking-widest pl-1">
+                            {t("landing.contact.label_query")}
+                          </Label>
                           <Textarea
                             id="query"
                             name="query"
                             value={formData.query}
                             onChange={handleChange}
-                            placeholder="I'm interested in implementing SMAART Institute for our students..."
+                            placeholder={t("landing.contact.placeholder_query") || "I'm interested in implementing SMAART Institute for our students..."}
                             required
                             className="bg-gray-50 dark:bg-white/5 border-gray-100 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:border-[#C0C0C0] focus:ring-1 focus:ring-[#C0C0C0] transition-all duration-300 min-h-[120px] rounded-xl px-4 py-3 resize-none"
                           />
@@ -237,11 +257,11 @@ const ContactForm = () => {
                             {isSubmitting ? (
                               <>
                                 <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                                Transmitting Message...
+                                {t("landing.contact.btn_sending")}
                               </>
                             ) : (
                               <>
-                                Send Enquiry
+                                {t("landing.contact.btn_send")}
                                 <Send className="ml-3 h-5 w-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                               </>
                             )}
@@ -261,5 +281,3 @@ const ContactForm = () => {
 };
 
 export default ContactForm;
-
-

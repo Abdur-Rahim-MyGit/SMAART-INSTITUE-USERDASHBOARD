@@ -708,68 +708,68 @@ router.post('/task-result', async (req, res) => {
     }
 });
 
-// Track active time spent (increments totalTimeSpent)
-router.post('/active-time', async (req, res) => {
+// --- USER PROGRESS CORE LOGIC ENDPOINTS ---
+const UserProgress = require('../models/UserProgress');
+
+// Get all progress for a course by active user
+router.get('/user-progress/:courseCode', async (req, res) => {
     try {
-        const studentId = req.user._id;
-        const { courseCode, incrementMinutes = 1 } = req.body;
-
-        let enrollment = null;
-
-        if (courseCode) {
-            // Find course
-            const course = await Course.findOne({
-                $or: [
-                    { courseCode: courseCode },
-                    { courseNumber: courseCode }
-                ]
-            });
-            if (course) {
-                enrollment = await CourseEnrollment.findOne({
-                    student: studentId,
-                    course: course._id
-                });
-            }
-        }
-
-        // Fallback: If no course specified or enrollment not found, find the most recently updated enrollment
-        if (!enrollment) {
-            enrollment = await CourseEnrollment.findOne({ student: studentId })
-                .sort({ updatedAt: -1 });
-        }
-
-        // If still no enrollment, create a default one for the first course
-        if (!enrollment) {
-            const firstCourse = await Course.findOne();
-            if (firstCourse) {
-                enrollment = new CourseEnrollment({
-                    student: studentId,
-                    course: firstCourse._id,
-                    status: 'in_progress',
-                    enrollmentDate: new Date(),
-                    progress: 0,
-                    moduleProgress: []
-                });
-            }
-        }
-
-        if (!enrollment) {
-            return res.status(404).json({ success: false, error: 'No active courses or enrollments found to track time.' });
-        }
-
-        // Increment totalTimeSpent in minutes
-        enrollment.totalTimeSpent = (enrollment.totalTimeSpent || 0) + incrementMinutes;
-        enrollment.lastAccessedAt = new Date();
-
-        await enrollment.save();
-
-        res.json({
-            success: true,
-            message: 'Active learning time updated successfully',
-            totalTimeSpent: enrollment.totalTimeSpent
+        const progressList = await UserProgress.find({
+            user: req.user.id,
+            courseCode: req.params.courseCode
         });
+        res.json({ success: true, data: progressList });
     } catch (err) {
-        console.error('Error tracking active time:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Save or update user progress entry
+router.post('/user-progress/save', async (req, res) => {
+    try {
+        const {
+            courseCode,
+            moduleId,
+            dayId,
+            stepId,
+            last_timestamp,
+            videoDuration,
+            videoCompleted,
+            assignmentStatus,
+            assignmentProgress,
+            testScore,
+            testTotalPoints,
+            testCompleted
+        } = req.body;
+
+        if (!courseCode || !moduleId || dayId === undefined || stepId === undefined) {
+            return res.status(400).json({ success: false, error: 'Missing required parameters' });
+        }
+
+        const updateData = {};
+        if (last_timestamp !== undefined) updateData.last_timestamp = Number(last_timestamp);
+        if (videoDuration !== undefined) updateData.videoDuration = Number(videoDuration);
+        if (videoCompleted !== undefined) updateData.videoCompleted = Boolean(videoCompleted);
+        if (assignmentStatus !== undefined) updateData.assignmentStatus = String(assignmentStatus);
+        if (assignmentProgress !== undefined) updateData.assignmentProgress = Number(assignmentProgress);
+        if (testScore !== undefined) updateData.testScore = testScore === null ? null : Number(testScore);
+        if (testTotalPoints !== undefined) updateData.testTotalPoints = testTotalPoints === null ? null : Number(testTotalPoints);
+        if (testCompleted !== undefined) updateData.testCompleted = Boolean(testCompleted);
+
+        const progress = await UserProgress.findOneAndUpdate(
+            {
+                user: req.user.id,
+                courseCode,
+                moduleId: String(moduleId),
+                dayId: Number(dayId),
+                stepId: Number(stepId)
+            },
+            { $set: updateData },
+            { new: true, upsert: true }
+        );
+
+        res.json({ success: true, data: progress });
+    } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
 });

@@ -2,28 +2,31 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Quote, ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const Testimonials = () => {
+  const { t } = useTranslation();
+
   const testimonials = [
     {
       id: 1,
-      quote: "Impact is measured by capability and progression, not just activity. We look at the whole system.",
-      author: "Systems Thinking",
-      role: "Core Value",
+      quote: t("landing.testimonials.quote1"),
+      author: t("landing.testimonials.author1"),
+      role: t("landing.testimonials.role1"),
       image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
     },
     {
       id: 2,
-      quote: "Focus on real-world outcomes that improve lives and economies. Evidence is our currency.",
-      author: "Measurable Impact",
-      role: "Core Value",
+      quote: t("landing.testimonials.quote2"),
+      author: t("landing.testimonials.author2"),
+      role: t("landing.testimonials.role2"),
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
     },
     {
       id: 3,
-      quote: "Preparing for the restructured world of work requires constant evolution and flexibility.",
-      author: "Adaptability",
-      role: "Core Value",
+      quote: t("landing.testimonials.quote3"),
+      author: t("landing.testimonials.author3"),
+      role: t("landing.testimonials.role3"),
       image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=128&q=80"
     }
   ];
@@ -55,7 +58,8 @@ const Testimonials = () => {
             viewport={{ once: true }}
             className="text-3xl font-bold mb-3 text-gray-900 dark:text-white tracking-tight font-heading"
           >
-            Impact & <span className="text-[#C0C0C0]">Values</span>
+            {t("landing.testimonials.title")}{" "}
+            <span className="text-[#C0C0C0]">{t("landing.testimonials.title_highlight")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -64,7 +68,7 @@ const Testimonials = () => {
             transition={{ delay: 0.2 }}
             className="text-base text-gray-600 dark:text-slate-200"
           >
-            Guided by the SMAART Values Framework
+            {t("landing.testimonials.subtitle")}
           </motion.p>
         </div>
 
@@ -162,4 +166,3 @@ const Testimonials = () => {
 };
 
 export default Testimonials;
-

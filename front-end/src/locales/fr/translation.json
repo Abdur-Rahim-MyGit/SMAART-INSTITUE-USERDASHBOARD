@@ -341,37 +341,37 @@
   "skills_passport": {
     "title": "Passeport de compétences numériques",
     "verifiable": "Vérifiable par l'employeur",
-    "hero_title": "L'avenir du talent vérifié.",
-    "hero_desc": "Votre titre de capacité sécurisé et vérifié par l'IA. Conçu pour les employeurs exigeants et les professionnels en quête de croissance.",
+    "hero_title": "L'avenir des talents vérifiés.",
+    "hero_desc": "Votre identifiant de capacité sécurisé et vérifié par l'IA. Conçu pour les employeurs qui exigent des preuves et les professionnels en quête de croissance.",
     "get_pdf": "Obtenir le PDF du passeport",
     "share": "Partager l'identité",
-    "global_readiness": "Préparation mondiale",
+    "global_readiness": "Préparation globale",
     "plvi_band": "Bande PLVI",
     "secure_protocol": "Protocole de confiance sécurisé",
-    "verification_live": "La vérification publique est en direct",
+    "verification_live": "La vérification publique est en ligne",
     "tabs": {
-      "smart": "Cours Smart",
-      "other": "Autre cours",
-      "certificates": "Certificats",
-      "projects": "Projets"
+      "smart": "Cours SMAART",
+      "other": "Compétences techniques",
+      "certificates": "Compétences IA",
+      "projects": "Compétences de domaine"
     },
     "stats": {
       "growth_delta": "Delta de croissance",
       "momentum": "Score d'élan",
       "badges": "Badges de compétences",
-      "trust": "Note de confiance"
+      "trust": "Indice de confiance"
     },
     "dna": {
-      "title": "ADN de compétences",
+      "title": "ADN des compétences",
       "desc": "Une analyse multidimensionnelle de vos forces cognitives et professionnelles vérifiées."
     },
     "proficiency": {
       "title": "Compétence vérifiée",
-      "gold_standard": "Vérifié conforme au standard d'or"
+      "gold_standard": "Certifié Gold Standard"
     },
     "timeline": {
-      "title": "Ligne de temps",
-      "baseline": "Base",
+      "title": "Chronologie",
+      "baseline": "Référence",
       "assessment": "Évaluation"
     },
     "other_courses": {
@@ -383,9 +383,56 @@
       "none": "Aucun certificat obtenu pour le moment."
     },
     "projects": {
-      "title": "Vitrine de projets",
+      "title": "Vitrine des projets",
       "none": "Aucun projet présenté pour le moment."
-    }
+    },
+    "standards": {
+      "understand": {
+        "title": "COMPRENDRE",
+        "desc": "Comprend clairement le contexte, l'intention et les priorités."
+      },
+      "structure": {
+        "title": "STRUCTURER",
+        "desc": "Organise la pensée en cadres et actions clairs."
+      },
+      "verify": {
+        "title": "VÉRIFIER",
+        "desc": "Vérifie l'exactitude, la qualité et les preuves avant la livraison."
+      },
+      "adapt": {
+        "title": "S'ADAPTER",
+        "desc": "Réagit bien au changement, à l'ambiguïté et aux nouveaux éléments."
+      },
+      "communicate": {
+        "title": "COMMUNIQUER",
+        "desc": "Exprime des idées avec clarté, brièveté et confiance."
+      },
+      "connect": {
+        "title": "CONNECTER",
+        "desc": "Établit la confiance et collabore efficacement avec les autres."
+      },
+      "own": {
+        "title": "ASSUMER",
+        "desc": "Assume la responsabilité et assure le suivi avec responsabilisation."
+      },
+      "create": {
+        "title": "CRÉER",
+        "desc": "Génère des idées utiles, des solutions et des améliorations."
+      },
+      "lead": {
+        "title": "DIRIGER",
+        "desc": "Guide les autres avec initiative, jugement et calme."
+      },
+      "grow": {
+        "title": "GRANDIR",
+        "desc": "Apprend des commentaires et évolue continuellement."
+      }
+    },
+    "standards_title": "Dix normes professionnelles",
+    "standards_matrix": "Matrice des normes professionnelles",
+    "rating": "Évaluation",
+    "institutional_registry": "Registre institutionnel",
+    "verified_records": "Dossiers vérifiés"
   },
   "quotients": {
     "CRQ": {
@@ -1027,102 +1074,6 @@
       }
     }
   },
-  "skills_passport": {
-    "title": "Passeport de compétences numériques",
-    "verifiable": "Vérifiable par l'employeur",
-    "hero_title": "L'avenir des talents vérifiés.",
-    "hero_desc": "Votre identifiant de capacité sécurisé et vérifié par l'IA. Conçu pour les employeurs qui exigent des preuves et les professionnels en quête de croissance.",
-    "get_pdf": "Obtenir le PDF du passeport",
-    "share": "Partager l'identité",
-    "global_readiness": "Préparation globale",
-    "plvi_band": "Bande PLVI",
-    "secure_protocol": "Protocole de confiance sécurisé",
-    "verification_live": "La vérification publique est en ligne",
-    "tabs": {
-      "smart": "Cours SMAART",
-      "other": "Compétences techniques",
-      "certificates": "Compétences IA",
-      "projects": "Compétences de domaine"
-    },
-    "stats": {
-      "growth_delta": "Delta de croissance",
-      "momentum": "Score d'élan",
-      "badges": "Badges de compétences",
-      "trust": "Indice de confiance"
-    },
-    "dna": {
-      "title": "ADN des compétences",
-      "desc": "Une analyse multidimensionnelle de vos forces cognitives et professionnelles vérifiées."
-    },
-    "proficiency": {
-      "title": "Compétence vérifiée",
-      "gold_standard": "Certifié Gold Standard"
-    },
-    "timeline": {
-      "title": "Chronologie",
-      "baseline": "Référence",
-      "assessment": "Évaluation"
-    },
-    "other_courses": {
-      "title": "Autres cours de l'institut",
-      "none": "Aucun cours externe trouvé."
-    },
-    "certificates": {
-      "title": "Certificats obtenus",
-      "none": "Aucun certificat obtenu pour le moment."
-    },
-    "projects": {
-      "title": "Vitrine des projets",
-      "none": "Aucun projet présenté pour le moment."
-    },
-    "standards": {
-      "understand": {
-        "title": "COMPRENDRE",
-        "desc": "Comprend clairement le contexte, l'intention et les priorités."
-      },
-      "structure": {
-        "title": "STRUCTURER",
-        "desc": "Organise la pensée en cadres et actions clairs."
-      },
-      "verify": {
-        "title": "VÉRIFIER",
-        "desc": "Vérifie l'exactitude, la qualité et les preuves avant la livraison."
-      },
-      "adapt": {
-        "title": "S'ADAPTER",
-        "desc": "Réagit bien au changement, à l'ambiguïté et aux nouveaux éléments."
-      },
-      "communicate": {
-        "title": "COMMUNIQUER",
-        "desc": "Exprime des idées avec clarté, brièveté et confiance."
-      },
-      "connect": {
-        "title": "CONNECTER",
-        "desc": "Établit la confiance et collabore efficacement avec les autres."
-      },
-      "own": {
-        "title": "ASSUMER",
-        "desc": "Assume la responsabilité et assure le suivi avec responsabilisation."
-      },
-      "create": {
-        "title": "CRÉER",
-        "desc": "Génère des idées utiles, des solutions et des améliorations."
-      },
-      "lead": {
-        "title": "DIRIGER",
-        "desc": "Guide les autres avec initiative, jugement et calme."
-      },
-      "grow": {
-        "title": "GRANDIR",
-        "desc": "Apprend des commentaires et évolue continuellement."
-      }
-    },
-    "standards_title": "Dix normes professionnelles",
-    "standards_matrix": "Matrice des normes professionnelles",
-    "rating": "Évaluation",
-    "institutional_registry": "Registre institutionnel",
-    "verified_records": "Dossiers vérifiés"
-  },
   "career_agent": {
     "loading_title": "Synchronisation de l'intelligence...",
     "loading_subtitle": "Cartographie de votre trajectoire de carrière",
@@ -1451,6 +1402,255 @@
       "placeholder_content": "Commencez à taper...",
       "last_edited": "Dernière modification : {{date}}",
       "save_note": "Enregistrer la note"
+    }
+  },
+  "landing": {
+    "navbar": {
+      "services": "Services",
+      "how_it_works": "Fonctionnement",
+      "testimonials": "Témoignages",
+      "faq": "FAQ",
+      "verify_certificate": "Vérifier le Certificat",
+      "contact": "Contact",
+      "login": "Connexion",
+      "enquiry": "Demande"
+    },
+    "hero": {
+      "badge": "Intégration du Passeport de Compétences Active",
+      "title_main": "Un Écosystème",
+      "title_sub": "d'Employabilité & d'Impact Intégré",
+      "title_desc": "pour le monde du travail en mutation.",
+      "description": "Libérez votre plein potentiel avec notre coach de carrière IA complet. Intégration de l'QE, des compétences cognitives et des résultats académiques.",
+      "get_started": "Commencer",
+      "book_demo": "Réserver une Démo",
+      "learn_more": "En Savoir Plus"
+    },
+    "marquee": {
+      "trusted_by": "Approuvé par les Grandes Institutions"
+    },
+    "services": {
+      "title": "Renforcer les Capacités pour un",
+      "title_highlight": "Monde du Travail en Mutation",
+      "subtitle": "Nous développons des capacités qui favorisent l'employabilité, la progression de carrière et la longévité professionnelle durable.",
+      "card_work_ready_title": "Capacité d'Adaptation & d'Employabilité",
+      "card_work_ready_desc": "We develop capabilities that enable employability, career progression, and sustained career longevity — supporting individuals from entry into work through growth and transition.",
+      "card_work_ready_features": [
+        "Employabilité",
+        "Évolution de Carrière",
+        "Longévité Durable"
+      ],
+      "card_impact_title": "Capacité Orientée Impact",
+      "card_impact_desc": "Nous développons des capacités pour l'innovation, l'entrepreneuriat et la création de valeur durable - permettant aux personnes et aux institutions de créer un impact économique et sociétal durable.",
+      "card_impact_features": [
+        "Innovation",
+        "Entrepreneuriat",
+        "Création de Valeur"
+      ],
+      "card_map_title": "SMAART Career Architecture Map™",
+      "card_map_desc": "Un modèle de référence moderne pour les carrières, les concevant comme un continuum à plusieurs étapes plutôt qu'une transition unique, reflétant des carrières plus longues et le changement technologique.",
+      "card_map_features": [
+        "Continuum Multi-étapes",
+        "Changement Technologique",
+        "Transitions Répétées"
+      ],
+      "learn_more_btn": "En Savoir Plus"
+    },
+    "deep_dive": {
+      "section1_badge": "Capacité Professionnelle & Technique™",
+      "section1_title": "Du Campus à la Carrière™",
+      "section1_desc": "Préparer les apprenants à entrer sur le marché du travail et aligner leurs compétences sur les pratiques professionnelles. Nous comblons le fossé entre la théorie académique et la réalité professionnelle.",
+      "point1_title": "Apprentissage Aligné sur la Pratique",
+      "point1_desc": "Des simulations réelles et des outils standards de l'industrie qui reflètent l'environnement de travail réel.",
+      "point2_title": "Priorité à l'Employabilité",
+      "point2_desc": "Des voies directes vers des rôles de début de carrière significatifs avec des preuves de capacités vérifiées.",
+      "section2_badge": "Capacité d'Innovation & d'Impact™",
+      "section2_title": "De la Carrière à la Vie™",
+      "section2_desc": "Soutenir la progression à long terme, la transition vers le leadership et la capacité à créer de la valeur par l'innovation. Pour ceux qui sont prêts à façonner l'avenir.",
+      "point3_title": "Transition vers le Leadership",
+      "point3_desc": "Passer du statut de contributeur individuel à celui de leader stratégique doté de compétences décisionnelles avancées.",
+      "point4_title": "Création de Valeur",
+      "point4_desc": "Compétences entrepreneuriales et cadres d'innovation pour la nouvelle économie.",
+      "analysis_view": "Vue de Capacité Professionnelle & Technique",
+      "analysis_live": "Analyse IA en Direct",
+      "analytics_view": "Analyses du Leadership & de l'Innovation"
+    },
+    "how_it_works": {
+      "title": "SMAART Système",
+      "title_highlight": "de Capacité Intégré™",
+      "subtitle": "Comment la capacité se construit pour le travail moderne. Intégration des compétences, du jugement et de l'adaptabilité.",
+      "step1_title": "Compétences",
+      "step1_desc": "Aptitude appliquée. Garantir que l'apprentissage se traduit par une application concrète et pas seulement par une qualification.",
+      "step2_title": "Jugement",
+      "step2_desc": "Qualité de décision dans des situations réelles. Développer la capacité à faire des choix efficaces dans des environnements complexes.",
+      "step3_title": "Adaptability",
+      "step3_desc": "Efficacité face aux changements de conditions. Renforcer la résilience et la flexibilité pour un monde du travail restructuré.",
+      "unlocked": "Déverrouillé",
+      "locked": "Verrouillé"
+    },
+    "passport": {
+      "title": "SMAART Passeport de",
+      "title_highlight": "Capacité & de Compétences™",
+      "desc": "Un registre vérifiable et permanent du développement et de la progression des capacités. Il capture non seulement ce que vous savez, mais aussi ce que vous pouvez faire, offrant des preuves fiables de votre préparation au monde du travail de demain.",
+      "features": [
+        "Profil de Capacité Vérifié",
+        "Portabilité Universelle",
+        "Progression Basée sur les Preuves"
+      ],
+      "btn": "Obtenir Votre Passeport de Compétences",
+      "badge": "Registre des Capacités & Compétences",
+      "verified": "VÉRIFIÉ",
+      "issued_by": "Émis Par"
+    },
+    "testimonials": {
+      "title": "Impact &",
+      "title_highlight": "Valeurs",
+      "subtitle": "Guidé par le Cadre des Valeurs SMAART",
+      "quote1": "L'impact se mesure à la capacité et à la progression, et pas seulement à l'activité. Nous analysons l'ensemble du système.",
+      "author1": "Pensée Systémique",
+      "role1": "Valeur Fondamentale",
+      "quote2": "Concentrez-vous sur des résultats concrets qui améliorent les vies et les économies. Les preuves sont notre monnaie.",
+      "author2": "Impact Mesurable",
+      "role2": "Valeur Fondamentale",
+      "quote3": "Se préparer à la restructuration du monde du travail exige une évolution constante et de la flexibilité.",
+      "author3": "Adaptabilité",
+      "role3": "Valeur Fondamentale"
+    },
+    "pricing": {
+      "title": "Partenariats",
+      "subtitle": "We form long-term, institutional partnerships to drive ecosystem-wide impact.",
+      "popular": "Le Plus Populaire",
+      "plan1_title": "Universities & Colleges",
+      "plan1_price": "Académique",
+      "plan1_desc": "Partner with us to enhance student employability and align curriculum with industry needs.",
+      "plan1_features": [
+        "Alignement du Programme",
+        "Employabilité des Étudiants",
+        "Développement de la Faculté"
+      ],
+      "plan1_cta": "S'associer avec nous",
+      "plan2_title": "Employers & Workforce",
+      "plan2_price": "Industrie",
+      "plan2_desc": "Access a pipeline of work-ready talent and upskill your existing workforce.",
+      "plan2_features": [
+        "Vivier de Talents",
+        "Montée en Compétences",
+        "Cadres de Capacités",
+        "Solutions de Recrutement"
+      ],
+      "plan2_cta": "Recruter des Talents",
+      "plan3_title": "Government & CSR",
+      "plan3_price": "Impact",
+      "plan3_desc": "Collaborate on large-scale skilling initiatives to drive social and economic impact.",
+      "plan3_features": [
+        "Formation à Grande Échelle",
+        "Impact Social",
+        "Développement Économique",
+        "Soutien Politique"
+      ],
+      "plan3_cta": "Collaborer"
+    },
+    "faq": {
+      "title": "Analyses &",
+      "title_highlight": "Cadres",
+      "subtitle": "Comprendre le monde du travail de demain.",
+      "q1": "Qu'est-ce que la SMAART Career Architecture Map™ ?",
+      "a1": "Un modèle de référence moderne qui conçoit les carrières comme un continuum à plusieurs étapes, aidant les individus à naviguer dans des vies professionnelles plus longues et des transitions fréquentes.",
+      "q2": "Qu'est-ce que l'Integrated Capability Framework™ ?",
+      "a2": "Notre cadre exclusif qui associe compétences (aptitude appliquée), jugement (qualité de décision) et adaptabilité (efficacité) pour bâtir une capacité professionnelle globale.",
+      "q3": "Qu'est-ce que les perspectives sur l'avenir du travail ?",
+      "a3": "Des analyses fondées sur la recherche concernant des tendances telles que l'automatisation intelligente, la restructuration des emplois et le passage d'un travail basé sur les rôles à un travail basé sur les compétences.",
+      "q4": "Comment puis-je accéder au rapport de préparation à l'emploi 2026 ?",
+      "a4": "Le rapport est accessible à nos partenaires institutionnels et abonnés, offrant des analyses approfondies de l'évolution de la demande de compétences et de capacités."
+    },
+    "verify": {
+      "badge": "Registres Officiels",
+      "title": "Vérification",
+      "title_highlight": "de Certificats",
+      "desc": "Vérifiez instantanément l'authenticité des certifications SMAART Institute. Notre système de vérification sécurisé par blockchain garantit confiance et crédibilité.",
+      "f1_title": "Inviolable",
+      "f1_info": "Sécurisé par Blockchain",
+      "f1_sub": "Registres de vérification immuables",
+      "f2_title": "Contrôle Instantané",
+      "f2_info": "Validation en Temps Réel",
+      "f2_sub": "Vérifiez en quelques secondes",
+      "f3_title": "Accès Mondial",
+      "f3_info": "Registre Centralisé",
+      "f3_sub": "Accès n'importe où, n'importe quand",
+      "card_title": "Vérification des Identifiants",
+      "tab_manual": "ID Manuel",
+      "tab_scan": "Scanner QR",
+      "scan_title": "Sélectionner une image QR code",
+      "scan_desc": "Choisissez une photo du certificat depuis votre galerie ou vos fichiers",
+      "btn_choose": "Choisir une Image",
+      "input_label": "Identifiant du Certificat",
+      "placeholder": "ex. SMAART-CAP-2025-ABC12",
+      "btn_auth": "Authentifier Maintenant",
+      "btn_verifying": "Transmission du Message...",
+      "failed_title": "Vérification Échouée",
+      "btn_try": "Réessayer",
+      "valid_title": "Certificat Valide",
+      "issue_title": "Problème Détecté",
+      "recipient": "Récipiendaire",
+      "credential": "Certification",
+      "issued": "Émis le",
+      "band": "Niveau"
+    },
+    "contact": {
+      "badge": "Prendre Contact",
+      "title": "S'engager avec",
+      "title_highlight": "SMAART Institute",
+      "desc": "Prêt à transformer votre institution ? Notre équipe est là pour vous guider dans l'implémentation de SMAART Institute. Construisons ensemble quelque chose d'extraordinaire.",
+      "email_title": "Écrivez-nous",
+      "email_sub": "Réponse sous 24 heures",
+      "call_title": "Appelez-nous",
+      "call_sub": "Lun-Ven de 9h à 18h",
+      "visit_title": "Visitez-nous",
+      "visit_sub": "600034, Inde",
+      "form_title": "Envoyez-nous un message",
+      "form_subtitle": "Parlez-nous des besoins de votre institution.",
+      "label_name": "Nom Complet",
+      "label_institution": "Institution",
+      "label_email": "Adresse E-mail",
+      "label_phone": "Numéro de Téléphone",
+      "label_query": "Comment pouvons-nous vous aider ?",
+      "placeholder_name": "Jean Dupont",
+      "placeholder_institution": "Université d'Excellence",
+      "placeholder_email": "jean.dupont@edu.com",
+      "placeholder_phone": "+33-000000000",
+      "placeholder_query": "Je suis intéressé par l'intégration de SMAART Institute pour nos étudiants...",
+      "btn_send": "Envoyer la Demande",
+      "btn_sending": "Transmission du Message...",
+      "success_title": "Message Reçu !",
+      "success_desc": "Merci de nous avoir contactés. Un spécialiste de notre équipe vous contactera dans un délai d'un jour ouvrable.",
+      "btn_another": "Envoyer une Autre Demande"
+    },
+    "newsletter": {
+      "title": "Gardez une Longueur d'Avance",
+      "desc": "Recevez directement dans votre boîte de réception des analyses exclusives sur l'avenir du travail, des tendances de carrière et des stratégies de renforcement des capacités.",
+      "placeholder": "Entrez votre e-mail",
+      "btn": "S'abonner Maintenant",
+      "no_spam": "Pas de spam, désinscription possible à tout moment.",
+      "toast_title": "Abonné !",
+      "toast_desc": "Vous avez été ajouté à notre liste d'initiés."
+    },
+    "footer": {
+      "desc": "Un écosystème d'employabilité et d'impact intégré. Renforcer les capacités pour un monde du travail en mutation.",
+      "links_title": "Liens Rapides",
+      "legal_title": "Mentions Légales",
+      "contact_title": "Contactez-nous",
+      "visit_text": "Nungambakkam, Chennai 600034, Inde",
+      "copyright": "Tous droits réservés.",
+      "back_to_top": "Retour en Haut",
+      "privacy_policy": "Politique de Confidentialité",
+      "terms_of_service": "Conditions d'Utilisation",
+      "cookie_policy": "Politique relative aux Cookies",
+      "data_protection": "Protection des Données"
+    },
+    "stats": {
+      "partner_institutions": "Institutions Partenaires",
+      "students_assessed": "Étudiants Évalués",
+      "placement_rate": "Taux de Placement",
+      "corporate_partners": "Partenaires Entreprises"
     }
   }
 }

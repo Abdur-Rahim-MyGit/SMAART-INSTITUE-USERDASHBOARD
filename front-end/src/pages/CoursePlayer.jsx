@@ -18,12 +18,52 @@ import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK
 import { getLearningFlowData } from "@/data/learningFlowData";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { coursesAPI, courseEnrollmentAPI } from "@/services/api";
-import { buildFlowFromCourse, TEMP_VIDEO_URL } from "@/utils/courseStages";
-import { mergeAdminQuizzesIntoFlow } from "@/utils/microAssessmentUtils";
-import { markCourseCompleted } from "@/utils/courseProgressStorage";
-import useActivityRestrictions from "@/hooks/useActivityRestrictions";
-import ActivityWarningModal from "@/components/ActivityWarningModal";
+import { courseEnrollmentAPI } from "@/services/api";
+
+// Sample video URLs - replace with actual video URLs from your backend
+const COURSE_VIDEOS = {
+  'S01': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S02': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S03': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S04': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S05': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S06': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S07': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S08': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S09': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S10': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S11': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S12': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S13': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S14': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S15': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S16': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S17': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S18': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S19': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S20': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S21': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S22': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S23': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S24': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'S25': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'PIQ01': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'PIQ02': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'PIQ03': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'PIQ04': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'PIQ05': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'AIQ01': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'AIQ02': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'AIQ03': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'AIQ04': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'AIQ05': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'SQ01': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'SQ02': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'SQ03': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'SQ04': 'https://www.w3schools.com/html/mov_bbb.mp4',
+  'SQ05': 'https://www.w3schools.com/html/mov_bbb.mp4',
+};
+
 const getCourseById = (courseId) => {
   const allCourses = [
     ...STAGE_1_COURSES,
@@ -225,6 +265,8 @@ const CoursePlayer = () => {
     isActive: !loading && !!course
   });
 
+  const [userProgressData, setUserProgressData] = useState({});
+
   useEffect(() => {
     setShowIntro(true);
     setActiveStep(null);
@@ -244,76 +286,147 @@ const CoursePlayer = () => {
       localStorage.setItem("smaart_last_watched_lesson", courseData.title || courseId);
       localStorage.setItem("smaart_course_progress", "0");
     }
-  }, [courseId, staticCourse, learningFlowData?.overviewTitle]);
 
-  // Load progress from database on mount or course/user change
-  useEffect(() => {
+    // ── Fetch detailed user progress from backend ──
     const fetchProgress = async () => {
-      if (!currentUser || !courseId) return;
+      if (!courseId) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
       try {
-        console.log('[CoursePlayer] Fetching enrollment progress for user:', currentUser._id || currentUser.id);
-        const response = await courseEnrollmentAPI.getByStudent(currentUser._id || currentUser.id);
-        if (response.success && response.data) {
-          // Find the enrollment for this course
-          const enrollment = response.data.find(e => e.course && (e.course.courseNumber === courseId || e.course.courseCode === courseId));
-          if (enrollment && enrollment.moduleProgress && enrollment.moduleProgress.length > 0) {
-            const mProg = enrollment.moduleProgress[0];
-            const stepsMap = {};
+        const response = await courseEnrollmentAPI.getUserProgress(courseId);
+        if (response && response.success && response.data) {
+          const progressMap = {};
+          const completedMap = {};
+          
+          response.data.forEach(item => {
+            const stepKey = String(item.stepId);
             
-            // From completedTasks
-            if (mProg.completedTasks) {
-              mProg.completedTasks.forEach(ct => {
-                stepsMap[String(ct.dayId)] = true;
-              });
+            // Restore step completion if video is completed, assignment is submitted, or test is completed
+            if (item.videoCompleted || item.assignmentStatus === 'Submitted' || item.testCompleted) {
+              completedMap[stepKey] = true;
             }
-
-            // From videoProgress
-            if (mProg.videoProgress) {
-              mProg.videoProgress.forEach(vp => {
-                if (vp.isCompleted) {
-                  stepsMap[String(vp.dayId)] = true;
-                }
-              });
-            }
-
-            console.log('[CoursePlayer] Loaded steps progress:', stepsMap);
-            setCompletedSteps(stepsMap);
             
-            const stepsDone = Object.keys(stepsMap).length;
-            const pct = Math.round((stepsDone / 9) * 100);
-            setVideoProgress(pct);
-
-            if (enrollment.status === 'completed') {
-              setIsCompleted(true);
-            }
+            progressMap[stepKey] = {
+              last_timestamp: item.last_timestamp || 0,
+              videoDuration: item.videoDuration || 0,
+              videoCompleted: item.videoCompleted || false,
+              assignmentStatus: item.assignmentStatus || 'Not Started',
+              assignmentProgress: item.assignmentProgress || 0,
+              testScore: item.testScore,
+              testTotalPoints: item.testTotalPoints,
+              testCompleted: item.testCompleted || false
+            };
+          });
+          
+          setCompletedSteps(completedMap);
+          setUserProgressData(progressMap);
+          
+          // Check if all steps are completed
+          const allSteps = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+          const allCompleted = allSteps.every(step => completedMap[step]);
+          if (allCompleted) {
+            setIsCompleted(true);
           }
         }
       } catch (err) {
-        console.error("Error loading student course progress:", err);
+        console.error("Failed to load user progress:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchProgress();
-  }, [courseId, currentUser]);
+  }, [courseId]);
+
+  const handleStartStep = async (stepNumber) => {
+    if (!courseId || !stepNumber) return;
+    const stepKey = String(stepNumber);
+    const currentStatus = userProgressData[stepKey]?.assignmentStatus;
+    
+    // Only update if it is not already 'Submitted' or 'In Progress'
+    if (currentStatus !== 'Submitted' && currentStatus !== 'In Progress') {
+      try {
+        const response = await courseEnrollmentAPI.saveUserProgress({
+          courseCode: courseId,
+          moduleId: '1',
+          dayId: 1,
+          stepId: parseInt(stepNumber),
+          assignmentStatus: 'In Progress',
+          assignmentProgress: 50
+        });
+        
+        if (response && response.success) {
+          setUserProgressData(prev => ({
+            ...prev,
+            [stepKey]: {
+              ...prev[stepKey],
+              assignmentStatus: 'In Progress',
+              assignmentProgress: 50
+            }
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to set assignment in progress:", err);
+      }
+    }
+  };
 
   const handleStartCourse = () => {
     setShowIntro(false);
     setActiveStep('1');
     setVideoWatched(false);
+    handleStartStep('1');
   };
 
   const handleStepClick = (stepNumber) => {
     if (!isStepLocked(stepNumber)) {
+      const isActivating = activeStep !== stepNumber;
       setActiveStep(activeStep === stepNumber ? null : stepNumber);
       setVideoWatched(false);
-      setCurrentVideoTime(0);
+      if (isActivating) {
+        handleStartStep(stepNumber);
+      }
     } else {
       toast.error(t("course_player.step_locked_warning", { step: parseInt(stepNumber) - 1 }));
     }
   };
 
-  const handleStepComplete = async (stepNumber) => {
+  const handleStepComplete = async (stepNumber, score = null, totalPoints = null) => {
     const newCompletedSteps = { ...completedSteps, [stepNumber]: true };
     setCompletedSteps(newCompletedSteps);
+
+    // Save completion state to server!
+    if (courseId) {
+      try {
+        await courseEnrollmentAPI.saveUserProgress({
+          courseCode: courseId,
+          moduleId: '1',
+          dayId: 1,
+          stepId: parseInt(stepNumber),
+          assignmentStatus: 'Submitted',
+          assignmentProgress: 100,
+          testScore: score,
+          testTotalPoints: totalPoints,
+          testCompleted: score !== null
+        });
+
+        // Update local progress data
+        setUserProgressData(prev => ({
+          ...prev,
+          [stepNumber]: {
+            ...prev[stepNumber],
+            assignmentStatus: 'Submitted',
+            assignmentProgress: 100,
+            testScore: score,
+            testTotalPoints: totalPoints,
+            testCompleted: score !== null
+          }
+        }));
+      } catch (err) {
+        console.error("Failed to save step completion to server:", err);
+      }
+    }
 
     // ── Save progress to localStorage for MyCourses continue watching ──
     const stepsDone = Object.keys(newCompletedSteps).length;
@@ -353,6 +466,7 @@ const CoursePlayer = () => {
       const nextStep = (parseInt(stepNumber) + 1).toString();
       setActiveStep(nextStep);
       setVideoWatched(false);
+      handleStartStep(nextStep);
     }
   };
 
@@ -376,20 +490,30 @@ const CoursePlayer = () => {
     if (completed) setVideoWatched(true);
     setIsCompleted(completed);
 
-    if (currentUser && activeStep) {
+    if (courseId && activeStep) {
       try {
-        await courseEnrollmentAPI.updateVideoProgress({
-          studentId: currentUser._id || currentUser.id,
+        await courseEnrollmentAPI.saveUserProgress({
           courseCode: courseId,
-          moduleId: 1,
-          dayId: parseInt(activeStep),
-          stepId: 1,
-          maxWatchedTime: maxTime,
-          videoDuration: duration || 0,
-          isCompleted: completed
+          moduleId: '1',
+          dayId: 1,
+          stepId: parseInt(activeStep),
+          last_timestamp: maxTime,
+          videoDuration: duration,
+          videoCompleted: completed
         });
+
+        // Update local progress data
+        setUserProgressData(prev => ({
+          ...prev,
+          [activeStep]: {
+            ...prev[activeStep],
+            last_timestamp: maxTime,
+            videoDuration: duration,
+            videoCompleted: completed
+          }
+        }));
       } catch (err) {
-        console.error("Error saving video progress to DB:", err);
+        console.error("Failed to save video progress to server:", err);
       }
     }
   };
@@ -479,6 +603,8 @@ const CoursePlayer = () => {
                 <CustomVideoPlayer
                   videoUrl={playbackUrl}
                   title={stepData.title}
+                  initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
+                  initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
                   onProgressUpdate={handleVideoProgressUpdate}
                   onTimeUpdate={(time) => setCurrentVideoTime(time)}
                   onNext={activeStep !== lastStepKey ? () => {
@@ -598,7 +724,7 @@ const CoursePlayer = () => {
           <MCQPractice
             content={stepData.content}
             questions={stepData.questions}
-            onComplete={() => handleStepComplete(stepLetter)}
+            onComplete={(score, totalPoints) => handleStepComplete(stepLetter, score, totalPoints)}
             isCompleted={isStepCompleted}
           />
         );
@@ -616,7 +742,7 @@ const CoursePlayer = () => {
           <AdvancedPractice
             content={stepData.content}
             questions={stepData.questions}
-            onComplete={() => handleStepComplete(stepLetter)}
+            onComplete={(score, totalPoints) => handleStepComplete(stepLetter, score, totalPoints)}
             isCompleted={isStepCompleted}
           />
         );

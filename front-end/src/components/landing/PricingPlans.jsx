@@ -1,34 +1,37 @@
 import { motion } from "framer-motion";
 import { Check, Zap, Building2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const PricingPlans = () => {
+    const { t } = useTranslation();
+
     const plans = [
         {
-            name: "Universities & Colleges",
-            price: "Academic",
-            description: "Partner with us to enhance student employability and align curriculum with industry needs.",
-            features: ["Curriculum Alignment", "Student Employability", "Faculty Development"],
-            cta: "Partner With Us",
+            name: t("landing.pricing.plan1_title"),
+            price: t("landing.pricing.plan1_price"),
+            description: t("landing.pricing.plan1_desc"),
+            features: t("landing.pricing.plan1_features", { returnObjects: true }) || ["Curriculum Alignment", "Student Employability", "Faculty Development"],
+            cta: t("landing.pricing.plan1_cta"),
             highlight: false,
             icon: <User className="w-5 h-5 text-blue-400" />
         },
         {
-            name: "Employers & Workforce",
-            price: "Industry",
+            name: t("landing.pricing.plan2_title"),
+            price: t("landing.pricing.plan2_price"),
             period: "",
-            description: "Access a pipeline of work-ready talent and upskill your existing workforce.",
-            features: ["Talent Pipeline", "Workforce Upskilling", "Capability Frameworks", "Recruitment Solutions"],
-            cta: "Hire Talent",
+            description: t("landing.pricing.plan2_desc"),
+            features: t("landing.pricing.plan2_features", { returnObjects: true }) || ["Talent Pipeline", "Workforce Upskilling", "Capability Frameworks", "Recruitment Solutions"],
+            cta: t("landing.pricing.plan2_cta"),
             highlight: true,
             icon: <Zap className="w-5 h-5 text-yellow-400" />
         },
         {
-            name: "Government & CSR",
-            price: "Impact",
-            description: "Collaborate on large-scale skilling initiatives to drive social and economic impact.",
-            features: ["Large-scale Skilling", "Social Impact", "Economic Development", "Policy Support"],
-            cta: "Collaborate",
+            name: t("landing.pricing.plan3_title"),
+            price: t("landing.pricing.plan3_price"),
+            description: t("landing.pricing.plan3_desc"),
+            features: t("landing.pricing.plan3_features", { returnObjects: true }) || ["Large-scale Skilling", "Social Impact", "Economic Development", "Policy Support"],
+            cta: t("landing.pricing.plan3_cta"),
             highlight: false,
             icon: <Building2 className="w-5 h-5 text-blue-400" />
         }
@@ -40,8 +43,12 @@ const PricingPlans = () => {
 
             <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
                 <div className="text-center max-w-2xl mx-auto mb-16">
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading tracking-tight">Partnerships</h2>
-                    <p className="text-gray-600 dark:text-gray-200">We form long-term, institutional partnerships to drive ecosystem-wide impact.</p>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading tracking-tight">
+                        {t("landing.pricing.title")}
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-200">
+                        {t("landing.pricing.subtitle")}
+                    </p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
@@ -59,7 +66,7 @@ const PricingPlans = () => {
                         >
                             {plan.highlight && (
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#1a3884] dark:bg-[#C0C0C0] text-white dark:text-[#002147] px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg border border-[#C0C0C0] dark:border-white">
-                                    Most Popular
+                                    {t("landing.pricing.popular")}
                                 </div>
                             )}
 
@@ -78,7 +85,7 @@ const PricingPlans = () => {
                             <p className="text-gray-600 dark:text-gray-200 text-sm mb-8 min-h-[40px]">{plan.description}</p>
 
                             <div className="space-y-4 mb-10 flex-grow">
-                                {plan.features.map((feature) => (
+                                {Array.isArray(plan.features) && plan.features.map((feature) => (
                                     <div key={feature} className="flex items-start gap-3 text-sm text-gray-600 dark:text-white">
                                         <Check className={`w-4 h-4 mt-0.5 ${plan.highlight ? "text-[#C0C0C0]" : "text-blue-400 dark:text-blue-300"}`} />
                                         <span>{feature}</span>
@@ -89,6 +96,10 @@ const PricingPlans = () => {
                             <div className="mt-auto">
                                 <Button
                                     variant="default"
+                                    onClick={() => {
+                                        const element = document.getElementById('contact');
+                                        if (element) element.scrollIntoView({ behavior: 'smooth' });
+                                    }}
                                     className={`w-full h-12 rounded-xl text-base font-semibold transition-all duration-300 ${plan.highlight
                                         ? "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#C0C0C0] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#C0C0C0]"
                                         : "bg-[#1a3884] hover:bg-[#0d2150] text-white dark:bg-[#C0C0C0] dark:text-[#002147] dark:hover:bg-[#fbbf24] shadow-lg shadow-[#1a3884]/25 border border-[#C0C0C0]"
@@ -106,4 +117,3 @@ const PricingPlans = () => {
 };
 
 export default PricingPlans;
-

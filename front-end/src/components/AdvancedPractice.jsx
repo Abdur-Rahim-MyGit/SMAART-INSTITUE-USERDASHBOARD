@@ -24,7 +24,14 @@ const AdvancedPractice = ({ content, questions, onComplete, isCompleted }) => {
       const answeredCount = Object.keys(selectedAnswers).length;
       if (answeredCount === questions.length) {
         setAllAnswered(true);
-        if (onComplete) onComplete();
+        const score = Object.keys(selectedAnswers).reduce((acc, qIndex) => {
+          const q = questions[qIndex];
+          if (q && q.correctAnswer !== undefined) {
+            return acc + (selectedAnswers[qIndex] === q.correctAnswer ? 1 : 0);
+          }
+          return acc + 1;
+        }, 0);
+        if (onComplete) onComplete(score, questions.length);
         toast.success('Advanced practice completed!');
       } else {
         toast.error('Please answer all questions before completing.');

@@ -243,6 +243,32 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
     }
   }, [autoPlay]);
 
+  // Seek to initial time once video metadata or canplay is triggered
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedMetadata = () => {
+      if (initialMaxTime > 0) {
+        console.log(`Resuming video from initialMaxTime: ${initialMaxTime}s`);
+        video.currentTime = initialMaxTime;
+        setCurrentTime(initialMaxTime);
+        setMaxTimeReached(initialMaxTime);
+        lastSyncTimeRef.current = initialMaxTime;
+      }
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    // In case the metadata is already loaded before the listener is attached:
+    if (video.readyState >= 1 && initialMaxTime > 0) {
+      handleLoadedMetadata();
+    }
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, [videoUrl, initialMaxTime]);
+
   // Check PiP support
   useEffect(() => {
     if (document.pictureInPictureEnabled && videoRef.current) {

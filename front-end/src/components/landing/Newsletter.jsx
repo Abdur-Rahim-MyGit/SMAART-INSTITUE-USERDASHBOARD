@@ -3,8 +3,10 @@ import { Mail, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 const Newsletter = () => {
+    const { t } = useTranslation();
     const [email, setEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -17,7 +19,9 @@ const Newsletter = () => {
         await new Promise(resolve => setTimeout(resolve, 1500));
         setIsLoading(false);
         setEmail("");
-        toast.always("Subscribed!", { description: "You've been added to our insider list." });
+        toast.success(t("landing.newsletter.toast_title") || "Subscribed!", { 
+            description: t("landing.newsletter.toast_desc") || "You've been added to our insider list." 
+        });
     };
 
     return (
@@ -32,10 +36,10 @@ const Newsletter = () => {
                     <div className="relative z-10 flex flex-col md:flex-row items-center gap-12">
                         <div className="flex-1 text-center md:text-left">
                             <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                                Stay Ahead of the Curve
+                                {t("landing.newsletter.title")}
                             </h3>
                             <p className="text-gray-400">
-                                Get exclusive Future of Work insights, career trends, and capability building strategies delivered to your inbox.
+                                {t("landing.newsletter.desc")}
                             </p>
                         </div>
 
@@ -45,7 +49,7 @@ const Newsletter = () => {
                                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                                     <Input
                                         type="email"
-                                        placeholder="Enter your email"
+                                        placeholder={t("landing.newsletter.placeholder") || "Enter your email"}
                                         className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#C0C0C0]/50 focus:ring-[#C0C0C0]/20 transition-all"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
@@ -61,13 +65,13 @@ const Newsletter = () => {
                                         <Loader2 className="w-4 h-4 animate-spin" />
                                     ) : (
                                         <>
-                                            Subscribe Now
+                                            {t("landing.newsletter.btn")}
                                             <ArrowRight className="w-4 h-4 ml-2" />
                                         </>
                                     )}
                                 </Button>
                                 <p className="text-xs text-center text-gray-600">
-                                    No spam, unsubscribe anytime.
+                                    {t("landing.newsletter.no_spam")}
                                 </p>
                             </form>
                         </div>
@@ -79,4 +83,3 @@ const Newsletter = () => {
 };
 
 export default Newsletter;
-

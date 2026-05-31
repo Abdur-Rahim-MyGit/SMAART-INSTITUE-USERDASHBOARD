@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Keyboard, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Globe2, X, Lock } from "lucide-react";
+import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Keyboard, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Globe2, X, Flame } from "lucide-react";
+import StreaksWidget from "@/components/dashboard/StreaksWidget";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -363,6 +364,47 @@ const DashboardLayout = () => {
   const languageRef = useRef(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [profilePhoto, setProfilePhoto] = useState(null);
+  const [showStreakModal, setShowStreakModal] = useState(false);
+  const [streakCount, setStreakCount] = useState(0);
+
+  const fetchStreak = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/streaks/status`, {
+        headers: {
+          "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        }
+      });
+      if (response.ok) {
+        const res = await response.json();
+        if (res.success && res.data) {
+          setStreakCount(res.data.currentStreak);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching streak for navbar badge:", err);
+    }
+  };
+
+  const recordActivityAndFetch = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/streaks/activity`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        }
+      });
+    } catch (err) {
+      console.error("Error auto-recording activity:", err);
+    } finally {
+      fetchStreak();
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      recordActivityAndFetch();
+    }
+  }, [user]);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   const hoverTimeoutRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -796,7 +838,7 @@ const DashboardLayout = () => {
 
                 {/* Premium Glassmorphism Dock */}
                 <div className="hidden sm:flex items-center p-1.5 bg-white dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/60 rounded-full shadow-[0_4px_12px_-2px_rgba(0,0,0,0.05),0_2px_4px_-2px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3)]">
-                  
+
                   {/* 1. Live Time Widget */}
                   <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-900/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] dark:shadow-[inset_0_1px_2px_rgba(255,255,255,0.02)] border border-slate-100 dark:border-slate-700/50 mr-2">
                     <div className="relative flex items-center justify-center">
@@ -832,150 +874,164 @@ const DashboardLayout = () => {
                         )}
                       </button>
 
-                    <AnimatePresence>
-                      {showNotifications && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute top-full right-0 mt-3 w-80 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-white/8 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.60)] overflow-hidden z-50"
-                        >
-                          {/* Header */}
-                          <div className="px-5 py-4 bg-[#1a3884] flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-white">
-                              <Bell className="w-4 h-4" />
-                              <span className="text-sm font-bold tracking-wide">Notifications</span>
+                      <AnimatePresence>
+                        {showNotifications && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute top-full right-0 mt-3 w-80 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-white/8 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.60)] overflow-hidden z-50"
+                          >
+                            {/* Header */}
+                            <div className="px-5 py-4 bg-[#1a3884] flex items-center justify-between">
+                              <div className="flex items-center gap-2 text-white">
+                                <Bell className="w-4 h-4" />
+                                <span className="text-sm font-bold tracking-wide">Notifications</span>
+                              </div>
+                              {unreadCount > 0 && (
+                                <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full text-white backdrop-blur-sm">
+                                  {unreadCount} New
+                                </span>
+                              )}
                             </div>
-                            {unreadCount > 0 && (
-                              <span className="text-[10px] font-bold bg-white/20 px-2 py-0.5 rounded-full text-white backdrop-blur-sm">
-                                {unreadCount} New
-                              </span>
-                            )}
-                          </div>
 
-                          {/* Content */}
-                          <div className="max-h-[360px] overflow-y-auto bg-white dark:bg-[#002147]">
-                            {notifications.length > 0 ? (
-                              <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                                {notifications.slice(0, 5).map((n) => (
-                                  <div
-                                    key={n._id}
-                                    onClick={() => {
-                                      markRead(n._id);
-                                      if (n.link) navigate(n.link);
-                                      setShowNotifications(false);
-                                    }}
-                                    className={`px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}`}
-                                  >
-                                    <div className="flex gap-3">
-                                      <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-blue-100 text-blue-600' :
-                                        n.type === 'assessment' ? 'bg-purple-100 text-purple-600' :
-                                          'b  g-slate-100 text-slate-600'
-                                        }`}>
-                                        {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
-                                      </div>
-                                      <div className="flex-1 min-w-0">
-                                        <p className={`text-xs leading-relaxed ${!n.isRead ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
-                                          {n.message}
-                                        </p>
-                                        <p className="text-[10px] text-slate-400 mt-1">
-                                          {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
-                                        </p>
+                            {/* Content */}
+                            <div className="max-h-[360px] overflow-y-auto bg-white dark:bg-[#002147]">
+                              {notifications.length > 0 ? (
+                                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                                  {notifications.slice(0, 5).map((n) => (
+                                    <div
+                                      key={n._id}
+                                      onClick={() => {
+                                        markRead(n._id);
+                                        if (n.link) navigate(n.link);
+                                        setShowNotifications(false);
+                                      }}
+                                      className={`px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}`}
+                                    >
+                                      <div className="flex gap-3">
+                                        <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-blue-100 text-blue-600' :
+                                          n.type === 'assessment' ? 'bg-purple-100 text-purple-600' :
+                                            'b  g-slate-100 text-slate-600'
+                                          }`}>
+                                          {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className={`text-xs leading-relaxed ${!n.isRead ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
+                                            {n.message}
+                                          </p>
+                                          <p className="text-[10px] text-slate-400 mt-1">
+                                            {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
+                                          </p>
+                                        </div>
                                       </div>
                                     </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="py-12 flex flex-col items-center justify-center text-slate-400">
+                                  <div className="w-16 h-16 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
+                                    <Bell className="w-8 h-8 text-slate-200 dark:text-slate-700" />
                                   </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="py-12 flex flex-col items-center justify-center text-slate-400">
-                                <div className="w-16 h-16 bg-[#F8FAFC] dark:bg-slate-800/50 rounded-full flex items-center justify-center mb-4">
-                                  <Bell className="w-8 h-8 text-slate-200 dark:text-slate-700" />
+                                  <p className="text-sm font-medium">No notifications yet</p>
                                 </div>
-                                <p className="text-sm font-medium">No notifications yet</p>
-                              </div>
-                            )}
-                          </div>
+                              )}
+                            </div>
 
-                          {/* Footer */}
-                          <button
-                            onClick={() => {
-                              navigate('/notifications');
-                              setShowNotifications(false);
-                            }}
-                            className="w-full py-3 bg-[#F8FAFC] dark:bg-slate-800/50 border-t border-slate-100 dark:border-[#1a3884]/15 text-xs font-bold text-[#1a3884] dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2"
+                            {/* Footer */}
+                            <button
+                              onClick={() => {
+                                navigate('/notifications');
+                                setShowNotifications(false);
+                              }}
+                              className="w-full py-3 bg-[#F8FAFC] dark:bg-slate-800/50 border-t border-slate-100 dark:border-[#1a3884]/15 text-xs font-bold text-[#1a3884] dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors flex items-center justify-center gap-2"
+                            >
+                              View all notifications
+                              <ExternalLink className="w-3 h-3" />
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* 4. Language Switcher */}
+                    <div className="relative" ref={languageRef}>
+                      <button
+                        onClick={() => setShowLanguages(!showLanguages)}
+                        className={`relative flex items-center gap-1.5 rounded-full px-2.5 py-1.5 transition-all active:scale-95 group ${showLanguages
+                          ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'
+                          : 'text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white'
+                          }`}
+                        aria-label="Change Language"
+                      >
+                        <Globe2 className="w-[18px] h-[18px] group-hover:rotate-[24deg] transition-transform duration-300" strokeWidth={2.2} />
+                        <span className="hidden md:inline text-[11px] font-bold tracking-[0.1em] mt-[1px]">
+                          {activeLanguage.shortLabel}
+                        </span>
+                        <ChevronDown className={`hidden md:block w-3 h-3 transition-transform duration-200 ${showLanguages ? 'rotate-180 text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-400'}`} />
+                      </button>
+
+                      <AnimatePresence>
+                        {showLanguages && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-50"
                           >
-                            View all notifications
-                            <ExternalLink className="w-3 h-3" />
-                          </button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                            <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-white/8 dark:bg-white/[0.03]">
+                              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
+                                Language
+                              </p>
+                              <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                {activeLanguage.name}
+                              </p>
+                            </div>
+                            <div className="p-2 space-y-1">
+                              {languageOptions.map((lang) => (
+                                <button
+                                  key={lang.code}
+                                  onClick={() => {
+                                    i18n.changeLanguage(lang.code);
+                                    setShowLanguages(false);
+                                  }}
+                                  className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeLanguageCode === lang.code
+                                    ? 'bg-[#1a3884] text-white'
+                                    : 'text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
+                                    }`}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <span className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[10px] font-black tracking-[0.18em] ${activeLanguageCode === lang.code ? 'bg-white/16 text-white' : 'bg-slate-100 text-slate-500 dark:bg-white/8 dark:text-slate-300'}`}>
+                                      {lang.shortLabel}
+                                    </span>
+                                    <span>{lang.name}</span>
+                                  </div>
+                                  <span className="text-[10px] opacity-60 font-bold">{lang.native}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
 
-                  {/* 4. Language Switcher */}
-                  <div className="relative" ref={languageRef}>
+                    {/* 5. Daily Streak Glowing Flame Icon */}
                     <button
-                      onClick={() => setShowLanguages(!showLanguages)}
-                      className={`relative flex items-center gap-1.5 rounded-full px-2.5 py-1.5 transition-all active:scale-95 group ${showLanguages
-                        ? 'bg-slate-100 dark:bg-slate-700/50 text-slate-900 dark:text-white'
-                        : 'text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white'
-                        }`}
-                      aria-label="Change Language"
+                      onClick={() => setShowStreakModal(true)}
+                      className="relative p-1.5 rounded-full text-amber-500 hover:text-orange-600 transition-all active:scale-95 group"
+                      aria-label="Daily Streaks"
                     >
-                      <Globe2 className="w-[18px] h-[18px] group-hover:rotate-[24deg] transition-transform duration-300" strokeWidth={2.2} />
-                      <span className="hidden md:inline text-[11px] font-bold tracking-[0.1em] mt-[1px]">
-                        {activeLanguage.shortLabel}
-                      </span>
-                      <ChevronDown className={`hidden md:block w-3 h-3 transition-transform duration-200 ${showLanguages ? 'rotate-180 text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-400'}`} />
-                    </button>
-
-                    <AnimatePresence>
-                      {showLanguages && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-50"
-                        >
-                          <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-white/8 dark:bg-white/[0.03]">
-                            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
-                              Language
-                            </p>
-                            <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">
-                              {activeLanguage.name}
-                            </p>
-                          </div>
-                          <div className="p-2 space-y-1">
-                            {languageOptions.map((lang) => (
-                              <button
-                                key={lang.code}
-                                onClick={() => {
-                                  i18n.changeLanguage(lang.code);
-                                  setShowLanguages(false);
-                                }}
-                                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeLanguageCode === lang.code
-                                  ? 'bg-[#1a3884] text-white'
-                                  : 'text-slate-600 dark:text-slate-400 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
-                                  }`}
-                              >
-                                <div className="flex items-center gap-3">
-                                  <span className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[10px] font-black tracking-[0.18em] ${activeLanguageCode === lang.code ? 'bg-white/16 text-white' : 'bg-slate-100 text-slate-500 dark:bg-white/8 dark:text-slate-300'}`}>
-                                    {lang.shortLabel}
-                                  </span>
-                                  <span>{lang.name}</span>
-                                </div>
-                                <span className="text-[10px] opacity-60 font-bold">{lang.native}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </motion.div>
+                      <Flame className="w-[18px] h-[18px] animate-pulse filter drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" strokeWidth={2.2} />
+                      {streakCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-extrabold text-[8px] px-1 rounded-full min-w-[14px] text-center border border-white dark:border-slate-800 scale-90 shadow-sm">
+                          {streakCount}
+                        </span>
                       )}
-                    </AnimatePresence>
+                    </button>
                   </div>
                 </div>
-              </div>
 
                 {/* 3. User Profile Card */}
                 <div
@@ -1052,6 +1108,45 @@ const DashboardLayout = () => {
           </motion.div>
         </div>
       </main>
+
+      {/* Streak Modal */}
+      <AnimatePresence>
+        {showStreakModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="relative max-w-3xl bg-white dark:bg-[#002147] rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-white/10"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02]">
+                <div className="flex items-center gap-2">
+                  <Flame className="w-5 h-5 text-amber-500 animate-bounce" />
+                  <span className="text-sm font-bold text-[#1a3884] dark:text-white uppercase tracking-wider">
+                    My Daily Streaks
+                  </span>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowStreakModal(false);
+                    fetchStreak(); // Refresh the badge on close
+                  }}
+                  className="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 max-h-[80vh] overflow-y-auto">
+                <StreaksWidget />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

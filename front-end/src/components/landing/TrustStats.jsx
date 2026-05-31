@@ -1,5 +1,6 @@
 import { motion, useInView, useSpring, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 const Counter = ({ value }) => {
   const ref = useRef(null);
@@ -28,11 +29,13 @@ const Counter = ({ value }) => {
 };
 
 const TrustStats = () => {
+  const { t } = useTranslation();
+
   const stats = [
-    { label: "Partner Institutions", value: "50+" },
-    { label: "Students Assessed", value: "10000+" },
-    { label: "Placement Rate", value: "92%" },
-    { label: "Corporate Partners", value: "100+" },
+    { label: t("landing.stats.partner_institutions") || "Partner Institutions", value: "50+" },
+    { label: t("landing.stats.students_assessed") || "Students Assessed", value: "10000+" },
+    { label: t("landing.stats.placement_rate") || "Placement Rate", value: "92%" },
+    { label: t("landing.stats.corporate_partners") || "Corporate Partners", value: "100+" },
   ];
 
   return (
@@ -70,4 +73,3 @@ const TrustStats = () => {
 };
 
 export default TrustStats;
-

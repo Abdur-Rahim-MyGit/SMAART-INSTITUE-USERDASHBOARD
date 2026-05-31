@@ -1,16 +1,21 @@
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
 import { Brain, BookOpen, Map, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const ServiceCard = ({ service, index }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const { t } = useTranslation();
 
   function handleMouseMove({ currentTarget, clientX, clientY }) {
     let { left, top } = currentTarget.getBoundingClientRect();
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
   }
+
+  // Handle i18n arrays safely
+  const features = Array.isArray(service.features) ? service.features : [];
 
   return (
     <motion.div
@@ -53,7 +58,7 @@ const ServiceCard = ({ service, index }) => {
         </p>
 
         <ul className="space-y-4 mb-8 border-t border-gray-100 dark:border-white/10 pt-6">
-          {service.features.map((feature) => (
+          {features.map((feature) => (
             <li key={feature} className="flex items-center text-sm text-gray-500 dark:text-slate-300 group-hover:text-gray-900 dark:group-hover:text-gray-200 transition-colors">
               <div className="w-1.5 h-1.5 rounded-full bg-[#C0C0C0] mr-3 shadow-[0_0_8px_#C0C0C0]" />
               {feature}
@@ -69,7 +74,7 @@ const ServiceCard = ({ service, index }) => {
             }}
             className="w-full justify-between bg-transparent hover:bg-gradient-to-r from-[#1a3884] to-[#0d2150] text-[#1a3884] dark:text-white hover:text-white border border-[#1a3884]/20 dark:border-white/20 hover:border-transparent transition-all duration-300 group/btn h-12 text-base font-medium backdrop-blur-sm shadow-sm hover:shadow-lg"
           >
-            Learn More
+            {t("landing.services.learn_more_btn")}
             <ArrowRight className="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform" />
           </Button>
         </div>
@@ -79,27 +84,29 @@ const ServiceCard = ({ service, index }) => {
 };
 
 const ServiceCards = () => {
+  const { t } = useTranslation();
+
   const services = [
     {
       id: "work-ready",
-      title: "Work-Ready & Adaptive Capability",
-      description: "We develop capabilities that enable employability, career progression, and sustained career longevity — supporting individuals from entry into work through growth and transition.",
+      title: t("landing.services.card_work_ready_title"),
+      description: t("landing.services.card_work_ready_desc"),
       icon: <Brain className="w-6 h-6" />,
-      features: ["Employability", "Career Progression", "Sustained Longevity"]
+      features: t("landing.services.card_work_ready_features", { returnObjects: true }) || ["Employability", "Career Progression", "Sustained Longevity"]
     },
     {
       id: "impact-oriented",
-      title: "Impact-Oriented Capability",
-      description: "We develop capabilities for innovation, entrepreneurship, and sustainable value creation — enabling individuals and institutions to create enduring economic and societal impact.",
+      title: t("landing.services.card_impact_title"),
+      description: t("landing.services.card_impact_desc"),
       icon: <BookOpen className="w-6 h-6" />,
-      features: ["Innovation", "Entrepreneurship", "Value Creation"]
+      features: t("landing.services.card_impact_features", { returnObjects: true }) || ["Innovation", "Entrepreneurship", "Value Creation"]
     },
     {
       id: "career-architecture",
-      title: "SMAART Career Architecture Map™",
-      description: "A modern reference model for careers, framing them as a multi-stage continuum rather than a single transition, reflecting longer careers and technological change.",
+      title: t("landing.services.card_map_title"),
+      description: t("landing.services.card_map_desc"),
       icon: <Map className="w-6 h-6" />,
-      features: ["Multi-stage Continuum", "Technological Change", "Repeated Transitions"]
+      features: t("landing.services.card_map_features", { returnObjects: true }) || ["Multi-stage Continuum", "Technological Change", "Repeated Transitions"]
     }
   ];
 
@@ -119,7 +126,10 @@ const ServiceCards = () => {
             viewport={{ once: true }}
             className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1a3884] dark:text-white tracking-tight font-heading leading-tight mb-6"
           >
-            Building Capability for the <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#C0C0C0] dark:from-blue-300 dark:via-white dark:to-yellow-300">Changing World of Work</span>
+            {t("landing.services.title")}{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] to-[#C0C0C0] dark:from-blue-300 dark:via-white dark:to-yellow-300">
+              {t("landing.services.title_highlight")}
+            </span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -128,7 +138,7 @@ const ServiceCards = () => {
             transition={{ delay: 0.2 }}
             className="text-lg text-gray-600 dark:text-slate-200 leading-relaxed font-light"
           >
-            We develop capabilities that enable employability, career progression, and sustained career longevity.
+            {t("landing.services.subtitle")}
           </motion.p>
         </div>
 
@@ -143,4 +153,3 @@ const ServiceCards = () => {
 };
 
 export default ServiceCards;
-

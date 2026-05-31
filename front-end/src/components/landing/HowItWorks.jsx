@@ -1,24 +1,27 @@
 import { motion } from "framer-motion";
-import { ClipboardCheck, Map, Award, Lock, Unlock, ArrowRight } from "lucide-react";
+import { ClipboardCheck, Map, Award, Lock, Unlock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const HowItWorks = () => {
+  const { t } = useTranslation();
+
   const steps = [
     {
       id: 1,
-      title: "Skills",
-      description: "Applied ability. Ensuring learning translates into real-world application not just qualification.",
+      title: t("landing.how_it_works.step1_title"),
+      description: t("landing.how_it_works.step1_desc"),
       icon: <ClipboardCheck className="w-8 h-8" />,
     },
     {
       id: 2,
-      title: "Judgement",
-      description: "Decision quality in real situations. Developing the ability to make effective choices in complex environments.",
+      title: t("landing.how_it_works.step2_title"),
+      description: t("landing.how_it_works.step2_desc"),
       icon: <Map className="w-8 h-8" />,
     },
     {
       id: 3,
-      title: "Adaptability",
-      description: "Effectiveness as conditions change. Building resilience and flexibility for a restructured world of work.",
+      title: t("landing.how_it_works.step3_title"),
+      description: t("landing.how_it_works.step3_desc"),
       icon: <Award className="w-8 h-8" />,
     }
   ];
@@ -39,7 +42,8 @@ const HowItWorks = () => {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold text-[#1a3884] dark:text-white mb-6 tracking-tight font-heading"
           >
-            SMAART Integrated <span className="text-[#C0C0C0]">Capability Framework™</span>
+            {t("landing.how_it_works.title")}{" "}
+            <span className="text-[#C0C0C0]">{t("landing.how_it_works.title_highlight")}</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -48,7 +52,7 @@ const HowItWorks = () => {
             transition={{ delay: 0.2 }}
             className="text-xl text-gray-600 dark:text-slate-200 font-light"
           >
-            How capability is built for modern work. Integrating skills, judgement, and adaptability.
+            {t("landing.how_it_works.subtitle")}
           </motion.p>
         </div>
 
@@ -97,7 +101,7 @@ const HowItWorks = () => {
                 <div className="mt-8 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
                   <div className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-slate-200 bg-gray-100 dark:bg-white/5 backdrop-blur-sm px-4 py-2 rounded-full border border-gray-200 dark:border-white/10">
                     {index === 0 ? <Unlock className="w-3 h-3 text-[#C0C0C0]" /> : <Lock className="w-3 h-3" />}
-                    {index === 0 ? "Unlocked" : "Locked"}
+                    {index === 0 ? t("landing.how_it_works.unlocked") : t("landing.how_it_works.locked")}
                   </div>
                 </div>
               </motion.div>
@@ -110,4 +114,3 @@ const HowItWorks = () => {
 };
 
 export default HowItWorks;
-
