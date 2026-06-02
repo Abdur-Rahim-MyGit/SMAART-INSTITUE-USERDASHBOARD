@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
   BookOpen, Target, Crown, CheckCircle2,
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { STAGES, TRACKS } from "@/data/courseStructureData";
+import { coursesAPI } from "@/services/api";
 import PageHero from "@/components/ui/PageHero";
 import {
   isStageUnlocked as checkStageUnlocked,
@@ -323,15 +324,15 @@ const CourseCard = ({ course, index, isCompleted, isCurrent, isUnlocked, onClick
               ? "bg-[#1a3884]/10 text-[#1a3884]"
               : "bg-gray-100 text-gray-500"
             }`}>
-            {course.id}
+            {course.courseNumber || course.id}
           </span>
 
           <h4 className={`font-bold text-[15px] mb-1 leading-tight ${isUnlocked ? "text-[#112b6b] dark:text-white" : "text-gray-400 dark:text-slate-400"
             }`}>
-            {t(`my_courses_page.courses.${course.id}.title`, course.title)}
+            {course.title || t(`my_courses_page.courses.${course.id}.title`)}
           </h4>
-          <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-1 font-medium">
-            {t(`my_courses_page.courses.${course.id}.subtitle`, course.subtitle)}
+          <p className="text-[12px] text-gray-500 leading-relaxed line-clamp-1 font-medium font-bold">
+            {course.subtitle || course.description || t(`my_courses_page.courses.${course.id}.subtitle`)}
           </p>
         </div>
       </div>
@@ -495,14 +496,200 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
 };
 
 /* ─── Main Component ─── */
-const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null }) => {
+const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null, continueWatching = null }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedStageId, setSelectedStageId] = useState(null);
+  const [dbCourses, setDbCourses] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    const loadCourses = async () => {
+      try {
+        const res = await coursesAPI.getPublished();
+        if (active && res?.data) {
+          setDbCourses(res.data);
+        }
+      } catch (err) {
+        console.error("Error loading published courses:", err);
+      } finally {
+        if (active) setLoadingCourses(false);
+      }
+    };
+    loadCourses();
+    return () => { active = false; };
+  }, []);
+
+  const { activeStages, activeTracks } = useMemo(() => {
+    const templateStages = [
+      {
+        id: 1,
+        name: 'Capacity',
+        subtitle: t("my_courses_page.stage_1_subtitle", 'Stage 1: Foundations'),
+        description: t("my_courses_page.stage_1_desc", 'Build the foundational skills and resources to perform at your best in any environment.'),
+        courses: [],
+        totalCourses: 0,
+        unlockAfter: null,
+        assessmentGate: 'T2',
+      },
+      {
+        id: 2,
+        name: 'Capability',
+        subtitle: t("my_courses_page.stage_2_subtitle", 'Stage 2: Intermediate'),
+        description: t("my_courses_page.stage_2_desc", 'Develop core competencies and technical expertise to excel in your chosen field.'),
+        courses: [],
+        totalCourses: 0,
+        unlockAfter: 'S10',
+        assessmentGate: 'T3',
+      },
+      {
+        id: 3,
+        name: 'Leadership',
+        subtitle: t("my_courses_page.stage_3_subtitle", 'Stage 3: Advanced'),
+        description: t("my_courses_page.stage_3_desc", 'Cultivate the mindset and vision to lead teams and drive meaningful change.'),
+        courses: [],
+        totalCourses: 0,
+        unlockAfter: 'S19',
+        assessmentGate: 'T4',
+      },
+    ];
+
+    const templateTracks = [
+      {
+        id: 'PIQ',
+        name: t("my_courses_page.piq_title", 'Personal Intelligence Quotient'),
+        shortName: 'PIQ',
+        description: t("my_courses_page.piq_desc", 'Develop mindset, confidence, and personal effectiveness'),
+        color: '#8B5CF6',
+        courses: [],
+        totalCourses: 0,
+        unlockAfter: 'S05',
+        icon: '🧍',
+      },
+      {
+        id: 'AIQ',
+        name: t("my_courses_page.aiq_title", 'AI Readiness Quotient'),
+        shortName: 'AIQ',
+        description: t("my_courses_page.aiq_desc", 'Master AI tools and work effectively with artificial intelligence'),
+        color: '#3B82F6',
+        courses: [],
+        totalCourses: 0,
+        unlockAfter: 'S15',
+        icon: '🤖',
+      },
+      {
+        id: 'SQ',
+        name: t("my_courses_page.sq_title", 'Sustainability Quotient'),
+        shortName: 'SQ',
+        description: t("my_courses_page.sq_desc", 'Build ethical thinking and sustainability awareness'),
+        color: '#10B981',
+        courses: [],
+        totalCourses: 0,
+        unlockAfter: 'S21',
+        icon: '🌱',
+      },
+    ];
+
+    if (!dbCourses || dbCourses.length === 0) {
+      return { activeStages: STAGES, activeTracks: TRACKS };
+    }
+
+    dbCourses.forEach((dbCourse) => {
+      const courseCode = dbCourse.courseCode || '';
+      const courseNumber = dbCourse.courseNumber || '';
+      const category = dbCourse.category || '';
+      const mapped = {
+        ...dbCourse,
+        id: courseCode || dbCourse._id,
+        title: dbCourse.title,
+        subtitle: dbCourse.description || dbCourse.subtitle || '',
+      };
+
+      const isPIQ = category.toLowerCase() === 'piq' || 
+                    courseCode.startsWith('PIQ') || 
+                    courseNumber.startsWith('PIQ');
+                    
+      const isAIQ = category.toLowerCase() === 'aiq' || 
+                    courseCode.startsWith('AIQ') || 
+                    courseNumber.startsWith('AIQ');
+                    
+      const isSQ = category.toLowerCase() === 'sq' || 
+                   courseCode.startsWith('SQ') || 
+                   courseNumber.startsWith('SQ');
+
+      if (isPIQ) {
+        templateTracks[0].courses.push(mapped);
+      } else if (isAIQ) {
+        templateTracks[1].courses.push(mapped);
+      } else if (isSQ) {
+        templateTracks[2].courses.push(mapped);
+      } else {
+        const codeNumStr = (courseNumber || courseCode).replace(/\D/g, '');
+        const codeNum = parseInt(codeNumStr, 10);
+        const isS = courseCode.startsWith('S') || courseNumber.startsWith('S');
+
+        if (category.toLowerCase() === 'capacity' || (isS && codeNum <= 10)) {
+          templateStages[0].courses.push(mapped);
+        } else if (category.toLowerCase() === 'capability' || (isS && codeNum <= 19)) {
+          templateStages[1].courses.push(mapped);
+        } else if (category.toLowerCase() === 'leadership' || (isS && codeNum <= 25)) {
+          templateStages[2].courses.push(mapped);
+        } else {
+          // Robust semantic fallbacks based on course title
+          const titleLower = (dbCourse.title || '').toLowerCase();
+          if (
+            titleLower.includes('mindset') ||
+            titleLower.includes('confidence') ||
+            titleLower.includes('motivation') ||
+            titleLower.includes('adaptability') ||
+            titleLower.includes('personal branding') ||
+            titleLower.includes('branding')
+          ) {
+            templateTracks[0].courses.push(mapped); // PIQ
+          } else if (
+            titleLower.includes('ai ') ||
+            titleLower.includes(' ai') ||
+            titleLower.includes('prompt') ||
+            titleLower.includes('artificial intelligence')
+          ) {
+            templateTracks[1].courses.push(mapped); // AIQ
+          } else if (
+            titleLower.includes('sustain') ||
+            titleLower.includes('ethical') ||
+            titleLower.includes('citizenship') ||
+            titleLower.includes('responsibility')
+          ) {
+            templateTracks[2].courses.push(mapped); // SQ
+          } else {
+            templateStages[0].courses.push(mapped); // Fallback to Stage 1 Capacity
+          }
+        }
+      }
+    });
+
+    const sortCourses = (a, b) => {
+      const codeA = a.courseCode || '';
+      const codeB = b.courseCode || '';
+      return codeA.localeCompare(codeB, undefined, { numeric: true, sensitivity: 'base' });
+    };
+
+    templateStages.forEach(s => {
+      s.courses.sort(sortCourses);
+      s.totalCourses = s.courses.length;
+    });
+
+    templateTracks.forEach(t => {
+      t.courses.sort(sortCourses);
+      t.totalCourses = t.courses.length;
+    });
+
+    return { activeStages: templateStages, activeTracks: templateTracks };
+  }, [dbCourses, t]);
 
   const isStageUnlocked = (stage) => checkStageUnlocked(stage, userProgress);
 
-  const selectedStage = STAGES.find(s => s.id === selectedStageId) || TRACKS.find(t => t.id === selectedStageId);
+  const selectedStage = activeStages.find(s => s.id === selectedStageId) || activeTracks.find(t => t.id === selectedStageId);
   const selectedCfg = STAGE_CONFIG[selectedStageId] || {
     tag: selectedStage?.id + ' Track',
     Icon: Zap,
@@ -510,11 +697,11 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
   };
 
   const totalCompleted = (userProgress.completedCourses || []).length;
-  const totalCourses = STAGES.reduce((a, s) => a + s.totalCourses, 0) + TRACKS.reduce((a, t) => a + t.totalCourses, 0);
-  const overallPct = Math.round((totalCompleted / totalCourses) * 100);
+  const totalCourses = activeStages.reduce((a, s) => a + s.totalCourses, 0) + activeTracks.reduce((a, t) => a + t.totalCourses, 0);
+  const overallPct = totalCourses > 0 ? Math.round((totalCompleted / totalCourses) * 100) : 0;
 
   const isTrackUnlocked = (trackId) => {
-    const track = TRACKS.find((t) => t.id === trackId);
+    const track = activeTracks.find((t) => t.id === trackId);
     return track ? checkTrackUnlocked(track, userProgress) : false;
   };
 
@@ -593,7 +780,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                   <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {STAGES.map((stage, i) => {
+                  {activeStages.map((stage, i) => {
                     const cfg = STAGE_CONFIG[stage.id];
                     const unlocked = isStageUnlocked(stage);
                     const completed = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
@@ -621,7 +808,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                   <div className="h-px flex-1 bg-slate-100 dark:bg-white/10" />
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                  {TRACKS.map((track, i) => {
+                  {activeTracks.map((track, i) => {
                     const unlocked = isTrackUnlocked(track.id);
                     const completed = track.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
 
