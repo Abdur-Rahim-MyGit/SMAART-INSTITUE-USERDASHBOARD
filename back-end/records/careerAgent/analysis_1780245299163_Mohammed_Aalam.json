@@ -1,0 +1,247 @@
+{
+  "id": "1780245299163",
+  "timestamp": "2026-05-31T16:34:59.163Z",
+  "status": "pending_analysis",
+  "profile_hash": "a7497c139fbb5f5e7d6ca66af6336f9c7b51f31205c8987fff372650c9b6d035",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Mohammed Aalam",
+      "email": "aalam@gmail.com",
+      "phone": "0987654323",
+      "registrationNumber": "STU00033"
+    },
+    "education": [
+      {
+        "level": "Undergraduate (UG)",
+        "domain": "Computer Science & IT",
+        "degreeGroup": "Bachelor of Computer Applications",
+        "specialisation": [
+          "General"
+        ],
+        "university": "",
+        "graduationYear": "2025",
+        "currentlyPursuing": true
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": {
+          "directionId": "CD-011001-P01",
+          "directionName": "Software Development",
+          "directionDescription": "Software development is the primary and most direct career outcome for BCA graduates. The curriculum covers programming languages (C, Java, Python, PHP), data structures, algorithms, and software engineering principles. Frontend, backend, and full-stack developer roles at IT services companies, product startups, and technology firms are the most consistent entry-level destinations for BCA graduates with practical coding competency.",
+          "directionOverview": "Software development is the primary and most direct career outcome for BCA graduates. The curriculum covers programming languages (C, Java, Python, PHP), data structures, algorithms, and software engineering principles. Frontend, backend, and full-stack developer roles at IT services companies, product startups, and technology firms are the most consistent entry-level destinations for BCA graduates with practical coding competency.",
+          "type": "Primary",
+          "uniqueId": "UG-011-001",
+          "roles": [
+            {
+              "role": "Software Engineer",
+              "id": "JF01-001"
+            },
+            {
+              "role": "Frontend Developer",
+              "id": "JF01-002"
+            },
+            {
+              "role": "Backend Developer",
+              "id": "JF01-003"
+            },
+            {
+              "role": "Full Stack Developer",
+              "id": "JF01-004"
+            },
+            {
+              "role": "Python Developer",
+              "id": "JF01-015"
+            },
+            {
+              "role": "Java Developer",
+              "id": "JF01-016"
+            },
+            {
+              "role": "Node.js Developer",
+              "id": "JF01-017"
+            },
+            {
+              "role": "PHP Developer",
+              "id": "JF01-018"
+            },
+            {
+              "role": "API Developer",
+              "id": "JF01-013"
+            },
+            {
+              "role": "Angular Developer",
+              "id": "JF01-021"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011001-P01",
+        "careerDirectionName": "Software Development",
+        "careerDirectionDescription": "Software development is the primary and most direct career outcome for BCA graduates. The curriculum covers programming languages (C, Java, Python, PHP), data structures, algorithms, and software engineering principles. Frontend, backend, and full-stack developer roles at IT services companies, product startups, and technology firms are the most consistent entry-level destinations for BCA graduates with practical coding competency.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Software Development",
+        "type": "Full-Time",
+        "salary": "25+ LPA",
+        "locations": [
+          "Chennai"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)"
+        ]
+      },
+      "secondary": {
+        "careerDirection": {
+          "directionId": "CD-011001-P03",
+          "directionName": "Web & Mobile Application Development",
+          "directionDescription": "Web and mobile application development involves building websites, e-commerce platforms, and mobile apps for Android and iOS. BCA General students receive hands-on training in HTML/CSS, JavaScript, PHP, and mobile development frameworks. These roles are in high demand across startups, digital agencies, and enterprise IT departments, and are among the most accessible entry points for BCA graduates who build practical projects during their degree.",
+          "directionOverview": "Web and mobile application development involves building websites, e-commerce platforms, and mobile apps for Android and iOS. BCA General students receive hands-on training in HTML/CSS, JavaScript, PHP, and mobile development frameworks. These roles are in high demand across startups, digital agencies, and enterprise IT departments, and are among the most accessible entry points for BCA graduates who build practical projects during their degree.",
+          "type": "Primary",
+          "uniqueId": "UG-011-001",
+          "roles": [
+            {
+              "role": "Frontend Developer",
+              "id": "JF01-002"
+            },
+            {
+              "role": "Backend Developer",
+              "id": "JF01-003"
+            },
+            {
+              "role": "Mobile App Developer - Android",
+              "id": "JF01-005"
+            },
+            {
+              "role": "Mobile App Developer - iOS",
+              "id": "JF01-006"
+            },
+            {
+              "role": "React Native Developer",
+              "id": "JF01-007"
+            },
+            {
+              "role": "Flutter Developer",
+              "id": "JF01-008"
+            },
+            {
+              "role": "Python Developer",
+              "id": "JF01-015"
+            },
+            {
+              "role": "PHP Developer",
+              "id": "JF01-018"
+            },
+            {
+              "role": "Angular Developer",
+              "id": "JF01-021"
+            },
+            {
+              "role": "Vue.js Developer",
+              "id": "JF01-022"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011001-P03",
+        "careerDirectionName": "Web & Mobile Application Development",
+        "careerDirectionDescription": "Web and mobile application development involves building websites, e-commerce platforms, and mobile apps for Android and iOS. BCA General students receive hands-on training in HTML/CSS, JavaScript, PHP, and mobile development frameworks. These roles are in high demand across startups, digital agencies, and enterprise IT departments, and are among the most accessible entry points for BCA graduates who build practical projects during their degree.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Web & Mobile Application Development",
+        "type": "Full-Time",
+        "salary": "25+ LPA",
+        "locations": [
+          "Bangalore"
+        ],
+        "location": "Bangalore",
+        "orgTypes": [
+          "Multinational Corporation (MNC)"
+        ]
+      },
+      "tertiary": {
+        "careerDirection": {
+          "directionId": "CD-011001-S02",
+          "directionName": "Product Management & UX Design",
+          "directionDescription": "Product management and UX design sit at the intersection of technology and user experience. Associate product managers and product analysts define product features and measure performance. UX designers and UI designers design the interfaces that users interact with. BCA graduates who understand technology architecture and user-centred design principles are well placed for these roles at technology companies and digital product teams.",
+          "directionOverview": "Product management and UX design sit at the intersection of technology and user experience. Associate product managers and product analysts define product features and measure performance. UX designers and UI designers design the interfaces that users interact with. BCA graduates who understand technology architecture and user-centred design principles are well placed for these roles at technology companies and digital product teams.",
+          "type": "Primary",
+          "uniqueId": "UG-011-001",
+          "roles": [
+            {
+              "role": "Associate Product Manager",
+              "id": "JF08-007"
+            },
+            {
+              "role": "Product Manager",
+              "id": "JF08-001"
+            },
+            {
+              "role": "Product Analyst",
+              "id": "JF08-006"
+            },
+            {
+              "role": "UX Designer",
+              "id": "JF08-002"
+            },
+            {
+              "role": "UI Designer",
+              "id": "JF08-003"
+            },
+            {
+              "role": "UX Researcher",
+              "id": "JF08-004"
+            },
+            {
+              "role": "User Research Analyst",
+              "id": "JF08-010"
+            },
+            {
+              "role": "Product Operations Analyst",
+              "id": "JF08-008"
+            },
+            {
+              "role": "UX Writer",
+              "id": "JF08-013"
+            },
+            {
+              "role": "Growth Product Manager",
+              "id": "JF08-009"
+            }
+          ]
+        },
+        "careerDirectionId": "CD-011001-S02",
+        "careerDirectionName": "Product Management & UX Design",
+        "careerDirectionDescription": "Product management and UX design sit at the intersection of technology and user experience. Associate product managers and product analysts define product features and measure performance. UX designers and UI designers design the interfaces that users interact with. BCA graduates who understand technology architecture and user-centred design principles are well placed for these roles at technology companies and digital product teams.",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Product Management & UX Design",
+        "type": "Full-Time",
+        "salary": "25+ LPA",
+        "locations": [
+          "Hyderabad"
+        ],
+        "location": "Hyderabad",
+        "orgTypes": [
+          "Multinational Corporation (MNC)"
+        ]
+      }
+    }
+  },
+  "output_generated_report": null
+}

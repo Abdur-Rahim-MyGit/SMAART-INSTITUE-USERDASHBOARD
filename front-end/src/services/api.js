@@ -185,7 +185,8 @@ export const apiCall = async (endpoint, options = {}) => {
       }
 
       if (!response.ok) {
-        const error = new Error(responseData.error || responseData.message || `API Error: ${response.status}`);
+        const errorMsg = (typeof responseData.error === 'string' ? responseData.error : null) || responseData.message || (responseData.error && responseData.error.message) || `API Error: ${response.status}`;
+        const error = new Error(errorMsg);
         error.data = responseData;
         error.status = response.status;
         throw error;

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, TrendingUp } from "lucide-react";
 import {
   RiBookOpenLine as BookOpen,
   RiFileList3Line as ClipboardCheck,

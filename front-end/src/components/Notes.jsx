@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Save, CheckCircle2, ArrowLeft, Loader2 } from 'lucide-react';
+import { FileText, Save, CheckCircle2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { notesAPI } from '@/services/api';
 
-const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "general" }) => {
+const Notes = ({ content, placeholder, diagramUrl, onComplete, isCompleted, courseId = "general" }) => {
   const [notes, setNotes] = useState('');
   const [saved, setSaved] = useState(false);
   const [hasMarkedComplete, setHasMarkedComplete] = useState(isCompleted || false);
@@ -52,7 +52,7 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
       const response = await notesAPI.upsert(courseId, notes);
       
       if (response.success) {
-        toast.success('Notes saved to database!');
+        toast.success('Self-reflection saved to database!');
         // Sync to localStorage as backup
         localStorage.setItem(`course-notes-${courseId}`, notes);
         
@@ -75,7 +75,7 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
   const handleComplete = () => {
     setHasMarkedComplete(true);
     if (onComplete) onComplete();
-    toast.success('Notes section completed!');
+    toast.success('Self-reflection completed!');
   };
 
   return (
@@ -85,10 +85,10 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
         <div className="border-b border-slate-200 dark:border-white/10 pb-4">
           <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-2">
             <FileText size={16} />
-            <span>Personal Notes</span>
+            <span>Self-Reflection</span>
           </div>
           <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
-            Reflection & Notes
+            Self-Reflection & Insights
           </h2>
         </div>
 
@@ -99,6 +99,11 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
           className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl rounded-3xl p-8 border border-white/20 dark:border-white/5 shadow-2xl shadow-blue-500/5"
         >
           <div className="prose prose-sm dark:prose-invert max-w-none">
+            {diagramUrl && (
+              <div className="mb-6 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/5 bg-white p-2 max-w-md mx-auto shadow-sm">
+                <img src={diagramUrl} alt="Framework Diagram" className="w-full h-auto object-contain max-h-64" />
+              </div>
+            )}
             <p className="text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed">
               {content}
             </p>
@@ -114,13 +119,13 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
         >
           <div className="mb-4">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-              Your Notes
+              Your Reflection
             </label>
             <div className="relative">
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder={placeholder || 'Start typing your notes here...'}
+                placeholder={placeholder || 'Start typing your self-reflection here...'}
                 disabled={loadingNotes}
                 className="w-full h-64 p-4 rounded-xl border-2 border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#002147] text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none resize-none transition-colors disabled:opacity-50"
               />
@@ -131,7 +136,7 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
               )}
             </div>
           </div>
- 
+  
           {/* Save Button */}
           <div className="flex items-center justify-between">
             <button
@@ -144,7 +149,7 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
               ) : (
                 <Save size={16} />
               )}
-              {saved ? 'Saved!' : 'Save Notes'}
+              {saved ? 'Saved!' : 'Save Reflection'}
             </button>
 
             {!hasMarkedComplete ? (
@@ -172,14 +177,14 @@ const Notes = ({ content, placeholder, onComplete, isCompleted, courseId = "gene
         >
           <h4 className="font-semibold text-amber-800 dark:text-amber-200 mb-2 flex items-center gap-2">
             <FileText size={16} />
-            Tips for Effective Note-Taking
+            Tips for Effective Self-Reflection
           </h4>
           <ul className="text-sm text-amber-700 dark:text-amber-300 space-y-1">
             <li>• Write down key insights that resonate with you</li>
             <li>• Connect concepts to your personal experiences</li>
             <li>• Note areas where you want to develop further</li>
             <li>• Record specific techniques you plan to practice</li>
-            <li>• Save your notes regularly to avoid losing them</li>
+            <li>• Save your reflection regularly to avoid losing it</li>
           </ul>
         </motion.div>
 

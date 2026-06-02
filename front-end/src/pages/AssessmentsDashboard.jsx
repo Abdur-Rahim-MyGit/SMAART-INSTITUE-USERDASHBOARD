@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
+    RiArrowLeftLine as ArrowLeft,
     RiArrowRightLine as ArrowRight,
     RiAwardLine as Award,
     RiBrainLine as Brain,

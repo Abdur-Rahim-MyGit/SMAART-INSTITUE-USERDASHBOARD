@@ -69,6 +69,7 @@ const CareerAgentDashboard = lazy(() => import('@/pages/CareerAgent/CareerAgentD
 // AI Career Coach pages
 const ProfileAnalysis = lazy(() => import('@/pages/AICareerCoach/ProfileAnalysis'));
 const ResumeBuilder = lazy(() => import('@/pages/AICareerCoach/ResumeBuilder'));
+const LockedOut = lazy(() => import('@/pages/LockedOut'));
 
 // Auth guard component
 import AssessmentFlowGuard from '@/components/AssessmentFlowGuard';

@@ -1,6 +1,23 @@
 const UserActivityLog = require('../models/UserActivityLog');
 const Result = require('../models/Result');
 const CourseEnrollment = require('../models/CourseEnrollment');
+const Course = require('../models/Course');
+const mongoose = require('mongoose');
+
+// Private helper to resolve a catalog code or string to its actual Course ObjectId
+const getActualCourseId = async (courseId) => {
+    if (!courseId) return undefined;
+    if (mongoose.Types.ObjectId.isValid(courseId)) {
+        return courseId;
+    }
+    const courseObj = await Course.findOne({
+        $or: [
+            { courseNumber: courseId },
+            { courseCode: courseId }
+        ]
+    });
+    return courseObj ? courseObj._id : undefined;
+};
 
 // Log a security violation/warning
 exports.logViolation = async (req, res, next) => {
@@ -15,10 +32,12 @@ exports.logViolation = async (req, res, next) => {
             });
         }
 
+        const actualCourseId = await getActualCourseId(courseId);
+
         // Count previous violations for this user and this assessment/course to calculate warning count
         const query = { userId };
         if (assessmentId) query.assessmentId = assessmentId;
-        if (courseId) query.courseId = courseId;
+        if (actualCourseId) query.courseId = actualCourseId;
 
         const count = await UserActivityLog.countDocuments(query);
         const warningsCount = count + 1;
@@ -26,7 +45,7 @@ exports.logViolation = async (req, res, next) => {
         const activityLog = new UserActivityLog({
             userId,
             assessmentId: assessmentId || undefined,
-            courseId: courseId || undefined,
+            courseId: actualCourseId,
             eventType,
             warningsCount
         });
@@ -57,6 +76,8 @@ exports.lockoutSubmit = async (req, res, next) => {
         let resultUpdated = false;
         let enrollmentUpdated = false;
 
+        const actualCourseId = await getActualCourseId(courseId);
+
         // 1. Handle Assessment Lockout
         if (assessmentId) {
             const result = await Result.findOne({
@@ -81,24 +102,24 @@ exports.lockoutSubmit = async (req, res, next) => {
         }
 
         // 2. Handle Course Lockout
-        if (courseId) {
+        if (actualCourseId) {
             const enrollment = await CourseEnrollment.findOne({
                 student: userId,
-                course: courseId
+                course: actualCourseId
             });
 
             if (enrollment) {
                 enrollment.status = 'suspended';
                 await enrollment.save();
                 enrollmentUpdated = true;
-                console.log(`🔒 CourseEnrollment suspended for course ${courseId} and user ${userId}.`);
+                console.log(`🔒 CourseEnrollment suspended for course ${actualCourseId} and user ${userId}.`);
             }
         }
 
         // 3. Log the 4th lockout violation
         const query = { userId };
         if (assessmentId) query.assessmentId = assessmentId;
-        if (courseId) query.courseId = courseId;
+        if (actualCourseId) query.courseId = actualCourseId;
         
         const count = await UserActivityLog.countDocuments(query);
         const warningsCount = count + 1; // This should be 4
@@ -106,7 +127,7 @@ exports.lockoutSubmit = async (req, res, next) => {
         const lockoutLog = new UserActivityLog({
             userId,
             assessmentId: assessmentId || undefined,
-            courseId: courseId || undefined,
+            courseId: actualCourseId,
             eventType: 'tab_switch',
             warningsCount
         });
@@ -138,9 +159,11 @@ exports.getWarningStatus = async (req, res, next) => {
         const userId = req.user._id || req.user.id;
         const { assessmentId, courseId } = req.query;
 
+        const actualCourseId = await getActualCourseId(courseId);
+
         const query = { userId };
         if (assessmentId) query.assessmentId = assessmentId;
-        if (courseId) query.courseId = courseId;
+        if (actualCourseId) query.courseId = actualCourseId;
 
         const count = await UserActivityLog.countDocuments(query);
 
