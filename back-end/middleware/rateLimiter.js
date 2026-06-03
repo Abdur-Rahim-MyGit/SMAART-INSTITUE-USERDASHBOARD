@@ -14,6 +14,7 @@ const loginLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { keyGeneratorIpFallback: false },
   // Use X-Forwarded-For (set by proxy) when available, fall back to direct IP
   keyGenerator: (req) => {
     const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim()
@@ -84,6 +85,7 @@ const resumeExportLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { keyGeneratorIpFallback: false },
   keyGenerator: (req) => String(req.user?._id || req.ip || 'anonymous'),
 });
 

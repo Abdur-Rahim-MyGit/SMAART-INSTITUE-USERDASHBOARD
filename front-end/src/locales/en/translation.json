@@ -678,7 +678,13 @@
     "congratulations_desc": "You've completed all 9 learning steps for this lesson!",
     "your_progress": "Your Progress",
     "nine_nine_steps": "9/9 Steps",
-    "continue_to_next_lesson": "Continue to Next Lesson"
+    "continue_to_next_lesson": "Continue to Next Lesson",
+    "learning_guidelines": "Learning Protocol & Guidelines",
+    "guideline_step": "Complete each step sequentially to validate your progress and unlock the next lesson.",
+    "guideline_active": "Remain actively engaged. User inactivity of 5 minutes or more is automatically recorded.",
+    "integrity_warning_title": "Integrity & Security Warning",
+    "warning_monitored": "Tab-switching, copying/pasting, and window minimization are strictly monitored in real-time.",
+    "warning_limit": "A maximum of 3 warnings are allowed. A 4th security breach will result in immediate disqualification and account lockout."
   },
   "my_assessments": {
     "page_title": "MY ASSESSMENTS",

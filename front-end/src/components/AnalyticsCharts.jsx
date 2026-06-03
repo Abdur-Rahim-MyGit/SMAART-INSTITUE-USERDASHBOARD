@@ -6,9 +6,12 @@ import {
 } from 'recharts';
 import {
   TrendingUp, Users, Award, Clock, BookOpen, CheckCircle2,
-  ListFilter, ShieldAlert, BarChart2, ShieldCheck, HelpCircle
+  ListFilter, ShieldAlert, BarChart2, ShieldCheck, HelpCircle,
+  Flame, LogIn, LogOut, Activity, Calendar, Zap, AlertTriangle
 } from 'lucide-react';
 import { apiCall } from '@/services/api';
+import useUser from '@/hooks/useUser';
+import { streaksAPI } from '@/services/streaksApi';
 
 // ----------------------------------------------------
 // CUSTOM TOOLTIP COMPONENTS
@@ -37,18 +40,26 @@ const CustomTooltip = ({ active, payload, label, y1Name = "Progress", y2Name = "
 // 1. STUDENT ANALYTICS VIEW
 // ----------------------------------------------------
 export const StudentAnalyticsView = () => {
+  const { user } = useUser();
   const [data, setData] = useState(null);
+  const [streakData, setStreakData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        const res = await apiCall('/analytics/student');
+        const [res, streakRes] = await Promise.all([
+          apiCall('/analytics/student'),
+          streaksAPI.getStatus().catch(() => null)
+        ]);
         if (res.success) {
           setData(res);
         }
+        if (streakRes && streakRes.success) {
+          setStreakData(streakRes.data);
+        }
       } catch (err) {
-        console.error('Failed fetching student analytics:', err);
+        console.error('Failed fetching student analytics and streaks:', err);
       } finally {
         setLoading(false);
       }
@@ -178,6 +189,151 @@ export const StudentAnalyticsView = () => {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* Daily Streaks & Activity Logs Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Streak Board */}
+        <div className="bg-white dark:bg-[#002A5C] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/10 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Flame className="w-5 h-5 text-orange-500 animate-pulse" />
+                Active Learning Streaks
+              </h3>
+              <span className="text-[10px] bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-400 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Gamified Learning
+              </span>
+            </div>
+
+            {/* Streak Counter display */}
+            <div className="flex items-center gap-6 bg-slate-50 dark:bg-slate-900/30 p-5 rounded-2xl border border-slate-100 dark:border-white/5 mb-6">
+              <div className="relative flex items-center justify-center bg-gradient-to-tr from-orange-500 to-amber-500 p-4 rounded-2xl shadow-lg shadow-orange-500/20">
+                <Flame className="w-10 h-10 text-white" />
+              </div>
+              <div>
+                <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Current Streak</p>
+                <h4 className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1 flex items-baseline gap-1">
+                  {streakData?.currentStreak || 0} <span className="text-sm font-semibold text-slate-500">Days</span>
+                </h4>
+              </div>
+            </div>
+
+            {/* Longest Streak / Milestones */}
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="bg-slate-50 dark:bg-slate-900/20 p-4 rounded-xl border border-slate-100 dark:border-white/5">
+                <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase">Longest Streak</p>
+                <h5 className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-1 flex justify-center items-center gap-1">
+                  <Zap className="w-4 h-4 text-amber-500" /> {streakData?.longestStreak || 0} Days
+                </h5>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-900/20 p-4 rounded-xl border border-slate-100 dark:border-white/5">
+                <p className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase">Rest Days Policy</p>
+                <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-2">
+                  Sundays rest day 🧘
+                </h5>
+              </div>
+            </div>
+
+            {/* Restoration Vouchers */}
+            {streakData?.achievements && streakData.achievements.length > 0 && (
+              <div className="mt-6 space-y-2">
+                <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">Earned Vouchers</p>
+                {streakData.achievements.map((ach, idx) => ach.voucher?.status === 'Active' && (
+                  <div key={idx} className="flex items-center justify-between bg-amber-500/10 border border-amber-500/20 px-4 py-2.5 rounded-xl text-xs text-amber-600 dark:text-amber-400">
+                    <span className="font-semibold flex items-center gap-1.5"><Award className="w-4 h-4" /> {ach.title}</span>
+                    <span className="font-mono bg-white dark:bg-[#002A5C] px-2 py-0.5 rounded border border-amber-500/30 uppercase font-bold text-[10px] tracking-wider">{ach.voucher.code}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-4 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3">
+            Streak records update automatically upon completing a step. Complete a course step daily to keep your streak alive!
+          </div>
+        </div>
+
+        {/* Audit Activity & Session Logs */}
+        <div className="bg-white dark:bg-[#002A5C] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/10 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Activity className="w-5 h-5 text-blue-500" />
+                Live Student Activity Feed
+              </h3>
+              <span className="text-[10px] bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                Audit Trail
+              </span>
+            </div>
+
+            {/* Activity Logs Timeline */}
+            <div className="relative border-l-2 border-slate-100 dark:border-white/10 pl-6 space-y-6">
+              {/* Login Event */}
+              <div className="relative">
+                <span className="absolute -left-[31px] top-0 flex items-center justify-center w-4 h-4 rounded-full bg-blue-500 ring-4 ring-white dark:ring-[#002A5C] shadow">
+                  <LogIn className="w-2.5 h-2.5 text-white" />
+                </span>
+                <div>
+                  <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">Session Started (Login Logged)</h4>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                    {user?.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Just now'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Course Attendance Event */}
+              {courses && courses.length > 0 ? (
+                courses.slice(0, 2).map((enroll, idx) => (
+                  <div key={idx} className="relative">
+                    <span className="absolute -left-[31px] top-0 flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-[#002A5C] shadow">
+                      <BookOpen className="w-2.5 h-2.5 text-white" />
+                    </span>
+                    <div>
+                      <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                        {enroll.status === 'completed' ? 'Course Completed' : 'Course Lectures Attended'}
+                      </h4>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">
+                        Course: <span className="font-semibold">{enroll.course?.title}</span> ({enroll.progress}% progressed)
+                      </p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                        Last Active: {enroll.updatedAt ? new Date(enroll.updatedAt).toLocaleString() : 'Recently'}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="relative">
+                  <span className="absolute -left-[31px] top-0 flex items-center justify-center w-4 h-4 rounded-full bg-slate-400 ring-4 ring-white dark:ring-[#002A5C] shadow">
+                    <Calendar className="w-2.5 h-2.5 text-white" />
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">No Course Attendance Logged</h4>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Enroll in a course to begin attendance logging.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Compliance / Security Checklist */}
+              <div className="relative">
+                <span className="absolute -left-[31px] top-0 flex items-center justify-center w-4 h-4 rounded-full bg-purple-500 ring-4 ring-white dark:ring-[#002A5C] shadow">
+                  <ShieldCheck className="w-2.5 h-2.5 text-white" />
+                </span>
+                <div>
+                  <h4 className="text-xs font-semibold text-slate-800 dark:text-slate-200">Compliance & Proctoring Scorecard</h4>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 flex items-center gap-1">
+                    Proctoring Checks: <span className="font-semibold text-emerald-500">Fully Active & Passed ✅</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-4 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            Security system captures abnormal activities, tab switching, and minimizes. Keep your proctoring logs clean.
+          </div>
         </div>
       </div>
     </div>

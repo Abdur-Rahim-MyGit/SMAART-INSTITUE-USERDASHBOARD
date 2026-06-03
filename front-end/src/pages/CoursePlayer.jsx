@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star, AlertTriangle, ShieldAlert } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import MCQPractice from "@/components/MCQPractice";
@@ -10,7 +10,9 @@ import AdvancedPractice from "@/components/AdvancedPractice";
 import CaseStudy from "@/components/CaseStudy";
 import Notes from "@/components/Notes";
 import MicroAssessment from "@/components/MicroAssessment";
+import ActivityWarningModal from "@/components/ActivityWarningModal";
 import useUser from "@/hooks/useUser";
+import useActivityRestrictions from "@/hooks/useActivityRestrictions";
 import FloatingDictionary from "@/components/FloatingDictionary";
 import FloatingNotes from "@/components/FloatingNotes";
 import SyncedTranscript from "@/components/SyncedTranscript";
@@ -19,11 +21,9 @@ import { getLearningFlowData } from "@/data/learningFlowData";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { coursesAPI, courseEnrollmentAPI } from "@/services/api";
-import { buildFlowFromCourse, TEMP_VIDEO_URL } from "@/utils/courseStages";
+import { buildFlowFromCourse, buildFlowFromLearningFlow, TEMP_VIDEO_URL } from "@/utils/courseStages";
 import { mergeAdminQuizzesIntoFlow } from "@/utils/microAssessmentUtils";
 import { markCourseCompleted } from "@/utils/courseProgressStorage";
-import useActivityRestrictions from "@/hooks/useActivityRestrictions";
-import ActivityWarningModal from "@/components/ActivityWarningModal";
 
 // Sample video URLs - replace with actual video URLs from your backend
 const COURSE_VIDEOS = {
@@ -127,18 +127,104 @@ const CoursePlayer = () => {
 
   const [courseMeta, setCourseMeta] = useState({ courseCode: null, courseDbId: null });
   const [taskResultsByDay, setTaskResultsByDay] = useState({});
+  const [dbCourse, setDbCourse] = useState(null);
   const staticCourse = getCourseById(courseId);
-  const { stageKey, stageNameKey, typeKey } = getStageAndTrackInfo(courseId);
+
+  const { stageKey, stageNameKey, typeKey } = useMemo(() => {
+    const courseCode = dbCourse?.courseCode || courseId || '';
+    const courseNumber = dbCourse?.courseNumber || '';
+    const category = dbCourse?.category || '';
+    const titleLower = (dbCourse?.title || '').toLowerCase();
+
+    const isPIQ = category.toLowerCase() === 'piq' || 
+                  courseCode.startsWith('PIQ') || 
+                  courseNumber.startsWith('PIQ') ||
+                  titleLower.includes('mindset') ||
+                  titleLower.includes('confidence') ||
+                  titleLower.includes('motivation') ||
+                  titleLower.includes('adaptability') ||
+                  titleLower.includes('personal branding') ||
+                  titleLower.includes('branding');
+                  
+    const isAIQ = category.toLowerCase() === 'aiq' || 
+                  courseCode.startsWith('AIQ') || 
+                  courseNumber.startsWith('AIQ') ||
+                  titleLower.includes('ai ') ||
+                  titleLower.includes(' ai') ||
+                  titleLower.includes('prompt') ||
+                  titleLower.includes('artificial intelligence');
+                  
+    const isSQ = category.toLowerCase() === 'sq' || 
+                 courseCode.startsWith('SQ') || 
+                 courseNumber.startsWith('SQ') ||
+                 titleLower.includes('sustain') ||
+                 titleLower.includes('ethical') ||
+                 titleLower.includes('citizenship') ||
+                 titleLower.includes('responsibility');
+
+    if (isPIQ) {
+      return { stageKey: 'course_player.stages.piq_track', stageNameKey: 'course_player.stages.personal_intelligence', typeKey: 'piq' };
+    }
+    if (isAIQ) {
+      return { stageKey: 'course_player.stages.aiq_track', stageNameKey: 'course_player.stages.ai_readiness', typeKey: 'aiq' };
+    }
+    if (isSQ) {
+      return { stageKey: 'course_player.stages.sq_track', stageNameKey: 'course_player.stages.sustainability', typeKey: 'siq' };
+    }
+
+    const codeNumStr = (courseNumber || courseCode).replace(/\D/g, '');
+    const codeNum = parseInt(codeNumStr, 10);
+    const isS = courseCode.startsWith('S') || courseNumber.startsWith('S');
+
+    if (category.toLowerCase() === 'capacity' || (isS && codeNum <= 10) || codeNum <= 10) {
+      return { stageKey: 'course_player.stages.stage_1', stageNameKey: 'course_player.stages.capacity', typeKey: 'capacity' };
+    }
+    if (category.toLowerCase() === 'capability' || (isS && codeNum <= 19) || codeNum <= 19) {
+      return { stageKey: 'course_player.stages.stage_2', stageNameKey: 'course_player.stages.capability', typeKey: 'capability' };
+    }
+    if (category.toLowerCase() === 'leadership' || (isS && codeNum <= 25) || codeNum <= 25) {
+      return { stageKey: 'course_player.stages.stage_3', stageNameKey: 'course_player.stages.leadership', typeKey: 'leadership' };
+    }
+
+    if (STAGE_1_COURSES.find(c => c.id === courseId)) {
+      return { stageKey: 'course_player.stages.stage_1', stageNameKey: 'course_player.stages.capacity', typeKey: 'capacity' };
+    }
+    if (STAGE_2_COURSES.find(c => c.id === courseId)) {
+      return { stageKey: 'course_player.stages.stage_2', stageNameKey: 'course_player.stages.capability', typeKey: 'capability' };
+    }
+    if (STAGE_3_COURSES.find(c => c.id === courseId)) {
+      return { stageKey: 'course_player.stages.stage_3', stageNameKey: 'course_player.stages.leadership', typeKey: 'leadership' };
+    }
+    if (PIQ_TRACK.find(c => c.id === courseId)) {
+      return { stageKey: 'course_player.stages.piq_track', stageNameKey: 'course_player.stages.personal_intelligence', typeKey: 'piq' };
+    }
+    if (AIQ_TRACK.find(c => c.id === courseId)) {
+      return { stageKey: 'course_player.stages.aiq_track', stageNameKey: 'course_player.stages.ai_readiness', typeKey: 'aiq' };
+    }
+    if (SQ_TRACK.find(c => c.id === courseId)) {
+      return { stageKey: 'course_player.stages.sq_track', stageNameKey: 'course_player.stages.sustainability', typeKey: 'siq' };
+    }
+
+    return { stageKey: 'course_player.stages.unknown', stageNameKey: 'course_player.stages.unknown', typeKey: 'unknown' };
+  }, [dbCourse, courseId]);
+
+  const formattedDisplayType = useMemo(() => {
+    if (typeKey === 'aiq' || typeKey === 'piq' || typeKey === 'siq') {
+      return typeKey.toUpperCase();
+    }
+    return typeKey.charAt(0).toUpperCase() + typeKey.slice(1);
+  }, [typeKey]);
+
   const staticFlow = getLearningFlowData(courseId);
   const learningFlowData = dynamicFlow || staticFlow;
   const course =
     staticCourse ||
     (dynamicFlow
       ? {
-          id: courseId,
-          title: dynamicFlow.overviewTitle || courseId,
-          subtitle: dynamicFlow.overview || ''
-        }
+        id: courseId,
+        title: dynamicFlow.overviewTitle || courseId,
+        subtitle: dynamicFlow.overview || ''
+      }
       : null);
   const stepNumbers = Array.from({ length: totalSteps }, (_, i) => String(i + 1));
   const lastStepKey = String(totalSteps);
@@ -165,24 +251,42 @@ const CoursePlayer = () => {
         if (cancelled) return;
 
         const dbCourse = courseRes?.data;
+        if (dbCourse) {
+          setDbCourse(dbCourse);
+        }
         const baseStaticFlow = getLearningFlowData(courseId);
 
         if (dbCourse) {
-          let flow = baseStaticFlow
-            ? { ...baseStaticFlow, overviewTitle: dbCourse.title || baseStaticFlow.overviewTitle }
-            : buildFlowFromCourse(dbCourse);
+          let flow;
+          const lf = dbCourse.learningFlow;
+          const hasLearningFlow = lf && (
+            lf.stepA_Why ||
+            lf.stepB_Story ||
+            lf.stepC_Framework ||
+            lf.stepD_Practice ||
+            lf.stepE_FlashCard ||
+            lf.stepF_AdvancedPractice
+          );
 
-          if (dbCourse.status === 'active' && dbCourse.modules?.[0]?.days?.length) {
-            const dbFlow = buildFlowFromCourse(dbCourse);
-            flow = {
-              ...flow,
-              ...dbFlow,
-              overviewTitle: dbCourse.title || flow.overviewTitle,
-              steps: { ...(flow.steps || {}), ...dbFlow.steps },
-            };
+          if (hasLearningFlow) {
+            flow = buildFlowFromLearningFlow(dbCourse);
+          } else {
+            flow = baseStaticFlow
+              ? { ...baseStaticFlow, overviewTitle: dbCourse.title || baseStaticFlow.overviewTitle }
+              : buildFlowFromCourse(dbCourse);
+
+            if (dbCourse.status === 'active' && dbCourse.modules?.[0]?.days?.length) {
+              const dbFlow = buildFlowFromCourse(dbCourse);
+              flow = {
+                ...flow,
+                ...dbFlow,
+                overviewTitle: dbCourse.title || flow.overviewTitle,
+                steps: { ...(flow.steps || {}), ...dbFlow.steps },
+              };
+            }
+            flow = mergeAdminQuizzesIntoFlow(flow, dbCourse);
           }
 
-          flow = mergeAdminQuizzesIntoFlow(flow, dbCourse);
           const stepCount = Object.keys(flow.steps || {}).length || 9;
           setDynamicFlow(flow);
           setTotalSteps(stepCount);
@@ -304,15 +408,15 @@ const CoursePlayer = () => {
         if (response && response.success && response.data) {
           const progressMap = {};
           const completedMap = {};
-          
+
           response.data.forEach(item => {
             const stepKey = String(item.stepId);
-            
+
             // Restore step completion if video is completed, assignment is submitted, or test is completed
             if (item.videoCompleted || item.assignmentStatus === 'Submitted' || item.testCompleted) {
               completedMap[stepKey] = true;
             }
-            
+
             progressMap[stepKey] = {
               last_timestamp: item.last_timestamp || 0,
               videoDuration: item.videoDuration || 0,
@@ -324,10 +428,10 @@ const CoursePlayer = () => {
               testCompleted: item.testCompleted || false
             };
           });
-          
+
           setCompletedSteps(completedMap);
           setUserProgressData(progressMap);
-          
+
           // Check if all steps are completed
           const allSteps = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
           const allCompleted = allSteps.every(step => completedMap[step]);
@@ -348,7 +452,7 @@ const CoursePlayer = () => {
     if (!courseId || !stepNumber) return;
     const stepKey = String(stepNumber);
     const currentStatus = userProgressData[stepKey]?.assignmentStatus;
-    
+
     // Only update if it is not already 'Submitted' or 'In Progress'
     if (currentStatus !== 'Submitted' && currentStatus !== 'In Progress') {
       try {
@@ -360,7 +464,7 @@ const CoursePlayer = () => {
           assignmentStatus: 'In Progress',
           assignmentProgress: 50
         });
-        
+
         if (response && response.success) {
           setUserProgressData(prev => ({
             ...prev,
@@ -629,8 +733,8 @@ const CoursePlayer = () => {
                 <button
                   onClick={() => setActiveTab('preview')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-xs sm:text-sm relative ${activeTab === 'preview'
-                      ? 'text-white'
-                      : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
+                    ? 'text-white'
+                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
                     }`}
                 >
                   {activeTab === 'preview' && (
@@ -648,8 +752,8 @@ const CoursePlayer = () => {
                 <button
                   onClick={() => setActiveTab('transcription')}
                   className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-xs sm:text-sm relative ${activeTab === 'transcription'
-                      ? 'text-white'
-                      : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
+                    ? 'text-white'
+                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
                     }`}
                 >
                   {activeTab === 'transcription' && (
@@ -679,9 +783,25 @@ const CoursePlayer = () => {
                   >
                     <div className="bg-[#F8FAFC] dark:bg-[#002A5C] border border-transparent dark:border-white/5 rounded-xl p-6 transition-colors duration-300">
                       <h4 className="font-semibold text-gray-900 dark:text-white mb-3">{t("course_player.lesson_preview")}</h4>
-                      <p className="text-gray-600 dark:text-slate-200 leading-relaxed">
-                        {stepData.content || t("course_player.lesson_preview_desc")}
-                      </p>
+                      {(stepLetter === '1' || stepLetter === '2' || stepLetter === '3') && stepData.title ? (
+                        <div className="space-y-2 mb-3">
+                          <h5 className="font-extrabold text-sm sm:text-base text-[#1a3884] dark:text-blue-400">
+                            {stepData.title}
+                          </h5>
+                          {stepLetter === '3' && stepData.diagramUrl && (
+                            <div className="my-4 rounded-xl overflow-hidden border border-slate-250 dark:border-white/5 bg-white p-2 max-w-lg mx-auto">
+                              <img src={stepData.diagramUrl} alt="Framework Diagram" className="w-full h-auto object-contain max-h-64" />
+                            </div>
+                          )}
+                          <p className="text-gray-650 dark:text-slate-200 text-sm leading-relaxed whitespace-pre-line">
+                            {stepData.content || t("course_player.lesson_preview_desc")}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-gray-600 dark:text-slate-200 leading-relaxed mb-3">
+                          {stepData.content || t("course_player.lesson_preview_desc")}
+                        </p>
+                      )}
                       <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                         <div className="flex items-center gap-2">
                           <Clock className="w-4 h-4 text-[#1a3884] dark:text-blue-400" />
@@ -754,24 +874,44 @@ const CoursePlayer = () => {
       case 'case-study':
         return (
           <CaseStudy
+            title={stepData.caseTitle || stepData.title}
             content={stepData.content}
             mcq={stepData.mcq}
+            questions={stepData.questions}
             onComplete={() => handleStepComplete(stepLetter)}
             isCompleted={isStepCompleted}
           />
         );
-      case 'notes':
+      case 'notes': {
+        const playbackUrl = stepData.videoUrl;
         return (
-          <Notes
-            content={stepData.content}
-            placeholder={stepData.placeholder}
-            onComplete={() => handleStepComplete(stepLetter)}
-            isCompleted={isStepCompleted}
-            onNextLesson={handleNextLesson}
-            showNextLesson={congratulationAcknowledged && stepLetter === lastStepKey}
-            courseId={courseId}
-          />
+          <div className="space-y-6 h-full overflow-y-auto pb-8">
+            {playbackUrl && (
+              <div className="rounded-xl overflow-hidden max-w-4xl mx-auto shadow-md border border-slate-200/50 dark:border-white/5">
+                <CustomVideoPlayer
+                  videoUrl={playbackUrl}
+                  title={stepData.title || "Self-Reflection Video"}
+                  initialMaxTime={userProgressData[stepLetter]?.last_timestamp || 0}
+                  initialCompleted={userProgressData[stepLetter]?.videoCompleted || false}
+                  onProgressUpdate={handleVideoProgressUpdate}
+                  onTimeUpdate={(time) => setCurrentVideoTime(time)}
+                  onNext={null}
+                />
+              </div>
+            )}
+            <Notes
+              content={stepData.content}
+              placeholder={stepData.placeholder}
+              diagramUrl={stepData.diagramUrl}
+              onComplete={() => handleStepComplete(stepLetter)}
+              isCompleted={isStepCompleted}
+              onNextLesson={handleNextLesson}
+              showNextLesson={congratulationAcknowledged && stepLetter === lastStepKey}
+              courseId={courseId}
+            />
+          </div>
         );
+      }
       default:
         return (
           <div className="prose prose-sm dark:prose-invert max-w-none">
@@ -862,7 +1002,7 @@ const CoursePlayer = () => {
                 {!showIntro && (
                   <div className="mb-6">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-bold text-slate-400">{course.id}</span>
+                      <span className="text-xs font-bold text-slate-400">{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</span>
                       {isCompleted && (
                         <span className="flex items-center gap-1.5 text-[10px] font-bold text-green-600">
                           <CheckCircle2 className="w-3 h-3" />
@@ -900,6 +1040,23 @@ const CoursePlayer = () => {
                         </p>
                       </div>
 
+                      {/* Course Banner Image */}
+                      {(dbCourse?.banner || course?.banner) && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.15, duration: 0.5 }}
+                          className="mb-6 rounded-2xl overflow-hidden border border-slate-200/60 dark:border-white/10 shadow-lg relative group"
+                        >
+                          <img
+                            src={dbCourse.banner || course.banner}
+                            alt={course.title}
+                            className="w-full h-48 sm:h-64 object-cover transform group-hover:scale-103 transition-transform duration-700"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+                        </motion.div>
+                      )}
+
                       <div className="bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl p-5 mb-6 border border-gray-200 dark:border-white/10 transition-colors duration-300">
                         <h3 className="text-xs font-bold text-gray-400 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
                           <Sparkles className="w-3.5 h-3.5 text-[#1a3884] dark:text-blue-400" />
@@ -909,11 +1066,11 @@ const CoursePlayer = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <div className="space-y-1">
                             <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.course_id")}</p>
-                            <p className="text-sm font-bold text-[#002147] dark:text-white">{course.id}</p>
+                            <p className="text-sm font-bold text-[#002147] dark:text-white">{dynamicFlow?.courseNumber || course?.courseNumber || course?.id}</p>
                           </div>
                           <div className="space-y-1">
                             <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.type")}</p>
-                            <p className="text-sm font-bold text-[#002147] dark:text-white">{t(typeKey)}</p>
+                            <p className="text-sm font-bold text-[#002147] dark:text-white">{formattedDisplayType}</p>
                           </div>
                           <div className="space-y-1">
                             <p className="text-xs font-medium text-gray-400 dark:text-slate-400">{t("course_player.duration")}</p>
@@ -921,10 +1078,44 @@ const CoursePlayer = () => {
                           </div>
                         </div>
 
-                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/10">
-                          <p className="text-gray-650 dark:text-slate-200 text-sm leading-relaxed">
-                            {learningFlowData?.overview || course.subtitle}
-                          </p>
+                        <div className="mt-5 pt-5 border-t border-gray-200 dark:border-white/10 space-y-5 text-left">
+                          {/* Guidelines */}
+                          <div className="space-y-2.5">
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-[#1a3884] dark:text-blue-400 flex items-center gap-2">
+                              <BookOpen className="w-3.5 h-3.5" />
+                              {t("course_player.learning_guidelines", "Learning Protocol & Guidelines")}
+                            </h4>
+                            <ul className="space-y-2 text-xs sm:text-sm text-slate-700 dark:text-slate-200 font-medium">
+                              <li className="flex items-start gap-2.5">
+                                <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 shrink-0" />
+                                <span>{t("course_player.guideline_step", "Complete each step sequentially to validate your progress and unlock the next lesson.")}</span>
+                              </li>
+                              <li className="flex items-start gap-2.5">
+                                <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 shrink-0" />
+                                <span>{t("course_player.guideline_active", "Remain actively engaged. User inactivity of 5 minutes or more is automatically recorded.")}</span>
+                              </li>
+                            </ul>
+                          </div>
+
+                          {/* Warnings */}
+                          <div className="space-y-2.5 pt-1.5">
+                            <h4 className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                              <ShieldAlert className="w-3.5 h-3.5" />
+                              {t("course_player.integrity_warning_title", "Integrity & Security Warning")}
+                            </h4>
+                            <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 p-3.5 dark:bg-amber-500/8">
+                              <ul className="space-y-2 text-xs text-amber-800 dark:text-amber-300 font-semibold leading-relaxed">
+                                <li className="flex items-start gap-2">
+                                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                                  <span>{t("course_player.warning_monitored", "Tab-switching, copying/pasting, and window minimization are strictly monitored in real-time.")}</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-650 dark:text-amber-400" />
+                                  <span>{t("course_player.warning_limit", "A maximum of 3 warnings are allowed. A 4th security breach will result in immediate disqualification and account lockout.")}</span>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
@@ -966,17 +1157,17 @@ const CoursePlayer = () => {
                           </div>
                           <div>
                             <h3 className="font-bold text-lg sm:text-2xl text-slate-900 dark:text-white leading-tight">
-                              {learningFlowData?.steps[activeStep]?.title || `${t("course_player.curriculum")} ${activeStep}`}
+                              {activeStep === '1' ? 'Why' : activeStep === '2' ? 'Story' : (learningFlowData?.steps[activeStep]?.title || `${t("course_player.curriculum")} ${activeStep}`)}
                             </h3>
                             <p className="text-[10px] sm:text-xs text-blue-600 font-bold uppercase tracking-wider">{t("course_player.active_session")}</p>
                           </div>
                         </div>
                         {learningFlowData?.steps[activeStep]?.contentType !== 'quiz' &&
                           !learningFlowData?.steps[activeStep]?.assessmentData && (
-                          <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl text-xs font-bold text-slate-500 border border-slate-100 dark:border-white/10">
-                            {learningFlowData?.steps[activeStep]?.duration || t("course_player.five_ten_min")}
-                          </div>
-                        )}
+                            <div className="px-4 py-2 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-xl text-xs font-bold text-slate-500 border border-slate-100 dark:border-white/10">
+                              {learningFlowData?.steps[activeStep]?.duration || t("course_player.five_ten_min")}
+                            </div>
+                          )}
                       </div>
 
                       {learningFlowData?.steps[activeStep] ? (
@@ -999,21 +1190,21 @@ const CoursePlayer = () => {
                         activeStep !== lastStepKey &&
                         learningFlowData?.steps[activeStep]?.contentType !== 'quiz' &&
                         !learningFlowData?.steps[activeStep]?.assessmentData && (
-                        <div className="mt-8 flex justify-end">
-                          <button
-                            onClick={() => {
-                              const nextStep = (parseInt(activeStep) + 1).toString();
-                              handleStepComplete(activeStep);
-                              setActiveStep(nextStep);
-                              setVideoWatched(false);
-                            }}
-                            className="px-8 py-3.5 rounded-xl bg-[#1a3884] text-white font-bold text-sm transition-all duration-300 flex items-center gap-2 hover:bg-[#112b6b] shadow-md active:scale-95 group"
-                          >
-                            {t("course_player.continue")}
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                          </button>
-                        </div>
-                      )}
+                          <div className="mt-8 flex justify-end">
+                            <button
+                              onClick={() => {
+                                const nextStep = (parseInt(activeStep) + 1).toString();
+                                handleStepComplete(activeStep);
+                                setActiveStep(nextStep);
+                                setVideoWatched(false);
+                              }}
+                              className="px-8 py-3.5 rounded-xl bg-[#1a3884] text-white font-bold text-sm transition-all duration-300 flex items-center gap-2 hover:bg-[#112b6b] shadow-md active:scale-95 group"
+                            >
+                              {t("course_player.continue")}
+                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            </button>
+                          </div>
+                        )}
 
                       {activeStep === lastStepKey && congratulationAcknowledged && (
                         <button
@@ -1127,17 +1318,17 @@ const CoursePlayer = () => {
                             disabled={status === 'locked'}
                             onClick={() => handleStepClick(step)}
                             className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all border ${isActive
-                                ? 'bg-[#1a3884] border-[#1a3884] text-white shadow-md'
-                                : status === 'completed'
-                                  ? 'bg-[#F8FAFC] dark:bg-slate-800/50 border-slate-100 dark:border-white/8'
-                                  : status === 'locked'
-                                    ? 'opacity-40 cursor-not-allowed border-transparent'
-                                    : 'bg-white dark:bg-[#002147] border-slate-200 dark:border-white/8 hover:border-[#1a3884]/30'
+                              ? 'bg-[#1a3884] border-[#1a3884] text-white shadow-md'
+                              : status === 'completed'
+                                ? 'bg-[#F8FAFC] dark:bg-slate-800/50 border-slate-100 dark:border-white/8'
+                                : status === 'locked'
+                                  ? 'opacity-40 cursor-not-allowed border-transparent'
+                                  : 'bg-white dark:bg-[#002147] border-slate-200 dark:border-white/8 hover:border-[#1a3884]/30'
                               }`}
                           >
                             <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${isActive ? 'bg-white/20 text-white' :
-                                status === 'completed' ? 'bg-green-100 text-green-600' :
-                                  status === 'locked' ? 'bg-slate-100 text-slate-400' : 'bg-slate-100 text-slate-600'
+                              status === 'completed' ? 'bg-green-100 text-green-600' :
+                                status === 'locked' ? 'bg-slate-100 text-slate-400' : 'bg-slate-100 text-slate-600'
                               }`}>
                               {status === 'completed' ? (
                                 <CheckCircle2 className="w-5 h-5" />
@@ -1150,7 +1341,7 @@ const CoursePlayer = () => {
 
                             <div className="flex-1 text-left min-w-0">
                               <h4 className={`font-bold text-sm truncate ${isActive ? 'text-white' : 'text-slate-900 dark:text-slate-200'}`}>
-                                {stepData?.title || `${t("course_player.curriculum")} ${step}`}
+                                {step === '1' ? 'Why' : step === '2' ? 'Story' : (stepData?.title || `${t("course_player.curriculum")} ${step}`)}
                               </h4>
                               <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400">
                                 <Clock size={12} className={isActive ? 'text-white/60' : 'text-slate-400'} />

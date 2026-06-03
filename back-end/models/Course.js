@@ -44,12 +44,17 @@ const reflectionQuestionSchema = new mongoose.Schema({
   question: { type: String, required: true },
   type: {
     type: String,
-    enum: ['text', 'essay', 'file-upload'],
+    enum: ['text', 'essay', 'file-upload', 'mcq'],
     default: 'text'
   },
   wordLimit: Number,
   isRequired: { type: Boolean, default: true },
-  sequence: Number
+  sequence: Number,
+  // MCQ fields support
+  options: [String],
+  correctAnswer: String,
+  explanation: String,
+  points: { type: Number, default: 1 }
 }, { _id: true });
 
 const handoutSchema = new mongoose.Schema({
