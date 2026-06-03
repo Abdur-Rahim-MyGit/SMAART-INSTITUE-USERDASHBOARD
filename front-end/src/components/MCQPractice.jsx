@@ -28,7 +28,13 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
         const score = Object.keys(selectedAnswers).reduce((acc, qIndex) => {
           const q = questions[qIndex];
           if (q && q.correctAnswer !== undefined) {
-            return acc + (selectedAnswers[qIndex] === q.correctAnswer ? 1 : 0);
+            const selIdx = selectedAnswers[qIndex];
+            const selOptionText = q.options?.[selIdx];
+            const isCorrect = 
+              selIdx === q.correctAnswer || 
+              String(selIdx) === String(q.correctAnswer) ||
+              (selOptionText !== undefined && String(selOptionText) === String(q.correctAnswer));
+            return acc + (isCorrect ? 1 : 0);
           }
           return acc + 1;
         }, 0);
@@ -48,12 +54,44 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
 
   const isCorrect = (questionIndex) => {
     const selected = selectedAnswers[questionIndex];
-    return selected === currentQuestion?.correctAnswer;
+    const q = questions[questionIndex];
+    if (!q) return false;
+    const selOptionText = q.options?.[selected];
+    return (
+      selected === q.correctAnswer ||
+      String(selected) === String(q.correctAnswer) ||
+      (selOptionText !== undefined && String(selOptionText) === String(q.correctAnswer))
+    );
   };
 
   const getAnsweredCount = () => Object.keys(selectedAnswers).length;
   const progress = (getAnsweredCount() / questions?.length) * 100;
 
+
+  if (isCompleted) {
+    return (
+      <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 flex items-center justify-center min-h-[350px]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="max-w-md w-full bg-[#f8fafc] dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 rounded-3xl p-8 text-center shadow-xl"
+        >
+          <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-6 shadow-lg shadow-green-500/20">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+            Practice Already Completed
+          </h3>
+          <p className="text-sm text-slate-500 dark:text-slate-405 mb-6 leading-relaxed">
+            You have already successfully finished this practice exercise. Your results have been submitted and validated.
+          </p>
+          <div className="text-xs font-bold text-green-600 dark:text-green-400 bg-green-500/10 py-2.5 px-4 rounded-xl inline-block">
+            Status: Validated & Locked
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
@@ -106,7 +144,10 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
               <div className="space-y-3 mb-6">
                 {currentQuestion.options.map((option, idx) => {
                   const isSelected = selectedAnswers[currentQuestionIndex] === idx;
-                  const isCorrectAnswer = idx === currentQuestion.correctAnswer;
+                  const isCorrectAnswer = 
+                    idx === currentQuestion.correctAnswer || 
+                    String(idx) === String(currentQuestion.correctAnswer) ||
+                    String(option) === String(currentQuestion.correctAnswer);
                   const showResult = showExplanation[currentQuestionIndex];
 
                   return (

@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
 
         const enrollments = await CourseEnrollment.find(query)
             .populate('student', 'fullName email')
-            .populate('course', 'title courseCode')
+            .populate('course', 'title courseCode courseNumber')
             .populate('college', 'name code')
             .sort({ enrollmentDate: -1 })
             .limit(parseInt(limit));
@@ -52,7 +52,7 @@ router.get('/:id', async (req, res) => {
     try {
         const enrollment = await CourseEnrollment.findById(req.params.id)
             .populate('student', 'fullName email studentId')
-            .populate('course', 'title courseCode modules')
+            .populate('course', 'title courseCode courseNumber modules')
             .populate('college', 'name code');
 
         if (!enrollment) {
@@ -167,7 +167,7 @@ router.get('/student/:studentId', async (req, res) => {
         const enrollments = await CourseEnrollment.find({ student: req.params.studentId })
             .populate({
                 path: 'course',
-                select: 'title courseCode duration status banner modules'
+                select: 'title courseCode courseNumber duration status banner modules'
             })
             .populate('college', 'name code')
             .sort({ enrollmentDate: -1 });

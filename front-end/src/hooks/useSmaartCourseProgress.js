@@ -33,7 +33,11 @@ const mergeCompletedFromEnrollments = (enrollments = []) => {
       enrollment.status === "completed" ||
       enrollment.progress >= 100;
 
-    if (isComplete && code) fromDb.push(code);
+    if (isComplete) {
+      if (code) fromDb.push(code);
+      const number = typeof courseRef === "object" ? courseRef?.courseNumber : null;
+      if (number) fromDb.push(number);
+    }
   });
 
   return [...new Set([...fromStorage, ...fromDb])];

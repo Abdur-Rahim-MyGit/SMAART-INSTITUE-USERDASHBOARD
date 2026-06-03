@@ -17,6 +17,7 @@ import {
   isTrackUnlocked as checkTrackUnlocked,
   isCourseUnlockedInStage,
   isCapacityDevUnlock,
+  normalizeCourseId,
 } from "@/utils/courseUnlock";
 
 /* ─── Stage visual config ─── */
@@ -352,9 +353,14 @@ const filterPublishedCourses = (courses, publishedCourseCodes) => {
 
 const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publishedCourseCodes }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { Icon } = cfg;
   const completedCount = stage.courses.filter(c => userProgress.completedCourses?.includes(c.id)).length;
   const pct = Math.round((completedCount / stage.totalCourses) * 100);
+
+  const publishedStageCourses = filterPublishedCourses(stage.courses, publishedCourseCodes);
+  const isAssessmentUnlocked = publishedStageCourses.length > 0 &&
+    publishedStageCourses.every(c => userProgress.completedCourses?.includes(c.id));
 
   const isCourseUnlocked = (courseId) => isCourseUnlockedInStage(courseId, stage, userProgress);
 
@@ -434,37 +440,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
             </div>
           </div>
         </div>
-
-        {/* Enhanced Progress bar */}
-        <div className="mt-8">
-          <div className="h-2 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden p-0.5 shadow-inner">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 1.5, ease: "circOut" }}
-              className="h-full rounded-full bg-gradient-to-r from-[#112b6b] via-[#1a3884] to-[#4c6ef5]"
-            />
-          </div>
-        </div>
       </section>
-
-      {/* Assessment gate banner */}
-      {stage.assessmentGate && (
-        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 bg-white dark:bg-[#002147] border border-slate-150 dark:border-white/10 rounded-3xl shadow-sm transition-colors duration-300">
-          <div className="w-12 h-12 rounded-2xl bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 shadow-sm">
-            <TrendingUp className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
-          </div>
-          <div className="flex-1">
-            <h4 className="font-extrabold text-[#112b6b] dark:text-white text-[15px]">{t("my_courses_page.assessment_required", { gate: stage.assessmentGate })}</h4>
-            <p className="text-gray-500 dark:text-slate-350 text-[13px] font-medium mt-0.5">{t("my_courses_page.assessment_required_desc")}</p>
-          </div>
-          {userProgress.assessmentsPassed?.includes(stage.assessmentGate) ? (
-            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-500/20 uppercase tracking-wider shadow-sm shrink-0 mt-3 sm:mt-0">{t("my_courses_page.status_passed")}</div>
-          ) : (
-            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#F8FAFC] dark:bg-[#002A5C] text-gray-500 dark:text-slate-400 border border-slate-100 dark:border-white/10 uppercase tracking-wider shadow-sm shrink-0 mt-3 sm:mt-0">{t("my_courses_page.status_locked")}</div>
-          )}
-        </div>
-      )}
 
       {/* Course grid - Strictly sequential visibility */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -491,6 +467,31 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
           );
         })}
       </div>
+
+      {/* Assessment gate banner */}
+      {stage.assessmentGate && (
+        <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 bg-white dark:bg-[#002147] border border-slate-150 dark:border-white/10 rounded-3xl shadow-sm transition-colors duration-300">
+          <div className="w-12 h-12 rounded-2xl bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 shadow-sm">
+            <TrendingUp className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
+          </div>
+          <div className="flex-1">
+            <h4 className="font-extrabold text-[#112b6b] dark:text-white text-[15px]">{t("my_courses_page.assessment_required", { gate: stage.assessmentGate })}</h4>
+            <p className="text-gray-500 dark:text-slate-350 text-[13px] font-medium mt-0.5">{t("my_courses_page.assessment_required_desc")}</p>
+          </div>
+          {userProgress.assessmentsPassed?.includes(stage.assessmentGate) ? (
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 border border-green-100 dark:border-green-500/20 uppercase tracking-wider shadow-sm shrink-0 mt-3 sm:mt-0">{t("my_courses_page.status_passed")}</div>
+          ) : isAssessmentUnlocked ? (
+            <button
+              onClick={() => navigate(`/assessment/${stage.assessmentGate}`)}
+              className="px-5 py-2.5 rounded-xl text-[11px] font-bold bg-gradient-to-r from-[#1a3884] to-[#4c6ef5] hover:from-[#152e6d] hover:to-[#3b5bdb] text-white border border-[#1a3884]/20 hover:border-transparent uppercase tracking-wider shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 shrink-0 mt-3 sm:mt-0 active:translate-y-0"
+            >
+              {t("my_courses_page.start_assessment", "Start Assessment")}
+            </button>
+          ) : (
+            <div className="px-4 py-2 rounded-xl text-[11px] font-bold bg-[#F8FAFC] dark:bg-[#002A5C] text-gray-500 dark:text-slate-400 border border-slate-100 dark:border-white/10 uppercase tracking-wider shadow-sm shrink-0 mt-3 sm:mt-0">{t("my_courses_page.status_locked")}</div>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 };
@@ -696,7 +697,8 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
     color: selectedStage?.color || '#1a3884'
   };
 
-  const totalCompleted = (userProgress.completedCourses || []).length;
+  const uniqueCompleted = [...new Set((userProgress.completedCourses || []).map(id => normalizeCourseId(id)))];
+  const totalCompleted = uniqueCompleted.length;
   const totalCourses = activeStages.reduce((a, s) => a + s.totalCourses, 0) + activeTracks.reduce((a, t) => a + t.totalCourses, 0);
   const overallPct = totalCourses > 0 ? Math.round((totalCompleted / totalCourses) * 100) : 0;
 

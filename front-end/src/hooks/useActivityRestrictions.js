@@ -105,6 +105,11 @@ export const useActivityRestrictions = ({ assessmentId = null, courseId = null, 
 
     // Set up proctoring event listeners
     useEffect(() => {
+        if (courseId) {
+            // Suspended mode disabled for courses for now, we can turn it on later
+            return;
+        }
+
         if (!isActive) {
             if (inactivityTimerRef.current) {
                 clearTimeout(inactivityTimerRef.current);

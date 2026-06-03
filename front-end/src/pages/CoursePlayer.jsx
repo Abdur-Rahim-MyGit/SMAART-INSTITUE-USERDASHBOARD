@@ -109,7 +109,6 @@ const CoursePlayer = () => {
   const navigate = useNavigate();
   const playerRef = useRef(null);
   const [videoProgress, setVideoProgress] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dynamicFlow, setDynamicFlow] = useState(null);
   const [totalSteps, setTotalSteps] = useState(9);
@@ -217,6 +216,14 @@ const CoursePlayer = () => {
 
   const staticFlow = getLearningFlowData(courseId);
   const learningFlowData = dynamicFlow || staticFlow;
+
+  const isCompleted = useMemo(() => {
+    if (!totalSteps) return false;
+    const stepsCount = Object.keys(learningFlowData?.steps || {}).length || totalSteps;
+    if (stepsCount <= 0) return false;
+    const allSteps = Array.from({ length: stepsCount }, (_, i) => String(i + 1));
+    return allSteps.every(step => completedSteps[step]);
+  }, [completedSteps, totalSteps, learningFlowData]);
   const course =
     staticCourse ||
     (dynamicFlow
@@ -382,7 +389,6 @@ const CoursePlayer = () => {
     setCompletedSteps({});
     setShowCongratulation(false);
     setCongratulationAcknowledged(false);
-    setIsCompleted(false);
     setVideoProgress(0);
     setCurrentVideoTime(0);
     setVideoWatched(false);
@@ -431,13 +437,6 @@ const CoursePlayer = () => {
 
           setCompletedSteps(completedMap);
           setUserProgressData(progressMap);
-
-          // Check if all steps are completed
-          const allSteps = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-          const allCompleted = allSteps.every(step => completedMap[step]);
-          if (allCompleted) {
-            setIsCompleted(true);
-          }
         }
       } catch (err) {
         console.error("Failed to load user progress:", err);
@@ -565,7 +564,6 @@ const CoursePlayer = () => {
 
     const allCompleted = stepNumbers.every((step) => newCompletedSteps[step]);
     if (allCompleted) {
-      setIsCompleted(true);
       setShowCongratulation(true);
       setActiveStep(null);
       localStorage.setItem('smaart_course_progress', '100');
@@ -581,7 +579,11 @@ const CoursePlayer = () => {
 
 
   const isStepLocked = (stepNumber) => {
-    return false; // Unlocked all for testing
+    const num = parseInt(stepNumber);
+    if (isNaN(num) || num <= 1) return false;
+    // Step is locked if the previous step is not completed
+    const prevStepKey = String(num - 1);
+    return !completedSteps[prevStepKey];
   };
 
   const getStepStatus = (stepNumber) => {
@@ -597,7 +599,6 @@ const CoursePlayer = () => {
   const handleVideoProgressUpdate = async (maxTime, completed, duration) => {
     setVideoProgress(maxTime);
     if (completed) setVideoWatched(true);
-    setIsCompleted(completed);
 
     if (courseId && activeStep) {
       try {
@@ -923,6 +924,27 @@ const CoursePlayer = () => {
     }
   };
 
+  const overallContentProgress = useMemo(() => {
+    if (!totalSteps) return 0;
+    const completedCount = Object.keys(completedSteps).length;
+    let progress = (completedCount / totalSteps) * 100;
+    
+    // Add current video's fractional progress if playing a video
+    if (activeStep && !completedSteps[activeStep] && userProgressData[activeStep]) {
+      const stepData = learningFlowData?.steps?.[activeStep];
+      if (stepData && stepData.contentType === 'video-text') {
+        const duration = userProgressData[activeStep].videoDuration || 0;
+        const current = currentVideoTime || userProgressData[activeStep].last_timestamp || 0;
+        if (duration > 0 && current < duration) {
+          const videoPct = (current / duration) * 100;
+          progress += (videoPct / totalSteps);
+        }
+      }
+    }
+    
+    return Math.min(100, Math.round(progress));
+  }, [completedSteps, totalSteps, activeStep, userProgressData, currentVideoTime, learningFlowData]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white dark:bg-[#00152E] flex items-center justify-center">
@@ -1244,13 +1266,13 @@ const CoursePlayer = () => {
                         <div className="flex items-center justify-between text-xs font-bold text-slate-500">
                           <span>{t("course_player.content_progress")}</span>
                           <span className="text-[#1a3884]">
-                            {Math.round((videoProgress / 100) * 100)}%
+                            {overallContentProgress}%
                           </span>
                         </div>
                         <div className="h-2.5 bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden border border-slate-200 dark:border-white/10">
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${(videoProgress / 100) * 100}%` }}
+                            animate={{ width: `${overallContentProgress}%` }}
                             className="h-full bg-[#1a3884] rounded-full"
                             transition={{ type: "spring", bounce: 0, duration: 1 }}
                           />
@@ -1421,7 +1443,7 @@ const CoursePlayer = () => {
                     transition={{ delay: 0.4 }}
                     className="text-gray-600"
                   >
-                    {t("course_player.congratulations_desc")}
+                    {t("course_player.congratulations_desc_dynamic", "You've completed all {{count}} learning steps for this lesson!", { count: totalSteps })}
                   </motion.p>
                 </div>
 
@@ -1434,10 +1456,12 @@ const CoursePlayer = () => {
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-semibold text-green-700 dark:text-green-300">{t("course_player.your_progress")}</span>
-                    <span className="text-sm font-bold text-green-700 dark:text-green-300">{t("course_player.nine_nine_steps")}</span>
+                    <span className="text-sm font-bold text-green-700 dark:text-green-300">
+                      {t("course_player.steps_progress_format", "{{count}}/{{total}} Steps", { count: totalSteps, total: totalSteps })}
+                    </span>
                   </div>
                   <div className="flex gap-1">
-                    {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((step, idx) => (
+                    {Array.from({ length: totalSteps }, (_, i) => String(i + 1)).map((step, idx) => (
                       <motion.div
                         key={step}
                         initial={{ scale: 0 }}
