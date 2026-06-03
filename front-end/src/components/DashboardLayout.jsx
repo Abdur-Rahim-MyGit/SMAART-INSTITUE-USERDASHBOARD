@@ -687,20 +687,9 @@ const DashboardLayout = () => {
                 </button>
 
                 <div className="flex flex-col min-w-0 shrink">
-                  {/* Subtle Breadcrumb */}
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 opacity-60">
-                    {(location.pathname === '/dashboard' || location.pathname === '/dashboard/') && (
-                      <>
-                        <span>SMAART</span>
-                        <ChevronRight className="w-2.5 h-2.5" />
-                      </>
-                    )}
-                    <span>Dashboard</span>
-                  </div>
+
 
                   <div className="flex items-center gap-3.5 min-w-0">
-                    {/* Primary Accent Bar */}
-                    <div className="shrink-0 w-1.5 h-7 bg-[#1a3884] dark:bg-blue-500 rounded-full shadow-[0_0_8px_rgba(26,56,132,0.15)]" />
                     <motion.h1
                       key={pageTitle}
                       initial={{ opacity: 0, x: -10 }}

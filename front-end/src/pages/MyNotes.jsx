@@ -2,21 +2,24 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-    Plus,
-    Trash2,
-    Search,
-    Save,
-    X,
-    Clock,
-    Sparkles,
-    ArrowLeft
-} from "lucide-react";
+import { Plus, Trash2, Search, Save, X, Clock, Sparkles, ArrowLeft, StickyNote } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CardSkeleton } from "@/components/SkeletonPatterns";
 import { notesAPI } from "@/services/api";
+
+// Color palette — bg (light), bg (dark), border, label, swatch hex
+const COLORS = [
+  { id: "yellow",  label: "Yellow",  light: "#fef9c3", dark: "#78350f33", border: "#fde047", hex: "#fde047" },
+  { id: "blue",    label: "Blue",    light: "#dbeafe", dark: "#1e3a5f55", border: "#93c5fd", hex: "#93c5fd" },
+  { id: "green",   label: "Green",   light: "#dcfce7", dark: "#14532d44", border: "#86efac", hex: "#86efac" },
+  { id: "purple",  label: "Purple",  light: "#f3e8ff", dark: "#4a1d9644", border: "#d8b4fe", hex: "#d8b4fe" },
+  { id: "rose",    label: "Rose",    light: "#ffe4e6", dark: "#881337aa", border: "#fda4af", hex: "#fda4af" },
+  { id: "indigo",  label: "Indigo",  light: "#e0e7ff", dark: "#312e8155", border: "#a5b4fc", hex: "#a5b4fc" },
+];
+
+const DEFAULT_COLOR = COLORS[0];
+
+const getColorById = (id) => COLORS.find(c => c.id === id) || DEFAULT_COLOR;
 
 const MyNotes = () => {
     const { t } = useTranslation();
@@ -25,20 +28,11 @@ const MyNotes = () => {
     const [notes, setNotes] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [showModal, setShowModal] = useState(false);
-    const [currentNote, setCurrentNote] = useState({ id: null, title: "", content: "", color: "bg-yellow-100 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700/50" });
+    const [currentNote, setCurrentNote] = useState({ id: null, title: "", content: "", colorId: DEFAULT_COLOR.id });
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const colors = [
-        { name: "Yellow", value: "bg-yellow-100 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700/50" },
-        { name: "Blue", value: "bg-blue-100 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700/50" },
-        { name: "Green", value: "bg-green-100 dark:bg-green-900/20 border-green-200 dark:border-green-700/50" },
-        { name: "Purple", value: "bg-purple-100 dark:bg-purple-900/20 border-purple-200 dark:border-purple-700/50" },
-        { name: "Rose", value: "bg-rose-100 dark:bg-rose-900/20 border-rose-200 dark:border-rose-700/50" },
-    ];
-
     useEffect(() => {
-        // Load User
         const userData = sessionStorage.getItem("user");
         if (userData) {
             const parsed = JSON.parse(userData);
@@ -56,36 +50,27 @@ const MyNotes = () => {
                 dbNotes = response.data.map(n => {
                     let displayTitle = n.title;
                     if (!displayTitle) {
-                        if (n.courseId.startsWith('personal-')) {
-                            displayTitle = "Untitled Note";
-                        } else if (n.courseId === 'general') {
-                            displayTitle = "General Course Notes";
-                        } else {
-                            displayTitle = `Course: ${n.courseId}`;
-                        }
+                        if (n.courseId.startsWith("personal-")) displayTitle = "Untitled Note";
+                        else if (n.courseId === "general") displayTitle = "General Course Notes";
+                        else displayTitle = `Course: ${n.courseId}`;
                     }
 
-                    let noteColor = colors[0].value;
-                    if (n.courseId.startsWith('personal-')) {
-                        const savedColor = localStorage.getItem(`note_color_${n._id}`);
-                        if (savedColor) noteColor = savedColor;
-                    } else {
-                        noteColor = "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-700/50";
-                    }
+                    let colorId = localStorage.getItem(`note_color_${n._id}`) || DEFAULT_COLOR.id;
+                    const isCourseNote = !n.courseId.startsWith("personal-");
+                    if (isCourseNote) colorId = "indigo";
 
                     return {
                         id: n._id,
                         title: displayTitle,
                         content: n.content,
-                        color: noteColor,
-                        isCourseNote: !n.courseId.startsWith('personal-'),
+                        colorId,
+                        isCourseNote,
                         courseId: n.courseId,
                         createdAt: n.createdAt,
-                        updatedAt: n.updatedAt || n.lastUpdated
+                        updatedAt: n.updatedAt || n.lastUpdated,
                     };
                 }).filter(n => (n.content && n.content.trim() !== "") || n.title);
             }
-
             setNotes(dbNotes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)));
         } catch (error) {
             console.error("Error loading notes:", error);
@@ -99,30 +84,23 @@ const MyNotes = () => {
             toast({ title: "Empty Note", description: "Please add a title or content.", variant: "destructive" });
             return;
         }
-
         const isNew = !currentNote.id;
         const noteCourseId = currentNote.courseId || `personal-${Date.now()}`;
         const noteTitle = currentNote.title || "Untitled Note";
 
         try {
             const response = await notesAPI.upsert(noteCourseId, currentNote.content, noteTitle);
-
             if (response.success && response.data) {
                 const savedId = response.data._id;
-                localStorage.setItem(`note_color_${savedId}`, currentNote.color);
-
-                toast({
-                    title: isNew ? "Note Created" : "Note Updated",
-                    description: "Your note has been saved to the cloud."
-                });
-
+                localStorage.setItem(`note_color_${savedId}`, currentNote.colorId);
+                toast({ title: isNew ? "Note Created" : "Note Updated", description: "Saved to the cloud." });
                 loadNotes(user.id || user._id);
                 setShowModal(false);
-                setCurrentNote({ id: null, title: "", content: "", color: colors[0].value });
+                setCurrentNote({ id: null, title: "", content: "", colorId: DEFAULT_COLOR.id });
             }
         } catch (err) {
             console.error("Failed to save note:", err);
-            toast({ title: "Error", description: "Failed to save note to database.", variant: "destructive" });
+            toast({ title: "Error", description: "Failed to save note.", variant: "destructive" });
         }
     };
 
@@ -132,16 +110,15 @@ const MyNotes = () => {
             if (response.success) {
                 setNotes(notes.filter(n => n.id !== id));
                 localStorage.removeItem(`note_color_${id}`);
-                toast({ title: "Note Deleted", description: "The note has been removed from your account." });
+                toast({ title: "Note Deleted" });
             }
-        } catch (err) {
-            console.error("Failed to delete note:", err);
+        } catch {
             toast({ title: "Error", description: "Could not delete the note.", variant: "destructive" });
         }
     };
 
     const openNewNote = () => {
-        setCurrentNote({ id: null, title: "", content: "", color: colors[0].value });
+        setCurrentNote({ id: null, title: "", content: "", colorId: DEFAULT_COLOR.id });
         setShowModal(true);
     };
 
@@ -155,189 +132,229 @@ const MyNotes = () => {
         note.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const formatDate = (isoString) => {
-        return new Date(isoString).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    };
+    const formatDate = (isoString) =>
+        new Date(isoString).toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+
+    const activeColor = getColorById(currentNote.colorId);
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
-            <main className="w-full relative py-8 px-4 md:px-6">
-                <div className="max-w-7xl mx-auto pb-12">
+        <div className="min-h-screen bg-[#F5F8FF] dark:bg-[#00152E] pb-12 pt-3 transition-colors duration-300">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
-                    {/* Back to Toolkit */}
-                    <button
-                        onClick={() => navigate("/dashboard/smaart-toolkit")}
-                        className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-6 hover:text-[#1a3884] transition-all animate-fade-in"
-                    >
-                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                            <ArrowLeft className="w-4 h-4" />
+                {/* Back button */}
+                <motion.button
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    onClick={() => navigate("/dashboard/smaart-toolkit")}
+                    className="group mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
+                >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
+                        <ArrowLeft className="h-3.5 w-3.5" />
+                    </div>
+                    Back to Toolkit
+                </motion.button>
+
+                {/* Header Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
+                >
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#1a3884]/15 bg-[#eef4ff] px-2.5 py-0.5 dark:border-[#1a3884]/40 dark:bg-[#1a3884]/20">
+                                <Sparkles className="h-3 w-3 text-[#1a3884] dark:text-blue-400" />
+                                <span className="text-[9.5px] font-black uppercase tracking-[0.22em] text-[#1a3884] dark:text-blue-400">Personal Study Notes</span>
+                            </div>
+                            <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                                My <span className="text-[#1a3884] dark:text-blue-300">Notes</span>
+                            </h1>
+                            <p className="mt-1 text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
+                                Organize your thoughts and course insights in one cloud-synced workspace.
+                            </p>
                         </div>
-                        Back to Toolkit
-                    </button>
 
-                    {/* Hero Section */}
-                    <div className="relative overflow-hidden rounded-[32px] border border-slate-200/70 bg-gradient-to-br from-white via-[#f8fbff] to-[#eef4ff] p-8 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.3)] dark:border-slate-700/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 mb-8">
-                        <div className="absolute inset-px rounded-[31px] border border-white/60 dark:border-white/5 pointer-events-none" />
-                        <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-blue-500/5 blur-3xl pointer-events-none" />
-
-                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                            <div className="space-y-4">
-                                <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 shadow-sm dark:border-blue-500/20 dark:bg-slate-900/50 dark:text-blue-400">
-                                    <Sparkles className="h-3 w-3" />
-                                    Personal Study Notes
-                                </div>
-                                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
-                                    My <span className="text-[#1a3884] dark:text-blue-500">Notes</span>
-                                </h1>
-                                <p className="max-w-xl text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-                                    Organize your thoughts, course insights, and personal breakthroughs in one secure, cloud-synced workspace.
-                                </p>
+                        {/* Search + New Note */}
+                        <div className="flex shrink-0 items-center gap-2">
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 pointer-events-none text-slate-400" />
+                                <input
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Search notes…"
+                                    className="w-44 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] py-2 pl-9 pr-3 text-[12.5px] font-medium text-[#0d1f4e] outline-none transition-all focus:border-[#1a3884] focus:w-56 focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white dark:placeholder:text-slate-500"
+                                />
                             </div>
-
-                            <div className="flex flex-col sm:flex-row items-center gap-4">
-                                <div className="relative w-full sm:w-64 group">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                                    <Input
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        placeholder="Search your library..."
-                                        className="pl-12 h-12 bg-white/80 dark:bg-slate-900/50 border-slate-200/60 dark:border-slate-700/50 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-400"
-                                    />
-                                </div>
-                                <Button
-                                    onClick={openNewNote}
-                                    className="h-12 px-6 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-2xl shadow-lg shadow-blue-500/20 flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-95"
-                                >
-                                    <Plus className="w-5 h-5" />
-                                    <span className="font-bold">New Note</span>
-                                </Button>
-                            </div>
+                            <button
+                                onClick={openNewNote}
+                                className="flex items-center gap-1.5 rounded-xl bg-[#1a3884] px-4 py-2 text-[12.5px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
+                            >
+                                <Plus className="h-4 w-4" /> New Note
+                            </button>
                         </div>
                     </div>
+                </motion.div>
 
-                    {/* Notes Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {loading ? (
-                            Array.from({ length: 8 }).map((_, i) => (
-                                <CardSkeleton key={i} />
-                            ))
-                        ) : (
-                            <AnimatePresence>
-                                {/* Create New Card */}
-                                <motion.div
-                                    layout
-                                    onClick={openNewNote}
-                                    className="min-h-[250px] flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-white/10 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all group"
-                                >
-                                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-[#002A5C] flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                                        <Plus className="w-6 h-6 text-slate-400 group-hover:text-blue-500" />
-                                    </div>
-                                    <p className="text-slate-500 font-medium group-hover:text-blue-600">Create New Note</p>
-                                </motion.div>
+                {/* Notes Grid */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {loading ? (
+                        Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)
+                    ) : (
+                        <AnimatePresence>
+                            {/* Create New tile */}
+                            <motion.div
+                                layout
+                                onClick={openNewNote}
+                                className="group flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#d8e6f7] transition-all hover:border-[#1a3884]/50 hover:bg-[#eef4ff] dark:border-[#1a3884]/20 dark:hover:bg-[#1a3884]/10"
+                            >
+                                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef4ff] transition-transform group-hover:scale-110 dark:bg-[#1a3884]/15">
+                                    <Plus className="h-5 w-5 text-[#1a3884] dark:text-blue-400" />
+                                </div>
+                                <p className="text-[12.5px] font-semibold text-slate-400 group-hover:text-[#1a3884] dark:text-slate-600 dark:group-hover:text-blue-400">New Note</p>
+                            </motion.div>
 
-                                {filteredNotes.map(note => (
+                            {filteredNotes.map((note) => {
+                                const nc = getColorById(note.colorId);
+                                return (
                                     <motion.div
                                         key={note.id}
                                         layout
-                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.9 }}
                                         onClick={() => openEditNote(note)}
-                                        className={`relative p-6 rounded-2xl border shadow-sm hover:shadow-lg transition-all cursor-pointer group hover:-translate-y-1 ${note.color} flex flex-col`}
+                                        className="group relative flex min-h-[180px] cursor-pointer flex-col rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
+                                        style={{
+                                            backgroundColor: nc.light,
+                                            borderColor: nc.border,
+                                        }}
                                     >
-                                        {note.isCourseNote && (
-                                            <span className="absolute top-4 right-4 bg-indigo-500/10 dark:bg-indigo-400/20 text-indigo-700 dark:text-indigo-300 font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full">
-                                                Course Note
-                                            </span>
-                                        )}
-                                        <h3 className="font-bold text-lg mb-2 text-slate-800 dark:text-slate-200 line-clamp-1 pr-16">{note.title}</h3>
-                                        <p className="text-slate-600 dark:text-slate-400 text-sm whitespace-pre-wrap line-clamp-6 flex-1 mb-4 leading-relaxed font-medium">
+                                        <div className="mb-1.5 flex items-center gap-2">
+                                            {note.isCourseNote && (
+                                                <span className="inline-flex rounded-full bg-white/60 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-indigo-700 shadow-sm dark:bg-indigo-900/40 dark:text-indigo-300">
+                                                    Course Note
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h3 className="mb-1.5 line-clamp-1 text-[14px] font-bold text-[#0d1f4e] dark:text-white">
+                                            {note.title}
+                                        </h3>
+                                        <p className="mb-3 line-clamp-5 flex-1 whitespace-pre-wrap text-[12.5px] leading-relaxed text-slate-600">
                                             {note.content}
                                         </p>
-                                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5 dark:border-white/5">
-                                            <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                                                <Clock className="w-3 h-3" /> {formatDate(note.updatedAt)}
+                                        <div className="mt-auto flex items-center justify-between border-t border-black/5 pt-3">
+                                            <span className="flex items-center gap-1 text-[10.5px] font-medium text-slate-400">
+                                                <Clock className="h-3 w-3" /> {formatDate(note.updatedAt)}
                                             </span>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); handleDeleteNote(note.id, note.courseId); }}
-                                                className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors"
+                                                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-100 hover:text-red-500"
                                                 title="Delete note"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 className="h-3.5 w-3.5" />
                                             </button>
                                         </div>
                                     </motion.div>
-                                ))}
-                            </AnimatePresence>
-                        )}
-                    </div>
-
-                    {filteredNotes.length === 0 && !loading && (
-                        <div className="text-center py-20">
-                            <p className="text-slate-500">No notes found matching "{searchQuery}"</p>
-                        </div>
+                                );
+                            })}
+                        </AnimatePresence>
                     )}
                 </div>
-            </main>
+
+                {filteredNotes.length === 0 && !loading && searchQuery && (
+                    <div className="py-16 text-center">
+                        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef4ff] dark:bg-[#1a3884]/15">
+                            <StickyNote className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
+                        </div>
+                        <p className="text-[13px] font-semibold text-slate-500 dark:text-slate-400">
+                            No notes found for &ldquo;{searchQuery}&rdquo;
+                        </p>
+                    </div>
+                )}
+            </div>
 
             {/* Editor Modal */}
             <AnimatePresence>
                 {showModal && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowModal(false)}>
-                        <div className="bg-white dark:bg-[#002147] w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
-
-                            {/* Modal Header */}
-                            <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-white/10">
-                                <h2 className="font-bold text-lg text-slate-800 dark:text-white">
-                                    {currentNote.id ? "Edit Note" : "New Note"}
-                                </h2>
-                                <div className="flex gap-2">
-                                    {/* Color Picker */}
-                                    <div className="flex gap-1 mr-4">
-                                        {colors.map(c => (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+                        onClick={() => setShowModal(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex w-full max-w-xl flex-col overflow-hidden rounded-2xl shadow-2xl"
+                            style={{ backgroundColor: activeColor.light, borderColor: activeColor.border, border: "1.5px solid" }}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            {/* Modal top bar */}
+                            <div className="flex items-center justify-between border-b px-5 py-3.5" style={{ borderColor: `${activeColor.border}88` }}>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[13px] font-bold text-[#0d1f4e]">
+                                        {currentNote.id ? "Edit Note" : "New Note"}
+                                    </span>
+                                    {/* Color picker swatches */}
+                                    <div className="flex items-center gap-1.5">
+                                        {COLORS.map(c => (
                                             <button
-                                                key={c.name}
-                                                onClick={() => setCurrentNote({ ...currentNote, color: c.value })}
-                                                className={`w-6 h-6 rounded-full border border-black/10 transition-transform hover:scale-110 ${c.value.split(" ")[0]} ${currentNote.color === c.value ? "ring-2 ring-offset-2 ring-blue-500" : ""}`}
-                                                title={c.name}
+                                                key={c.id}
+                                                onClick={() => setCurrentNote(prev => ({ ...prev, colorId: c.id }))}
+                                                title={c.label}
+                                                className="relative h-5 w-5 rounded-full border-2 transition-transform hover:scale-110"
+                                                style={{
+                                                    backgroundColor: c.hex,
+                                                    borderColor: currentNote.colorId === c.id ? "#1a3884" : "transparent",
+                                                    boxShadow: currentNote.colorId === c.id ? "0 0 0 1.5px #1a3884" : "0 0 0 1px rgba(0,0,0,0.1)",
+                                                }}
                                             />
                                         ))}
                                     </div>
-                                    <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600">
-                                        <X className="w-6 h-6" />
-                                    </button>
                                 </div>
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-black/5 hover:text-slate-600"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
                             </div>
 
-                            {/* Modal Body */}
-                            <div className="p-6 flex-1 overflow-y-auto space-y-4">
+                            {/* Note content */}
+                            <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3" style={{ maxHeight: "60vh" }}>
                                 <input
-                                    className="w-full text-2xl font-bold bg-transparent border-none placeholder:text-gray-300 dark:placeholder:text-gray-600 focus:outline-none text-slate-800 dark:text-white"
-                                    placeholder="Title"
+                                    className="w-full bg-transparent text-[18px] font-bold text-[#0d1f4e] placeholder:text-slate-300 outline-none"
+                                    placeholder="Note title…"
                                     value={currentNote.title}
-                                    onChange={(e) => setCurrentNote({ ...currentNote, title: e.target.value })}
+                                    onChange={(e) => setCurrentNote(prev => ({ ...prev, title: e.target.value }))}
                                 />
                                 <textarea
-                                    className="w-full h-64 bg-transparent border-none resize-none focus:outline-none text-slate-600 dark:text-slate-300 text-lg leading-relaxed placeholder:text-gray-300 dark:placeholder:text-gray-600"
-                                    placeholder="Start typing..."
+                                    className="w-full resize-none bg-transparent text-[13.5px] leading-relaxed text-slate-700 placeholder:text-slate-300 outline-none"
+                                    placeholder="Start writing…"
+                                    rows={10}
                                     value={currentNote.content}
-                                    onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
+                                    onChange={(e) => setCurrentNote(prev => ({ ...prev, content: e.target.value }))}
                                 />
                             </div>
 
-                            {/* Modal Footer */}
-                            <div className="p-4 border-t border-gray-100 dark:border-white/10 flex justify-between items-center bg-[#F8FAFC] dark:bg-black/20">
-                                <div className="flex items-center gap-4">
-                                    <div className="text-xs text-slate-400">
-                                        {currentNote.updatedAt && `Last edited: ${formatDate(currentNote.updatedAt)}`}
-                                    </div>
-                                </div>
-                                <Button onClick={handleSaveNote} className="bg-[#1a3884] hover:bg-[#132c6b] text-white shadow-md">
-                                    <Save className="w-4 h-4 mr-2" /> Save Note
-                                </Button>
+                            {/* Modal footer */}
+                            <div className="flex items-center justify-between border-t px-5 py-3" style={{ borderColor: `${activeColor.border}88` }}>
+                                <span className="text-[11px] font-medium text-slate-400">
+                                    {currentNote.updatedAt && `Last edited: ${formatDate(currentNote.updatedAt)}`}
+                                </span>
+                                <button
+                                    onClick={handleSaveNote}
+                                    className="flex items-center gap-1.5 rounded-xl bg-[#1a3884] px-4 py-2 text-[12.5px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
+                                >
+                                    <Save className="h-3.5 w-3.5" /> Save Note
+                                </button>
                             </div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 )}
             </AnimatePresence>
         </div>

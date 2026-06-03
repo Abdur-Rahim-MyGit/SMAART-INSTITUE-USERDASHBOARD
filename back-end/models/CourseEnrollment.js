@@ -217,6 +217,13 @@ courseEnrollmentSchema.pre('save', async function (next) {
           this.status = 'completed';
           if (!this.completionDate) {
             this.completionDate = new Date();
+            // Trigger dynamic badge award asynchronously
+            if (course && course.courseCode && this.student) {
+                const { awardCourseMasterBadge } = require('../utils/badgeUtils');
+                awardCourseMasterBadge(this.student, this.course, course.courseCode, course.title).catch(err => {
+                    console.error('Failed to award course master badge during enrollment save:', err);
+                });
+            }
           }
         } else if (this.progress > 0 || hasAnyActivity) {
           this.status = 'in_progress';

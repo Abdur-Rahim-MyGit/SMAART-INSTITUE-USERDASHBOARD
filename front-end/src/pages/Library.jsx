@@ -1,9 +1,56 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, BookOpen, Bookmark, ArrowRight, Loader2, Star, ArrowLeft } from "lucide-react";
+import { Search, BookOpen, ArrowRight, Loader2, Star, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+
+const FALLBACK_BOOKS = [
+  {
+    id: "fb1", title: "Atomic Habits", author: "James Clear", category: "Psychology", rating: 4.8,
+    image: "https://m.media-amazon.com/images/I/81wgcld4wxL.jpg",
+    description: "An easy & proven way to build good habits & break bad ones.",
+    link: "https://jamesclear.com/atomic-habits"
+  },
+  {
+    id: "fb2", title: "Deep Work", author: "Cal Newport", category: "Productivity", rating: 4.6,
+    image: "https://m.media-amazon.com/images/I/41-a20c+r9L._SX322_BO1,204,203,200_.jpg",
+    description: "Rules for focused success in a distracted world.",
+    link: "https://www.calnewport.com/books/deep-work/"
+  },
+  {
+    id: "fb3", title: "Mindset", author: "Carol S. Dweck", category: "Psychology", rating: 4.6,
+    image: "https://m.media-amazon.com/images/I/71oD1zRxGSL.jpg",
+    description: "The new psychology of success.",
+    link: "https://www.amazon.com/Mindset-Psychology-Carol-S-Dweck/dp/0345472322"
+  },
+  {
+    id: "fb4", title: "Designing Your Life", author: "Bill Burnett & Dave Evans", category: "Career", rating: 4.5,
+    image: "https://m.media-amazon.com/images/I/81f5f4iH+4L.jpg",
+    description: "How to build a well-lived, joyful life.",
+    link: "https://designingyour.life/"
+  },
+  {
+    id: "fb5", title: "The Lean Startup", author: "Eric Ries", category: "Business", rating: 4.5,
+    image: "https://m.media-amazon.com/images/I/81-QB7nDh4L.jpg",
+    description: "How today's entrepreneurs use continuous innovation to create radically successful businesses.",
+    link: "https://theleanstartup.com/"
+  },
+  {
+    id: "fb6", title: "Thinking, Fast and Slow", author: "Daniel Kahneman", category: "Psychology", rating: 4.7,
+    image: "https://m.media-amazon.com/images/I/71wvKXWCMBL.jpg",
+    description: "A groundbreaking tour of the mind and the two systems that drive the way we think.",
+    link: "https://www.amazon.com/Thinking-Fast-Slow-Daniel-Kahneman/dp/0374533555"
+  },
+];
+
+const CATEGORIES = [
+  { id: "all", label: "All Books" },
+  { id: "business", label: "Business" },
+  { id: "psychology", label: "Psychology" },
+  { id: "technology", label: "Technology" },
+  { id: "career", label: "Career" },
+];
 
 const Library = () => {
   const { t } = useTranslation();
@@ -13,86 +60,28 @@ const Library = () => {
   const [loading, setLoading] = useState(false);
   const [category, setCategory] = useState("all");
 
-  const categories = [
-    { id: "all", label: t("library.categories.all", "All Books") },
-    { id: "business", label: t("library.categories.business", "Business") },
-    { id: "psychology", label: t("library.categories.psychology", "Psychology") },
-    { id: "technology", label: t("library.categories.technology", "Technology") }
-  ];
-
-  // Default initial search
-  useEffect(() => {
-    fetchBooks("career development");
-  }, []);
-
-  /* Fallback content for when API fails or returns no results */
-  const FALLBACK_BOOKS = [
-    {
-      id: "fb1",
-      title: "Atomic Habits",
-      author: "James Clear",
-      category: "Psychology",
-      rating: 4.8,
-      image: "https://m.media-amazon.com/images/I/81wgcld4wxL.jpg",
-      description: "An easy & proven way to build good habits & break bad ones.",
-      link: "https://jamesclear.com/atomic-habits"
-    },
-    {
-      id: "fb2",
-      title: "Deep Work",
-      author: "Cal Newport",
-      category: "Productivity",
-      rating: 4.6,
-      image: "https://m.media-amazon.com/images/I/41-a20c+r9L._SX322_BO1,204,203,200_.jpg",
-      description: "Rules for focused success in a distracted world.",
-      link: "https://www.calnewport.com/books/deep-work/"
-    },
-    {
-      id: "fb3",
-      title: "Mindset",
-      author: "Carol S. Dweck",
-      category: "Psychology",
-      rating: 4.6,
-      image: "https://m.media-amazon.com/images/I/71oD1zRxGSL.jpg",
-      description: "The new psychology of success.",
-      link: "https://www.amazon.com/Mindset-Psychology-Carol-S-Dweck/dp/0345472322"
-    },
-    {
-      id: "fb4",
-      title: "Designing Your Life",
-      author: "Bill Burnett & Dave Evans",
-      category: "Career",
-      rating: 4.5,
-      image: "https://m.media-amazon.com/images/I/81f5f4iH+4L.jpg",
-      description: "How to build a well-lived, joyful life.",
-      link: "https://designingyour.life/"
-    }
-  ];
+  useEffect(() => { fetchBooks("career development"); }, []);
 
   const fetchBooks = async (query) => {
     setLoading(true);
     try {
-      // Use Google Books API
       const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=12`);
       const data = await res.json();
-
       if (data.items) {
-        const formatted = data.items.map(item => ({
+        setBooks(data.items.map(item => ({
           id: item.id,
           title: item.volumeInfo.title,
           author: item.volumeInfo.authors?.[0] || "Unknown Author",
           category: item.volumeInfo.categories?.[0] || "General",
           rating: item.volumeInfo.averageRating || 4.5,
-          image: item.volumeInfo.imageLinks?.thumbnail?.replace('http:', 'https:') || "https://placehold.co/400x600?text=No+Cover",
+          image: item.volumeInfo.imageLinks?.thumbnail?.replace("http:", "https:") || "https://placehold.co/400x600?text=No+Cover",
           description: item.volumeInfo.description,
-          link: item.volumeInfo.previewLink
-        }));
-        setBooks(formatted);
+          link: item.volumeInfo.previewLink,
+        })));
       } else {
         setBooks(FALLBACK_BOOKS);
       }
-    } catch (error) {
-      console.error("Error fetching books:", error);
+    } catch {
       toast.error("Using offline library resources");
       setBooks(FALLBACK_BOOKS);
     } finally {
@@ -108,117 +97,147 @@ const Library = () => {
 
   const filteredBooks = category === "all"
     ? books
-    : books.filter(book => book.category.toLowerCase().includes(category));
+    : books.filter(b => b.category.toLowerCase().includes(category));
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#002147]">
-      <main className="container mx-auto px-4 md:px-6 py-8">
-        {/* Premium Back Button */}
-        <button
+    <div className="min-h-screen bg-[#F5F8FF] dark:bg-[#00152E] pb-12 pt-3 transition-colors duration-300">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {/* Back button */}
+        <motion.button
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
           onClick={() => navigate("/dashboard/smaart-toolkit")}
-          className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-6 hover:text-[#1a3884] transition-all animate-fade-in"
+          className="group mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
         >
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-            <ArrowLeft className="w-4 h-4" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
+            <ArrowLeft className="h-3.5 w-3.5" />
           </div>
           Back to Toolkit
-        </button>
+        </motion.button>
 
-        <div className="mb-8">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl font-sans font-bold text-slate-800 dark:text-white mb-2"
-          >
-            {t("toolkit.sections.library.title", "Knowledge Library")}
-          </motion.h1>
-          <p className="text-slate-600 dark:text-slate-400">
-            {t("toolkit.sections.library.description", "Unlock a curated repository of knowledge. Explore essential books and articles tailored to accelerate your growth.")}
+        {/* Header Card */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
+        >
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#1a3884]/15 bg-[#eef4ff] px-2.5 py-0.5 dark:border-[#1a3884]/40 dark:bg-[#1a3884]/20">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#1a3884] dark:bg-blue-400" />
+            <span className="text-[9.5px] font-black uppercase tracking-[0.22em] text-[#1a3884] dark:text-blue-400">Knowledge Hub</span>
+          </div>
+          <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+            Knowledge <span className="text-[#1a3884] dark:text-blue-300">Library</span>
+          </h1>
+          <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+            Curated books &amp; resources to accelerate your learning and career growth.
           </p>
-        </div>
+        </motion.div>
 
-        {/* Search & Filter */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <form onSubmit={handleSearch} className="flex-1 relative">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={t("library.search_placeholder", "Search by title, author, or topic...")}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] focus:ring-2 focus:ring-blue-500 shadow-sm transition-all"
-            />
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+        {/* Search + Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center"
+        >
+          {/* Search */}
+          <form onSubmit={handleSearch} className="flex flex-1 items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 pointer-events-none text-slate-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by title, author, or topic…"
+                className="w-full rounded-xl border border-[#d8e6f7] bg-white py-2 pl-11 pr-4 text-[13px] font-medium text-[#0d1f4e] shadow-[0_2px_8px_rgba(26,56,132,0.06)] outline-none transition-all focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/15 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white dark:placeholder:text-slate-500"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading || !searchTerm.trim()}
+              className="flex items-center gap-1.5 rounded-xl bg-[#1a3884] px-4 py-2 text-[12.5px] font-bold text-white shadow-sm transition-all hover:bg-[#132c6b] active:scale-95 disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+              Search
+            </button>
           </form>
 
-          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
-            {categories.map(cat => (
+          {/* Category pills */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            {CATEGORIES.map(cat => (
               <button
                 key={cat.id}
                 onClick={() => setCategory(cat.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${category === cat.id
-                  ? "bg-[#1a3884] text-white shadow-md"
-                  : "bg-white dark:bg-[#002A5C] text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C] border border-slate-200 dark:border-white/10"
-                  }`}
+                className={`rounded-xl px-3.5 py-2 text-[12px] font-semibold whitespace-nowrap transition-all ${
+                  category === cat.id
+                    ? "bg-[#1a3884] text-white shadow-sm"
+                    : "border border-[#d8e6f7] bg-white text-slate-500 hover:border-[#1a3884]/30 hover:text-[#1a3884] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-slate-400 dark:hover:text-blue-300"
+                }`}
               >
                 {cat.label}
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Content Grid */}
+        {/* Book Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-              <div key={i} className="h-96 bg-slate-200 dark:bg-[#002A5C] rounded-xl animate-pulse" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="h-72 animate-pulse rounded-2xl border border-[#d8e6f7] bg-white dark:border-[#1a3884]/20 dark:bg-[#001a3d]" />
             ))}
           </div>
         ) : filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
             <AnimatePresence>
               {filteredBooks.map((book, index) => (
                 <motion.div
-                   key={book.id}
-                   initial={{ opacity: 0, scale: 0.9 }}
-                   animate={{ opacity: 1, scale: 1 }}
-                   transition={{ delay: index * 0.05 }}
-                   className="group relative bg-white dark:bg-[#002A5C] rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-white/10"
+                  key={book.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                  className="group overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-[0_2px_8px_rgba(26,56,132,0.05)] transition-all duration-300 hover:shadow-[0_8px_24px_rgba(26,56,132,0.13)] hover:-translate-y-0.5 dark:border-[#1a3884]/20 dark:bg-[#001a3d]"
                 >
-                  <div className="aspect-[2/3] overflow-hidden bg-slate-100 relative">
+                  {/* Cover */}
+                  <div className="relative aspect-[2/3] overflow-hidden bg-slate-100 dark:bg-[#001630]">
                     <img
                       src={book.image}
                       alt={book.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 flex items-end bg-gradient-to-t from-[#0d1f4e]/90 via-transparent to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                       <a
                         href={book.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full bg-white/20 backdrop-blur-md text-white py-2 rounded-lg font-medium text-center hover:bg-white/30 transition-colors flex items-center justify-center gap-2"
+                        className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-white/15 py-1.5 text-[11px] font-bold text-white backdrop-blur-sm transition-all hover:bg-white/25"
                       >
-                        {t("library.preview", "Preview")} <ArrowRight className="w-4 h-4" />
+                        Preview <ArrowRight className="h-3 w-3" />
                       </a>
                     </div>
                   </div>
 
-                  <div className="p-4 space-y-2">
-                    <div className="flex justify-between items-start">
-                      <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                  {/* Info */}
+                  <div className="p-3 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="rounded-full bg-[#eef4ff] px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-400 truncate max-w-[80%]">
                         {book.category}
                       </span>
-                      <div className="flex items-center gap-1 text-yellow-500 text-xs font-bold">
-                        <Star className="w-3 h-3 fill-current" />
-                        {book.rating}
+                      <div className="flex items-center gap-0.5 text-amber-400">
+                        <Star className="h-2.5 w-2.5 fill-current" />
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">{book.rating}</span>
                       </div>
                     </div>
-
-                    <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h3 className="text-[12.5px] font-bold leading-tight text-[#0d1f4e] line-clamp-2 dark:text-white group-hover:text-[#1a3884] dark:group-hover:text-blue-300 transition-colors">
                       {book.title}
                     </h3>
-
-                    <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">
+                    <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 line-clamp-1">
                       {book.author}
                     </p>
                   </div>
@@ -228,19 +247,16 @@ const Library = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <BookOpen className="w-16 h-16 text-slate-300 mb-4" />
-            <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300">
-              {t("library.no_books", "No books found")}
-            </h3>
-            <p className="text-slate-500">
-              {t("library.no_books_desc", "Try adjusting your search terms")}
-            </p>
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#eef4ff] dark:bg-[#1a3884]/15">
+              <BookOpen className="h-8 w-8 text-[#1a3884] dark:text-blue-400" />
+            </div>
+            <h3 className="text-[15px] font-bold text-[#0d1f4e] dark:text-white">No books found</h3>
+            <p className="mt-1 text-[12.5px] text-slate-500 dark:text-slate-400">Try adjusting your search terms</p>
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 };
 
 export default Library;
-

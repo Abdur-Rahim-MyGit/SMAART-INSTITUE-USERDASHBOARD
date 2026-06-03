@@ -45,6 +45,7 @@ const Motivational = lazy(() => import('@/pages/Motivational'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const Notifications = lazy(() => import('@/pages/Notifications'));
 const Help = lazy(() => import('@/pages/Help'));
+const LockedOut = lazy(() => import('@/pages/LockedOut'));
 const SupportTicketsPage = lazy(() => import('@/pages/SupportTicketsPage'));
 const Certificate = lazy(() => import('@/pages/Certificate'));
 const VerifyCertificate = lazy(() => import('@/pages/VerifyCertificate'));

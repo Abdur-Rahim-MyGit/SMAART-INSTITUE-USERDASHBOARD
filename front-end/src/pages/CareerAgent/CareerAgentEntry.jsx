@@ -1,25 +1,65 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 /**
  * CareerAgentEntry
  * Smart entry guard: checks if user has existing career analysis.
- * If yes → redirects to /dashboard/career-agent/dashboard
- * If no  → redirects to /dashboard/career-agent/onboarding
+ * First checks localStorage. If missing, calls API to verify.
+ * If found → redirects to /dashboard/career-agent/dashboard
+ * If not found → redirects to /dashboard/career-agent/onboarding
  */
 const CareerAgentEntry = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const analysisId = localStorage.getItem('smaart_analysis_id');
-    const analysis = localStorage.getItem('smaart_analysis');
+    const checkStatus = async () => {
+      // Fast path: if we have it in localStorage, go to dashboard
+      const analysisId = localStorage.getItem('smaart_analysis_id');
+      const analysis = localStorage.getItem('smaart_analysis');
 
-    if (analysisId && analysis) {
-      navigate('/dashboard/career-agent/dashboard', { replace: true });
-    } else {
+      if (analysisId && analysis) {
+        navigate('/dashboard/career-agent/dashboard', { replace: true });
+        return;
+      }
+
+      // Check backend to see if a pathway exists
+      try {
+        const token = sessionStorage.getItem('token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+        const res = await fetch('/api/career-agent/final-pathway', {
+          credentials: 'include',
+          headers
+        });
+
+        if (res.ok) {
+          const payload = await res.json();
+          // If the backend has an analysis for this user, route to dashboard
+          if (payload.found && payload.output_data) {
+            navigate('/dashboard/career-agent/dashboard', { replace: true });
+            return;
+          }
+        }
+      } catch (e) {
+        console.error('Error checking backend analysis status:', e);
+      }
+
+      // If nothing was found, go to onboarding
       navigate('/dashboard/career-agent/onboarding', { replace: true });
-    }
+    };
+
+    checkStatus();
   }, [navigate]);
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: '3px solid rgba(26, 56, 132, 0.2)', borderTopColor: '#1a3884', animation: 'spin 1s linear infinite' }}></div>
+        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
   return null;
 };

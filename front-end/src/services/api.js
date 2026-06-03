@@ -450,10 +450,10 @@ export const todosAPI = {
   },
 
   // Create a new todo task
-  create: async (title, dueDate) => {
+  create: async (title, dueDate, priority = 'medium') => {
     return apiCall('/todos', {
       method: 'POST',
-      body: JSON.stringify({ title, dueDate }),
+      body: JSON.stringify({ title, dueDate, priority }),
     });
   },
 

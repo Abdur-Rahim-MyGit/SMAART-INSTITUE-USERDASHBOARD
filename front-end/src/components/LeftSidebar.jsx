@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, TrendingUp } from "lucide-react";
 import {
   RiBookOpenLine as BookOpen,
   RiFileList3Line as ClipboardCheck,
@@ -437,9 +437,7 @@ const LeftSidebar = () => {
                             </div>
                           ) : (
                             <Link
-                              to={item.path === '/dashboard/career-agent'
-                                ? (localStorage.getItem('smaart_analysis_id') ? '/dashboard/career-agent/dashboard' : '/dashboard/career-agent/onboarding')
-                                : item.path}
+                              to={item.path}
                               onClick={() => setIsMobileOpen(false)}
                               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
                                 ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/25'
@@ -588,9 +586,7 @@ const LeftSidebar = () => {
                   ) : (
                     <Link
                       key={item.path}
-                      to={item.path === '/dashboard/career-agent'
-                        ? (localStorage.getItem('smaart_analysis_id') ? '/dashboard/career-agent/dashboard' : '/dashboard/career-agent/onboarding')
-                        : item.path}
+                      to={item.path}
                       className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${active
                         ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/25'
                         : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'

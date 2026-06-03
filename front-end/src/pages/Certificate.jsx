@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
-import { Download, Award, CheckCircle2, ShieldCheck, Brain, Activity, Target, Users, Zap, Cpu, Scale, Trophy, Medal } from 'lucide-react';
+import { Download, Award, CheckCircle2, ShieldCheck, Brain, Activity, Target, Users, Zap, Cpu, Scale, Trophy, Medal, ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
@@ -52,6 +54,7 @@ const skills = [
 ];
 
 const Certificate = () => {
+    const navigate = useNavigate();
     const certificateRef = useRef(null);
     const { user, refreshUser } = useUser();
     const [selectedType, setSelectedType] = useState(null);
@@ -221,111 +224,114 @@ const Certificate = () => {
     // --- RENDER SELECTION SCREEN ---
     if (!selectedType) {
         return (
-            <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
-                <main className="w-full relative py-12 px-4 md:px-6">
-                    {/* Header */}
-                    <div className="text-center mb-8">
-                        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#C0C0C0] to-[#A8A8A8] flex items-center justify-center shadow-lg shadow-amber-500/20">
-                            <ShieldCheck className="w-10 h-10 text-[#002147]" />
+            <div className="space-y-6">
+                {/* ── Back button ── */}
+                <motion.button
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.35 }}
+                    onClick={() => navigate("/dashboard/skills-vault")}
+                    className="group flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
+                >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
+                        <ArrowLeft className="h-3.5 w-3.5" />
+                    </div>
+                    Back to Skills Vault
+                </motion.button>
+
+                {/* ── Hero Header ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
+                >
+                    <div className="relative z-10">
+                        {/* Badge pill */}
+                        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#1a3884]/15 bg-[#eef4ff] px-2.5 py-0.5 dark:border-[#1a3884]/40 dark:bg-[#1a3884]/20">
+                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#1a3884] dark:bg-blue-400" />
+                            <span className="text-[9px] font-black tracking-wider text-[#1a3884] dark:text-blue-400">
+                                SECURE LEDGER
+                            </span>
                         </div>
-                        <h1 className="text-3xl font-bold text-[#002147] dark:text-white mb-3 tracking-tight">Credentials & Achievements</h1>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">Access your verified SMAART Institute certifications and badges</p>
+
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#1a3884] to-[#2656c8] text-white shadow-md">
+                                <ShieldCheck className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <h1 className="text-[20px] font-extrabold tracking-tight text-[#0d1f4e] sm:text-[24px] dark:text-white">
+                                    Credentials & Certificates
+                                </h1>
+                                <p className="text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                                    Access, manage, and download your verified SMAART Institute certifications.
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Tab Navigation */}
-                    <div className="flex justify-center mb-8">
-                        <div className="inline-flex bg-white dark:bg-[#002A5C] rounded-2xl p-1.5 shadow-lg border border-slate-200 dark:border-white/10">
-                            <button
-                                onClick={() => setActiveTab('certificates')}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'certificates'
-                                    ? 'bg-[#002147] text-white shadow-md'
-                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C]'
-                                    }`}
-                            >
-                                <Award className="w-5 h-5" />
-                                Certificates
-                            </button>
-                            <button
-                                onClick={() => setActiveTab('badges')}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${activeTab === 'badges'
-                                    ? 'bg-[#002147] text-white shadow-md'
-                                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C]'
-                                    }`}
-                            >
-                                <Trophy className="w-5 h-5" />
-                                Badges & Achievements
-                            </button>
-                        </div>
-                    </div>
+                    {/* Decorative bg element */}
+                    <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-[#1a3884]/5 blur-[32px] dark:bg-blue-500/10" />
+                </motion.div>
 
-                    {/* Certificates Tab */}
-                    {activeTab === 'certificates' && (
-                        <div className="flex flex-col items-center">
-                            <div className="grid gap-4 w-full max-w-2xl">
-                                {certificateTypes.map((cert) => (
-                                    <button
-                                        key={cert.id}
-                                        onClick={() => setSelectedType(cert)}
-                                        className="group relative w-full p-6 rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 hover:border-[#1a3884] dark:hover:border-[#1a3884] transition-all duration-300 text-left hover:shadow-xl dark:shadow-none"
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] flex items-center justify-center shrink-0 group-hover:bg-[#1a3884]/10 text-[#1a3884] transition-colors">
-                                                <Award className="w-6 h-6" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <h3 className="text-lg font-bold text-[#002147] dark:text-white">
-                                                    {cert.title}
-                                                </h3>
-                                                <p className="text-slate-400 text-sm mt-0.5 flex items-center gap-1.5 font-medium">
-                                                    <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
-                                                    Verified Level 1 Credential
-                                                </p>
-                                            </div>
-                                            <div className="text-[#1a3884] font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                                                VIEW SECURE <span className="text-lg">→</span>
-                                            </div>
+                {/* Main Content */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                    className="rounded-2xl border border-[#d8e6f7] bg-white p-6 shadow-[0_2px_8px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 dark:bg-[#001630]"
+                >
+                    <div className="space-y-8 animate-fade-in">
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                            {certificateTypes.map((cert) => (
+                                <button
+                                    key={cert.id}
+                                    onClick={() => setSelectedType(cert)}
+                                    className="group flex flex-col items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-5 text-left transition-all hover:border-[#eab308]/50 hover:bg-white hover:shadow-lg hover:shadow-yellow-500/10 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#eab308]/50 dark:hover:bg-[#001630]"
+                                >
+                                    <div className="flex w-full items-start justify-between gap-4">
+                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-b from-[#fef08a] via-[#eab308] to-[#a16207] shadow-[0_4px_12px_rgba(234,179,8,0.4)] border border-[#fef08a]/50 transition-transform group-hover:scale-105">
+                                            <Award className="h-6 w-6 text-white drop-shadow-md" />
                                         </div>
-                                    </button>
-                                ))}
-                            </div>
+                                        <div className="flex h-8 items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-900/30 dark:bg-emerald-900/10 dark:text-emerald-400">
+                                            <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                                            Verified
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="mt-2">
+                                        <h3 className="mb-2 text-[15px] font-extrabold leading-tight text-[#0d1f4e] transition-colors group-hover:text-[#1a3884] dark:text-white dark:group-hover:text-blue-400">
+                                            {cert.title}
+                                        </h3>
+                                        <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400">Level 1 Professional Credential</p>
+                                    </div>
 
-                            {/* Verify Certificate Link */}
-                            <div className="mt-8 text-center">
-                                <a
-                                    href="/verify-certificate"
-                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#1a3884] text-white font-bold shadow-lg hover:shadow-xl transition-all"
-                                >
-                                    <ShieldCheck className="w-5 h-5" />
-                                    Verify a Certificate
-                                </a>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
-                                    Have a certificate ID? Verify its authenticity here
-                                </p>
-                            </div>
+                                    <div className="mt-2 flex w-full items-center justify-between border-t border-[#d8e6f7] pt-4 dark:border-[#1a3884]/20">
+                                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#1a3884] dark:text-blue-400">
+                                            View Secure Document
+                                        </span>
+                                        <span className="text-lg text-[#1a3884] transition-transform group-hover:translate-x-1 dark:text-blue-400">→</span>
+                                    </div>
+                                </button>
+                            ))}
                         </div>
-                    )}
 
-                    {/* Badges Tab */}
-                    {activeTab === 'badges' && (
-                        <div className="max-w-6xl mx-auto">
-                            <BadgeGallery userName={userData.fullName} badges={user?.badges || []} />
-
-                            {/* Verify Badge Link */}
-                            <div className="mt-8 text-center">
-                                <a
-                                    href="/verify-badge"
-                                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#2a7a85] hover:from-[#2a7a85] hover:to-[#1a3884] text-white font-bold shadow-lg hover:shadow-xl transition-all"
-                                >
-                                    <Medal className="w-5 h-5" />
-                                    Verify a Badge
-                                </a>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-3">
-                                    Have a badge ID? Verify its authenticity here
-                                </p>
+                        {/* Verify Actions */}
+                        <div className="flex flex-col items-center justify-center rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-8 text-center dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
+                            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#eef4ff] text-[#1a3884] dark:bg-[#1a3884]/20 dark:text-blue-400">
+                                <ShieldCheck className="h-6 w-6" />
                             </div>
+                            <h4 className="mb-2 text-[16px] font-extrabold text-[#0d1f4e] dark:text-white">Credential Verification Engine</h4>
+                            <p className="mb-6 max-w-sm text-[13px] font-medium text-slate-500 dark:text-slate-400">Have a certificate ID? Verify its authenticity instantly on our secure ledger.</p>
+                            <a
+                                href="/verify-certificate"
+                                className="inline-flex items-center gap-2 rounded-xl bg-[#1a3884] px-8 py-3 text-[13.5px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95"
+                            >
+                                Launch Verifier
+                            </a>
                         </div>
-                    )}
-                </main>
+                    </div>
+                </motion.div>
             </div>
         );
     }
@@ -338,18 +344,18 @@ const Certificate = () => {
             <main className="w-full relative py-8 px-4 flex flex-col items-center">
 
                 {/* Controls */}
-                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-4 no-print bg-white/80 dark:bg-dark-card/80 backdrop-blur-md p-2 rounded-2xl border border-gray-200 dark:border-white/10 shadow-lg">
+                <div className="z-[30] flex w-full max-w-[794px] items-center justify-between mb-8 no-print bg-white dark:bg-[#002147] p-3 sm:p-4 rounded-2xl border border-gray-200 dark:border-white/10 shadow-sm">
                     <button
                         onClick={() => setSelectedType(null)}
-                        className="flex items-center gap-2 bg-transparent hover:bg-gray-100 dark:hover:bg-[#002A5C] text-slate-700 dark:text-slate-200 px-4 py-2 rounded-xl transition-all font-medium text-sm"
+                        className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 dark:bg-[#00152e] dark:hover:bg-[#001a38] text-slate-700 dark:text-slate-200 px-5 py-2.5 rounded-xl transition-all font-semibold text-sm border border-slate-200 dark:border-white/5"
                     >
                         ← Back
                     </button>
-                    <div className="w-px h-6 bg-gray-300 dark:bg-slate-600"></div>
+                    
                     <button
                         onClick={handleDownload}
                         disabled={isGenerating}
-                        className="flex items-center gap-2 bg-[#002147] hover:bg-[#0d1b2a] dark:bg-[#1a3884] dark:hover:bg-[#132c6b] text-white px-5 py-2 rounded-xl shadow-md transition-all font-bold text-sm disabled:opacity-50"
+                        className="flex items-center gap-2 bg-[#1a3884] hover:bg-[#132c6b] text-white px-6 py-2.5 rounded-xl shadow-md transition-all font-bold text-sm disabled:opacity-50"
                     >
                         <Download className="w-4 h-4" />
                         {isGenerating ? 'Generating...' : 'Download PDF'}
@@ -357,7 +363,7 @@ const Certificate = () => {
                 </div>
 
                 {/* Certificate Paper - A4 Portrait */}
-                <div className="transform scale-[0.6] sm:scale-[0.8] lg:scale-[0.9] origin-top mt-16 shadow-2xl">
+                <div className="transform scale-[0.6] sm:scale-[0.8] lg:scale-[0.9] origin-top shadow-2xl">
                     <div className="certificate-paper" ref={certificateRef} id="certificate-to-print">
                         {/* Security Watermark Backdrop */}
                         <div className={`cert-watermark-overlay ${selectedType.id === 'combined' ? 'combined-watermark' : ''}`}>{certId}</div>

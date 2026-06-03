@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
 // @access  Private
 router.post('/', async (req, res) => {
   try {
-    const { title, dueDate } = req.body;
+    const { title, dueDate, priority } = req.body;
 
     if (!title || !dueDate) {
       return res.status(400).json({
@@ -44,6 +44,7 @@ router.post('/', async (req, res) => {
       user: req.user._id,
       title,
       dueDate,
+      priority: priority || 'medium',
       completed: false,
       reminderTriggered: false
     });
@@ -66,7 +67,7 @@ router.post('/', async (req, res) => {
 // @access  Private
 router.put('/:id', async (req, res) => {
   try {
-    const { title, completed, dueDate } = req.body;
+    const { title, completed, dueDate, priority } = req.body;
 
     let todo = await Todo.findOne({
       _id: req.params.id,
@@ -81,6 +82,7 @@ router.put('/:id', async (req, res) => {
     }
 
     if (title !== undefined) todo.title = title;
+    if (priority !== undefined) todo.priority = priority;
     if (completed !== undefined) {
       todo.completed = completed;
       // If marked as uncompleted, reset reminderTriggered

@@ -5,6 +5,7 @@ import {
     Download,
     Loader2,
     ArrowLeft,
+    ArrowRight,
     Sparkles,
     User,
     Briefcase,
@@ -673,53 +674,8 @@ const ResumeBuilder = () => {
                             <FileText className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Pro Resume Builder</h1>
-                            <p className="text-slate-650 dark:text-slate-350 font-medium">Create, customize, and download a professional, ATS-optimized resume.</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <button onClick={handleSave} disabled={saving} className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-[#002A5C] text-slate-700 dark:text-slate-350 rounded-2xl border border-slate-200 dark:border-white/10 hover:border-[#1a3884] hover:bg-slate-50 dark:hover:bg-[#003170] transition-all font-bold text-sm shadow-sm disabled:opacity-50">
-                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            <span>Save Progress</span>
-                        </button>
-                        {currentStep === steps.length - 1 && (
-                            <button onClick={handleDownloadPDF} disabled={generating} className="flex items-center gap-2 px-5 py-2.5 bg-[#1a3884] dark:bg-blue-600 hover:bg-[#132c6b] dark:hover:bg-blue-550 text-white rounded-2xl transition-all font-bold text-sm shadow-lg shadow-blue-600/20 hover:scale-[1.02] active:scale-95 disabled:opacity-50 animate-pulse-slow">
-                                {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                                <span>Download PDF</span>
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                {/* Steps Wizard Progress Bar */}
-                <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-sm mb-8 overflow-hidden">
-                    <div className="flex items-center overflow-x-auto no-scrollbar scroll-smooth">
-                        <div className="flex items-center gap-6 px-4 py-2">
-                            {steps.map((step, idx) => {
-                                const Icon = step.icon;
-                                const isActive = idx === currentStep;
-                                const isCompleted = idx < currentStep;
-
-                                return (
-                                    <div key={step.id} className="flex items-center gap-2 md:gap-4 shrink-0">
-                                        <button
-                                            onClick={() => setCurrentStep(idx)}
-                                            className={`flex flex-col items-center gap-2 group transition-all ${isActive ? 'scale-105' : ''}`}
-                                        >
-                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${isActive ? 'bg-[#1a3884] text-white shadow-lg shadow-blue-500/40' : isCompleted ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-[#002A5C] text-slate-400 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'}`}>
-                                                <Icon className="w-5 h-5" />
-                                            </div>
-                                            <span className={`text-[9px] font-bold uppercase tracking-widest ${isActive ? 'text-blue-650 dark:text-blue-400' : 'text-slate-400'}`}>
-                                                {step.label}
-                                            </span>
-                                        </button>
-                                        {idx < steps.length - 1 && (
-                                            <div className={`h-[2px] w-4 md:w-12 rounded-full ${isCompleted ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-[#002A5C]'}`}></div>
-                                        )}
-                                    </div>
-                                );
-                            })}
+                            <h1 className="text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight">Resume Builder</h1>
+                            <p className="text-[12px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Create, customize, and download a professional, ATS-optimized resume.</p>
                         </div>
                     </div>
                 </div>
@@ -741,6 +697,41 @@ const ResumeBuilder = () => {
                     )}
                 </div>
             </header>
+
+            <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+                {/* Form Section */}
+                <section className={`flex-1 flex-col relative ${currentStep === steps.length - 1 ? 'hidden lg:flex lg:w-1/2' : 'flex w-full'}`}>
+                    <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    <div className="max-w-4xl mx-auto p-4 md:p-8 pb-10">
+                        <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3 shadow-sm mb-6">
+                            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+                                {steps.map((step, idx) => {
+                                    const Icon = step.icon;
+                                    const isActive = idx === currentStep;
+                                    const isCompleted = idx < currentStep;
+                                    return (
+                                        <div key={step.id} className="flex items-center shrink-0">
+                                            <button
+                                                onClick={() => setCurrentStep(idx)}
+                                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
+                                                    isActive
+                                                        ? 'bg-[#1a3884] text-white shadow-md'
+                                                        : isCompleted
+                                                        ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10'
+                                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                }`}
+                                            >
+                                                <Icon className="w-3.5 h-3.5 shrink-0" />
+                                                <span className="hidden sm:inline">{step.label}</span>
+                                            </button>
+                                            {idx < steps.length - 1 && (
+                                                <div className={`mx-1 h-[2px] w-4 rounded-full ${isCompleted ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
 
                         <div className="min-h-[400px]">
                             {steps[currentStep].id === 'personal' && (
@@ -1021,61 +1012,60 @@ const ResumeBuilder = () => {
                                 </div>
                             )}
                         </div>
-
-                        {/* Navigation Buttons Card */}
-                        <div className="flex justify-between items-center bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 p-6 rounded-3xl shadow-sm mt-8">
-                            <button
-                                onClick={prevStep}
-                                disabled={currentStep === 0}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all ${currentStep === 0 ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50' : 'text-slate-650 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-[#002A5C]'}`}
-                            >
-                                <ArrowLeft className="w-4 h-4" /> Previous
-                            </button>
-                            <button
-                                onClick={nextStep}
-                                className="flex items-center gap-2 px-10 py-3 bg-[#1a3884] dark:bg-blue-600 hover:bg-[#132c6b] dark:hover:bg-blue-550 text-white rounded-2xl font-black transition-all shadow-lg shadow-blue-600/20 group active:scale-95"
-                            >
-                                Next Step
-                                <motion.div animate={{ x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} className="group-hover:translate-x-1 transition-transform">
-                                    <Plus className="w-4 h-4 rotate-[-90deg]" />
-                                </motion.div>
-                            </button>
-                        </div>
+                    </div>
                     </div>
 
                     {/* Navigation Footer - Fixed at bottom of section */}
-                    <div className="p-6 bg-white dark:bg-[#002147] border-t border-slate-200 dark:border-white/8 flex justify-between items-center z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                    <div className="p-6 bg-white dark:bg-[#002147] border-t border-slate-200 dark:border-white/8 flex justify-between items-center z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] shrink-0">
                         <button
                             onClick={prevStep}
                             disabled={currentStep === 0}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all ${currentStep === 0 ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#002A5C]'}`}
+                            className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-[12px] font-semibold transition-all ${
+                                currentStep === 0
+                                    ? 'text-slate-300 dark:text-slate-700 cursor-not-allowed opacity-50'
+                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#002A5C]'
+                            }`}
                         >
                             <ArrowLeft className="w-4 h-4" /> Previous
                         </button>
                         <button
                             onClick={nextStep}
-                            className={`flex items-center gap-2 px-10 py-3 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-2xl font-black transition-all shadow-lg shadow-blue-600/20 group active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
+                            className={`flex items-center gap-1.5 px-5 py-2 bg-[#1a3884] hover:bg-[#132c6b] text-white rounded-lg text-[12px] font-bold transition-all shadow-md shadow-blue-600/20 active:scale-95 ${currentStep === steps.length - 1 ? 'hidden' : 'flex'}`}
                         >
                             Next Step
-                            <motion.div animate={{ x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} className="group-hover:translate-x-1 transition-transform">
-                                <Plus className="w-4 h-4 rotate-[-90deg]" />
-                            </motion.div>
+                            <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                     </div>
                 </section>
 
                 {/* Preview Canvas (Shows on last step) */}
-                <section 
+                <section
                     ref={containerRef}
-                    className={`flex-1 overflow-auto relative p-4 md:p-12 custom-scrollbar shadow-inner bg-slate-100 dark:bg-[#002147] ${currentStep === steps.length - 1 ? 'block' : 'hidden'}`}
+                    className={`flex-1 flex flex-col overflow-hidden relative bg-slate-100 dark:bg-[#001a3d] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
                 >
-                    <div 
-                        className="flex justify-center items-start w-full"
-                        style={{ 
-                            height: scale < 1 ? `${1122.5 * scale}px` : 'auto', 
-                            overflow: 'hidden' 
-                        }}
-                    >
+                    {/* Preview toolbar */}
+                    <div className="flex items-center justify-between px-5 py-2.5 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={prevStep}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                            >
+                                <ArrowLeft className="w-3.5 h-3.5" /> Edit Details
+                            </button>
+                        </div>
+                        <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Preview</p>
+                        <div className="w-[88px]" />{/* spacer */}
+                    </div>
+
+                    {/* Scrollable canvas area */}
+                    <div className="flex-1 overflow-auto custom-scrollbar p-4 md:p-8">
+                        <div
+                            className="flex justify-center items-start w-full"
+                            style={{
+                                height: scale < 1 ? `${1122.5 * scale}px` : 'auto',
+                                overflow: 'hidden'
+                            }}
+                        >
                         <div 
                             id="resume-preview" 
                             className="bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm" 
@@ -1127,75 +1117,11 @@ const ResumeBuilder = () => {
                                     {resumeData.personalInfo.location && <span className="flex items-center">📍 {resumeData.personalInfo.location}</span>}
                                 </div>
                             </div>
-                            <button
-                                onClick={prevStep}
-                                className="flex items-center gap-2 px-6 py-3 text-slate-650 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-2xl font-bold transition-all border border-slate-200 dark:border-white/10 shadow-sm"
-                            >
-                                <ArrowLeft className="w-4 h-4" /> Edit Details
-                            </button>
+
                         </div>
 
-                        <div className="flex justify-center items-start w-full bg-slate-100/50 dark:bg-[#001E3D] border border-slate-200 dark:border-white/10 p-4 md:p-12 rounded-3xl shadow-inner overflow-hidden min-h-[600px]">
-                            <div
-                                className="flex justify-center items-start w-full"
-                                style={{
-                                    height: scale < 1 ? `${1122.5 * scale}px` : 'auto',
-                                    overflow: 'hidden'
-                                }}
-                            >
-                                <div
-                                    id="resume-preview"
-                                    className="bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm"
-                                    style={{
-                                        fontFamily: '"Times New Roman", Times, serif',
-                                        transform: scale < 1 ? `scale(${scale})` : 'none',
-                                        transformOrigin: 'top center'
-                                    }}
-                                >
-                                    {/* Content Area */}
-                                    <div className="relative z-10 text-left">
-                                        {/* Header Section */}
-                                        <div className="flex flex-col items-center text-center relative z-10 mb-6">
-                                            <h1 className="text-4xl font-bold !text-black m-0 leading-tight uppercase tracking-tight" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-                                                {resumeData.personalInfo.fullName || 'FIRST LAST'}
-                                            </h1>
-                                            <h2 className="text-lg font-semibold !text-gray-800 mt-1 uppercase tracking-widest">{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
-
-                                            <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-3 text-[10.5px] !text-gray-700 max-w-full">
-                                                {resumeData.personalInfo.phone && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Phone className="w-[10px] h-[10px] shrink-0" />
-                                                        {resumeData.personalInfo.phone}
-                                                    </span>
-                                                )}
-                                                {resumeData.personalInfo.email && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Mail className="w-[10px] h-[10px] shrink-0" />
-                                                        {resumeData.personalInfo.email}
-                                                    </span>
-                                                )}
-                                                {resumeData.personalInfo.location && (
-                                                    <span className="flex items-center gap-1">
-                                                        <MapPinIcon className="w-[10px] h-[10px] shrink-0" />
-                                                        {resumeData.personalInfo.location}
-                                                    </span>
-                                                )}
-                                                {resumeData.personalInfo.linkedinUrl && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Linkedin className="w-[10px] h-[10px] shrink-0" />
-                                                        {resumeData.personalInfo.linkedinUrl}
-                                                    </span>
-                                                )}
-                                                {resumeData.personalInfo.githubUrl && (
-                                                    <span className="flex items-center gap-1">
-                                                        <Github className="w-[10px] h-[10px] shrink-0" />
-                                                        {resumeData.personalInfo.githubUrl}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-6">
+                            {/* Content Area */}
+                            <div className="space-y-6">
                                             {/* Summary */}
                                             {resumeData.summary && (
                                                 <section>
@@ -1227,6 +1153,9 @@ const ResumeBuilder = () => {
                                                 </div>
                                             )}
 
+                            </div>
+                        </div>
+
                         {/* Preview-only footer — pinned to bottom of A4, hidden during html2canvas PDF capture */}
                         <div
                             data-html2canvas-ignore="true"
@@ -1237,7 +1166,8 @@ const ResumeBuilder = () => {
                             </p>
                         </div>
                     </div>
-                )}
+                    </div>
+                </section>
             </main>
         </div>
     );

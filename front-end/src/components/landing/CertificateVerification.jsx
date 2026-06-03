@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, CheckCircle2, XCircle, AlertTriangle, Search, Loader2, Shield, Hash, Database, Zap, ImageIcon, QrCode } from 'lucide-react';
 import apiCall from '@/services/api';
@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useTranslation } from "react-i18next";
 
-const CertificateVerification = () => {
+const CertificateVerification = ({ isDashboard = false }) => {
     const { t } = useTranslation();
     const [certificateId, setCertificateId] = useState('');
     const [verificationResult, setVerificationResult] = useState(null);
@@ -26,7 +26,6 @@ const CertificateVerification = () => {
         setIsQrScanning(true);
 
         try {
-            // We need a hidden element for Html5Qrcode to work with scanFile
             const html5Qrcode = new Html5Qrcode("reader-landing-hidden");
             const decodedText = await html5Qrcode.scanFile(file, false);
 
@@ -89,57 +88,60 @@ const CertificateVerification = () => {
     };
 
     return (
-        <section id="verify-certificate" className="py-24 bg-gray-50 dark:bg-[#000F24] relative overflow-hidden transition-colors duration-500">
-            {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#1a3884]/5 dark:bg-[#1a3884]/10 rounded-none blur-[120px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#C0C0C0]/5 dark:bg-[#C0C0C0]/10 rounded-none blur-[100px] -translate-x-1/2 translate-y-1/2 pointer-events-none" />
+        <section id="verify-certificate" className={`${isDashboard ? 'py-4' : 'py-16'} relative overflow-hidden transition-colors duration-500`}>
+            {/* Background decoration (only visible heavily on landing page) */}
+            {!isDashboard && (
+                <>
+                    <div className="absolute right-0 top-0 h-[600px] w-[600px] -translate-y-1/2 translate-x-1/2 rounded-full bg-[#1a3884]/5 blur-[120px] pointer-events-none dark:bg-[#1a3884]/10" />
+                    <div className="absolute bottom-0 left-0 h-[400px] w-[400px] -translate-x-1/2 translate-y-1/2 rounded-full bg-blue-400/5 blur-[100px] pointer-events-none dark:bg-blue-400/10" />
+                </>
+            )}
 
-            <div className="container mx-auto px-6 sm:px-10 md:px-16 lg:px-24 relative z-10">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid lg:grid-cols-12 gap-16 lg:gap-20 items-stretch">
+            <div className={`mx-auto px-4 relative z-10 ${isDashboard ? 'max-w-full' : 'container sm:px-10 md:px-16 lg:px-24'}`}>
+                <div className="mx-auto max-w-7xl">
+                    <div className={`grid items-stretch gap-8 lg:grid-cols-12 ${isDashboard ? 'lg:gap-10' : 'lg:gap-16'}`}>
 
                         {/* Left Column: Info & Features */}
-                        <div className="lg:col-span-5 flex flex-col justify-center">
+                        <div className="flex flex-col justify-center lg:col-span-5">
                             <motion.div
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.8 }}
+                                transition={{ duration: 0.6 }}
                             >
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-none bg-[#1a3884]/10 dark:bg-[#C0C0C0]/10 border border-[#1a3884]/20 dark:border-[#C0C0C0]/20 text-[#1a3884] dark:text-[#C0C0C0] text-xs font-bold uppercase tracking-widest mb-8">
-                                    {t("landing.verify.badge")}
+                                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#1a3884]/15 bg-[#eef4ff] px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] dark:border-[#1a3884]/30 dark:bg-[#1a3884]/20 dark:text-blue-400">
+                                    <ShieldCheck className="h-3.5 w-3.5" />
+                                    {t("landing.verify.badge") || "OFFICIAL RECORDS"}
                                 </div>
-                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#002147] dark:text-white mb-6 font-heading leading-tight tracking-tight">
+                                <h2 className={`font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white ${isDashboard ? 'text-[22px] sm:text-[26px] mb-3' : 'text-3xl md:text-4xl lg:text-[40px] mb-5'}`}>
                                     {t("landing.verify.title")} <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a3884] via-[#2a4d9e] to-[#C0C0C0] dark:from-blue-300 dark:via-blue-100 dark:to-yellow-300">
+                                    <span className="text-[#1a3884] dark:text-blue-400">
                                         {t("landing.verify.title_highlight")}
                                     </span>
                                 </h2>
-                                <p className="text-gray-600 dark:text-slate-200 text-base mb-10 leading-relaxed max-w-md font-light">
+                                <p className={`font-medium leading-relaxed text-slate-500 dark:text-slate-400 ${isDashboard ? 'text-[13px] mb-6' : 'text-[15px] mb-8 max-w-md'}`}>
                                     {t("landing.verify.desc")}
                                 </p>
 
-                                <div className="space-y-6">
+                                <div className="space-y-3">
                                     {[
-                                        { icon: Shield, title: t("landing.verify.f1_title"), info: t("landing.verify.f1_info"), sub: t("landing.verify.f1_sub") },
-                                        { icon: Zap, title: t("landing.verify.f2_title"), info: t("landing.verify.f2_info"), sub: t("landing.verify.f2_sub") },
-                                        { icon: Database, title: t("landing.verify.f3_title"), info: t("landing.verify.f3_info"), sub: t("landing.verify.f3_sub") }
+                                        { icon: Shield, title: t("landing.verify.f1_title") || "TAMPER PROOF", info: t("landing.verify.f1_info") || "Blockchain Secured", sub: t("landing.verify.f1_sub") || "Immutable verification records" },
+                                        { icon: Zap, title: t("landing.verify.f2_title") || "INSTANT", info: t("landing.verify.f2_info") || "Real-time Verification", sub: t("landing.verify.f2_sub") || "Zero wait time validation" },
                                     ].map((item, idx) => (
                                         <motion.div
                                             key={idx}
-                                            initial={{ opacity: 0, x: -20 }}
+                                            initial={{ opacity: 0, x: -10 }}
                                             whileInView={{ opacity: 1, x: 0 }}
                                             viewport={{ once: true }}
-                                            transition={{ delay: 0.2 + idx * 0.1 }}
-                                            className="flex items-center gap-5 p-4 rounded-none bg-white dark:bg-[#001835]/80 border border-gray-100 dark:border-white/10 hover:border-[#C0C0C0]/50 dark:hover:border-[#C0C0C0]/50 shadow-sm transition-all duration-300 group backdrop-blur-sm"
+                                            transition={{ delay: 0.1 + idx * 0.1 }}
+                                            className={`group flex items-center gap-4 rounded-xl border border-[#d8e6f7] bg-white p-3.5 shadow-sm transition-all duration-300 hover:border-[#1a3884]/30 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 ${isDashboard ? '' : 'p-4'}`}
                                         >
-                                            <div className="w-12 h-12 rounded-none bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center group-hover:bg-[#1a3884] dark:group-hover:bg-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-all duration-300 shadow-inner">
-                                                <item.icon className="w-5 h-5 text-[#1a3884] dark:text-[#C0C0C0] group-hover:text-white dark:group-hover:text-[#002147] transition-colors" />
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#d8e6f7] bg-[#f5f8ff] transition-transform group-hover:scale-105 dark:border-[#1a3884]/20 dark:bg-[#001630]">
+                                                <item.icon className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
                                             </div>
                                             <div>
-                                                <h4 className="text-gray-400 dark:text-slate-400 font-bold text-[9px] uppercase tracking-widest mb-0.5">{item.title}</h4>
-                                                <p className="text-[#002147] dark:text-white font-bold text-base leading-none mb-0.5">{item.info}</p>
-                                                <p className="text-gray-500 dark:text-slate-300 text-[11px] font-light tracking-wide">{item.sub}</p>
+                                                <p className="mb-0.5 text-[14px] font-bold leading-none text-[#0d1f4e] dark:text-white">{item.info}</p>
+                                                <p className="text-[12px] font-medium text-slate-500 dark:text-slate-400">{item.sub}</p>
                                             </div>
                                         </motion.div>
                                     ))}
@@ -153,237 +155,230 @@ const CertificateVerification = () => {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.8 }}
+                                transition={{ duration: 0.6 }}
                                 className="h-full"
                             >
-                                <div className="bg-white dark:bg-[#001835]/90 border border-gray-100 dark:border-white/10 rounded-none p-1 shadow-2xl relative overflow-hidden h-full flex flex-col backdrop-blur-xl group">
+                                <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-xl shadow-[#1a3884]/5 dark:border-[#1a3884]/20 dark:bg-[#001630]">
+                                    
+                                    {/* Top Decoration */}
+                                    <div className="relative flex h-24 shrink-0 items-center justify-center overflow-hidden bg-gradient-to-r from-[#1a3884] to-[#112b6b]">
+                                        <div className="absolute inset-0 bg-black/10" />
+                                        <div className="relative z-10 flex items-center gap-3">
+                                            <ShieldCheck className="h-6 w-6 text-blue-300" />
+                                            <h3 className="text-[16px] font-extrabold tracking-wide text-white">
+                                                {t("landing.verify.card_title") || "Credential Check"}
+                                            </h3>
+                                        </div>
+                                    </div>
 
-                                    {/* Inner Container */}
-                                    <div className="bg-white/50 dark:bg-dark-bg/50 rounded-none flex flex-col h-full overflow-hidden relative border border-gray-50 dark:border-white/5">
-
-                                        {/* Top Decoration */}
-                                        <div className="h-32 bg-gradient-to-r from-[#1a3884] to-[#0d1f4d] relative overflow-hidden flex-shrink-0">
-                                            <div className="absolute inset-0 bg-[#C0C0C0]/10 pattern-dots" />
-                                            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#C0C0C0]/20 rounded-none blur-3xl" />
-                                            <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-none blur-xl" />
-
-                                            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-white dark:from-[#001835] to-transparent opacity-20" />
-
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white pb-4">
-                                                <ShieldCheck className="w-10 h-10 mb-2 text-[#C0C0C0]" />
-                                                <h3 className="text-xl text-white font-bold font-heading tracking-wide">
-                                                    {t("landing.verify.card_title")}
-                                                </h3>
-                                            </div>
+                                    <div className="flex flex-grow flex-col px-5 pb-8 pt-5 sm:px-8">
+                                        {/* Tab Switcher */}
+                                        <div className="relative z-10 mx-auto mb-6 flex w-full max-w-sm rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-1 shadow-sm dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
+                                            <button
+                                                onClick={() => { setActiveTab('id'); setVerificationResult(null); setError(null); }}
+                                                className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === 'id'
+                                                    ? 'bg-white text-[#1a3884] shadow-sm dark:bg-[#002A5C] dark:text-white'
+                                                    : 'text-slate-500 hover:text-[#0d1f4e] dark:text-slate-400 dark:hover:text-white'}`}
+                                            >
+                                                <Hash className="h-3.5 w-3.5" />
+                                                {t("landing.verify.tab_manual") || "MANUAL ID"}
+                                            </button>
+                                            <button
+                                                onClick={() => { setActiveTab('scan'); setVerificationResult(null); setError(null); }}
+                                                className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 ${activeTab === 'scan'
+                                                    ? 'bg-white text-[#1a3884] shadow-sm dark:bg-[#002A5C] dark:text-white'
+                                                    : 'text-slate-500 hover:text-[#0d1f4e] dark:text-slate-400 dark:hover:text-white'}`}
+                                            >
+                                                <QrCode className="h-3.5 w-3.5" />
+                                                {t("landing.verify.tab_scan") || "SCAN QR"}
+                                            </button>
                                         </div>
 
-                                        <div className="px-6 md:px-10 pb-10 pt-6 flex-grow flex flex-col -mt-6">
-                                            {/* Tab Switcher */}
-                                            <div className="flex mt-10 bg-slate-100 dark:bg-slate-800/50 p-1.5 rounded-2xl mb-10 border border-slate-200/50 dark:border-white/5 shadow-inner max-w-sm mx-auto relative z-10 w-full">
-                                                <button
-                                                    onClick={() => { setActiveTab('id'); setVerificationResult(null); setError(null); }}
-                                                    className={`flex-1 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all duration-300 ${activeTab === 'id'
-                                                        ? 'bg-white dark:bg-[#002A5C] text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
-                                                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
-                                                >
-                                                    <Hash className="w-3.5 h-3.5" />
-                                                    {t("landing.verify.tab_manual")}
-                                                </button>
-                                                <button
-                                                    onClick={() => { setActiveTab('scan'); setVerificationResult(null); setError(null); }}
-                                                    className={`flex-1 py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2.5 transition-all duration-300 ${activeTab === 'scan'
-                                                        ? 'bg-white dark:bg-[#002A5C] text-[#1a3884] dark:text-white shadow-lg shadow-slate-200/50 dark:shadow-none'
-                                                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
-                                                >
-                                                    <QrCode className="w-3.5 h-3.5" />
-                                                    {t("landing.verify.tab_scan")}
-                                                </button>
-                                            </div>
+                                        <div className="flex flex-grow flex-col justify-center">
+                                            <AnimatePresence mode="wait">
+                                                {activeTab === 'scan' ? (
+                                                    <motion.div
+                                                        key="scanner"
+                                                        initial={{ opacity: 0, scale: 0.95 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        exit={{ opacity: 0, scale: 0.95 }}
+                                                        className="w-full text-center"
+                                                    >
+                                                        {/* Hidden elements for scanner */}
+                                                        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
+                                                        <div id="reader-landing-hidden" className="hidden"></div>
 
-                                            <div className="flex-grow flex flex-col justify-center">
-                                                <AnimatePresence mode="wait">
-                                                    {activeTab === 'scan' ? (
-                                                        <motion.div
-                                                            key="scanner"
-                                                            initial={{ opacity: 0, scale: 0.95 }}
-                                                            animate={{ opacity: 1, scale: 1 }}
-                                                            exit={{ opacity: 0, scale: 0.95 }}
-                                                            className="w-full text-center py-6"
-                                                        >
-                                                            {/* Hidden elements for scanner */}
-                                                            <input
-                                                                ref={fileInputRef}
-                                                                type="file"
-                                                                accept="image/*"
-                                                                className="hidden"
-                                                                onChange={handleFileSelect}
-                                                            />
-                                                            <div id="reader-landing-hidden" className="hidden"></div>
-
-                                                            <div className="flex flex-col items-center gap-6">
-                                                                <div className="w-24 h-24 rounded-2xl bg-slate-50 dark:bg-[#002147] border-2 border-dashed border-slate-200 dark:border-white/8 flex items-center justify-center group-hover:border-[#1a3884] transition-colors">
-                                                                    {isQrScanning ? (
-                                                                        <Loader2 className="w-10 h-10 text-[#1a3884] animate-spin" />
-                                                                    ) : (
-                                                                        <ImageIcon className="w-10 h-10 text-slate-300 dark:text-slate-700" />
-                                                                    )}
-                                                                </div>
-
-                                                                <div className="space-y-2">
-                                                                    <h4 className="text-lg font-bold text-slate-800 dark:text-white">
-                                                                        {t("landing.verify.scan_title")}
-                                                                    </h4>
-                                                                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-[240px] mx-auto">
-                                                                        {t("landing.verify.scan_desc")}
-                                                                    </p>
-                                                                </div>
-
-                                                                {qrScanError && (
-                                                                    <div className="px-4 py-2 bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-xl text-xs text-red-600 dark:text-red-400">
-                                                                        {qrScanError}
-                                                                    </div>
-                                                                )}
-
-                                                                <button
-                                                                    type="button"
-                                                                    disabled={isQrScanning}
-                                                                    onClick={() => fileInputRef.current?.click()}
-                                                                    className="w-full max-w-sm h-14 bg-[#1a3884] hover:bg-[#0d1f4d] text-white rounded-2xl font-bold shadow-xl shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
-                                                                >
-                                                                    <ImageIcon className="w-5 h-5 text-white/70" />
-                                                                    {t("landing.verify.btn_choose")}
-                                                                </button>
-                                                            </div>
-                                                        </motion.div>
-                                                    ) : (
-                                                        <motion.form
-                                                            key="form"
-                                                            initial={{ opacity: 0, x: -20 }}
-                                                            animate={{ opacity: 1, x: 0 }}
-                                                            exit={{ opacity: 0, x: 20 }}
-                                                            onSubmit={handleSubmit}
-                                                            className="space-y-6 w-full max-w-sm mx-auto"
-                                                        >
-                                                            <div className="space-y-3">
-                                                                <label className="block text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em] ml-1">
-                                                                    {t("landing.verify.input_label")}
-                                                                </label>
-                                                                <div className="relative group">
-                                                                    <input
-                                                                        type="text"
-                                                                        value={certificateId}
-                                                                        onChange={(e) => setCertificateId(e.target.value)}
-                                                                        placeholder={t("landing.verify.placeholder") || "e.g. SMAART-CAP-2025-ABC12"}
-                                                                        className="w-full h-16 px-6 pl-14 rounded-2xl border-2 border-slate-100 dark:border-white/8 bg-slate-50/50 dark:bg-slate-900/50 text-slate-900 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:border-[#1a3884] focus:ring-4 focus:ring-[#1a3884]/5 transition-all outline-none font-medium"
-                                                                    />
-                                                                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600 group-focus-within:text-[#1a3884] transition-colors" />
-                                                                </div>
-                                                            </div>
-
-                                                            <button
-                                                                type="submit"
-                                                                disabled={isVerifying || !certificateId.trim()}
-                                                                className="w-full h-16 bg-[#1a3884] hover:bg-[#0d1f4d] text-white rounded-2xl font-bold shadow-xl shadow-[#1a3884]/20 hover:shadow-[#1a3884]/40 hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
-                                                            >
-                                                                {isVerifying ? (
-                                                                    <Loader2 className="w-5 h-5 animate-spin text-white/50" />
+                                                        <div className="flex flex-col items-center gap-4">
+                                                            <div className="flex h-20 w-20 items-center justify-center rounded-xl border-2 border-dashed border-[#d8e6f7] bg-[#f5f8ff] transition-colors dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
+                                                                {isQrScanning ? (
+                                                                    <Loader2 className="h-8 w-8 animate-spin text-[#1a3884]" />
                                                                 ) : (
-                                                                    <>
-                                                                        <ShieldCheck className="w-5 h-5 text-white/70 group-hover:scale-110 transition-transform" />
-                                                                        {t("landing.verify.btn_auth")}
-                                                                    </>
+                                                                    <ImageIcon className="h-8 w-8 text-slate-300 dark:text-slate-600" />
                                                                 )}
-                                                            </button>
-                                                        </motion.form>
-                                                    )}
-                                                </AnimatePresence>
+                                                            </div>
 
-                                                {/* Verification Results Overlay */}
-                                                <AnimatePresence>
-                                                    {(verificationResult || error) && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, y: 50 }}
-                                                            animate={{ opacity: 1, y: 0 }}
-                                                            exit={{ opacity: 0, y: 50 }}
-                                                            className="absolute inset-0 bg-white dark:bg-[#001835] z-50 flex flex-col p-6 rounded-none animate-fade-in"
-                                                        >
+                                                            <div>
+                                                                <h4 className="text-[15px] font-bold text-[#0d1f4e] dark:text-white">
+                                                                    {t("landing.verify.scan_title") || "Upload QR Code"}
+                                                                </h4>
+                                                                <p className="mx-auto mt-1 max-w-[240px] text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
+                                                                    {t("landing.verify.scan_desc") || "Select an image containing the certificate QR code."}
+                                                                </p>
+                                                            </div>
+
+                                                            {qrScanError && (
+                                                                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-[12px] font-bold text-red-600 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-400">
+                                                                    {qrScanError}
+                                                                </div>
+                                                            )}
+
                                                             <button
-                                                                onClick={() => { setVerificationResult(null); setError(null); }}
-                                                                className="absolute top-4 right-4 p-2 bg-gray-100 dark:bg-white/10 rounded-none hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
+                                                                type="button"
+                                                                disabled={isQrScanning}
+                                                                onClick={() => fileInputRef.current?.click()}
+                                                                className="mt-2 flex h-12 w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-[#1a3884] px-6 text-[12px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                                                             >
-                                                                <XCircle className="w-5 h-5 text-gray-500" />
+                                                                <ImageIcon className="h-4 w-4" />
+                                                                {t("landing.verify.btn_choose") || "Choose Image"}
                                                             </button>
+                                                        </div>
+                                                    </motion.div>
+                                                ) : (
+                                                    <motion.form
+                                                        key="form"
+                                                        initial={{ opacity: 0, x: -10 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        exit={{ opacity: 0, x: 10 }}
+                                                        onSubmit={handleSubmit}
+                                                        className="mx-auto w-full max-w-xs space-y-5"
+                                                    >
+                                                        <div>
+                                                            <label className="mb-1.5 ml-1 block text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                                                                {t("landing.verify.input_label") || "Certificate Identifier"}
+                                                            </label>
+                                                            <div className="relative">
+                                                                <input
+                                                                    type="text"
+                                                                    value={certificateId}
+                                                                    onChange={(e) => setCertificateId(e.target.value)}
+                                                                    placeholder={t("landing.verify.placeholder") || "e.g. SMAART-CAP-2025-ABC12"}
+                                                                    className="h-12 w-full rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-4 pl-11 text-[13px] font-bold text-[#0d1f4e] outline-none transition-all focus:border-[#1a3884] focus:ring-2 focus:ring-[#1a3884]/10 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white dark:placeholder:text-slate-600"
+                                                                />
+                                                                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                                            </div>
+                                                        </div>
 
-                                                            <div className="flex-grow flex flex-col items-center justify-center text-center">
-                                                                {error ? (
-                                                                    <div className="space-y-4">
-                                                                        <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-none flex items-center justify-center mx-auto mb-4">
-                                                                            <XCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
-                                                                        </div>
-                                                                        <h3 className="text-xl font-bold text-red-600 dark:text-red-400">
-                                                                            {t("landing.verify.failed_title")}
+                                                        <button
+                                                            type="submit"
+                                                            disabled={isVerifying || !certificateId.trim()}
+                                                            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#1a3884] px-6 text-[12px] font-bold text-white shadow-md transition-all hover:bg-[#132c6b] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                                                        >
+                                                            {isVerifying ? (
+                                                                <Loader2 className="h-4 w-4 animate-spin text-white/70" />
+                                                            ) : (
+                                                                <>
+                                                                    <ShieldCheck className="h-4 w-4 text-white/80" />
+                                                                    {t("landing.verify.btn_auth") || "Authenticate"}
+                                                                </>
+                                                            )}
+                                                        </button>
+                                                    </motion.form>
+                                                )}
+                                            </AnimatePresence>
+
+                                            {/* Verification Results Overlay */}
+                                            <AnimatePresence>
+                                                {(verificationResult || error) && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: 10 }}
+                                                        className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/95 p-6 backdrop-blur-sm dark:bg-[#001630]/95"
+                                                    >
+                                                        <button
+                                                            onClick={() => { setVerificationResult(null); setError(null); }}
+                                                            className="absolute right-3 top-3 rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#1a3884]/20 dark:hover:text-slate-300"
+                                                        >
+                                                            <XCircle className="h-5 w-5" />
+                                                        </button>
+
+                                                        <div className="w-full max-w-sm text-center">
+                                                            {error ? (
+                                                                <div className="space-y-3">
+                                                                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 border border-red-100 dark:border-red-900/30 dark:bg-red-900/10">
+                                                                        <XCircle className="h-8 w-8 text-red-500" />
+                                                                    </div>
+                                                                    <h3 className="text-[16px] font-extrabold text-red-600 dark:text-red-400">
+                                                                        {t("landing.verify.failed_title") || "Verification Failed"}
+                                                                    </h3>
+                                                                    <p className="text-[13px] font-medium text-slate-600 dark:text-slate-300">{error}</p>
+                                                                    <button
+                                                                        onClick={() => { setVerificationResult(null); setError(null); }}
+                                                                        className="mt-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] px-6 py-2 text-[12px] font-bold text-[#0d1f4e] transition-colors hover:border-[#1a3884]/30 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-white dark:hover:border-blue-500/30"
+                                                                    >
+                                                                        {t("landing.verify.btn_try") || "Try Again"}
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="space-y-5">
+                                                                    <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border ${verificationResult.verified ? 'border-green-200 bg-green-50 text-green-500 dark:border-green-900/30 dark:bg-green-900/10' : 'border-yellow-200 bg-yellow-50 text-yellow-500 dark:border-yellow-900/30 dark:bg-yellow-900/10'}`}>
+                                                                        {verificationResult.verified ? <CheckCircle2 className="h-8 w-8" /> : <AlertTriangle className="h-8 w-8" />}
+                                                                    </div>
+
+                                                                    <div>
+                                                                        <h3 className="text-[16px] font-extrabold text-[#0d1f4e] dark:text-white">
+                                                                            {verificationResult.verified ? (t("landing.verify.valid_title") || "Valid Credential") : (t("landing.verify.issue_title") || "Invalid Credential")}
                                                                         </h3>
-                                                                        <p className="text-gray-600 dark:text-slate-200">{error}</p>
-                                                                        <button
-                                                                            onClick={() => { setVerificationResult(null); setError(null); }}
-                                                                            className="mt-4 px-6 py-2 bg-gray-100 dark:bg-white/10 rounded-none text-sm font-bold"
-                                                                        >
-                                                                            {t("landing.verify.btn_try")}
-                                                                        </button>
+                                                                        <p className="mt-1 text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                                                                            {verificationResult.message}
+                                                                        </p>
                                                                     </div>
-                                                                ) : (
-                                                                    <div className="w-full space-y-6">
-                                                                        <div className={`w-20 h-20 rounded-none flex items-center justify-center mx-auto shadow-lg ${verificationResult.verified ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
-                                                                            {verificationResult.verified ? <CheckCircle2 className="w-10 h-10" /> : <AlertTriangle className="w-10 h-10" />}
-                                                                        </div>
 
-                                                                        <div>
-                                                                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                                                                                {verificationResult.verified ? t("landing.verify.valid_title") : t("landing.verify.issue_title")}
-                                                                            </h3>
-                                                                            <p className="text-sm text-gray-500 dark:text-slate-300">
-                                                                                {verificationResult.message}
-                                                                            </p>
-                                                                        </div>
-
-                                                                        {verificationResult.verified && verificationResult.certificate && (
-                                                                            <div className="bg-gray-50 dark:bg-[#000F24] p-6 rounded-none border border-gray-100 dark:border-white/5 text-left space-y-4 shadow-inner">
+                                                                    {verificationResult.verified && verificationResult.certificate && (
+                                                                        <div className="rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-4 text-left shadow-inner dark:border-[#1a3884]/20 dark:bg-[#001a3d]">
+                                                                            <div className="mb-3">
+                                                                                <label className="mb-0.5 block text-[9px] font-black uppercase tracking-wider text-slate-400">
+                                                                                    {t("landing.verify.recipient") || "Issued To"}
+                                                                                </label>
+                                                                                <p className="text-[14px] font-extrabold text-[#1a3884] dark:text-blue-400">
+                                                                                    {verificationResult.certificate.fullName}
+                                                                                </p>
+                                                                            </div>
+                                                                            <div className="mb-3 h-px bg-[#d8e6f7] dark:bg-[#1a3884]/20" />
+                                                                            <div className="mb-3">
+                                                                                <label className="mb-0.5 block text-[9px] font-black uppercase tracking-wider text-slate-400">
+                                                                                    {t("landing.verify.credential") || "Credential Name"}
+                                                                                </label>
+                                                                                <p className="text-[13px] font-bold text-[#0d1f4e] dark:text-white">
+                                                                                    {verificationResult.certificate.certificateTitle}
+                                                                                </p>
+                                                                            </div>
+                                                                            <div className="grid grid-cols-2 gap-4">
                                                                                 <div>
-                                                                                    <label className="text-xs text-gray-400 uppercase tracking-wider font-bold">
-                                                                                        {t("landing.verify.recipient")}
+                                                                                    <label className="mb-0.5 block text-[9px] font-black uppercase tracking-wider text-slate-400">
+                                                                                        {t("landing.verify.issued") || "Issue Date"}
                                                                                     </label>
-                                                                                    <p className="text-lg font-bold text-[#1a3884] dark:text-[#C0C0C0]">{verificationResult.certificate.fullName}</p>
+                                                                                    <p className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
+                                                                                        {new Date(verificationResult.certificate.issueDate).toLocaleDateString()}
+                                                                                    </p>
                                                                                 </div>
-                                                                                <div className="h-px bg-gray-200 dark:bg-white/10" />
                                                                                 <div>
-                                                                                    <label className="text-xs text-gray-400 uppercase tracking-wider font-bold">
-                                                                                        {t("landing.verify.credential")}
+                                                                                    <label className="mb-0.5 block text-[9px] font-black uppercase tracking-wider text-slate-400">
+                                                                                        {t("landing.verify.band") || "Band"}
                                                                                     </label>
-                                                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{verificationResult.certificate.certificateTitle}</p>
-                                                                                </div>
-                                                                                <div className="grid grid-cols-2 gap-4">
-                                                                                    <div>
-                                                                                        <label className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">
-                                                                                            {t("landing.verify.issued")}
-                                                                                        </label>
-                                                                                        <p className="text-sm font-mono text-gray-700 dark:text-slate-200">{new Date(verificationResult.certificate.issueDate).toLocaleDateString()}</p>
-                                                                                    </div>
-                                                                                    <div>
-                                                                                        <label className="text-[10px] text-gray-400 uppercase tracking-wider font-bold">
-                                                                                            {t("landing.verify.band")}
-                                                                                        </label>
-                                                                                        <p className="text-sm font-mono text-gray-700 dark:text-slate-200">{verificationResult.certificate.readinessBand}</p>
-                                                                                    </div>
+                                                                                    <p className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
+                                                                                        {verificationResult.certificate.readinessBand}
+                                                                                    </p>
                                                                                 </div>
                                                                             </div>
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
                                     </div>
                                 </div>

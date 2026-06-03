@@ -80,6 +80,51 @@ const checkCourseCompletionBadges = async (userId, courseId, courseData = {}) =>
 };
 
 /**
+ * Award a specific course master badge (e.g., S01-MASTER)
+ * Dynamically creates the badge template if it doesn't exist.
+ */
+const awardCourseMasterBadge = async (userId, courseId, courseCode, courseTitle) => {
+    try {
+        if (!courseCode) return null;
+        const badgeId = `${courseCode.toUpperCase()}-MASTER`;
+        
+        let badge = await Badge.findOne({ badgeId });
+        
+        if (!badge) {
+            // Dynamically create the course badge template using global theme #1a3884
+            badge = new Badge({
+                badgeId,
+                title: `${courseTitle || courseCode} Master`,
+                description: `Awarded for successfully completing the ${courseTitle || courseCode} course.`,
+                category: 'learning',
+                tier: 'standard',
+                xp: 200,
+                icon: 'Award',
+                color: '#1a3884',
+                criteria: {
+                    type: 'course_completion',
+                    courseId
+                },
+                rarity: 'rare',
+                isActive: true
+            });
+            await badge.save();
+            console.log(`Created new dynamic course badge template: ${badgeId}`);
+        }
+        
+        return await awardBadge(userId, badgeId, {
+            courseId,
+            courseName: courseTitle,
+            courseCode,
+            completionDate: new Date()
+        });
+    } catch (error) {
+        console.error('Error awarding course master badge:', error);
+        return null;
+    }
+};
+
+/**
  * Check and award skill (module) completion badges
  * @param {String} userId - User ID
  * @param {String} moduleId - Module (Skill) ID
@@ -171,5 +216,6 @@ module.exports = {
     checkCourseCompletionBadges,
     getUserBadges,
     getUserBadgeStats,
-    checkSkillCompletionBadges
+    checkSkillCompletionBadges,
+    awardCourseMasterBadge
 };

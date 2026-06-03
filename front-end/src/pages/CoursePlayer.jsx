@@ -18,7 +18,12 @@ import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK
 import { getLearningFlowData } from "@/data/learningFlowData";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { courseEnrollmentAPI } from "@/services/api";
+import { coursesAPI, courseEnrollmentAPI } from "@/services/api";
+import { buildFlowFromCourse, TEMP_VIDEO_URL } from "@/utils/courseStages";
+import { mergeAdminQuizzesIntoFlow } from "@/utils/microAssessmentUtils";
+import { markCourseCompleted } from "@/utils/courseProgressStorage";
+import useActivityRestrictions from "@/hooks/useActivityRestrictions";
+import ActivityWarningModal from "@/components/ActivityWarningModal";
 
 // Sample video URLs - replace with actual video URLs from your backend
 const COURSE_VIDEOS = {
@@ -119,7 +124,7 @@ const CoursePlayer = () => {
   const [congratulationAcknowledged, setCongratulationAcknowledged] = useState(false);
   const [videoWatched, setVideoWatched] = useState(false);
   const { t } = useTranslation();
-  const { user: currentUser } = useUser();
+
   const [courseMeta, setCourseMeta] = useState({ courseCode: null, courseDbId: null });
   const [taskResultsByDay, setTaskResultsByDay] = useState({});
   const staticCourse = getCourseById(courseId);

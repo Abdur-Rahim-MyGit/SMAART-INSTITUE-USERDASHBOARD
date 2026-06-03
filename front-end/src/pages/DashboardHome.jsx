@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PageTransition from "@/components/PageTransition";
-import VisionBoardSplash from "@/components/VisionBoardSplash";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import HeroSection from "@/components/dashboard/HeroSection";
 import LearningProgress from "@/components/dashboard/LearningProgress";
+import CareerPathsWidget from "@/components/dashboard/CareerPathsWidget";
+
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
 import StudentOnboarding from "@/components/onboarding/StudentOnboarding";
 import CollegeBanners from "@/components/CollegeBanners";
-import VisionGoalsWidget from "@/components/dashboard/VisionGoalsWidget";
 import { RiAlertLine } from "@remixicon/react";
 import { useTranslation } from "react-i18next";
 
@@ -118,34 +118,41 @@ const DashboardHome = () => {
   return (
     <ErrorBoundary>
       <PageTransition>
-        {/* Vision Board Splash Overlay - Temporarily Hidden */}
-        {/* 
-      {showVisionSplash && (
-        <VisionBoardSplash onComplete={handleVisionSplashComplete} duration={3000} />
-      )} 
-      */}
-
         {/* Student Onboarding */}
         {!showVisionSplash && user && (
           <StudentOnboarding user={user} />
         )}
 
-        {/* Main Dashboard Layout with increased spacing */}
-        <div className="space-y-8 pb-10">
-          {/* Hero Section */}
-          <HeroSection
-            userName={user?.firstName || user?.fullName || "User"}
-          />
+        {/* Dashboard Layout */}
+        <div className="flex flex-col gap-6 pb-10">
 
-          {/* College Banners */}
-          <CollegeBanners />
+          {/* ── FULL WIDTH TOP: Hero & Banners ── */}
+          <div className="w-full space-y-6">
+            {/* Hero */}
+            <HeroSection
+              userName={user?.firstName || user?.fullName || "User"}
+              paths={paths}
+              pathsLoading={pathsLoading}
+            />
 
-          {/* Learning Progress Section */}
-          <LearningProgress
-            paths={paths}
-            loading={pathsLoading}
-            error={pathsError}
-          />
+            {/* College Banners */}
+            <CollegeBanners />
+          </div>
+
+          {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
+          <div className="flex flex-col xl:flex-row gap-6">
+            {/* ── LEFT: Career Pathways ── */}
+            <div className="flex-1 min-w-0">
+              <CareerPathsWidget paths={paths} loading={pathsLoading} />
+            </div>
+
+            {/* ── RIGHT: Calendar + Tasks ── */}
+            <div className="w-full xl:w-[320px] 2xl:w-[360px] shrink-0">
+              <div className="sticky top-24">
+                <LearningProgress />
+              </div>
+            </div>
+          </div>
 
         </div>
       </PageTransition>

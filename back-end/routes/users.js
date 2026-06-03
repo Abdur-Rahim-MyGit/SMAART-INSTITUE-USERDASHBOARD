@@ -968,8 +968,6 @@ router.get('/verify-badge/:badgeId', async (req, res) => {
     if (userBadge) {
       // New system (standalone UserBadge collection)
       const MasterBadge = require('../models/Badge');
-      const Student = require('../models/Student');
-      const User = require('../models/User');
 
       badge = {
         _id: userBadge._id,

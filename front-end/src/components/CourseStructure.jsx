@@ -495,7 +495,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
 };
 
 /* ─── Main Component ─── */
-const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null }) => {
+const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null, continueWatching }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedStageId, setSelectedStageId] = useState(null);

@@ -14,17 +14,19 @@ export const useLearningPaths = (userId) => {
         setError(null);
 
         // ── Priority 1: Career Directions from Career Agent Analysis ──────────
-        // Try to fetch the user's registered career directions from their analysis
+        // Try to fetch the user's registered career directions from their final pathway
         try {
           const token = sessionStorage.getItem('token');
-          const res = await fetch('/api/career-agent/my-analysis', {
+          const res = await fetch('/api/career-agent/final-pathway', {
             credentials: 'include',
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
           });
           if (res.ok) {
             const payload = await res.json();
-            if (payload.found && payload.analysis) {
-              const { analysis, input_data } = payload;
+            // Only reflect paths in dashboard if the user has explicitly locked them
+            if (payload.found && payload.is_locked && payload.output_data) {
+              const analysis = payload.output_data;
+              const input_data = payload.input_data;
               const preferences = input_data?.preferences || {};
 
               // Build direction name from analysis or from input_data preferences

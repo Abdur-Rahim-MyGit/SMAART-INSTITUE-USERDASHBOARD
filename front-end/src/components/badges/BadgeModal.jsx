@@ -1,11 +1,113 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Award, X, Linkedin, Facebook, Download, ExternalLink, CheckCircle2, Sparkles } from 'lucide-react';
+import { X, Linkedin, Facebook, Download, ExternalLink, CheckCircle2, Sparkles } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+
+/* ── Inline hex badge for modal (mirrors BadgeCard logic) ── */
+const MODULE_PALETTE = {
+    capacity:   { hex: '#1a3884', ribbon: '#0d2059', tick: '#7aa3f0' },
+    capability: { hex: '#1750b3', ribbon: '#0f3d8c', tick: '#6fa4f5' },
+    leadership: { hex: '#14337a', ribbon: '#0b2057', tick: '#6690e0' },
+    piq:        { hex: '#0e5a8c', ribbon: '#09415f', tick: '#5bbde0' },
+    aiq:        { hex: '#1b5fa6', ribbon: '#114080', tick: '#68aef2' },
+    sq:         { hex: '#1e3a5f', ribbon: '#112338', tick: '#5a8ec2' },
+    default:    { hex: '#1a3884', ribbon: '#0d2059', tick: '#7aa3f0' },
+};
+const resolveColors = (category = '') => {
+    const c = category.toLowerCase();
+    if (c.includes('capacity'))   return MODULE_PALETTE.capacity;
+    if (c.includes('capability')) return MODULE_PALETTE.capability;
+    if (c.includes('leadership')) return MODULE_PALETTE.leadership;
+    if (c.includes('piq'))        return MODULE_PALETTE.piq;
+    if (c.includes('aiq'))        return MODULE_PALETTE.aiq;
+    if (c.includes('sq'))         return MODULE_PALETTE.sq;
+    return MODULE_PALETTE.default;
+};
+const HEX_PATH = 'M50 5 L95 27.5 L95 87.5 L50 110 L5 87.5 L5 27.5 Z';
+const splitLines = (text = '', maxLen = 12) => {
+    const tokens = [];
+    text.split(/[ -]/).forEach(word => {
+        if (word.trim()) {
+            tokens.push(word.trim());
+        }
+    });
+    const lines = [];
+    let current = '';
+    for (const tok of tokens) {
+        const test = current ? `${current} ${tok}` : tok;
+        if (test.length <= maxLen) { current = test; }
+        else { if (current) lines.push(current.trim()); current = tok; }
+    }
+    if (current) lines.push(current.trim());
+    return lines.slice(0, 3);
+};
+const ModalHexBadge = ({ badge }) => {
+    const c = resolveColors(badge.category);
+    const uid = (badge.id || badge.badgeId || 'b').replace(/[^a-zA-Z0-9]/g, '');
+    const year = badge.earnedDate ? new Date(badge.earnedDate).getFullYear() : new Date().getFullYear();
+    const displayName = (badge.title || '').replace(/ Master$/i, '').trim();
+    const lines = splitLines(displayName, 12);
+
+    // Pick font sizes with perfect breathing room to avoid crowding the borders
+    const maxLineLen = Math.max(...lines.map(l => l.length), 1);
+    let fontSize = 8.2;
+    if (maxLineLen > 11) fontSize = 7.2;
+    else if (maxLineLen < 8) fontSize = 9.2;
+
+    const lineHeight = fontSize * 1.25;
+    const midY = 41.0; // Visually balanced center (between top point y=12 and ribbon peak y=61)
+    
+    // Standard baseline offset centering:
+    // startY is the baseline of the first line.
+    // startY = midY - ((n - 1) * lh - 0.7 * fs) / 2
+    const startY = midY - ((lines.length - 1) * lineHeight - 0.7 * fontSize) / 2;
+
+    return (
+        <svg viewBox="0 0 100 130" width={140} height={140} xmlns="http://www.w3.org/2000/svg" style={{ overflow: 'visible' }}>
+            <defs>
+                <linearGradient id={`mo-${uid}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={c.hex} />
+                    <stop offset="100%" stopColor={c.ribbon} />
+                </linearGradient>
+                <linearGradient id={`mi-${uid}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ffffff" />
+                    <stop offset="100%" stopColor="#eef3ff" />
+                </linearGradient>
+                <clipPath id={`mc-${uid}`}><rect x="0" y="70" width="100" height="30" /></clipPath>
+            </defs>
+            <path d={HEX_PATH} fill={`url(#mo-${uid})`} />
+            <path d="M50 12 L88 32 L88 83 L50 103 L12 83 L12 32 Z" fill={`url(#mi-${uid})`} />
+            <g clipPath={`url(#mc-${uid})`}>
+                <path d="M0 72 L100 72 L100 90 L0 90 Z" fill={c.hex} />
+                <polygon points="0,90 50,98 100,90 100,93 50,101 0,93" fill={c.ribbon} />
+                <polygon points="0,72 50,64 100,72 100,69 50,61 0,69" fill={c.hex} />
+            </g>
+            {/* Perfectly centred text block */}
+            {lines.map((line, i) => (
+                <text
+                    key={i}
+                    x="50"
+                    y={startY + i * lineHeight}
+                    textAnchor="middle"
+                    fontFamily="Inter,'Segoe UI',Arial,sans-serif"
+                    fontWeight="800"
+                    fontSize={fontSize}
+                    fill={c.hex}
+                    letterSpacing="0.2"
+                >
+                    {line}
+                </text>
+            ))}
+            <text x="50" y="82" textAnchor="middle" fontFamily="Inter,sans-serif" fontWeight="900" fontSize="7" fill="#fff" letterSpacing="2">CERTIFIED</text>
+            <text x="50" y="94" textAnchor="middle" fontFamily="Inter,sans-serif" fontWeight="700" fontSize="5.5" fill="rgba(255,255,255,0.85)" letterSpacing="0.5">{year}</text>
+            <text x="50" y="122" textAnchor="middle" fontFamily="Inter,sans-serif" fontWeight="800" fontSize="5" fill={c.hex} letterSpacing="1.5">SMAART INSTITUTE</text>
+        </svg>
+    );
+};
 
 // Clean category styling matching standard quotient card colors
 const tierStyles = {
@@ -41,9 +143,6 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
     const tier = badge.tier?.toLowerCase() || 'standard';
     const style = tierStyles[tier] || tierStyles.standard;
 
-    // Pick dynamic icons based on tier
-    const isGoldOrTrophy = tier === 'gold' || badge.title?.toLowerCase().includes('gold') || badge.title?.toLowerCase().includes('conqueror');
-    const BadgeIcon = isGoldOrTrophy ? Trophy : Award;
 
     const handleShare = async (platform) => {
         setIsSharing(true);
@@ -122,9 +221,9 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         {/* Certificate Content for PDF */}
                         <div id="badge-certificate-content" className="bg-white dark:bg-slate-900/30 relative overflow-hidden py-5 px-4 sm:px-6 border-b border-slate-50 dark:border-white/5">
                             <div className="flex flex-col items-center">
-                                {/* Clean Square-Rounded Icon Container - scaled down */}
-                                <div className={`w-12 h-12 rounded-xl ${style.bg} ${style.color} flex items-center justify-center mb-3 mt-1 shadow-sm`}>
-                                    <BadgeIcon className="w-6 h-6" />
+                                {/* Hexagonal badge */}
+                                <div className="mb-1 mt-1">
+                                    <ModalHexBadge badge={badge} />
                                 </div>
 
                                 {/* Achievement Badge Title - scaled down */}
