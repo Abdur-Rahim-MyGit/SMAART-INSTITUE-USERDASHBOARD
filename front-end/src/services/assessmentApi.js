@@ -2,6 +2,14 @@ import { apiCall } from './api';
 
 export const assessmentApi = {
     /**
+     * Get all assessments
+     * @returns {Promise} List of assessments
+     */
+    getAll: async () => {
+        return apiCall('/assessments');
+    },
+
+    /**
      * Get assessment by description
      * @param {string} description - Description to search for (e.g., "big 5")
      * @returns {Promise} Assessment data

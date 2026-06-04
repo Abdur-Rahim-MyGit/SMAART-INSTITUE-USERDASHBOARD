@@ -22,6 +22,48 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
 
+  const showImmediateFeedback = (shuffledQuestions?.length || 0) <= 1;
+
+  const handleNextDelayed = (answerIndex) => {
+    if (isSubmitting) return;
+    const newAnswers = [...userAnswers];
+    newAnswers[currentQuestionIndex] = answerIndex;
+    setUserAnswers(newAnswers);
+    setSelectedAnswer(null);
+    if (currentQuestionIndex < shuffledQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      finishQuizDelayed(newAnswers);
+    }
+  };
+
+  const finishQuizDelayed = async (answers) => {
+    const finalScore = computeQuizScore(shuffledQuestions, answers);
+    const totalPoints = shuffledQuestions.reduce((acc, q) => acc + (q.points || 1), 0);
+    setScore(finalScore);
+    setStep('result');
+    setIsSubmitting(true);
+    try {
+        await courseEnrollmentAPI.updateTaskResult({
+            studentId,
+            courseCode,
+            moduleId,
+            dayId,
+            stepId: assessmentData?.stepId || 2,
+            score: finalScore,
+            totalPoints,
+            responses: {
+                questionIndices: shuffledQuestions.map((q) => q._originalIndex),
+                userAnswers: answers,
+            },
+        });
+    } catch (error) {
+        console.error("Failed to save progress", error);
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     if (assessmentData?.questions?.length) {
       const allQuestions = normalizeQuizQuestions(assessmentData.questions);
@@ -230,7 +272,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      return (
                        <button
                          key={idx}
-                         onClick={() => !showExplanation && !isSubmitting && handleSubmitAnswer(idx)}
+                         onClick={() => !showExplanation && !isSubmitting && setSelectedAnswer(idx)}
                          disabled={showExplanation || isSubmitting}
                          className={btnClass}
                        >
@@ -257,8 +299,32 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
 
                 {/* Explanation & Next Button */}
                 <AnimatePresence>
-                  {showExplanation && (
-                    <motion.div
+                   {!showExplanation && (
+                     <div className="mt-6 flex justify-end">
+                       {showImmediateFeedback ? (
+                         <button
+                           onClick={() => handleSubmitAnswer(selectedAnswer)}
+                           disabled={selectedAnswer === null || isSubmitting}
+                           className="flex w-full sm:w-auto justify-center items-center gap-2 bg-[#1a3884] text-white px-6 py-2.5 rounded-lg hover:bg-[#112b6b] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
+                         >
+                           Submit Answer
+                           <ArrowRight size={16} />
+                         </button>
+                       ) : (
+                         <button
+                           onClick={() => handleNextDelayed(selectedAnswer)}
+                           disabled={selectedAnswer === null || isSubmitting}
+                           className="flex w-full sm:w-auto justify-center items-center gap-2 bg-[#1a3884] text-white px-6 py-2.5 rounded-lg hover:bg-[#112b6b] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
+                         >
+                           {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                           <ArrowRight size={16} />
+                         </button>
+                       )}
+                     </div>
+                   )}
+
+                   {showExplanation && (
+                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-900 dark:text-blue-300"

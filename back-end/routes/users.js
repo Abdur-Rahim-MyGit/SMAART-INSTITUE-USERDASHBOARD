@@ -716,13 +716,13 @@ router.get('/register-details/:email', async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
 
     // First try to find in User collection
-    let user = await User.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName');
+    let user = await User.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan');
     let userSource = 'User';
     let fallbackCollege = null;
 
     // Even if User is found, if college is missing, check Student collection
     if (!user || !user.college) {
-      const student = await Student.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName');
+      const student = await Student.findOne({ email: normalizedEmail }).populate('college', 'logo collegeName subscriptionPlan');
       if (student) {
         if (user) {
           fallbackCollege = student.college;

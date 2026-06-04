@@ -1013,7 +1013,6 @@ const ResumeBuilder = () => {
                             )}
                         </div>
                     </div>
-                    </div>
                 </div>
 
                     {/* Navigation Footer - Fixed at bottom of section */}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, Lightbulb } from 'lucide-react';
+import { CheckCircle2, XCircle, Lightbulb, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 
 const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
@@ -8,13 +8,14 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showExplanation, setShowExplanation] = useState({});
   const [allAnswered, setAllAnswered] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const showImmediateFeedback = (questions?.length || 0) <= 1;
 
   const currentQuestion = questions?.[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === (questions?.length - 1);
 
   const handleAnswerSelect = (questionIndex, answerIndex) => {
     setSelectedAnswers(prev => ({ ...prev, [questionIndex]: answerIndex }));
-    setShowExplanation(prev => ({ ...prev, [questionIndex]: true }));
   };
 
   const handleNext = () => {
@@ -67,6 +68,93 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
   const getAnsweredCount = () => Object.keys(selectedAnswers).length;
   const progress = (getAnsweredCount() / questions?.length) * 100;
 
+
+    if (showResults) {
+    const totalQuestions = questions.length;
+    const score = Object.keys(selectedAnswers).reduce((acc, qIndex) => {
+      const q = questions[qIndex];
+      const selIdx = selectedAnswers[qIndex];
+      const selOptionText = q.options?.[selIdx];
+      const isCorrect = 
+        selIdx === q.correctAnswer || 
+        String(selIdx) === String(q.correctAnswer) ||
+        (selOptionText !== undefined && String(selOptionText) === String(q.correctAnswer));
+      return acc + (isCorrect ? 1 : 0);
+    }, 0);
+
+    return (
+      <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto">
+        <div className="max-w-4xl mx-auto space-y-6 text-center py-8">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 mb-6">
+            <Trophy size={40} />
+          </div>
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">Practice Complete!</h3>
+          <p className="text-slate-500 dark:text-slate-400">Here is your performance summary</p>
+          
+          <div className="flex justify-center items-center gap-4 py-4 text-2xl font-bold">
+            <span className="text-slate-900 dark:text-white">{score}</span>
+            <span className="text-gray-400">/</span>
+            <span className="text-slate-600 dark:text-slate-400">{totalQuestions}</span>
+          </div>
+
+          <div className="text-left space-y-6 pt-6 border-t border-slate-200 dark:border-white/10">
+            <h4 className="text-lg font-bold text-slate-800 dark:text-slate-200">Review Responses</h4>
+            {questions.map((q, qIndex) => {
+              const selectedIdx = selectedAnswers[qIndex];
+              const correctIdx = q.correctAnswer;
+              
+              return (
+                <div key={qIndex} className="p-4 bg-slate-50/50 dark:bg-slate-800/30 rounded-xl border border-slate-200 dark:border-white/5 space-y-3">
+                  <p className="font-semibold text-slate-900 dark:text-white">{qIndex + 1}. {q.question || q.scenario}</p>
+                  <div className="space-y-2">
+                    {q.options.map((option, idx) => {
+                      const isUserChoice = selectedIdx === idx;
+                      const isCorrect = idx === correctIdx || String(idx) === String(correctIdx) || String(option) === String(correctIdx);
+                      
+                      let optionClass = "p-3 rounded-lg border text-sm flex items-center justify-between ";
+                      if (isCorrect) {
+                        optionClass += "border-green-500 bg-green-50/50 dark:bg-green-500/10 text-green-800 dark:text-green-400";
+                      } else if (isUserChoice) {
+                        optionClass += "border-red-500 bg-red-50/50 dark:bg-red-500/10 text-red-800 dark:text-red-400";
+                      } else {
+                        optionClass += "border-slate-100 dark:border-white/5 text-slate-600 dark:text-slate-400";
+                      }
+
+                      return (
+                        <div key={idx} className={optionClass}>
+                          <span>{String.fromCharCode(65 + idx)}. {option}</span>
+                          <div className="flex items-center gap-2 text-xs">
+                            {isUserChoice && <span className="font-bold uppercase px-1.5 py-0.5 rounded bg-slate-200/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-350">Your answer</span>}
+                            {isCorrect && <CheckCircle2 size={16} className="text-green-500" />}
+                            {isUserChoice && !isCorrect && <XCircle size={16} className="text-red-500" />}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {q.explanation && (
+                    <div className="text-xs text-blue-700 dark:text-blue-300 bg-blue-50/50 dark:bg-blue-900/15 p-3 rounded-lg">
+                      <strong>Explanation:</strong> {q.explanation}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => {
+              if (onComplete) onComplete(score, totalQuestions);
+              toast.success('Practice completed!');
+            }}
+            className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold shadow-lg shadow-[#1a3884]/30 transition-all mt-6"
+          >
+            Continue to Next Step
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isCompleted) {
     return (
@@ -148,7 +236,7 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
                     idx === currentQuestion.correctAnswer || 
                     String(idx) === String(currentQuestion.correctAnswer) ||
                     String(option) === String(currentQuestion.correctAnswer);
-                  const showResult = showExplanation[currentQuestionIndex];
+                  const showResult = showImmediateFeedback && showExplanation[currentQuestionIndex];
 
                   return (
                     <button
@@ -226,7 +314,7 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
 
             {/* Explanation */}
             <AnimatePresence>
-              {showExplanation[currentQuestionIndex] && currentQuestion.explanation && (
+              {showResult && currentQuestion.explanation && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
@@ -252,13 +340,22 @@ const MCQPractice = ({ content, questions, onComplete, isCompleted }) => {
               >
                 Previous
               </button>
-              <button
-                onClick={handleNext}
-                disabled={!showExplanation[currentQuestionIndex]}
-                className="px-6 py-2 bg-[#1a3884] hover:bg-[#002147] text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLastQuestion ? (allAnswered ? 'Completed' : 'Complete') : 'Next'}
-              </button>
+              {!showExplanation[currentQuestionIndex] ? (
+                <button
+                  onClick={() => setShowExplanation(prev => ({ ...prev, [currentQuestionIndex]: true }))}
+                  disabled={selectedAnswers[currentQuestionIndex] === undefined || selectedAnswers[currentQuestionIndex] === ''}
+                  className="px-6 py-2 bg-[#1a3884] hover:bg-[#002147] text-white rounded-lg text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Submit Answer
+                </button>
+              ) : (
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-2 bg-[#1a3884] hover:bg-[#002147] text-white rounded-lg text-sm font-medium transition-colors"
+                >
+                  {isLastQuestion ? (allAnswered ? 'Completed' : 'Complete') : 'Next'}
+                </button>
+              )}
             </div>
           </motion.div>
         )}

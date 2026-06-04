@@ -234,6 +234,35 @@ courseEnrollmentSchema.pre('save', async function (next) {
           this.completionDate = undefined;
         }
 
+        // Recalculate totalTimeSpent based on active learning logs
+        let calculatedMinutes = 0;
+        this.moduleProgress.forEach(mp => {
+          if (mp.videoProgress) {
+            mp.videoProgress.forEach(vp => {
+              calculatedMinutes += (vp.maxWatchedTime || 0) / 60;
+            });
+          }
+          if (mp.quizzesTaken) {
+            mp.quizzesTaken.forEach(q => {
+              calculatedMinutes += 15;
+            });
+          }
+          if (mp.reflectionsSubmitted) {
+            mp.reflectionsSubmitted.forEach(r => {
+              calculatedMinutes += 10;
+            });
+          }
+          if (mp.completedTasks) {
+            mp.completedTasks.forEach(ct => {
+              const hasVideo = mp.videoProgress && mp.videoProgress.some(vp => vp.dayId === ct.dayId && vp.isCompleted);
+              if (!hasVideo) {
+                calculatedMinutes += 15;
+              }
+            });
+          }
+        });
+        this.totalTimeSpent = Math.max(0, Math.round(calculatedMinutes));
+
         next();
       } else {
         // Log warning but don't fallback to flawed moduleProgress.length
@@ -241,6 +270,7 @@ courseEnrollmentSchema.pre('save', async function (next) {
       }
     } else {
       this.progress = 0;
+      this.totalTimeSpent = 0;
     }
 
     next();

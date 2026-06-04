@@ -13,11 +13,14 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
   const [completed, setCompleted] = useState(isCompleted || false);
 
   const hasQuestionsList = questions && questions.length > 0;
+  const showImmediateFeedback = (questions?.length || 0) + (mcq ? 1 : 0) <= 1;
 
   // Handle option select for MCQ reflection question type
   const handleMCQSelect = (qIdx, optionVal) => {
     setSelectedAnswers(prev => ({ ...prev, [qIdx]: optionVal }));
-    setShowExplanation(prev => ({ ...prev, [qIdx]: true }));
+    if (showImmediateFeedback) {
+      setShowExplanation(prev => ({ ...prev, [qIdx]: true }));
+    }
   };
 
   // Legacy MCQ selection (single MCQ prop)
@@ -26,7 +29,9 @@ const CaseStudy = ({ title, content, mcq, questions = [], onComplete, isComplete
 
   const handleLegacySelect = (idx) => {
     setLegacySelected(idx);
-    setLegacyShowExplanation(true);
+    if (showImmediateFeedback) {
+      setLegacyShowExplanation(true);
+    }
   };
 
   // Mock Upload function for File Upload type questions

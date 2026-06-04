@@ -40,6 +40,9 @@ const STAGE_MAP = {
   T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40 },
   T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36, durationMinutes: 45 },
   T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34, durationMinutes: 40 },
+  AIQ: { code: 'ASM00005', name: 'AIQ', title: 'AIQ Assessment', questionLimit: 36, durationMinutes: 45 },
+  SQ: { code: 'ASM00006', name: 'SQ', title: 'SQ Assessment', questionLimit: 36, durationMinutes: 45 },
+  PIQ: { code: 'ASM00007', name: 'PIQ', title: 'PIQ Assessment', questionLimit: 36, durationMinutes: 45 },
 };
 
 // Helper function to get band colors - MINIMAL MONOCHROME THEME

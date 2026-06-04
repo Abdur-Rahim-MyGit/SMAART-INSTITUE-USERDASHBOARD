@@ -180,7 +180,8 @@ router.get('/user/:userId/status', async (req, res) => {
             T1: { completed: false, completedAt: null },
             T2: { completed: false, completedAt: null },
             T3: { completed: false, completedAt: null },
-            T4: { completed: false, completedAt: null }
+            T4: { completed: false, completedAt: null },
+            AIQ: { completed: false, completedAt: null }
         };
 
         // Check T1 from BaseLineResult

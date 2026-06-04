@@ -164,10 +164,10 @@ const MyAssessments = () => {
         <div className="mr-4 flex flex-shrink-0 flex-col items-center">
           <div
             className={`flex h-12 w-12 items-center justify-center rounded-xl text-xs font-bold shadow-md sm:h-14 sm:w-14 sm:text-sm ${isCompleted
-                ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white shadow-lg shadow-blue-500/20"
-                : isCurrent
-                  ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white"
-                  : "border-2 border-slate-100 bg-[#F8FAFC] text-slate-400 dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-500"
+              ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white shadow-lg shadow-blue-500/20"
+              : isCurrent
+                ? "bg-gradient-to-br from-[#1a3884] to-[#3b6de3] text-white"
+                : "border-2 border-slate-100 bg-[#F8FAFC] text-slate-400 dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-500"
               }`}
           >
             {t("my_assessments.step")} {index + 1}
@@ -178,16 +178,16 @@ const MyAssessments = () => {
           <motion.div
             whileHover={!isLocked && !isTimerActive ? { scale: 1.02 } : {}}
             className={`relative overflow-hidden rounded-[24px] border shadow-[0_18px_40px_-30px_rgba(15,23,42,0.12)] transition-all duration-300 dark:shadow-none ${isCompleted || (isCurrent && !isTimerActive)
-                ? "border-blue-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#fbfdff_100%)] dark:border-blue-500/25 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,1)_0%,_rgba(30,41,59,1)_100%)]"
-                : "border-slate-200/80 bg-[linear-gradient(180deg,_#ffffff_0%,_#fbfdff_100%)] opacity-70 dark:border-slate-700/70 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,1)_0%,_rgba(30,41,59,1)_100%)]"
+              ? "border-blue-200 bg-[linear-gradient(180deg,_#ffffff_0%,_#fbfdff_100%)] dark:border-blue-500/25 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,1)_0%,_rgba(30,41,59,1)_100%)]"
+              : "border-slate-200/80 bg-[linear-gradient(180deg,_#ffffff_0%,_#fbfdff_100%)] opacity-70 dark:border-slate-700/70 dark:bg-[linear-gradient(180deg,_rgba(15,23,42,1)_0%,_rgba(30,41,59,1)_100%)]"
               }`}
           >
             <div className="relative z-10 p-5 sm:p-6">
               <div className="mb-4 flex items-start gap-4">
                 <div
                   className={`relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl shadow-sm sm:h-16 sm:w-16 ${isCompleted || (isCurrent && !isTimerActive)
-                      ? "bg-blue-50 text-[#1a3884] dark:bg-blue-500/10 dark:text-blue-400"
-                      : "bg-[#F8FAFC] text-slate-400 dark:bg-[#002A5C] dark:text-slate-500"
+                    ? "bg-blue-50 text-[#1a3884] dark:bg-blue-500/10 dark:text-blue-400"
+                    : "bg-[#F8FAFC] text-slate-400 dark:bg-[#002A5C] dark:text-slate-500"
                     }`}
                 >
                   {isCompleted ? (
