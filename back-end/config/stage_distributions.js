@@ -116,6 +116,33 @@ const STAGE_DISTRIBUTIONS = {
             }
             return totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
         }
+    },
+    AIQ: {
+        code: 'ASM00005',
+        name: 'AIQ',
+        totalQuestions: 36,
+        quotients: {
+            'CRQ': { easy: 1, medium: 3, hard: 2 }, // Total: 6
+            'SRQ': { easy: 1, medium: 3, hard: 1 }, // Total: 5
+            'LQ': { easy: 1, medium: 3, hard: 1 }, // Total: 5
+            'SIQ': { easy: 1, medium: 3, hard: 1 }, // Total: 5
+            'PEQ': { easy: 1, medium: 3, hard: 2 }, // Total: 6
+            'DAQ': { easy: 2, medium: 4, hard: 3 }  // Total: 9
+        },
+        // AIQ Assessment: Higher weight on DAQ (Digital & AI Literacy)
+        weightedFormula: (quotientScores) => {
+            const weights = { CRQ: 0.15, SRQ: 0.10, LQ: 0.15, SIQ: 0.10, PEQ: 0.15, DAQ: 0.35 };
+            let weightedSum = 0, totalWeight = 0;
+            for (const [key, data] of Object.entries(quotientScores)) {
+                if (data.possible > 0) {
+                    const pct = Math.round((data.earned / data.possible) * 100);
+                    const w = weights[key] || (1 / 6);
+                    weightedSum += pct * w;
+                    totalWeight += w;
+                }
+            }
+            return totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
+        }
     }
 };
 

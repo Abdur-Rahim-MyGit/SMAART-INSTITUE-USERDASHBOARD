@@ -1298,25 +1298,6 @@ const CoursePlayer = () => {
                         </div>
                       )}
 
-                      {activeStep &&
-                        activeStep !== lastStepKey &&
-                        learningFlowData?.steps[activeStep]?.contentType !== 'quiz' &&
-                        !learningFlowData?.steps[activeStep]?.assessmentData && (
-                          <div className="mt-8 flex justify-end">
-                            <button
-                              onClick={() => {
-                                const nextStep = (parseInt(activeStep) + 1).toString();
-                                handleStepComplete(activeStep);
-                                setActiveStep(nextStep);
-                                setVideoWatched(false);
-                              }}
-                              className="px-8 py-3.5 rounded-xl bg-[#1a3884] text-white font-bold text-sm transition-all duration-300 flex items-center gap-2 hover:bg-[#112b6b] shadow-md active:scale-95 group"
-                            >
-                              {t("course_player.continue")}
-                              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                          </div>
-                        )}
 
                       {activeStep === lastStepKey && congratulationAcknowledged && (
                         <button

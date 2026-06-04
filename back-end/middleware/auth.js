@@ -53,7 +53,7 @@ const protect = async (req, res, next) => {
       }
 
       // Attach user to request (excluding password)
-      req.user = await UserModel.findById(decoded.userId || decoded.id).populate('college', 'logo collegeName').select('-password');
+      req.user = await UserModel.findById(decoded.userId || decoded.id).populate('college', 'logo collegeName subscriptionPlan').select('-password');
 
       if (!req.user) {
         return res.status(401).json({

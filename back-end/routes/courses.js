@@ -1,5 +1,6 @@
 const express = require('express');
 const Course = require('../models/Course');
+const College = require('../models/College');
 const { protect } = require('../middleware/auth');
 const {
     COURSE_STAGE_TITLES,
@@ -72,6 +73,56 @@ router.get('/debug-flashcards-db', async (req, res) => {
 // Apply protection to all course routes
 router.use(protect);
 
+const getAllowedCategories = async (user) => {
+    let allowed = ['Capacity', 'Capability', 'Leadership'];
+    if (!user || user.role === 'admin' || user.role === 'moderator') {
+        return null; 
+    }
+    if (user.college) {
+        const collegeDoc = await College.findById(user.college);
+        if (collegeDoc && collegeDoc.subscriptionPlan) {
+            const { plan, addons } = collegeDoc.subscriptionPlan;
+            const hasAIQ = !!addons?.aiq;
+            if (hasAIQ) allowed.push('AIQ');
+
+            const hasSQ = plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq;
+            if (hasSQ) allowed.push('SQ');
+
+            const hasPIQ = plan === 'Smaart Complete' || !!addons?.piq;
+            if (hasPIQ) allowed.push('PIQ');
+
+            const hasBC = !!addons?.britishCouncil;
+            if (hasBC) allowed.push('British Council');
+        } else {
+            allowed.push('AIQ');
+        }
+    } else {
+        allowed.push('AIQ');
+    }
+    return allowed;
+};
+
+const checkCourseAccess = (course, allowedCategories) => {
+    if (!allowedCategories) return true;
+    const catLower = (course.category || '').toLowerCase();
+    const code = (course.courseCode || '').toUpperCase();
+    const num = (course.courseNumber || '').toUpperCase();
+    
+    if (catLower === 'piq' || code.startsWith('PIQ') || num.startsWith('PIQ')) {
+        return allowedCategories.includes('PIQ');
+    }
+    if (catLower === 'aiq' || code.startsWith('AIQ') || num.startsWith('AIQ')) {
+        return allowedCategories.includes('AIQ');
+    }
+    if (catLower === 'sq' || code.startsWith('SQ') || num.startsWith('SQ')) {
+        return allowedCategories.includes('SQ');
+    }
+    if (catLower === 'british council' || code.startsWith('BC') || num.startsWith('BC')) {
+        return allowedCategories.includes('British Council');
+    }
+    return true; 
+};
+
 // Get all courses with search and filter functionality
 // NOW INCLUDES FULL MODULES AND DAYS DATA
 router.get('/', async (req, res) => {
@@ -89,8 +140,19 @@ router.get('/', async (req, res) => {
             query.colleges = college;
         }
 
-        // Filter by category
-        if (category) {
+        const allowedCategories = await getAllowedCategories(req.user);
+        if (allowedCategories) {
+            if (category) {
+                const isAllowed = allowedCategories.some(c => c.toLowerCase() === category.toLowerCase());
+                if (!isAllowed) {
+                    query.category = '__none__';
+                } else {
+                    query.category = category;
+                }
+            } else {
+                query.category = { $in: allowedCategories };
+            }
+        } else if (category) {
             query.category = category;
         }
 
@@ -216,6 +278,15 @@ router.get('/:id/stages', async (req, res) => {
             });
         }
 
+        const allowedCategories = await getAllowedCategories(req.user);
+        if (!checkCourseAccess(course, allowedCategories)) {
+            return res.status(403).json({
+                success: false,
+                error: 'Access Denied',
+                message: 'Your institution subscription does not include access to this course.'
+            });
+        }
+
         const days = course.modules?.[0]?.days || [];
         const stages = days.map((day, index) => ({
             stageNumber: day.dayNumber || index + 1,
@@ -285,6 +356,15 @@ router.get('/catalog/:catalogId', async (req, res) => {
             });
         }
 
+        const allowedCategories = await getAllowedCategories(req.user);
+        if (!checkCourseAccess(course, allowedCategories)) {
+            return res.status(403).json({
+                success: false,
+                error: 'Access Denied',
+                message: 'Your institution subscription does not include access to this course.'
+            });
+        }
+
         res.json({
             success: true,
             data: enrichCourseForPlayer(course),
@@ -316,6 +396,15 @@ router.get('/code/:code', async (req, res) => {
             });
         }
 
+        const allowedCategories = await getAllowedCategories(req.user);
+        if (!checkCourseAccess(course, allowedCategories)) {
+            return res.status(403).json({
+                success: false,
+                error: 'Access Denied',
+                message: 'Your institution subscription does not include access to this course.'
+            });
+        }
+
         res.json({
             success: true,
             data: enrichCourseForPlayer(course),
@@ -340,6 +429,15 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({
                 success: false,
                 error: 'Course not found'
+            });
+        }
+
+        const allowedCategories = await getAllowedCategories(req.user);
+        if (!checkCourseAccess(course, allowedCategories)) {
+            return res.status(403).json({
+                success: false,
+                error: 'Access Denied',
+                message: 'Your institution subscription does not include access to this course.'
             });
         }
 

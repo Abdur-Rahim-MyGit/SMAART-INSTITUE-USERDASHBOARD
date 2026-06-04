@@ -23,7 +23,7 @@ import { assessmentApi } from "@/services/assessmentApi";
 import PageHero from "@/components/ui/PageHero";
 import { toast } from "sonner";
 
-const STAGES = [
+const DEFAULT_STAGES = [
     {
         key: "T1",
         code: "ASM00001",
@@ -64,10 +64,97 @@ const STAGES = [
         totalQuestions: 34,
         duration: "40 min",
     },
+    {
+        key: "AIQ",
+        code: "ASM00005",
+        title: "AIQ Assessment",
+        subtitle: "AI & Digital Literacy",
+        description:
+            "Evaluate your artificial intelligence quotient, digital literacy, and technology readiness.",
+        totalQuestions: 36,
+        duration: "45 min",
+    },
 ];
 
+const mapAssessmentToStage = (ass) => {
+    let key = "T1";
+    if (ass.assessmentCode === "ASM00002") key = "T2";
+    else if (ass.assessmentCode === "ASM00003") key = "T3";
+    else if (ass.assessmentCode === "ASM00004") key = "T4";
+    else if (ass.assessmentCode === "ASM00005" || ass.questionCategory === "AIQ") key = "AIQ";
+    else if (ass.assessmentCode === "ASM00001") key = "T1";
+    else {
+        key = ass.assessmentCode || ass._id;
+    }
+
+    let subtitle = "Assessment";
+    if (key === "T1") subtitle = "Foundation";
+    else if (key === "T2") subtitle = "Growth";
+    else if (key === "T3") subtitle = "Applied Skills";
+    else if (key === "T4") subtitle = "Mastery";
+    else if (key === "AIQ") subtitle = "AI & Digital Literacy";
+
+    const targetQuestionsMap = {
+        T1: 36,
+        T2: 34,
+        T3: 36,
+        T4: 34,
+        AIQ: 36,
+    };
+    const totalQuestions = targetQuestionsMap[key] || ass.totalQuestions || 36;
+
+    let durationStr = "45 min";
+    if (ass.duration) {
+        if (ass.duration >= 1440) {
+            const standardDurations = {
+                T1: "45 min",
+                T2: "40 min",
+                T3: "45 min",
+                T4: "40 min",
+                AIQ: "45 min",
+            };
+            durationStr = standardDurations[key] || "45 min";
+        } else {
+            durationStr = `${ass.duration} min`;
+        }
+    } else {
+        const standardDurations = {
+            T1: "45 min",
+            T2: "40 min",
+            T3: "45 min",
+            T4: "40 min",
+            AIQ: "45 min",
+        };
+        durationStr = standardDurations[key] || "45 min";
+    }
+
+    // Default descriptions fallback if description is empty
+    let description = ass.description || "";
+    if (!description) {
+        const standardDescriptions = {
+            T1: "Establish your foundational understanding and baseline competency across all six quotients.",
+            T2: "Measure your capacity for growth and development across cognitive and emotional domains.",
+            T3: "Evaluate your applied capability and professional readiness with advanced challenges.",
+            T4: "Demonstrate your leadership potential and mastery across all competency dimensions.",
+            AIQ: "Evaluate your artificial intelligence quotient, digital literacy, and technology readiness.",
+        };
+        description = standardDescriptions[key] || "Take this evaluation to measure your professional quotients.";
+    }
+
+    return {
+        _id: ass._id,
+        key: key,
+        code: ass.assessmentCode || "",
+        title: ass.assessmentName,
+        subtitle: subtitle,
+        description: description,
+        totalQuestions: totalQuestions,
+        duration: durationStr,
+    };
+};
+
 const METRICS = [
-    { label: "Guided Stages", value: "4", icon: Layers },
+    { label: "Guided Stages", value: "5", icon: Layers },
     { label: "Quotients", value: "6", icon: Brain },
     { label: "Reports", value: "Instant", icon: Award },
 ];
@@ -83,12 +170,13 @@ const AssessmentsDashboard = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [stageStatus, setStageStatus] = useState({});
+    const [stages, setStages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedStage, setSelectedStage] = useState(null);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     useEffect(() => {
-        const fetchStatus = async () => {
+        const fetchData = async () => {
             try {
                 const userData = sessionStorage.getItem("user");
                 if (!userData) {
@@ -103,26 +191,40 @@ const AssessmentsDashboard = () => {
                     return;
                 }
 
-                const res = await assessmentApi.getStageStatus(userId);
-                if (res.success && res.data) {
-                    setStageStatus(res.data);
+                const [statusRes, assessmentsRes] = await Promise.all([
+                    assessmentApi.getStageStatus(userId).catch(() => null),
+                    assessmentApi.getAll().catch(() => null)
+                ]);
+
+                if (statusRes && statusRes.success && statusRes.data) {
+                    setStageStatus(statusRes.data);
                 }
-            } catch {
-                // Keep dashboard usable if the status lookup fails.
+
+                if (assessmentsRes && assessmentsRes.success && assessmentsRes.data) {
+                    const mappedStages = assessmentsRes.data.map(mapAssessmentToStage);
+                    const order = { T1: 1, T2: 2, T3: 3, T4: 4, AIQ: 5 };
+                    mappedStages.sort((a, b) => (order[a.key] || 99) - (order[b.key] || 99));
+                    setStages(mappedStages);
+                } else {
+                    setStages(DEFAULT_STAGES);
+                }
+            } catch (err) {
+                console.error("Error loading dashboard data:", err);
+                setStages(DEFAULT_STAGES);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchStatus();
+        fetchData();
     }, []);
 
     const isCompleted = (key) => stageStatus[key]?.completed === true;
-    const completedCount = STAGES.filter((stage) => isCompleted(stage.key)).length;
-    const pct = Math.round((completedCount / STAGES.length) * 100);
+    const completedCount = stages.filter((stage) => isCompleted(stage.key)).length;
+    const pct = Math.round((completedCount / (stages.length || 1)) * 100);
 
     const handleResetAll = async () => {
-        if (!window.confirm(t("assessments_dashboard.reset_confirm", "Are you sure you want to reset all 4 assessments? This will permanently delete your scores and progress, and you will have to restart T1 Baseline."))) {
+        if (!window.confirm(t("assessments_dashboard.reset_confirm", `Are you sure you want to reset all ${stages.length} assessments? This will permanently delete your scores and progress, and you will have to restart T1 Baseline.`))) {
             return;
         }
 
@@ -143,7 +245,7 @@ const AssessmentsDashboard = () => {
             const res = await assessmentApi.resetAllStages(userId);
             if (res.success) {
                 setStageStatus({});
-                toast.success(t("assessments_dashboard.success_reset", "Successfully reset all 4 assessments!"));
+                toast.success(t("assessments_dashboard.success_reset", `Successfully reset all ${stages.length} assessments!`));
             } else {
                 toast.error(res.error || t("assessments_dashboard.error_reset", "Failed to reset assessments"));
             }
@@ -224,7 +326,7 @@ const AssessmentsDashboard = () => {
                             <SkeletonGrid />
                         ) : (
                             <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
-                                {STAGES.map((stage, index) => (
+                                {stages.map((stage, index) => (
                                     <StageCard
                                         key={stage.key}
                                         stage={stage}
@@ -377,11 +479,10 @@ const AssessmentsDashboard = () => {
                                         setSelectedStage(null);
                                         navigate(`/assessment/${stageKey}`);
                                     }}
-                                    className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md transition-all duration-300 ${
-                                        agreedToTerms
+                                    className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md transition-all duration-300 ${agreedToTerms
                                             ? "bg-[#1a3884] hover:bg-[#002147] hover:shadow-lg cursor-pointer hover:-translate-y-0.5"
                                             : "bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed shadow-none"
-                                    }`}
+                                        }`}
                                 >
                                     <Play className="h-4 w-4 fill-white" />
                                     {t("assessments_dashboard.start_stage", "Start Stage Assessment")}

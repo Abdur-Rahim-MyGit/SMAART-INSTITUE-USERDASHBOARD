@@ -501,7 +501,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
 };
 
 /* ─── Main Component ─── */
-const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null, continueWatching = null }) => {
+const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCodes = null, continueWatching = null, user }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedStageId, setSelectedStageId] = useState(null);
@@ -594,10 +594,21 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
         unlockAfter: 'S21',
         icon: '🌱',
       },
+      {
+        id: 'British Council',
+        name: t("my_courses_page.british_council_title", 'British Council English'),
+        shortName: 'BC',
+        description: t("my_courses_page.british_council_desc", 'Develop English communication skills with British Council certified courses'),
+        color: '#EC4899',
+        courses: [],
+        totalCourses: 0,
+        unlockAfter: 'S01',
+        icon: '🇬🇧',
+      },
     ];
 
     if (!dbCourses || dbCourses.length === 0) {
-      return { activeStages: STAGES, activeTracks: TRACKS };
+      return { activeStages: STAGES, activeTracks: templateTracks };
     }
 
     dbCourses.forEach((dbCourse) => {
@@ -623,12 +634,18 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                    courseCode.startsWith('SQ') || 
                    courseNumber.startsWith('SQ');
 
+      const isBC = category.toLowerCase() === 'british council' || 
+                   courseCode.startsWith('BC') || 
+                   courseNumber.startsWith('BC');
+
       if (isPIQ) {
         templateTracks[0].courses.push(mapped);
       } else if (isAIQ) {
         templateTracks[1].courses.push(mapped);
       } else if (isSQ) {
         templateTracks[2].courses.push(mapped);
+      } else if (isBC) {
+        templateTracks[3].courses.push(mapped);
       } else {
         const codeNumStr = (courseNumber || courseCode).replace(/\D/g, '');
         const codeNum = parseInt(codeNumStr, 10);
@@ -666,6 +683,12 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
             titleLower.includes('responsibility')
           ) {
             templateTracks[2].courses.push(mapped); // SQ
+          } else if (
+            titleLower.includes('british') ||
+            titleLower.includes('council') ||
+            titleLower.includes('english')
+          ) {
+            templateTracks[3].courses.push(mapped); // British Council
           } else {
             templateStages[0].courses.push(mapped); // Fallback to Stage 1 Capacity
           }
@@ -689,8 +712,29 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
       t.totalCourses = t.courses.length;
     });
 
-    return { activeStages: templateStages, activeTracks: templateTracks };
-  }, [dbCourses, t]);
+    // Check active subscription plans and addons
+    const plan = user?.college?.subscriptionPlan?.plan || 'Smaart Core';
+    const addons = user?.college?.subscriptionPlan?.addons || {};
+
+    const isStudent = user?.role === 'student' || (!user?.role && user?.college);
+    
+    // Determine visibility flags
+    const hasPIQ = isStudent && user?.college?.subscriptionPlan ? (plan === 'Smaart Complete' || !!addons?.piq) : true;
+    const hasAIQ = isStudent && user?.college?.subscriptionPlan ? !!addons?.aiq : true;
+    const hasSQ = isStudent && user?.college?.subscriptionPlan ? (plan === 'Smaart Standard' || plan === 'Smaart Complete' || !!addons?.sq) : true;
+    const hasBC = isStudent && user?.college?.subscriptionPlan ? !!addons?.britishCouncil : true;
+
+    const filteredTracks = [];
+    if (hasPIQ) filteredTracks.push(templateTracks[0]);
+    if (hasAIQ) filteredTracks.push(templateTracks[1]);
+    if (hasSQ) filteredTracks.push(templateTracks[2]);
+    if (hasBC) filteredTracks.push(templateTracks[3]);
+
+    return {
+      activeStages: templateStages.filter(s => s.courses.length > 0),
+      activeTracks: filteredTracks.filter(t => t.courses.length > 0)
+    };
+  }, [dbCourses, t, user]);
 
   const isStageUnlocked = (stage) => checkStageUnlocked(stage, userProgress);
 

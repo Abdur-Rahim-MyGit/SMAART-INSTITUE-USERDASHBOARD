@@ -72,7 +72,7 @@ exports.getStudentAnalytics = async (req, res) => {
 
     // Fetch student's course enrollments
     const enrollments = await CourseEnrollment.find({ student: studentId })
-      .populate('course', 'title code description')
+      .populate('course', 'title code description learningFlow modules courseCode courseNumber')
       .populate('college', 'collegeName');
 
     // Calculate metrics
@@ -102,6 +102,19 @@ exports.getStudentAnalytics = async (req, res) => {
 
     const timeline = getStudentTimeline(enrollments);
 
+    // Fetch user's vision boards to see when they were updated/created
+    const VisionBoard = require('../models/VisionBoard');
+    const visionBoards = await VisionBoard.find({ userId: studentId }).lean();
+
+    // Fetch user's career pathway/analyses
+    const { FinalCareerPathwayModel, CareerAnalysisModel } = require('../models/careerAgentModels');
+    const finalPathway = await FinalCareerPathwayModel.findOne({ userId: studentId }).lean();
+    const careerAnalyses = await CareerAnalysisModel.find({ userId: studentId }).lean();
+
+    // Fetch granular user progress steps
+    const UserProgress = require('../models/UserProgress');
+    const userProgress = await UserProgress.find({ user: studentId }).lean();
+
     res.json({
       success: true,
       metrics: {
@@ -114,7 +127,11 @@ exports.getStudentAnalytics = async (req, res) => {
         dailyUsage
       },
       courses: enrollments,
-      timeline
+      timeline,
+      visionBoards,
+      finalPathway,
+      careerAnalyses,
+      userProgress
     });
   } catch (err) {
     console.error('Error in getStudentAnalytics:', err);
