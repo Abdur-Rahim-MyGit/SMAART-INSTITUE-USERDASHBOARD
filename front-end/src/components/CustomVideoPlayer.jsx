@@ -669,106 +669,109 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md p-6 text-center overflow-hidden"
+            className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Confetti Explosion */}
+            {/* Confetti — lighter count so it doesn't obscure the card */}
             <div className="absolute inset-0 pointer-events-none">
               <Confetti
                 width={containerDimensions.width}
                 height={containerDimensions.height}
                 recycle={false}
-                numberOfPieces={400}
-                gravity={0.15}
+                numberOfPieces={180}
+                gravity={0.18}
                 colors={['#1a3884', '#002147', '#FFD700', '#FFFFFF', '#4ADE80']}
               />
             </div>
 
+            {/* Compact card */}
             <motion.div
-              initial={{ scale: 0.8, opacity: 0, y: 30 }}
+              initial={{ scale: 0.85, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0, y: 30 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
-              className="relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 max-w-sm w-full shadow-2xl border border-white/20"
+              exit={{ scale: 0.85, opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 260, damping: 22, delay: 0.15 }}
+              className="relative bg-white/12 backdrop-blur-xl rounded-2xl px-6 py-5 w-[240px] shadow-2xl border border-white/20 text-center"
             >
-              {/* Glowing Background Effect behind the card */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#1a3884]/20 to-[#002147]/20 rounded-2xl blur-xl -z-10" />
+              {/* Subtle glow behind card */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#1a3884]/20 to-green-500/10 -z-10 blur-lg" />
 
-              {/* Animated Icon */}
-              <div className="w-24 h-24 mx-auto mb-6 relative">
-                 <motion.div 
-                    initial={{ scale: 0, rotate: -45 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: "spring", stiffness: 200, delay: 0.4 }}
-                    className="w-full h-full bg-gradient-to-tr from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30"
-                 >
-                    <motion.svg 
-                      viewBox="0 0 24 24" 
-                      className="w-14 h-14 text-white stroke-current"
-                      fill="none" 
-                      strokeWidth="3"
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                    >
-                      <motion.path 
-                        d="M20 6L9 17l-5-5"
-                        initial={{ pathLength: 0, opacity: 0 }}
-                        animate={{ pathLength: 1, opacity: 1 }}
-                        transition={{ duration: 0.6, ease: "easeOut", delay: 0.6 }}
-                      />
-                    </motion.svg>
-                 </motion.div>
-                 
-                 {/* Sparkles around icon */}
-                 {[0, 1, 2].map((i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1, 0], opacity: [0, 1, 0], rotate: [0, 90] }}
-                      transition={{ duration: 2, repeat: Infinity, delay: 0.8 + (i * 0.4) }}
-                      className="absolute top-0 right-0"
-                      style={{ 
-                        left: `${50 + 40 * Math.cos(i * 2.1)}%`, 
-                        top: `${50 + 40 * Math.sin(i * 2.1)}%` 
-                      }}
-                    >
-                      <Sparkles className="w-6 h-6 text-yellow-400 fill-yellow-400" />
-                    </motion.div>
-                 ))}
-              </div>
-
-              {/* Text Content */}
+              {/* Icon */}
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
+                initial={{ scale: 0, rotate: -30 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 280, delay: 0.3 }}
+                className="w-13 h-13 mx-auto mb-3 relative"
               >
-                <h3 className="text-3xl font-bold text-white mb-2 drop-shadow-md">
-                  Awesome Job!
+                <div className="w-12 h-12 mx-auto bg-gradient-to-tr from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg shadow-green-500/30">
+                  <motion.svg
+                    viewBox="0 0 24 24"
+                    className="w-7 h-7 text-white stroke-current"
+                    fill="none"
+                    strokeWidth="2.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <motion.path
+                      d="M20 6L9 17l-5-5"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.5, ease: "easeOut", delay: 0.45 }}
+                    />
+                  </motion.svg>
+                </div>
+
+                {/* Two tiny sparkles */}
+                {[0, 1].map((i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
+                    transition={{ duration: 1.8, repeat: Infinity, delay: 0.7 + i * 0.5 }}
+                    className="absolute"
+                    style={{
+                      left: `${50 + 48 * Math.cos(i * 2.5)}%`,
+                      top: `${50 + 48 * Math.sin(i * 2.5)}%`,
+                    }}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Text */}
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.55 }}
+              >
+                <h3 className="text-lg font-extrabold text-white leading-tight tracking-tight">
+                  Awesome Job! 🎉
                 </h3>
-                <p className="text-gray-200 mb-8 font-medium text-lg">
-                  Lesson Completed Successfully
+                <p className="text-white/70 text-[11px] font-medium mt-0.5 mb-4">
+                  Lesson completed successfully
                 </p>
               </motion.div>
-              
-              {/* Buttons */}
-              <motion.div 
-                className="flex gap-3 justify-center"
-                initial={{ opacity: 0, y: 10 }}
+
+              {/* Action buttons — compact row */}
+              <motion.div
+                className="flex gap-2 justify-center"
+                initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
+                transition={{ delay: 0.7 }}
               >
                 <button
                   onClick={() => {
                     setShowSuccess(false);
                     if (videoRef.current) {
-                        videoRef.current.currentTime = 0;
-                        videoRef.current.play();
+                      videoRef.current.currentTime = 0;
+                      videoRef.current.play();
                     }
                   }}
-                  className="px-6 py-3 rounded-xl border border-white/30 text-white font-semibold hover:bg-white/10 flex items-center gap-2 transition-all active:scale-95"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/25
+                             text-white/80 text-[11px] font-semibold hover:bg-white/10
+                             transition-all active:scale-95"
                 >
-                  <RotateCcw className="w-4 h-4" />
+                  <RotateCcw className="w-3 h-3" />
                   Replay
                 </button>
                 <button
@@ -776,10 +779,14 @@ const CustomVideoPlayer = forwardRef(({ videoUrl, title, duration, poster, initi
                     setShowSuccess(false);
                     if (onNext) onNext();
                   }}
-                  className="px-8 py-3 rounded-xl bg-gradient-to-r from-[#1a3884] to-[#287a84] text-white font-bold hover:shadow-lg hover:shadow-[#1a3884]/40 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 active:scale-95 active:translate-y-0"
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl
+                             bg-gradient-to-r from-[#1a3884] to-[#1e5fa8]
+                             text-white text-[11px] font-bold
+                             hover:shadow-md hover:shadow-[#1a3884]/40
+                             transition-all hover:-translate-y-0.5 active:scale-95"
                 >
-                  {onNext ? nextLabel : 'Continue to Content'}
-                  <Play className="w-4 h-4 fill-current" />
+                  {onNext ? nextLabel : 'Continue'}
+                  <Play className="w-3 h-3 fill-current" />
                 </button>
               </motion.div>
             </motion.div>

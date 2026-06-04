@@ -133,6 +133,68 @@ export const canAccessCourse = (courseId, userProgress) => {
 };
 
 export const resolveStaticCourseTitle = (courseId) => {
+  if (!courseId) return null;
+  const cleanId = String(courseId).trim().toUpperCase();
+
+  const directMap = {
+    "S01": "Self-Awareness Foundations",
+    "CRS00001": "Self-Awareness Foundations",
+    "S02": "Emotional Intelligence Basics",
+    "CRS00002": "Emotional Intelligence Basics",
+    "S03": "Time Management Mastery",
+    "CRS00003": "Time Management Mastery",
+    "S04": "Critical Thinking Fundamentals",
+    "CRS00004": "Critical Thinking Fundamentals",
+    "S05": "Problem Solving Frameworks",
+    "CRS00005": "Problem Solving Frameworks",
+    "S06": "Learning How to Learn",
+    "CRS00006": "Learning How to Learn",
+    "S07": "Stress Management",
+    "CRS00007": "Stress Management",
+    "S08": "Goal Setting & Planning",
+    "CRS00008": "Goal Setting & Planning",
+    "S09": "Communication Basics",
+    "CRS00009": "Communication Basics",
+    "S10": "Digital Literacy",
+    "CRS00010": "Digital Literacy",
+
+    "S11": "Team Collaboration",
+    "CRS00011": "Team Collaboration",
+    "S12": "Advanced Communication",
+    "CRS00012": "Advanced Communication",
+    "S13": "Conflict Resolution",
+    "CRS00013": "Conflict Resolution",
+    "S14": "Project Management Basics",
+    "CRS00014": "Project Management Basics",
+    "S15": "AI Fundamentals",
+    "CRS00015": "AI Fundamentals",
+    "S16": "Data Literacy",
+    "CRS00016": "Data Literacy",
+    "S17": "Creative Thinking",
+    "CRS00017": "Creative Thinking",
+    "S18": "Decision Making Under Uncertainty",
+    "CRS00018": "Decision Making Under Uncertainty",
+    "S19": "Networking & Relationship Building",
+    "CRS00019": "Networking & Relationship Building",
+
+    "S20": "Leadership Fundamentals",
+    "CRS00020": "Leadership Fundamentals",
+    "S21": "Strategic Thinking",
+    "CRS00021": "Strategic Thinking",
+    "S22": "Change Management",
+    "CRS00022": "Change Management",
+    "S23": "Ethical Leadership",
+    "CRS00023": "Ethical Leadership",
+    "S24": "Mentoring & Coaching",
+    "CRS00024": "Mentoring & Coaching",
+    "S25": "Executive Presence",
+    "CRS00025": "Executive Presence",
+  };
+
+  if (directMap[cleanId]) {
+    return directMap[cleanId];
+  }
+
   for (const stage of STAGES) {
     const match = stage.courses.find((c) => compareCourseIds(c.id, courseId));
     if (match) return match.title;

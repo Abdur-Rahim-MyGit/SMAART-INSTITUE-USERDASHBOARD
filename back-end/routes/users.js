@@ -954,11 +954,34 @@ router.get('/verify-badge/:badgeId', async (req, res) => {
   try {
     const { badgeId } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(badgeId)) {
-      return res.status(400).json({ error: 'Invalid Badge ID format' });
-    }
-
     const UserBadge = require('../models/UserBadge');
+    const MasterBadge = require('../models/Badge');
+
+    if (!mongoose.Types.ObjectId.isValid(badgeId)) {
+      // Fallback: Verify generic badge template if it's a string like 'BADGE-CRQ-2026-001'
+      const genericBadge = await MasterBadge.findOne({ badgeId: badgeId.toUpperCase() });
+      
+      if (genericBadge) {
+          return res.json({
+            success: true,
+            badge: {
+              id: genericBadge.badgeId,
+              badgeId: genericBadge.badgeId,
+              title: genericBadge.title,
+              description: genericBadge.description,
+              tier: genericBadge.tier,
+              xp: genericBadge.xp,
+              earnedDate: new Date(), // Generic current date since it's not a specific assignment
+              category: genericBadge.category
+            },
+            owner: {
+              fullName: 'Verified SMAART Learner'
+            },
+            issuedBy: 'SMAART Institute'
+          });
+      }
+      return res.status(400).json({ error: 'Invalid Badge ID format or Badge not found' });
+    }
     // Fetch userBadge without populating userId initially to preserve the ID if it's a Student
     let userBadge = await UserBadge.findById(badgeId).populate('badgeId');
 

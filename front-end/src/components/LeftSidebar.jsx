@@ -316,7 +316,7 @@ const LeftSidebar = () => {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed left-0 top-0 h-screen w-[280px] z-[100] lg:hidden bg-white dark:bg-[#002147] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-2xl flex flex-col"
+            className="fixed left-0 top-0 h-screen w-[280px] z-[100] lg:hidden bg-white dark:bg-[#00152E] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-2xl flex flex-col"
           >
             {/* Mobile Header */}
             <div className="p-6 flex items-center justify-between border-b border-slate-100 dark:border-[#1a3884]/15">
@@ -334,7 +334,7 @@ const LeftSidebar = () => {
               </div>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#002A5C] transition-colors"
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
               >
                 <X weight="bold" className="w-5 h-5 text-slate-500 dark:text-slate-400" />
               </button>
@@ -379,7 +379,7 @@ const LeftSidebar = () => {
                                 toggleTheme();
                                 setIsMobileOpen(false);
                               }}
-                              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]"
+                              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-white/5"
                             >
                               {content}
                             </button>
@@ -387,7 +387,7 @@ const LeftSidebar = () => {
                             <div className="w-full">
                               <button
                                 onClick={() => setShowLanguages(!showLanguages)}
-                                className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 w-full text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5"
                               >
                                 <div className="flex items-center gap-3">
                                   <Icon className="w-5 h-5 text-[#1a3884]" />
@@ -425,7 +425,7 @@ const LeftSidebar = () => {
                                         }}
                                         className={`w-full flex items-center justify-between px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${i18n.language === lang.code
                                             ? 'bg-[#1a3884] text-white shadow-sm'
-                                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'
                                           }`}
                                       >
                                         <span>{lang.name}</span>
@@ -441,7 +441,7 @@ const LeftSidebar = () => {
                               onClick={() => setIsMobileOpen(false)}
                               className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${active
                                 ? 'bg-[#1a3884] text-white shadow-lg shadow-[#1a3884]/25'
-                                : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
+                                : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-white/5'
                                 }`}
                             >
                               {content}
@@ -477,7 +477,7 @@ const LeftSidebar = () => {
         initial={false}
         animate={{ width: isCollapsed ? 70 : 260 }}
         transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-        className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-[#002147] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-xl`}
+        className={`fixed left-0 top-0 h-screen z-[80] hidden lg:flex flex-col bg-white dark:bg-[#00152E] border-r border-slate-200 dark:border-[#1a3884]/15 shadow-xl`}
         onMouseEnter={() => isCollapsed && toggleSidebar()}
       >
         <div className={`flex flex-col items-start py-6 border-b border-slate-100 dark:border-[#1a3884]/15 ${isCollapsed ? 'px-3 items-center' : 'px-5'}`}>
@@ -532,12 +532,12 @@ const LeftSidebar = () => {
                       {/* Icon */}
                       <div className={`relative ${isCollapsed ? '' : ''}`}>
                         <Icon
-                          className={`w-5 h-5 transition-colors ${active ? 'text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-[#1a3884]'
+                          className={`w-5 h-5 transition-colors ${active ? 'text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-[#1a3884] dark:group-hover:text-white'
                             }`}
                         />
                         {/* Tooltip for collapsed state */}
                         {isCollapsed && (
-                          <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-[#002A5C] text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
+                          <div className="absolute left-full ml-2 px-2 py-1 bg-slate-900 dark:bg-white/5 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
                             {label}
                           </div>
                         )}
@@ -579,7 +579,7 @@ const LeftSidebar = () => {
                     <button
                       key={item.label}
                       onClick={toggleTheme}
-                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C] ${isCollapsed ? 'justify-center' : ''}`}
+                      className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#1a3884]/30 dark:hover:text-white ${isCollapsed ? 'justify-center' : ''}`}
                     >
                       {content}
                     </button>
@@ -589,7 +589,7 @@ const LeftSidebar = () => {
                       to={item.path}
                       className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 relative ${active
                         ? 'bg-[#1a3884] text-white shadow-md shadow-[#1a3884]/25'
-                        : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#002A5C]'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-[#F8FAFC] dark:hover:bg-[#1a3884]/30 dark:hover:text-white'
                         } ${isCollapsed ? 'justify-center' : ''}`}
                     >
                       {content}
@@ -609,7 +609,7 @@ const LeftSidebar = () => {
         {/* User Profile Section with Hover Card */}
         <div className="p-3 border-t border-slate-100 dark:border-[#1a3884]/15 relative z-50">
           <div
-            className={`flex items-center gap-3 p-2 rounded-xl bg-[#F8FAFC] dark:bg-[#002A5C] cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-[#003580] ${isCollapsed ? 'justify-center' : ''}`}
+            className={`flex items-center gap-3 p-2 rounded-xl bg-[#F8FAFC] dark:bg-white/5 cursor-pointer transition-all hover:bg-slate-100 dark:hover:bg-white/10 ${isCollapsed ? 'justify-center' : ''}`}
             onClick={() => navigate('/dashboard/profile')}
           >
             {/* Avatar - Fixed to College Logo */}
@@ -618,7 +618,7 @@ const LeftSidebar = () => {
                 <img
                   src={user.college.logo.startsWith('http') ? user.college.logo : `${API_BASE_URL.replace('/api', '')}/${user.college.logo}`}
                   alt={user.college.collegeName || "College Logo"}
-                  className="w-10 h-10 rounded-lg object-contain bg-white dark:bg-[#002A5C] border-2 border-slate-100 dark:border-[#1a3884]/30 p-1"
+                  className="w-10 h-10 rounded-lg object-contain bg-white dark:bg-white/5 border-2 border-slate-100 dark:border-[#1a3884]/30 p-1"
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-[#1a3884] flex items-center justify-center border-2 border-slate-100 dark:border-[#1a3884]/30">

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaShieldAlt, FaStar, FaCheckCircle, FaTimesCircle, FaLinkedin, FaFacebook, FaTwitter, FaDownload, FaTrophy, FaMedal, FaCrown } from 'react-icons/fa';
+import { FaShieldAlt, FaStar, FaCheckCircle, FaTimesCircle, FaLinkedin, FaFacebook, FaTwitter, FaDownload, FaTrophy, FaMedal, FaCrown, FaAward } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -11,6 +11,7 @@ import useUser from '@/hooks/useUser';
 import DashboardSidebar from '@/components/DashboardSidebar';
 import PageTransition from '@/components/PageTransition';
 import Navbar from '@/components/Navbar';
+import { HexBadgeSVG, resolveColors } from './BadgeCard';
 
 const tierConfig = {
     bronze: {
@@ -263,7 +264,7 @@ const VerifyBadge = () => {
                             className="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-slate-200"
                         >
                             {/* Header */}
-                            <div className={`bg-gradient-to-r ${tier.gradient} p-6 text-center`}>
+                            <div className="bg-[#1a3884] p-6 text-center">
                                 <p className="text-white/80 text-sm font-medium tracking-wider uppercase mb-1">
                                     SMAART Institute
                                 </p>
@@ -276,43 +277,19 @@ const VerifyBadge = () => {
                             <div className="p-8">
                                 <div className="flex flex-col items-center">
                                     {/* Badge Icon */}
-                                    <div className={`
-                                        relative w-28 h-28 flex items-center justify-center
-                                        bg-gradient-to-br ${tier.gradient}
-                                        rounded-full shadow-xl mb-6
-                                    `}>
-                                        <FaShieldAlt className="w-16 h-16 text-white drop-shadow-lg" />
-                                        <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-2 shadow-lg">
-                                            <TierIcon className={`w-5 h-5 ${tier.textColor}`} />
-                                        </div>
-                                    </div>
-
-                                    {/* Stars */}
-                                    <div className="flex gap-1.5 mb-4">
-                                        {[...Array(3)].map((_, i) => (
-                                            <FaStar
-                                                key={i}
-                                                className={`w-5 h-5 ${i < tier.stars
-                                                        ? tier.textColor
-                                                        : 'text-gray-300'
-                                                    }`}
-                                            />
-                                        ))}
+                                    <div className="w-32 h-32 flex items-center justify-center mb-6 drop-shadow-xl">
+                                        <HexBadgeSVG 
+                                            colors={resolveColors(badge.category)}
+                                            badgeId={badge.badgeId || badge.id}
+                                            courseName={(badge.title || '').replace(/ Master$/i, '').trim()}
+                                            year={badge.earnedDate ? new Date(badge.earnedDate).getFullYear() : new Date().getFullYear()}
+                                        />
                                     </div>
 
                                     {/* Badge Title */}
-                                    <h3 className={`text-2xl font-bold ${tier.textColor} text-center mb-2`}>
+                                    <h3 className="text-2xl font-bold text-[#1a3884] text-center mb-4">
                                         {badge.title}
                                     </h3>
-
-                                    {/* Tier */}
-                                    <span className={`
-                                        px-4 py-1 rounded-full text-sm font-bold uppercase
-                                        bg-gradient-to-r ${tier.gradient} text-white
-                                        shadow-md mb-4
-                                    `}>
-                                        {badge.tier} Tier
-                                    </span>
 
                                     {/* Description */}
                                     <p className="text-slate-600 text-center max-w-md mb-6">
@@ -335,21 +312,15 @@ const VerifyBadge = () => {
                                                 })}
                                             </span>
                                         </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                                            <span className="text-sm text-slate-500">XP Awarded</span>
-                                            <span className="font-semibold text-slate-800">+{badge.xp} XP</span>
-                                        </div>
-                                        <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                                            <span className="text-sm text-slate-500">Percentile</span>
-                                            <span className="font-semibold text-slate-800">Top {badge.percentile}%</span>
-                                        </div>
+
+
                                         <div className="flex justify-between items-center py-2 border-b border-slate-100">
                                             <span className="text-sm text-slate-500">Issued By</span>
                                             <span className="font-semibold text-slate-800">{badge.issuedBy}</span>
                                         </div>
                                         <div className="flex justify-between items-center py-2">
                                             <span className="text-sm text-slate-500">Badge ID</span>
-                                            <span className="font-mono text-xs text-slate-600">{badge.id}</span>
+                                            <span className="font-mono text-xs text-slate-600">{badge.badgeId || badge.id}</span>
                                         </div>
                                     </div>
 

@@ -654,7 +654,7 @@ const DashboardLayout = () => {
   const pageTitle = getPageTitle();
 
   return (
-    <div className={`min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300`}>
+    <div className={`min-h-screen bg-[#e8eff8] dark:bg-[#00152E] transition-colors duration-300`}>
       {/* Session Expiry Warning Modal */}
       <SessionExpiryWarning
         isVisible={showWarning}
@@ -667,7 +667,7 @@ const DashboardLayout = () => {
 
       {/* Main Content Area */}
       <main
-        className={`transition-all duration-300 min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] ${isCareerAgentDashboard ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]')
+        className={`transition-all duration-300 min-h-screen bg-[#e8eff8] dark:bg-[#00152E] ${isCareerAgentDashboard ? 'lg:ml-0' : (isCollapsed ? 'lg:ml-[70px]' : 'lg:ml-[260px]')
           }`}
       >
         {/* Top Header Bar - Premium AI SaaS Style */}
@@ -694,8 +694,7 @@ const DashboardLayout = () => {
                       key={pageTitle}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="text-xl sm:text-2xl md:text-[28px] font-bold text-slate-900 dark:text-white tracking-tight font-sans transition-colors duration-300 truncate min-w-0"
-                      style={{ letterSpacing: '-0.02em' }}
+                      className="text-lg md:text-[20px] font-bold text-[#0d1f4e] dark:text-white transition-colors duration-300 truncate min-w-0"
                     >
                       {pageTitle}
                     </motion.h1>

@@ -573,6 +573,119 @@ router.post('/career-direction', async (req, res) => {
   }
 });
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CAREER DIRECTION LOCKING SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * GET /api/career-agent/direction-lock/status
+ * Returns the user's current career direction lock status.
+ * AUTO-EXPIRES: if lockExpiryDate has passed, automatically locks.
+ */
+router.get('/direction-lock/status', optionalAuth, async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Authentication required.' });
+    const userId = req.user._id || req.user.id;
+    const email  = req.user.email;
+
+    let record = await FinalCareerPathwayModel.findOne({ userId }).lean();
+    if (!record && email) {
+      record = await FinalCareerPathwayModel.findOne({ student_email: email }).lean();
+    }
+
+    // No pathway yet — user hasn't completed first analysis
+    if (!record) {
+      return res.json({
+        found: false,
+        isLocked: false,
+        firstVisitAt: null,
+        lockExpiryDate: null,
+        attemptsUsed: 0,
+        maxAttempts: 5,
+        remainingAttempts: 5,
+        remainingDays: 14,
+        lockReason: null,
+        primaryCareerPath: null,
+        secondaryCareerPath: null,
+        tertiaryCareerPath: null,
+        firstVisitModalShown: false,
+        finalLockedDate: null,
+      });
+    }
+
+    // ── Auto-expiry check ────────────────────────────────────────────────────
+    // If the 14-day window has closed and the record isn't locked yet → lock it now
+    if (!record.is_locked && record.lockExpiryDate && new Date(record.lockExpiryDate) < new Date()) {
+      const updated = await FinalCareerPathwayModel.findOneAndUpdate(
+        { _id: record._id, is_locked: { $ne: true } }, // prevent double-lock race
+        {
+          $set: {
+            is_locked: true,
+            locked_at: new Date(),
+            finalLockedDate: new Date(),
+            lockReason: 'time_expired',
+            primaryCareerPath:   record.primaryCareerPath   || record.primary_role,
+            secondaryCareerPath: record.secondaryCareerPath || record.secondary_role,
+            tertiaryCareerPath:  record.tertiaryCareerPath  || record.tertiary_role,
+            updated_at: new Date(),
+          }
+        },
+        { new: true }
+      ).lean();
+      if (updated) record = updated;
+    }
+
+    const now = new Date();
+    const expiry = record.lockExpiryDate ? new Date(record.lockExpiryDate) : null;
+    const remainingMs = expiry ? Math.max(0, expiry - now) : 0;
+    const remainingDays = expiry ? Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24))) : 0;
+    const used = record.attemptsUsed || 0;
+    const max  = record.maxAttempts  || 5;
+
+    return res.json({
+      found: true,
+      isLocked: !!record.is_locked,
+      firstVisitAt: record.firstVisitAt || null,
+      lockExpiryDate: record.lockExpiryDate || null,
+      attemptsUsed: used,
+      maxAttempts: max,
+      remainingAttempts: Math.max(0, max - used),
+      remainingDays,
+      lockReason: record.lockReason || null,
+      primaryCareerPath: record.primaryCareerPath || record.primary_role || null,
+      secondaryCareerPath: record.secondaryCareerPath || record.secondary_role || null,
+      tertiaryCareerPath: record.tertiaryCareerPath || record.tertiary_role || null,
+      firstVisitModalShown: !!record.firstVisitModalShown,
+      finalLockedDate: record.finalLockedDate || null,
+    });
+  } catch (err) {
+    console.error('[career-agent] direction-lock/status error:', err);
+    res.status(500).json({ error: 'Failed to fetch lock status', details: err.message });
+  }
+});
+
+/**
+ * PUT /api/career-agent/direction-lock/mark-modal-shown
+ * Call once from the frontend after showing the first-visit modal.
+ * Sets firstVisitModalShown = true so it never shows again.
+ */
+router.put('/direction-lock/mark-modal-shown', optionalAuth, async (req, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Authentication required.' });
+    const userId = req.user._id || req.user.id;
+
+    await FinalCareerPathwayModel.findOneAndUpdate(
+      { userId },
+      { $set: { firstVisitModalShown: true, updated_at: new Date() } }
+    );
+    return res.json({ success: true });
+  } catch (err) {
+    console.error('[career-agent] mark-modal-shown error:', err);
+    res.status(500).json({ error: 'Failed to update modal flag', details: err.message });
+  }
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ONBOARDING ENGINE
 // ─────────────────────────────────────────────────────────────────────────────
@@ -581,6 +694,13 @@ router.post('/career-direction', async (req, res) => {
  * POST /api/career-agent/onboarding
  * Main career intelligence processing endpoint.
  * Uses the same engine from Career-Agent/backend/engine.js.
+ *
+ * LOCK SYSTEM ENFORCEMENT:
+ *  1. Checks if pathway is already locked → 423
+ *  2. Checks if 14-day window expired   → auto-locks → 423
+ *  3. Checks if attempts exhausted      → 423
+ *  4. On success: increments attemptsUsed, sets firstVisitAt/lockExpiryDate on first save,
+ *     auto-locks if this save consumed the last attempt.
  */
 router.post('/onboarding', optionalAuth, async (req, res) => {
   try {
@@ -592,6 +712,63 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
       studentData.personalDetails = studentData.personalDetails || {};
       studentData.personalDetails.email = loggedInUser.email;
       studentData.personalDetails.name = studentData.personalDetails.name || loggedInUser.name;
+    }
+
+    // ── LOCK ENFORCEMENT (server-side, cannot be bypassed) ───────────────────
+    if (loggedInUser) {
+      const userId = loggedInUser._id || loggedInUser.id;
+      const existingPathway = await FinalCareerPathwayModel.findOne({ userId }).lean();
+
+      if (existingPathway) {
+        // 1. Already manually or permanently locked
+        if (existingPathway.is_locked) {
+          return res.status(423).json({
+            error: 'Career direction is permanently locked. No further modifications are allowed.',
+            locked: true,
+            lockReason: existingPathway.lockReason || 'manual',
+            primaryCareerPath: existingPathway.primaryCareerPath || existingPathway.primary_role,
+            secondaryCareerPath: existingPathway.secondaryCareerPath || existingPathway.secondary_role,
+            tertiaryCareerPath: existingPathway.tertiaryCareerPath || existingPathway.tertiary_role,
+          });
+        }
+
+        // 2. Time-based expiry — auto-lock and reject
+        if (existingPathway.lockExpiryDate && new Date(existingPathway.lockExpiryDate) < new Date()) {
+          await FinalCareerPathwayModel.findOneAndUpdate(
+            { userId },
+            {
+              $set: {
+                is_locked: true,
+                locked_at: new Date(),
+                finalLockedDate: new Date(),
+                lockReason: 'time_expired',
+                primaryCareerPath:   existingPathway.primaryCareerPath   || existingPathway.primary_role,
+                secondaryCareerPath: existingPathway.secondaryCareerPath || existingPathway.secondary_role,
+                tertiaryCareerPath:  existingPathway.tertiaryCareerPath  || existingPathway.tertiary_role,
+                updated_at: new Date(),
+              }
+            }
+          );
+          return res.status(423).json({
+            error: 'Your 14-day career direction window has expired. Your career direction is now permanently locked.',
+            locked: true,
+            lockReason: 'time_expired',
+          });
+        }
+
+        // 3. Attempts exhausted
+        const used = existingPathway.attemptsUsed || 0;
+        const max  = existingPathway.maxAttempts  || 5;
+        if (used >= max) {
+          return res.status(423).json({
+            error: `You have used all ${max} career analysis attempts. Your direction is now locked.`,
+            locked: true,
+            lockReason: 'attempts_exhausted',
+            attemptsUsed: used,
+            maxAttempts: max,
+          });
+        }
+      }
     }
 
     // Normalize skills upfront (objects vs strings)
@@ -649,12 +826,46 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
     const studentEmail   = studentData.personalDetails?.email || loggedInUser?.email || 'Unknown';
     const primaryRole    = studentData.preferences?.primary?.role || 'Career Match';
     const preVerifiedData = analysis.preVerified || {};
+    const primaryPath   = studentData.preferences?.primary?.careerDirectionName   || studentData.preferences?.primary?.role    || '';
+    const secondaryPath = studentData.preferences?.secondary?.careerDirectionName || studentData.preferences?.secondary?.role  || '';
+    const tertiaryPath  = studentData.preferences?.tertiary?.careerDirectionName  || studentData.preferences?.tertiary?.role   || '';
 
-    // ── Save / Update FinalCareerPathway (the user's per-user source of truth) ────
-    // Uses upsert so first submit creates, every edit updates the same document.
+    // ── Save / Update FinalCareerPathway + lock tracking ────────────────────
     if (loggedInUser) {
       const userId = loggedInUser._id || loggedInUser.id;
       const preV = analysis.preVerified || {};
+      const now  = new Date();
+
+      // Fetch current record to calculate new attempt count
+      const currentRecord = await FinalCareerPathwayModel.findOne({ userId }).lean();
+      const prevAttempts  = currentRecord?.attemptsUsed || 0;
+      const newAttempts   = prevAttempts + 1;
+      const maxAttempts   = currentRecord?.maxAttempts || 5;
+      const isFirstSave   = !currentRecord?.firstVisitAt;
+
+      // Build the lock update fields
+      const lockFields = {
+        attemptsUsed: newAttempts,
+        primaryCareerPath:   primaryPath,
+        secondaryCareerPath: secondaryPath,
+        tertiaryCareerPath:  tertiaryPath,
+      };
+
+      // Set firstVisitAt and lockExpiryDate only on FIRST successful save
+      if (isFirstSave) {
+        lockFields.firstVisitAt   = now;
+        lockFields.lockExpiryDate = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+      }
+
+      // Auto-lock if this save consumes the last available attempt
+      if (newAttempts >= maxAttempts) {
+        lockFields.is_locked       = true;
+        lockFields.locked_at       = now;
+        lockFields.finalLockedDate = now;
+        lockFields.lockReason      = 'attempts_exhausted';
+        console.log(`[career-agent] Auto-locking career direction for user ${userId} — all ${maxAttempts} attempts used.`);
+      }
+
       FinalCareerPathwayModel.findOneAndUpdate(
         { userId },
         {
@@ -662,7 +873,7 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
             userId,
             student_name:   studentName,
             student_email:  studentEmail,
-            input_data:     studentData,       // ← full form data (edu, skills, prefs, etc.)
+            input_data:     studentData,
             output_data:    analysis,
             primary_role:   primaryRole,
             secondary_role: studentData.preferences?.secondary?.role || '',
@@ -670,9 +881,10 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
             zone_primary:   preV?.primaryZone?.employer_zone   || 'Unknown',
             zone_secondary: preV?.secondaryZone?.employer_zone || 'Unknown',
             zone_tertiary:  preV?.tertiaryZone?.employer_zone  || 'Unknown',
-            updated_at:     new Date()
+            updated_at:     now,
+            ...lockFields,
           },
-          $setOnInsert: { created_at: new Date() }
+          $setOnInsert: { created_at: now }
         },
         { upsert: true, new: true }
       ).catch(err => console.warn('[career-agent] FinalCareerPathway upsert warning:', err.message));
@@ -680,7 +892,6 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
 
     // Also save to CareerAnalysis for history
     CareerAnalysisModel.create({
-
       userId: loggedInUser?._id || loggedInUser?.id || null,
       student_name: studentName,
       student_email: studentEmail,
@@ -711,6 +922,8 @@ router.post('/onboarding', optionalAuth, async (req, res) => {
     res.status(500).json({ error: 'Career analysis failed', details: err.message });
   }
 });
+
+
 
 /**
  * GET /api/career-agent/final-pathway

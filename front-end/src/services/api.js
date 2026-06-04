@@ -13,7 +13,10 @@ const getApiBaseUrl = () => {
 };
 
 export let API_BASE_URL = getApiBaseUrl();
-let workingBaseUrl = sessionStorage.getItem("workingApiPort"); // Cache for the discovered working port
+
+// Clear stale cached port on every page load so we always re-probe
+sessionStorage.removeItem("workingApiPort");
+let workingBaseUrl = null; // Will be discovered on first API call
 
 // Export for use in other files
 export const getBackendUrl = () => {
@@ -225,28 +228,24 @@ export const apiCall = async (endpoint, options = {}) => {
       error.message.includes('NetworkError') ||
       error.message.includes('ERR_CONNECTION_REFUSED');
 
-    // FIX #14: Only probe fallback ports in development mode
+    // Only probe fallback ports if this is a network/connection error
     const isDev = import.meta.env.DEV;
     const is404InDev = isDev && error.status === 404;
     const isErrorThatTriggersFallback = isNetworkError || is404InDev;
 
-    // If it's a 404 in dev, or a general network error when we don't have a confirmed port
-    if (isErrorThatTriggersFallback && isDev) {
-      // If we already had a confirmed port but now it's giving 404, we might need to search again 
-      // (e.g. backend restarted on a different port)
-      if (workingBaseUrl && !is404InDev) throw error; 
+    if (isErrorThatTriggersFallback) {
+      console.warn("⚠️ API connection failed, searching for backend on fallback ports (5001, 5002)...");
 
-      console.warn("⚠️ API connection failed or route not found, searching for backend fallbacks (dev mode)...");
-
+      const hostname = window.location.hostname;
       const fallbacks = [
-        API_BASE_URL.replace(":5000", ":5001"),
-        API_BASE_URL.replace(":5000", ":5002")
+        `http://${hostname}:5001/api`,
+        `http://${hostname}:5002/api`,
       ];
 
       for (const fallbackUrl of fallbacks) {
         try {
-          // Use a VERY short timeout for fallback discovery (2s)
-          const result = await performCall(fallbackUrl, 2000);
+          // Use a short timeout for fallback discovery (3s)
+          const result = await performCall(fallbackUrl, 3000);
           console.log(`✅ Backend discovered on ${fallbackUrl}`);
           workingBaseUrl = fallbackUrl;
           sessionStorage.setItem("workingApiPort", fallbackUrl);

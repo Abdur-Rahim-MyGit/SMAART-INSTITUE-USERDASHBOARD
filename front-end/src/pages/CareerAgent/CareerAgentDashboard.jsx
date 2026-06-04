@@ -1,5 +1,5 @@
 import './careerAgent.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import RoleDetailedView from './panels/RoleDetailedView';
 import DirectionOverview from './panels/DirectionOverview';
 import MarketIntelligence from './panels/MarketIntelligence';
@@ -7,15 +7,18 @@ import SkillsPanel from './panels/SkillsPanel';
 import AIImplementation from './panels/AIImplementation';
 import InterviewPrep from './panels/InterviewPrep';
 import ResumeTips from './panels/ResumeTips';
-import FutureScope from './panels/FutureScope';
-import ProjectSpace from './panels/ProjectSpace';
 import CareerRoadmap from './panels/CareerRoadmap';
 import CareerDirectionCard from './panels/CareerDirectionCard';
 import Certifications from './panels/Certifications';
+import CareerFirstVisitModal from './components/CareerFirstVisitModal';
+import CareerLockBanner from './components/CareerLockBanner';
+
+import CareerLockedModal from './components/CareerLockedModal';
+import { fetchLockStatus } from '@/services/CareerLockService';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { Compass, ClipboardList, BarChart3, Dna, Map, Award, Rocket, Bot, Mic, FileText, Code, Lock, Unlock, CheckCircle, Trophy, Medal, Target, Sparkles, Sun, Moon, Monitor, ChevronDown, X, Menu } from 'lucide-react';
+import { Compass, ClipboardList, BarChart3, Dna, Map, Award, Rocket, Bot, Mic, FileText, Code, Lock, Unlock, CheckCircle, Trophy, Medal, Target, Sparkles, Sun, Moon, Monitor, ChevronDown, X, Menu, RefreshCw } from 'lucide-react';
 const CareerAgentDashboard = () => {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
@@ -24,75 +27,43 @@ const CareerAgentDashboard = () => {
     const [data, setData] = useState(null);
     const [activeRole, setActiveRole] = useState(1);
     const [activePanel, setActivePanel] = useState('direction');
-    const [lockedRoles, setLockedRoles] = useState([]);
-    const [showWelcome, setShowWelcome] = useState(false);
-    const [showSelectionFlow, setShowSelectionFlow] = useState(false);
-    const [selectionStates, setSelectionStates] = useState({ primary: null, secondary: null, tertiary: null });
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
-    const handleLockPath = (roleName) => {
-        // Instead of immediate lock, show the selection flow
-        setShowSelectionFlow(true);
-    };
+    // ── Career Direction Locking System ────────────────────────────────────────
+    const [lockStatus, setLockStatus] = useState(null);
+    const [showFirstVisitModal, setShowFirstVisitModal] = useState(false);
+    const [showLockedModal, setShowLockedModal] = useState(false);
+    const prevLockedRef = useRef(false);
 
-    const handleFinalizeLock = async () => {
-        // "Not Interested" is handled immediately on button click (navigates directly).
-        // This function only runs when user has marked all paths as "Interested" and clicks Confirm.
-        const { primary = {}, secondary = {}, tertiary = {} } = data || {};
-        const _draft = (() => { try { return JSON.parse(localStorage.getItem('smaart_onboarding_draft') || '{}'); } catch { return {}; } })();
-        const _dp = _draft?.preferences || {};
-        
-        const prefPrimary   = primary?.direction?.directionName   || localStorage.getItem('smaart_pref_primary')   || _dp.primary?.careerDirectionName   || _dp.primary?.role   || primary?.tab1?.role_name   || 'Primary';
-        const prefSecondary = secondary?.direction?.directionName || localStorage.getItem('smaart_pref_secondary') || _dp.secondary?.careerDirectionName || _dp.secondary?.role || secondary?.tab1?.role_name || 'Secondary';
-        const prefTertiary  = tertiary?.direction?.directionName  || localStorage.getItem('smaart_pref_tertiary')  || _dp.tertiary?.careerDirectionName  || _dp.tertiary?.role  || tertiary?.tab1?.role_name  || 'Tertiary';
-
-        const newlyLocked = [];
-        if (selectionStates.primary === 'interested')   newlyLocked.push(prefPrimary);
-        if (selectionStates.secondary === 'interested') newlyLocked.push(prefSecondary);
-        if (selectionStates.tertiary === 'interested')  newlyLocked.push(prefTertiary);
-
+    const refreshLockStatus = useCallback(async () => {
         try {
-            const res = await fetch('/api/career-agent/final-pathway/lock', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include'
-            });
-            if (res.ok) {
-                setLockedRoles(newlyLocked);
-                setShowSelectionFlow(false);
-                setShowWelcome(true);
-                setTimeout(() => setShowWelcome(false), 3200);
-            } else {
-                console.error('Failed to lock final pathway in database');
-                setLockedRoles(newlyLocked);
-                setShowSelectionFlow(false);
+            const status = await fetchLockStatus();
+            if (status) {
+                // Detect a new lock event (was unlocked, now locked)
+                if (!prevLockedRef.current && status.isLocked) {
+                    setShowLockedModal(true);
+                }
+                prevLockedRef.current = status.isLocked;
+                setLockStatus(status);
+                // Lock status is tracked via lockStatus state — no separate lockedRoles needed
+                // Show first-visit modal when analysis exists and modal hasn't been shown
+                if (status.found && !status.firstVisitModalShown && !status.isLocked) {
+                    setShowFirstVisitModal(true);
+                }
             }
         } catch (e) {
-            console.error('Error locking final pathway:', e);
-            setLockedRoles(newlyLocked);
-            setShowSelectionFlow(false);
+            console.warn('[Dashboard] Lock status fetch error:', e.message);
         }
-    };
+    }, []);
+
+    // No manual lock — paths are locked automatically after 5 attempts or 14 days.
 
     useEffect(() => {
         const loadAnalysisAndLockStatus = async () => {
-            // Fetch final pathway lock status first
-            try {
-                const lockRes = await fetch('/api/career-agent/final-pathway', { credentials: 'include' });
-                if (lockRes.ok) {
-                    const lockPayload = await lockRes.json();
-                    if (lockPayload.found && lockPayload.is_locked) {
-                        const locked = [];
-                        if (lockPayload.primary_role) locked.push(lockPayload.primary_role);
-                        if (lockPayload.secondary_role) locked.push(lockPayload.secondary_role);
-                        if (lockPayload.tertiary_role) locked.push(lockPayload.tertiary_role);
-                        setLockedRoles(locked.length > 0 ? locked : ['Locked Pathway']);
-                        setSelectionStates({ primary: 'interested', secondary: 'interested', tertiary: 'interested' });
-                    }
-                }
-            } catch (e) {
-                console.warn('[Dashboard] Failed to fetch final pathway lock status:', e.message);
-            }
+
+
+            // ── Fetch career direction lock status (new system) ─────────────
+            await refreshLockStatus();
 
             try {
                 // 1️⃣ Try to load from MongoDB (per-user, persists across devices)
@@ -128,7 +99,7 @@ const CareerAgentDashboard = () => {
         };
 
         loadAnalysisAndLockStatus();
-    }, [navigate]);
+    }, [navigate, refreshLockStatus]);
 
     // FIX: Direction Overview shows empty because the 'direction' field is missing from saved analyses.
     // When the engine stores a report, it attaches direction data only if fetchDirectionFromDB succeeds.
@@ -253,7 +224,6 @@ const CareerAgentDashboard = () => {
     const diffTime = Date.now() - new Date(regDate).getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     const remainingDays = 14 - diffDays;
-    const showLockWarningBanner = lockedRoles.length === 0;
 
     // Build allDirections array for MarketIntelligence — includes roles from each direction
     const buildDirRoles = (roleData) => {
@@ -290,176 +260,37 @@ const CareerAgentDashboard = () => {
         { id: 'skills', label: t('career_agent.panels.skills', 'Skill DNA'), icon: <Dna size={18} /> },
         { id: 'roadmap', label: t('career_agent.panels.roadmap', 'Career Roadmap'), icon: <Map size={18} /> },
         { id: 'certs', label: t('career_agent.panels.certs', 'Certifications'), icon: <Award size={18} /> },
-        { id: 'future', label: t('career_agent.panels.future', 'Future Scope'), icon: <Rocket size={18} /> },
-        { id: 'ai', label: t('career_agent.panels.ai', 'AI Implementation'), icon: <Bot size={18} /> },
         { id: 'interview', label: t('career_agent.panels.interview', 'Interview Prep'), icon: <Mic size={18} /> },
-        { id: 'resume', label: t('career_agent.panels.resume', 'Resume Tips'), icon: <FileText size={18} /> },
-        { id: 'projects', label: t('career_agent.panels.projects', 'Project Space'), icon: <Code size={18} /> }
+        { id: 'resume', label: t('career_agent.panels.resume', 'Resume Tips'), icon: <FileText size={18} /> }
     ];
 
     const matchScore = parseInt(currentData.match_explanation?.match(/\d+/) || 75);
+    const isCareerLocked = lockStatus?.isLocked ?? false;
 
     return (
         <div className="career-agent-page">
 
-            {/* ── Selection Flow Modal ── */}
-            {showSelectionFlow && (
-                <div className="selection-modal-overlay">
-                    <div className="selection-modal-content">
-                        <div style={{ textAlign: 'center', flexShrink: 0, animation: 'fadeIn 0.6s ease 0.1s both' }}>
-                            <h2 style={{ fontSize: '1.8rem', fontWeight: 950, color: 'white', marginBottom: '0.2rem', letterSpacing: '-0.02em' }}>{t('career_agent.selection.title', 'Path Precision Selection')}</h2>
-                            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontWeight: 500 }}>{t('career_agent.selection.subtitle', 'Confirm your interest level for each field.')}</p>
-                        </div>
+            {/* ── Career Direction Lock: First Visit Modal ── */}
+            <CareerFirstVisitModal
+                isOpen={showFirstVisitModal && !showLockedModal}
+                lockStatus={lockStatus}
+                onStartAnalysis={() => {
+                    setShowFirstVisitModal(false);
+                    navigate('/dashboard/career-agent/onboarding');
+                }}
+                onRemindLater={() => setShowFirstVisitModal(false)}
+            />
 
-                        <div className="selection-flow-grid">
-                            {[
-                                { key: 'primary', label: t('career_agent.selection.primary_path', 'Primary Path'), data: primary, title: prefPrimary, delay: '0.2s' },
-                                { key: 'secondary', label: t('career_agent.selection.secondary_path', 'Secondary Path'), data: secondary, title: prefSecondary, delay: '0.3s' },
-                                { key: 'tertiary', label: t('career_agent.selection.tertiary_path', 'Tertiary Path'), data: tertiary, title: prefTertiary, delay: '0.4s' }
-                            ].map((item, idx) => (
-                                <div key={item.key} style={{
-                                    background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '20px',
-                                    padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem',
-                                    boxShadow: '0 15px 40px rgba(0,0,0,0.3)', overflow: 'hidden',
-                                    animation: 'popIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
-                                    animationDelay: item.delay
-                                }}>
-                                    <div style={{ flexShrink: 0 }}>
-                                        <div style={{ fontSize: '0.62rem', fontWeight: 800, color: 'var(--accent)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '0.25rem' }}>
-                                            {item.label}
-                                        </div>
-                                        <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--text)', margin: 0, lineHeight: 1.15 }}>{item.title}</h3>
-                                    </div>
+            {/* ── Career Direction Lock: Auto-Lock Notification Modal ── */}
+            <CareerLockedModal
+                isOpen={showLockedModal}
+                lockStatus={lockStatus}
+                onClose={() => setShowLockedModal(false)}
+            />
 
-                                    {/* Role mini-list - Flexible height */}
-                                    <div style={{ 
-                                        flex: 1, overflowY: 'auto', padding: '0.75rem', minHeight: '100px', maxHeight: '220px',
-                                        background: 'var(--navy2)', borderRadius: '12px', border: '1px solid var(--border)'
-                                    }} className="custom-scrollbar">
-                                        <div style={{ fontSize: '0.58rem', color: 'var(--text2)', marginBottom: '0.5rem', fontWeight: 800, letterSpacing: '0.05em' }}>{t('career_agent.selection.roles', 'ROLES:')}</div>
-                                        {(item.data?.direction?.roles || []).length > 0 ? (
-                                            (item.data?.direction?.roles || []).map((r, i) => (
-                                                <div key={i} style={{ fontSize: '0.78rem', color: 'var(--text)', padding: '0.45rem 0', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 500 }}>
-                                                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--accent)', opacity: 0.5 }} />
-                                                    {r.role}
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div style={{ fontSize: '0.8rem', color: 'var(--muted)', fontStyle: 'italic', textAlign: 'center', marginTop: '1.5rem' }}>{t('career_agent.selection.no_roles', 'No specific roles listed')}</div>
-                                        )}
-                                    </div>
 
-                                    <div style={{ display: 'flex', gap: '0.6rem', flexShrink: 0 }}>
-                                        <button 
-                                            onClick={() => setSelectionStates(prev => ({ ...prev, [item.key]: 'interested' }))}
-                                            style={{
-                                                flex: 1, padding: '0.7rem', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 800,
-                                                background: selectionStates[item.key] === 'interested' ? 'rgba(16, 185, 129, 0.08)' : 'transparent',
-                                                border: '1.5px solid', 
-                                                borderColor: selectionStates[item.key] === 'interested' ? 'var(--green)' : 'var(--border2)',
-                                                color: selectionStates[item.key] === 'interested' ? 'var(--green)' : 'var(--muted)',
-                                                cursor: 'pointer', transition: 'all 0.2s',
-                                                boxShadow: selectionStates[item.key] === 'interested' ? '0 4px 12px rgba(16, 185, 129, 0.1)' : 'none'
-                                            }}
-                                        >
-                                            {t('career_agent.selection.interested', 'Interested')}
-                                        </button>
-                                        <button 
-                                            onClick={() => {
-                                                // Immediately navigate to THAT tier's specific preference step
-                                                // Primary=Step3, Secondary=Step4, Tertiary=Step5
-                                                const TIER_STEP = { primary: 3, secondary: 4, tertiary: 5 };
-                                                setShowSelectionFlow(false);
-                                                navigate('/dashboard/career-agent/onboarding', {
-                                                    state: {
-                                                        startStep: TIER_STEP[item.key],
-                                                        editTier: item.key
-                                                    }
-                                                });
-                                            }}
-                                            style={{
-                                                flex: 1, padding: '0.7rem', borderRadius: '10px', fontSize: '0.72rem', fontWeight: 800,
-                                                background: 'transparent',
-                                                border: '1.5px solid var(--border2)',
-                                                color: 'var(--muted)',
-                                                cursor: 'pointer', transition: 'all 0.2s',
-                                            }}
-                                        >
-                                            {t('career_agent.selection.not_interested', 'Not Interested')}
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem', flexShrink: 0, marginTop: '0.5rem', animation: 'fadeIn 0.5s ease 0.6s both' }}>
-                            <button 
-                                onClick={() => setShowSelectionFlow(false)}
-                                style={{ 
-                                    padding: '0.8rem 2.2rem', borderRadius: '12px', 
-                                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', 
-                                    color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem'
-                                }}
-                            >
-                                {t('common.cancel', 'Cancel')}
-                            </button>
-                            <button 
-                                disabled={!selectionStates.primary || !selectionStates.secondary || !selectionStates.tertiary}
-                                onClick={handleFinalizeLock}
-                                style={{ 
-                                    padding: '0.8rem 3.5rem', borderRadius: '12px', 
-                                    background: (!selectionStates.primary || !selectionStates.secondary || !selectionStates.tertiary) ? 'rgba(255,255,255,0.1)' : 'var(--accent)',
-                                    color: 'white', fontWeight: 900, cursor: 'pointer', border: 'none',
-                                    opacity: (!selectionStates.primary || !selectionStates.secondary || !selectionStates.tertiary) ? 0.3 : 1,
-                                    boxShadow: (!selectionStates.primary || !selectionStates.secondary || !selectionStates.tertiary) ? 'none' : '0 12px 24px rgba(37,99,235,0.4)',
-                                    fontSize: '0.85rem'
-                                }}
-                            >
-                                {t('career_agent.selection.confirm', 'Confirm Selection & Lock In')}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
-            {/* ── Welcome Overlay ── */}
-            {showWelcome && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 11000,
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(10,14,26,0.92)', backdropFilter: 'blur(12px)',
-                    animation: 'fadeIn 0.4s ease',
-                }}>
-                    {/* Animated ring */}
-                    <div style={{
-                        width: '88px', height: '88px', borderRadius: '50%',
-                        border: '2px solid var(--accent-border)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        marginBottom: '1.75rem', position: 'relative',
-                        animation: 'popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both',
-                    }}>
-                        <div style={{
-                            position: 'absolute', inset: '-6px', borderRadius: '50%',
-                            border: '2px solid var(--accent)', opacity: 0.4,
-                        }} />
-                        <span style={{ display: 'flex', color: 'var(--accent)' }}><Lock size={40} /></span>
-                    </div>
-                    <div style={{ fontSize: '0.6rem', fontWeight: 800, letterSpacing: '0.18em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '0.6rem', animation: 'fadeIn 0.4s ease 0.3s both' }}>{t('career_agent.welcome.path_confirmed', 'Path Confirmed')}</div>
-                    <div style={{ fontSize: '1.65rem', fontWeight: 900, color: 'var(--text1)', letterSpacing: '-0.02em', marginBottom: '0.5rem', textAlign: 'center', maxWidth: '480px', animation: 'fadeIn 0.4s ease 0.4s both' }}>
-                        {t('career_agent.welcome.title', 'Welcome to Your Journey')}
-                    </div>
-                    <div style={{ fontSize: '0.88rem', color: 'var(--muted)', textAlign: 'center', maxWidth: '360px', lineHeight: 1.65, animation: 'fadeIn 0.4s ease 0.5s both' }}>
-                        {lockedRoles.length > 1 
-                            ? t('career_agent.welcome.desc_multiple', "You've successfully locked in your chosen career paths. Your multi-track SMAART roadmaps are ready.")
-                            : <span>{t('career_agent.welcome.desc_single_start', "You've locked in ")}<strong style={{ color: 'var(--text2)' }}>{lockedRoles[0]}</strong>{t('career_agent.welcome.desc_single_end', " as your career path. Your SMAART roadmap is ready.")}</span>
-                        }
-                    </div>
-                    <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', animation: 'fadeIn 0.4s ease 0.7s both' }}>
-                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)', animation: 'pulse 1s ease infinite' }} />
-                        <span style={{ fontSize: '0.7rem', color: 'var(--muted)', fontWeight: 600 }}>{t('career_agent.welcome.closing', 'Closing automatically…')}</span>
-                    </div>
-                </div>
-            )}
             {/* ── Mobile Sidebar Drawer ── */}
             {showMobileSidebar && (
                 <div 
@@ -525,50 +356,46 @@ const CareerAgentDashboard = () => {
                         {/* ── Theme Switcher ── */}
                         <button
                             onClick={() => {
-                                const next = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
+                                const next = theme === 'light' ? 'dark' : 'light';
                                 setTheme(next);
                             }}
-                            title={`Theme: ${theme} — click to switch`}
+                            title="Toggle Theme"
                             style={{
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                width: '36px', height: '36px',
-                                borderRadius: '10px',
-                                border: '1px solid var(--border2)',
-                                background: 'var(--card)',
-                                color: 'var(--text2)',
+                                width: '38px', height: '38px',
+                                borderRadius: '50%',
+                                border: '1px solid var(--border)',
+                                background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+                                color: theme === 'dark' ? '#E2E8F0' : '#475569',
                                 cursor: 'pointer',
-                                transition: 'all 0.2s ease',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 flexShrink: 0,
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
                             }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border2)'; e.currentTarget.style.color = 'var(--text2)'; }}
+                            onMouseEnter={e => { 
+                                e.currentTarget.style.transform = 'translateY(-2px)'; 
+                                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; 
+                                e.currentTarget.style.color = 'var(--accent)';
+                                e.currentTarget.style.borderColor = 'var(--accent)';
+                            }}
+                            onMouseLeave={e => { 
+                                e.currentTarget.style.transform = 'translateY(0)'; 
+                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)'; 
+                                e.currentTarget.style.color = theme === 'dark' ? '#E2E8F0' : '#475569';
+                                e.currentTarget.style.borderColor = 'var(--border)';
+                            }}
                         >
-                            {theme === 'dark' ? <Moon size={15} /> : theme === 'light' ? <Sun size={15} /> : <Monitor size={15} />}
+                            {theme === 'dark' ? <Moon size={18} fill="currentColor" fillOpacity={0.2} /> : <Sun size={18} fill="currentColor" fillOpacity={0.2} />}
                         </button>
 
-                        {lockedRoles.length > 0 ? (
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                padding: '0.55rem 1.1rem',
-                                background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)',
-                                borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700, color: 'var(--green)',
-                            }}>
-                                <Lock size={14} />
-                                <span className="hide-mobile">{t('career_agent.header.path_locked', 'Path Locked In')}</span>
-                                <span className="show-mobile-inline">{t('career_agent.header.locked', 'Locked')}</span>
-                            </div>
-                        ) : (
-                            <button
-                                className="btn-ghost"
-                                onClick={() => handleLockPath(currentData?.tab1?.role_name)}
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                            >
-                                <Lock size={14} />
-                                <span className="hide-mobile">{t('career_agent.header.lock_path', 'Lock This Path')}</span>
-                                <span className="show-mobile-inline">{t('career_agent.header.lock', 'Lock')}</span>
-                            </button>
-                        )}
-                        <button className="btn-primary" onClick={() => navigate('/dashboard/career-agent/onboarding')}>
+
+                        <button 
+                            className="btn-primary" 
+                            onClick={() => navigate('/dashboard/career-agent/onboarding')}
+                            disabled={isCareerLocked}
+                            style={{ opacity: isCareerLocked ? 0.5 : 1, cursor: isCareerLocked ? 'not-allowed' : 'pointer' }}
+                            title={isCareerLocked ? "Your career direction is permanently locked." : "Start a new analysis"}
+                        >
                             <span className="hide-mobile">{t('career_agent.header.new_analysis', 'New Analysis')}</span>
                             <span className="show-mobile-inline">{t('career_agent.header.new', 'New')}</span>
                         </button>
@@ -591,72 +418,8 @@ const CareerAgentDashboard = () => {
                 </div>
             </header>
 
-            {/* Lock path warning/alert banner */}
-            {showLockWarningBanner && (
-                <div style={{
-                    margin: '0.5rem 2rem 1.25rem 2rem',
-                    padding: '1rem 1.5rem',
-                    borderRadius: '16px',
-                    background: remainingDays <= 0 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)',
-                    border: '1px solid',
-                    borderColor: remainingDays <= 0 ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)',
-                    color: remainingDays <= 0 ? '#EF4444' : '#F59E0B',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '1rem',
-                    flexWrap: 'wrap',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{
-                            padding: '0.5rem',
-                            borderRadius: '12px',
-                            background: remainingDays <= 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: remainingDays <= 0 ? '#EF4444' : '#F59E0B'
-                        }}>
-                            {remainingDays <= 0 ? <Bot size={20} /> : <Compass size={20} />}
-                        </div>
-                        <div>
-                            <div style={{ fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                {remainingDays <= 0 ? 'Urgent Career Lock Needed' : 'Action Required: Lock Career Path'}
-                            </div>
-                            <div style={{ fontSize: '0.78rem', opacity: 0.85, marginTop: '0.15rem', color: 'var(--text)' }}>
-                                {remainingDays <= 0
-                                    ? 'Still not set your Career Path! You have exceeded the 14-day limit. Please select and lock your path immediately.'
-                                    : `You have ${remainingDays} day${remainingDays !== 1 ? 's' : ''} left to select and lock your career path.`
-                                }
-                            </div>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => setShowSelectionFlow(true)}
-                        style={{
-                            padding: '0.6rem 1.25rem',
-                            borderRadius: '12px',
-                            background: remainingDays <= 0 ? '#EF4444' : '#F59E0B',
-                            color: 'white',
-                            border: 'none',
-                            fontWeight: 800,
-                            fontSize: '0.75rem',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.4rem',
-                            boxShadow: remainingDays <= 0 ? '0 4px 12px rgba(239, 68, 68, 0.3)' : '0 4px 12px rgba(245, 158, 11, 0.3)',
-                            transition: 'all 0.2s',
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; }}
-                        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                    >
-                        <Lock size={12} />
-                        <span>Lock Career Path Now</span>
-                    </button>
-                </div>
-            )}
+            {/* Career Direction Lock Banner */}
+            <CareerLockBanner lockStatus={lockStatus} />
 
             <div className="dash-body">
                 <aside className="sidebar">
@@ -671,6 +434,8 @@ const CareerAgentDashboard = () => {
                             </div>
                         </div>
                     </div>
+
+
 
                     <div className="sidebar-nav">
                         {panels.map(p => (
@@ -756,7 +521,7 @@ const CareerAgentDashboard = () => {
                                     </p>
                                 </div>
 
-                                {lockedRoles.includes(currentData.tab1.role_name) ? (
+                                {isCareerLocked && (
                                     /* Locked state badge */
                                     <div style={{
                                         display: 'flex', alignItems: 'center', gap: '0.5rem',
@@ -768,7 +533,7 @@ const CareerAgentDashboard = () => {
                                     }}>
                                         <Lock size={14} /> {t('career_agent.header.path_locked', 'Path Locked In')}
                                     </div>
-                                ) : null}
+                                )}
                             </div>
                             <DirectionOverview
                                 directionData={currentData?.direction || null}
@@ -861,65 +626,7 @@ const CareerAgentDashboard = () => {
                         </div>
                     )}
 
-                    {/* Panel 7: Future Scope */}
-                    {activePanel === 'future' && (
-                        <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Rocket size={22} color="var(--accent)" /> {t('career_agent.future.title', 'Future Trajectory & Growth')}</h2>
-                            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>
-                                {t('career_agent.future.desc_start', 'Salary progression, role evolution, and who this path suits best — based on ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>.
-                            </p>
-                            <FutureScope
-                                roleName={roleName}
-                                mongoRoleData={currentData}
-                                futureScope={currentData.tab5?.future_scope}
-                                targetAudience={currentData.tab5?.target_audience}
-                            />
-                        </div>
-                    )}
 
-                    {/* Panel 8: AI Implementation */}
-                    {activePanel === 'ai' && (
-                        <div className="panel animate-fade-in">
-                            <h2 style={{ marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Bot size={22} color="var(--accent)" /> {t('career_agent.ai.title', 'AI Implementation in Role')}</h2>
-                            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.5rem' }}>{t('career_agent.ai.desc_start', 'How AI is reshaping ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>{t('career_agent.ai.desc_end', ' — exposure analysis, AI-native skills, and what remains irreplaceably human.')}</p>
-                            <AIImplementation
-                                roleName={roleName}
-                                mongoRoleData={currentData}
-                                fallback={currentData.tab3}
-                            />
-                        </div>
-                    )}
-
-                    {/* Panel 11: Project Space */}
-                    {activePanel === 'projects' && (
-                        <div className="panel animate-fade-in">
-                            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.5rem', gap: '1rem', flexWrap: 'wrap' }}>
-                                <div>
-                                    <h2 style={{ margin: 0, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Code size={22} color="var(--accent)" /> {t('career_agent.projects.title', 'Project Space')}</h2>
-                                    <p style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: 0 }}>
-                                        {t('career_agent.projects.desc_start', 'High-impact blueprint builds that prove your skills for ')}<strong style={{ color: 'var(--text2)' }}>{roleName}</strong>.
-                                    </p>
-                                </div>
-                                {lockedRoles.length > 0 && (
-                                    <div style={{
-                                        display: 'flex', alignItems: 'center', gap: '0.5rem',
-                                        padding: '0.45rem 0.9rem',
-                                        background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)',
-                                        borderRadius: '8px', fontSize: '0.72rem', fontWeight: 700, color: 'var(--green)',
-                                    }}>
-                                        <Unlock size={14} /> {t('career_agent.projects.unlocked', 'Unlocked')}
-                                    </div>
-                                )}
-                            </div>
- 
-                            <ProjectSpace
-                                projects={safeTab4.projects || []}
-                                locked={lockedRoles.length === 0}
-                                roleName={roleName}
-                                onUnlockClick={() => setActivePanel('roledetail')}
-                            />
-                        </div>
-                    )}
 
                     {/* Panel: Interview Prep */}
                     {activePanel === 'interview' && (
@@ -955,7 +662,7 @@ const CareerAgentDashboard = () => {
 
 
                     {/* Placeholders for remaining panels */}
-                    {!['direction', 'overview', 'roledetail', 'market', 'skills', 'roadmap', 'future', 'ai', 'projects', 'interview', 'resume', 'certs'].includes(activePanel) && (
+                    {!['direction', 'overview', 'roledetail', 'market', 'skills', 'roadmap', 'interview', 'resume', 'certs'].includes(activePanel) && (
                         <div className="panel animate-fade-in" style={{ textAlign: 'center', padding: '5rem 0' }}>
                             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🔧</div>
                             <h3>{panels.find(p => p.id === activePanel)?.label} Panel</h3>

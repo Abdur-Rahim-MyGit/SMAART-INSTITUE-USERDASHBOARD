@@ -46,42 +46,41 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
 
 
   return (
-    <div className="w-full h-full bg-[#fbfcfd] dark:bg-[#020617] p-4 md:p-6 overflow-y-auto relative overflow-hidden">
+    <div className="w-full h-full bg-white dark:bg-[#002147] p-4 md:p-6 overflow-y-auto relative overflow-hidden">
       {/* Subtle Background Glows */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-50/30 dark:bg-blue-900/5 rounded-full blur-[100px] -mr-48 -mt-48 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-50/30 dark:bg-indigo-900/5 rounded-full blur-[100px] -ml-48 -mb-48 pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-50/20 dark:bg-blue-900/5 rounded-full blur-[100px] -mr-48 -mt-48 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-50/20 dark:bg-indigo-900/5 rounded-full blur-[100px] -ml-48 -mb-48 pointer-events-none" />
       
       <div className="max-w-4xl mx-auto space-y-6 relative z-10">
         {/* Header */}
         <div className="border-b border-slate-200 dark:border-white/10 pb-4">
-          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-2">
-            <RotateCcw size={16} />
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+            <RotateCcw size={14} className="text-[#1a3884] dark:text-blue-400" />
             <span>Flash Cards</span>
           </div>
-          <h2 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+          <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white mb-2">
             {content?.title || 'Flash Cards'}
           </h2>
-
         </div>
 
         {/* Flashcard */}
         <div className="flex flex-col items-center gap-6">
           <motion.div 
             onClick={handleFlip}
-            whileHover={{ scale: 1.02, y: -8 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.01, y: -4 }}
+            whileTap={{ scale: 0.99 }}
             className="relative w-full max-w-2xl aspect-[3/2] cursor-pointer perspective-1000 group transition-all duration-500"
           >
             <motion.div
-              className="relative w-full h-full shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] rounded-3xl"
+              className="relative w-full h-full shadow-2xl rounded-3xl"
               initial={false}
               animate={{ rotateY: isFlipped ? 180 : 0 }}
-              transition={{ duration: 0.7, type: 'spring', stiffness: 200, damping: 15 }}
+              transition={{ duration: 0.6, type: 'spring', stiffness: 200, damping: 18 }}
               style={{ transformStyle: 'preserve-3d' }}
             >
               {/* Front - Force Solid Background and Visibility */}
               <motion.div
-                className="absolute inset-0 bg-slate-900 dark:bg-[#00152E] rounded-3xl flex items-center justify-center p-10 border border-white/10 overflow-hidden"
+                className="absolute inset-0 bg-[#1a3884] dark:bg-[#002A5C] rounded-3xl flex items-center justify-center p-8 md:p-10 border border-white/10 overflow-hidden"
                 style={{ 
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -92,20 +91,19 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
                 transition={{ duration: 0.2 }}
               >
                 {/* Rich Gradient Overlay - 100% Opaque */}
-                <div className="absolute inset-0 bg-[#1e3a8a] opacity-100" />
-                <div className="absolute inset-0 bg-gradient-to-br from-[#1e40af] via-[#1e3a8a] to-[#172554] opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#1a3884] via-[#112b6b] to-[#0d1e4c] opacity-100" />
                 
                 <div className="text-center space-y-6 relative z-10">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 mb-4">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/10 mb-4">
                     <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                    <span className="text-[9px] font-black text-white uppercase tracking-[0.25em]">Flashcard Phase</span>
+                    <span className="text-[9px] font-black text-white uppercase tracking-[0.25em]">Flashcard Front</span>
                   </div>
-                  <h3 className="text-2xl md:text-4xl font-black text-white leading-tight px-4 tracking-tight">
+                  <h3 className="text-2xl md:text-3xl font-black text-white leading-tight px-4 tracking-tight">
                     {currentCard?.front}
                   </h3>
-                  <div className="pt-10 flex flex-col items-center gap-4 opacity-60">
-                    <div className="h-px w-12 bg-white/40" />
-                    <span className="text-[10px] font-black text-white uppercase tracking-[0.3em]">
+                  <div className="pt-8 flex flex-col items-center gap-3 opacity-60">
+                    <div className="h-px w-10 bg-white/40" />
+                    <span className="text-[9px] font-black text-white uppercase tracking-[0.25em]">
                       Tap to Flip
                     </span>
                   </div>
@@ -114,7 +112,7 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
 
               {/* Back - Force Solid Background and Visibility */}
               <motion.div
-                className="absolute inset-0 bg-white dark:bg-[#00152E] rounded-3xl flex items-center justify-center p-10 border border-slate-200 dark:border-white/8"
+                className="absolute inset-0 bg-[#F8FAFC] dark:bg-[#002A5C] rounded-3xl flex items-center justify-center p-8 md:p-10 border border-slate-200 dark:border-white/10"
                 style={{ 
                   backfaceVisibility: 'hidden',
                   WebkitBackfaceVisibility: 'hidden',
@@ -125,14 +123,14 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
                 transition={{ duration: 0.2 }}
               >
                 <div className="text-center space-y-6">
-                  <span className="text-[10px] font-black text-[#1a3884] dark:text-blue-500 uppercase tracking-[0.4em] mb-4 block">
+                  <span className="text-[9px] font-black text-[#1a3884] dark:text-blue-450 uppercase tracking-[0.25em] mb-4 block">
                     THE SOLUTION
                   </span>
-                  <p className="text-xl md:text-3xl font-bold text-slate-900 dark:text-white leading-relaxed tracking-tight px-6">
+                  <p className="text-lg md:text-2xl font-bold text-slate-900 dark:text-white leading-relaxed tracking-tight px-4">
                     {currentCard?.back}
                   </p>
-                  <div className="pt-8 opacity-20">
-                     <RotateCcw size={16} className="mx-auto text-slate-900 dark:text-white" />
+                  <div className="pt-6 opacity-30">
+                     <RotateCcw size={15} className="mx-auto text-slate-900 dark:text-white" />
                   </div>
                 </div>
               </motion.div>
@@ -144,21 +142,21 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
             <button
               onClick={handlePrevious}
               disabled={currentIndex === 0}
-              className="p-3 rounded-full bg-slate-100 dark:bg-[#002A5C] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#002A5C] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#002A5C] dark:hover:bg-[#003170] text-slate-700 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={18} />
             </button>
 
-            <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
+            <span className="text-sm font-extrabold text-slate-600 dark:text-slate-400">
               {currentIndex + 1} / {flashcards.length}
             </span>
 
             <button
               onClick={handleNext}
               disabled={currentIndex === flashcards.length - 1}
-              className="p-3 rounded-full bg-slate-100 dark:bg-[#002A5C] text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#002A5C] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-[#002A5C] dark:hover:bg-[#003170] text-slate-700 dark:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={18} />
             </button>
           </div>
 
@@ -166,32 +164,32 @@ const FlashcardTask = ({ content, cards, onComplete, isCompleted }) => {
           {!hasMarkedComplete ? (
             <button
               onClick={handleMarkComplete}
-              className="w-full max-w-md px-6 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
+              className="w-full max-w-md px-6 py-3.5 bg-[#1a3884] hover:bg-[#112b6b] text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
             >
-              <CheckCircle2 size={20} />
+              <CheckCircle2 size={18} />
               Mark as Complete
             </button>
           ) : (
-            <div className="w-full max-w-md px-6 py-3 bg-green-100 dark:bg-green-900/30 border-2 border-green-500 dark:border-green-600 text-green-700 dark:text-green-400 font-bold rounded-xl flex items-center justify-center gap-2">
-              <CheckCircle2 size={20} />
-              Review Mode - You've completed these cards
+            <div className="w-full max-w-md px-6 py-3.5 bg-green-500/10 border-2 border-green-500 text-green-700 dark:text-green-450 font-bold rounded-xl flex items-center justify-center gap-2 text-sm uppercase tracking-wider">
+              <CheckCircle2 size={18} />
+              Completed
             </div>
           )}
         </div>
 
         {/* Interview Tips */}
         {content?.interviewTips && content.interviewTips.length > 0 && (
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Lightbulb size={18} className="text-amber-600 dark:text-amber-400" />
-              <h3 className="font-bold text-amber-900 dark:text-amber-100">
+          <div className="bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/40 rounded-2xl p-5">
+            <div className="flex items-center gap-2.5 mb-3.5">
+              <Lightbulb size={16} className="text-amber-600 dark:text-amber-400" />
+              <h3 className="font-extrabold text-sm uppercase tracking-wider text-amber-900 dark:text-amber-100">
                 Interview Prep Tips
               </h3>
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {content.interviewTips.map((tip, idx) => (
-                <li key={idx} className="text-sm text-amber-800 dark:text-amber-200 flex gap-2">
-                  <span className="font-bold">{idx + 1}.</span>
+                <li key={idx} className="text-sm text-amber-800 dark:text-amber-200 flex gap-2 font-medium leading-relaxed">
+                  <span className="font-black text-[#1a3884] dark:text-blue-400">{idx + 1}.</span>
                   <span>{tip}</span>
                 </li>
               ))}

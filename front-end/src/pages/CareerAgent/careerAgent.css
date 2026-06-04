@@ -646,6 +646,7 @@
 /* Inputs */
 .career-agent-page input,
 .career-agent-page select,
+.career-agent-page select option,
 .career-agent-page textarea {
   background: var(--navy2) !important;
   border: 1.5px solid var(--border2) !important;
@@ -653,7 +654,7 @@
   padding: 0.75rem 1rem !important;
   font-size: 0.88rem !important;
   color: var(--text1) !important;
-  font-family: var(--font) !important;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
   transition: all 0.2s ease !important;
 }
 .career-agent-page input:focus,
@@ -663,6 +664,14 @@
   background: var(--card) !important;
   box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12) !important;
   outline: none !important;
+}
+
+.career-agent-page select.select-placeholder,
+.career-agent-page select option[value=""] {
+  color: var(--muted) !important;
+}
+.career-agent-page select option {
+  color: var(--text1) !important;
 }
 
 .career-agent-page .field-error input,

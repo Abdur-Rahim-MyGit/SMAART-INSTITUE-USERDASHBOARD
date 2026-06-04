@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { BookOpen, ArrowRight, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ANIMATION_DELAYS, ANIMATION_DURATIONS } from "@/constants/dashboard";
+import { resolveStaticCourseTitle, compareCourseIds } from "@/utils/courseUnlock";
 
 const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
   const { t } = useTranslation();
@@ -15,6 +16,19 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
       : 0,
     [paths]
   );
+
+  // Derive the active path or fallback to last watched course/module from local storage
+  const activePath = paths.length > 0 ? paths[0] : null;
+  const lastWatchedCourse = localStorage.getItem("smaart_last_watched_course");
+  const storedProgress = parseInt(localStorage.getItem("smaart_course_progress") || "0", 10);
+  
+  const rawTitle = activePath ? activePath.title : (localStorage.getItem("smaart_last_watched_title") || lastWatchedCourse || "Capacity: Foundations");
+  const displayTitle = resolveStaticCourseTitle(rawTitle) || resolveStaticCourseTitle(activePath?.id) || resolveStaticCourseTitle(activePath?.courseCode) || rawTitle;
+
+  const isLastWatched = activePath ? (compareCourseIds(activePath.id, lastWatchedCourse) || compareCourseIds(activePath.courseCode, lastWatchedCourse)) : false;
+  const displayProgress = activePath 
+    ? Math.max(activePath.progress || 0, isLastWatched ? storedProgress : 0)
+    : (storedProgress || averageProgress);
 
   return (
     <motion.div
@@ -58,14 +72,14 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
           {/* RIGHT: Progress + CTA */}
           <div className="flex items-center gap-4 shrink-0 pl-4">
             {/* Overall Progress */}
-            <div className="hidden sm:flex flex-col gap-1.5 min-w-[130px]">
+            <div className="hidden sm:flex flex-col gap-1.5 min-w-[160px] max-w-[220px]">
               <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                  <TrendingUp className="w-3 h-3" />
-                  Progress
+                <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest truncate" title={displayTitle}>
+                  <TrendingUp className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{displayTitle}</span>
                 </span>
-                <span className="text-sm font-extrabold text-[#1a3884] dark:text-blue-400">
-                  {pathsLoading ? "—" : `${averageProgress}%`}
+                <span className="text-sm font-extrabold text-[#1a3884] dark:text-blue-400 shrink-0">
+                  {pathsLoading ? "—" : `${displayProgress}%`}
                 </span>
               </div>
               <div className="h-1.5 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden border border-slate-200/50 dark:border-slate-700/50">
@@ -74,7 +88,7 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
                 ) : (
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: `${averageProgress}%` }}
+                    animate={{ width: `${displayProgress}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
                     className="h-full rounded-full shadow-[0_0_8px_rgba(26,56,132,0.3)]"
                     style={{ background: "linear-gradient(90deg, #112b6b 0%, #1a3884 100%)" }}
@@ -93,7 +107,7 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
               transition={{ delay: 0.3, duration: 0.4 }}
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => navigate("/dashboard/courses")}
+              onClick={() => navigate(activePath?.navigateTo || "/dashboard/courses")}
               className="flex items-center gap-1.5 px-4 py-2 bg-[#1a3884] hover:bg-[#132c6b] dark:bg-[#1a3884] dark:hover:bg-[#112558] text-white rounded-xl text-xs font-bold shadow-md shadow-[#1a3884]/20 transition-colors whitespace-nowrap"
             >
               <BookOpen className="w-3.5 h-3.5 shrink-0" />
@@ -105,10 +119,14 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
 
         {/* Mobile: progress bar row */}
         <div className="sm:hidden flex items-center gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-white/10">
-          <div className="flex-1">
-            <div className="flex justify-between mb-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</span>
-              <span className="text-xs font-extrabold text-[#1a3884] dark:text-blue-400">{pathsLoading ? "—" : `${averageProgress}%`}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between mb-1 gap-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate" title={displayTitle}>
+                {displayTitle}
+              </span>
+              <span className="text-xs font-extrabold text-[#1a3884] dark:text-blue-400 shrink-0">
+                {pathsLoading ? "—" : `${displayProgress}%`}
+              </span>
             </div>
             <div className="h-1.5 w-full bg-slate-100 dark:bg-[#002A5C] rounded-full overflow-hidden">
               {pathsLoading ? (
@@ -116,7 +134,7 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
               ) : (
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${averageProgress}%` }}
+                  animate={{ width: `${displayProgress}%` }}
                   transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
                   className="h-full rounded-full"
                   style={{ background: "linear-gradient(90deg, #112b6b 0%, #1a3884 100%)" }}
@@ -125,8 +143,8 @@ const HeroSection = memo(({ userName, paths = [], pathsLoading = false }) => {
             </div>
           </div>
           <button
-            onClick={() => navigate("/dashboard/courses")}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1a3884] text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap"
+            onClick={() => navigate(activePath?.navigateTo || "/dashboard/courses")}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1a3884] text-white rounded-lg text-xs font-bold shadow-sm whitespace-nowrap shrink-0"
           >
             <BookOpen className="w-3 h-3" />
             Continue

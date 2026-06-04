@@ -45,6 +45,19 @@ const toolkitSections = [
     meta: "Definitions",
     detail: "Search meanings and vocabulary exercises to strengthen your professional language.",
   },
+  {
+    id: 8,
+    title: "Interview Preparation",
+    description:
+      "Access role-specific interview questions, aptitude tests, and domain resources tailored to your selected career path.",
+    icon: BookOpen,
+    path: "/dashboard/interview-prep",
+    badge: "Career",
+    badgeColor: "#1a3884",
+    cta: "Start Practicing",
+    meta: "Aptitude + Domain + HR",
+    detail: "Get fully equipped with Technical, Domain, and Behavioural questions synced to your Career Agent profile.",
+  },
   // {
   //   id: 5,
   //   title: "Library",
@@ -219,8 +232,8 @@ const SMAArtToolkit = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#F5F8FF] pb-12 pt-3 transition-colors duration-300 dark:bg-[#00152E]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-transparent pb-12 transition-colors duration-300">
+      <div className="mx-auto max-w-7xl">
 
         {/* ── Hero Header ── */}
         <motion.div

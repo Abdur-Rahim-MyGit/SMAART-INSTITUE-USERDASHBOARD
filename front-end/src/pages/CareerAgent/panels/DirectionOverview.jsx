@@ -39,9 +39,13 @@ const DirectionOverview = ({ directionData }) => {
 
     const { directionId, directionName, directionDescription, directionOverview, type, roles = [] } = normalizedData;
 
-    const validRoles = roles.filter(r => r.role && r.role.trim() !== '');
-
-
+    const validRoles = roles.filter(r => {
+        if (typeof r === 'string') return r.trim() !== '';
+        return r && r.role && r.role.trim() !== '';
+    }).map(r => {
+        if (typeof r === 'string') return { role: r, id: null };
+        return r;
+    });
     /* ── Type badge colour ── */
     const typeMeta = {
         Primary: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', color: 'var(--green)', dot: '#10b981' },

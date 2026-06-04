@@ -78,41 +78,50 @@ const SupportTicketsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300">
+    <div className="min-h-screen bg-transparent transition-colors duration-300 pb-24">
       <div className="pt-4">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
           {/* Header */}
-          {/* Back Button */}
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-6 hover:text-[#1a3884] transition-all"
-          >
-            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-              <ArrowLeft className="w-4 h-4" />
-            </div>
-            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-          </button>
+          {/* Back Button - Mobile Only */}
+          <div className="mb-4 md:hidden">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                <ArrowLeft className="w-4 h-4" />
+              </div>
+              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+            </button>
+          </div>
 
-          <div className="mb-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
-              <div className="flex items-center gap-4">
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#132c6b] flex items-center justify-center shadow-lg shadow-[#1a3884]/20 flex-shrink-0">
-                  <LifeBuoy className="w-5.5 h-5.5 sm:w-6 sm:h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{t("support_tickets_page.support_center")}</h1>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5 sm:mt-1">
-                    {t("support_tickets_page.we_are_here_to_help")}
+          {/* ── Standardized Header ── */}
+          <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+          >
+              <div className="flex flex-col">
+                  <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1a3884]/10 dark:bg-blue-900/30">
+                          <LifeBuoy className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
+                      </div>
+                      <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                          Support <span className="text-[#1a3884] dark:text-blue-300">Center</span>
+                      </h1>
+                  </div>
+                  <p className="mt-1 max-w-xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+                      {t("support_tickets_page.we_are_here_to_help")}
                   </p>
-                </div>
               </div>
 
               {/* Tabs */}
-              <div className="flex w-full md:w-auto gap-1 p-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl shadow-sm">
+              <div className="flex w-full md:w-auto gap-1 p-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl shadow-sm">
                 <button
                   onClick={() => setActiveTab('create')}
                   className={`flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'create'
-                    ? 'bg-[#1a3884] text-white shadow-md'
+                    ? 'bg-[#1a3884] text-white shadow-sm'
                     : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
@@ -121,15 +130,14 @@ const SupportTicketsPage = () => {
                 <button
                   onClick={() => setActiveTab('history')}
                   className={`flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 transition-all ${activeTab === 'history'
-                    ? 'bg-[#1a3884] text-white shadow-md'
+                    ? 'bg-[#1a3884] text-white shadow-sm'
                     : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                     }`}
                 >
                   <History size={15} /> {t("support_tickets_page.history")}
                 </button>
               </div>
-            </div>
-          </div>
+          </motion.div>
 
           <AnimatePresence mode="wait">
             {activeTab === 'create' ? (

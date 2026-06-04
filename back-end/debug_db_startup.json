@@ -1,0 +1,1016 @@
+{
+  "collectionNames": [
+    "userprogresses",
+    "announcements",
+    "careerdirections",
+    "dailyanalytics",
+    "visionboardnews",
+    "career-agent-certifaction",
+    "students",
+    "cqresults",
+    "roleskillslist",
+    "skillspassports",
+    "aiprofiles",
+    "registrations",
+    "assessments",
+    "skilllibraries",
+    "communityposts",
+    "user_achievements",
+    "incidents",
+    "otps",
+    "careerintelligences",
+    "problems",
+    "career_agent_data",
+    "communitygroups",
+    "results",
+    "arqresults",
+    "careeranalyses",
+    "support",
+    "auditlogs",
+    "skillProgress",
+    "usercertificates",
+    "useractivitylogs",
+    "careerroles",
+    "questionbanks",
+    "companies",
+    "departments",
+    "skills_master_v2",
+    "resumes",
+    "teachers",
+    "badges",
+    "issues",
+    "moderationlogs",
+    "visionboards",
+    "enrollments",
+    "learningprogrammes",
+    "visionboardpros",
+    "courses",
+    "userbadges",
+    "tasks",
+    "vakresults",
+    "slametrics",
+    "coaches",
+    "degrees",
+    "courseenrollments",
+    "collegedegrees",
+    "sqresults",
+    "apikeys",
+    "mentorshiplogs",
+    "uservisionboards",
+    "collegebanners",
+    "finalcareerpathway",
+    "big5results",
+    "user_progress",
+    "baselineresults",
+    "eqresults",
+    "logs",
+    "assets",
+    "studentplacementprofiles",
+    "notifications",
+    "stageresults",
+    "placementapplications",
+    "skillslist",
+    "jobpostings",
+    "counters",
+    "users",
+    "systemconfigs",
+    "communitytaskprogresses",
+    "todos",
+    "roleSkills",
+    "notes",
+    "sessions",
+    "chatmessages",
+    "engagementprofiles",
+    "colleges",
+    "loginotps",
+    "knowledgebases",
+    "coachsessions",
+    "roles-profile-data",
+    "studentpersonalprofiles",
+    "resumeverifications",
+    "coachalerts",
+    "escalations",
+    "moderations",
+    "roleskills_v2",
+    "avatars",
+    "user_streaks",
+    "aiqresults",
+    "certificates",
+    "changes",
+    "csiregisters",
+    "servicerequests",
+    "jobfamilies"
+  ],
+  "sampleUser": {
+    "_id": "69a01107dd2dc157b475ac5a",
+    "fullName": "fareeda",
+    "email": "fareeda@gmail.com",
+    "mobile": "8986878787",
+    "password": "$2a$10$ogX1pzogjiuUnfOOhQQ3VeLakxtrHZgAUvr6NqOdKuFdMOZEGDt2.",
+    "role": "admin",
+    "qualification": "MBA",
+    "specialization": "Business Analysis",
+    "location": "Chennai",
+    "referralCode": "",
+    "certificates": [],
+    "status": "active",
+    "createdAt": "2026-02-26T09:23:19.274Z",
+    "loginHistory": [
+      {
+        "timestamp": "2026-03-03T04:36:30.246Z",
+        "ipAddress": "::ffff:192.168.0.182",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36",
+        "browser": "Chrome",
+        "os": "Windows 10",
+        "device": "Desktop",
+        "location": "Unknown",
+        "success": true,
+        "_id": "69a6654edd3aa553411cce3b"
+      },
+      {
+        "timestamp": "2026-02-27T06:39:25.973Z",
+        "ipAddress": "::1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "browser": "Chrome",
+        "os": "Windows 10",
+        "device": "Desktop",
+        "location": "Unknown",
+        "success": true,
+        "_id": "69a13c1df60c20bc20269290"
+      },
+      {
+        "timestamp": "2026-02-26T09:55:52.216Z",
+        "ipAddress": "::1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "browser": "Chrome",
+        "os": "Windows 10",
+        "device": "Desktop",
+        "location": "Unknown",
+        "success": true,
+        "_id": "69a018a8a313396de407a62d"
+      },
+      {
+        "timestamp": "2026-02-26T09:41:41.915Z",
+        "ipAddress": "::1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "browser": "Chrome",
+        "os": "Windows 10",
+        "device": "Desktop",
+        "location": "Unknown",
+        "success": true,
+        "_id": "69a01555a313396de407a29a"
+      },
+      {
+        "timestamp": "2026-02-26T09:27:03.296Z",
+        "ipAddress": "::1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "browser": "Chrome",
+        "os": "Windows 10",
+        "device": "Desktop",
+        "location": "Unknown",
+        "success": true,
+        "_id": "69a011e7dd2dc157b475ad56"
+      },
+      {
+        "timestamp": "2026-02-26T09:23:35.789Z",
+        "ipAddress": "::1",
+        "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+        "browser": "Chrome",
+        "os": "Windows 10",
+        "device": "Desktop",
+        "location": "Unknown",
+        "success": true,
+        "_id": "69a01117dd2dc157b475ac60"
+      }
+    ],
+    "updatedAt": "2026-03-03T04:36:30.247Z",
+    "userId": "USR000001",
+    "__v": 6,
+    "lastLogin": "2026-03-03T04:36:30.246Z",
+    "lastLoginIp": "::ffff:192.168.0.182"
+  },
+  "sampleStudent": {
+    "_id": "69a0132cdd2dc157b475af32",
+    "fullName": "Sharuk",
+    "email": "sharuk@gmail.com",
+    "mobile": "3123131311",
+    "password": "$2a$10$g4a/t90kqC22yuK1MZGDJeyRASthMRRnAJHKkC0sjOo0z1SMqwbkq",
+    "role": "student",
+    "college": "69a0118ddd2dc157b475ad2a",
+    "rollNumber": "3213123131",
+    "section": "C",
+    "department": "Computer Application",
+    "assignedTeacher": "69a01316dd2dc157b475aeed",
+    "enrolledCourses": [],
+    "coachingSessions": [],
+    "status": "active",
+    "assessments": [],
+    "admissionDate": "2026-02-26T09:32:28.601Z",
+    "loginHistory": [],
+    "createdAt": "2026-02-26T09:32:28.603Z",
+    "updatedAt": "2026-06-02T07:18:22.598Z",
+    "studentId": "STU00001",
+    "__v": 1,
+    "lastOtpSentAt": "2026-02-26T09:42:13.524Z",
+    "otpAttempts": 0,
+    "badges": [],
+    "currentSessionId": "fae7dedb-18ab-4e8c-bb1a-aad3dd5f5292",
+    "isAssessmentCompleted": false,
+    "isFirstLogin": false,
+    "isRegistered": false,
+    "lastLogin": "2026-06-02T07:18:22.598Z",
+    "mustChangePassword": false,
+    "passwordChangedAt": "2026-04-20T09:07:03.619Z",
+    "sessionExpiresAt": "2026-06-02T10:18:22.566Z",
+    "settings": {
+      "profile": {
+        "displayName": "Sharuk",
+        "email": "sharuk@gmail.com",
+        "bio": "",
+        "phone": "3123131313"
+      },
+      "notifications": {
+        "emailNotifications": true,
+        "pushNotifications": true,
+        "assessmentReminders": true,
+        "courseUpdates": true,
+        "coachSessionReminders": true,
+        "communityActivity": true
+      },
+      "privacy": {
+        "profileVisibility": "everyone",
+        "twoFactorEnabled": false
+      },
+      "appearance": {
+        "theme": "light",
+        "accentColor": "#1a3884"
+      },
+      "language": {
+        "preferredLanguage": "Hindi",
+        "timezone": "Asia/Kolkata (GMT+5:30)",
+        "dateFormat": "DD/MM/YYYY"
+      }
+    },
+    "batch": "2024-2028",
+    "certificates": [],
+    "degree": "6a0ae4f114a042b1510b6976",
+    "idProof": "",
+    "userPassword": "Sharuk@123"
+  },
+  "allUsers": [
+    {
+      "_id": "69a01107dd2dc157b475ac5a",
+      "fullName": "fareeda",
+      "email": "fareeda@gmail.com"
+    },
+    {
+      "_id": "69a0118ddd2dc157b475ad2d",
+      "fullName": "Ramesh",
+      "email": "ramesh@gmail.com"
+    },
+    {
+      "_id": "69a0163bb5689288f85ed66d",
+      "fullName": "Sharuk",
+      "email": "sharuk@gmail.com"
+    },
+    {
+      "_id": "69a016bd3355c520d9c0ee7d",
+      "fullName": "Abdul Razith",
+      "email": "abdulrazith@gmail.com"
+    },
+    {
+      "_id": "69a016bdf59189a4eb49cee6",
+      "fullName": "Kumar",
+      "email": "kumar@gmail.com"
+    },
+    {
+      "_id": "69a0188ea313396de407a621",
+      "fullName": "Rahim",
+      "email": "rahim@gmail.com"
+    },
+    {
+      "_id": "69a1b4a9e609713774844a89",
+      "fullName": "Souban",
+      "email": "souban@gmail.com"
+    },
+    {
+      "_id": "69a2918d0f837c5e58b679e3",
+      "fullName": "Testly",
+      "email": "test-xss@example.com"
+    },
+    {
+      "_id": "69a291ba0f837c5e58b679e9",
+      "fullName": "Test Student",
+      "email": "student-1772261818284@test.com"
+    },
+    {
+      "_id": "69a55476e06c9ec1efa24b90",
+      "fullName": "Rahim",
+      "email": "rahim.dev.linux@gmail.com"
+    },
+    {
+      "_id": "69a55b4cfead6bb9f44293f0",
+      "fullName": "Khalid",
+      "email": "khalid@gmail.com"
+    },
+    {
+      "_id": "69a66a51dd3aa553411cd130",
+      "fullName": "SMAART Healthcare",
+      "email": "smaarthealthcareprojects@gmail.com"
+    },
+    {
+      "_id": "69a6a1d31a822da27152d668",
+      "fullName": "testy",
+      "email": "test@gmail.com"
+    },
+    {
+      "_id": "69a948474f1687dbe4b2f37c",
+      "fullName": "Dharsini J",
+      "email": "dharsinismaart@gmail.com"
+    },
+    {
+      "_id": "69aa76d053e06ec0d0fc015b",
+      "fullName": "Asma S",
+      "email": "dharsinijega6@gmail.com"
+    },
+    {
+      "_id": "69aa77fc53e06ec0d0fc037f",
+      "fullName": "Jesima Banu R",
+      "email": "jdharsini20@gmail.com"
+    },
+    {
+      "_id": "69b3ace8bfa671245acdb836",
+      "fullName": "Paul",
+      "email": "paul@gmail.com"
+    },
+    {
+      "_id": "69b46cf8d2b5fcf57c549b27",
+      "email": "admin@itsm.local"
+    },
+    {
+      "_id": "69b46cf8d2b5fcf57c549b28",
+      "email": "agent@itsm.local"
+    },
+    {
+      "_id": "69b46cf8d2b5fcf57c549b29",
+      "email": "user@itsm.local"
+    },
+    {
+      "_id": "69b46cf8d2b5fcf57c549b2a",
+      "email": "manager@itsm.local"
+    },
+    {
+      "_id": "69b46cf8d2b5fcf57c549b2b",
+      "email": "l2eng@itsm.local"
+    },
+    {
+      "_id": "69b46cf8d2b5fcf57c549b2c",
+      "email": "l3expert@itsm.local"
+    },
+    {
+      "_id": "69b46cf8d2b5fcf57c549b2d",
+      "email": "cio@itsm.local"
+    },
+    {
+      "_id": "69b7e76d2ed2721c7cbb1fb8",
+      "fullName": "Rahul",
+      "email": "rahul@gmail.com"
+    },
+    {
+      "_id": "69b80d6fd67f7475b34b0d85",
+      "fullName": "Mahesh",
+      "email": "mahesh@gmail.com"
+    },
+    {
+      "_id": "69b9180d7283610b7cbf8f32",
+      "fullName": "Ram",
+      "email": "ram@gmail.com"
+    },
+    {
+      "_id": "69b934e787b0ca6403d25927",
+      "fullName": "Raju",
+      "email": "raju@gmail.com"
+    },
+    {
+      "_id": "69b99b88559bebadc9b10c9e",
+      "fullName": "Faariz",
+      "email": "faariz@gmail.com"
+    },
+    {
+      "_id": "69ba3fbe4f0693184bf767e6",
+      "fullName": "John",
+      "email": "john@gmail.com"
+    },
+    {
+      "_id": "69c79b5745af76ec5e1c4e6e",
+      "fullName": "Sharan",
+      "email": "sharan@gmail.com"
+    },
+    {
+      "_id": "69ca4dfa9e381f32f6f1ee48",
+      "fullName": "Ruwaid",
+      "email": "ruwaid@gmail.com"
+    },
+    {
+      "_id": "69cf96f2cda692a21e970dbb",
+      "fullName": "Rajesh",
+      "email": "rajesh@gmail.com"
+    },
+    {
+      "_id": "69d3548e131d05ee809a4030",
+      "fullName": "Kalidas",
+      "email": "kalidas@gmail.com"
+    },
+    {
+      "_id": "69e0b99e56ab75fec31c3ef3",
+      "fullName": "Mohammed Rashad",
+      "email": "mohammedrashadvanaikar@gmail.com"
+    },
+    {
+      "_id": "69e0dddeb7279f42ccb3c2ca",
+      "fullName": "Rahman",
+      "email": "rahman@gmail.com"
+    },
+    {
+      "_id": "69e7494bcf07abdfabba6ae1",
+      "fullName": "Mohammed Aalam",
+      "email": "aalam@gmail.com"
+    },
+    {
+      "_id": "69fc5f69458d1e572ec18611",
+      "fullName": "Ayesha",
+      "email": "ayesha@gmail.com"
+    },
+    {
+      "_id": "69fc67522b8feb24233a7278",
+      "fullName": "Mukesh",
+      "email": "mukesh@gmail.com"
+    },
+    {
+      "_id": "6a004a9b203dd4500de9bcbb",
+      "fullName": "Vickram",
+      "email": "vickram@gmail.com"
+    },
+    {
+      "_id": "6a06eba5ab3d5487b2b9c2f9",
+      "fullName": "Mohammed Faheem",
+      "email": "faheem@gmail.com"
+    },
+    {
+      "_id": "6a0a96ff83c5354233988e7d",
+      "fullName": "Vickram",
+      "email": "vickram4656@gmail.com"
+    },
+    {
+      "_id": "6a0af74dcded7ef371945f2a",
+      "fullName": "Mohammed Rashad",
+      "email": "rashad@gmail.com"
+    },
+    {
+      "_id": "6a142a1013d1dc625325c0aa",
+      "fullName": "Rashad",
+      "email": "smaart.rashad@gmail.com"
+    },
+    {
+      "_id": "6a14384013427e5699aadb56",
+      "fullName": "Joheem",
+      "email": "joheem@gmail.com"
+    },
+    {
+      "_id": "6a1b24933954980351ac3074",
+      "fullName": "Streak Test User",
+      "email": "streaktest@example.com"
+    }
+  ],
+  "collegesList": [
+    {
+      "_id": "69a0118ddd2dc157b475ad2a",
+      "collegeName": "SRM",
+      "institutionType": "College",
+      "governanceType": "Private",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1772097854/smaart-minds/images/apdqbj8himb6ynbbmc5v.jpg",
+      "email": "srmuniversity@gmail.com",
+      "website": "srmuni.com",
+      "contactNumber": "9840881766",
+      "address": {
+        "street": "SRM Nagar, Kattankulathur - 603203, Chengalpattu District, Tamil Nadu, India",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "531231",
+        "country": "India"
+      },
+      "onboardingDate": "2026-02-26T00:00:00.000Z",
+      "affiliatedUniversity": "SRM University",
+      "coordinatorInfo": {
+        "name": "Abdul Kadhar",
+        "designation": "Principal",
+        "email": "abdulkadhar@gmail.com",
+        "mobile": "9344625458"
+      },
+      "registrationNumber": "312312312321",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "42134234234234",
+      "panNumber": "42342342432",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772097889/smaart-minds/documents/wwuyut6yujqfs5e66nc3",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772097894/smaart-minds/documents/v2xqhybnytlvb7iamstd",
+      "ndaDocument": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772097898/smaart-minds/documents/t1l0hj5ggonlkn6qvqap",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-02-26T00:00:00.000Z",
+      "validityEndDate": "2027-02-26T00:00:00.000Z",
+      "status": "active",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-02-26T09:25:33.374Z",
+      "updatedAt": "2026-02-26T09:41:50.085Z",
+      "collegeCode": "CLG00001",
+      "__v": 0,
+      "collegeAdmin": "69a0118ddd2dc157b475ad2d"
+    },
+    {
+      "_id": "69a55b4cfead6bb9f44293ed",
+      "collegeName": "SMAART University",
+      "institutionType": "College",
+      "governanceType": "Autonomous",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1772440484/smaart-minds/images/enmfxj5yzvklh6hptvk5.jpg",
+      "email": "smaart@gmail.com",
+      "website": "smaartinstitute.org",
+      "contactNumber": "7779998885",
+      "address": {
+        "street": "123 First street",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "600004",
+        "country": "India"
+      },
+      "onboardingDate": "2026-03-02T00:00:00.000Z",
+      "affiliatedUniversity": "University of Madras",
+      "coordinatorInfo": {
+        "name": "Rehana ",
+        "designation": "Director ",
+        "email": "rehana@gmail.com",
+        "mobile": "8887779994"
+      },
+      "registrationNumber": "9876543210",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "33AA12345678901",
+      "panNumber": "123456789A",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772440986/smaart-minds/documents/jnuljmw7yef42imlofx1",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772441001/smaart-minds/documents/j1il9tutxokmjelmyfaj",
+      "ndaDocument": "https://res.cloudinary.com/dcppk0wx4/raw/upload/v1772441012/smaart-minds/documents/ljisysh89k53xa3tun4x",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-03-02T00:00:00.000Z",
+      "validityEndDate": "2027-03-02T00:00:00.000Z",
+      "status": "active",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-03-02T09:41:32.385Z",
+      "updatedAt": "2026-03-02T09:41:32.692Z",
+      "collegeCode": "CLG00002",
+      "__v": 0,
+      "collegeAdmin": "69a55b4cfead6bb9f44293f0"
+    },
+    {
+      "_id": "69b80d6fd67f7475b34b0d82",
+      "collegeName": "St. Joseph's",
+      "institutionType": "College",
+      "governanceType": "Private",
+      "logo": "https://res.cloudinary.com/dlpmrdcqp/image/upload/v1773668976/smaart-minds/images/ddlwxgxcueddhny39p7f.png",
+      "email": "stjoseph's@gmail.com",
+      "website": "www.stjosephs.com",
+      "contactNumber": "3123131313",
+      "address": {
+        "street": "Off, Old Mahabalipuram Road, Kamaraj Nagar, Semmancheri, Chennai, Tamil Nadu 600119",
+        "city": "Trichy",
+        "state": "Tamil Nadu",
+        "pincode": "600119",
+        "country": "India"
+      },
+      "onboardingDate": "2026-03-16T00:00:00.000Z",
+      "affiliatedUniversity": "dasdasda",
+      "coordinatorInfo": {
+        "name": "Raj",
+        "designation": "Dean",
+        "email": "raj@gmail.com",
+        "mobile": "3123123131"
+      },
+      "registrationNumber": "312313213131",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "",
+      "panNumber": "",
+      "mouDocument": "https://res.cloudinary.com/dlpmrdcqp/image/upload/v1773669688/smaart-minds/images/zjgeama3zmtncwmk7aic.webp",
+      "universityActProof": "https://res.cloudinary.com/dlpmrdcqp/image/upload/v1773669698/smaart-minds/images/rxp2vvfufvllk3rdg3mw.webp",
+      "ndaDocument": "",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-03-16T00:00:00.000Z",
+      "validityEndDate": "2027-03-16T00:00:00.000Z",
+      "status": "active",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-03-16T14:02:23.612Z",
+      "updatedAt": "2026-04-15T00:51:30.906Z",
+      "collegeCode": "CLG00003",
+      "__v": 0,
+      "collegeAdmin": "69b80d6fd67f7475b34b0d85"
+    },
+    {
+      "_id": "69b9180d7283610b7cbf8f2f",
+      "collegeName": "Saveetha College of Engineering",
+      "institutionType": "College",
+      "governanceType": "Private",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773737918/smaart-minds/images/bb0toku7wzzynugkrbst.jpg",
+      "email": "saveethaeng@gmail.com",
+      "website": "www.engsaveetha.com",
+      "contactNumber": "3123123123",
+      "address": {
+        "street": "Saveetha Nagar, Kanchipuram - Chennai Rd, Sriperumbadur, Chennai, Tamil Nadu 602105",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "602105",
+        "country": "India"
+      },
+      "onboardingDate": "2026-03-17T00:00:00.000Z",
+      "affiliatedUniversity": "Anna University",
+      "coordinatorInfo": {
+        "name": "Sam",
+        "designation": "Principal",
+        "email": "sam@gmail.com",
+        "mobile": "3123123123"
+      },
+      "registrationNumber": "3123123213",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "",
+      "panNumber": "",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773737956/smaart-minds/images/dh6jffhr1byfvwigmg2v.webp",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773737961/smaart-minds/images/b4ynv4isqljd9wph2cbw.jpg",
+      "ndaDocument": "",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-03-17T00:00:00.000Z",
+      "validityEndDate": "2027-03-17T00:00:00.000Z",
+      "status": "active",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-03-17T08:59:57.174Z",
+      "updatedAt": "2026-03-17T11:34:20.033Z",
+      "collegeCode": "CLG00004",
+      "__v": 0,
+      "collegeAdmin": "69b9180d7283610b7cbf8f32"
+    },
+    {
+      "_id": "69b91d3c2ae08203c14321c6",
+      "collegeName": "Chennai Institute of Technology",
+      "institutionType": "College",
+      "governanceType": "Private",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773739255/smaart-minds/images/o3siautumfkilurrzncu.jpg",
+      "email": "chennaiit@gmail.com",
+      "website": "chennaiit.com",
+      "contactNumber": "3123123123",
+      "address": {
+        "street": "Sarathy Nagar, Kundrathur, Chennai, Malayambakkam, Tamil Nadu 600133",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "600130",
+        "country": "India"
+      },
+      "onboardingDate": "2026-03-17T00:00:00.000Z",
+      "affiliatedUniversity": "Anna University",
+      "coordinatorInfo": {
+        "name": "Rajesh",
+        "designation": "Dean",
+        "email": "rajesh@gmail.com",
+        "mobile": "3213131231"
+      },
+      "registrationNumber": "313213123123213",
+      "accreditationStatus": "Not Applicable",
+      "gstNumber": "",
+      "panNumber": "",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773739299/smaart-minds/images/vv5tm4lye8sztglzapvu.png",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773739304/smaart-minds/images/pxfged1c9fvviunwaal2.jpg",
+      "ndaDocument": "",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-03-17T00:00:00.000Z",
+      "validityEndDate": "2027-03-17T00:00:00.000Z",
+      "status": "active",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-03-17T09:22:04.993Z",
+      "updatedAt": "2026-04-16T10:26:57.463Z",
+      "collegeCode": "CLG00005",
+      "__v": 0
+    },
+    {
+      "_id": "69b934e787b0ca6403d25924",
+      "collegeName": "DG Vaishnav College",
+      "institutionType": "College",
+      "governanceType": "Private",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773745281/smaart-minds/images/liiogtw2cggadkpexsma.webp",
+      "email": "dgvaishnav@gmail.com",
+      "website": "www.vaishnavclg.com",
+      "contactNumber": "3123123123",
+      "address": {
+        "street": "NO.833, E.V.R. Periyar High Road, SBI Officers Colony, Arumbakkam, Chennai, Tamil Nadu 600106",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "600106",
+        "country": "India"
+      },
+      "onboardingDate": "2026-03-17T00:00:00.000Z",
+      "affiliatedUniversity": "University of Madras",
+      "coordinatorInfo": {
+        "name": "Mahesh",
+        "designation": "Principal",
+        "email": "mahesh@gmail.com",
+        "mobile": "3123123131"
+      },
+      "registrationNumber": "21321312312312",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "",
+      "panNumber": "",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773745330/smaart-minds/images/tbvtou87e67cd9narxfy.jpg",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773745334/smaart-minds/images/fugjsbmh8bxheu22xjn2.jpg",
+      "ndaDocument": "",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-03-17T00:00:00.000Z",
+      "validityEndDate": "2027-03-17T00:00:00.000Z",
+      "status": "active",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-03-17T11:03:03.613Z",
+      "updatedAt": "2026-03-17T11:03:03.888Z",
+      "collegeCode": "CLG00006",
+      "__v": 0,
+      "collegeAdmin": "69b934e787b0ca6403d25927"
+    },
+    {
+      "_id": "69ba3fbe4f0693184bf767e3",
+      "collegeName": "MEASI Institute of Information Technology",
+      "institutionType": "College",
+      "governanceType": "Private",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773813550/smaart-minds/images/ugnib7l9vqhpnn8w3gdr.png",
+      "email": "measiiit@gmail.com",
+      "website": "https://measiit.edu.in/",
+      "contactNumber": "5435345345",
+      "address": {
+        "street": "87, Peter's Rd, Peters Colony, Royapettah, Chennai, Tamil Nadu 600014",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "600014",
+        "country": "India"
+      },
+      "onboardingDate": "2026-03-18T00:00:00.000Z",
+      "affiliatedUniversity": "University of Madras",
+      "coordinatorInfo": {
+        "name": "Raul",
+        "designation": "HM",
+        "email": "raul@gmail.com",
+        "mobile": "6546456456"
+      },
+      "registrationNumber": "321312313",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "",
+      "panNumber": "",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773813642/smaart-minds/images/x5kk1v3d1kaak2xylwpm.jpg",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1773813649/smaart-minds/images/rfmrkbsky2ntsffoe6ht.jpg",
+      "ndaDocument": "",
+      "chairmanVideo": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1773813662/smaart-minds/videos/ttsj3mhod6qk4ucbnutw.mp4",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-03-18T00:00:00.000Z",
+      "validityEndDate": "2027-03-18T00:00:00.000Z",
+      "status": "active",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-03-18T06:01:34.436Z",
+      "updatedAt": "2026-04-16T11:31:47.982Z",
+      "collegeCode": "CLG00007",
+      "__v": 0,
+      "collegeAdmin": "69ba3fbe4f0693184bf767e6"
+    },
+    {
+      "_id": "69c79b5745af76ec5e1c4e6b",
+      "collegeName": "Loyola College",
+      "institutionType": "State University",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1774688424/smaart-minds/images/wzz91nbypqcxcw2gkohm.png",
+      "email": "loyolacollegeofarts@gmail.com",
+      "website": "https://www.loyolacollege.edu/",
+      "contactNumber": "6234234239",
+      "address": {
+        "street": "PB 3301, Sterling Rd, Nungambakkam, Chennai, Tamil Nadu",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "600034",
+        "country": "India"
+      },
+      "onboardingDate": "2026-03-28T00:00:00.000Z",
+      "universityType": "State",
+      "coordinatorInfo": {
+        "name": "Shanmugam",
+        "designation": "Principal",
+        "email": "shanmugam@gmail.com",
+        "mobile": "7542342342"
+      },
+      "registrationNumber": "42342342342342",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "",
+      "panNumber": "",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1774688525/smaart-minds/images/ixansbbjymb6daf8dviv.webp",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1774688533/smaart-minds/images/i2bxwybpedii17pwyumn.jpg",
+      "ndaDocument": "",
+      "chairmanVideo": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1779103452/smaart-minds/videos/juzia7raxchxgicquxkx.mp4",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-03-28T00:00:00.000Z",
+      "validityEndDate": "2027-03-28T00:00:00.000Z",
+      "status": "Active",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-03-28T09:11:51.015Z",
+      "updatedAt": "2026-06-03T11:08:47.408Z",
+      "collegeCode": "CLG00008",
+      "__v": 0,
+      "collegeAdmin": "69c79b5745af76ec5e1c4e6e",
+      "affiliatedUniversity": "University of Madras",
+      "validityDuration": 1,
+      "subscriptionPlan": {
+        "plan": "Smaart Complete",
+        "addons": {
+          "aiq": false,
+          "piq": false,
+          "britishCouncil": true
+        }
+      }
+    },
+    {
+      "_id": "69e0b99e56ab75fec31c3ef0",
+      "collegeName": "Noble College",
+      "institutionType": "Deemed University",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1776334126/smaart-minds/images/fkr0rmszgyager8h3q1s.webp",
+      "email": "noble@gmail.com",
+      "website": "https://www.noblecollege.edu.in",
+      "contactNumber": "8925366447",
+      "address": {
+        "street": "Chennai",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "pincode": "600001",
+        "country": "India"
+      },
+      "onboardingDate": "2026-04-16T00:00:00.000Z",
+      "universityType": "Deemed",
+      "coordinatorInfo": {
+        "name": "Rashad",
+        "designation": "Principal",
+        "email": "rashad@gmail.com",
+        "mobile": "8925366447"
+      },
+      "registrationNumber": "42342342342342",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "",
+      "panNumber": "",
+      "mouDocument": "https:/res.cloudinary.com/dcppk0wx4/image/upload/v1776334229/smaart-minds/images/rjphhnxmjdgrrtjxtzgl.png",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1776334235/smaart-minds/images/qmpiyf6eetydfuueyiod.webp",
+      "ndaDocument": "",
+      "chairmanVideo": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1779101774/smaart-minds/videos/xf8en7hndbbqfrz9ju5q.mp4",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-04-16T00:00:00.000Z",
+      "validityEndDate": "2027-04-16T00:00:00.000Z",
+      "status": "Active",
+      "numberOfDepartments": 3,
+      "departments": [
+        {
+          "name": "B.Com. - General",
+          "code": "BCom-G",
+          "totalYears": 3,
+          "_id": "6a2009ee53a594bbc4c4486c"
+        },
+        {
+          "name": "B.B.A. - General",
+          "code": "BBA-G",
+          "totalYears": 3,
+          "_id": "6a2009ee53a594bbc4c4486d"
+        },
+        {
+          "name": "B.C.A. - General",
+          "code": "BCA-G",
+          "totalYears": 3,
+          "_id": "6a2009ee53a594bbc4c4486e"
+        }
+      ],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-04-16T10:27:42.013Z",
+      "updatedAt": "2026-06-03T11:03:10.319Z",
+      "collegeCode": "CLG00009",
+      "__v": 0,
+      "collegeAdmin": "69e0b99e56ab75fec31c3ef3",
+      "validityDuration": 1,
+      "affiliatedUniversity": "University of Madras",
+      "collegeAdminPassword": "Ras@md123",
+      "addons": {
+        "aiq": false,
+        "piq": false,
+        "britishCouncil": false
+      },
+      "plan": "Smaart Core",
+      "subscriptionPlan": {
+        "plan": "Smaart Core",
+        "addons": {
+          "aiq": true,
+          "piq": false,
+          "britishCouncil": false
+        }
+      }
+    },
+    {
+      "_id": "6a142a1013d1dc625325c0a7",
+      "collegeName": "Ambur University",
+      "institutionType": "Private University",
+      "logo": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1779706245/smaart-minds/images/rnfnkmttojnmodrquphv.png",
+      "email": "ambur@gmail.com",
+      "website": "https://www.amburuniversity.edu.in/",
+      "contactNumber": "1234567890",
+      "address": {
+        "street": "Ambur Street",
+        "city": "Vellore",
+        "state": "Tamil Nadu",
+        "pincode": "635802",
+        "country": "India"
+      },
+      "onboardingDate": "2026-05-25T00:00:00.000Z",
+      "affiliatedUniversity": "",
+      "universityType": "Private",
+      "coordinatorInfo": {
+        "name": "Ambur PM",
+        "designation": "Principal",
+        "email": "amburpm@gmail.com",
+        "mobile": "1234567890"
+      },
+      "collegeAdminPassword": "Rashad@123",
+      "registrationNumber": "42342342342342",
+      "accreditationStatus": "NAAC",
+      "gstNumber": "",
+      "panNumber": "",
+      "mouDocument": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1779706345/smaart-minds/images/kyufvpxezrieyvxakni1.jpg",
+      "universityActProof": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1779706356/smaart-minds/images/vuiidyoql7vyznda4lxe.jpg",
+      "ndaDocument": "https://res.cloudinary.com/dcppk0wx4/image/upload/v1779706365/smaart-minds/images/mslkbpekamdi9ov6yaxp.jpg",
+      "chairmanVideo": "https://res.cloudinary.com/dcppk0wx4/video/upload/v1779706378/smaart-minds/videos/liakfadxsfkd3yfjeff9.mp4",
+      "maxFaculty": 100,
+      "maxStudents": 1000,
+      "validityStartDate": "2026-05-25T00:00:00.000Z",
+      "validityEndDate": "2027-05-25T00:00:00.000Z",
+      "validityDuration": 1,
+      "status": "Inactive",
+      "numberOfDepartments": 0,
+      "departments": [],
+      "totalStudents": 0,
+      "activeCourses": 0,
+      "institutionalReports": [],
+      "createdAt": "2026-05-25T10:53:04.543Z",
+      "updatedAt": "2026-06-03T11:05:03.794Z",
+      "collegeCode": "CLG00010",
+      "__v": 0,
+      "collegeAdmin": "6a142a1013d1dc625325c0aa",
+      "subscriptionPlan": {
+        "plan": "Smaart Standard",
+        "addons": {
+          "aiq": false,
+          "piq": true,
+          "britishCouncil": false
+        }
+      }
+    }
+  ],
+  "connectedTo": "ac-3hctxon-shard-00-00.bkxwjdl.mongodb.net",
+  "dbName": "test"
+}

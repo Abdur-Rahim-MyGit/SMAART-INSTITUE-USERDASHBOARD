@@ -70,6 +70,7 @@ const CareerAgentDashboard = lazy(() => import('@/pages/CareerAgent/CareerAgentD
 // AI Career Coach pages
 const ProfileAnalysis = lazy(() => import('@/pages/AICareerCoach/ProfileAnalysis'));
 const ResumeBuilder = lazy(() => import('@/pages/AICareerCoach/ResumeBuilder'));
+const InterviewPrepTool = lazy(() => import('@/pages/InterviewPrepTool'));
 
 // Auth guard component
 import AssessmentFlowGuard from '@/components/AssessmentFlowGuard';
@@ -217,6 +218,7 @@ const AnimatedRoutes = () => {
                         {/* AI Career Coach Routes */}
                         <Route path="/dashboard/profile-analysis" element={<ProfileAnalysis />} />
                         <Route path="/dashboard/resume-builder" element={<ResumeBuilder />} />
+                        <Route path="/dashboard/interview-prep" element={<InterviewPrepTool />} />
 
                         {/* Career Data Fetcher */}
                         <Route path="/dashboard/career-data-fetcher" element={<CareerDataFetcher />} />

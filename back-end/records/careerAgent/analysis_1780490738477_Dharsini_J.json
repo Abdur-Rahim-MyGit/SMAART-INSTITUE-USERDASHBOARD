@@ -1,0 +1,530 @@
+{
+  "id": "1780490738477",
+  "timestamp": "2026-06-03T12:45:38.477Z",
+  "status": "completed",
+  "profile_hash": "32fab0cc7e3fa51b3fc40f9ecbcabc05080292b5aa98a412f18c2d68eeb568d8",
+  "input_user_data": {
+    "personalDetails": {
+      "name": "Dharsini J",
+      "email": "dharsinismaart@gmail.com",
+      "phone": "9445150351",
+      "registrationNumber": "REG-12345"
+    },
+    "education": [
+      {
+        "level": "Diploma",
+        "domain": "Engineering & Technology",
+        "degreeGroup": "Diploma in Engineering (Polytechnic)",
+        "specialisation": [
+          "Electrical"
+        ],
+        "university": "",
+        "graduationYear": "2022",
+        "currentlyPursuing": true
+      }
+    ],
+    "skills": [],
+    "experience": [
+      {
+        "orgName": "",
+        "designation": "",
+        "sector": "",
+        "type": "Full-Time",
+        "startDate": "",
+        "endDate": "",
+        "currentlyWorking": false,
+        "isCustomSector": false
+      }
+    ],
+    "preferences": {
+      "primary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "5G Engineer",
+        "type": "Full-Time",
+        "salary": "3-5 LPA",
+        "locations": [
+          "Chennai"
+        ],
+        "location": "Chennai",
+        "orgTypes": [
+          "Startup (Early-stage / Growth-stage)"
+        ]
+      },
+      "secondary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Commercial Pilot - Captain",
+        "type": "Full-Time",
+        "salary": "25+ LPA",
+        "locations": [
+          "Ambala"
+        ],
+        "location": "Ambala",
+        "orgTypes": [
+          "Family-owned Business"
+        ]
+      },
+      "tertiary": {
+        "careerDirection": null,
+        "careerDirectionId": "",
+        "careerDirectionName": "",
+        "careerDirectionDescription": "",
+        "sectors": [],
+        "sector": "",
+        "family": "",
+        "role": "Ship Captain",
+        "type": "Full-Time",
+        "salary": "0-3 LPA",
+        "locations": [
+          "Delhi"
+        ],
+        "location": "Delhi",
+        "orgTypes": [
+          "Consulting / Professional Services Firm"
+        ]
+      }
+    }
+  },
+  "output_generated_report": {
+    "status": "success_deterministic",
+    "generated_at": "2026-06-03T12:45:38.662Z",
+    "preVerified": {
+      "dataFilesReady": true,
+      "primaryZone": {
+        "employer_zone": "Red",
+        "skill_coverage_pct": 0
+      },
+      "secondaryZone": {
+        "employer_zone": "Red"
+      },
+      "tertiaryZone": {
+        "employer_zone": "Red"
+      },
+      "primaryMarket": null,
+      "primarySkillGap": {
+        "missing": [],
+        "matched": [],
+        "coveragePct": 0,
+        "dataReady": true,
+        "source": "local"
+      }
+    },
+    "primary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 15%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "5G Engineer",
+        "job_family": "Telecom & Networking",
+        "role_description": "A 5G Engineer at a leading telecom operator, a major telecom operator, or a telecom vendor spends a typical week configuring gNB (Next Generation NodeB) base station parameters for 5G NR NSA and SA deployments, running 5G NR RF performance analysis from drive test and KPI data, preparing 5G network deployment documentation against 3GPP Release 15/16 specifications, testing 5G network slicing configurations in the lab environment, and coordinating with the 5G core team on AMF/SMF/UPF integration testing for SA deployment. They track DOT spectrum allocation decisions and their implications for frequency band deployment planning.",
+        "narrative_para1": "A 5G Engineer at a leading telecom operator, a major telecom operator, or a telecom vendor spends a typical week configuring gNB (Next Generation NodeB) base station parameters for 5G NR NSA and SA deployments, running 5G NR RF performance analysis from drive test and KPI data, preparing 5G network deployment documentation against 3GPP Release 15/16 specifications, testing 5G network slicing configurations in the lab environment, and coordinating with the 5G core team on AMF/SMF/UPF integration testing for SA deployment. They track DOT spectrum allocation decisions and their implications for frequency band deployment planning.",
+        "narrative_para2": "This is an AI-Evolving role with high AI exposure on tooling and documentation. GitHub Copilot assists with 5G NR automation scripting and network function configuration code. ChatGPT and Claude generate 5G network design documentation, NSA/SA architecture specification write-ups, and 5G use case documentation. AI-powered 5G network optimisation tools assist with automated beam management and interference coordination analytics. Perplexity AI rapidly surfaces 3GPP Release 16/17/18 specification updates and DOT 5G spectrum policy notifications. However, configuring massive MIMO antenna systems and managing India's specific multi-band 5G spectrum environment require deep human 5G expertise.",
+        "narrative_para3": "5G Engineering suits people with strong LTE foundations who are ready to extend into 5G NR's substantially more complex technical terrain — massive MIMO beamforming, network slicing, ultra-low latency service delivery, and cloud-native core architecture. You need genuine enthusiasm for rapidly evolving 3GPP standards, strong Python scripting skills for automation, and the patience for India's complex multi-band 5G spectrum environment across 700 MHz, 3.5 GHz, and 26 GHz bands. If you find the frontier of wireless technology genuinely exciting, 5G engineering is one of India's most dynamic technical careers right now.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Actively AI-Evolving",
+        "salary_range": "₹6.0L - ₹13.0L",
+        "salary_progression": null,
+        "english_requirement": "Essential",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "52",
+        "ai_impact": "This is an AI-Evolving role with high AI exposure on tooling and documentation. GitHub Copilot assists with 5G NR automation scripting and network function configuration code. ChatGPT and Claude generate 5G network design documentation, NSA/SA architecture specification write-ups, and 5G use case documentation. AI-powered 5G network optimisation tools assist with automated beam management and interference coordination analytics. Perplexity AI rapidly surfaces 3GPP Release 16/17/18 specification updates and DOT 5G spectrum policy notifications. However, configuring massive MIMO antenna systems and managing India's specific multi-band 5G spectrum environment require deep human 5G expertise.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced 5G Engineer",
+            "description": "Uses AI productivity tools daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "52%",
+          "level": "High",
+          "tasks_assisted": "5G Engineers benefit from AI with GitHub Copilot assisting with 5G NR (New Radio) automation scripting and network function configuration code. ChatGPT/Claude for Telecom and Networking Documentation generates 5G network design documentation, NSA/SA architecture specification write-ups, and 5G use case documentation. AI-powered 5G network optimisation tools assist with automated beam management and interference coordination analytics. Perplexity AI rapidly surfaces 3GPP Release 16/17/18 specification updates and DOT 5G spectrum policy notifications.",
+          "human_value": "5G Engineers design and optimise 5G networks — making beamforming configuration decisions, managing network slicing deployment, and integrating 5G with India's emerging enterprise use case requirements — requiring deep understanding of 5G SA (Standalone) architecture and India's specific spectrum environment AI cannot independently contextualise. Managing India's 5G rollout (Jio, Airtel 5G deployment), configuring massive MIMO antenna systems, and developing 5G use cases for Indian industry verticals require experienced human 5G engineering expertise."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for 5G Engineer."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a 5G Engineer portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified 5G Engineer",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "5G Engineer Capstone",
+            "description": "Complete 5G Engineer end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "5G Engineering suits people with strong LTE foundations who are ready to extend into 5G NR's substantially more complex technical terrain — massive MIMO beamforming, network slicing, ultra-low latency service delivery, and cloud-native core architecture. You need genuine enthusiasm for rapidly evolving 3GPP standards, strong Python scripting skills for automation, and the patience for India's complex multi-band 5G spectrum environment across 700 MHz, 3.5 GHz, and 26 GHz bands. If you find the frontier of wireless technology genuinely exciting, 5G engineering is one of India's most dynamic technical careers right now.",
+        "target_audience": "UG/PG graduates with interest in Telecom & Networking.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "5G Engineer",
+        "job_family": "Telecom & Networking",
+        "narrative_para1": "A 5G Engineer at a leading telecom operator, a major telecom operator, or a telecom vendor spends a typical week configuring gNB (Next Generation NodeB) base station parameters for 5G NR NSA and SA deployments, running 5G NR RF performance analysis from drive test and KPI data, preparing 5G network deployment documentation against 3GPP Release 15/16 specifications, testing 5G network slicing configurations in the lab environment, and coordinating with the 5G core team on AMF/SMF/UPF integration testing for SA deployment. They track DOT spectrum allocation decisions and their implications for frequency band deployment planning.",
+        "narrative_para2": "This is an AI-Evolving role with high AI exposure on tooling and documentation. GitHub Copilot assists with 5G NR automation scripting and network function configuration code. ChatGPT and Claude generate 5G network design documentation, NSA/SA architecture specification write-ups, and 5G use case documentation. AI-powered 5G network optimisation tools assist with automated beam management and interference coordination analytics. Perplexity AI rapidly surfaces 3GPP Release 16/17/18 specification updates and DOT 5G spectrum policy notifications. However, configuring massive MIMO antenna systems and managing India's specific multi-band 5G spectrum environment require deep human 5G expertise.",
+        "narrative_para3": "5G Engineering suits people with strong LTE foundations who are ready to extend into 5G NR's substantially more complex technical terrain — massive MIMO beamforming, network slicing, ultra-low latency service delivery, and cloud-native core architecture. You need genuine enthusiasm for rapidly evolving 3GPP standards, strong Python scripting skills for automation, and the patience for India's complex multi-band 5G spectrum environment across 700 MHz, 3.5 GHz, and 26 GHz bands. If you find the frontier of wireless technology genuinely exciting, 5G engineering is one of India's most dynamic technical careers right now.",
+        "salary_range_low": "600000",
+        "salary_range_high": "1300000",
+        "ai_exposure_pct": "52",
+        "ai_exposure_level": "High",
+        "ai_exposure_detail": "5G Engineers benefit from AI with GitHub Copilot assisting with 5G NR (New Radio) automation scripting and network function configuration code. ChatGPT/Claude for Telecom and Networking Documentation generates 5G network design documentation, NSA/SA architecture specification write-ups, and 5G use case documentation. AI-powered 5G network optimisation tools assist with automated beam management and interference coordination analytics. Perplexity AI rapidly surfaces 3GPP Release 16/17/18 specification updates and DOT 5G spectrum policy notifications.",
+        "human_value_tasks": "5G Engineers design and optimise 5G networks — making beamforming configuration decisions, managing network slicing deployment, and integrating 5G with India's emerging enterprise use case requirements — requiring deep understanding of 5G SA (Standalone) architecture and India's specific spectrum environment AI cannot independently contextualise. Managing India's 5G rollout (Jio, Airtel 5G deployment), configuring massive MIMO antenna systems, and developing 5G use cases for Indian industry verticals require experienced human 5G engineering expertise.",
+        "english_requirement": "Essential"
+      }
+    },
+    "secondary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "Commercial Pilot - Captain",
+        "job_family": "Aviation & Transportation",
+        "role_description": "A Commercial Pilot Captain at a leading domestic airline, the national carrier, a full-service airline, or a low-cost airline Air spends a typical working day completing a DGCA-standard pre-flight briefing with the co-pilot, reviewing weather reports and NOTAMs, conducting the pre-flight external aircraft inspection, managing the cockpit pre-departure checklist, and flying the aircraft through all phases of flight — taxi, takeoff, cruise, approach, and landing — using the Boeing 737 NG/MAX, Airbus A320/A321 NEO, or other type-rated aircraft. Between flights, they complete journey log entries, file delay reports, and communicate with airline operations control.",
+        "narrative_para1": "A Commercial Pilot Captain at a leading domestic airline, the national carrier, a full-service airline, or a low-cost airline Air spends a typical working day completing a DGCA-standard pre-flight briefing with the co-pilot, reviewing weather reports and NOTAMs, conducting the pre-flight external aircraft inspection, managing the cockpit pre-departure checklist, and flying the aircraft through all phases of flight — taxi, takeoff, cruise, approach, and landing — using the Boeing 737 NG/MAX, Airbus A320/A321 NEO, or other type-rated aircraft. Between flights, they complete journey log entries, file delay reports, and communicate with airline operations control.",
+        "narrative_para2": "This is an AI-Evolving role with low AI exposure in core flying duties, despite advanced avionics. AI-enhanced FMS (Flight Management System) automates route and fuel optimisation. AI weather analysis tools provide SIGMET and turbulence alert briefing. AI fatigue risk management systems assist with crew duty scheduling compliance. DGCA regulations require licensed human Pilot-in-Command authority for every flight — AI cannot hold a DGCA ATPL licence or assume PIC responsibility. The irreplaceable human value — exercising Pilot-in-Command authority, managing emergency situations through trained judgment, and carrying legal accountability for every passenger — is statutory and non-negotiable. Note: salary figures in source data (₹24–50 lakh) are complex base + allowances structures; flagged for verification.",
+        "narrative_para3": "Commercial Pilot Captaincy is reached through a structured progression from CPL holder through First Officer to Captain — typically 7–15 years of total flying experience. The role demands exceptional technical skill, unwavering safety culture, and the interpersonal authority for Crew Resource Management that makes the two-pilot cockpit effective. Flying requires comfort with highly structured environments and the psychological stability for high-consequence decisions made under time pressure. If you are genuinely passionate about aviation, have the cognitive and physical aptitude for DGCA ATPL examinations and flying training, and are prepared for the rotational lifestyle of airline operations, this is one of India's most prestigious professional careers.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Stable with AI Augmentation",
+        "salary_range": "₹24.0L - ₹50.0L",
+        "salary_progression": null,
+        "english_requirement": "Essential",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "25",
+        "ai_impact": "This is an AI-Evolving role with low AI exposure in core flying duties, despite advanced avionics. AI-enhanced FMS (Flight Management System) automates route and fuel optimisation. AI weather analysis tools provide SIGMET and turbulence alert briefing. AI fatigue risk management systems assist with crew duty scheduling compliance. DGCA regulations require licensed human Pilot-in-Command authority for every flight — AI cannot hold a DGCA ATPL licence or assume PIC responsibility. The irreplaceable human value — exercising Pilot-in-Command authority, managing emergency situations through trained judgment, and carrying legal accountability for every passenger — is statutory and non-negotiable. Note: salary figures in source data (₹24–50 lakh) are complex base + allowances structures; flagged for verification.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced Commercial Pilot - Captain",
+            "description": "Uses AI productivity tools daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "25%",
+          "level": "Moderate",
+          "tasks_assisted": "Commercial Pilot Captains benefit from limited AI assistance — enhanced avionics autopilot systems, AI-powered flight management system (FMS) route optimisation, and AI weather analysis briefing tools. ChatGPT assists with pre-flight documentation. AI fatigue risk management systems assist with crew duty scheduling compliance. However, commercial aviation's safety-critical nature fundamentally restricts AI in flight control, and DGCA regulations require licensed human pilot-in-command authority for every flight.",
+          "human_value": "Commercial Pilot Captains exercise Pilot-in-Command authority — making final flight safety decisions, managing emergency situations through trained judgment, and carrying legal accountability for every passenger on board under the Aircraft Act 1934 and DGCA regulations. Flying the aircraft, managing crew resource management, and exercising the regulatory authority and professional accountability that aviation safety demands require irreplaceable human piloting expertise. AI cannot hold a DGCA ATPL licence or assume PIC responsibility."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for Commercial Pilot - Captain."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a Commercial Pilot - Captain portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified Commercial Pilot - Captain",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "Commercial Pilot - Captain Capstone",
+            "description": "Complete Commercial Pilot - Captain end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "Commercial Pilot Captaincy is reached through a structured progression from CPL holder through First Officer to Captain — typically 7–15 years of total flying experience. The role demands exceptional technical skill, unwavering safety culture, and the interpersonal authority for Crew Resource Management that makes the two-pilot cockpit effective. Flying requires comfort with highly structured environments and the psychological stability for high-consequence decisions made under time pressure. If you are genuinely passionate about aviation, have the cognitive and physical aptitude for DGCA ATPL examinations and flying training, and are prepared for the rotational lifestyle of airline operations, this is one of India's most prestigious professional careers.",
+        "target_audience": "UG/PG graduates with interest in Aviation & Transportation.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "Commercial Pilot - Captain",
+        "job_family": "Aviation & Transportation",
+        "narrative_para1": "A Commercial Pilot Captain at a leading domestic airline, the national carrier, a full-service airline, or a low-cost airline Air spends a typical working day completing a DGCA-standard pre-flight briefing with the co-pilot, reviewing weather reports and NOTAMs, conducting the pre-flight external aircraft inspection, managing the cockpit pre-departure checklist, and flying the aircraft through all phases of flight — taxi, takeoff, cruise, approach, and landing — using the Boeing 737 NG/MAX, Airbus A320/A321 NEO, or other type-rated aircraft. Between flights, they complete journey log entries, file delay reports, and communicate with airline operations control.",
+        "narrative_para2": "This is an AI-Evolving role with low AI exposure in core flying duties, despite advanced avionics. AI-enhanced FMS (Flight Management System) automates route and fuel optimisation. AI weather analysis tools provide SIGMET and turbulence alert briefing. AI fatigue risk management systems assist with crew duty scheduling compliance. DGCA regulations require licensed human Pilot-in-Command authority for every flight — AI cannot hold a DGCA ATPL licence or assume PIC responsibility. The irreplaceable human value — exercising Pilot-in-Command authority, managing emergency situations through trained judgment, and carrying legal accountability for every passenger — is statutory and non-negotiable. Note: salary figures in source data (₹24–50 lakh) are complex base + allowances structures; flagged for verification.",
+        "narrative_para3": "Commercial Pilot Captaincy is reached through a structured progression from CPL holder through First Officer to Captain — typically 7–15 years of total flying experience. The role demands exceptional technical skill, unwavering safety culture, and the interpersonal authority for Crew Resource Management that makes the two-pilot cockpit effective. Flying requires comfort with highly structured environments and the psychological stability for high-consequence decisions made under time pressure. If you are genuinely passionate about aviation, have the cognitive and physical aptitude for DGCA ATPL examinations and flying training, and are prepared for the rotational lifestyle of airline operations, this is one of India's most prestigious professional careers.",
+        "salary_range_low": "2400000",
+        "salary_range_high": "5000000",
+        "ai_exposure_pct": "25",
+        "ai_exposure_level": "Moderate",
+        "ai_exposure_detail": "Commercial Pilot Captains benefit from limited AI assistance — enhanced avionics autopilot systems, AI-powered flight management system (FMS) route optimisation, and AI weather analysis briefing tools. ChatGPT assists with pre-flight documentation. AI fatigue risk management systems assist with crew duty scheduling compliance. However, commercial aviation's safety-critical nature fundamentally restricts AI in flight control, and DGCA regulations require licensed human pilot-in-command authority for every flight.",
+        "human_value_tasks": "Commercial Pilot Captains exercise Pilot-in-Command authority — making final flight safety decisions, managing emergency situations through trained judgment, and carrying legal accountability for every passenger on board under the Aircraft Act 1934 and DGCA regulations. Flying the aircraft, managing crew resource management, and exercising the regulatory authority and professional accountability that aviation safety demands require irreplaceable human piloting expertise. AI cannot hold a DGCA ATPL licence or assume PIC responsibility.",
+        "english_requirement": "Essential"
+      }
+    },
+    "tertiary": {
+      "zone": "Red",
+      "zone_message": "This role usually requires a different background. Extra preparation required.",
+      "preparation_time": "6+ months",
+      "match_explanation": "Your alignment score is 0%. You have 0 matching skills.",
+      "tab1": {
+        "role_name": "Ship Captain",
+        "job_family": "Aviation & Transportation",
+        "role_description": "A Ship Captain (Master Mariner) operating a container vessel, bulk carrier, or product tanker calling at Indian ports (JNPT, Mundra, Vizag, Paradip) spends a typical sea voyage managing the bridge watch schedule, conducting daily safety meetings with the officers, reviewing ECDIS (Electronic Chart Display and Information System) track planning for the next port approach, completing voyage reports for the shipping company's operations department, and managing cargo documentation. At Indian ports, they coordinate with the port agent, customs, immigration, and Port State Control inspectors for vessel clearance. Note: salary figures reflect significant variance by vessel type and rank per source data.",
+        "narrative_para1": "A Ship Captain (Master Mariner) operating a container vessel, bulk carrier, or product tanker calling at Indian ports (JNPT, Mundra, Vizag, Paradip) spends a typical sea voyage managing the bridge watch schedule, conducting daily safety meetings with the officers, reviewing ECDIS (Electronic Chart Display and Information System) track planning for the next port approach, completing voyage reports for the shipping company's operations department, and managing cargo documentation. At Indian ports, they coordinate with the port agent, customs, immigration, and Port State Control inspectors for vessel clearance. Note: salary figures reflect significant variance by vessel type and rank per source data.",
+        "narrative_para2": "This is an AI-Evolving role with moderate AI exposure on navigation technology. AI-enhanced ECDIS provides automated collision avoidance and route optimisation advisory. AI weather routing tools surface optimised voyage routing for fuel efficiency. AI cargo management systems assist with automated stability and trim calculation. However, IMO SOLAS regulations require the Master to have full authority and legal accountability for the vessel — AI cannot hold a Master Mariner certificate or assume command responsibility. The irreplaceable human value — navigating challenging approaches, managing international crew, and responding to maritime emergencies — is legally mandated by IMO/DG Shipping regulations. Salary is complex and variable per source data.",
+        "narrative_para3": "Ship Captaincy is reached after approximately 12–18 years of sea service progressing through deck officer ranks — Third Officer, Second Officer, Chief Officer, Master. The career requires commitment to continuous certification (STCW Manila Amendments), years of sea service away from home, and the exceptional leadership responsibility of command authority over vessel, cargo, and crew. If you have a genuine vocation for seafaring, can manage the lifestyle demands of extended voyages away from home, and aspire to the highest command authority in the maritime profession — whose English-language communication skills meet STCW standards — this is one of the world's most respected professional careers.",
+        "typical_employers_india": "MNCs, Startups, Consultancies",
+        "common_entry_paths": "Campus Placements, Internships",
+        "job_demand": "Stable with AI Augmentation",
+        "salary_range": "₹20.0L - ₹50.0L",
+        "salary_progression": null,
+        "english_requirement": "Essential",
+        "remote_friendly": "Office-Based",
+        "emerging_role_flag": false,
+        "programme_levels": "",
+        "ai_exposure_pct": "28",
+        "ai_impact": "This is an AI-Evolving role with moderate AI exposure on navigation technology. AI-enhanced ECDIS provides automated collision avoidance and route optimisation advisory. AI weather routing tools surface optimised voyage routing for fuel efficiency. AI cargo management systems assist with automated stability and trim calculation. However, IMO SOLAS regulations require the Master to have full authority and legal accountability for the vessel — AI cannot hold a Master Mariner certificate or assume command responsibility. The irreplaceable human value — navigating challenging approaches, managing international crew, and responding to maritime emergencies — is legally mandated by IMO/DG Shipping regulations. Salary is complex and variable per source data.",
+        "emerging_roles": [
+          {
+            "name": "AI-Enhanced Ship Captain",
+            "description": "Uses AI productivity tools daily."
+          }
+        ]
+      },
+      "tab2": {
+        "must_have": [],
+        "nice_to_have": []
+      },
+      "tab3": {
+        "ai_tools": [
+          {
+            "name": "ChatGPT",
+            "category": "AI-Powered",
+            "usage": "General Assistance",
+            "adoption_level": "High"
+          }
+        ],
+        "ai_exposure": {
+          "percentage": "28%",
+          "level": "Moderate",
+          "tasks_assisted": "Ship Captains benefit from limited AI assistance with AI-enhanced ECDIS (Electronic Chart Display and Information System) providing automated collision avoidance and route optimisation advisory. AI weather routing tools surface optimised voyage routing for fuel efficiency. AI cargo management systems assist with automated stability and trim calculation. However, IMO SOLAS regulations require the Master to have full authority and accountability for the vessel — AI cannot hold a Master Mariner certificate or assume command responsibility.",
+          "human_value": "Ship Captains exercise Master's authority — the highest command responsibility in maritime law — making navigation decisions, managing emergencies, and bearing legal accountability for vessel, cargo, and crew safety under IMO/SOLAS/MARPOL regulations. Navigating India's challenging port approaches (congested anchorages, shallow coastal waters, monsoon sea states), managing international crew, and responding to maritime emergencies require the irreplaceable professional expertise of a licensed Master Mariner certified by DG Shipping."
+        },
+        "human_skills": [
+          "Analytical Thinking",
+          "Communication",
+          "Problem Solving",
+          "Continuous Learning"
+        ]
+      },
+      "tab4": {
+        "skill_gap": {
+          "current_skills": [
+            "Basic Academics",
+            "Communication"
+          ],
+          "missing_skills": []
+        },
+        "learning_roadmap": [
+          {
+            "step": "Step 1 - Foundation Skills",
+            "description": "Master the prerequisites for Ship Captain."
+          },
+          {
+            "step": "Step 2 - Core Technical Skills",
+            "description": "Learn essential technologies for this role."
+          },
+          {
+            "step": "Step 3 - Advanced Applications",
+            "description": "Deep dive into advanced specialisations."
+          },
+          {
+            "step": "Step 4 - Projects & Portfolio",
+            "description": "Build a Ship Captain portfolio."
+          }
+        ],
+        "certifications": [
+          {
+            "name": "Industry Certified Ship Captain",
+            "issuer": "Accredited Provider",
+            "difficulty": "Intermediate",
+            "duration": "3-4 months"
+          }
+        ],
+        "projects": [
+          {
+            "project_name": "Ship Captain Capstone",
+            "description": "Complete Ship Captain end-to-end project.",
+            "skills_demonstrated": ""
+          }
+        ]
+      },
+      "tab5": {
+        "future_scope": "Ship Captaincy is reached after approximately 12–18 years of sea service progressing through deck officer ranks — Third Officer, Second Officer, Chief Officer, Master. The career requires commitment to continuous certification (STCW Manila Amendments), years of sea service away from home, and the exceptional leadership responsibility of command authority over vessel, cargo, and crew. If you have a genuine vocation for seafaring, can manage the lifestyle demands of extended voyages away from home, and aspire to the highest command authority in the maritime profession — whose English-language communication skills meet STCW standards — this is one of the world's most respected professional careers.",
+        "target_audience": "UG/PG graduates with interest in Aviation & Transportation.",
+        "growth_trajectory": "Steady upward growth trajectory with specialisation."
+      },
+      "raw": {
+        "role_name": "Ship Captain",
+        "job_family": "Aviation & Transportation",
+        "narrative_para1": "A Ship Captain (Master Mariner) operating a container vessel, bulk carrier, or product tanker calling at Indian ports (JNPT, Mundra, Vizag, Paradip) spends a typical sea voyage managing the bridge watch schedule, conducting daily safety meetings with the officers, reviewing ECDIS (Electronic Chart Display and Information System) track planning for the next port approach, completing voyage reports for the shipping company's operations department, and managing cargo documentation. At Indian ports, they coordinate with the port agent, customs, immigration, and Port State Control inspectors for vessel clearance. Note: salary figures reflect significant variance by vessel type and rank per source data.",
+        "narrative_para2": "This is an AI-Evolving role with moderate AI exposure on navigation technology. AI-enhanced ECDIS provides automated collision avoidance and route optimisation advisory. AI weather routing tools surface optimised voyage routing for fuel efficiency. AI cargo management systems assist with automated stability and trim calculation. However, IMO SOLAS regulations require the Master to have full authority and legal accountability for the vessel — AI cannot hold a Master Mariner certificate or assume command responsibility. The irreplaceable human value — navigating challenging approaches, managing international crew, and responding to maritime emergencies — is legally mandated by IMO/DG Shipping regulations. Salary is complex and variable per source data.",
+        "narrative_para3": "Ship Captaincy is reached after approximately 12–18 years of sea service progressing through deck officer ranks — Third Officer, Second Officer, Chief Officer, Master. The career requires commitment to continuous certification (STCW Manila Amendments), years of sea service away from home, and the exceptional leadership responsibility of command authority over vessel, cargo, and crew. If you have a genuine vocation for seafaring, can manage the lifestyle demands of extended voyages away from home, and aspire to the highest command authority in the maritime profession — whose English-language communication skills meet STCW standards — this is one of the world's most respected professional careers.",
+        "salary_range_low": "2000000",
+        "salary_range_high": "5000000",
+        "ai_exposure_pct": "28",
+        "ai_exposure_level": "Moderate",
+        "ai_exposure_detail": "Ship Captains benefit from limited AI assistance with AI-enhanced ECDIS (Electronic Chart Display and Information System) providing automated collision avoidance and route optimisation advisory. AI weather routing tools surface optimised voyage routing for fuel efficiency. AI cargo management systems assist with automated stability and trim calculation. However, IMO SOLAS regulations require the Master to have full authority and accountability for the vessel — AI cannot hold a Master Mariner certificate or assume command responsibility.",
+        "human_value_tasks": "Ship Captains exercise Master's authority — the highest command responsibility in maritime law — making navigation decisions, managing emergencies, and bearing legal accountability for vessel, cargo, and crew safety under IMO/SOLAS/MARPOL regulations. Navigating India's challenging port approaches (congested anchorages, shallow coastal waters, monsoon sea states), managing international crew, and responding to maritime emergencies require the irreplaceable professional expertise of a licensed Master Mariner certified by DG Shipping.",
+        "english_requirement": "Essential"
+      }
+    },
+    "ml_success_probability": null,
+    "ml_semantic_skills": [],
+    "combined_tab4": {
+      "combined_pathway_summary": "Your immediate focus must be learning the missing fundamentals for 5G Engineer (Target Direction). Role success probability: Calculating",
+      "skill_gap": {
+        "current_skills": [
+          "Basic Academics",
+          "Communication"
+        ],
+        "missing_skills": []
+      },
+      "learning_roadmap": [
+        {
+          "step": "Step 1 - Foundation Skills",
+          "description": "Master prerequisites and theoretical fundamentals."
+        },
+        {
+          "step": "Step 2 - Core Technical Skills",
+          "description": "Learn core technologies."
+        },
+        {
+          "step": "Step 3 - Advanced Applications",
+          "description": "Apply skills in complex scenarios."
+        },
+        {
+          "step": "Step 4 - Projects & Portfolio",
+          "description": "Deploy market-ready portfolios demonstrating these skills."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "Certified 5G Engineer Professional",
+          "issuer": "Industry Standard Provider",
+          "difficulty": "Intermediate",
+          "duration": "3 months"
+        }
+      ],
+      "courses": [
+        {
+          "course_name": "5G Engineer Crash Course",
+          "platform": "YouTube / Coursera",
+          "link_status": "Free"
+        }
+      ],
+      "projects": [
+        {
+          "project_name": "5G Engineer Capstone",
+          "description": "A complete end-to-end implementation.",
+          "skills_demonstrated": ""
+        }
+      ]
+    }
+  }
+}

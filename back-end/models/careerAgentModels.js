@@ -149,7 +149,27 @@ const FinalCareerPathwaySchema = new mongoose.Schema({
   is_locked:      { type: Boolean, default: false },
   locked_at:      { type: Date },
   created_at:     { type: Date, default: Date.now },
-  updated_at:     { type: Date, default: Date.now }
+  updated_at:     { type: Date, default: Date.now },
+
+  // ── Career Direction Locking System ──────────────────────────────────────────
+  // firstVisitAt: set when the FIRST successful analysis completes (never overwritten)
+  firstVisitAt:         { type: Date },
+  // lockExpiryDate: firstVisitAt + 14 days (auto-calculated on first analysis save)
+  lockExpiryDate:       { type: Date },
+  // attemptsUsed: incremented by 1 on every successful onboarding/re-analysis save
+  attemptsUsed:         { type: Number, default: 0 },
+  // maxAttempts: the ceiling — 5 by default
+  maxAttempts:          { type: Number, default: 5 },
+  // finalLockedDate: timestamp when the auto-lock fired (time or attempts exhausted)
+  finalLockedDate:      { type: Date },
+  // lockReason: why it was locked — 'manual' | 'attempts_exhausted' | 'time_expired'
+  lockReason:           { type: String, enum: ['manual', 'attempts_exhausted', 'time_expired'] },
+  // Friendly names stored at lock time (from preferences)
+  primaryCareerPath:    { type: String },
+  secondaryCareerPath:  { type: String },
+  tertiaryCareerPath:   { type: String },
+  // firstVisitModalShown: guards one-time display of the "Time to Lock" modal
+  firstVisitModalShown: { type: Boolean, default: false }
 }, { collection: 'finalcareerpathway' });
 
 // One pathway record per user

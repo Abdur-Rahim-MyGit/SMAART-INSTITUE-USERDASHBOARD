@@ -10,6 +10,7 @@ import jobRolesData from './data/jobRolesData.json';
 import indianCities from './data/indianCities.json';
 import useUser from '@/hooks/useUser';
 import { useTranslation } from 'react-i18next';
+import { fetchLockStatus } from '@/services/CareerLockService';
 
 // Constants
 const SALARY_OPTIONS = [
@@ -82,7 +83,7 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder })
         {selected.length === 0 && <span style={{ color: 'var(--muted)', fontSize: '0.78rem' }}>{displayPlaceholder}</span>}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+      {options.length > 0 ? (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', maxHeight: '140px', overflowY: 'auto', padding: '0.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border)' }}>
           {options.map(opt => (
             <button
@@ -91,9 +92,9 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder })
               style={{
                 padding: '0.25rem 0.75rem', fontSize: '0.72rem', borderRadius: '100px', cursor: 'pointer',
                 fontFamily: 'var(--font)', border: '1px solid',
-                background: selected.includes(opt) ? 'rgba(var(--accent-rgb), 0.2)' : 'rgba(255,255,255,0.03)',
+                background: selected.includes(opt) ? 'var(--accent)' : 'var(--navy2)',
                 borderColor: selected.includes(opt) ? 'var(--accent)' : 'var(--border2)',
-                color: selected.includes(opt) ? 'var(--text)' : 'var(--text2)',
+                color: selected.includes(opt) ? '#ffffff' : 'var(--text2)',
                 transition: 'all 0.15s',
                 opacity: (!selected.includes(opt) && selected.length >= max) ? 0.4 : 1
               }}
@@ -102,7 +103,11 @@ function MultiSelect({ options, selected = [], onChange, max = 3, placeholder })
             </button>
           ))}
         </div>
-      </div>
+      ) : (
+        <p style={{ fontSize: '0.72rem', color: 'var(--muted)', fontStyle: 'italic', marginTop: '0.2rem' }}>
+          {t('career_agent.onboarding.select_degree_first', 'Select a degree group to view available specialisations.')}
+        </p>
+      )}
 
       {max > 1 && <p style={{ fontSize: '0.65rem', color: 'var(--muted)', marginTop: '0.4rem' }}>{t('career_agent.onboarding.select_up_to', 'Select up to {{count}}.', { count: max })}</p>}
     </div>
@@ -244,9 +249,9 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
               </div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 800, color: isSel ? 'var(--accent)' : 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.3rem', transition: 'color 0.3s ease' }}>Career Pathway</div>
-                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: isSel ? 'var(--accent)' : 'var(--text)', marginBottom: '0.2rem', letterSpacing: '-0.02em' }}>{dir.directionName}</div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{dir.directionDescription}</div>
+                <div style={{ fontSize: '0.58rem', fontWeight: 700, color: isSel ? 'var(--accent)' : 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.2rem', transition: 'color 0.3s ease' }}>Career Pathway</div>
+                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: isSel ? 'var(--accent)' : 'var(--text1)', marginBottom: '0.2rem', letterSpacing: '-0.015em' }}>{dir.directionName}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{dir.directionDescription}</div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
@@ -268,11 +273,11 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
                 style={{ padding: '1.2rem 1.5rem', background: `rgba(var(--accent-rgb),0.01)`, border: `1.5px solid var(--accent)`, borderTop: 'none', borderRadius: '0 0 20px 20px', overflow: 'hidden' }}
               >
                 {dir.directionOverview && (
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text2)', lineHeight: 1.6, marginBottom: dir.roles?.length > 0 ? '0.8rem' : 0 }}>{dir.directionOverview}</p>
+                  <p style={{ fontSize: '0.7rem', color: 'var(--text2)', lineHeight: 1.6, marginBottom: dir.roles?.length > 0 ? '0.8rem' : 0 }}>{dir.directionOverview}</p>
                 )}
                 {dir.roles && dir.roles.filter(r => !excludeRoles.includes(r.role)).length > 0 && (
                   <>
-                    <div style={{ fontSize: '0.62rem', color: 'var(--muted)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{t('career_agent.onboarding.core_entry_roles', 'Core Entry Roles')}</div>
+                    <div style={{ fontSize: '0.58rem', color: 'var(--muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>{t('career_agent.onboarding.core_entry_roles', 'Core Entry Roles')}</div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                       {dir.roles.filter(r => !excludeRoles.includes(r.role)).map((r, ri) => {
                         const isRoleSel = selected?.role === r.role;
@@ -285,7 +290,7 @@ function CareerDirectionSelector({ directions = [], selected = null, onChange, l
                               onChange({ ...dir, role: r.role });
                             }}
                             style={{
-                              fontSize: '0.65rem',
+                              fontSize: '0.62rem',
                               padding: '0.2rem 0.65rem',
                               background: isRoleSel ? 'var(--accent)' : '#fff',
                               border: isRoleSel ? '1px solid var(--accent)' : '1px solid var(--border2)',
@@ -496,6 +501,14 @@ function SkillSection({ skills, onChange }) {
       setName('');
       setCert({ issuer: '', year: '', url: '' });
       // Keep selected status as the default for next entry (usually users add multiple verified or multiple self-learnt at once)
+      try {
+        const link = document.createElement('a');
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } catch (err) {
+        console.error('Download failed:', err);
+      }
     }
   };
 
@@ -594,6 +607,18 @@ const CareerAgentOnboarding = () => {
     axios.get('/api/career-agent/career-roles/names')
       .then(res => setDbRoles(res.data))
       .catch(err => console.error('Failed to load career roles:', err));
+  }, []);
+
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockDetails, setLockDetails] = useState(null);
+
+  useEffect(() => {
+    fetchLockStatus().then(status => {
+      if (status && status.isLocked) {
+        setIsLocked(true);
+        setLockDetails(status);
+      }
+    });
   }, []);
 
   // ─── EDIT MODE: Pre-fill ALL form data so education is loaded when jumping to Step 3/4/5 ──
@@ -1163,6 +1188,30 @@ const CareerAgentOnboarding = () => {
     );
   }
 
+  if (isLocked) {
+    return (
+      <div className="career-agent-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 80px)', padding: '2rem' }}>
+        <div style={{ maxWidth: '500px', textAlign: 'center', background: 'var(--card)', padding: '3rem 2rem', borderRadius: '24px', border: '1px solid var(--border)', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+          <div style={{ width: '80px', height: '80px', background: 'rgba(16,185,129,0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem auto' }}>
+            <Lock size={40} color="#10b981" />
+          </div>
+          <h2 style={{ fontSize: '1.8rem', fontWeight: 900, marginBottom: '1rem', color: 'var(--text)' }}>Direction Locked</h2>
+          <p style={{ color: 'var(--muted)', lineHeight: 1.6, marginBottom: '2rem' }}>
+            Your career direction has been permanently locked. You can no longer generate new career analyses.
+            Please return to your dashboard to view your locked career paths.
+          </p>
+          <button 
+            className="btn-primary" 
+            onClick={() => navigate('/dashboard/career-agent/dashboard')}
+            style={{ padding: '0.8rem 2rem', fontSize: '1rem', borderRadius: '12px' }}
+          >
+            Return to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <PageTransition>
       <div className="career-agent-page screen-onboard">
@@ -1355,12 +1404,13 @@ const CareerAgentOnboarding = () => {
                           </button>
                         )}
                       </div>
+                    </div>
 
-                      <div className="fgrid">
+                    <div className="fgrid">
                         {/* Level */}
                         <div className="fg">
                           <label className="fl">Degree Level <span className="req">*</span></label>
-                          <select className={i === 0 ? getFieldErrorClass('education.0.level') : ''} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)}>
+                          <select className={`${i === 0 ? getFieldErrorClass('education.0.level') : ''} ${!edu.level ? 'select-placeholder' : ''}`} required={i === 0} value={edu.level} onChange={e => updateEdu(i, 'level', e.target.value)}>
                             <option value="">Select Level...</option>
                             {Object.keys(eduData).map(l => <option key={l}>{l}</option>)}
                           </select>
@@ -1369,7 +1419,7 @@ const CareerAgentOnboarding = () => {
                         {/* Domain */}
                         <div className="fg">
                           <label className="fl">Domain <span className="req">*</span></label>
-                          <select className={i === 0 ? getFieldErrorClass('education.0.domain') : ''} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled={!edu.level}>
+                          <select className={`${i === 0 ? getFieldErrorClass('education.0.domain') : ''} ${!edu.domain ? 'select-placeholder' : ''}`} required={i === 0} value={edu.domain} onChange={e => updateEdu(i, 'domain', e.target.value)} disabled={!edu.level}>
                             <option value="">Select Domain...</option>
                             {getDomains(eduData, edu.level).map(d => <option key={d}>{d}</option>)}
                           </select>
@@ -1378,7 +1428,7 @@ const CareerAgentOnboarding = () => {
                         {/* Degree Group */}
                         <div className="fg">
                           <label className="fl">Degree Group <span className="req">*</span></label>
-                          <select className={i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled={!edu.domain}>
+                          <select className={`${i === 0 ? getFieldErrorClass('education.0.degreeGroup') : ''} ${!edu.degreeGroup ? 'select-placeholder' : ''}`} required={i === 0} value={edu.degreeGroup} onChange={e => updateEdu(i, 'degreeGroup', e.target.value)} disabled={!edu.domain}>
                             <option value="">Select Degree...</option>
                             {getDegreeGroups(eduData, edu.level, edu.domain).map(d => <option key={d}>{d}</option>)}
                           </select>
@@ -1413,7 +1463,6 @@ const CareerAgentOnboarding = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
                 ))}
 
                 {formData.education.length < 3 && (
