@@ -5,6 +5,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import HeroSection from "@/components/dashboard/HeroSection";
 import LearningProgress from "@/components/dashboard/LearningProgress";
 import CareerPathsWidget from "@/components/dashboard/CareerPathsWidget";
+import InProgressRoadmap from "@/components/dashboard/InProgressRoadmap";
 
 import useUser from "@/hooks/useUser";
 import { useLearningPaths } from "@/hooks/useLearningPaths";
@@ -16,7 +17,7 @@ import { useTranslation } from "react-i18next";
 const DashboardHome = () => {
   const { t } = useTranslation();
   const { user, loading: userLoading } = useUser();
-  const { paths, loading: pathsLoading, error: pathsError } = useLearningPaths(user?._id);
+  const { paths, enrolledCourses, inProgressCourses, loading: pathsLoading } = useLearningPaths(user?._id);
   const [showVisionSplash, setShowVisionSplash] = useState(false);
   const [dashboardLoading, setDashboardLoading] = useState(true);
   const [loadingError, setLoadingError] = useState(false);
@@ -124,14 +125,14 @@ const DashboardHome = () => {
         )}
 
         {/* Dashboard Layout */}
-        <div className="flex flex-col gap-6 pb-10">
+        <div className="flex flex-col gap-6 pb-10 min-h-screen bg-transparent transition-colors duration-300">
 
           {/* ── FULL WIDTH TOP: Hero & Banners ── */}
           <div className="w-full space-y-6">
             {/* Hero */}
             <HeroSection
               userName={user?.firstName || user?.fullName || "User"}
-              paths={paths}
+              paths={enrolledCourses}
               pathsLoading={pathsLoading}
             />
 
@@ -141,9 +142,12 @@ const DashboardHome = () => {
 
           {/* ── BOTTOM TWO COLUMNS: Pathways & Calendar ── */}
           <div className="flex flex-col xl:flex-row gap-6">
-            {/* ── LEFT: Career Pathways ── */}
-            <div className="flex-1 min-w-0">
+            {/* ── LEFT: Career Pathways + In-Progress Roadmap ── */}
+            <div className="flex-1 min-w-0 flex flex-col gap-6">
               <CareerPathsWidget paths={paths} loading={pathsLoading} />
+
+              {/* In-Progress Course Roadmap (max 5, only shown when there is data) */}
+              <InProgressRoadmap courses={inProgressCourses} loading={pathsLoading} />
             </div>
 
             {/* ── RIGHT: Calendar + Tasks ── */}

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star, AlertTriangle, ShieldAlert } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, Clock, Target, CheckCircle2, Lock, ChevronRight, ChevronDown, PlayCircle, FileText, Volume2, Sparkles, Trophy, Star, AlertTriangle, ShieldAlert, StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import CustomVideoPlayer from "@/components/CustomVideoPlayer";
 import MCQPractice from "@/components/MCQPractice";
@@ -11,10 +12,10 @@ import CaseStudy from "@/components/CaseStudy";
 import Notes from "@/components/Notes";
 import MicroAssessment from "@/components/MicroAssessment";
 import ActivityWarningModal from "@/components/ActivityWarningModal";
+import FloatingDictionary from "@/components/FloatingDictionary";
 import useUser from "@/hooks/useUser";
 import useActivityRestrictions from "@/hooks/useActivityRestrictions";
-import FloatingDictionary from "@/components/FloatingDictionary";
-import FloatingNotes from "@/components/FloatingNotes";
+import { InlineNotes } from "@/components/FloatingNotes";
 import SyncedTranscript from "@/components/SyncedTranscript";
 import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK } from "@/data/courseStructureData";
 import { getLearningFlowData } from "@/data/learningFlowData";
@@ -24,6 +25,23 @@ import { coursesAPI, courseEnrollmentAPI } from "@/services/api";
 import { buildFlowFromCourse, buildFlowFromLearningFlow, TEMP_VIDEO_URL } from "@/utils/courseStages";
 import { mergeAdminQuizzesIntoFlow } from "@/utils/microAssessmentUtils";
 import { markCourseCompleted } from "@/utils/courseProgressStorage";
+import Confetti from 'react-confetti';
+import { HexBadgeSVG, resolveColors } from "@/components/badges/BadgeCard";
+import { compareCourseIds, resolveStaticCourseTitle } from "@/utils/courseUnlock";
+
+const getCourseCategory = (courseId) => {
+  const cid = String(courseId || '').toUpperCase();
+  if (cid.startsWith('PIQ')) return 'piq';
+  if (cid.startsWith('AIQ')) return 'aiq';
+  if (cid.startsWith('SQ')) return 'sq';
+  const numPart = parseInt(cid.replace(/\D/g, ''), 10);
+  if (!isNaN(numPart)) {
+    if (numPart <= 10) return 'capacity';
+    if (numPart <= 19) return 'capability';
+    return 'leadership';
+  }
+  return 'capacity';
+};
 
 // Sample video URLs - replace with actual video URLs from your backend
 const COURSE_VIDEOS = {
@@ -121,6 +139,22 @@ const CoursePlayer = () => {
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
   const [showCongratulation, setShowCongratulation] = useState(false);
   const [congratulationAcknowledged, setCongratulationAcknowledged] = useState(false);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : 1200,
+    height: typeof window !== "undefined" ? window.innerHeight : 800,
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [videoWatched, setVideoWatched] = useState(false);
   const { t } = useTranslation();
 
@@ -447,6 +481,14 @@ const CoursePlayer = () => {
     fetchProgress();
   }, [courseId]);
 
+  // Keep localStorage progress in sync with player state
+  useEffect(() => {
+    if (!courseId || totalSteps <= 0) return;
+    const stepsDone = Object.keys(completedSteps).length;
+    const pct = Math.round((stepsDone / totalSteps) * 100);
+    localStorage.setItem('smaart_course_progress', String(pct));
+  }, [completedSteps, totalSteps, courseId]);
+
   const handleStartStep = async (stepNumber) => {
     if (!courseId || !stepNumber) return;
     const stepKey = String(stepNumber);
@@ -638,18 +680,18 @@ const CoursePlayer = () => {
       ...AIQ_TRACK,
       ...SQ_TRACK,
     ];
-    const currentIndex = allCourses.findIndex(c => c.id === courseId);
+    const currentIndex = allCourses.findIndex(c => compareCourseIds(c.id, courseId));
 
     // Stage Gating Logic - Redirect to assessment at stage boundaries
-    if (courseId === 'S10') {
+    if (compareCourseIds(courseId, 'S10')) {
       navigate('/assessment/T2');
       return;
     }
-    if (courseId === 'S19') {
+    if (compareCourseIds(courseId, 'S19')) {
       navigate('/assessment/T3');
       return;
     }
-    if (courseId === 'S25') {
+    if (compareCourseIds(courseId, 'S25')) {
       navigate('/assessment/T4');
       return;
     }
@@ -663,7 +705,23 @@ const CoursePlayer = () => {
       setCongratulationAcknowledged(false);
       setIsCompleted(false);
       setVideoProgress(0); // Reset video progress for next course
-      navigate(`/dashboard/courses/${nextCourse.id}/player`);
+
+      let nextId = nextCourse.id;
+      if (courseId.startsWith("CRS")) {
+        const isS = nextId.startsWith("S");
+        const numPart = parseInt(nextId.replace(/\D/g, ''), 10);
+        if (isS && !isNaN(numPart)) {
+          nextId = `CRS${String(numPart).padStart(5, '0')}`;
+        } else if (nextId.startsWith("PIQ") && !isNaN(numPart)) {
+          nextId = `CRS${String(25 + numPart).padStart(5, '0')}`;
+        } else if (nextId.startsWith("AIQ") && !isNaN(numPart)) {
+          nextId = `CRS${String(30 + numPart).padStart(5, '0')}`;
+        } else if (nextId.startsWith("SQ") && !isNaN(numPart)) {
+          nextId = `CRS${String(35 + numPart).padStart(5, '0')}`;
+        }
+      }
+
+      navigate(`/dashboard/courses/${nextId}/player`);
     } else {
       navigate('/dashboard/courses');
     }
@@ -729,7 +787,7 @@ const CoursePlayer = () => {
 
             {/* Tab Switcher Section */}
             <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-white/10 shadow-sm overflow-hidden">
-              {/* Tab Navigation */}
+              {/* Tab Navigation — Preview | Transcription | Notes */}
               <div className="flex p-1.5 bg-slate-100/50 dark:bg-slate-800/50 m-2 sm:m-4 rounded-xl border border-slate-200/30 dark:border-white/5">
                 <button
                   onClick={() => setActiveTab('preview')}
@@ -767,6 +825,26 @@ const CoursePlayer = () => {
                   <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
                     <FileText size={14} className={activeTab === 'transcription' ? 'text-white' : 'text-slate-400'} />
                     {t("course_player.transcription")}
+                  </span>
+                </button>
+                {/* Notes tab — replaces the floating Quick Notes button */}
+                <button
+                  onClick={() => setActiveTab('notes')}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg font-bold transition-all duration-300 text-xs sm:text-sm relative ${activeTab === 'notes'
+                    ? 'text-white'
+                    : 'text-slate-500 hover:text-slate-700 hover:bg-white/50 dark:hover:bg-slate-700/50'
+                    }`}
+                >
+                  {activeTab === 'notes' && (
+                    <motion.div
+                      layoutId="activeTabBackground"
+                      className="absolute inset-0 bg-[#1a3884] rounded-lg shadow-lg shadow-[#1a3884]/20"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center gap-1.5 sm:gap-2">
+                    <StickyNote size={14} className={activeTab === 'notes' ? 'text-white' : 'text-slate-400'} />
+                    Notes
                   </span>
                 </button>
               </div>
@@ -831,6 +909,18 @@ const CoursePlayer = () => {
                       transcriptText={stepData.transcriptText || stepData.captions}
                       title={t("course_player.video_transcription")}
                     />
+                  </motion.div>
+                )}
+                {activeTab === 'notes' && (
+                  <motion.div
+                    key="notes"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-3 sm:p-4"
+                  >
+                    <InlineNotes courseId={courseId} />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1390,126 +1480,143 @@ const CoursePlayer = () => {
         </main>
 
         {/* Congratulation Modal */}
-        <AnimatePresence>
-          {showCongratulation && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.8, opacity: 0, y: 20 }}
-                transition={{ type: "spring", duration: 0.5 }}
-                className="bg-white rounded-3xl p-5 sm:p-8 max-w-lg w-full shadow-2xl border border-gray-200"
-              >
-                {/* Animated Trophy Icon */}
-                <div className="flex justify-center mb-6">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                    className="relative"
-                  >
-                    <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
-                      <Trophy className="w-12 h-12 text-white" />
-                    </div>
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-                      className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center"
-                    >
-                      <Sparkles className="w-4 h-4 text-white" />
-                    </motion.div>
-                  </motion.div>
-                </div>
-
-                {/* Congratulations Text */}
-                <div className="text-center mb-6">
-                  <motion.h2
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-3xl font-bold text-[#002147] mb-2"
-                  >
-                    {t("course_player.congratulations")}
-                  </motion.h2>
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="text-gray-600"
-                  >
-                    {t("course_player.congratulations_desc_dynamic", "You've completed all {{count}} learning steps for this lesson!", { count: totalSteps })}
-                  </motion.p>
-                </div>
-
-                {/* Progress Summary */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 mb-6 border border-green-200 dark:border-green-800"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-green-700 dark:text-green-300">{t("course_player.your_progress")}</span>
-                    <span className="text-sm font-bold text-green-700 dark:text-green-300">
-                      {t("course_player.steps_progress_format", "{{count}}/{{total}} Steps", { count: totalSteps, total: totalSteps })}
-                    </span>
-                  </div>
-                  <div className="flex gap-1">
-                    {Array.from({ length: totalSteps }, (_, i) => String(i + 1)).map((step, idx) => (
-                      <motion.div
-                        key={step}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.6 + idx * 0.05 }}
-                        className="flex-1 h-2 bg-green-500 rounded-full"
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-
-                {/* Stars Animation */}
+        {typeof document !== "undefined" && createPortal(
+          <AnimatePresence>
+            {showCongratulation && (
+              <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+                {/* Backdrop */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="flex justify-center gap-2 mb-6"
-                >
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <motion.div
-                      key={star}
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.7 + star * 0.1, type: "spring", stiffness: 200 }}
-                    >
-                      <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" />
-                    </motion.div>
-                  ))}
-                </motion.div>
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/75 backdrop-blur-md"
+                  onClick={handleAcknowledgeCongratulation}
+                />
 
-                {/* Continue Button */}
-                <motion.button
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                  onClick={handleNextLesson}
-                  className="w-full py-4 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                {/* Confetti (layered in front of card) */}
+                <Confetti
+                  width={windowSize.width}
+                  height={windowSize.height}
+                  recycle={false}
+                  numberOfPieces={500}
+                  colors={['#1a3884', '#112b6b', '#2b5a9e', '#4c6ef5', '#ffd700']}
+                  style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1001, pointerEvents: 'none' }}
+                />
+
+                {/* Card Container */}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0, y: 20 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.8, opacity: 0, y: 20 }}
+                  transition={{ type: "spring", duration: 0.5 }}
+                  className="bg-white dark:bg-[#001a3d] rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-[0_20px_50px_rgba(26,56,132,0.3)] border border-[#d8e6f7] dark:border-[#1a3884]/30 relative overflow-hidden flex flex-col items-center z-[1000]"
                 >
-                  {t("course_player.continue_to_next_lesson")}
-                  <ChevronRight className="w-4 h-4" />
-                </motion.button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  {/* Subtle Glow */}
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-gradient-to-b from-[#1a3884]/8 to-transparent rounded-full blur-2xl pointer-events-none" />
+
+                  {/* Unlocked Hex Badge */}
+                  <div className="flex justify-center mb-6 relative z-10">
+                    <motion.div
+                      initial={{ scale: 0, rotate: -30 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ delay: 0.2, type: "spring", stiffness: 120 }}
+                      className="relative"
+                    >
+                      <HexBadgeSVG
+                        colors={resolveColors(getCourseCategory(courseId))}
+                        badgeId={`${courseId}-MASTER`}
+                        courseName={resolveStaticCourseTitle(courseId) || dbCourse?.title || courseId}
+                        year={new Date().getFullYear()}
+                        size={180}
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* Congratulations Text */}
+                  <div className="text-center mb-6 relative z-10 w-full">
+                    <motion.h2
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="text-[28px] font-black text-[#1a3884] dark:text-blue-300 mb-1"
+                    >
+                      Congratulations!
+                    </motion.h2>
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-[15px] font-extrabold text-slate-600 dark:text-slate-400"
+                    >
+                      You have unlocked this badge
+                    </motion.p>
+                  </div>
+
+                  {/* Progress Summary */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="w-full bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl p-4 mb-6 border border-green-200 dark:border-green-800/40 relative z-10"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-extrabold text-green-700 dark:text-green-400">{t("course_player.your_progress")}</span>
+                      <span className="text-xs font-black text-green-700 dark:text-green-400">
+                        {t("course_player.steps_progress_format", "{{count}}/{{total}} Steps", { count: totalSteps, total: totalSteps })}
+                      </span>
+                    </div>
+                    <div className="flex gap-1">
+                      {Array.from({ length: totalSteps }, (_, i) => String(i + 1)).map((step, idx) => (
+                        <motion.div
+                          key={step}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.6 + idx * 0.05 }}
+                          className="flex-1 h-2 bg-green-500 rounded-full"
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+
+                  {/* Stars Animation */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="flex justify-center gap-2 mb-6 relative z-10"
+                  >
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <motion.div
+                        key={star}
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ delay: 0.7 + star * 0.1, type: "spring", stiffness: 200 }}
+                      >
+                        <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+
+                  {/* Continue Button */}
+                  <motion.button
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 }}
+                    onClick={handleNextLesson}
+                    className="w-full py-3.5 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl text-sm font-extrabold transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-[1.02] relative z-10"
+                  >
+                    {t("course_player.continue_to_next_lesson")}
+                    <ChevronRight className="w-4 h-4" />
+                  </motion.button>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
       </div>
       <FloatingDictionary />
-      <FloatingNotes />
+      {/* FloatingNotes removed — Notes moved into the tab panel above */}
       <ActivityWarningModal
         isOpen={isWarningVisible}
         warningsCount={warningsCount}

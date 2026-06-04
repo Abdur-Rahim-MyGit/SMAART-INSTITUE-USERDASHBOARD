@@ -18,144 +18,48 @@ import {
   isCapacityDevUnlock,
   hasPassedBaseline,
   resolveStaticCourseTitle,
+  compareCourseIds,
 } from "@/utils/courseUnlock";
+import { STAGE_1_COURSES, STAGE_2_COURSES, STAGE_3_COURSES, PIQ_TRACK, AIQ_TRACK, SQ_TRACK } from "@/data/courseStructureData";
 
 /* ─── Single My Courses hero (assessment → in-progress → completed) ─── */
 const MyCoursesHeroBanner = ({
   mode,
   course,
-  progress,
   onPrimaryAction,
   primaryLabel,
 }) => {
   const { t } = useTranslation();
-  const pct = progress || 0;
 
-  const label =
-    mode === "assessment"
-      ? t("my_courses_page.assessment_recommended_short", "Recommended next step")
-      : mode === "completed"
-        ? t("my_courses_page.course_completed_short", "Course completed")
-        : t("my_courses_page.continue_watching");
-
-  const title =
+  const rawTitle =
     mode === "assessment"
       ? t("my_courses_page.complete_t1_title", "Complete your T1 Baseline Assessment")
       : course?.title || t("my_courses_page.your_current_course");
 
-  const description =
-    mode === "assessment"
-      ? t(
-          "my_courses_page.complete_t1_desc_open",
-          "Finish the foundation assessment to personalize your path. All courses below remain available to browse and start anytime."
-        )
-      : mode === "completed"
-        ? t(
-            "my_courses_page.course_completed_desc",
-            "You have completed this course and your baseline assessment. Explore the next lesson in your programme below."
-          )
-        : course?.lastWatchedLesson
-          ? null
-          : t("my_courses_page.resume_hint", "Pick up where you left off.");
+  const displayTitle = resolveStaticCourseTitle(rawTitle) || rawTitle;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative rounded-[24px] overflow-hidden border border-blue-100 dark:border-[#1a3884]/30 shadow-xl mb-8 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/50 dark:from-[#001835] dark:via-[#002147] dark:to-[#112b6b]"
-    >
-      <div className="absolute top-0 right-0 w-2/5 h-full bg-gradient-to-l from-blue-100/10 dark:from-[#1a3884]/25 to-transparent pointer-events-none" />
-
-      <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6 p-6 md:p-8">
-        <div className="flex items-center gap-5 flex-1 min-w-0">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50/80 dark:bg-white/10 border border-blue-100 dark:border-white/15 flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
-            {mode === "completed" ? (
-              <RiCheckboxCircleLine className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-            ) : (
-              <RiBookOpenLine className="w-8 h-8 text-blue-600 dark:text-blue-300" />
-            )}
+    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+      {(mode === "in_progress" || mode === "assessment" || mode === "completed") && (
+          <div className="flex flex-col text-left">
+             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
+                {mode === "assessment" ? "Next Step" : mode === "completed" ? "Completed Course" : "Current Course"}
+             </span>
+             <span className="text-[13px] font-bold text-[#0d1f4e] dark:text-white truncate max-w-[200px] md:max-w-[250px]" title={displayTitle}>
+                {displayTitle}
+             </span>
           </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="text-[9px] font-black uppercase tracking-[0.25em] text-blue-600 dark:text-blue-300">
-                {label}
-              </span>
-              {(mode === "in_progress" || mode === "completed") && (
-                <>
-                  <span className="w-1 h-1 rounded-full bg-blue-400/50" />
-                  <span className="text-[9px] font-bold text-slate-550 dark:text-slate-400 uppercase tracking-wider">
-                    {t("my_courses_page.pct_complete", { pct: mode === "completed" ? 100 : pct })}
-                  </span>
-                </>
-              )}
-            </div>
-
-            <h2
-              className="text-xl md:text-2xl font-extrabold text-slate-900 dark:text-white leading-tight mb-1"
-              style={{ letterSpacing: "-0.02em" }}
-            >
-              {title}
-            </h2>
-
-            {description && (
-              <p className="text-[13px] text-slate-650 dark:text-slate-300 font-medium max-w-xl leading-relaxed">
-                {description}
-              </p>
-            )}
-
-            {mode === "in_progress" && course?.lastWatchedLesson && (
-              <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5 mt-1">
-                <RiTimeLine className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                {t("my_courses_page.last_watched")}{" "}
-                <span className="text-slate-800 dark:text-slate-350 font-bold">{course.lastWatchedLesson}</span>
-              </p>
-            )}
-
-            {(mode === "in_progress" || mode === "completed") && (
-              <div className="mt-3 w-full">
-                <div className="h-1.5 w-full bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${mode === "completed" ? 100 : pct}%` }}
-                    transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-blue-500 dark:from-blue-400 dark:to-blue-300"
-                  />
-                </div>
-                <div className="flex items-center justify-between mt-1">
-                  <span className="text-[10px] text-slate-500 dark:text-slate-500 font-medium">
-                    {(course?.totalModules || course?.modules?.length) > 0
-                      ? t("my_courses_page.modules_count", {
-                          completed: course.completedModules || 0,
-                          total: course.totalModules || course.modules.length,
-                        })
-                      : t("my_courses_page.pct_complete", {
-                          pct: mode === "completed" ? 100 : pct,
-                        })}
-                  </span>
-                  {mode === "completed" && (
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                      <RiCheckboxCircleLine className="w-3 h-3" />{" "}
-                      {t("my_courses_page.completed")}
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={onPrimaryAction}
-          className="flex items-center gap-3 px-6 py-3.5 bg-blue-600 dark:bg-white text-white dark:text-[#112b6b] font-extrabold text-sm rounded-xl hover:-translate-y-1 hover:shadow-lg transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-md shadow-blue-600/10 dark:shadow-none"
-        >
-          {mode === "in_progress" && <RiPlayFill className="w-4 h-4 fill-current" />}
-          {primaryLabel}
-          <RiArrowRightSLine className="w-4 h-4" />
-        </button>
-      </div>
-    </motion.div>
+      )}
+      <button
+        type="button"
+        onClick={onPrimaryAction}
+        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-[#1a3884] hover:bg-[#112b6b] dark:bg-blue-500 text-white font-bold text-[13px] rounded-xl transition-all duration-300 flex-shrink-0 whitespace-nowrap shadow-sm active:scale-[0.98]"
+      >
+        {(mode === "in_progress" || mode === "completed") && <RiPlayFill className="w-4 h-4 fill-current" />}
+        {mode === "completed" ? t("my_courses_page.resume_course", "Resume Course") : primaryLabel}
+        <RiArrowRightSLine className="w-4 h-4" />
+      </button>
+    </div>
   );
 };
 
@@ -254,14 +158,49 @@ const MyCourses = () => {
   useEffect(() => {
     const loadCurrentCourse = async () => {
       try {
-        const lastWatched = localStorage.getItem("smaart_last_watched_course");
-        const lastWatchedLesson = localStorage.getItem("smaart_last_watched_lesson");
-        const lastProgress = parseInt(localStorage.getItem("smaart_course_progress") || "0", 10);
+        let lastWatched = localStorage.getItem("smaart_last_watched_course");
+        let lastWatchedLesson = localStorage.getItem("smaart_last_watched_lesson");
+        let lastProgress = parseInt(localStorage.getItem("smaart_course_progress") || "0", 10);
 
         if (!lastWatched) {
           setCurrentCourse(null);
           setCurrentProgress(0);
           return;
+        }
+
+        const allCourses = [
+          ...STAGE_1_COURSES,
+          ...STAGE_2_COURSES,
+          ...STAGE_3_COURSES,
+          ...PIQ_TRACK,
+          ...AIQ_TRACK,
+          ...SQ_TRACK,
+        ];
+
+        // If the course is completed, find the next one in sequence
+        const isCompleted = userProgress.completedCourses?.some(c => compareCourseIds(c, lastWatched));
+        if (isCompleted) {
+          const idx = allCourses.findIndex(c => compareCourseIds(c.id, lastWatched));
+          if (idx !== -1 && idx < allCourses.length - 1) {
+            const nextCourseObj = allCourses[idx + 1];
+            let nextId = nextCourseObj.id;
+            if (lastWatched.startsWith("CRS")) {
+              const isS = nextId.startsWith("S");
+              const numPart = parseInt(nextId.replace(/\D/g, ''), 10);
+              if (isS && !isNaN(numPart)) {
+                nextId = `CRS${String(numPart).padStart(5, '0')}`;
+              } else if (nextId.startsWith("PIQ") && !isNaN(numPart)) {
+                nextId = `CRS${String(25 + numPart).padStart(5, '0')}`;
+              } else if (nextId.startsWith("AIQ") && !isNaN(numPart)) {
+                nextId = `CRS${String(30 + numPart).padStart(5, '0')}`;
+              } else if (nextId.startsWith("SQ") && !isNaN(numPart)) {
+                nextId = `CRS${String(35 + numPart).padStart(5, '0')}`;
+              }
+            }
+            lastWatched = nextId;
+            lastProgress = 0;
+            lastWatchedLesson = null;
+          }
         }
 
         try {
@@ -288,7 +227,6 @@ const MyCourses = () => {
                 totalModules,
               });
               setCurrentProgress(pct || lastProgress);
-              refreshProgress();
               return;
             }
           }
@@ -315,7 +253,7 @@ const MyCourses = () => {
     };
 
     loadCurrentCourse();
-  }, [t, refreshProgress]);
+  }, [t, refreshProgress, userProgress]);
 
   useEffect(() => {
     const lastWatched = localStorage.getItem("smaart_last_watched_course");
@@ -349,10 +287,6 @@ const MyCourses = () => {
       handleStartBaseline();
       return;
     }
-    if (heroMode === "completed") {
-      document.getElementById("my-courses-programme")?.scrollIntoView({ behavior: "smooth" });
-      return;
-    }
     const id =
       currentCourse?.courseCode ||
       localStorage.getItem("smaart_last_watched_course") ||
@@ -372,7 +306,7 @@ const MyCourses = () => {
   ) : null;
 
   return (
-    <div>
+    <div className="min-h-screen bg-transparent transition-colors duration-300">
       <div id="my-courses-programme">
         <CourseStructure
           onCourseClick={handleCourseClick}

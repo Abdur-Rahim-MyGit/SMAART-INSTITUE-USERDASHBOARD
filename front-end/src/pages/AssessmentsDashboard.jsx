@@ -166,42 +166,58 @@ const AssessmentsDashboard = () => {
     };
 
     return (
-        <div className="bg-[#F8FAFC] dark:bg-[#00152E] transition-colors duration-300 min-h-screen pt-4 pb-8">
-            <div className="max-w-7xl mx-auto mb-4 px-4 sm:px-6 lg:px-8">
-                <button
-                    onClick={() => navigate("/dashboard")}
-                    className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
-                >
-                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                        <ArrowLeft className="w-4 h-4" />
-                    </div>
-                    {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-                </button>
-            </div>
+        <div className="bg-transparent transition-colors duration-300 min-h-screen pb-8">
+            <main>
+                <div className="mx-auto max-w-7xl space-y-6 pt-4">
 
-            <main className="px-4 py-4 sm:px-6 lg:px-8">
-                <div className="mx-auto max-w-7xl space-y-8 lg:space-y-10">
-                    <PageHero
-                        badge={t("assessments_dashboard.badge", "Assessment Journey")}
-                        title={t("assessments_dashboard.title", "Assessments Centre")}
-                        subtitle={t("assessments_dashboard.subtitle", "Experience a structured pathway to mastery. Track your progress, complete each stage with confidence, and unlock your performance insights.")}
+                    {/* Clean header matching My Courses style */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        className="relative overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-4"
                     >
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={handleResetAll}
-                            className="inline-flex h-11 items-center justify-center gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-5 text-sm font-bold text-rose-700 shadow-sm transition-all hover:bg-rose-100 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-950/40"
-                        >
-                            <RotateCcw className="h-4 w-4" />
-                            {t("assessments_dashboard.reset_assessments", "Reset Assessments")}
-                        </motion.button>
-                    </PageHero>
+                        {/* Mobile back button */}
+                        <div className="md:hidden mb-2">
+                            <button
+                                onClick={() => navigate("/dashboard")}
+                                className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
+                            >
+                                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                                    <ArrowLeft className="w-4 h-4" />
+                                </div>
+                                {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+                            </button>
+                        </div>
+
+                        <div className="flex-1">
+                            <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                                {t("assessments_dashboard.title", "Assessments")}{" "}
+                                <span className="text-[#1a3884] dark:text-blue-300">Centre</span>
+                            </h1>
+                            <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
+                                {t("assessments_dashboard.subtitle", "Track your progress, complete each stage with confidence, and unlock your performance insights.")}
+                            </p>
+                        </div>
+
+                        <div className="flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-3 md:pt-0 md:pl-6">
+                            <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleResetAll}
+                                className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 text-[12px] font-bold text-rose-700 shadow-sm transition-all hover:bg-rose-100 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400"
+                            >
+                                <RotateCcw className="h-3.5 w-3.5" />
+                                {t("assessments_dashboard.reset_assessments", "Reset Assessments")}
+                            </motion.button>
+                        </div>
+                    </motion.div>
 
                     <motion.section
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.45 }}
-                        className="space-y-6 lg:space-y-8"
+                        className="space-y-4"
                     >
 
                         {loading ? (
@@ -227,7 +243,7 @@ const AssessmentsDashboard = () => {
             {/* Assessment Guidelines popup modal */}
             <AnimatePresence>
                 {selectedStage && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+                    <div className="fixed top-0 left-0 right-0 bottom-0 z-[9999] flex items-center justify-center p-4">
                         {/* Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -243,28 +259,28 @@ const AssessmentsDashboard = () => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
                             transition={{ type: "spring", duration: 0.5, bounce: 0.15 }}
-                            className="relative z-10 w-full max-w-2xl overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-[#002147] flex flex-col max-h-[90vh]"
+                            className="relative z-10 w-full max-w-lg overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white shadow-2xl dark:border-slate-800 dark:bg-[#002147] flex flex-col max-h-[85vh] mx-auto"
                         >
                             {/* Modal Header */}
-                            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5 dark:border-slate-800/80">
+                            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-800/80 flex-shrink-0">
                                 <div>
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-[#003170] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a3884] dark:text-blue-300">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-300 mb-0.5">
                                         {t("assessments_dashboard.modal_badge", "Assessment Gate")}
-                                    </span>
-                                    <h3 className="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100 sm:text-xl">
+                                    </p>
+                                    <h3 className="text-[17px] font-extrabold tracking-tight text-[#0d1f4e] dark:text-slate-100">
                                         {t(`assessments_dashboard.stages.${selectedStage.key}.title`, selectedStage.title)}
                                     </h3>
                                 </div>
                                 <button
                                     onClick={() => setSelectedStage(null)}
-                                    className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#002A5C] dark:hover:text-slate-200 transition-colors"
+                                    className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#002A5C] dark:hover:text-slate-200 transition-colors flex-shrink-0"
                                 >
-                                    <CloseIcon className="h-5 w-5" />
+                                    <CloseIcon className="h-4 w-4" />
                                 </button>
                             </div>
 
                             {/* Modal Body */}
-                            <div className="overflow-y-auto px-6 py-6 sm:px-8 space-y-6 max-h-[calc(100vh-250px)]">
+                            <div className="overflow-y-auto flex-1 px-5 py-5 space-y-4">
                                 {/* Stage description & summary */}
                                 <div className="rounded-2xl border border-slate-100 bg-[#F8FAFC] p-5 dark:border-white/10 dark:bg-slate-800/40">
                                     <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-350">
@@ -277,12 +293,12 @@ const AssessmentsDashboard = () => {
                                 </div>
 
                                 {/* Protocol & Guidelines section inside modal */}
-                                <div className="space-y-4">
-                                    <h4 className="text-xs font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-300">
+                                <div className="space-y-3">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.25em] text-[#1a3884] dark:text-blue-300">
                                         {t("assessments_dashboard.guidelines_title", "Assessment Protocol & Guidelines")}
                                     </h4>
 
-                                    <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {[
                                             {
                                                 key: "dynamic_questions",
@@ -305,13 +321,13 @@ const AssessmentsDashboard = () => {
                                                 desc: "Screen recording, copy-paste and tab-switching are monitored.",
                                             },
                                         ].map((item) => (
-                                            <div key={item.key} className="flex gap-3">
-                                                <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#1a3884] dark:bg-blue-400" />
-                                                <div className="space-y-1">
-                                                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-700 dark:text-slate-300">
+                                            <div key={item.key} className="flex gap-3 rounded-xl border border-[#d8e6f7] bg-[#F8FAFC] p-3.5 dark:border-white/10 dark:bg-slate-800/30">
+                                                <div className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#1a3884] dark:bg-blue-400" />
+                                                <div>
+                                                    <p className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-700 dark:text-slate-300 mb-0.5">
                                                         {t(`assessments_dashboard.${item.key}_title`, item.title)}
                                                     </p>
-                                                    <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                                    <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
                                                         {t(`assessments_dashboard.${item.key}_desc`, item.desc)}
                                                     </p>
                                                 </div>
@@ -388,72 +404,72 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 22 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.08, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: index * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="group"
         >
             <div
                 onClick={onAction}
-                className={`relative cursor-pointer overflow-hidden rounded-[30px] border bg-white transition-all duration-300 dark:bg-[#002147] ${completed
-                    ? "border-slate-200 shadow-sm hover:border-slate-300 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
-                    : "border-slate-200 shadow-sm hover:border-[#1a3884]/30 hover:shadow-md dark:border-white/10 dark:hover:border-slate-600"
-                    }`}
+                className={`relative cursor-pointer overflow-hidden rounded-[20px] border bg-white transition-all duration-300 dark:bg-[#002147] hover:-translate-y-0.5 ${
+                    completed
+                        ? "border-emerald-200 shadow-sm hover:shadow-md dark:border-emerald-800/20"
+                        : "border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.05)] hover:shadow-[0_6px_20px_rgba(26,56,132,0.1)] hover:border-[#1a3884]/30 dark:border-white/10"
+                }`}
             >
-                <div className={`h-1 ${completed ? "bg-[#1a3884]" : "bg-slate-100 dark:bg-[#002A5C]"}`} />
-                <div className="p-6 sm:p-7">
-                    <div className="mb-5 flex items-start justify-between gap-4 sm:gap-5">
-                        <div className="flex items-start gap-4 sm:gap-5">
+                <div className="p-5 sm:p-6">
+                    <div className="mb-4 flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
                             <div
-                                className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl text-base font-bold ${completed
-                                    ? "bg-[#1a3884] text-white shadow-sm"
-                                    : "border border-slate-200 bg-[#F8FAFC] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-400"
-                                    }`}
+                                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[13px] font-bold border ${
+                                    completed
+                                        ? "bg-emerald-500 border-emerald-600 text-white shadow-sm"
+                                        : "bg-white border-[#d8e6f7] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-400"
+                                }`}
                             >
-                                {completed ? <CheckCircle2 className="h-6 w-6" /> : `0${index + 1}`}
+                                {completed ? <CheckCircle2 className="h-5 w-5" /> : `0${index + 1}`}
                             </div>
 
                             <div className="min-w-0 pt-0.5">
-                                <h3 className="text-base sm:text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-100">
+                                <h3 className="text-[15px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-slate-100">
                                     {t(`assessments_dashboard.stages.${stage.key}.title`, stage.title)}
                                 </h3>
-                                <p className="mt-1 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                                <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
                                     {t(`assessments_dashboard.stages.${stage.key}.subtitle`, stage.subtitle)}
                                 </p>
                             </div>
                         </div>
 
                         {completed && (
-                            <div className="flex-shrink-0 pt-0.5">
-                                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-100 bg-[linear-gradient(180deg,_#ecfdf5_0%,_#dcfce7_100%)] px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300 shadow-sm">
-                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                            <div className="flex-shrink-0">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
+                                    <CheckCircle2 className="h-3 w-3" />
                                     {t("assessments_dashboard.verified", "Verified")}
                                 </span>
                             </div>
                         )}
                     </div>
 
-                    <p className="mb-4 sm:mb-5 text-xs sm:text-sm font-medium leading-relaxed sm:leading-6 text-slate-500 dark:text-slate-350">
+                    <p className="mb-3 text-[12px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
                         {t(`assessments_dashboard.stages.${stage.key}.description`, stage.description)}
                     </p>
 
-                    <div className="mb-5 sm:mb-6 flex flex-wrap items-center gap-2">
+                    <div className="mb-4 flex flex-wrap items-center gap-2">
                         <InfoChip icon={FileText} label={`${stage.totalQuestions} ${t("assessments_dashboard.questions", "Qs")}`} />
                         <InfoChip icon={Clock} label={durationLabel} />
                     </div>
 
                     {completed && score !== undefined && (
-                        <div className="mb-6 rounded-2xl border border-slate-200 bg-[#F8FAFC] p-4 shadow-sm dark:border-white/10 dark:bg-slate-800/50">
-                            <div className="mb-3 flex items-center justify-between">
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                        <div className="mb-4 rounded-[14px] border border-[#d8e6f7] bg-[#F8FAFC] p-3.5 dark:border-white/10 dark:bg-slate-800/50">
+                            <div className="mb-2 flex items-center justify-between">
+                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-400">
                                     {t("assessments_dashboard.performance", "Your Performance")}
                                 </span>
-                                <span className="text-lg font-bold text-[#1a3884] dark:text-white sm:text-2xl">
-                                    {score}
-                                    <span className="ml-1 text-sm text-slate-500 dark:text-slate-400">%</span>
+                                <span className="text-lg font-black text-[#1a3884] dark:text-white">
+                                    {score}<span className="ml-0.5 text-xs text-slate-500">%</span>
                                 </span>
                             </div>
-                            <div className="h-2 rounded-full bg-slate-200 p-0.5 dark:bg-[#003170]">
+                            <div className="h-1.5 rounded-full bg-slate-200 overflow-hidden dark:bg-[#003170]">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${score}%` }}
@@ -464,30 +480,31 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         </div>
                     )}
 
-                    <motion.button
+                    <button
                         onClick={(event) => {
                             event.stopPropagation();
                             onAction();
                         }}
-                        className={`flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 sm:px-6 sm:py-4 text-xs sm:text-sm font-bold transition-all duration-300 ${completed
-                            ? "border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#002A5C]"
-                            : "bg-[#1a3884] text-white shadow-md hover:bg-[#002147] hover:shadow-lg hover:-translate-y-0.5"
-                            }`}
+                        className={`flex w-full items-center justify-center gap-2.5 rounded-xl px-4 py-3 text-[13px] font-bold transition-all duration-300 ${
+                            completed
+                                ? "border border-[#d8e6f7] bg-white text-slate-700 hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300"
+                                : "bg-[#1a3884] text-white shadow-sm hover:bg-[#112b6b] hover:shadow-md"
+                        }`}
                     >
                         {completed ? (
                             <>
-                                <Eye className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+                                <Eye className="h-4 w-4" />
                                 {t("assessments_dashboard.view_report", "View Performance Report")}
-                                <ChevronRight className="ml-auto h-4 w-4 sm:h-5 sm:w-5 opacity-40" />
+                                <ChevronRight className="ml-auto h-4 w-4 opacity-40" />
                             </>
                         ) : (
                             <>
-                                <Play className="h-4.5 w-4.5 sm:h-5 sm:w-5 fill-white" />
+                                <Play className="h-4 w-4 fill-white" />
                                 {t("assessments_dashboard.start_stage", "Start Stage Assessment")}
-                                <ArrowRight className="ml-auto h-4 w-4 sm:h-5 sm:w-5 opacity-80 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="ml-auto h-4 w-4 opacity-80 transition-transform group-hover:translate-x-1" />
                             </>
                         )}
-                    </motion.button>
+                    </button>
                 </div>
             </div>
         </motion.div>

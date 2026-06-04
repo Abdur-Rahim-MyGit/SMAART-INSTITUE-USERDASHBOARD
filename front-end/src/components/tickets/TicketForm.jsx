@@ -289,7 +289,7 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-[#1a3884]/50 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-[#1a3884] transition-colors"
+            className="px-4 py-2 text-sm font-bold rounded-lg border border-slate-200 dark:border-[#1a3884]/50 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-[#1a3884] transition-colors"
           >
             {t("support_tickets_page.cancel")}
           </button>
@@ -297,16 +297,16 @@ const TicketForm = ({ onSuccess, onCancel, initialData }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg bg-[#1a3884] text-white hover:bg-[#132c6b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
               {t("support_tickets_page.submitting")}
             </>
           ) : (
             <>
-              <Send className="w-4 h-4" />
+              <Send className="w-3.5 h-3.5" />
               {t("support_tickets_page.submit_ticket")}
             </>
           )}

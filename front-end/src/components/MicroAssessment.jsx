@@ -183,9 +183,8 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
           <div className="text-center space-y-3 md:space-y-6 py-4 md:py-8">
             <div className="w-16 h-16 md:w-20 md:h-20 bg-[#1a3884]/10 rounded-full flex items-center justify-center mx-auto text-[#1a3884] mb-2 md:mb-6">
                <AlertCircle className="w-10 h-10 md:w-12 md:h-12" />
-            </div>
-            <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white">Ready for the Assessment?</h3>
-            <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-sm md:text-base leading-relaxed">
+            </div>            <h3 className="text-2xl md:text-3xl font-black text-[#1a3884] dark:text-white tracking-tight">Ready for the Assessment?</h3>
+            <p className="text-slate-600 dark:text-slate-350 max-w-md mx-auto text-sm md:text-base leading-relaxed font-medium">
               You will answer <strong>{normalizeQuizQuestions(assessmentData?.questions || []).length} multiple-choice questions</strong>.
               {assessmentData?.shuffleQuestions !== false
                 ? ' Questions appear in random order.'
@@ -194,7 +193,7 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
             </p>
             <button
               onClick={handleStart}
-              className="w-full sm:w-auto px-8 py-3 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-xl font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-[#1a3884]/30"
+              className="w-full sm:w-auto px-10 py-4 bg-[#1a3884] hover:bg-[#112b6b] text-white rounded-2xl font-bold text-base transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-[#1a3884]/20"
             >
               Start Assessment
             </button>
@@ -211,42 +210,61 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                exit={{ opacity: 0, x: -20 }}
                className="space-y-6"
              >
-                <h3 className="text-base md:text-xl font-medium text-gray-800 dark:text-slate-200 leading-snug md:leading-relaxed">
+                <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white leading-snug md:leading-relaxed">
                   {currentQuestion.question}
                 </h3>
 
-                <div className="space-y-2 md:space-y-3">
+                <div className="space-y-2.5 md:space-y-3.5">
                   {currentQuestion.options.map((option, idx) => {
                      const isSelected = selectedAnswer === idx;
                      const correctIdx = getCorrectOptionIndex(currentQuestion);
                      const isCorrectOption = idx === correctIdx;
-                     const btnClass = `w-full text-left p-2.5 md:p-4 rounded-xl border-2 transition-all ${getMcqOptionClassName({
-                       showFeedback: showExplanation,
-                       index: idx,
-                       selectedIndex: selectedAnswer,
-                       question: currentQuestion,
-                     })}`;
+                     const showResult = showExplanation;
 
                      return (
                        <button
                          key={idx}
-                         onClick={() => !showExplanation && !isSubmitting && handleSubmitAnswer(idx)}
-                         disabled={showExplanation || isSubmitting}
-                         className={btnClass}
+                         onClick={() => !showResult && !isSubmitting && handleSubmitAnswer(idx)}
+                         disabled={showResult || isSubmitting}
+                         className={`w-full text-left p-4 md:p-5 rounded-2xl border-2 transition-all duration-300 font-medium ${
+                           showResult
+                             ? isCorrectOption
+                               ? 'border-green-500 bg-green-55/10 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                               : isSelected && !isCorrectOption
+                               ? 'border-red-500 bg-red-55/10 dark:bg-red-900/20 text-red-750 dark:text-red-300'
+                               : 'border-slate-200 dark:border-white/10 bg-[#F8FAFC] dark:bg-[#002A5C] opacity-50 text-slate-500'
+                             : isSelected
+                             ? 'border-[#1a3884] bg-[#1a3884]/5 text-[#1a3884] dark:text-blue-300'
+                             : 'border-slate-200 dark:border-white/10 bg-white dark:bg-[#002A5C] hover:border-slate-350 dark:hover:border-slate-655 text-slate-750 dark:text-slate-200'
+                         }`}
                        >
-                         <div className="flex items-center gap-3">
-                           <div className={`
-                             w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold
-                             ${showExplanation && isCorrectOption ? 'border-green-500 bg-green-500 text-white' : ''}
-                             ${showExplanation && isSelected && !isCorrectOption ? 'border-red-500 bg-red-500 text-white' : ''}
-                             ${!showExplanation && isSelected ? 'border-[#1a3884] bg-[#1a3884] text-white' : 'border-gray-300 dark:border-slate-600 text-slate-500'}
-                           `}>
-                              {showExplanation && isCorrectOption && <CheckCircle2 size={14} />}
-                              {showExplanation && isSelected && !isCorrectOption && <XCircle size={14} />}
-                              {!showExplanation && getOptionLabel(idx)}
+                         <div className="flex items-center gap-3.5">
+                           <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center flex-shrink-0 text-xs font-bold transition-all duration-300 ${
+                             showResult
+                               ? isCorrectOption
+                                 ? 'border-green-500 bg-green-500 text-white'
+                                 : isSelected && !isCorrectOption
+                                 ? 'border-red-500 bg-red-500 text-white'
+                                 : 'border-slate-300 dark:border-slate-600 text-slate-500'
+                               : isSelected
+                               ? 'border-[#1a3884] bg-[#1a3884] text-white'
+                               : 'border-slate-300 dark:border-slate-600 text-slate-500'
+                           }`}>
+                             {showResult ? (
+                               isCorrectOption || (isSelected && !isCorrectOption) ? (
+                                 isCorrectOption ? (
+                                   <CheckCircle2 className="w-4.5 h-4.5 text-white" />
+                                 ) : (
+                                   <XCircle className="w-4.5 h-4.5 text-white" />
+                                 )
+                               ) : (
+                                 <span>{getOptionLabel(idx)}</span>
+                               )
+                             ) : (
+                               <span>{getOptionLabel(idx)}</span>
+                             )}
                            </div>
-                           <span className="text-sm md:text-base dark:text-slate-300">
-                             <span className="font-semibold text-slate-500 dark:text-slate-400 mr-2">{getOptionLabel(idx)}.</span>
+                           <span className="text-sm md:text-base font-semibold leading-relaxed">
                              {option}
                            </span>
                          </div>
@@ -261,21 +279,21 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg text-blue-900 dark:text-blue-300"
+                      className="mt-6 p-5 bg-blue-50 dark:bg-blue-900/10 border border-blue-200/50 dark:border-blue-800/40 rounded-2xl text-blue-900 dark:text-blue-300"
                     >
-                       <p className="font-semibold mb-1 flex items-center gap-2">
-                         <AlertCircle size={16} /> Explanation
+                       <p className="font-extrabold mb-1.5 flex items-center gap-2 text-sm uppercase tracking-wider text-[#1a3884] dark:text-blue-400">
+                         <AlertCircle size={15} /> Explanation
                        </p>
-                       <p className="text-sm opacity-90">
+                       <p className="text-sm font-medium leading-relaxed opacity-95">
                          {currentQuestion.explanation || "No explanation provided."}
                        </p>
 
                        <button
                          onClick={handleNextQuestion}
-                         className="mt-4 flex w-full sm:w-auto justify-center items-center gap-2 bg-[#1a3884] text-white px-6 py-2 rounded-lg hover:bg-[#112b6b] transition-colors ml-auto shadow-md"
+                         className="mt-4 flex w-full sm:w-auto justify-center items-center gap-2 bg-[#1a3884] text-white px-7 py-3 rounded-xl font-bold text-sm hover:bg-[#112b6b] transition-colors ml-auto shadow-md"
                        >
                          {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Finish Assessment'}
-                         <ArrowRight size={16} />
+                         <ArrowRight size={15} />
                        </button>
                     </motion.div>
                   )}
@@ -320,10 +338,10 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      return (
                        <div key={idx} className={btnClass}>
                          <div className="flex items-center gap-3 min-w-0 flex-1">
-                           <span className="w-7 h-7 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold flex-shrink-0">
+                           <span className="w-8 h-8 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold flex-shrink-0">
                              {getOptionLabel(idx)}
                            </span>
-                           <span className="text-sm md:text-base">{option}</span>
+                           <span className="text-sm md:text-base font-semibold text-slate-700 dark:text-slate-200">{option}</span>
                          </div>
                          <div className="flex items-center gap-2 flex-shrink-0">
                            {isUserChoice && (

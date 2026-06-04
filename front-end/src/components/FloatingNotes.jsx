@@ -151,7 +151,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
             >
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-600/20 group-hover:rotate-6 transition-transform">
+                <div className="w-9 h-9 rounded-xl bg-[#1a3884] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[#1a3884]/20 group-hover:rotate-6 transition-transform">
                     <AnimatePresence mode="wait">
                         {open ? (
                             <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
@@ -196,7 +196,7 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
                         {/* Header */}
                         <div className="px-4 py-3 border-b border-slate-100 dark:border-white/8 flex items-center justify-between bg-slate-50/80 dark:bg-slate-900/80">
                             <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                                <div className="w-7 h-7 rounded-lg bg-[#1a3884] flex items-center justify-center">
                                     <FileText className="w-3.5 h-3.5 text-white" />
                                 </div>
                                 <h3 className="text-sm font-bold text-slate-800 dark:text-white">Quick Notes</h3>
@@ -262,3 +262,148 @@ const FloatingNotes = ({ courseId: propCourseId }) => {
 };
 
 export default FloatingNotes;
+
+// ── Inline version (used in the Notes tab — no floating trigger) ──────────────
+export const InlineNotes = ({ courseId: propCourseId }) => {
+    const { courseId: urlCourseId } = useParams();
+
+    const [sessionId] = useState(() => {
+        const sessionKey = `note_session_${urlCourseId || 'general'}`;
+        let id = sessionStorage.getItem(sessionKey);
+        if (!id) { id = Date.now().toString(); sessionStorage.setItem(sessionKey, id); }
+        return id;
+    });
+
+    const courseId = propCourseId || (urlCourseId ? `${urlCourseId}-session-${sessionId}` : `general-session-${sessionId}`);
+
+    const [notes, setNotes] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [lastSaved, setLastSaved] = useState(null);
+    const textareaRef = useRef(null);
+    const debounceRef = useRef(null);
+
+    useEffect(() => {
+        const fetchNotes = async () => {
+            try {
+                setLoading(true);
+                const response = await notesAPI.getByCourse(courseId);
+                if (response.success && response.data) {
+                    setNotes(response.data.content || "");
+                    setLastSaved(response.data.updatedAt ? new Date(response.data.updatedAt) : null);
+                }
+            } catch {
+                const local = localStorage.getItem(`course-notes-${courseId}`);
+                if (local) setNotes(local);
+            } finally { setLoading(false); }
+        };
+        fetchNotes();
+    }, [courseId]);
+
+    useEffect(() => {
+        const handleSync = (e) => {
+            if (e.detail?.courseId === courseId && e.detail.content !== notes) setNotes(e.detail.content);
+        };
+        window.addEventListener('notes-updated', handleSync);
+        return () => window.removeEventListener('notes-updated', handleSync);
+    }, [courseId, notes]);
+
+    const saveNotes = useCallback(async (content) => {
+        setSaving(true);
+        try {
+            const response = await notesAPI.upsert(courseId, content);
+            if (response.success) {
+                setLastSaved(new Date());
+                localStorage.setItem(`course-notes-${courseId}`, content);
+                window.dispatchEvent(new CustomEvent('notes-updated', { detail: { courseId, content } }));
+            }
+        } catch { /* silent */ } finally { setSaving(false); }
+    }, [courseId]);
+
+    const handleChange = (e) => {
+        const value = e.target.value;
+        setNotes(value);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => saveNotes(value), 1000);
+    };
+
+    const handleManualSave = () => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        saveNotes(notes);
+        toast.success("Notes saved!");
+    };
+
+    const handleNewNote = () => {
+        if (!notes.trim()) { toast.info("Notes are already empty."); return; }
+        saveNotes(notes);
+        const newId = Date.now().toString();
+        sessionStorage.setItem(`note_session_${urlCourseId || 'general'}`, newId);
+        setNotes("");
+        setLastSaved(null);
+        toast.success("New note session started!");
+    };
+
+    return (
+        <div className="rounded-xl border border-slate-200/80 dark:border-white/8 overflow-hidden bg-white dark:bg-[#002147]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-2.5 bg-slate-50 dark:bg-[#002A5C] border-b border-slate-100 dark:border-white/8">
+                <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-[#1a3884] flex items-center justify-center">
+                        <FileText className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-sm font-bold text-slate-800 dark:text-white">Quick Notes</span>
+                    {lastSaved && (
+                        <span className="text-[10px] text-slate-400 font-medium ml-1">
+                            · Saved {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                    )}
+                </div>
+                <div className="flex items-center gap-1.5">
+                    {saving && <Loader2 className="w-3 h-3 animate-spin text-indigo-500" />}
+                    <button
+                        onClick={handleNewNote}
+                        title="Archive current & start fresh"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-[#003170] transition-colors"
+                    >
+                        <Plus className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                        onClick={handleManualSave}
+                        title="Save now"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-[#003170] transition-colors"
+                    >
+                        <Save className="w-3.5 h-3.5" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Textarea */}
+            <div className="relative">
+                <textarea
+                    ref={textareaRef}
+                    value={notes}
+                    onChange={handleChange}
+                    placeholder="Start typing your notes here... Notes are auto-saved to your profile."
+                    disabled={loading}
+                    className="w-full h-48 p-4 bg-white dark:bg-[#002147] text-slate-800 dark:text-slate-200
+                               text-sm focus:outline-none resize-none disabled:opacity-50
+                               font-medium leading-relaxed placeholder:text-slate-300 dark:placeholder:text-slate-600"
+                />
+                {loading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-[#002147]/60">
+                        <Loader2 className="w-5 h-5 animate-spin text-indigo-500" />
+                    </div>
+                )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-[#002A5C] border-t border-slate-100 dark:border-white/8">
+                <p className="text-[10px] text-slate-400">Auto-saved to your profile</p>
+                <span className={`text-[9px] font-bold uppercase tracking-widest ${saving ? 'text-indigo-500' : 'text-emerald-500'}`}>
+                    {saving ? 'Saving...' : 'Synced ✓'}
+                </span>
+            </div>
+        </div>
+    );
+};
+

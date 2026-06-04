@@ -5,9 +5,12 @@ import { useTranslation } from 'react-i18next';
 import BadgeCard from './BadgeCard';
 import BadgeModal from './BadgeModal';
 import { STAGES, TRACKS } from "@/data/courseStructureData";
+import useUser from "@/hooks/useUser";
+import apiCall from "@/services/api";
 
-const BadgeGallery = ({ badges: userBadges = [], completedCourses = [], userName = 'Student' }) => {
+const BadgeGallery = ({ completedCourses = [], userName = 'Student' }) => {
     const { t } = useTranslation();
+    const { user } = useUser();
     const [badges, setBadges] = useState([]);
     const [selectedBadge, setSelectedBadge] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,48 +25,98 @@ const BadgeGallery = ({ badges: userBadges = [], completedCourses = [], userName
     }));
 
     useEffect(() => {
-        const fetchBadges = async () => {
+        const fetchAndAwardBadges = async () => {
+            if (!user) return;
+            const userId = user.id || user._id;
+
             try {
                 setIsLoading(true);
-                // Generate course badges from courseStructureData based on completedCourses
-                const generatedBadges = [];
-                
+
+                // 1. Fetch user's earned badges from backend
+                const response = await apiCall(`/badges/user/${userId}/earned`);
+                const existingBadges = response?.data || [];
+
+                // Keep track of new badges to auto-award
+                const newlyAwarded = [];
+
+                // 2. Identify all badges the user *should* have based on completedCourses
                 [...STAGES, ...TRACKS].forEach(module => {
                     const moduleName = module.name || module.shortName;
                     const categoryName = moduleName.toLowerCase().replace(/\s+/g, '-');
                     
-                    module.courses.forEach(course => {
-                        // Display badge ONLY if course is completed
+                    module.courses.forEach(async (course) => {
+                        const targetBadgeId = `${course.id}-MASTER`;
+                        // If course is completed...
                         if (completedCourses && completedCourses.includes(course.id)) {
-                            generatedBadges.push({
-                                id: `${course.id}-MASTER`,
-                                badgeId: `${course.id}-MASTER`,
-                                title: `${course.title} Master`,
-                                description: `Awarded for successfully completing the ${course.title} course in the ${moduleName} track.`,
-                                category: categoryName,
-                                tier: 'standard',
-                                xp: 200,
-                                earnedDate: new Date(), // Display current date if unknown
-                                isEarned: true,
-                                progress: 100,
-                                icon: 'Award',
-                                color: '#1a3884' // Global theme Deep Navy
-                            });
+                            // Check if they already have the badge in the DB
+                            const hasBadge = existingBadges.some(b => b.badgeId === targetBadgeId || b.id === targetBadgeId);
+                            
+                            if (!hasBadge) {
+                                // Auto-award missing badge silently via API
+                                try {
+                                    const awardRes = await apiCall('/badges/award', {
+                                        method: 'POST',
+                                        body: JSON.stringify({
+                                            userId,
+                                            badgeId: targetBadgeId,
+                                            metadata: { autoAwarded: true, courseId: course.id }
+                                        })
+                                    });
+                                    if (awardRes?.success && awardRes?.data?.badge) {
+                                        newlyAwarded.push({
+                                            ...awardRes.data.badge,
+                                            id: awardRes.data.badge._id || awardRes.data.badge.id, // Mongoose ObjectId
+                                            _id: awardRes.data.badge._id || awardRes.data.badge.id,
+                                            earnedDate: new Date(),
+                                            isEarned: true
+                                        });
+                                    }
+                                } catch (awardErr) {
+                                    console.error(`Failed to auto-award ${targetBadgeId}`, awardErr);
+                                }
+                            }
                         }
                     });
                 });
+
+                // Re-fetch final badge list if any were newly awarded, otherwise use existing
+                let finalBadges = [...existingBadges, ...newlyAwarded];
                 
-                setBadges(generatedBadges);
+                if (newlyAwarded.length > 0) {
+                     // Wait a moment for DB persistence then re-fetch
+                     await new Promise(r => setTimeout(r, 500));
+                     const finalRes = await apiCall(`/badges/user/${userId}/earned`);
+                     if (finalRes?.data) finalBadges = finalRes.data;
+                }
+
+                // Format badges for gallery display
+                const displayBadges = finalBadges.map(b => ({
+                    ...b,
+                    id: b._id || b.id,      // Ensure Mongo ID is used for QR
+                    _id: b._id || b.id,     // Duplicate for safety
+                    badgeId: b.badgeId,
+                    title: b.title || `${b.badgeId} Master`,
+                    description: b.description || `Awarded for successfully completing the track.`,
+                    category: b.category || 'learning',
+                    tier: b.tier || 'standard',
+                    xp: b.xp || 200,
+                    earnedDate: b.earnedDate || b.earnedAt || new Date(),
+                    isEarned: true,
+                    progress: 100,
+                    icon: b.icon || 'Award',
+                    color: b.color || '#1a3884' // Deep Navy theme
+                }));
+                
+                setBadges(displayBadges);
             } catch (error) {
-                console.error('Error loading badges:', error);
-                setBadges([]);
+                console.error('Error loading/awarding badges:', error);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchBadges();
-    }, [completedCourses, t]);
+        fetchAndAwardBadges();
+    }, [completedCourses, t, user?.id, user?._id]);
 
     // Filter by category
     const filteredBadges = badges.filter((badge) => {

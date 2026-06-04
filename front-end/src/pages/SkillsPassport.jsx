@@ -998,26 +998,23 @@ const SkillsPassport = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#e8eff8] px-4 py-6 sm:px-6 sm:py-8" style={documentFont}>
+        <div className="min-h-screen bg-transparent" style={documentFont}>
             <motion.div
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, ease: "easeOut" }}
                 className="mx-auto flex max-w-[235mm] flex-col gap-5"
             >
-                <div className="flex flex-col gap-4 rounded-[24px] border border-[#d6dfef] bg-white/80 px-4 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <div className="mx-auto flex w-full max-w-[210mm] flex-col gap-4 rounded-[24px] border border-[#d6dfef] bg-white/80 px-5 py-5 backdrop-blur md:flex-row md:items-center md:justify-between">
                     <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#45639b]">
-                            SMAART Skills Passport
-                        </p>
-                        <h1 className="mt-2 text-2xl font-semibold text-[#10285a]" style={displayFont}>
-                            Premium AI-Verified Credential Document
+                        <h1 className="text-[1.65rem] font-[800] tracking-tight text-[#10285a]" style={displayFont}>
+                            Skills Passport
                         </h1>
-                        <p className="mt-1 text-sm text-slate-600">
-                            Multi-page academic and professional identity passport synced from live backend records.
+                        <p className="mt-1 text-[0.85rem] font-[500] text-slate-500 max-w-[480px] leading-relaxed">
+                            Your comprehensive academic and professional identity, securely synced with live SMAART records.
                         </p>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
                         <ActionButton icon={ArrowLeft} label="Back" onClick={() => navigate(-1)} />
                         <ActionButton icon={Share2} label="Copy Link" onClick={handleCopyLink} />
                         <ActionButton

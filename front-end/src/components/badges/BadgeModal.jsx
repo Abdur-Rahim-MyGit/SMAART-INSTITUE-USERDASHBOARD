@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Linkedin, Facebook, Download, ExternalLink, CheckCircle2, Sparkles } from 'lucide-react';
+import { X, Download, ExternalLink, CheckCircle2, Sparkles } from 'lucide-react';
+import { FaLinkedin, FaWhatsapp, FaInstagram } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -139,25 +141,29 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
 
     if (!badge) return null;
 
-    const verificationUrl = `${window.location.origin}/verify-badge/${badge._id || badge.id}`;
+    const displayCode = badge.badgeId || badge.id;
+    const verificationUrl = `${window.location.origin}/verify-badge/${displayCode}`;
     const tier = badge.tier?.toLowerCase() || 'standard';
     const style = tierStyles[tier] || tierStyles.standard;
 
 
     const handleShare = async (platform) => {
         setIsSharing(true);
-        const shareText = `🏆 I just earned the "${badge.title}" badge at SMAART Institute! ${badge.xp ? `+${badge.xp} XP` : ''} #SMAARTInstitute #Achievement`;
+        const shareText = `🏆 I just earned the "${badge.title}" badge at SMAART Institute! #SMAARTInstitute #Achievement`;
         const shareUrl = verificationUrl;
 
-        const shareUrls = {
-            linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`,
-            facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
-            twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-        };
-
-        if (shareUrls[platform]) {
-            window.open(shareUrls[platform], '_blank', 'width=600,height=400');
-            toast.success(`Opening ${platform.charAt(0).toUpperCase() + platform.slice(1)} to share your achievement!`);
+        if (platform === 'linkedin') {
+            const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+            window.open(url, '_blank', 'width=600,height=400');
+            toast.success('Opening LinkedIn to share your achievement!');
+        } else if (platform === 'whatsapp') {
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+            window.open(url, '_blank');
+            toast.success('Opening WhatsApp to share your achievement!');
+        } else if (platform === 'instagram') {
+            navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+            toast.success('Link copied! Paste it to share on Instagram.');
+            window.open('https://instagram.com', '_blank');
         }
         setIsSharing(false);
     };
@@ -166,23 +172,24 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
         const toastId = toast.loading('Generating badge certificate...');
 
         try {
-            const element = document.getElementById('badge-certificate-content');
+            const element = document.getElementById('hidden-pdf-certificate');
             if (!element) return;
 
             const canvas = await html2canvas(element, {
                 scale: 2,
                 backgroundColor: '#ffffff',
                 useCORS: true,
+                logging: false,
             });
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF({
                 orientation: 'landscape',
                 unit: 'mm',
-                format: 'a5',
+                format: 'a4',
             });
 
-            pdf.addImage(imgData, 'PNG', 0, 0, 210, 148);
+            pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
             pdf.save(`${badge.title.replace(/\s+/g, '_')}_Badge_Certificate.pdf`);
 
             toast.success('Badge certificate downloaded!', { id: toastId });
@@ -192,23 +199,38 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
         }
     };
 
-    return (
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm"
-                    onClick={onClose}
-                >
+                <>
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm"
+                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
+                        onClick={onClose}
+                    />
+                    {/* Positioning wrapper — plain div owns centering, motion.div owns animation only */}
+                    <div
+                        style={{
+                            position: 'fixed',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 1000,
+                            width: '90vw',
+                            maxWidth: '28rem',
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                     <motion.div
                         initial={{ scale: 0.96, opacity: 0, y: 12 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.96, opacity: 0, y: 12 }}
                         transition={{ type: 'spring', damping: 28, stiffness: 350 }}
-                        className="relative w-full max-w-xl max-h-[96vh] overflow-y-auto bg-white dark:bg-[#002147] rounded-[24px] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15)] border border-slate-100 dark:border-white/8 scrollbar-thin"
-                        onClick={(e) => e.stopPropagation()}
+                        className="max-h-[92vh] overflow-y-auto bg-white dark:bg-[#002147] rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.25)] border border-slate-100 dark:border-white/10 scrollbar-thin"
                     >
                         {/* Close Button */}
                         <button
@@ -217,6 +239,87 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         >
                             <X className="w-4 h-4" />
                         </button>
+
+                        {/* Hidden Landscape Certificate strictly for PDF Export */}
+                        <div 
+                            id="hidden-pdf-certificate" 
+                            className="absolute w-[1122px] h-[794px] bg-white text-slate-900 font-sans flex flex-col justify-between overflow-hidden"
+                            style={{ 
+                                position: 'absolute',
+                                left: '-9999px', 
+                                top: '-9999px', 
+                                padding: '60px', 
+                                pointerEvents: 'none',
+                                zIndex: -1
+                            }}
+                        >
+                            {/* Header Stripe */}
+                            <div className="absolute top-0 left-0 w-full h-4 bg-[#1a3884]"></div>
+                            <div className="absolute top-4 left-0 w-full h-1 bg-[#287a84]"></div>
+                            
+                            {/* Decorative Elements */}
+                            <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
+                            <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-emerald-50 rounded-full blur-3xl opacity-50"></div>
+
+                            {/* Main Content Area */}
+                            <div className="flex-1 flex flex-col items-center justify-center text-center mt-12 relative z-10">
+                                <div className="mb-10">
+                                    <h1 className="text-4xl font-black text-[#1a3884] uppercase tracking-widest mb-2">SMAART Institute</h1>
+                                    <p className="text-xl font-bold text-slate-400 uppercase tracking-widest">Badge Verification Certificate</p>
+                                </div>
+
+                                <p className="text-2xl text-slate-500 mb-4 font-medium tracking-wide">This formally certifies that</p>
+                                <h2 className="text-5xl font-black text-slate-900 mb-10 pb-4 border-b-2 border-slate-200 inline-block px-16">{userName}</h2>
+                                
+                                <p className="text-xl text-slate-500 mb-8 font-medium tracking-wide">has successfully demonstrated mastery and earned the</p>
+                                
+                                <div className="flex items-center justify-center gap-8 mb-8 bg-slate-50 py-6 px-12 rounded-[24px] border border-slate-100 shadow-sm">
+                                    <div className="w-28 h-28 flex-shrink-0">
+                                        <ModalHexBadge badge={badge} />
+                                    </div>
+                                    <div className="text-left">
+                                        <h3 className="text-4xl font-black text-[#1a3884] mb-3 leading-tight">{badge.title}</h3>
+                                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-sm font-bold uppercase tracking-wider">
+                                            <CheckCircle2 className="w-4 h-4" />
+                                            Verified Credential
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="mt-auto flex items-end justify-between border-t-2 border-slate-100 pt-8 relative z-10">
+                                <div>
+                                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Date of Issue</p>
+                                    <p className="text-xl font-black text-slate-800">
+                                        {badge.earnedDate ? new Date(badge.earnedDate).toLocaleDateString(i18n.language || 'en-GB', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric',
+                                        }) : new Date().toLocaleDateString()}
+                                    </p>
+                                </div>
+                                
+                                <div className="flex items-center gap-6">
+                                    <div className="text-right">
+                                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Verification Code</p>
+                                        <p className="text-lg font-mono font-bold text-slate-800 tracking-wider">{displayCode}</p>
+                                    </div>
+                                    <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-200">
+                                        <QRCodeSVG
+                                            value={verificationUrl}
+                                            size={80}
+                                            level="H"
+                                            includeMargin={false}
+                                            fgColor="#1a3884"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Bottom Stripe */}
+                            <div className="absolute bottom-0 left-0 w-full h-8 bg-[#1a3884]"></div>
+                        </div>
 
                         {/* Certificate Content for PDF */}
                         <div id="badge-certificate-content" className="bg-white dark:bg-slate-900/30 relative overflow-hidden py-5 px-4 sm:px-6 border-b border-slate-50 dark:border-white/5">
@@ -250,15 +353,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                         </span>
                                         <span className="font-black text-slate-900 dark:text-white">{userName}</span>
                                     </div>
-                                    <div className="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-2">
-                                        <span className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[10px]">
-                                            {t('badge_gallery.xp_credit')}
-                                        </span>
-                                        <span className="font-black text-[#1a3884] dark:text-blue-400 flex items-center gap-1">
-                                            <Sparkles className="w-3 h-3 text-amber-500" />
-                                            +{badge.xp || 0} XP
-                                        </span>
-                                    </div>
+
                                     {badge.earnedDate && (
                                         <div className="flex justify-between items-center border-t border-slate-100 dark:border-white/5 pt-2">
                                             <span className="font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-[10px]">
@@ -275,8 +370,8 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     )}
                                 </div>
 
-                                {/* QR Code & Verification Section - tighter padding */}
-                                <div className="flex items-center gap-3.5 p-3 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-white/5 shadow-sm max-w-sm w-full">
+                                {/* QR Code & Verification Section - clean centered align */}
+                                <div className="flex items-center justify-between p-3 bg-white dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-white/5 shadow-sm max-w-sm w-full">
                                     <QRCodeSVG
                                         value={verificationUrl}
                                         size={52}
@@ -285,12 +380,12 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                         bgColor="transparent"
                                         fgColor="#1a3884"
                                     />
-                                    <div className="text-left min-w-0 flex-1">
+                                    <div className="text-right min-w-0">
                                         <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-0.5">
                                             {t('badge_gallery.verification_code')}
                                         </p>
                                         <p className="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 break-all">
-                                            {badge._id || badge.id}
+                                            {displayCode}
                                         </p>
                                     </div>
                                 </div>
@@ -300,60 +395,60 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         {/* Actions Footer - reduced padding and tighter button grids */}
                         <div className="p-4 sm:p-5 bg-slate-50/50 dark:bg-slate-900/10 rounded-b-[24px]">
                             {/* Share Options */}
-                            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-center mb-2">
+                            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-center mb-2.5">
                                 {t('badge_gallery.share_credential')}
                             </p>
-                            <div className="flex justify-center flex-wrap gap-2 mb-4">
+                            <div className="flex justify-center items-center gap-3.5 mb-5">
                                 <button
                                     onClick={() => handleShare('linkedin')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0077b5] hover:bg-[#006699] text-white rounded-lg transition-all font-bold text-[9px] uppercase tracking-wider shadow-sm"
+                                    title="Share on LinkedIn"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0077b5]/10 hover:bg-[#0077b5] text-[#0077b5] hover:text-white transition-all duration-200 border border-[#0077b5]/20 hover:border-transparent active:scale-90"
                                 >
-                                    <Linkedin className="w-3 h-3" />
-                                    LinkedIn
+                                    <FaLinkedin className="w-4 h-4" />
                                 </button>
                                 <button
-                                    onClick={() => handleShare('facebook')}
+                                    onClick={() => handleShare('whatsapp')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1877f2] hover:bg-[#166fe5] text-white rounded-lg transition-all font-bold text-[9px] uppercase tracking-wider shadow-sm"
+                                    title="Share on WhatsApp"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25d366]/10 hover:bg-[#25d366] text-[#25d366] hover:text-white transition-all duration-200 border border-[#25d366]/20 hover:border-transparent active:scale-90"
                                 >
-                                    <Facebook className="w-3 h-3" />
-                                    Facebook
+                                    <FaWhatsapp className="w-4.5 h-4.5" />
                                 </button>
                                 <button
-                                    onClick={() => handleShare('twitter')}
+                                    onClick={() => handleShare('instagram')}
                                     disabled={isSharing}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0f1419] hover:bg-[#181d22] text-white rounded-lg transition-all font-bold text-[9px] uppercase tracking-wider shadow-sm"
+                                    title="Copy Link for Instagram"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e1306c]/10 hover:bg-[#e1306c] text-[#e1306c] hover:text-white transition-all duration-200 border border-[#e1306c]/20 hover:border-transparent active:scale-90"
                                 >
-                                    <svg className="w-3 h-3 fill-current" viewBox="0 0 24 24">
-                                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                                    </svg>
-                                    X
+                                    <FaInstagram className="w-4.5 h-4.5" />
                                 </button>
                             </div>
 
                             {/* Download & Verification Actions - condensed grid */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-w-sm mx-auto w-full">
+                            <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto w-full">
                                 <button
                                     onClick={handleDownloadCertificate}
-                                    className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#1a3884] to-[#002147] text-white text-[11px] font-black uppercase tracking-widest hover:shadow-sm transform active:scale-95 transition-all w-full text-center"
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1a3884] hover:bg-[#132c6b] text-white text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 shadow-sm"
                                 >
-                                    <Download className="w-3.5 h-3.5" /> {t('badge_gallery.download_certificate')}
+                                    <Download className="w-3.5 h-3.5" /> Download Badge
                                 </button>
                                 <a
                                     href={verificationUrl}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 text-[#002147] dark:text-white text-[11px] font-black uppercase tracking-widest hover:shadow-sm hover:border-[#1a3884] dark:hover:border-blue-500 transform active:scale-95 transition-all w-full text-center"
+                                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-[#1a3884] dark:text-blue-400 text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 hover:border-[#1a3884]/30 hover:bg-[#1a3884]/5 dark:hover:bg-[#1a3884]/10 text-center"
                                 >
-                                    <ExternalLink className="w-3.5 h-3.5" /> {t('badge_gallery.verify_badge')}
+                                    <ExternalLink className="w-3.5 h-3.5" /> Verify Badge
                                 </a>
                             </div>
                         </div>
                     </motion.div>
-                </motion.div>
+                    </div>
+                </>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 };
 

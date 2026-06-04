@@ -17,6 +17,57 @@ const router = express.Router();
 const { generalLimiter } = require('../middleware/rateLimiter');
 router.use(generalLimiter);
 
+// Public debug endpoint to inspect flashcard data structure in MongoDB
+router.get('/debug-flashcards-db', async (req, res) => {
+    try {
+        const courses = await Course.find({});
+        const result = courses.map(c => {
+            const flowCards = [];
+            const moduleCards = [];
+            if (c.learningFlow) {
+                Object.values(c.learningFlow).forEach(step => {
+                    if (step.cards) {
+                        flowCards.push(...step.cards);
+                    } else if (step.content?.cards) {
+                        flowCards.push(...step.content.cards);
+                    }
+                });
+            }
+            if (c.modules) {
+                c.modules.forEach(m => {
+                    if (m.days) {
+                        m.days.forEach(d => {
+                            if (d.steps) {
+                                d.steps.forEach(s => {
+                                    if (s.type === 'flashcard' || s.type === 'flashcards' || s.contentType === 'flashcard') {
+                                        const cards = s.cards || s.content?.cards || [];
+                                        moduleCards.push(...cards);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+            return {
+                courseCode: c.courseCode,
+                courseNumber: c.courseNumber,
+                title: c.title,
+                hasLearningFlow: !!c.learningFlow,
+                learningFlowCardsCount: flowCards.length,
+                modulesCardsCount: moduleCards.length,
+                modulesCards: moduleCards
+            };
+        });
+        res.json({
+            success: true,
+            coursesCount: courses.length,
+            data: result
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 // Apply protection to all course routes
 router.use(protect);

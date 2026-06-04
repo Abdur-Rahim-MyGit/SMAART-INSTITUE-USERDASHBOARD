@@ -24,52 +24,43 @@ const Community = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] pb-24 selection:bg-[#002147]/20">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+    <div className="min-h-screen bg-transparent pb-24 selection:bg-[#002147]/20">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
 
-        {/* Back Button */}
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-8 hover:text-[#1a3884] transition-all"
-        >
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-            <ArrowLeft className="w-4 h-4" />
-          </div>
-          {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-        </button>
-
-        {/* ── Header Section ────────────────────────────────────────────── */}
-        <div className="mb-6 sm:mb-10">
-          <div className="flex items-center gap-3 sm:gap-4 mb-4">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#002147] to-[#003580] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/20 shrink-0"
+        {/* Back Button - Mobile Only */}
+        <div className="mb-4 md:hidden">
+            <button
+            onClick={() => navigate("/dashboard")}
+            className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
             >
-              <Megaphone className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-            </motion.div>
-            <div className="min-w-0">
-              <motion.h1
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="text-xl sm:text-2xl md:text-3xl font-black text-[#002147] dark:text-white tracking-tight leading-tight"
-              >
-                {t("community_page.title")}
-              </motion.h1>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="flex items-center gap-2 mt-0.5 sm:mt-1"
-              >
-                <p className="text-gray-500 dark:text-slate-300 font-medium text-sm">
-                  {t("community_page.subtitle")}
-                </p>
-              </motion.div>
+            <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                <ArrowLeft className="w-4 h-4" />
             </div>
-          </div>
+            {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+            </button>
         </div>
+
+        {/* ── Standardized Header ── */}
+        <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+        >
+            <div className="flex flex-col">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1a3884]/10 dark:bg-blue-900/30">
+                        <Megaphone className="h-4 w-4 text-[#1a3884] dark:text-blue-400" />
+                    </div>
+                    <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                        {t("community_page.title").split(' ')[0]} <span className="text-[#1a3884] dark:text-blue-300">{t("community_page.title").split(' ').slice(1).join(' ')}</span>
+                    </h1>
+                </div>
+                <p className="mt-1 max-w-xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+                    {t("community_page.subtitle")}
+                </p>
+            </div>
+        </motion.div>
 
         {/* ── Main Noticeboard ────────────────────────────────────────── */}
         <motion.div

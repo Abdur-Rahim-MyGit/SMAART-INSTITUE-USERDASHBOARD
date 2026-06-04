@@ -107,6 +107,7 @@ export const useSmaartCourseProgress = (userId) => {
           courseCode: e.course?.courseCode,
           progress: e.progress || 0,
           status: e.status,
+          moduleProgress: e.moduleProgress || [],
         })),
       });
     } catch (err) {

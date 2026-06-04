@@ -50,47 +50,28 @@ const DashboardHeader = () => {
   };
 
   return (
-    <div className="w-full px-6 py-8 sm:px-10 lg:px-12 bg-white dark:bg-[#002147] border-b border-slate-100 dark:border-slate-800/50 relative overflow-hidden transition-all duration-300">
-      {/* Decorative background element */}
-      <div className="absolute top-0 right-0 w-64 h-full bg-gradient-to-l from-blue-50/50 to-transparent dark:from-blue-900/10 pointer-events-none" />
-      
-      <div className="max-w-[1600px] mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-1 bg-[#1a3884] dark:bg-blue-500 rounded-full" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400">
-                SMAART Institute Dashboard
-              </span>
-            </div>
-            
-            <motion.h1 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight font-sans transition-colors duration-300"
-              style={{
-                letterSpacing: '-0.02em',
-              }}
-            >
-              {getPageTitle()}
-            </motion.h1>
+    <div className="w-full px-6 py-4 sm:px-8 lg:px-10 bg-white dark:bg-[#00152E] border-b border-[#d8e6f7] dark:border-white/5 relative z-40 transition-colors duration-300 shadow-sm dark:shadow-none">
+      <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a3884] dark:text-blue-400">
+              SMAART Institute
+            </span>
           </div>
+          
+          <motion.h1 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-[20px] font-bold leading-tight tracking-tight text-[#0d1f4e] dark:text-white"
+          >
+            {getPageTitle()}
+          </motion.h1>
+        </div>
 
-          {/* Optional context label or action could go here */}
-          <div className="hidden md:flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Current View</p>
-              <p className="text-xs font-bold text-slate-600 dark:text-slate-300">Personalized Learning Path</p>
-            </div>
-          </div>
+        <div className="flex items-center gap-4">
+          <NotificationBell />
         </div>
       </div>
-<div className="absolute right-4 top-6 z-40">
-        <NotificationBell />
-      </div>
-
-      {/* Bottom Silver Line */}
-      <div style={{ height: '3px', background: 'linear-gradient(90deg, #C0C0C0, #FFFFFF, #C0C0C0)' }} />
     </div>
   );
 };

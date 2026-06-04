@@ -287,11 +287,11 @@ const Certificate = () => {
                                 <button
                                     key={cert.id}
                                     onClick={() => setSelectedType(cert)}
-                                    className="group flex flex-col items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-5 text-left transition-all hover:border-[#eab308]/50 hover:bg-white hover:shadow-lg hover:shadow-yellow-500/10 dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#eab308]/50 dark:hover:bg-[#001630]"
+                                    className="group flex flex-col items-start gap-4 rounded-xl border border-[#d8e6f7] bg-[#f5f8ff] p-5 text-left transition-all hover:border-[#1a3884]/50 hover:bg-white hover:shadow-[0_4px_20px_rgba(26,56,132,0.08)] dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:hover:border-[#1a3884]/50 dark:hover:bg-[#001630]"
                                 >
                                     <div className="flex w-full items-start justify-between gap-4">
-                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-b from-[#fef08a] via-[#eab308] to-[#a16207] shadow-[0_4px_12px_rgba(234,179,8,0.4)] border border-[#fef08a]/50 transition-transform group-hover:scale-105">
-                                            <Award className="h-6 w-6 text-white drop-shadow-md" />
+                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#eef4ff] border border-blue-200/60 dark:bg-[#1a3884]/15 dark:border-blue-500/20 transition-transform group-hover:scale-105">
+                                            <Award className="h-6 w-6 text-[#1a3884] dark:text-blue-400" />
                                         </div>
                                         <div className="flex h-8 items-center rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-900/30 dark:bg-emerald-900/10 dark:text-emerald-400">
                                             <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />

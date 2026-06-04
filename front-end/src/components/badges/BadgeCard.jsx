@@ -35,7 +35,7 @@ const MODULE_PALETTE = {
     },
 };
 
-const resolveColors = (category = '') => {
+export const resolveColors = (category = '') => {
     const c = category.toLowerCase();
     if (c.includes('capacity'))   return MODULE_PALETTE['capacity'];
     if (c.includes('capability')) return MODULE_PALETTE['capability'];
@@ -81,8 +81,8 @@ const splitIntoLines = (text = '', maxLen = 12) => {
 
 /* ────────────────────────────────────────────────
    HexBadgeSVG  —  the visual badge centrepiece
-──────────────────────────────────────────────── */
-const HexBadgeSVG = ({ colors, badgeId, courseName, year, size = 190 }) => {
+   ──────────────────────────────────────────────── */
+export const HexBadgeSVG = ({ colors, badgeId, courseName, year, size = 190 }) => {
     const c = colors;
     const uid = (badgeId || 'badge').replace(/[^a-zA-Z0-9]/g, '');
 
@@ -276,25 +276,12 @@ const BadgeCard = ({ badge, onClick }) => {
                 {moduleLabel}
             </span>
 
-            {/* Footer: XP + Verified */}
-            <div className="relative z-10 mt-auto flex w-full items-center justify-between
+            {/* Footer: Verified */}
+            <div className="relative z-10 mt-auto flex w-full items-center justify-center
                             border-t border-[#d8e6f7] dark:border-[#1a3884]/20 pt-2.5">
-                {badge.xp ? (
-                    <span className="flex items-center gap-1 rounded-md border border-[#d8e6f7]
-                                     bg-[#f5f8ff] px-2 py-0.5 text-[8px] font-black
-                                     uppercase tracking-wider text-[#1a3884]
-                                     dark:border-[#1a3884]/20 dark:bg-[#001a3d] dark:text-blue-400">
-                        <Sparkles className="h-2.5 w-2.5 text-amber-500" />
-                        +{badge.xp} XP
-                    </span>
-                ) : (
-                    <span className="text-[8px] font-bold uppercase tracking-wider text-slate-400">
-                        Earned
-                    </span>
-                )}
-                <span className="flex items-center gap-0.5 text-[8px] font-bold
-                                 uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="h-2.5 w-2.5" />
+                <span className="flex items-center gap-1.5 text-[9px] font-extrabold
+                                 uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                     Verified
                 </span>
             </div>

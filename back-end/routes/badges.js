@@ -104,7 +104,7 @@ router.get('/user/:userId/earned', async (req, res) => {
 
         const badges = userBadges.map(ub => ({
             id: ub.badgeId.badgeId,
-            _id: ub.badgeId._id,
+            _id: ub._id, // Fixed: Must be the UserBadge assignment ID, not the Badge template ID
             title: ub.badgeId.title,
             description: ub.badgeId.description,
             category: ub.badgeId.category,

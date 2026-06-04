@@ -13,8 +13,8 @@ router.get('/', searchLimiter, async (req, res) => {
   try {
     const { search, limit = 50 } = req.query;
 
-    // SECURITY FIX: Only return active colleges (case-insensitive)
-    let query = { status: { $regex: '^active$', $options: 'i' } };
+    // No status filter — show all colleges in institution selector
+    let query = {};
 
     let colleges = [];
     if (search) {

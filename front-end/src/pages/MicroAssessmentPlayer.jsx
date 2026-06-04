@@ -343,7 +343,7 @@ const MicroAssessmentPlayer = () => {
                           disabled={showFeedback}
                           className={`w-full flex items-center gap-4 rounded-2xl border-2 p-5 text-left transition-all ${optionClass}`}
                         >
-                          <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors ${
+                          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors ${
                             showFeedback && isCorrectOption
                               ? "border-green-500 bg-green-500 text-white"
                               : showFeedback && isSelected && !isCorrectOption
@@ -356,8 +356,8 @@ const MicroAssessmentPlayer = () => {
                             {showFeedback && isSelected && !isCorrectOption && <XCircle className="h-4 w-4" />}
                             {!showFeedback && getOptionLabel(i)}
                           </div>
-                          <span className="text-base font-medium">
-                            <span className="font-bold text-slate-500 dark:text-slate-400 mr-2">{getOptionLabel(i)}.</span>
+                          <span className="text-sm md:text-base font-semibold text-slate-750 dark:text-slate-250">
+                            <span className="hidden">{getOptionLabel(i)}.</span>
                             {opt}
                           </span>
                         </button>
@@ -484,13 +484,13 @@ const MicroAssessmentPlayer = () => {
                           const isSelected = userAns === optIdx;
                           const isActualCorrect = optIdx === getCorrectOptionIndex(q);
                           
-                          let optClass = "border-slate-100 bg-white text-slate-700 dark:border-white/5 dark:bg-[#001A3A] dark:text-slate-300";
-                          if (isActualCorrect) optClass = "border-green-500 bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-                          else if (isSelected && !isActualCorrect) optClass = "border-red-500 bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-300";
+                          let optClass = "border-slate-250 bg-[#F8FAFC]/50 text-slate-500 dark:border-white/5 dark:bg-[#001A3A] dark:text-slate-300 opacity-60";
+                          if (isActualCorrect) optClass = "border-green-500 bg-green-55/10 text-green-700 dark:bg-green-900/20 dark:text-green-300";
+                          else if (isSelected && !isActualCorrect) optClass = "border-red-500 bg-red-55/10 text-red-750 dark:bg-red-900/20 dark:text-red-300";
 
                           return (
-                            <div key={optIdx} className={`flex items-center gap-4 rounded-xl border-2 p-4 ${optClass}`}>
-                              <div className="flex-1 font-medium">{opt}</div>
+                            <div key={optIdx} className={`flex items-center gap-4 rounded-2xl border-2 p-4 md:p-5 transition-all duration-300 ${optClass}`}>
+                              <div className="flex-1 text-sm md:text-base font-semibold leading-relaxed text-slate-750 dark:text-slate-200">{opt}</div>
                               {isSelected && <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 opacity-70">Your Answer</span>}
                               {isActualCorrect && <CheckCircle2 className="h-5 w-5 text-green-500" />}
                               {(isSelected && !isActualCorrect) && <XCircle className="h-5 w-5 text-red-500" />}

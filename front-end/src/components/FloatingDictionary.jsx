@@ -151,44 +151,32 @@ const FloatingDictionary = () => {
             <motion.div
                 layout
                 onClick={() => setOpen(!open)}
-                className="fixed bottom-6 right-4 sm:right-8 z-50 h-14 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl text-[#1a3884] dark:text-white shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border border-white/20 dark:border-slate-700/50 flex items-center gap-3 p-2.5 sm:px-5 cursor-pointer hover:shadow-blue-600/20 transition-all duration-300 group overflow-hidden"
+                className="fixed bottom-6 right-4 sm:right-8 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] text-white shadow-[0_8px_32px_rgba(26,56,132,0.4)] border border-white/20 flex items-center justify-center cursor-pointer hover:shadow-[0_12px_40px_rgba(26,56,132,0.5)] transition-all duration-300 group"
                 initial={{ y: 100, opacity: 0 }}
-                animate={{
-                    y: 0,
-                    opacity: 1
-                }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
+                animate={{ y: 0, opacity: 1 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
             >
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform">
-                    <AnimatePresence mode="wait">
-                        {open ? (
-                            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                                <X className="w-4 h-4 text-white" />
-                            </motion.div>
-                        ) : (
-                            <motion.div key="book" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                                <Book className="w-4 h-4 text-white" />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                <AnimatePresence mode="wait">
+                    {open ? (
+                        <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                            <X className="w-6 h-6 text-white" />
+                        </motion.div>
+                    ) : (
+                        <motion.div key="book" className="relative flex items-center justify-center group-hover:rotate-[10deg] transition-transform duration-300" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                            <Book className="w-6 h-6 text-white" />
+                            {/* AI-like status/sparkle dot */}
+                            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#1a3884] animate-pulse" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
+                {/* Tooltip on Hover */}
                 {!open && (
-                    <motion.div
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="hidden sm:flex flex-col pr-4"
-                    >
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 leading-none mb-1">Quick Search</span>
-                        <span className="text-sm font-bold tracking-tight text-slate-500 dark:text-slate-400 whitespace-nowrap italic">Look up a word...</span>
-                    </motion.div>
-                )}
-
-                {/* Status dot */}
-                {!open && (
-                    <div className="flex items-center gap-1.5 ml-auto hidden sm:flex">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <div className="absolute right-full mr-4 px-3 py-1.5 rounded-lg bg-[#0d1f4e] text-white text-xs font-bold tracking-wide whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-xl border border-white/10 flex items-center">
+                        Dictionary
+                        {/* Triangle pointer */}
+                        <div className="absolute top-1/2 -right-1.5 -translate-y-1/2 border-[4px] border-transparent border-l-[#0d1f4e]" />
                     </div>
                 )}
             </motion.div>
@@ -204,23 +192,21 @@ const FloatingDictionary = () => {
                         className="fixed bottom-24 right-6 z-[60] w-[340px] max-h-[480px] flex flex-col rounded-2xl bg-white dark:bg-[#002A5C] border border-slate-200/80 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/40 overflow-hidden"
                     >
                         {/* Header */}
-                        <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700/50 flex items-center justify-between bg-slate-50/80 dark:bg-slate-800/80">
+                        <div className="px-4 py-3.5 border-b border-[#1a3884]/10 dark:border-white/10 flex items-center justify-between bg-gradient-to-r from-[#1a3884] to-[#112b6b] text-white">
                             <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#1a3884] to-[#2d5dc7] flex items-center justify-center">
-                                    <Book className="w-3.5 h-3.5 text-white" />
-                                </div>
-                                <h3 className="text-sm font-bold text-slate-800 dark:text-white">Quick Dictionary</h3>
+                                <Book className="w-4 h-4 text-blue-200" />
+                                <h3 className="text-sm font-extrabold tracking-tight">Quick Dictionary</h3>
                             </div>
                             <button
                                 onClick={() => navigate("/dashboard/dictionary")}
-                                className="text-[10px] font-semibold text-[#1a3884] dark:text-blue-400 hover:underline flex items-center gap-1"
+                                className="text-[10px] font-semibold text-blue-200 hover:text-white hover:underline flex items-center gap-1 transition-colors"
                             >
                                 Full view <ExternalLink className="w-3 h-3" />
                             </button>
                         </div>
 
                         {/* Search */}
-                        <form onSubmit={handleSubmit} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700/50">
+                        <form onSubmit={handleSubmit} className="px-4 py-3 border-b border-slate-100 dark:border-slate-700/50 bg-[#F8FAFC] dark:bg-slate-800/50">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <input
@@ -229,10 +215,10 @@ const FloatingDictionary = () => {
                                     value={query}
                                     onChange={handleInputChange}
                                     placeholder="Type a word to look up…"
-                                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/60 bg-white dark:bg-slate-700/50 text-sm text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400 transition-all"
+                                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/60 bg-white dark:bg-[#00152E] text-sm text-[#0d1f4e] dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1a3884]/40 focus:border-[#1a3884] transition-all"
                                 />
                                 {loading && (
-                                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-blue-500" />
+                                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-[#1a3884] dark:text-blue-400" />
                                 )}
                             </div>
                             <p className="text-[10px] text-slate-400 mt-1.5 pl-1">Results appear instantly as you type</p>
@@ -251,9 +237,9 @@ const FloatingDictionary = () => {
                                         <Search className="w-6 h-6 text-rose-500" />
                                     </div>
                                     <div className="space-y-1 px-4">
-                                        <p className="text-sm font-bold text-slate-800 dark:text-white">Word Not Found</p>
+                                        <p className="text-sm font-bold text-[#0d1f4e] dark:text-white">Word Not Found</p>
                                         <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                                            We couldn't find a definition for <span className="font-semibold text-slate-700 dark:text-slate-200">"{query}"</span>. Please check the spelling.
+                                            We couldn't find a definition for <span className="font-semibold text-[#1a3884] dark:text-blue-300">"{query}"</span>. Please check the spelling.
                                         </p>
                                     </div>
                                 </motion.div>
@@ -261,8 +247,8 @@ const FloatingDictionary = () => {
 
                             {!loading && !error && !result && (
                                 <div className="text-center py-6">
-                                    <Book className="w-8 h-8 text-slate-200 dark:text-slate-700 mx-auto mb-2" />
-                                    <p className="text-xs text-slate-400 dark:text-slate-500">Start typing to see definitions instantly</p>
+                                    <Book className="w-8 h-8 text-[#1a3884]/20 dark:text-blue-400/30 mx-auto mb-2" />
+                                    <p className="text-xs text-[#0d1f4e]/60 dark:text-slate-400">Start typing to see definitions instantly</p>
                                 </div>
                             )}
 
@@ -270,7 +256,7 @@ const FloatingDictionary = () => {
                                 <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
                                     {/* Word header */}
                                     <div className="flex items-center gap-2">
-                                        <h4 className="text-lg font-bold text-slate-900 dark:text-white capitalize">{result.word}</h4>
+                                        <h4 className="text-lg font-bold text-[#0d1f4e] dark:text-white capitalize">{result.word}</h4>
                                         {result.phonetic && (
                                             <span className="text-xs text-slate-400 font-mono">{result.phonetic}</span>
                                         )}
@@ -292,12 +278,12 @@ const FloatingDictionary = () => {
                                             </span>
                                             <ul className="mt-1 space-y-1.5">
                                                 {meaning.definitions.slice(0, 2).map((def, j) => (
-                                                    <li key={j} className="flex gap-1.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                                                        <span className="text-slate-300 dark:text-slate-600 mt-0.5 flex-shrink-0">•</span>
+                                                    <li key={j} className="flex gap-1.5 text-xs text-[#0d1f4e]/80 dark:text-slate-300 leading-relaxed">
+                                                        <span className="text-[#1a3884]/40 dark:text-blue-400/50 mt-0.5 flex-shrink-0">•</span>
                                                         <div>
                                                             <span>{def.definition}</span>
                                                             {def.example && (
-                                                                <p className="mt-0.5 text-[11px] italic text-slate-400 dark:text-slate-500">
+                                                                <p className="mt-0.5 text-[11px] italic text-[#1a3884]/60 dark:text-blue-300/60">
                                                                     "{def.example}"
                                                                 </p>
                                                             )}

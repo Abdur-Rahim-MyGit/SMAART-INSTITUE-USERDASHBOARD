@@ -4,6 +4,8 @@ import { assessmentApi } from '@/services/assessmentApi';
 
 export const useLearningPaths = (userId) => {
   const [paths, setPaths] = useState([]);
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [inProgressCourses, setInProgressCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -12,6 +14,7 @@ export const useLearningPaths = (userId) => {
       try {
         setLoading(true);
         setError(null);
+        let resolvedPaths = [];
 
         // ── Priority 1: Career Directions from Career Agent Analysis ──────────
         // Try to fetch the user's registered career directions from their final pathway
@@ -23,11 +26,12 @@ export const useLearningPaths = (userId) => {
           });
           if (res.ok) {
             const payload = await res.json();
-            // Only reflect paths in dashboard if the user has explicitly locked them
-            if (payload.found && payload.is_locked && payload.output_data) {
+            // If we found a final pathway, retrieve it and set its locked state
+            if (payload.found && payload.output_data) {
               const analysis = payload.output_data;
               const input_data = payload.input_data;
               const preferences = input_data?.preferences || {};
+              const isLocked = !payload.is_locked; // locked = true if the final pathway hasn't been finalized yet
 
               // Build direction name from analysis or from input_data preferences
               const getDirectionName = (analysisPath, prefPref, localKey) => {
@@ -74,34 +78,43 @@ export const useLearningPaths = (userId) => {
               }
 
               const careerPaths = [
-                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   progress: assessmentPct, btnText: 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   navigateTo: '/dashboard/career-agent' },
-                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, progress: assessmentPct, btnText: 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', navigateTo: '/dashboard/career-agent' },
-                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  progress: assessmentPct, btnText: 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  navigateTo: '/dashboard/career-agent' },
+                primaryName   && { id: 'primary',   title: primaryName,   subtitle: primarySub,   progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(primaryName),   color: 'blue',   locked: isLocked, navigateTo: '/dashboard/career-agent' },
+                secondaryName && { id: 'secondary', title: secondaryName, subtitle: secondarySub, progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(secondaryName), color: 'indigo', locked: isLocked, navigateTo: '/dashboard/career-agent' },
+                tertiaryName  && { id: 'tertiary',  title: tertiaryName,  subtitle: tertiarySub,  progress: assessmentPct, btnText: isLocked ? 'Unlock Career Path' : 'View Career Path', icon: getIconForDirection(tertiaryName),  color: 'amber',  locked: isLocked, navigateTo: '/dashboard/career-agent' },
               ].filter(Boolean);
 
               if (careerPaths.length > 0) {
-                setPaths(careerPaths);
-                setLoading(false);
-                return;
+                resolvedPaths = careerPaths;
               }
             }
           }
         } catch (caErr) {
-          console.log('[useLearningPaths] Career analysis fetch failed, trying enrolled courses:', caErr.message);
+          console.log('[useLearningPaths] Career analysis fetch failed:', caErr.message);
         }
 
         // ── Priority 2: Enrolled Course Paths ────────────────────────────────
         if (userId) {
           try {
-            const enrollments = await courseEnrollmentAPI.getByStudent(userId);
+            // API returns { success, count, data: [...] } — unwrap the data array
+            const enrollmentResponse = await courseEnrollmentAPI.getByStudent(userId);
+            const enrollmentList = enrollmentResponse?.data || enrollmentResponse || [];
 
-            if (enrollments && enrollments.length > 0) {
+            if (enrollmentList && enrollmentList.length > 0) {
               const pathsData = await Promise.all(
-                enrollments.map(async (enrollment) => {
+                enrollmentList.map(async (enrollment) => {
                   try {
-                    const course = await coursesAPI.getById(enrollment.course);
+                    // enrollment.course is already populated by the backend (has title, courseCode, etc.)
+                    // Use the populated object directly; fall back to a fresh fetch if needed.
+                    let course = enrollment.course;
+                    if (!course || typeof course !== 'object' || !course.title) {
+                      const courseId = typeof course === 'string' ? course : course?._id;
+                      const courseRes = await coursesAPI.getById(courseId);
+                      // coursesAPI.getById returns { success, data: course } — unwrap
+                      course = courseRes?.data || courseRes;
+                    }
                     return {
                       id: course._id,
+                      courseCode: course.courseCode,
                       title: course.title,
                       subtitle: course.description || 'No description',
                       progress: enrollment.progress || 0,
@@ -123,18 +136,76 @@ export const useLearningPaths = (userId) => {
                 .sort((a, b) => b.progress - a.progress);
 
               if (validPaths.length > 0) {
-                setPaths(validPaths);
-                setLoading(false);
-                return;
+                setEnrolledCourses(validPaths);
+                // Also set to paths if there are no career paths
+                if (resolvedPaths.length === 0) {
+                  resolvedPaths = validPaths;
+                }
               }
+
+              // ── Build in-progress roadmap entries (max 5) ─────────────────
+              // Show any actively enrolled course that isn't fully completed or dropped
+              console.log('[useLearningPaths] Raw enrollmentList statuses:', enrollmentList.map(e => ({ status: e.status, progress: e.progress, title: e.course?.title })));
+              const inProgressList = enrollmentList
+                .filter(e => !['completed', 'dropped', 'suspended'].includes(e.status) && e.progress < 100)
+                .slice(0, 5)
+                .map(e => {
+                  const course = e.course; // already populated
+                  if (!course || typeof course !== 'object') return null;
+
+                  // Build a stages/steps array from course.modules[*].days
+                  const stages = [];
+                  if (course.modules && course.modules.length > 0) {
+                    course.modules.forEach((mod, mIdx) => {
+                      if (!mod.days) return;
+                      const mProg = (e.moduleProgress || []).find(
+                        mp => mp.module?.toString() === mod._id?.toString()
+                      );
+                      mod.days.forEach(day => {
+                        const dayId = day.dayNumber || (day._id ? stages.length + 1 : stages.length + 1);
+                        // Check if this day is completed
+                        const videosDone = (mProg?.videoProgress || []).some(
+                          vp => vp.dayId === dayId && vp.isCompleted
+                        );
+                        const tasksDone = (mProg?.completedTasks || []).some(
+                          ct => ct.dayId === dayId
+                        );
+                        const isCompleted = videosDone || tasksDone;
+                        const isInProgress = !isCompleted && mProg &&
+                          ((mProg.videoProgress || []).some(vp => vp.dayId === dayId && vp.maxWatchedTime > 0));
+
+                        stages.push({
+                          id: `${mod._id}-${dayId}`,
+                          label: day.title || day.moduleDetails?.title || `Session ${dayId}`,
+                          dayId,
+                          moduleTitle: mod.title || `Module ${mIdx + 1}`,
+                          status: isCompleted ? 'completed' : isInProgress ? 'in_progress' : 'locked'
+                        });
+                      });
+                    });
+                  }
+
+                  return {
+                    enrollmentId: e._id,
+                    courseId: course._id,
+                    courseCode: course.courseCode,
+                    title: course.title,
+                    progress: e.progress || 0,
+                    status: e.status,
+                    stages, // array of { id, label, dayId, moduleTitle, status }
+                    navigateTo: '/dashboard/courses'
+                  };
+                })
+                .filter(Boolean);
+
+              setInProgressCourses(inProgressList);
             }
           } catch (apiErr) {
             console.log('[useLearningPaths] Enrollment fetch failed:', apiErr.message);
           }
         }
 
-        // ── Priority 3: Empty state — no courses or career analysis yet ──────
-        setPaths([]);
+        setPaths(resolvedPaths);
       } catch (err) {
         console.error('Error in fetchLearningPaths:', err);
         setPaths([]);
@@ -146,7 +217,7 @@ export const useLearningPaths = (userId) => {
     fetchLearningPaths();
   }, [userId]);
 
-  return { paths, loading, error };
+  return { paths, enrolledCourses, inProgressCourses, loading, error };
 };
 
 export default useLearningPaths;

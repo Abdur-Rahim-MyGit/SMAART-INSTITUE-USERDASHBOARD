@@ -236,7 +236,7 @@ const Settings = () => {
                     <button
                       type="button"
                       onClick={() => setShowChangePasswordModal(true)}
-                      className="px-4 py-2 rounded-lg border border-[#1a3884] text-[#1a3884] font-medium hover:bg-[#1a3884]/10 transition-colors"
+                      className="px-4 py-2 rounded-lg border border-[#1a3884] text-[#1a3884] text-sm font-bold hover:bg-[#1a3884]/10 transition-colors"
                     >
                       {t("settings_page.change")}
                     </button>
@@ -543,8 +543,8 @@ const Settings = () => {
       transition={{ duration: 0.5 }}
       className="space-y-6"
     >
-      {/* Back Button */}
-      <div>
+      {/* Back Button - Mobile Only */}
+      <div className="md:hidden">
         <button
           onClick={() => navigate("/dashboard")}
           className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
@@ -573,7 +573,7 @@ const Settings = () => {
                     }`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="font-medium">{tab.label}</span>
+                  <span className="font-medium text-[14px]">{tab.label}</span>
                 </button>
               );
             })}
@@ -589,10 +589,10 @@ const Settings = () => {
             transition={{ duration: 0.3 }}
             className="rounded-2xl bg-white dark:bg-[#002147] border border-gray-200 dark:border-white/10 p-6 shadow-sm dark:shadow-none"
           >
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            <h2 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white mb-1">
               {settingsTabs.find((tab) => tab.id === activeTab)?.label}
             </h2>
-            <p className="text-gray-500 dark:text-slate-300 mb-6">
+            <p className="text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 mb-6">
               {settingsTabs.find((tab) => tab.id === activeTab)?.description}
             </p>
 
@@ -601,15 +601,15 @@ const Settings = () => {
             {/* Save Button */}
             {(activeTab === "profile" || activeTab === "customisation") && (
               <div className="mt-8 flex justify-end gap-3">
-                <button className="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-[#1a3884]/50 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#1a3884] transition-colors">
+                <button className="px-4 py-2 text-sm font-bold rounded-lg border border-gray-300 dark:border-[#1a3884]/50 text-gray-500 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-[#1a3884] transition-colors">
                   {t("settings_page.cancel")}
                 </button>
                 <button
                   onClick={activeTab === "profile" ? handleSaveProfile : handleSaveLanguage}
                   disabled={saving}
-                  className="px-6 py-2.5 rounded-xl bg-[#1a3884] text-white font-medium hover:bg-[#1a3884]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 text-sm font-bold rounded-lg bg-[#1a3884] text-white hover:bg-[#132c6b] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
                 >
-                  {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   {t("settings_page.save_changes")}
                 </button>
               </div>

@@ -169,23 +169,23 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
         </div>
       </div>
 
-      <div className="space-y-5 p-6 md:flex-1">
-        <div className="space-y-3">
+      <div className="space-y-3.5 p-4 md:flex-1">
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between gap-2">
-            <span className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.15em] ${isCurrentVision
-              ? "bg-primary/10 text-primary"
-              : "bg-slate-100 text-slate-500 dark:bg-[#002A5C] dark:text-slate-300"
+            <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${isCurrentVision
+              ? "border-[#1a3884]/20 bg-[#1a3884]/5 text-[#1a3884] dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-400"
+              : "border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700/50 dark:bg-slate-800/50 dark:text-slate-400"
               }`}>
               {isCurrentVision ? t("vision_board.current_focus") : t("vision_board.stored_vision")}
             </span>
-            <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500">
+            <p className="text-[10.5px] font-bold text-slate-400 dark:text-slate-500">
               {formatDate(board.createdAt)}
             </p>
           </div>
-          <h3 className="truncate text-lg font-bold tracking-tight text-slate-900 dark:text-white" title={board.title}>
+          <h3 className="truncate text-[16px] font-extrabold tracking-tight text-slate-900 dark:text-white" title={board.title}>
             {board.title}
           </h3>
-          <p className="line-clamp-2 min-h-[2.5rem] text-[14px] leading-relaxed text-slate-500 dark:text-slate-400">
+          <p className="line-clamp-2 min-h-[2.5rem] text-[13px] leading-relaxed text-slate-500 dark:text-slate-400">
             {board.description || t("vision_board.default_board_desc")}
           </p>
         </div>
@@ -195,7 +195,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
             size="sm"
             variant="outline"
             onClick={() => onPreview(board)}
-            className="flex-1 rounded-[14px] border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:bg-[#002A5C]"
+            className="flex-1 rounded-lg border-slate-200 bg-white font-bold text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-[#002147] dark:text-slate-200 dark:hover:bg-[#002A5C]"
           >
             {t("vision_board.preview")}
           </Button>
@@ -212,7 +212,7 @@ const BoardCard = ({ board, onDelete, onDuplicate, onEdit, onPreview, onSetAsAct
               setIsSettingActive(false);
             }}
             disabled={isSettingActive}
-            className={`flex-1 rounded-[14px] font-bold tracking-wide transition-all ${isCurrentVision
+            className={`flex-1 rounded-lg font-bold tracking-wide transition-all ${isCurrentVision
               ? "bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-200"
               : "bg-primary text-white hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20"
               }`}
@@ -797,10 +797,10 @@ const VisionBoardGalleryPro = () => {
 
 
   return (
-    <main className="min-h-screen w-full bg-[#F8FAFC] px-4 py-5 transition-colors duration-300 dark:bg-[#00152E] md:px-8">
+    <main className="min-h-screen w-full bg-transparent px-4 py-5 transition-colors duration-300 md:px-8">
       <div className="mx-auto max-w-[1600px] pb-6">
-        {/* Back Button */}
-        <div className="mb-4">
+        {/* Back Button - Mobile Only */}
+        <div className="mb-4 md:hidden">
           <button
             onClick={() => navigate("/dashboard")}
             className="group flex items-center gap-3 text-[#112b6b] dark:text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
@@ -812,30 +812,40 @@ const VisionBoardGalleryPro = () => {
           </button>
         </div>
 
-        {/* ── Standardized PageHero ── */}
-        <PageHero
-          badge={t("vision_board.vision_journey")}
-          title={t("vision_board.gallery_title")}
-          subtitle={t("vision_board.gallery_subtitle")}
+        {/* ── Standardized Header ── */}
+        <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-6"
         >
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center gap-2 rounded-2xl border border-slate-100 bg-white dark:bg-[#002147] px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-white shadow-sm dark:border-white/10">
-              <Grid3X3 className="h-3.5 w-3.5 text-[#1a3884] dark:text-blue-400" />
-              {boards.length} / {maxAllowed} {t("vision_board.slots")}
+            <div className="flex flex-col">
+                <h1 className="text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                    Vision Board <span className="text-[#1a3884] dark:text-blue-300">Gallery</span>
+                </h1>
+                <p className="mt-1 max-w-xl text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+                    {t("vision_board.gallery_subtitle")}
+                </p>
             </div>
-            <Button
-              onClick={handleCreateNew}
-              disabled={!canCreateMore}
-              className={`h-11 rounded-xl px-5 text-sm font-bold tracking-wide shadow-md transition-all active:scale-95 ${canCreateMore
-                ? "bg-[#1a3884] text-white hover:bg-[#132c6b]"
-                : "cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-[#002A5C]"
-                }`}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              {t("vision_board.create_new_board")}
-            </Button>
-          </div>
-        </PageHero>
+            
+            <div className="flex flex-wrap items-center justify-end gap-3">
+                <div className="inline-flex items-center gap-1.5 rounded-lg border border-slate-100 bg-[#F8FAFC] dark:bg-[#002147] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 dark:text-white shadow-sm dark:border-white/10">
+                    <Grid3X3 className="h-3.5 w-3.5 text-[#1a3884] dark:text-blue-400" />
+                    {boards.length} / {maxAllowed} {t("vision_board.slots")}
+                </div>
+                <Button
+                    onClick={handleCreateNew}
+                    disabled={!canCreateMore}
+                    className={`h-8 rounded-lg px-4 text-xs font-bold tracking-wide transition-all active:scale-95 ${canCreateMore
+                        ? "bg-[#1a3884] text-white hover:bg-[#132c6b] shadow-sm"
+                        : "cursor-not-allowed bg-slate-100 text-slate-400 dark:bg-[#002A5C]"
+                        }`}
+                >
+                    <Plus className="mr-1.5 h-3.5 w-3.5" />
+                    {t("vision_board.create_new_board")}
+                </Button>
+            </div>
+        </motion.div>
 
         <div className="mt-4">
           {isLoading ? (
