@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mic, ArrowLeft } from 'lucide-react';
+import { IconMicrophone as Mic, IconArrowLeft as ArrowLeft } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import InterviewPrep from './CareerAgent/panels/InterviewPrep';
 import '../pages/CareerAgent/careerAgent.css'; // Import the CSS to ensure variables are present
@@ -34,24 +34,24 @@ const InterviewPrepTool = () => {
                 >
                     <button
                         onClick={() => navigate('/dashboard/smaart-toolkit')}
-                        className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#1a3884] transition-colors mb-6"
+                        className="group mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
                     >
-                        <ArrowLeft size={16} /> Back to Toolkit
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
+                            <ArrowLeft stroke={1.5} className="h-4 w-4" />
+                        </div>
+                        Back to Toolkit
                     </button>
 
-                    <div className="bg-white dark:bg-[#00152E] rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-white/10">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-[#1a3884] dark:text-blue-400 flex items-center justify-center">
-                                <Mic size={20} strokeWidth={2.5} />
-                            </div>
-                            <h1 className="text-[22px] font-extrabold text-[#0d1f4e] dark:text-white">
-                                Interview Preparation
+                    <div className="relative mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]">
+                        <div className="relative z-10">
+                            <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+                                Interview <span className="text-[#1a3884] dark:text-blue-300">Preparation</span>
                             </h1>
+                            <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+                                Resources and questions tailored for <strong className="text-[#1a3884] dark:text-blue-300">{roleName}</strong>. 
+                                Switch your target role in the Career Agent dashboard to update this.
+                            </p>
                         </div>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm ml-[52px]">
-                            Resources and questions tailored for <strong className="text-[#1a3884] dark:text-blue-300">{roleName}</strong>. 
-                            Switch your target role in the Career Agent dashboard to update this.
-                        </p>
                     </div>
                 </motion.div>
 

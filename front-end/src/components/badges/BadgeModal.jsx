@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, ExternalLink, CheckCircle2, Sparkles } from 'lucide-react';
+import { X, Download, ExternalLink, CheckCircle2, Sparkles, ShieldCheck } from 'lucide-react';
 import { FaLinkedin, FaWhatsapp, FaInstagram } from 'react-icons/fa';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
@@ -180,6 +180,14 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                 backgroundColor: '#ffffff',
                 useCORS: true,
                 logging: false,
+                onclone: (clonedDoc) => {
+                    // Ensure the cloned element is perfectly visible to the internal renderer
+                    const el = clonedDoc.getElementById('hidden-pdf-certificate');
+                    if (el) {
+                        el.style.left = '0px';
+                        el.style.position = 'relative';
+                    }
+                }
             });
 
             const imgData = canvas.toDataURL('image/png');
@@ -243,82 +251,95 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                         {/* Hidden Landscape Certificate strictly for PDF Export */}
                         <div 
                             id="hidden-pdf-certificate" 
-                            className="absolute w-[1122px] h-[794px] bg-white text-slate-900 font-sans flex flex-col justify-between overflow-hidden"
                             style={{ 
-                                position: 'absolute',
+                                position: 'fixed',
                                 left: '-9999px', 
-                                top: '-9999px', 
-                                padding: '60px', 
-                                pointerEvents: 'none',
-                                zIndex: -1
+                                top: '0', 
+                                width: '1122px',
+                                height: '794px',
+                                backgroundColor: '#ffffff',
+                                fontFamily: 'Inter, Arial, sans-serif',
+                                overflow: 'hidden',
+                                zIndex: -1,
+                                boxSizing: 'border-box',
                             }}
                         >
-                            {/* Header Stripe */}
-                            <div className="absolute top-0 left-0 w-full h-4 bg-[#1a3884]"></div>
-                            <div className="absolute top-4 left-0 w-full h-1 bg-[#287a84]"></div>
+                            {/* Premium Header Stripes */}
+                            <div style={{ position: 'absolute', top: '0px', left: '0px', width: '1122px', height: '20px', backgroundColor: '#1a3884' }}></div>
+                            <div style={{ position: 'absolute', top: '20px', left: '0px', width: '1122px', height: '6px', backgroundColor: '#f59e0b' }}></div>
                             
-                            {/* Decorative Elements */}
-                            <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
-                            <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-emerald-50 rounded-full blur-3xl opacity-50"></div>
+                            {/* Flat Decorative Circles */}
+                            <div style={{ position: 'absolute', top: '-150px', right: '-150px', width: '500px', height: '500px', backgroundColor: '#f0f6ff', borderRadius: '50%', zIndex: 0 }}></div>
+                            <div style={{ position: 'absolute', bottom: '-150px', left: '-150px', width: '500px', height: '500px', backgroundColor: '#f0fdf4', borderRadius: '50%', zIndex: 0 }}></div>
 
-                            {/* Main Content Area */}
-                            <div className="flex-1 flex flex-col items-center justify-center text-center mt-12 relative z-10">
-                                <div className="mb-10">
-                                    <h1 className="text-4xl font-black text-[#1a3884] uppercase tracking-widest mb-2">SMAART Institute</h1>
-                                    <p className="text-xl font-bold text-slate-400 uppercase tracking-widest">Badge Verification Certificate</p>
+                            {/* Header Text */}
+                            <div style={{ position: 'absolute', top: '100px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
+                                <h1 style={{ fontSize: '42px', fontWeight: 900, color: '#1a3884', textTransform: 'uppercase', letterSpacing: '4px', margin: '0 0 10px 0' }}>SMAART Institute</h1>
+                                <p style={{ fontSize: '20px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '6px', margin: 0 }}>Official Badge Certificate</p>
+                            </div>
+
+                            {/* Recipient Section */}
+                            <div style={{ position: 'absolute', top: '240px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
+                                <p style={{ fontSize: '24px', color: '#64748b', fontWeight: 500, letterSpacing: '1px', margin: '0 0 15px 0' }}>This formally certifies that</p>
+                                <h2 style={{ fontSize: '64px', fontWeight: 900, color: '#0f172a', margin: '0', padding: '0 0 15px 0' }}>{userName}</h2>
+                            </div>
+
+                            {/* Divider Line */}
+                            <div style={{ position: 'absolute', top: '350px', left: '511px', width: '100px', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '10px', zIndex: 10 }}></div>
+
+                            {/* Subtitle */}
+                            <div style={{ position: 'absolute', top: '390px', left: '0px', width: '1122px', textAlign: 'center', zIndex: 10 }}>
+                                <p style={{ fontSize: '20px', color: '#64748b', fontWeight: 500, letterSpacing: '1px', margin: 0 }}>has successfully demonstrated mastery and earned the</p>
+                            </div>
+
+                            {/* Badge Box (Absolute Positioning to avoid layout collapse) */}
+                            <div style={{ position: 'absolute', top: '450px', left: '161px', width: '800px', height: '180px', backgroundColor: '#ffffff', borderRadius: '32px', border: '2px solid #f1f5f9', zIndex: 10 }}>
+                                {/* Badge Image */}
+                                <div style={{ position: 'absolute', top: '20px', left: '40px', width: '140px', height: '140px' }}>
+                                    <ModalHexBadge badge={badge} />
+                                </div>
+                                
+                                {/* Badge Title */}
+                                <div style={{ position: 'absolute', top: '45px', left: '210px', width: '550px', textAlign: 'left' }}>
+                                    <h3 style={{ fontSize: '38px', fontWeight: 900, color: '#1a3884', margin: '0', lineHeight: 1.2 }}>{badge.title}</h3>
                                 </div>
 
-                                <p className="text-2xl text-slate-500 mb-4 font-medium tracking-wide">This formally certifies that</p>
-                                <h2 className="text-5xl font-black text-slate-900 mb-10 pb-4 border-b-2 border-slate-200 inline-block px-16">{userName}</h2>
-                                
-                                <p className="text-xl text-slate-500 mb-8 font-medium tracking-wide">has successfully demonstrated mastery and earned the</p>
-                                
-                                <div className="flex items-center justify-center gap-8 mb-8 bg-slate-50 py-6 px-12 rounded-[24px] border border-slate-100 shadow-sm">
-                                    <div className="w-28 h-28 flex-shrink-0">
-                                        <ModalHexBadge badge={badge} />
-                                    </div>
-                                    <div className="text-left">
-                                        <h3 className="text-4xl font-black text-[#1a3884] mb-3 leading-tight">{badge.title}</h3>
-                                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-sm font-bold uppercase tracking-wider">
-                                            <CheckCircle2 className="w-4 h-4" />
-                                            Verified Credential
-                                        </span>
-                                    </div>
+                                {/* Verified Pill */}
+                                <div style={{ position: 'absolute', top: '105px', left: '210px', padding: '8px 20px', borderRadius: '50px', border: '2px solid #a7f3d0', backgroundColor: '#ecfdf5' }}>
+                                    <span style={{ color: '#047857', fontSize: '15px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                        ✓ Verified Credential
+                                    </span>
                                 </div>
                             </div>
 
-                            {/* Footer */}
-                            <div className="mt-auto flex items-end justify-between border-t-2 border-slate-100 pt-8 relative z-10">
-                                <div>
-                                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Date of Issue</p>
-                                    <p className="text-xl font-black text-slate-800">
-                                        {badge.earnedDate ? new Date(badge.earnedDate).toLocaleDateString(i18n.language || 'en-GB', {
-                                            day: 'numeric',
-                                            month: 'long',
-                                            year: 'numeric',
-                                        }) : new Date().toLocaleDateString()}
-                                    </p>
-                                </div>
-                                
-                                <div className="flex items-center gap-6">
-                                    <div className="text-right">
-                                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Verification Code</p>
-                                        <p className="text-lg font-mono font-bold text-slate-800 tracking-wider">{displayCode}</p>
-                                    </div>
-                                    <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-200">
-                                        <QRCodeSVG
-                                            value={verificationUrl}
-                                            size={80}
-                                            level="H"
-                                            includeMargin={false}
-                                            fgColor="#1a3884"
-                                        />
-                                    </div>
-                                </div>
+                            {/* Footer Line */}
+                            <div style={{ position: 'absolute', top: '680px', left: '80px', width: '962px', height: '2px', backgroundColor: '#f1f5f9', zIndex: 10 }}></div>
+
+                            {/* Footer: Date */}
+                            <div style={{ position: 'absolute', top: '700px', left: '80px', width: '300px', textAlign: 'left', zIndex: 10 }}>
+                                <p style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px', margin: '0 0 5px 0' }}>Date of Issue</p>
+                                <p style={{ fontSize: '24px', fontWeight: 900, color: '#1e293b', margin: 0 }}>
+                                    {badge.earnedDate ? new Date(badge.earnedDate).toLocaleDateString(i18n.language || 'en-GB', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric',
+                                    }) : new Date().toLocaleDateString()}
+                                </p>
                             </div>
-                            
+
+                            {/* Footer: Verification Code */}
+                            <div style={{ position: 'absolute', top: '700px', left: '500px', width: '400px', textAlign: 'right', zIndex: 10 }}>
+                                <p style={{ fontSize: '14px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '2px', margin: '0 0 5px 0' }}>Verification Code</p>
+                                <p style={{ fontSize: '20px', fontFamily: 'monospace', fontWeight: 700, color: '#334155', letterSpacing: '2px', margin: 0 }}>{displayCode}</p>
+                            </div>
+
+                            {/* Footer: QR Code */}
+                            <div style={{ position: 'absolute', top: '675px', left: '942px', width: '100px', height: '100px', backgroundColor: '#ffffff', borderRadius: '16px', border: '2px solid #f1f5f9', zIndex: 10, padding: '8px' }}>
+                                <QRCodeSVG value={verificationUrl} size={80} level="H" includeMargin={false} fgColor="#1a3884" />
+                            </div>
+
                             {/* Bottom Stripe */}
-                            <div className="absolute bottom-0 left-0 w-full h-8 bg-[#1a3884]"></div>
+                            <div style={{ position: 'absolute', bottom: '0px', left: '0px', width: '1122px', height: '30px', backgroundColor: '#f8fafc' }}></div>
                         </div>
 
                         {/* Certificate Content for PDF */}
@@ -403,7 +424,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     onClick={() => handleShare('linkedin')}
                                     disabled={isSharing}
                                     title="Share on LinkedIn"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0077b5]/10 hover:bg-[#0077b5] text-[#0077b5] hover:text-white transition-all duration-200 border border-[#0077b5]/20 hover:border-transparent active:scale-90"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3884]/5 hover:bg-[#1a3884] text-[#1a3884] hover:text-white transition-all duration-200 border border-[#1a3884]/10 hover:border-transparent active:scale-90"
                                 >
                                     <FaLinkedin className="w-4 h-4" />
                                 </button>
@@ -411,7 +432,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     onClick={() => handleShare('whatsapp')}
                                     disabled={isSharing}
                                     title="Share on WhatsApp"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25d366]/10 hover:bg-[#25d366] text-[#25d366] hover:text-white transition-all duration-200 border border-[#25d366]/20 hover:border-transparent active:scale-90"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3884]/5 hover:bg-[#1a3884] text-[#1a3884] hover:text-white transition-all duration-200 border border-[#1a3884]/10 hover:border-transparent active:scale-90"
                                 >
                                     <FaWhatsapp className="w-4.5 h-4.5" />
                                 </button>
@@ -419,7 +440,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     onClick={() => handleShare('instagram')}
                                     disabled={isSharing}
                                     title="Copy Link for Instagram"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#e1306c]/10 hover:bg-[#e1306c] text-[#e1306c] hover:text-white transition-all duration-200 border border-[#e1306c]/20 hover:border-transparent active:scale-90"
+                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1a3884]/5 hover:bg-[#1a3884] text-[#1a3884] hover:text-white transition-all duration-200 border border-[#1a3884]/10 hover:border-transparent active:scale-90"
                                 >
                                     <FaInstagram className="w-4.5 h-4.5" />
                                 </button>
@@ -439,7 +460,7 @@ const BadgeModal = ({ badge, isOpen, onClose, userName = 'Student' }) => {
                                     rel="noopener noreferrer"
                                     className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-[#1a3884] dark:text-blue-400 text-[11px] font-black uppercase tracking-widest transition-all transform active:scale-95 hover:border-[#1a3884]/30 hover:bg-[#1a3884]/5 dark:hover:bg-[#1a3884]/10 text-center"
                                 >
-                                    <ExternalLink className="w-3.5 h-3.5" /> Verify Badge
+                                    <ShieldCheck className="w-3.5 h-3.5" /> Verify Badge
                                 </a>
                             </div>
                         </div>

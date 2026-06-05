@@ -3,22 +3,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
-    RiArrowLeftLine as ArrowLeft,
-    RiArrowRightLine as ArrowRight,
-    RiAwardLine as Award,
-    RiBrainLine as Brain,
-    RiCheckboxCircleLine as CheckCircle2,
-    RiArrowRightSLine as ChevronRight,
-    RiTimeLine as Clock,
-    RiCloseLine as CloseIcon,
-    RiEyeLine as Eye,
-    RiFileListLine as FileText,
-    RiInformationLine as Info,
-    RiStackLine as Layers,
-    RiPlayFill as Play,
-    RiRestartLine as RotateCcw,
-    RiLineChartLine as TrendingUp,
-} from "@remixicon/react";
+    IconArrowLeft as ArrowLeft,
+    IconArrowRight as ArrowRight,
+    IconCertificate as Award,
+    IconActivity as Brain,
+    IconCircleCheckFilled as CheckCircle2,
+    IconChevronRight as ChevronRight,
+    IconClock as Clock,
+    IconX as CloseIcon,
+    IconEye as Eye,
+    IconFileText as FileText,
+    IconInfoCircle as Info,
+    IconStack2 as Layers,
+    IconPlayerPlayFilled as Play,
+    IconRefresh as RotateCcw,
+    IconTrendingUp as TrendingUp,
+} from "@tabler/icons-react";
 import { assessmentApi } from "@/services/assessmentApi";
 import PageHero from "@/components/ui/PageHero";
 import { toast } from "sonner";
@@ -286,7 +286,7 @@ const AssessmentsDashboard = () => {
                                 className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                                    <ArrowLeft className="w-4 h-4" />
+                                    <ArrowLeft stroke={1.5} className="w-4 h-4" />
                                 </div>
                                 {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
                             </button>
@@ -309,7 +309,7 @@ const AssessmentsDashboard = () => {
                                 onClick={handleResetAll}
                                 className="inline-flex h-9 items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 text-[12px] font-bold text-rose-700 shadow-sm transition-all hover:bg-rose-100 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400"
                             >
-                                <RotateCcw className="h-3.5 w-3.5" />
+                                <RotateCcw stroke={1.5} className="h-3.5 w-3.5" />
                                 {t("assessments_dashboard.reset_assessments", "Reset Assessments")}
                             </motion.button>
                         </div>
@@ -377,7 +377,7 @@ const AssessmentsDashboard = () => {
                                     onClick={() => setSelectedStage(null)}
                                     className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#002A5C] dark:hover:text-slate-200 transition-colors flex-shrink-0"
                                 >
-                                    <CloseIcon className="h-4 w-4" />
+                                    <CloseIcon stroke={1.5} className="h-4 w-4" />
                                 </button>
                             </div>
 
@@ -484,7 +484,7 @@ const AssessmentsDashboard = () => {
                                             : "bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed shadow-none"
                                         }`}
                                 >
-                                    <Play className="h-4 w-4 fill-white" />
+                                    <Play size={16} className="h-4 w-4 fill-white" />
                                     {t("assessments_dashboard.start_stage", "Start Stage Assessment")}
                                 </button>
                             </div>
@@ -594,15 +594,15 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                     >
                         {completed ? (
                             <>
-                                <Eye className="h-4 w-4" />
+                                <Eye stroke={1.5} className="h-4 w-4" />
                                 {t("assessments_dashboard.view_report", "View Performance Report")}
-                                <ChevronRight className="ml-auto h-4 w-4 opacity-40" />
+                                <ChevronRight stroke={1.5} className="ml-auto h-4 w-4 opacity-40" />
                             </>
                         ) : (
                             <>
-                                <Play className="h-4 w-4 fill-white" />
+                                <Play size={16} className="h-4 w-4 fill-white" />
                                 {t("assessments_dashboard.start_stage", "Start Stage Assessment")}
-                                <ArrowRight className="ml-auto h-4 w-4 opacity-80 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight stroke={1.5} className="ml-auto h-4 w-4 opacity-80 transition-transform group-hover:translate-x-1" />
                             </>
                         )}
                     </button>
@@ -617,7 +617,7 @@ const InfoChip = ({ icon: Icon, label }) => (
         whileHover={{ y: -1, scale: 1.02 }}
         className="inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-500 shadow-sm dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-300"
     >
-        <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+        <Icon stroke={1.5} className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
         {label}
     </motion.span>
 );

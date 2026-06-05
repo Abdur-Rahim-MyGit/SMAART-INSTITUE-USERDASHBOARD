@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { IconFileDescription } from '@tabler/icons-react';
 import {
     FileText,
     Download,
@@ -662,16 +663,16 @@ const ResumeBuilder = () => {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-blue-500/30 selection:text-blue-200">
+        <div className="flex flex-col h-[calc(100vh-130px)] min-h-[600px] bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden rounded-[24px] border border-[#d8e6f7] shadow-[0_4px_24px_rgba(26,56,132,0.05)] dark:border-[#1a3884]/20 font-sans selection:bg-blue-500/30 selection:text-blue-200">
             {/* Header */}
-            <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-50 shrink-0 shadow-sm">
+            <header className="h-[72px] flex items-center justify-between px-6 bg-white dark:bg-[#001a3d] border-b border-[#d8e6f7] dark:border-[#1a3884]/20 z-10 shrink-0">
                 <div className="flex items-center gap-4">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-2xl transition-all group text-slate-500 hover:text-slate-900 dark:hover:text-white">
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                     </button>
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#00152E] to-[#1a3884] flex items-center justify-center shadow-lg shadow-[#1a3884]/20 ring-4 ring-[#1a3884]/10">
-                            <FileText className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-xl bg-[#1a3884] flex items-center justify-center shadow-sm">
+                            <IconFileDescription stroke={1.5} className="w-5 h-5 text-white" />
                         </div>
                         <div>
                             <h1 className="text-[17px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight">Resume Builder</h1>
@@ -697,11 +698,11 @@ const ResumeBuilder = () => {
                     )}
                 </div>
             </header>
-<main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+<main className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-white/50 dark:bg-transparent">
                 {/* Form Section */}
                 <section className={`flex-1 flex-col relative ${currentStep === steps.length - 1 ? 'hidden lg:flex lg:w-1/2' : 'flex w-full'}`}>
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
-                        <div className="max-w-4xl mx-auto p-4 md:p-8 pb-10">
+                        <div className="max-w-4xl mx-auto p-5 md:p-8 pb-12">
                             <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-3 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex items-center gap-3 shrink-0">
                                     <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">Step {currentStep + 1} of {steps.length}</span>
@@ -1017,11 +1018,7 @@ const ResumeBuilder = () => {
                                                             <textarea placeholder="Provide some context about this achievement..." value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                                                        <textarea placeholder="Provide some context about this achievement..." value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
-                                                    </div>
-                                                </div>
+
                                             </motion.div>
                                         ))}
                                     </AnimatePresence>
@@ -1031,8 +1028,7 @@ const ResumeBuilder = () => {
                                 </div>
                             )}
                         </div>
-                    </div>
-                </div>
+
 
                             {/* Navigation buttons inside max-w-4xl card layout */}
                             <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200 dark:border-white/10">

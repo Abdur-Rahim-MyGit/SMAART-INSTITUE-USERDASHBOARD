@@ -527,6 +527,7 @@ const CoursePlayer = () => {
     setActiveStep('1');
     setVideoWatched(false);
     handleStartStep('1');
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
   };
 
   const handleStepClick = (stepNumber) => {
@@ -536,6 +537,7 @@ const CoursePlayer = () => {
       setVideoWatched(false);
       if (isActivating) {
         handleStartStep(stepNumber);
+        setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50);
       }
     } else {
       toast.error(t("course_player.step_locked_warning", { step: parseInt(stepNumber) - 1 }));
@@ -1062,15 +1064,15 @@ const CoursePlayer = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#00152E] transition-colors duration-500 relative overflow-hidden">
+    <div className="flex flex-col bg-transparent overflow-hidden transition-colors duration-500 relative min-h-[calc(100vh-130px)]">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-50/50 dark:bg-blue-900/5 rounded-full blur-[120px] -mr-64 -mt-64 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-50/50 dark:bg-indigo-900/5 rounded-full blur-[120px] -ml-64 -mb-64 pointer-events-none" />
 
-      <div className="relative z-10">
+      <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-white/10 sticky top-0 z-30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <div className="bg-transparent border-b border-[#d8e6f7] dark:border-[#1a3884]/20 sticky top-0 z-30">
+          <div className="w-full px-0 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
               <div className="flex flex-wrap items-center gap-3 sm:gap-5">
                 <button
@@ -1084,10 +1086,10 @@ const CoursePlayer = () => {
                 </button>
                 <div className="h-5 w-px bg-slate-200 dark:bg-[#003170]" />
                 <div className="flex items-center gap-3">
-                  <Badge variant="secondary" className="bg-slate-100 text-[#1a3884] border-transparent font-bold px-3 py-0.5 text-[10px]">
+                  <Badge variant="secondary" className="bg-[#1a3884]/10 dark:bg-blue-900/30 text-[#1a3884] dark:text-blue-300 border-transparent font-black px-3.5 py-1 text-xs uppercase tracking-wider">
                     {t(stageKey)}
                   </Badge>
-                  <span className="text-xs font-bold text-slate-900 dark:text-slate-200">
+                  <span className="text-[17px] font-black tracking-tight text-[#0d1f4e] dark:text-white">
                     {t(stageNameKey)}
                   </span>
                 </div>

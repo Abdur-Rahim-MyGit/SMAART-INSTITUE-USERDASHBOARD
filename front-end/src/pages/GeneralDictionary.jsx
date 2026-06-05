@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Volume2, Book, Star, ArrowRight, Loader2, Sparkles, ArrowLeft } from "lucide-react";
+import {
+  IconSearch as Search,
+  IconVolume as Volume2,
+  IconBook as Book,
+  IconStar as Star,
+  IconArrowRight as ArrowRight,
+  IconLoader2 as Loader2,
+  IconSparkles as Sparkles,
+  IconArrowLeft as ArrowLeft
+} from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -146,7 +155,7 @@ const GeneralDictionary = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F8FF] dark:bg-[#00152E] pb-12 pt-3 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent pb-12 pt-0 transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Back button */}
@@ -158,7 +167,7 @@ const GeneralDictionary = () => {
           className="group mb-5 flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.22em] text-[#1a3884]/70 transition-all hover:text-[#1a3884] dark:text-slate-400 dark:hover:text-slate-200"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8e6f7] bg-white shadow-sm transition-all duration-200 group-hover:-translate-x-0.5 group-hover:shadow-md dark:border-[#1a3884]/30 dark:bg-[#001a3d]">
-            <ArrowLeft className="h-3.5 w-3.5" />
+            <ArrowLeft stroke={1.5} className="h-4 w-4" />
           </div>
           Back to Toolkit
         </motion.button>
@@ -171,15 +180,11 @@ const GeneralDictionary = () => {
           className="relative mb-6 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)]"
         >
           <div className="relative z-10">
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#1a3884]/15 bg-[#eef4ff] px-2.5 py-0.5 dark:border-[#1a3884]/40 dark:bg-[#1a3884]/20">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#1a3884] dark:bg-blue-400" />
-              <span className="text-[9.5px] font-black uppercase tracking-[0.22em] text-[#1a3884] dark:text-blue-400">Reference Tool</span>
-            </div>
-            <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+            <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
               General <span className="text-[#1a3884] dark:text-blue-300">Dictionary</span>
             </h1>
             <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-              Definitions, phonetics, audio pronunciation &amp; synonyms — all in one place.
+              Definitions, phonetics &amp; synonyms — all in one place.
             </p>
           </div>
         </motion.div>

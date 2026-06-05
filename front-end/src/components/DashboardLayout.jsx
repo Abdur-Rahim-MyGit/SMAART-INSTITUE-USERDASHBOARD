@@ -1,7 +1,30 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, ChevronDown, Bell, Settings, Search, Command, Keyboard, Clock, Sun, Moon, Info, CheckCircle, AlertCircle, ExternalLink, Menu, Star, LogOut, Trophy, User, Globe2, X, Flame } from "lucide-react";
+import {
+  IconChevronRight as ChevronRight,
+  IconChevronDown as ChevronDown,
+  IconBell as Bell,
+  IconSettings as Settings,
+  IconSearch as Search,
+  IconCommand as Command,
+  IconKeyboard as Keyboard,
+  IconClock as Clock,
+  IconSun as Sun,
+  IconMoon as Moon,
+  IconInfoCircle as Info,
+  IconCircleCheck as CheckCircle,
+  IconAlertCircle as AlertCircle,
+  IconExternalLink as ExternalLink,
+  IconMenu2 as Menu,
+  IconStar as Star,
+  IconLogout as LogOut,
+  IconTrophy as Trophy,
+  IconUser as User,
+  IconWorld as Globe2,
+  IconX as X,
+  IconFlame as Flame,
+} from "@tabler/icons-react";
 import StreaksWidget from "@/components/dashboard/StreaksWidget";
 import { useTranslation } from "react-i18next";
 import LeftSidebar from "./LeftSidebar";
@@ -272,6 +295,54 @@ const STATIC_SEARCH_ITEMS = [
     type: "Page",
     keywords: ["quotients", "skills", "grid", "iq", "eq", "sq"]
   },
+  {
+    id: "page-performance",
+    title: "Performance",
+    subtitle: "Track academic and skill performance analytics",
+    path: "/dashboard/performance",
+    type: "Page",
+    keywords: ["performance", "analytics", "progress", "stats", "score"]
+  },
+  {
+    id: "page-career-agent",
+    title: "Career Directions",
+    subtitle: "Explore career paths and get AI-powered career guidance",
+    path: "/dashboard/career-agent",
+    type: "Page",
+    keywords: ["career", "agent", "career agent", "career directions", "jobs", "path", "guidance", "ai career"]
+  },
+  {
+    id: "page-wallet",
+    title: "SMAART Wallet",
+    subtitle: "Manage your learning credits and rewards",
+    path: "/dashboard/smaart-wallet",
+    type: "Page",
+    keywords: ["wallet", "credits", "rewards", "coins", "points"]
+  },
+  {
+    id: "page-todos",
+    title: "To-Do & Calendar",
+    subtitle: "Manage tasks, deadlines, and your schedule",
+    path: "/dashboard/todos",
+    type: "Page",
+    keywords: ["todo", "tasks", "calendar", "deadlines", "schedule", "planner"]
+  },
+  {
+    id: "page-notifications",
+    title: "Notifications",
+    subtitle: "View all your alerts and activity updates",
+    path: "/dashboard/notifications",
+    type: "Page",
+    keywords: ["notifications", "alerts", "updates", "activity"]
+  },
+  {
+    id: "page-groups",
+    title: "Student Groups",
+    subtitle: "Join and chat with student groups",
+    path: "/dashboard/groups",
+    type: "Page",
+    keywords: ["groups", "student groups", "chat", "community", "team"]
+  },
 ];
 
 const COURSE_SEARCH_ITEMS = STAGES.flatMap((stage) =>
@@ -351,7 +422,15 @@ const getSearchResults = (query) => {
 const DashboardLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Reset scroll position on route change
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [location.pathname]);
+  
   const isCareerAgentDashboard = location.pathname === '/dashboard/career-agent/dashboard';
+  const isImmersiveRoute = location.pathname.includes('/player') || (location.pathname.includes('/micro-assessments/') && location.pathname.split('/').length > 3);
+  
   const { t, i18n } = useTranslation();
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useSidebar();
   const { theme, setTheme } = useTheme();
@@ -745,34 +824,24 @@ const DashboardLayout = () => {
                         <span className="leading-none mt-[1px]">K</span>
                       </div>
                     </div>
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery("");
-                          setShowSearchResults(false);
-                          searchInputRef.current?.focus();
-                        }}
-                        className="absolute inset-y-0 right-10 flex items-center pr-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                        aria-label="Clear search"
-                      >
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 dark:bg-[#003170] text-[10px] font-bold">✕</span>
-                      </button>
-                    )}
+
                   </div>
 
                   <AnimatePresence>
-                    {showSearchResults && searchQuery.trim() && (
+                    {showSearchResults && (searchQuery.trim() || true) && (
                       <motion.div
                         id="dashboard-search-results"
                         initial={{ opacity: 0, y: 8, scale: 0.98 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.98 }}
                         transition={{ duration: 0.18 }}
-                        className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/8 bg-white dark:bg-[#002147] shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.60)] backdrop-blur-xl"
+                        className="absolute top-full left-0 right-0 mt-3 overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/8 bg-white dark:bg-[#002147] shadow-[0_24px_60px_-16px_rgba(15,23,42,0.28)] dark:shadow-[0_24px_60px_-16px_rgba(0,0,0,0.60)] backdrop-blur-xl z-[100]"
                       >
-                        <div className="border-b border-slate-200 dark:border-[#1a3884]/20 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                          Search results
+                        <div className="border-b border-slate-200 dark:border-[#1a3884]/20 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                          <span>{searchQuery.trim() ? "Search results" : "Quick Navigation"}</span>
+                          {!searchQuery.trim() && (
+                            <span className="text-[10px] font-normal normal-case tracking-normal text-slate-400">Click any page to jump there</span>
+                          )}
                         </div>
 
                         {searchResults.length > 0 ? (
@@ -793,7 +862,12 @@ const DashboardLayout = () => {
                                     <span className="text-sm font-semibold text-slate-900 dark:text-slate-50">
                                       {item.title}
                                     </span>
-                                    <span className="rounded-full bg-slate-100 dark:bg-[#002A5C] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:text-slate-300">
+                                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                                      item.type === 'Page' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300' :
+                                      item.type === 'Course' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300' :
+                                      item.type === 'Track' ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300' :
+                                      'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-300'
+                                    }`}>
                                       {item.type}
                                     </span>
                                   </div>
@@ -811,7 +885,7 @@ const DashboardLayout = () => {
                               No matching results found
                             </p>
                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                              Try a page name, course title, track, or assessment code.
+                              Try: "career", "courses", "toolkit", "wallet", "settings"
                             </p>
                           </div>
                         )}
@@ -845,7 +919,7 @@ const DashboardLayout = () => {
                       className="p-1.5 rounded-full text-slate-400 dark:text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/50 dark:hover:text-white transition-all active:scale-95"
                       aria-label="Toggle Theme"
                     >
-                      {theme === 'dark' ? <Sun className="w-[18px] h-[18px] hover:rotate-45 transition-transform duration-300" strokeWidth={2.2} /> : <Moon className="w-[18px] h-[18px] hover:-rotate-12 transition-transform duration-300" strokeWidth={2.2} />}
+                      {theme === 'dark' ? <Sun size={18} stroke={1.5} className="hover:rotate-45 transition-transform duration-300" /> : <Moon size={18} stroke={1.5} className="hover:-rotate-12 transition-transform duration-300" />}
                     </button>
 
                     {/* 3. Notifications */}
@@ -856,7 +930,7 @@ const DashboardLayout = () => {
                           }`}
                         aria-label="Notifications"
                       >
-                        <Bell className="w-[18px] h-[18px] group-hover:rotate-12 transition-transform duration-300 origin-top" strokeWidth={2.2} />
+                        <Bell size={18} stroke={1.5} className="group-hover:rotate-12 transition-transform duration-300 origin-top" />
                         {unreadCount > 0 && (
                           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 border border-white dark:border-slate-800 rounded-full shadow-sm animate-pulse"></span>
                         )}
@@ -869,7 +943,7 @@ const DashboardLayout = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute top-full right-0 mt-3 w-80 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-white/8 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.60)] overflow-hidden z-50"
+                            className="absolute top-full right-0 mt-3 w-80 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-white/8 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.60)] overflow-hidden z-[100]"
                           >
                             {/* Header */}
                             <div className="px-5 py-4 bg-[#1a3884] flex items-center justify-between">
@@ -892,29 +966,31 @@ const DashboardLayout = () => {
                                     <div
                                       key={n._id}
                                       onClick={() => {
-                                        markRead(n._id);
-                                        if (n.link) navigate(n.link);
+                                        navigate('/notifications');
                                         setShowNotifications(false);
                                       }}
-                                      className={`px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/50 dark:bg-slate-800/20' : ''}`}
-                                    >
-                                      <div className="flex gap-3">
-                                        <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-blue-100 text-blue-600' :
-                                          n.type === 'assessment' ? 'bg-purple-100 text-purple-600' :
-                                            'b  g-slate-100 text-slate-600'
-                                          }`}>
-                                          {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <p className={`text-xs leading-relaxed ${!n.isRead ? 'font-bold text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
-                                            {n.message}
-                                          </p>
-                                          <p className="text-[10px] text-slate-400 mt-1">
-                                            {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
-                                          </p>
+                                      className={`px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-slate-800/50 cursor-pointer transition-colors ${!n.isRead ? 'bg-slate-50/40 dark:bg-slate-800/20' : ''}`}
+                                      >
+                                        <div className="flex gap-3">
+                                          <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${n.type === 'course' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                                            n.type === 'assessment' ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400' :
+                                              'bg-[#1a3884]/10 text-[#1a3884] dark:bg-[#1a3884]/30 dark:text-blue-400'
+                                            }`}>
+                                            {n.type === 'course' ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+                                          </div>
+                                          <div className="flex-1 min-w-0 pr-3">
+                                            <div className="flex items-start gap-2 mb-1">
+                                              {!n.isRead && <div className="w-1.5 h-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400 shrink-0 mt-[5px]" />}
+                                              <p className={`text-[12px] leading-relaxed ${!n.isRead ? 'font-bold text-[#0d1f4e] dark:text-white' : 'font-medium text-slate-600 dark:text-slate-400'}`}>
+                                                {n.message}
+                                              </p>
+                                            </div>
+                                            <p className={`text-[10px] text-slate-400 ${!n.isRead ? 'ml-3.5' : ''}`}>
+                                              {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
+                                            </p>
+                                          </div>
                                         </div>
                                       </div>
-                                    </div>
                                   ))}
                                 </div>
                               ) : (
@@ -953,7 +1029,7 @@ const DashboardLayout = () => {
                           }`}
                         aria-label="Change Language"
                       >
-                        <Globe2 className="w-[18px] h-[18px] group-hover:rotate-[24deg] transition-transform duration-300" strokeWidth={2.2} />
+                        <Globe2 size={18} stroke={1.5} className="group-hover:rotate-[24deg] transition-transform duration-300" />
                         <span className="hidden md:inline text-[11px] font-bold tracking-[0.1em] mt-[1px]">
                           {activeLanguage.shortLabel}
                         </span>
@@ -967,7 +1043,7 @@ const DashboardLayout = () => {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-50"
+                            className="absolute top-full right-0 mt-3 w-48 bg-white dark:bg-[#002147] border border-slate-200/60 dark:border-slate-700/60 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] overflow-hidden z-[100]"
                           >
                             <div className="border-b border-slate-100 bg-slate-50/70 px-4 py-3 dark:border-white/8 dark:bg-white/[0.03]">
                               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400 dark:text-slate-500">
@@ -1011,7 +1087,7 @@ const DashboardLayout = () => {
                       className="relative p-1.5 rounded-full text-amber-500 hover:text-orange-600 transition-all active:scale-95 group"
                       aria-label="Daily Streaks"
                     >
-                      <Flame className="w-[18px] h-[18px] animate-pulse filter drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" strokeWidth={2.2} />
+                      <Flame size={18} stroke={1.5} className="animate-pulse filter drop-shadow-[0_0_6px_rgba(245,158,11,0.6)]" />
                       {streakCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-extrabold text-[8px] px-1 rounded-full min-w-[14px] text-center border border-white dark:border-slate-800 scale-90 shadow-sm">
                           {streakCount}

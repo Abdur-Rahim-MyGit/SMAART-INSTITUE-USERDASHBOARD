@@ -194,10 +194,10 @@ const MicroAssessmentPlayer = () => {
   if (!assessment) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#00152E]">
+    <div className="min-h-[calc(100vh-130px)] bg-transparent">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-[#002147]/80 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
+      <header className="sticky top-0 z-40 border-b border-[#d8e6f7] bg-transparent px-0 py-3 dark:border-[#1a3884]/20">
+        <div className="flex w-full items-center justify-between">
           <button
             onClick={() => {
               if (phase === "taking") {
@@ -228,7 +228,7 @@ const MicroAssessmentPlayer = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-10">
+      <main className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 sm:py-10">
         <AnimatePresence mode="wait">
           
           {/* ─── START PHASE ─────────────────────────────────────────── */}

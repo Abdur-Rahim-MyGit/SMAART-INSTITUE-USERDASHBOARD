@@ -67,7 +67,7 @@ const Notifications = () => {
   } = useNotifications();
 
   const [filter, setFilter] = useState('all');
-  const [summary, setSummary] = useState(null);
+  const [dateRange, setDateRange] = useState('all_time');
   const navigate = useNavigate();
 
   const fetchSummary = useCallback(async () => {
@@ -82,25 +82,64 @@ const Notifications = () => {
   }, []);
 
   useEffect(() => {
-    fetchNotifications(1, false, { unreadOnly: filter === 'unread' }).catch((error) => {
+    const options = { unreadOnly: filter === 'unread' };
+    if (dateRange === 'today') {
+      const start = new Date(); start.setHours(0, 0, 0, 0);
+      options.startDate = start.toISOString();
+      const end = new Date(); end.setHours(23, 59, 59, 999);
+      options.endDate = end.toISOString();
+    } else if (dateRange === 'last_7_days') {
+      const start = new Date(); start.setDate(start.getDate() - 7);
+      options.startDate = start.toISOString();
+    } else if (dateRange === 'last_30_days') {
+      const start = new Date(); start.setDate(start.getDate() - 30);
+      options.startDate = start.toISOString();
+    }
+
+    fetchNotifications(1, false, options).catch((error) => {
       console.error('Error fetching notifications:', error);
     });
-  }, [fetchNotifications, filter]);
+  }, [fetchNotifications, filter, dateRange]);
 
   useEffect(() => {
     fetchSummary();
   }, [fetchSummary]);
 
   const handleRefresh = async () => {
-    await Promise.all([
-      fetchNotifications(1, false, { unreadOnly: filter === 'unread' }),
-      fetchSummary(),
-    ]);
+    const options = { unreadOnly: filter === 'unread' };
+    if (dateRange === 'today') {
+      const start = new Date(); start.setHours(0, 0, 0, 0);
+      options.startDate = start.toISOString();
+      const end = new Date(); end.setHours(23, 59, 59, 999);
+      options.endDate = end.toISOString();
+    } else if (dateRange === 'last_7_days') {
+      const start = new Date(); start.setDate(start.getDate() - 7);
+      options.startDate = start.toISOString();
+    } else if (dateRange === 'last_30_days') {
+      const start = new Date(); start.setDate(start.getDate() - 30);
+      options.startDate = start.toISOString();
+    }
+    await fetchNotifications(1, false, options);
   };
 
   const loadMore = () => {
     const nextPage = (pagination?.page || 1) + 1;
-    fetchNotifications(nextPage, true, { unreadOnly: filter === 'unread' }).catch((error) => {
+    
+    const options = { unreadOnly: filter === 'unread' };
+    if (dateRange === 'today') {
+      const start = new Date(); start.setHours(0, 0, 0, 0);
+      options.startDate = start.toISOString();
+      const end = new Date(); end.setHours(23, 59, 59, 999);
+      options.endDate = end.toISOString();
+    } else if (dateRange === 'last_7_days') {
+      const start = new Date(); start.setDate(start.getDate() - 7);
+      options.startDate = start.toISOString();
+    } else if (dateRange === 'last_30_days') {
+      const start = new Date(); start.setDate(start.getDate() - 30);
+      options.startDate = start.toISOString();
+    }
+
+    fetchNotifications(nextPage, true, options).catch((error) => {
       console.error('Error loading more notifications:', error);
     });
   };
@@ -181,43 +220,27 @@ const Notifications = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6"
+          className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#002147]"
         >
-          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#002A5C]">
+          {/* Header & Filters Section */}
+          <div className="p-4 sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-800">
-                  <Bell className="h-6 w-6 text-white" />
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-[#1a3884] shadow-sm">
+                  <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-slate-900 dark:text-white">{t('notifications.title', 'Notifications')}</h1>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <h1 className="text-lg sm:text-xl font-bold text-[#0d1f4e] dark:text-white">{t('notifications.title', 'Notifications')}</h1>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                     {unreadCount > 0 ? t('notifications.unread_count', '{{count}} unread notifications', { count: unreadCount }) : t('notifications.all_caught_up', 'All caught up!')}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="hidden items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-500 dark:border-white/10 dark:text-slate-400 sm:flex">
-                  <span
-                    className={`h-2.5 w-2.5 rounded-full ${wsStatus === 'connected'
-                        ? 'bg-emerald-500'
-                        : wsStatus === 'connecting'
-                          ? 'bg-amber-500'
-                          : 'bg-red-500'
-                      }`}
-                  />
-                  <span>
-                    {wsStatus === 'connected'
-                      ? t('notifications.ws.live_updates', 'Live updates on')
-                      : wsStatus === 'connecting'
-                        ? t('notifications.ws.connecting', 'Connecting')
-                        : t('notifications.ws.offline', 'Realtime offline')}
-                  </span>
-                </div>
                 <button
                   onClick={handleRefresh}
-                  className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-slate-200"
+                  className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-[#1a3884] dark:text-slate-400 dark:hover:bg-[#1a3884]/20 dark:hover:text-blue-400"
                   title={t('notifications.actions.refresh', 'Refresh')}
                 >
                   <RefreshCw className="h-5 w-5" />
@@ -225,243 +248,176 @@ const Notifications = () => {
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllRead}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#1a3884] transition-colors hover:bg-[#1a3884]/10 dark:text-blue-400 dark:hover:bg-[#1a3884]/20"
                   >
                     <CheckCheck className="h-4 w-4" />
                     <span className="hidden sm:inline">{t('notifications.actions.mark_all_read', 'Mark all read')}</span>
                   </button>
                 )}
-                {notifications.length > 0 && (
-                  <button
-                    onClick={clearAll}
-                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">{t('notifications.actions.clear_all', 'Clear all')}</span>
-                  </button>
-                )}
               </div>
             </div>
 
-            <div className="mt-4 flex gap-2 border-t border-slate-100 pt-4 dark:border-white/10">
-              <button
-                onClick={() => setFilter('all')}
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${filter === 'all'
-                    ? 'bg-[#1a3884] text-white'
-                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#002A5C]'
-                  }`}
-              >
-                {t('notifications.filters.all', 'All')}
-              </button>
-              <button
-                onClick={() => setFilter('unread')}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${filter === 'unread'
-                    ? 'bg-[#1a3884] text-white'
-                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#002A5C]'
-                  }`}
-              >
-                {t('notifications.filters.unread', 'Unread')}
-                {unreadCount > 0 && (
-                  <span
-                    className={`rounded-full px-1.5 py-0.5 text-xs ${filter === 'unread'
-                        ? 'bg-white/20'
-                        : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                      }`}
-                  >
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-100 pt-4 dark:border-white/10">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setFilter('all')}
+                  className={`rounded-lg px-4 py-2 text-[13px] font-semibold transition-colors ${filter === 'all'
+                      ? 'bg-[#1a3884] text-white shadow-sm'
+                      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#1a3884]/20'
+                    }`}
+                >
+                  {t('notifications.filters.all', 'All')}
+                </button>
+                <button
+                  onClick={() => setFilter('unread')}
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-semibold transition-colors ${filter === 'unread'
+                      ? 'bg-[#1a3884] text-white shadow-sm'
+                      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-[#1a3884]/20'
+                    }`}
+                >
+                  {t('notifications.filters.unread', 'Unread')}
+                  {unreadCount > 0 && (
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] ${filter === 'unread'
+                          ? 'bg-white/20'
+                          : 'bg-blue-100 text-[#1a3884] dark:bg-blue-900/30 dark:text-blue-400'
+                        }`}
+                    >
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <select
+                  value={dateRange}
+                  onChange={(e) => setDateRange(e.target.value)}
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[13px] font-medium text-slate-700 shadow-sm outline-none transition-colors focus:border-[#1a3884] focus:ring-1 focus:ring-[#1a3884] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-200"
+                >
+                  <option value="all_time">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="last_7_days">Last 7 Days</option>
+                  <option value="last_30_days">Last 30 Days</option>
+                </select>
+              </div>
             </div>
           </div>
-        </motion.div>
 
-        {summary && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-6"
-          >
-            <div className="rounded-xl border border-blue-800 bg-gradient-to-br from-blue-900 to-indigo-800 p-5 text-white shadow-lg dark:border-white/10 dark:from-slate-800 dark:to-slate-800">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-white">{t('notifications.summary.welcome', 'Welcome back, {{name}}!', { name: summary.fullName })}</h2>
-                  <p className="mt-1 text-sm text-blue-200 dark:text-slate-400">{t('notifications.summary.subtitle', "Here's your daily summary")}</p>
+          {/* List Section */}
+          <div className="border-t border-slate-200 bg-slate-50/30 dark:border-white/10 dark:bg-[#00152E]/30">
+            {isLoading ? (
+              <div className="p-4"><NotificationsSkeleton /></div>
+            ) : notifications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800/50">
+                  <Bell className="h-10 w-10 text-slate-400 dark:text-slate-500" />
                 </div>
-                <div className="flex items-center gap-2 text-sm text-blue-100 dark:text-slate-300">
-                  <Clock className="h-4 w-4" />
-                  <span>
-                    {t('notifications.summary.current_session', 'Current Session: {{time}}', {
-                      time: new Date(summary.currentLogin).toLocaleString(i18n.language || 'en-US', {
-                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
-                      })
-                    })}
-                  </span>
-                </div>
+                <h2 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
+                  {filter === 'unread' ? t('notifications.empty.no_unread', 'No unread notifications') : t('notifications.empty.no_notifications', 'No notifications yet')}
+                </h2>
+                <p className="max-w-sm text-sm text-slate-500 dark:text-slate-400">
+                  {filter === 'unread'
+                    ? t('notifications.empty.unread_desc', "You're all caught up! Check back later for new updates.")
+                    : t('notifications.empty.notifications_desc', "When you get notifications, they'll appear here. Stay tuned!")}
+                </p>
               </div>
+            ) : (
+              <div className="flex flex-col">
+                {Object.entries(groupedNotifications).map(([dateLabel, items], index) => (
+                  <div key={dateLabel} className="flex flex-col">
+                    <div className={`border-b border-slate-200 bg-slate-50/80 px-4 py-2.5 dark:border-white/5 dark:bg-[#00152E]/80 ${index !== 0 ? 'border-t' : ''}`}>
+                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        {dateLabel}
+                      </h3>
+                    </div>
+                    <div className="divide-y divide-slate-100 bg-white dark:divide-white/5 dark:bg-[#002147]">
+                      <AnimatePresence>
+                        {items.map((notification) => {
+                          const IconComponent = getIcon(notification.icon);
 
-              <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <div className="rounded-lg bg-white/10 p-3 dark:bg-slate-700/50">
-                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">{t('notifications.summary.last_login', 'Last Login')}</div>
-                  <div className="mt-1 font-semibold text-white">
-                    {summary.lastLogin
-                      ? new Date(summary.lastLogin).toLocaleString(i18n.language || 'en-US', {
-                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
-                      })
-                      : t('notifications.summary.first_login', 'First login!')}
-                  </div>
-                </div>
-
-                <div className="rounded-lg bg-white/10 p-3 dark:bg-slate-700/50">
-                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">{t('notifications.summary.badges_earned', 'Badges Earned')}</div>
-                  <div className="mt-1 flex items-center gap-2 font-semibold text-white">
-                    <Award className="h-4 w-4" />
-                    {summary.badgesEarned}
-                  </div>
-                </div>
-
-                <div className="rounded-lg bg-white/10 p-3 dark:bg-slate-700/50">
-                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">{t('notifications.summary.today_sessions', "Today's Sessions")}</div>
-                  <div className="mt-1 flex items-center gap-2 font-semibold text-white">
-                    <BookOpen className="h-4 w-4" />
-                    {t('notifications.summary.sessions_completed', '{{count}} completed', { count: summary.todayCompletedSessions })}
-                  </div>
-                </div>
-
-                <div className="rounded-lg bg-white/10 p-3 dark:bg-slate-700/50">
-                  <div className="text-xs uppercase tracking-wide text-blue-200 dark:text-slate-400">{t('notifications.summary.enrolled_courses', 'Enrolled Courses')}</div>
-                  <div className="mt-1 font-semibold text-white">{summary.totalEnrollments}</div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {isLoading ? (
-          <NotificationsSkeleton />
-        ) : notifications.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#002A5C]"
-          >
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-[#F8FAFC] dark:bg-slate-700/50">
-                <Bell className="h-12 w-12 text-slate-400 dark:text-slate-500" />
-              </div>
-              <h2 className="mb-2 text-xl font-semibold text-slate-900 dark:text-white">
-                {filter === 'unread' ? t('notifications.empty.no_unread', 'No unread notifications') : t('notifications.empty.no_notifications', 'No notifications yet')}
-              </h2>
-              <p className="max-w-sm text-slate-500 dark:text-slate-400">
-                {filter === 'unread'
-                  ? t('notifications.empty.unread_desc', "You're all caught up! Check back later for new updates.")
-                  : t('notifications.empty.notifications_desc', "When you get notifications, they'll appear here. Stay tuned!")}
-              </p>
-            </div>
-          </motion.div>
-        ) : (
-          <div className="space-y-4">
-            {Object.entries(groupedNotifications).map(([dateLabel, items]) => (
-              <div key={dateLabel}>
-                <h3 className="mb-3 px-2 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {dateLabel}
-                </h3>
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm divide-y divide-slate-100 dark:border-white/10 dark:bg-[#002A5C] dark:divide-slate-700">
-                  <AnimatePresence>
-                    {items.map((notification) => {
-                      const IconComponent = getIcon(notification.icon);
-
-                      return (
-                        <motion.div
-                          key={notification._id}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0, height: 0 }}
-                          className={`relative group transition-colors ${!notification.isRead
-                              ? 'bg-blue-50/50 dark:bg-blue-900/10'
-                              : 'bg-white dark:bg-[#002A5C]'
-                            } hover:bg-[#F8FAFC] dark:hover:bg-slate-700/50`}
-                        >
-                          <button
-                            onClick={() => handleNotificationClick(notification)}
-                            className="flex w-full items-start gap-4 px-4 py-4 text-left"
-                          >
-                            <div
-                              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl"
-                              style={{ backgroundColor: `${notification.color || '#1a3884'}15` }}
+                          return (
+                            <motion.div
+                              key={notification._id}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className={`relative group transition-colors ${!notification.isRead
+                                  ? 'bg-blue-50/50 dark:bg-[#1a3884]/20'
+                                  : 'bg-white dark:bg-[#002147]'
+                                } hover:bg-slate-50 dark:hover:bg-[#1a3884]/40`}
                             >
-                              <IconComponent
-                                className="h-6 w-6"
-                                style={{ color: notification.color || '#1a3884' }}
-                              />
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-start justify-between gap-3">
-                                <div>
-                                  <p className="font-semibold text-slate-900 dark:text-white">{notification.title}</p>
-                                  <span className="text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">
-                                    {t(TYPE_LABELS[notification.type] || notification.type, notification.type)}
-                                  </span>
-                                </div>
-                                <div className="flex-shrink-0 text-right">
-                                  <span className="text-xs text-slate-400 dark:text-slate-500">
-                                    {formatTimeAgo(notification.createdAt)}
-                                  </span>
-                                  {!notification.isRead && (
-                                    <div className="ml-auto mt-1 h-2 w-2 rounded-full bg-[#1a3884]" />
-                                  )}
-                                </div>
-                              </div>
-                              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{notification.message}</p>
-                            </div>
-                          </button>
-
-                          <div className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-                            {!notification.isRead && (
                               <button
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  markRead(notification._id);
-                                }}
-                                className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
-                                title={t('notifications.actions.mark_as_read', 'Mark as read')}
+                                onClick={() => handleNotificationClick(notification)}
+                                className="flex w-full items-start gap-4 px-4 py-4 text-left"
                               >
-                                <Check className="h-4 w-4" />
-                              </button>
-                            )}
-                            <button
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                deleteNotification(notification._id);
-                              }}
-                              className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20"
-                              title={t('notifications.actions.delete', 'Delete')}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
-                </div>
-              </div>
-            ))}
+                                <div
+                                  className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl"
+                                  style={{ backgroundColor: `${notification.color || '#1a3884'}15` }}
+                                >
+                                  <IconComponent
+                                    className="h-5 w-5 sm:h-6 sm:w-6"
+                                    style={{ color: notification.color || '#1a3884' }}
+                                  />
+                                </div>
 
-            {hasMore && (
-              <div className="flex justify-center pt-4">
-                <button
-                  onClick={loadMore}
-                  className="rounded-xl border border-slate-200 bg-white px-6 py-3 font-medium text-slate-700 shadow-sm transition-colors hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#002A5C]"
-                >
-                  {t('notifications.actions.load_more', 'Load more notifications')}
-                </button>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                      <p className="text-[14px] font-bold text-[#0d1f4e] dark:text-white leading-tight mb-0.5">{notification.title}</p>
+                                      <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#1a3884]/60 dark:text-blue-400">
+                                        {t(TYPE_LABELS[notification.type] || notification.type, notification.type)}
+                                      </span>
+                                    </div>
+                                    <div className="flex-shrink-0 text-right">
+                                      <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                                        {formatTimeAgo(notification.createdAt)}
+                                      </span>
+                                      {!notification.isRead && (
+                                        <div className="ml-auto mt-1 h-1.5 w-1.5 rounded-full bg-[#1a3884] dark:bg-blue-400" />
+                                      )}
+                                    </div>
+                                  </div>
+                                  <p className="mt-1.5 text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">{notification.message}</p>
+                                </div>
+                              </button>
+
+                              <div className="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                                {!notification.isRead && (
+                                  <button
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      markRead(notification._id);
+                                    }}
+                                    className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                                    title={t('notifications.actions.mark_as_read', 'Mark as read')}
+                                  >
+                                    <Check className="h-4 w-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                ))}
+
+                {hasMore && (
+                  <div className="flex justify-center border-t border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-[#002147]">
+                    <button
+                      onClick={loadMore}
+                      className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300 dark:hover:bg-[#1a3884]/30"
+                    >
+                      {t('notifications.actions.load_more', 'Load more notifications')}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
+        </motion.div>
       </main>
     </div>
   );

@@ -1,11 +1,18 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
 import {
-  BookOpen, Target, Crown, CheckCircle2,
-  ArrowLeft, Zap, TrendingUp,
-  Play, GraduationCap, ArrowRight, ChevronRight,
-  Brain, Bot, Leaf
-} from "lucide-react";
+  IconStack2 as BookOpen,
+  IconActivity as Target,
+  IconHierarchy as Crown,
+  IconCircleCheckFilled as CheckCircle2,
+  IconArrowLeft as ArrowLeft,
+  IconBolt as Zap,
+  IconTrendingUp as TrendingUp,
+  IconPlayerPlayFilled as Play,
+  IconFingerprint as Brain,
+  IconCpu as Bot,
+  IconInfinity as Leaf
+} from "@tabler/icons-react";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -99,7 +106,7 @@ const CategoryCard = ({ stage, cfg, isUnlocked, completedCount, onClick, delay }
               ? "bg-white border-[#d8e6f7] group-hover:scale-110 group-hover:shadow-md dark:bg-white/5 dark:border-white/10"
               : "bg-white border-[#e2e8f0] opacity-70"
               }`}>
-              <Icon className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />
+              <Icon stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -207,9 +214,9 @@ const TrackCard = ({ track, isUnlocked, completedCount, onClick, delay }) => {
               ? "bg-white border-[#d8e6f7] group-hover:scale-110 group-hover:shadow-md dark:bg-white/5 dark:border-white/10"
               : "bg-white border-[#e2e8f0] opacity-70"
               }`}>
-              {track.id === 'PIQ' && <Brain className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
-              {track.id === 'AIQ' && <Bot className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
-              {track.id === 'SQ' && <Leaf className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
+              {track.id === 'PIQ' && <Brain stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
+              {track.id === 'AIQ' && <Bot stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
+              {track.id === 'SQ' && <Leaf stroke={1.5} className={`w-6 h-6 ${isUnlocked ? "text-[#1a3884] dark:text-blue-400" : "text-gray-400"}`} />}
             </div>
 
             <div className="flex-1 min-w-0">
@@ -373,7 +380,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
           className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
         >
           <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft stroke={1.5} className="w-4 h-4" />
           </div>
           {t("my_courses_page.back_to_overview")}
         </button>
@@ -476,7 +483,7 @@ const StageDetailView = ({ stage, cfg, userProgress, onBack, onCourseClick, publ
       {stage.assessmentGate && (
         <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 bg-white dark:bg-[#002147] border border-slate-150 dark:border-white/10 rounded-3xl shadow-sm transition-colors duration-300">
           <div className="w-12 h-12 rounded-2xl bg-[#F8FAFC] dark:bg-[#002A5C] border border-slate-100 dark:border-white/10 flex items-center justify-center flex-shrink-0 shadow-sm">
-            <TrendingUp className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
+            <TrendingUp stroke={1.5} className="w-6 h-6 text-[#1a3884] dark:text-blue-400" />
           </div>
           <div className="flex-1">
             <h4 className="font-extrabold text-[#112b6b] dark:text-white text-[15px]">{t("my_courses_page.assessment_required", { gate: stage.assessmentGate })}</h4>
@@ -779,7 +786,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
                 className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
               >
                 <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft stroke={1.5} className="w-4 h-4" />
                 </div>
                 {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
               </button>

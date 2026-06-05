@@ -2,33 +2,34 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { LayoutDashboard, TrendingUp } from "lucide-react";
 import {
-  RiBookOpenLine as BookOpen,
-  RiFileList3Line as ClipboardCheck,
-  RiToolsLine as Wrench,
-  RiTrophyLine as Award,
-  RiShieldCheckLine as ShieldCheck,
-  RiLightbulbLine as Lightbulb,
-  RiGroupLine as Users,
-  RiSettings4Line as Settings,
-  RiQuestionLine as HelpCircle,
-  RiBellLine as Bell,
-  RiMenuLine as Menu,
-  RiArrowLeftSLine as ChevronLeft,
-  RiArrowRightSLine as ChevronRight,
-  RiArrowDownSLine as ChevronDown,
-  RiGlobalLine as Languages,
-  RiStarLine as Star,
-  RiLogoutBoxRLine as LogOut,
-  RiUserLine as User,
-  RiCloseLine as X,
-  RiSparklingLine as Sparkles,
-  RiCheckDoubleLine as CheckCheck,
-  RiCompassLine as Compass,
-  RiSunLine as Sun,
-  RiMoonLine as Moon,
-} from "@remixicon/react";
+  IconLayoutDashboard as LayoutDashboard,
+  IconTrendingUp as TrendingUp,
+  IconBook2 as BookOpen,
+  IconClipboardCheck as ClipboardCheck,
+  IconTool as Wrench,
+  IconAward as Award,
+  IconShieldCheck as ShieldCheck,
+  IconBulb as Lightbulb,
+  IconUsers as Users,
+  IconSettings as Settings,
+  IconHelpCircle as HelpCircle,
+  IconBell as Bell,
+  IconMenu2 as Menu,
+  IconChevronLeft as ChevronLeft,
+  IconChevronRight as ChevronRight,
+  IconChevronDown as ChevronDown,
+  IconWorld as Languages,
+  IconStar as Star,
+  IconLogout as LogOut,
+  IconUser as User,
+  IconX as X,
+  IconSparkles as Sparkles,
+  IconChecks as CheckCheck,
+  IconBrain as Brain,
+  IconSun as Sun,
+  IconMoon as Moon,
+} from "@tabler/icons-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSidebar } from "@/contexts/SidebarContext";
 import useUser from "@/hooks/useUser";
@@ -76,7 +77,7 @@ const menuGroups = [
     title: "sidebar.group_skills",
     items: [
       { icon: Award, label: "sidebar.skills_vault", path: "/dashboard/skills-vault", badge: null },
-      { icon: Compass, label: "sidebar.career_directions", path: "/dashboard/career-agent", badge: null },
+      { icon: Brain, label: "sidebar.career_directions", path: "/dashboard/career-agent", badge: null },
       { icon: ShieldCheck, label: "sidebar.skills_passport", path: "/dashboard/skills-passport", badge: null },
       { icon: Lightbulb, label: "sidebar.vision_board", path: "/dashboard/vision-boards", badge: null },
     ]
@@ -336,7 +337,7 @@ const LeftSidebar = () => {
                 onClick={() => setIsMobileOpen(false)}
                 className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
               >
-                <X weight="bold" className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                <X size={20} stroke={1.5} className="w-5 h-5 text-slate-500 dark:text-slate-400" />
               </button>
             </div>
 
@@ -355,7 +356,7 @@ const LeftSidebar = () => {
 
                       const content = (
                         <>
-                          <Icon className={`w-5 h-5 ${active ? 'text-white' : 'text-[#1a3884]'}`} />
+                          <Icon size={20} stroke={1.5} className={`w-5 h-5 ${active ? 'text-white' : 'text-[#1a3884]'}`} />
                           <span className="font-medium text-sm">{label}</span>
                           {item.badge && (
                             <span className="ml-auto px-2 py-0.5 text-[10px] font-bold bg-emerald-500 text-white rounded-full">
@@ -464,7 +465,7 @@ const LeftSidebar = () => {
                 }}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut size={20} stroke={1.5} className="w-5 h-5" />
                 <span className="font-medium text-sm">{t("sidebar.logout")}</span>
               </button>
             </div>
@@ -531,7 +532,7 @@ const LeftSidebar = () => {
                     <>
                       {/* Icon */}
                       <div className={`relative ${isCollapsed ? '' : ''}`}>
-                        <Icon
+                        <Icon size={20} stroke={1.5}
                           className={`w-5 h-5 transition-colors ${active ? 'text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-[#1a3884] dark:group-hover:text-white'
                             }`}
                         />
@@ -622,7 +623,7 @@ const LeftSidebar = () => {
                 />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-[#1a3884] flex items-center justify-center border-2 border-slate-100 dark:border-[#1a3884]/30">
-                  <User weight="duotone" className="w-6 h-6 text-white" />
+                  <User size={20} stroke={1.5} className="w-6 h-6 text-white" />
                 </div>
               )}
             </div>
@@ -641,7 +642,7 @@ const LeftSidebar = () => {
 
             {/* Arrow Indicator */}
             {!isCollapsed && (
-              <ChevronRight weight="bold" className="w-4 h-4 text-slate-400" />
+              <ChevronRight size={16} stroke={1.5} className="w-4 h-4 text-slate-400" />
             )}
           </div>
         </div>

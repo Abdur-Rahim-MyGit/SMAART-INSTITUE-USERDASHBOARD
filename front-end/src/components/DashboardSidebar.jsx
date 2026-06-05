@@ -2,28 +2,28 @@ import { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  BookOpen,
-  Award,
-  Trophy,
-  Menu,
-  X,
-  Lightbulb,
-  Zap,
-  Brain,
-  Wallet,
-  LayoutDashboard,
-  Settings,
-  HelpCircle,
-  Bell,
-  CheckCheck,
-  Sun,
-  Moon,
-  Users,
-  ClipboardCheck,
-  ChevronDown,
-  Languages,
-  ListTodo
-} from "lucide-react";
+  IconBook2 as BookOpen,
+  IconAward as Award,
+  IconTrophy as Trophy,
+  IconMenu2 as Menu,
+  IconX as X,
+  IconBulb as Lightbulb,
+  IconBolt as Zap,
+  IconBrain as Brain,
+  IconWallet as Wallet,
+  IconLayoutDashboard as LayoutDashboard,
+  IconSettings as Settings,
+  IconHelpCircle as HelpCircle,
+  IconBell as Bell,
+  IconChecks as CheckCheck,
+  IconSun as Sun,
+  IconMoon as Moon,
+  IconUsers as Users,
+  IconClipboardCheck as ClipboardCheck,
+  IconChevronDown as ChevronDown,
+  IconLanguage as Languages,
+  IconListCheck as ListTodo
+} from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import ChatbotModal from "@/components/ChatbotModal";
@@ -192,7 +192,7 @@ const DashboardSidebar = () => {
               className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-[#002A5C] lg:hidden"
               onClick={() => setIsMobileOpen(!isMobileOpen)}
             >
-              {isMobileOpen ? <X className="h-5 w-5 text-slate-600 dark:text-slate-300" /> : <Menu className="h-5 w-5 text-slate-600 dark:text-slate-300" />}
+              {isMobileOpen ? <X size={20} stroke={1.5} className="text-slate-600 dark:text-slate-300" /> : <Menu size={20} stroke={1.5} className="text-slate-600 dark:text-slate-300" />}
             </button>
 
             <div className="flex items-center gap-3">
@@ -280,7 +280,7 @@ const DashboardSidebar = () => {
               className="rounded-lg p-2 text-slate-500 transition-all hover:bg-slate-100 hover:text-[#1a3884] dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-blue-300"
               aria-label="Toggle Theme"
             >
-              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {theme === 'dark' ? <Sun size={20} stroke={1.5} /> : <Moon size={20} stroke={1.5} />}
             </button>
 
             <div className="relative" ref={notificationRef}>
@@ -288,7 +288,7 @@ const DashboardSidebar = () => {
                 onClick={() => setNotificationOpen(!notificationOpen)}
                 className="group/nav relative mr-1 rounded-lg p-2 text-slate-400 transition-all hover:bg-blue-50 hover:text-[#1a3884] dark:hover:bg-blue-900/20 dark:hover:text-blue-300"
               >
-                <Bell className="h-5 w-5 group-hover/nav:animate-bounce" />
+                <Bell size={20} stroke={1.5} className="group-hover/nav:animate-bounce" />
                 {unreadCount > 0 && (
                   <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-red-500 text-[10px] font-bold text-white dark:border-slate-900">
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -308,7 +308,7 @@ const DashboardSidebar = () => {
                   >
                     <div className="flex items-center justify-between bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Bell className="h-5 w-5 text-white" />
+                        <Bell size={20} stroke={1.5} className="text-white" />
                         <h3 className="font-semibold text-white">Notifications</h3>
                         {unreadCount > 0 && (
                           <span className="rounded-md bg-white/20 px-2 py-0.5 text-xs text-white">
@@ -319,11 +319,11 @@ const DashboardSidebar = () => {
                       <div className="flex items-center gap-2">
                         {unreadCount > 0 && (
                           <button onClick={markAllRead} className="text-white/80 hover:text-white" title="Mark all read">
-                            <CheckCheck className="h-4 w-4" />
+                            <CheckCheck size={16} stroke={1.5} />
                           </button>
                         )}
                         <button onClick={() => setNotificationOpen(false)} className="text-white/80 hover:text-white">
-                          <X className="h-4 w-4" />
+                          <X size={16} stroke={1.5} />
                         </button>
                       </div>
                     </div>
@@ -336,7 +336,7 @@ const DashboardSidebar = () => {
                       ) : notifications.length === 0 ? (
                         <div className="flex flex-col items-center px-4 py-10 text-center">
                           <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 dark:bg-[#002A5C]">
-                            <Bell className="h-7 w-7 text-slate-400" />
+                            <Bell size={28} stroke={1.5} className="text-slate-400" />
                           </div>
                           <p className="font-medium text-slate-500 dark:text-slate-400">No notifications yet</p>
                           <button
@@ -358,7 +358,7 @@ const DashboardSidebar = () => {
                                 className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
                                 style={{ backgroundColor: `${notification.color || '#2563EB'}20` }}
                               >
-                                <Bell className="h-5 w-5" style={{ color: notification.color || '#2563EB' }} />
+                                <Bell size={20} stroke={1.5} style={{ color: notification.color || '#2563EB' }} />
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-start justify-between">
@@ -465,7 +465,7 @@ const DashboardSidebar = () => {
                 onClick={() => setIsMobileOpen(false)}
                 className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-[#002A5C]"
               >
-                <X className="h-5 w-5 text-slate-500 dark:text-slate-400" />
+                <X size={20} stroke={1.5} className="text-slate-500 dark:text-slate-400" />
               </button>
             </div>
 
@@ -490,7 +490,7 @@ const DashboardSidebar = () => {
                           : 'text-slate-600 hover:bg-[#F8FAFC] dark:text-slate-400 dark:hover:bg-[#002A5C]'
                           }`}
                       >
-                        <Icon className={`h-5 w-5 ${isActive ? 'text-white' : 'text-[#1a3884]'}`} />
+                        <Icon size={20} stroke={1.5} className={`${isActive ? 'text-white' : 'text-[#1a3884]'}`} />
                         <span className="font-medium">{item.label}</span>
                       </Link>
                     </motion.div>
@@ -504,7 +504,7 @@ const DashboardSidebar = () => {
                 onClick={toggleTheme}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-slate-600 transition-colors hover:bg-[#F8FAFC] dark:text-slate-400 dark:hover:bg-[#002A5C]"
               >
-                {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-500" /> : <Moon className="h-5 w-5 text-[#1a3884]" />}
+                {theme === 'dark' ? <Sun size={20} stroke={1.5} className="text-yellow-500" /> : <Moon size={20} stroke={1.5} className="text-[#1a3884]" />}
                 <span className="font-medium">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
               </button>
 
@@ -513,14 +513,14 @@ const DashboardSidebar = () => {
                 className="mt-1 flex w-full items-center justify-between rounded-xl px-4 py-3 text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <Languages className="w-5 h-5 text-[#1a3884] dark:text-blue-400" />
+                  <Languages size={20} stroke={1.5} className="text-[#1a3884] dark:text-blue-400" />
                   <span className="font-medium">Language</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs text-slate-400 dark:text-slate-500 uppercase font-bold tracking-wider">
                     {i18n.language === 'en' ? 'EN' : i18n.language === 'hi' ? 'HI' : i18n.language === 'ta' ? 'TA' : i18n.language === 'ur' ? 'UR' : i18n.language === 'fr' ? 'FR' : i18n.language.toUpperCase()}
                   </span>
-                  <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${showLanguages ? 'rotate-180' : ''}`} />
+                  <ChevronDown size={16} stroke={1.5} className={`text-slate-400 transition-transform duration-200 ${showLanguages ? 'rotate-180' : ''}`} />
                 </div>
               </button>
 
@@ -568,7 +568,7 @@ const DashboardSidebar = () => {
                   background: 'linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 50%, #C0C0C0 100%)',
                 }}
               >
-                <Award className="h-5 w-5 text-slate-900" />
+                <Award size={20} stroke={1.5} className="text-slate-900" />
                 <span className="font-bold text-slate-900">Skills Passport</span>
               </Link>
             </div>
@@ -588,7 +588,7 @@ const DashboardSidebar = () => {
                       }}
                       className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-slate-500 transition-all hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-slate-200"
                     >
-                      <Icon className="h-5 w-5" />
+                      <Icon size={20} stroke={1.5} />
                       <span className="text-sm font-medium">{item.label}</span>
                     </button>
                   );
@@ -601,7 +601,7 @@ const DashboardSidebar = () => {
                     onClick={() => setIsMobileOpen(false)}
                     className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-slate-500 transition-all hover:bg-white hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#002A5C] dark:hover:text-slate-200"
                   >
-                    <Icon className="h-5 w-5" />
+                    <Icon size={20} stroke={1.5} />
                     <span className="text-sm font-medium">{item.label}</span>
                   </Link>
                 );

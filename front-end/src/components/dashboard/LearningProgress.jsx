@@ -287,12 +287,7 @@ const LearningProgress = memo(() => {
                 <Calendar className="w-4 h-4 text-slate-300 dark:text-slate-600" />
               </div>
               <p className="text-[11px] text-slate-400 dark:text-slate-500">No tasks for this day</p>
-              <button
-                onClick={() => setShowInput(true)}
-                className="text-[11px] text-[#1a3884] dark:text-blue-400 font-bold mt-1 hover:underline"
-              >
-                + Add a task
-              </button>
+              <p className="text-[10px] text-slate-300 dark:text-slate-600 mt-0.5">Use the + Add button above</p>
             </div>
           ) : (
             selectedTodos.map(todo => {

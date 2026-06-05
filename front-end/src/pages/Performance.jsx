@@ -43,25 +43,23 @@ const Performance = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] font-sans transition-colors duration-300">
-      <main className="p-4 md:p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* Dashboard Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Progression Analytics
-              </h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Visualizing course progression, student participation, and institutional performance insights.
-              </p>
-            </div>
+    <div className="bg-transparent font-sans transition-colors duration-300">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Dashboard Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-[24px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
+              Progression <span className="text-[#1a3884] dark:text-blue-300">Analytics</span>
+            </h1>
+            <p className="mt-1 text-[12.5px] font-medium text-slate-500 dark:text-slate-400">
+              Visualizing course progression, student participation, and institutional performance insights.
+            </p>
           </div>
-
-          {/* Render the role-specific view */}
-          {renderAnalyticsView()}
         </div>
-      </main>
+
+        {/* Render the role-specific view */}
+        {renderAnalyticsView()}
+      </div>
     </div>
   );
 };
