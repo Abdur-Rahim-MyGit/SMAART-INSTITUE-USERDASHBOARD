@@ -43,7 +43,7 @@ const LearningProgress = memo(() => {
 
   const isoOf = (d) => new Date(year, month, d).toISOString().split("T")[0];
   const selectedIso = selectedDate.toISOString().split("T")[0];
-  
+
   const getTasksForDay = (d) => {
     const dayIso = isoOf(d);
     return todos.filter(t => t.dueDate?.split("T")[0] === dayIso);
@@ -60,12 +60,12 @@ const LearningProgress = memo(() => {
   };
 
   const selectedTodos = todos.filter(t => t.dueDate?.split("T")[0] === selectedIso);
-  
+
   const isToday = (d) => {
     const n = new Date();
     return d === n.getDate() && month === n.getMonth() && year === n.getFullYear();
   };
-  
+
   const isSelected = (d) =>
     d === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear();
 
@@ -118,7 +118,6 @@ const LearningProgress = memo(() => {
       <div className="px-4 pt-4 pb-3 border-b border-slate-100 dark:border-[#1a3884]/20">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-1 h-4 bg-[#1a3884] dark:bg-blue-400 rounded-full" />
             <span className="text-xs font-extrabold text-slate-800 dark:text-white tracking-tight">{monthLabel}</span>
           </div>
           <div className="flex items-center gap-0.5">
@@ -162,8 +161,8 @@ const LearningProgress = memo(() => {
                   ${sel
                     ? "bg-[#1a3884] text-white font-bold shadow-sm"
                     : tod
-                    ? "bg-blue-50 dark:bg-[#1a3884]/25 text-[#1a3884] dark:text-blue-300 font-bold"
-                    : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C]"
+                      ? "bg-blue-50 dark:bg-[#1a3884]/25 text-[#1a3884] dark:text-blue-300 font-bold"
+                      : "text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#002A5C]"
                   }`}
               >
                 {d}
@@ -176,7 +175,7 @@ const LearningProgress = memo(() => {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-4 mt-3 pt-2 border-t border-slate-50 dark:border-[#1a3884]/10 text-[9px] font-extrabold tracking-wider text-slate-400 dark:text-slate-500 uppercase select-none">
+        {/* <div className="flex items-center justify-center gap-4 mt-3 pt-2 border-t border-slate-50 dark:border-[#1a3884]/10 text-[9px] font-extrabold tracking-wider text-slate-400 dark:text-slate-500 uppercase select-none">
           <div className="flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
             High
@@ -189,7 +188,7 @@ const LearningProgress = memo(() => {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             Low
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* ── Tasks Section ─────────────────────────── */}
@@ -251,9 +250,8 @@ const LearningProgress = memo(() => {
                         <button
                           key={p}
                           onClick={() => setNewPriority(p)}
-                          className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded transition-all ${
-                            active ? activeColors[p] : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                          }`}
+                          className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded transition-all ${active ? activeColors[p] : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            }`}
                         >
                           {p}
                         </button>
@@ -287,7 +285,12 @@ const LearningProgress = memo(() => {
                 <Calendar className="w-4 h-4 text-slate-300 dark:text-slate-600" />
               </div>
               <p className="text-[11px] text-slate-400 dark:text-slate-500">No tasks for this day</p>
-              <p className="text-[10px] text-slate-300 dark:text-slate-600 mt-0.5">Use the + Add button above</p>
+              {/* <button
+                onClick={() => setShowInput(true)}
+                className="text-[11px] text-[#1a3884] dark:text-blue-400 font-bold mt-1 hover:underline"
+              >
+                + Add a task
+              </button> */}
             </div>
           ) : (
             selectedTodos.map(todo => {
@@ -302,9 +305,8 @@ const LearningProgress = memo(() => {
                   layout
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex items-center gap-2 px-2.5 py-2 rounded-xl bg-slate-50 dark:bg-[#002A5C]/60 border border-slate-100 dark:border-[#1a3884]/15 border-l-3 ${
-                    priorityColors[todo.priority || "medium"]
-                  } group hover:border-[#1a3884]/25 transition-all`}
+                  className={`flex items-center gap-2 px-2.5 py-2 rounded-xl bg-slate-50 dark:bg-[#002A5C]/60 border border-slate-100 dark:border-[#1a3884]/15 border-l-3 ${priorityColors[todo.priority || "medium"]
+                    } group hover:border-[#1a3884]/25 transition-all`}
                 >
                   <button
                     onClick={() => toggleTodo(todo._id, todo.completed)}

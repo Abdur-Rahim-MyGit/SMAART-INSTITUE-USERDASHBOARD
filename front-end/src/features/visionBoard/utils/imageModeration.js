@@ -194,6 +194,35 @@ const checkImageText = async (imageSource) => {
   }
 };
 
+const checkImageServerSide = async (base64Image) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/nsfw/check`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ imageData: base64Image }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server moderation error: ${response.status}`);
+    }
+
+    const result = await response.json();
+    if (result.success && !result.isSafe) {
+      return {
+        flagged: true,
+        reason: result.reason || 'Image contains inappropriate content (server check)',
+        type: 'server_ai',
+      };
+    }
+    return { flagged: false };
+  } catch (error) {
+    console.error('Server-side image check error:', error);
+    return { flagged: false, error: error.message }; // Fail open
+  }
+};
+
 // ═══════════════════════════════════════════════════════════════════════════
 // COMPREHENSIVE IMAGE CHECK
 // ═══════════════════════════════════════════════════════════════════════════
@@ -212,25 +241,29 @@ export const checkImageComprehensive = async (base64Image) => {
         nsfw: { flagged: false },
         objects: { flagged: false },
         text: { flagged: false },
+        server: { flagged: false },
       };
 
       try {
-        // Run checks in parallel for speed
-        const [nsfwResult, objectResult, textResult] = await Promise.all([
+        // Run checks in parallel for speed (including the backend server AI check)
+        const [nsfwResult, objectResult, textResult, serverResult] = await Promise.all([
           checkNSFW(img),
           checkDangerousObjects(img),
           checkImageText(base64Image),
+          checkImageServerSide(base64Image),
         ]);
 
         checks.nsfw = nsfwResult;
         checks.objects = objectResult;
         checks.text = textResult;
+        checks.server = serverResult;
 
         // Determine overall safety
         const flaggedChecks = [];
         if (nsfwResult.flagged) flaggedChecks.push(nsfwResult);
         if (objectResult.flagged) flaggedChecks.push(objectResult);
         if (textResult.flagged) flaggedChecks.push(textResult);
+        if (serverResult.flagged) flaggedChecks.push(serverResult);
 
         if (flaggedChecks.length > 0) {
           // Combine reasons from all flagged checks

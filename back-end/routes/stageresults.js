@@ -146,6 +146,7 @@ router.get('/user/:userId/stage/:stage', async (req, res) => {
                 stageBand: stageResult.stageBand,
                 quotientProfile: stageResult.quotientProfile,
                 passed: stageResult.passed,
+                attemptNumber: stageResult.attemptNumber || 1,
                 completedAt: stageResult.createdAt,
                 score: stageResult.score,
                 totalScore: stageResult.totalScore,
@@ -172,26 +173,54 @@ router.get('/user/:userId/status', async (req, res) => {
         const { userId } = req.params;
 
         const [stageResults, baselineResult] = await Promise.all([
-            StageResult.find({ userId }).select('stage createdAt'),
+            StageResult.find({ userId }).select('stage passed stageScore createdAt'),
             BaseLineResult.findOne({ userId }).select('createdAt')
         ]);
 
         const status = {
-            T1: { completed: false, completedAt: null },
-            T2: { completed: false, completedAt: null },
-            T3: { completed: false, completedAt: null },
-            T4: { completed: false, completedAt: null },
-            AIQ: { completed: false, completedAt: null }
+            T1: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 1 },
+            T2: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
+            T3: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
+            T4: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
+            AIQ: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
+            SQ: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 },
+            PIQ: { completed: false, completedAt: null, score: undefined, attemptCount: 0, locked: false, remainingAttempts: 3 }
         };
 
         // Check T1 from BaseLineResult
         if (baselineResult) {
-            status.T1 = { completed: true, completedAt: baselineResult.createdAt };
+            status.T1 = { completed: true, completedAt: baselineResult.createdAt, score: 100, attemptCount: 1, locked: false, remainingAttempts: 0 };
         }
 
-        // Check all stages from StageResult
+        // Group stageResults by stage
+        const { getStageConfig } = require('../config/stage_distributions');
+        const resultsByStage = {};
         stageResults.forEach(sr => {
-            status[sr.stage] = { completed: true, completedAt: sr.createdAt };
+            if (!resultsByStage[sr.stage]) {
+                resultsByStage[sr.stage] = [];
+            }
+            resultsByStage[sr.stage].push(sr);
+        });
+
+        Object.keys(status).forEach(stageKey => {
+            if (stageKey === 'T1') return; // T1 is handled separately
+
+            const results = resultsByStage[stageKey] || [];
+            const hasPassed = results.some(r => r.passed);
+            const attemptCount = results.length;
+            const highestScore = results.reduce((max, r) => Math.max(max, r.stageScore || 0), 0);
+            const stageConfig = getStageConfig(stageKey) || { maxAttempts: 3 };
+            const locked = !hasPassed && attemptCount >= stageConfig.maxAttempts;
+            const passedResult = results.find(r => r.passed);
+
+            status[stageKey] = {
+                completed: hasPassed,
+                completedAt: passedResult ? passedResult.createdAt : (results[results.length - 1]?.createdAt || null),
+                score: passedResult ? passedResult.stageScore : highestScore,
+                attemptCount,
+                locked,
+                remainingAttempts: Math.max(0, stageConfig.maxAttempts - attemptCount)
+            };
         });
 
         res.json({ success: true, data: status });
@@ -200,6 +229,107 @@ router.get('/user/:userId/status', async (req, res) => {
         res.status(500).json({
             success: false,
             error: 'Failed to fetch stage status',
+            message: err.message
+        });
+    }
+});
+
+/**
+ * GET /api/stageresults/user/:userId/stage/:stage/attempts
+ * Get all attempt history for a specific stage (for retry tracking)
+ */
+router.get('/user/:userId/stage/:stage/attempts', async (req, res) => {
+    try {
+        const { userId, stage } = req.params;
+        const stageKey = stage.toUpperCase();
+
+        const attempts = await StageResult.find({ userId, stage: stageKey })
+            .sort({ attemptNumber: 1, createdAt: 1 })
+            .select('stage stageScore stageBand passed attemptNumber createdAt timeTaken percentage');
+
+        const hasPassed = attempts.some(a => a.passed);
+        const { getStageConfig } = require('../config/stage_distributions');
+        const stageConfig = getStageConfig(stageKey);
+        const maxAttempts = stageConfig?.maxAttempts || 3;
+        const passingPercentage = stageConfig?.passingPercentage || 70;
+
+        res.json({
+            success: true,
+            data: {
+                stage: stageKey,
+                attempts,
+                attemptCount: attempts.length,
+                maxAttempts,
+                passingPercentage,
+                hasPassed,
+                locked: !hasPassed && attempts.length >= maxAttempts,
+                remainingAttempts: Math.max(0, maxAttempts - attempts.length)
+            }
+        });
+    } catch (err) {
+        console.error('❌ Error fetching stage attempts:', err);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch stage attempts',
+            message: err.message
+        });
+    }
+});
+
+/**
+ * POST /api/stageresults/restart-course
+ * Reset/restart the courses for a student's current stage and delete attempt results
+ */
+router.post('/restart-course', async (req, res) => {
+    try {
+        const { userId, stage } = req.body;
+        const stageKey = stage.toUpperCase();
+
+        const stageCoursesMap = {
+            'T2': ['S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'S08', 'S09', 'S10'],
+            'T3': ['S11', 'S12', 'S13', 'S14', 'S15', 'S16', 'S17', 'S18', 'S19'],
+            'T4': ['S20', 'S21', 'S22', 'S23', 'S24', 'S25'],
+            'AIQ': ['AIQ01', 'AIQ02', 'AIQ03', 'AIQ04', 'AIQ05'],
+            'SQ': ['SQ01', 'SQ02', 'SQ03', 'SQ04', 'SQ05'],
+            'PIQ': ['PIQ01', 'PIQ02', 'PIQ03', 'PIQ04', 'PIQ05']
+        };
+
+        const courseCodes = stageCoursesMap[stageKey];
+        if (!courseCodes) {
+            return res.status(400).json({
+                success: false,
+                error: `Stage ${stageKey} does not have courses configured for restart.`
+            });
+        }
+
+        const Course = require('../models/Course');
+        const CourseEnrollment = require('../models/CourseEnrollment');
+
+        // 1. Find course ObjectIds
+        const courses = await Course.find({ courseCode: { $in: courseCodes } }).select('_id');
+        const courseIds = courses.map(c => c._id);
+
+        // 2. Delete enrollments for these courses for this user
+        const deleteRes = await CourseEnrollment.deleteMany({
+            student: userId,
+            course: { $in: courseIds }
+        });
+
+        // 3. Clear StageResult attempts
+        const stageResultRes = await StageResult.deleteMany({
+            userId,
+            stage: stageKey
+        });
+
+        res.json({
+            success: true,
+            message: `Successfully restarted ${stageKey} stage. Deleted ${deleteRes.deletedCount} course enrollments and cleared stage results/attempts.`
+        });
+    } catch (err) {
+        console.error('❌ Error restarting stage course:', err);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to restart stage course',
             message: err.message
         });
     }

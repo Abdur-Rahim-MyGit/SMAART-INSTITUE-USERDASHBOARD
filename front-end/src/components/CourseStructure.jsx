@@ -770,7 +770,7 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
         <div className="absolute top-[20%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
       </div>
 
-      {/* Page header — standardized PageHero */}
+      {/* Page header — standardized PageHero with restored old design */}
       {!selectedStageId && (
         <div className="relative z-10 pt-4 pb-0">
           <motion.div
@@ -805,8 +805,18 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
               <div className="relative z-10 flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-4 md:pt-0 md:pl-6 w-full md:w-auto flex items-center justify-start md:justify-end">
                 {continueWatching}
               </div>
-            )}
-          </motion.div>
+              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+            </button>
+          </div>
+
+          <PageHero
+            badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
+            icon={GraduationCap}
+            title={t("my_courses_page.programme", "My Learning Journey")}
+            subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
+          >
+            {continueWatching}
+          </PageHero>
         </div>
       )}
 

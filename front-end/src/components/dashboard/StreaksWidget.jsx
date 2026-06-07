@@ -122,37 +122,75 @@ const StreaksWidget = () => {
     }
   };
 
-  // Helper to get past 6 calendar days (excluding Sundays) for visualization
+  const getLocalDateString = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Helper to get current week's Monday to Sunday (excluding Sundays from streak count but displaying it)
   const getRecentTrackDays = () => {
     const days = [];
     const now = new Date();
+    
+    // Get current day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    const currentDayOfWeek = now.getDay();
+    
+    // Determine how many days to subtract to get to Monday of this week.
+    // If today is Sunday (0), Monday of this week was 6 days ago.
+    // If today is Monday (1), Monday of this week is today.
+    // Otherwise, Monday was (currentDayOfWeek - 1) days ago.
+    const daysToMonday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+    
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - daysToMonday);
+    
+    // Determine active dates in the current streak going backward from lastActivityDate
+    const activeDates = new Set();
+    if (streakData?.currentStreak > 0 && streakData?.lastActivityDate) {
+      let S = streakData.currentStreak;
+      let iter = new Date(streakData.lastActivityDate);
+      
+      let iterations = 0;
+      while (S > 0 && iterations < 30) {
+        iterations++;
+        const dayOfWeek = iter.getDay();
+        
+        if (dayOfWeek !== 0) {
+          // Weekday counts as active streak day
+          const dateStr = getLocalDateString(iter);
+          activeDates.add(dateStr);
+          S--;
+        }
+        iter.setDate(iter.getDate() - 1);
+      }
+    }
 
-    // Generate last 6 calendar days
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(now.getDate() - i);
-
+    // Construct the 7 days of the current week (Monday to Sunday)
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      
+      const dateStr = getLocalDateString(d);
       const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
       const isSunday = d.getDay() === 0;
-
-      // Determine state
-      let state = "pending"; // pending, active, sunday
-
+      
+      let state = "pending";
       if (isSunday) {
         state = "sunday";
-      } else if (streakData?.lastActivityDate) {
-        const dStr = d.toISOString().split("T")[0];
-        const lastActStr = new Date(streakData.lastActivityDate).toISOString().split("T")[0];
-        if (dStr === lastActStr) {
-          state = "active";
-        }
+      } else if (activeDates.has(dateStr)) {
+        state = "active";
       }
-
+      
+      const todayStr = getLocalDateString(now);
+      const isToday = dateStr === todayStr;
+      
       days.push({
         name: dayName,
         date: d.getDate(),
         state,
-        isToday: i === 0
+        isToday
       });
     }
     return days;
@@ -160,7 +198,26 @@ const StreaksWidget = () => {
 
   if (loading) {
     return (
-      <div className="w-full py-6 px-6 rounded-[24px] bg-white dark:bg-[#002147] border border-gray-100 dark:border-[#1a3884]/20 animate-pulse h-48" />
+      <div className="w-full p-6 sm:p-7 rounded-[24px] bg-white dark:bg-[#002147] border border-gray-100/80 dark:border-[#1a3884]/20 animate-pulse flex flex-col items-center gap-6 min-w-[320px]">
+        {/* Left Side Skeleton */}
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-200 dark:bg-slate-850" />
+          <div className="space-y-2">
+            <div className="h-6 w-20 bg-slate-200 dark:bg-slate-850 rounded-md" />
+            <div className="h-4 w-32 bg-slate-200 dark:bg-slate-850 rounded-md" />
+          </div>
+        </div>
+
+        {/* Middle Skeleton */}
+        <div className="flex flex-col items-center gap-2.5 w-full">
+          <div className="h-3 w-48 bg-slate-200 dark:bg-slate-850 rounded-md" />
+          <div className="flex items-center gap-2">
+            {[...Array(7)].map((_, i) => (
+              <div key={i} className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-slate-850" />
+            ))}
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -232,11 +289,13 @@ const StreaksWidget = () => {
               } else if (day.state === "sunday") {
                 bgClass = "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-100/50 dark:border-indigo-900/30 text-indigo-500";
                 icon = <Coffee className="w-3 h-3 text-indigo-500 absolute -top-1 -right-1" />;
+              } else if (day.isToday) {
+                bgClass = "bg-amber-500/5 dark:bg-amber-500/10 border-amber-500 border-2 text-slate-700 dark:text-slate-200 shadow-sm shadow-amber-500/5";
               }
 
               return (
                 <div key={idx} className="relative flex flex-col items-center gap-1">
-                  <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex flex-col items-center justify-center border font-bold text-xs sm:text-sm transition-all duration-300 ${bgClass} ${day.isToday ? "ring-2 ring-amber-500/50" : ""}`}>
+                  <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex flex-col items-center justify-center border font-bold text-xs sm:text-sm transition-all duration-300 ${bgClass}`}>
                     <span className="text-[9px] uppercase font-bold opacity-60">{day.name}</span>
                     <span className="leading-none mt-0.5">{day.date}</span>
                     {icon}
@@ -247,27 +306,15 @@ const StreaksWidget = () => {
           </div>
         </div>
 
-        {/* Right Side: Manual Trigger & Voucher Information */}
-        <div className="flex flex-col gap-3 min-w-[200px]">
-          <button
-            onClick={handleManualCheckIn}
-            disabled={actionLoading}
-            className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active:translate-y-0.5 ${streakData?.currentStreak > 0
-              ? "bg-slate-100 hover:bg-slate-200 dark:bg-[#002A5C] dark:hover:bg-[#003575] text-slate-700 dark:text-white"
-              : "bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-orange-500/10"
-              }`}
-          >
-            <Sparkles className="w-4 h-4" />
-            {streakData?.currentStreak > 0 ? "Active Today" : "Claim Daily Active Status"}
-          </button>
-
-          {activeVouchers.length > 0 && (
+        {/* Right Side: Voucher Information */}
+        {activeVouchers.length > 0 && (
+          <div className="flex flex-col gap-3 min-w-[200px]">
             <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 py-1.5 px-2.5 rounded-lg flex items-center gap-1.5 border border-emerald-500/20">
               <Gift className="w-3.5 h-3.5 animate-pulse" />
               <span>Available Vouchers: {activeVouchers.length}</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
       </div>
 
