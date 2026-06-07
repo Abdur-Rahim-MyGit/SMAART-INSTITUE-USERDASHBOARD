@@ -1,7 +1,7 @@
 {
-  "name": "smaart-minds-backend",
+  "name": "smaart-institute-backend",
   "version": "1.0.0",
-  "description": "SMAART Minds Backend API",
+  "description": "SMAART Institute Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

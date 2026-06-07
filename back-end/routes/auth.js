@@ -646,7 +646,9 @@ router.post('/login',
         email: user.email,
         gender: finalGender,
         role: userType === 'student' ? 'student' : (userType === 'teacher' ? 'teacher' : (userType === 'registration' ? 'student' : user.role)),
-        userType: userType
+        userType: userType,
+        lastLogin: user.lastLogin || null,
+        previousLogin: user.previousLogin || null
       };
 
       // Check if user has completed registration (exists in both students and registration collections)
@@ -928,12 +930,17 @@ router.post('/verify-login-otp', otpLimiter, async (req, res) => {
     // Update user with new session ID, expiry, and lastLogin timestamp
     // First, get the current lastLogin to store as previousLogin
     const currentUser = await UserModel.findById(user._id);
+    const now = new Date();
     await UserModel.findByIdAndUpdate(user._id, {
       currentSessionId: sessionId,
       sessionExpiresAt: sessionExpiresAt, // Hard 3-hour expiry wall
       previousLogin: currentUser?.lastLogin || null,
-      lastLogin: new Date()
+      lastLogin: now
     });
+
+    // Update returned user object with newly generated login timestamps
+    user.lastLogin = now;
+    user.previousLogin = currentUser?.lastLogin || null;
 
     // Re-issue JWT token with sessionId included — expires in 3 hours
     const token = jwt.sign(
@@ -1353,7 +1360,9 @@ router.post('/first-login-change-password', async (req, res) => {
           email: student.email,
           role: 'student',
           userType: 'student',
-          hasRegistration: true
+          hasRegistration: true,
+          lastLogin: new Date(),
+          previousLogin: student.lastLogin || null
         }
       });
     }
@@ -1419,7 +1428,9 @@ router.post('/first-login-change-password', async (req, res) => {
       hasRegistration: !!registration,
       mustChangePassword: false,   // SECURITY: Explicitly cleared so frontend guard doesn't fire
       isFirstLogin: true,          // Flag to trigger welcome/assessment flow
-      passwordJustChanged: true    // Used by frontend for smart routing
+      passwordJustChanged: true,   // Used by frontend for smart routing
+      lastLogin: student.lastLogin,
+      previousLogin: student.previousLogin || null
     };
 
     console.log(`[Auth] Student ${student.email} successfully changed password on first login`);

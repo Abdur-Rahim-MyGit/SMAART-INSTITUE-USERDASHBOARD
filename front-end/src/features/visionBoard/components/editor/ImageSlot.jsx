@@ -21,14 +21,28 @@ const ImageSlot = ({
   onImageRemove,
   snapEnabled,
   onGuideChange,
+  zoomLevel = 100,
 }) => {
   const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const dragStartRef = useRef({ x: 0, y: 0 });
   const [initialPinchDistance, setInitialPinchDistance] = useState(null);
   const [initialScale, setInitialScale] = useState(1);
   const [isTransforming, setIsTransforming] = useState(false);
   const [transformStart, setTransformStart] = useState(null);
+
+  const imageRef = useRef(image);
+  const zoomLevelRef = useRef(zoomLevel);
+  const snapEnabledRef = useRef(snapEnabled);
+  const onImageUpdateRef = useRef(onImageUpdate);
+  const onGuideChangeRef = useRef(onGuideChange);
+
+  // Sync refs on render
+  imageRef.current = image;
+  zoomLevelRef.current = zoomLevel;
+  snapEnabledRef.current = snapEnabled;
+  onImageUpdateRef.current = onImageUpdate;
+  onGuideChangeRef.current = onGuideChange;
 
   const gapPercent = gap / 6;
   const imageScale = Math.round((image?.scale || 1) * 100);
@@ -100,20 +114,21 @@ const ImageSlot = ({
   };
 
   const handleMouseDown = (event) => {
-    if (!image) {
+    if (!imageRef.current) {
       return;
     }
 
     const { clientX, clientY } = getClientCoords(event);
+    const zoomScale = zoomLevelRef.current / 100;
     setIsDragging(true);
-    setDragStart({
-      x: clientX - (image.position?.x || 0),
-      y: clientY - (image.position?.y || 0),
-    });
+    dragStartRef.current = {
+      x: (clientX / zoomScale) - (imageRef.current.position?.x || 0),
+      y: (clientY / zoomScale) - (imageRef.current.position?.y || 0),
+    };
   };
 
   const handleTouchStart = (event) => {
-    if (!image) {
+    if (!imageRef.current) {
       return;
     }
     event.stopPropagation();
@@ -121,20 +136,21 @@ const ImageSlot = ({
     if (event.touches.length === 2) {
       const distance = getTouchDistance(event.touches);
       setInitialPinchDistance(distance);
-      setInitialScale(image.scale || 1);
+      setInitialScale(imageRef.current.scale || 1);
       return;
     }
 
     const { clientX, clientY } = getClientCoords(event);
+    const zoomScale = zoomLevelRef.current / 100;
     setIsDragging(true);
-    setDragStart({
-      x: clientX - (image.position?.x || 0),
-      y: clientY - (image.position?.y || 0),
-    });
+    dragStartRef.current = {
+      x: (clientX / zoomScale) - (imageRef.current.position?.x || 0),
+      y: (clientY / zoomScale) - (imageRef.current.position?.y || 0),
+    };
   };
 
   const handleTransformStart = (event) => {
-    if (!image || isLocked || isHidden) {
+    if (!imageRef.current || imageRef.current.locked || imageRef.current.hidden) {
       return;
     }
     event.stopPropagation();
@@ -145,15 +161,15 @@ const ImageSlot = ({
 
     setIsTransforming(true);
     setTransformStart({
-      scale: image.scale || 1,
-      rotation: image.rotation || 0,
+      scale: imageRef.current.scale || 1,
+      rotation: imageRef.current.rotation || 0,
       angle: Math.atan2(clientY - center.y, clientX - center.x),
       distance: Math.max(Math.hypot(clientX - center.x, clientY - center.y), 24),
     });
   };
 
   useEffect(() => {
-    if (!image) {
+    if (!isDragging && !isTransforming) {
       return undefined;
     }
 
@@ -164,7 +180,7 @@ const ImageSlot = ({
         if (newDistance) {
           const scaleFactor = newDistance / initialPinchDistance;
           const newScale = Math.min(Math.max(initialScale * scaleFactor, 0.25), 4);
-          onImageUpdate(slot.id, { scale: newScale });
+          onImageUpdateRef.current(slot.id, { scale: newScale });
         }
         return;
       }
@@ -178,7 +194,7 @@ const ImageSlot = ({
         const nextDistance = Math.max(Math.hypot(clientX - center.x, clientY - center.y), 24);
         const rotationDelta = ((nextAngle - transformStart.angle) * 180) / Math.PI;
         const nextScale = Math.min(Math.max(transformStart.scale * (nextDistance / transformStart.distance), 0.25), 4);
-        onImageUpdate(slot.id, {
+        onImageUpdateRef.current(slot.id, {
           scale: Number(nextScale.toFixed(2)),
           rotation: Math.round(transformStart.rotation + rotationDelta),
         });
@@ -186,13 +202,15 @@ const ImageSlot = ({
       }
 
       if (isDragging && event.touches.length === 1) {
+        event.preventDefault();
         const { clientX, clientY } = getClientCoords(event);
-        const rawX = clientX - dragStart.x;
-        const rawY = clientY - dragStart.y;
-        const shouldSnapX = snapEnabled && Math.abs(rawX) < 12;
-        const shouldSnapY = snapEnabled && Math.abs(rawY) < 12;
-        onGuideChange?.({ vertical: shouldSnapX, horizontal: shouldSnapY, spacingX: null, spacingY: null });
-        onImageUpdate(slot.id, {
+        const zoomScale = zoomLevelRef.current / 100;
+        const rawX = (clientX / zoomScale) - dragStartRef.current.x;
+        const rawY = (clientY / zoomScale) - dragStartRef.current.y;
+        const shouldSnapX = snapEnabledRef.current && Math.abs(rawX) < 12;
+        const shouldSnapY = snapEnabledRef.current && Math.abs(rawY) < 12;
+        onGuideChangeRef.current?.({ vertical: shouldSnapX, horizontal: shouldSnapY, spacingX: null, spacingY: null });
+        onImageUpdateRef.current(slot.id, {
           position: {
             x: shouldSnapX ? 0 : rawX,
             y: shouldSnapY ? 0 : rawY,
@@ -209,7 +227,7 @@ const ImageSlot = ({
         const nextDistance = Math.max(Math.hypot(event.clientX - center.x, event.clientY - center.y), 24);
         const rotationDelta = ((nextAngle - transformStart.angle) * 180) / Math.PI;
         const nextScale = Math.min(Math.max(transformStart.scale * (nextDistance / transformStart.distance), 0.25), 4);
-        onImageUpdate(slot.id, {
+        onImageUpdateRef.current(slot.id, {
           scale: Number(nextScale.toFixed(2)),
           rotation: Math.round(transformStart.rotation + rotationDelta),
         });
@@ -220,13 +238,14 @@ const ImageSlot = ({
         return;
       }
 
-      const rawX = event.clientX - dragStart.x;
-      const rawY = event.clientY - dragStart.y;
-      const shouldSnapX = snapEnabled && Math.abs(rawX) < 12;
-      const shouldSnapY = snapEnabled && Math.abs(rawY) < 12;
-      onGuideChange?.({ vertical: shouldSnapX, horizontal: shouldSnapY, spacingX: null, spacingY: null });
+      const zoomScale = zoomLevelRef.current / 100;
+      const rawX = (event.clientX / zoomScale) - dragStartRef.current.x;
+      const rawY = (event.clientY / zoomScale) - dragStartRef.current.y;
+      const shouldSnapX = snapEnabledRef.current && Math.abs(rawX) < 12;
+      const shouldSnapY = snapEnabledRef.current && Math.abs(rawY) < 12;
+      onGuideChangeRef.current?.({ vertical: shouldSnapX, horizontal: shouldSnapY, spacingX: null, spacingY: null });
 
-      onImageUpdate(slot.id, {
+      onImageUpdateRef.current(slot.id, {
         position: {
           x: shouldSnapX ? 0 : rawX,
           y: shouldSnapY ? 0 : rawY,
@@ -239,7 +258,7 @@ const ImageSlot = ({
       setIsTransforming(false);
       setTransformStart(null);
       setInitialPinchDistance(null);
-      onGuideChange?.({ vertical: false, horizontal: false, spacingX: null, spacingY: null });
+      onGuideChangeRef.current?.({ vertical: false, horizontal: false, spacingX: null, spacingY: null });
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -256,15 +275,10 @@ const ImageSlot = ({
       window.removeEventListener("touchcancel", handleEnd);
     };
   }, [
-    dragStart,
-    image,
     initialPinchDistance,
     initialScale,
     isDragging,
     isTransforming,
-    onImageUpdate,
-    onGuideChange,
-    snapEnabled,
     slot.id,
     transformStart,
   ]);

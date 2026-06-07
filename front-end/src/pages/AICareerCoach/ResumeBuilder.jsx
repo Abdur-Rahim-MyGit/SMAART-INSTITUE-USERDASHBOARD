@@ -13,6 +13,8 @@ import {
     Award,
     Printer,
     Save,
+    Eye,
+    Check,
     Plus,
     Trash2,
     RefreshCw,
@@ -86,6 +88,216 @@ const ResumeWatermark = () => (
     </div>
 );
 
+const TemplateThumbnail = ({ type }) => {
+    if (type === 'classic') {
+        return (
+            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
+                <div className="flex flex-col items-center gap-1">
+                    <div className="w-20 h-2 bg-slate-900 rounded-full" />
+                    <div className="w-12 h-1 bg-slate-500 rounded-full" />
+                    <div className="w-32 h-1 bg-slate-300 rounded-full mt-1" />
+                </div>
+                <div className="flex flex-col gap-1 w-full">
+                    <div className="w-full h-0.5 bg-slate-300" />
+                    <div className="w-full flex gap-1">
+                        <div className="w-1/3 h-1 bg-slate-300 rounded" />
+                        <div className="w-2/3 h-1 bg-slate-200 rounded" />
+                    </div>
+                    <div className="w-5/6 h-1 bg-slate-200 rounded" />
+                </div>
+                <div className="w-full h-0.5 bg-slate-300 mt-1" />
+            </div>
+        );
+    }
+    if (type === 'modern') {
+        return (
+            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
+                <div className="flex gap-2">
+                    <div className="w-1.5 h-8 bg-blue-700 rounded-sm" />
+                    <div className="flex flex-col gap-1">
+                        <div className="w-24 h-2.5 bg-slate-900 rounded" />
+                        <div className="w-14 h-1.5 bg-blue-600 rounded" />
+                    </div>
+                </div>
+                <div className="flex flex-col gap-1 w-full pl-3 mt-1">
+                    <div className="w-16 h-1.5 bg-slate-800 rounded mb-1" />
+                    <div className="w-full flex gap-1">
+                        <div className="w-2 h-2 bg-blue-100 rounded-full" />
+                        <div className="w-4/5 h-1 bg-slate-350 rounded" />
+                    </div>
+                    <div className="w-full flex gap-1">
+                        <div className="w-2 h-2 bg-blue-100 rounded-full" />
+                        <div className="w-5/6 h-1 bg-slate-250 rounded" />
+                    </div>
+                </div>
+                <div className="w-full flex justify-between items-center pl-3 border-t border-slate-100 pt-1">
+                    <div className="w-12 h-1 bg-slate-300 rounded" />
+                    <div className="w-4 h-4 bg-slate-200 rounded-sm" />
+                </div>
+            </div>
+        );
+    }
+    if (type === 'executive') {
+        return (
+            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none">
+                <div className="flex flex-col items-center gap-1">
+                    <div className="w-24 h-2 bg-[#002147] rounded-full" />
+                    <div className="w-36 h-[1px] bg-slate-200" />
+                    <div className="w-20 h-1 bg-slate-400 rounded-full" />
+                    <div className="w-36 h-[1px] bg-slate-200" />
+                </div>
+                <div className="flex flex-col gap-1.5 w-full">
+                    <div className="w-20 h-1.5 bg-[#002147] rounded" />
+                    <div className="w-full flex gap-2">
+                        <div className="w-1/4 h-1 bg-slate-300 rounded" />
+                        <div className="w-3/4 h-1 bg-slate-200 rounded" />
+                    </div>
+                </div>
+                <div className="w-full flex justify-between items-center border-t border-[#002147]/20 pt-1">
+                    <div className="w-14 h-1 bg-slate-350 rounded" />
+                    <div className="w-4 h-4 bg-slate-200 rounded-sm" />
+                </div>
+            </div>
+        );
+    }
+    if (type === 'tech') {
+        return (
+            <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1.5 justify-between select-none pointer-events-none font-mono">
+                <div className="flex flex-col gap-0.5">
+                    <div className="w-20 h-2 bg-emerald-700 rounded-sm" />
+                    <div className="w-16 h-1.5 bg-slate-500 rounded-sm" />
+                </div>
+                <div className="flex flex-col gap-1 w-full mt-1">
+                    <div className="flex items-center gap-1">
+                        <span className="text-[7px] text-emerald-500 font-bold">//</span>
+                        <div className="w-12 h-1.5 bg-emerald-700 rounded-sm" />
+                    </div>
+                    <div className="w-full flex gap-1 pl-1">
+                        <span className="text-[6px] text-emerald-500 font-bold">&gt;</span>
+                        <div className="w-5/6 h-1 bg-slate-350 rounded-sm" />
+                    </div>
+                </div>
+                <div className="w-full flex gap-1 pl-1">
+                    <div className="px-1 py-0.5 bg-emerald-50 border border-emerald-100 rounded text-[5px] text-emerald-800">HTML</div>
+                    <div className="px-1 py-0.5 bg-emerald-50 border border-emerald-100 rounded text-[5px] text-emerald-800">CSS</div>
+                    <div className="px-1 py-0.5 bg-emerald-50 border border-emerald-100 rounded text-[5px] text-emerald-800">JS</div>
+                </div>
+            </div>
+        );
+    }
+    // academic
+    return (
+        <div className="w-full h-32 bg-white border border-slate-200 rounded p-3 flex flex-col gap-1 justify-between select-none pointer-events-none">
+            <div className="flex flex-col items-center">
+                <div className="w-24 h-2 bg-black rounded-full" />
+                <div className="w-14 h-1.5 bg-black rounded-full mt-0.5" />
+            </div>
+            <div className="flex flex-col gap-1 w-full mt-1">
+                <div className="w-16 h-1.5 bg-black rounded" />
+                <div className="w-full flex gap-1">
+                    <div className="w-1 h-1 bg-black rounded-full mt-[3px]" />
+                    <div className="w-full h-1 bg-slate-700 rounded" />
+                </div>
+                <div className="w-full flex gap-1">
+                    <div className="w-1 h-1 bg-black rounded-full mt-[3px]" />
+                    <div className="w-5/6 h-1 bg-slate-700 rounded" />
+                </div>
+            </div>
+            <div className="w-full h-[1px] bg-slate-350 mt-1" />
+        </div>
+    );
+};
+
+const templates = {
+    classic: {
+        id: 'classic',
+        name: 'Classic Professional',
+        desc: 'Traditional serif styling preferred by corporate, finance, and legal sectors.',
+        tag: 'Corporate & Finance',
+        fontFamily: '"Times New Roman", Times, serif',
+        titleClass: 'text-4xl font-bold uppercase tracking-tight text-black text-center',
+        subtitleClass: 'text-lg font-semibold text-gray-800 uppercase tracking-widest text-center mt-1',
+        contactClass: 'flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-3 text-[10.5px] text-gray-700 max-w-full',
+        sectionHeaderClass: 'text-[13px] font-bold text-black uppercase border-b-2 border-black pb-0.5 mb-2.5 tracking-wider',
+        sectionClass: 'mb-6',
+        bodyTextClass: 'text-gray-800 text-[11px] leading-normal',
+        bulletClass: 'text-gray-700 text-[11px] leading-normal mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0',
+        skillsClass: 'text-[11px] text-gray-700 space-y-1 px-1',
+        skillsLabelClass: 'font-bold text-black',
+        cardBg: 'from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 border-slate-205 dark:border-white/10'
+    },
+    modern: {
+        id: 'modern',
+        name: 'Modern Minimalist',
+        desc: 'Clean sans-serif typography and optimized spacing, perfect for tech and startups.',
+        tag: 'Tech & Startups',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        titleClass: 'text-3xl font-black tracking-tight text-slate-900 text-left border-l-4 border-[#1a3884] pl-3',
+        subtitleClass: 'text-md font-bold text-[#1a3884] uppercase tracking-wider text-left mt-1 pl-3',
+        contactClass: 'flex flex-wrap justify-start items-center gap-x-4 gap-y-1 mt-3 text-[10.5px] text-slate-600 pl-3',
+        sectionHeaderClass: 'text-[12px] font-extrabold text-slate-900 uppercase tracking-widest border-b border-slate-200 pb-1 mb-2.5 flex items-center gap-2',
+        sectionClass: 'mb-5',
+        bodyTextClass: 'text-slate-700 text-[11px] leading-relaxed',
+        bulletClass: 'text-slate-600 text-[11px] leading-relaxed mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'◦\'] before:absolute before:left-0 before:text-[#1a3884] before:font-bold',
+        skillsClass: 'flex flex-col gap-2 mt-1',
+        skillsLabelClass: 'font-bold text-slate-800 text-[11px] w-full mb-1',
+        skillsBadge: 'bg-slate-100 text-slate-850 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-slate-200',
+        cardBg: 'from-blue-50/50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10 border-blue-200/50 dark:border-blue-500/10'
+    },
+    executive: {
+        id: 'executive',
+        name: 'Executive Premium',
+        desc: 'Distinguished editorial styling with navy accents, tailored for senior roles.',
+        tag: 'Business & Management',
+        fontFamily: 'Georgia, serif',
+        titleClass: 'text-3xl font-bold tracking-tight text-[#002147] text-center italic',
+        subtitleClass: 'text-sm font-bold text-slate-600 uppercase tracking-widest text-center mt-1 border-t border-b border-slate-200 py-1 max-w-md mx-auto',
+        contactClass: 'flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-3 text-[10.5px] text-slate-700 max-w-full italic',
+        sectionHeaderClass: 'text-[13px] font-extrabold text-[#002147] uppercase border-b-2 border-[#002147]/30 pb-0.5 mb-2.5 tracking-wider',
+        sectionClass: 'mb-5',
+        bodyTextClass: 'text-slate-800 text-[11px] leading-normal',
+        bulletClass: 'text-slate-700 text-[11px] leading-normal mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'■\'] before:absolute before:left-0 before:text-[#002147] before:text-[8px] before:top-[2px]',
+        skillsClass: 'text-[11px] text-slate-700 space-y-1.5 px-1',
+        skillsLabelClass: 'font-bold text-[#002147]',
+        cardBg: 'from-amber-50/30 to-amber-100/20 dark:from-amber-950/10 dark:to-amber-900/5 border-amber-250/30 dark:border-amber-500/10'
+    },
+    tech: {
+        id: 'tech',
+        name: 'Tech Developer',
+        desc: 'Monospace skill elements and neat modern hierarchy for engineering and analyst roles.',
+        tag: 'Engineering & IT',
+        fontFamily: 'monospace, system-ui, sans-serif',
+        titleClass: 'text-3xl font-bold tracking-tight text-emerald-700 text-left uppercase',
+        subtitleClass: 'text-sm font-bold text-slate-500 tracking-wider text-left mt-0.5',
+        contactClass: 'flex flex-wrap justify-start items-center gap-x-4 gap-y-1 mt-2.5 text-[10px] text-slate-600 border-b border-slate-200 pb-3',
+        sectionHeaderClass: 'text-[12px] font-bold text-emerald-700 uppercase tracking-wider mb-2 flex items-center gap-1.5 before:content-[\'//\'] before:text-emerald-500',
+        sectionClass: 'mb-5',
+        bodyTextClass: 'text-slate-700 text-[11px] leading-relaxed',
+        bulletClass: 'text-slate-600 text-[11px] leading-relaxed mt-1 whitespace-pre-wrap pl-4 relative before:content-[\'>\'] before:absolute before:left-0 before:text-emerald-500 before:font-bold',
+        skillsClass: 'flex flex-col gap-2 mt-1',
+        skillsLabelClass: 'font-bold text-slate-800 text-[10px] uppercase w-full mt-1.5',
+        skillsBadge: 'bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-mono border border-emerald-200/50',
+        cardBg: 'from-emerald-50/50 to-emerald-100/30 dark:from-emerald-950/20 dark:to-emerald-900/10 border-emerald-200/50 dark:border-emerald-500/10'
+    },
+    academic: {
+        id: 'academic',
+        name: 'Academic Standard',
+        desc: 'High density format focusing purely on content length and traditional formatting.',
+        tag: 'Academic & Research',
+        fontFamily: 'Arial, Helvetica, sans-serif',
+        titleClass: 'text-3xl font-black text-black text-center uppercase tracking-normal',
+        subtitleClass: 'text-sm font-bold text-black uppercase tracking-wide text-center mt-0.5',
+        contactClass: 'flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-2 text-[10.5px] text-black max-w-full',
+        sectionHeaderClass: 'text-[12px] font-bold text-black uppercase border-b border-black pb-0.5 mb-2 tracking-wide',
+        sectionClass: 'mb-4',
+        bodyTextClass: 'text-black text-[10.5px] leading-normal',
+        bulletClass: 'text-black text-[10.5px] leading-normal mt-0.5 whitespace-pre-wrap pl-4 relative before:content-[\'•\'] before:absolute before:left-0',
+        skillsClass: 'text-[10.5px] text-black space-y-0.5 px-1',
+        skillsLabelClass: 'font-bold',
+        cardBg: 'from-gray-50 to-gray-150 dark:from-slate-800 dark:to-slate-850 border-slate-200 dark:border-white/10'
+    }
+};
+
 const ResumeBuilder = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -102,6 +314,8 @@ const ResumeBuilder = () => {
     const [verificationUrl, setVerificationUrl] = useState('');
     const [verificationQr, setVerificationQr] = useState('');
     const [studentId, setStudentId] = useState('');
+    const [selectedTemplate, setSelectedTemplate] = useState('classic');
+    const [isPreviewFullscreen, setIsPreviewFullscreen] = useState(false);
 
     const steps = [
         { id: 'personal', label: 'Profile', icon: User },
@@ -217,7 +431,7 @@ const ResumeBuilder = () => {
                         ...prev.personalInfo,
                         fullName: data.fullName || prev.personalInfo.fullName || '',
                         email: data.email || prev.personalInfo.email || '',
-                        phone: data.mobile || prev.personalInfo.phone || '',
+                        mobile: data.mobile || prev.personalInfo.mobile || '',
                         targetRole: data.targetRole || prev.personalInfo.targetRole || '',
                         location: reg.address ? `${reg.address.city || ''}, ${reg.address.state || ''}` : (data.location || prev.personalInfo.location || ''),
                     },
@@ -358,7 +572,7 @@ const ResumeBuilder = () => {
                         ...prev.personalInfo,
                         fullName: data.fullName || prev.personalInfo.fullName || '',
                         email: data.email || prev.personalInfo.email || '',
-                        phone: data.mobile || prev.personalInfo.phone || '',
+                        mobile: data.mobile || prev.personalInfo.mobile || '',
                         targetRole: data.targetRole || prev.personalInfo.targetRole || '',
                         location: reg.address ? `${reg.address.city || ''}, ${reg.address.state || ''}` : (data.location || prev.personalInfo.location || ''),
                     },
@@ -526,8 +740,8 @@ const ResumeBuilder = () => {
                 const retryMinutes = exportRes?.retryAfter || 60;
                 toast.error(
                     exportRes?.error ||
-                        exportRes?.message ||
-                        `Export limit reached. Try again in ${retryMinutes} minutes.`
+                    exportRes?.message ||
+                    `Export limit reached. Try again in ${retryMinutes} minutes.`
                 );
                 return;
             }
@@ -633,8 +847,164 @@ const ResumeBuilder = () => {
         };
     }, [currentStep, loading]);
 
+    const validateStep = (stepIndex) => {
+        const stepId = steps[stepIndex]?.id;
+        if (!stepId) return true;
+
+        if (stepId === 'personal') {
+            const info = resumeData.personalInfo || {};
+            const details = resumeData.personalDetails || {};
+            
+            if (!info.targetRole?.trim()) {
+                toast.error("Please enter your Target Role.");
+                return false;
+            }
+            if (!info.email?.trim()) {
+                toast.error("Please enter your Email Address.");
+                return false;
+            }
+            if (!info.mobile?.trim()) {
+                toast.error("Please enter your Mobile Number.");
+                return false;
+            }
+            if (!info.location?.trim()) {
+                toast.error("Please enter your Location.");
+                return false;
+            }
+            if (!info.linkedinUrl?.trim()) {
+                toast.error("Please enter your LinkedIn URL.");
+                return false;
+            }
+            if (!info.githubUrl?.trim()) {
+                toast.error("Please enter your GitHub URL.");
+                return false;
+            }
+
+            if (!resumeData.summary?.trim()) {
+                toast.error("Please enter a Professional Summary.");
+                return false;
+            }
+        }
+
+        if (stepId === 'education') {
+            if (!resumeData.education || resumeData.education.length === 0) {
+                toast.error("Please add at least one Education entry.");
+                return false;
+            }
+            for (let i = 0; i < resumeData.education.length; i++) {
+                const edu = resumeData.education[i];
+                if (!edu.institution?.trim()) {
+                    toast.error(`Please enter Institution Name for Education entry #${i + 1}.`);
+                    return false;
+                }
+                if (!edu.degree?.trim()) {
+                    toast.error(`Please enter Degree for Education entry #${i + 1}.`);
+                    return false;
+                }
+                if (!edu.year?.trim()) {
+                    toast.error(`Please enter Year of Passing for Education entry #${i + 1}.`);
+                    return false;
+                }
+                if (!edu.grade?.trim()) {
+                    toast.error(`Please enter Grade / CGPA for Education entry #${i + 1}.`);
+                    return false;
+                }
+                if (!edu.location?.trim()) {
+                    toast.error(`Please enter Location for Education entry #${i + 1}.`);
+                    return false;
+                }
+            }
+        }
+
+        if (stepId === 'experience') {
+            for (let i = 0; i < resumeData.experience.length; i++) {
+                const exp = resumeData.experience[i];
+                if (!exp.company?.trim()) {
+                    toast.error(`Please enter Company Name for Experience entry #${i + 1}.`);
+                    return false;
+                }
+                if (!exp.role?.trim()) {
+                    toast.error(`Please enter Role / Position for Experience entry #${i + 1}.`);
+                    return false;
+                }
+                if (!exp.duration?.trim()) {
+                    toast.error(`Please enter Duration for Experience entry #${i + 1}.`);
+                    return false;
+                }
+                if (!exp.description?.trim()) {
+                    toast.error(`Please enter Description for Experience entry #${i + 1}.`);
+                    return false;
+                }
+            }
+        }
+
+        if (stepId === 'projects') {
+            if (!resumeData.projects || resumeData.projects.length === 0) {
+                toast.error("Please add at least one Project.");
+                return false;
+            }
+            for (let i = 0; i < resumeData.projects.length; i++) {
+                const proj = resumeData.projects[i];
+                if (!proj.title?.trim()) {
+                    toast.error(`Please enter Title for Project entry #${i + 1}.`);
+                    return false;
+                }
+                if (!proj.description?.trim()) {
+                    toast.error(`Please enter Description for Project entry #${i + 1}.`);
+                    return false;
+                }
+            }
+        }
+
+        if (stepId === 'skills') {
+            const skills = resumeData.skills || {};
+            if (!skills.technical?.trim()) {
+                toast.error("Please enter Technical Skills.");
+                return false;
+            }
+            if (!skills.soft?.trim()) {
+                toast.error("Please enter Soft Skills.");
+                return false;
+            }
+            if (!skills.languages?.trim()) {
+                toast.error("Please enter Languages.");
+                return false;
+            }
+        }
+
+        if (stepId === 'achievements') {
+            for (let i = 0; i < resumeData.achievements.length; i++) {
+                const ach = resumeData.achievements[i];
+                if (!ach.title?.trim()) {
+                    toast.error(`Please enter Title for Award entry #${i + 1}.`);
+                    return false;
+                }
+                if (!ach.description?.trim()) {
+                    toast.error(`Please enter Description for Award entry #${i + 1}.`);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    };
+
+    const handleStepClick = (idx) => {
+        if (idx <= currentStep) {
+            setCurrentStep(idx);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            for (let s = currentStep; s < idx; s++) {
+                if (!validateStep(s)) return;
+            }
+            setCurrentStep(idx);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
+            if (!validateStep(currentStep)) return;
             setCurrentStep(currentStep + 1);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -649,7 +1019,7 @@ const ResumeBuilder = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen w-full flex items-center justify-center bg-[#F8FAFC] dark:bg-[#00152E]">
+            <div className="h-full w-full flex items-center justify-center bg-[#F8FAFC] dark:bg-[#00152E]">
                 <div className="flex flex-col items-center gap-4">
                     <div className="relative w-16 h-16">
                         <div className="absolute inset-0 rounded-full border-4 border-blue-500/20"></div>
@@ -662,9 +1032,9 @@ const ResumeBuilder = () => {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-blue-500/30 selection:text-blue-200">
+        <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-[#00152E] overflow-hidden font-sans selection:bg-blue-500/30 selection:text-blue-200">
             {/* Header */}
-            <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-50 shrink-0 shadow-sm">
+            <header className="h-16 flex items-center justify-between px-6 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/8 z-30 shrink-0 shadow-sm">
                 <div className="flex items-center gap-4">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 dark:hover:bg-[#002A5C] rounded-2xl transition-all group text-slate-500 hover:text-slate-900 dark:hover:text-white">
                         <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
@@ -685,6 +1055,12 @@ const ResumeBuilder = () => {
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span className="text-[10px] font-bold tracking-wider uppercase">{resumePublicId || 'Secure Resume'}</span>
                     </div>
+                    {currentStep !== steps.length - 1 && (
+                        <button onClick={() => handleStepClick(steps.length - 1)} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-50 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-200 rounded-xl transition-all font-semibold text-xs border border-slate-200 dark:border-white/10 shadow-sm">
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Review</span>
+                        </button>
+                    )}
                     <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-50 dark:bg-[#002A5C] hover:bg-slate-100 dark:hover:bg-[#003575] text-slate-700 dark:text-slate-205 rounded-xl transition-all font-semibold text-xs border border-slate-200 dark:border-white/10 disabled:opacity-50 shadow-sm">
                         {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                         <span className="hidden sm:inline">Save Progress</span>
@@ -697,54 +1073,72 @@ const ResumeBuilder = () => {
                     )}
                 </div>
             </header>
-<main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+            <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
                 {/* Form Section */}
-                <section className={`flex-1 flex-col relative ${currentStep === steps.length - 1 ? 'hidden lg:flex lg:w-1/2' : 'flex w-full'}`}>
+                <section className={`flex-1 flex-col relative ${currentStep === steps.length - 1 ? 'hidden' : 'flex w-full'}`}>
                     <div className="flex-1 overflow-y-auto custom-scrollbar">
                         <div className="max-w-4xl mx-auto p-4 md:p-8 pb-10">
-                            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl px-5 py-3 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div className="flex items-center gap-3 shrink-0">
-                                    <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest shrink-0">Step {currentStep + 1} of {steps.length}</span>
-
-
+                            {/* Modern Responsive Stepper */}
+                            <div className="bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-3xl p-6 shadow-sm mb-8">
+                                <div className="flex items-center justify-between mb-4">
+                                    <span className="text-[11px] font-bold text-[#1a3884] dark:text-blue-400 uppercase tracking-widest">
+                                        Step {currentStep + 1} of {steps.length}
+                                    </span>
                                 </div>
+                                
+                                {/* Progress Bar / Stepper Track */}
+                                <div className="relative flex items-center justify-between w-full px-6 sm:px-16">
+                                    {/* Track line container */}
+                                    <div className="absolute left-10 sm:left-20 right-10 sm:right-20 top-1/2 -translate-y-1/2 h-1 -z-0">
+                                        {/* Background Track Line */}
+                                        <div className="absolute inset-0 bg-slate-100 dark:bg-slate-800/60 rounded-full" />
+                                        {/* Active Progress Line */}
+                                        <div 
+                                            className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-blue-500 to-[#1a3884] rounded-full transition-all duration-550 ease-in-out"
+                                            style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
+                                        />
+                                    </div>
 
-                                <div className="flex-1 min-w-0 flex items-center justify-start md:justify-end gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-                                    <AnimatePresence initial={false}>
-                                        {steps.slice(0, currentStep + 1).map((step, idx) => {
-                                            const Icon = step.icon;
-                                            const isActive = idx === currentStep;
-                                            const isCompleted = idx < currentStep;
-                                            return (
-                                                <motion.div
-                                                    key={step.id}
-                                                    initial={{ opacity: 0, x: 10, scale: 0.95 }}
-                                                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                                                    exit={{ opacity: 0, scale: 0.95 }}
-                                                    transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                                                    className="flex items-center shrink-0"
+                                    {steps.map((step, idx) => {
+                                        const Icon = step.icon;
+                                        const isActive = idx === currentStep;
+                                        const isCompleted = idx < currentStep;
+                                        
+                                        return (
+                                            <div key={step.id} className="relative z-10 flex flex-col items-center">
+                                                <button
+                                                    onClick={() => handleStepClick(idx)}
+                                                    className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                                                        isActive 
+                                                            ? 'bg-[#1a3884] text-white ring-4 ring-blue-500/20 scale-110 shadow-md shadow-blue-500/10'
+                                                            : isCompleted
+                                                                ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+                                                                : 'bg-white dark:bg-[#002147] text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 hover:border-slate-350 dark:hover:border-white/20'
+                                                    }`}
+                                                    title={step.label}
                                                 >
-                                                    <button
-                                                        onClick={() => setCurrentStep(idx)}
-                                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${
-                                                            isActive
-                                                                ? 'bg-[#1a3884] text-white shadow-md shadow-blue-500/10'
-                                                                : isCompleted
-                                                                ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100/50'
-                                                                : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                                                        }`}
-                                                    >
-                                                        <Icon className="w-3.5 h-3.5 shrink-0" />
-                                                        <span>{step.label}</span>
-                                                    </button>
-                                                    {idx < currentStep && (
-                                                        <div className="mx-1.5 h-[2px] w-3 rounded-full bg-emerald-300 dark:bg-emerald-500" />
+                                                    {isCompleted ? (
+                                                        <Check className="w-4 h-4" />
+                                                    ) : (
+                                                        <Icon className="w-4 h-4" />
                                                     )}
-                                                </motion.div>
-                                            );
-                                        })}
-                                    </AnimatePresence>
+                                                </button>
+                                                
+                                                {/* Step label - hidden on mobile to avoid layout crowding */}
+                                                <span className={`absolute top-11 text-[9.5px] font-bold uppercase tracking-wider whitespace-nowrap hidden sm:block transition-all duration-300 ${
+                                                    isActive 
+                                                        ? 'text-[#1a3884] dark:text-blue-400 font-extrabold scale-105'
+                                                        : isCompleted
+                                                            ? 'text-emerald-600 dark:text-emerald-450'
+                                                            : 'text-slate-400 dark:text-slate-500'
+                                                }`}>
+                                                    {step.label}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
+                                <div className="h-6 sm:h-8" aria-hidden="true" /> {/* spacing for labels */}
                             </div>
 
                             <div className="min-h-[400px]">
@@ -776,7 +1170,7 @@ const ResumeBuilder = () => {
                                                 <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Mobile Number</label>
                                                 <div className="relative">
                                                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                                    <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.phone} onChange={(e) => handleNestedChange('personalInfo', 'phone', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
+                                                    <input type="text" placeholder="+91 00000 00000" value={resumeData.personalInfo.mobile} onChange={(e) => handleNestedChange('personalInfo', 'mobile', e.target.value)} className="w-full pl-9 pr-3 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
                                                 </div>
                                             </div>
                                         </div>
@@ -804,27 +1198,7 @@ const ResumeBuilder = () => {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Father's Name</label>
-                                                <input type="text" placeholder="Father's Name" value={resumeData.personalDetails?.fatherName} onChange={(e) => handleNestedChange('personalDetails', 'fatherName', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                            </div>
-                                            <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Mother's Name</label>
-                                                <input type="text" placeholder="Mother's Name" value={resumeData.personalDetails?.motherName} onChange={(e) => handleNestedChange('personalDetails', 'motherName', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                            </div>
-                                        </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Date of Birth</label>
-                                                <input type="date" value={resumeData.personalDetails?.dob} onChange={(e) => handleNestedChange('personalDetails', 'dob', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                            </div>
-                                            <div className="group">
-                                                <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Nationality</label>
-                                                <input type="text" placeholder="Nationality" value={resumeData.personalDetails?.nationality} onChange={(e) => handleNestedChange('personalDetails', 'nationality', e.target.value)} className="w-full px-4 py-3 bg-white dark:bg-[#002147] border border-slate-200 dark:border-white/10 rounded-2xl outline-none focus:border-blue-500 dark:text-white transition-all text-sm font-medium shadow-sm" />
-                                            </div>
-                                        </div>
 
                                         <div className="group">
                                             <label className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Professional Summary</label>
@@ -1017,33 +1391,25 @@ const ResumeBuilder = () => {
                                                             <textarea placeholder="Provide some context about this achievement..." value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
                                                         </div>
                                                     </div>
-                                                    <div>
-                                                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1.5 uppercase tracking-wider">Description</label>
-                                                        <textarea placeholder="Provide some context about this achievement..." value={ach.description} onChange={(e) => handleArrayChange('achievements', idx, 'description', e.target.value)} className="w-full p-3 bg-[#F8FAFC] dark:bg-[#00152E] border border-slate-200 dark:border-white/10 rounded-2xl text-sm dark:text-white outline-none focus:border-blue-500 min-h-[60px] resize-none" rows={2}></textarea>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        ))}
-                                    </AnimatePresence>
-                                    <button onClick={() => addArrayItem('achievements', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-amber-500 hover:text-amber-500 transition-all">
-                                        <Plus className="w-5 h-5" /> Add Achievement
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                                                </motion.div>
+                                            ))}
+                                        </AnimatePresence>
+                                        <button onClick={() => addArrayItem('achievements', { title: '', link: '', description: '' })} className="w-full py-6 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 dark:text-slate-400 font-bold flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-slate-900 hover:border-amber-500 hover:text-amber-500 transition-all">
+                                            <Plus className="w-5 h-5" /> Add Achievement
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* Navigation buttons inside max-w-4xl card layout */}
                             <div className="flex justify-between items-center mt-8 pt-6 border-t border-slate-200 dark:border-white/10">
                                 <button
                                     onClick={prevStep}
                                     disabled={currentStep === 0}
-                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ${
-                                        currentStep === 0
-                                            ? 'text-slate-350 dark:text-slate-700 bg-slate-100/50 dark:bg-slate-800/20 cursor-not-allowed opacity-50'
-                                            : 'text-slate-700 dark:text-slate-300 bg-white dark:bg-[#002147] border border-slate-250 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-[#002A5C] hover:scale-[1.02] active:scale-95 shadow-sm'
-                                    }`}
+                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold transition-all duration-300 ${currentStep === 0
+                                        ? 'text-slate-350 dark:text-slate-700 bg-slate-100/50 dark:bg-slate-800/20 cursor-not-allowed opacity-50'
+                                        : 'text-slate-700 dark:text-slate-300 bg-white dark:bg-[#002147] border border-slate-250 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-[#002A5C] hover:scale-[1.02] active:scale-95 shadow-sm'
+                                        }`}
                                 >
                                     <ArrowLeft className="w-4 h-4" /> Previous
                                 </button>
@@ -1062,229 +1428,370 @@ const ResumeBuilder = () => {
                 {/* Preview Canvas (Shows on last step) */}
                 <section
                     ref={containerRef}
-                    className={`flex-1 flex flex-col overflow-hidden relative bg-slate-100 dark:bg-[#001a3d] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
+                    className={`flex-1 flex flex-col overflow-hidden relative bg-slate-50 dark:bg-[#001a3d] ${currentStep === steps.length - 1 ? 'flex' : 'hidden'}`}
                 >
-                    {/* Preview toolbar */}
-                    <div className="flex items-center justify-between px-5 py-2.5 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-sm">
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={prevStep}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200 dark:border-white/10"
-                            >
-                                <ArrowLeft className="w-3.5 h-3.5" /> Edit Details
-                            </button>
-                        </div>
-                        <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Preview</p>
-                        <div className="w-[88px]" />{/* spacer */}
-                    </div>
+                    {!isPreviewFullscreen ? (
+                        /* Layout Template Selector Dashboard */
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                            {/* Selector Header */}
+                            <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-sm">
+                                <button
+                                    onClick={prevStep}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-650 dark:text-slate-350 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                                >
+                                    <ArrowLeft className="w-3.5 h-3.5" /> Back to Edit Details
+                                </button>
+                                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-white">Choose A Template Style</h2>
+                                <div className="w-[130px]" />
+                            </div>
 
-                    {/* Scrollable canvas area */}
-                    <div className="flex-1 overflow-auto custom-scrollbar p-4 md:p-8">
-                        <div
-                            className="flex justify-center items-start w-full"
-                            style={{
-                                height: scale < 1 ? `${1122.5 * scale}px` : 'auto',
-                                overflow: 'hidden'
-                            }}
-                        >
-                            <div 
-                                id="resume-preview" 
-                                className="bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm" 
-                                style={{ 
-                                    fontFamily: '"Times New Roman", Times, serif',
-                                    transform: scale < 1 ? `scale(${scale})` : 'none',
-                                    transformOrigin: 'top center'
-                                }}
-                            >
-                                <ResumeWatermark />
+                            {/* Template Grid Scroll Area */}
+                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 flex flex-col items-center">
+                                <div className="text-center max-w-xl mb-8">
+                                    <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-2">
+                                        Select an ATS-Friendly Layout
+                                    </h1>
+                                    <p className="text-sm text-slate-600 dark:text-slate-405 leading-relaxed">
+                                        Our templates are professionally designed and engineered to pass applicant tracking systems (ATS). Select a style below to view your resume in full-screen and download.
+                                    </p>
+                                </div>
 
-                                <div className="relative z-10 text-left">
-                                    {/* Header Section */}
-                                    <div className="flex flex-col items-center text-center relative z-10 mb-6">
-                                        <h1 className="text-4xl font-bold !text-black m-0 leading-tight uppercase tracking-tight" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-                                            {resumeData.personalInfo.fullName || 'FIRST LAST'}
-                                        </h1>
-                                        <h2 className="text-lg font-semibold !text-gray-800 mt-1 uppercase tracking-widest">{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full">
+                                    {Object.values(templates).map((t) => (
+                                        <div
+                                            key={t.id}
+                                            className="group flex flex-col bg-white dark:bg-slate-900 border border-slate-205 dark:border-white/10 rounded-xl overflow-hidden hover:shadow-xl hover:border-slate-300 dark:hover:border-white/20 transition-all duration-300"
+                                        >
+                                            {/* Simulated Preview graphic */}
+                                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-white/5 flex items-center justify-center">
+                                                <TemplateThumbnail type={t.id} />
+                                            </div>
 
-                                        <div className="mt-4 w-full border border-slate-200 bg-slate-50/80 px-4 py-3 flex items-center justify-between gap-4 rounded-sm">
-                                            <div className="text-left min-w-0">
-                                                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
-                                                    <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
-                                                    {ORG_NAME} verified resume
+                                            {/* Details */}
+                                            <div className="p-5 flex-1 flex flex-col justify-between">
+                                                <div>
+                                                    <div className="flex items-center justify-between gap-2 mb-2">
+                                                        <h3 className="font-bold text-slate-900 dark:text-white text-base">
+                                                            {t.name}
+                                                        </h3>
+                                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 text-[#1a3884] dark:text-blue-300 whitespace-nowrap">
+                                                            {t.tag}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                                                        {t.desc}
+                                                    </p>
                                                 </div>
-                                                <p className="mt-1.5 text-[10px] !text-slate-650">
-                                                    ID: <span className="font-semibold !text-black">{resumePublicId}</span>
+
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedTemplate(t.id);
+                                                        setIsPreviewFullscreen(true);
+                                                    }}
+                                                    className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-[#1a3884] hover:bg-[#152e6c] text-white font-semibold rounded-lg text-xs transition-all shadow-md group-hover:scale-[1.02]"
+                                                >
+                                                    <Eye className="w-3.5 h-3.5" /> Preview & Select
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        /* Full Screen Interactive Preview */
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                            {/* Toolbar with navigation and controls */}
+                            <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 bg-white dark:bg-[#002147] border-b border-slate-200 dark:border-white/10 shrink-0 shadow-md">
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setIsPreviewFullscreen(false)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold text-slate-650 dark:text-slate-355 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-all border border-slate-200 dark:border-white/10"
+                                    >
+                                        <ArrowLeft className="w-3.5 h-3.5" /> All Styles
+                                    </button>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                        Style:
+                                    </label>
+                                    <select
+                                        value={selectedTemplate}
+                                        onChange={(e) => setSelectedTemplate(e.target.value)}
+                                        className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-850 dark:text-white text-xs font-semibold rounded-lg py-1.5 px-3 outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                                    >
+                                        {Object.values(templates).map((t) => (
+                                            <option key={t.id} value={t.id}>
+                                                {t.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={handleDownloadPDF}
+                                        disabled={generating}
+                                        className="flex items-center justify-center gap-1.5 px-4 py-1.5 bg-[#1a3884] hover:bg-[#152e6c] disabled:bg-slate-400 text-white font-semibold rounded-lg text-xs transition-all shadow-md"
+                                    >
+                                        {generating ? (
+                                            <>
+                                                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Download className="w-3.5 h-3.5" /> Download PDF
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Scrollable canvas area */}
+                            <div className="flex-1 overflow-auto custom-scrollbar p-4 md:p-8">
+                                <div
+                                    className="flex justify-center items-start w-full"
+                                    style={{
+                                        height: scale < 1 ? `${1122.5 * scale}px` : 'auto',
+                                        overflow: 'hidden'
+                                    }}
+                                >
+                                    <div
+                                        id="resume-preview"
+                                        className="bg-white w-[210mm] min-h-[297mm] shadow-[0_20px_60px_rgba(0,0,0,0.15)] ring-1 ring-slate-900/5 p-[15mm] shrink-0 text-black text-[12px] leading-snug relative rounded-sm"
+                                        style={{
+                                            fontFamily: templates[selectedTemplate]?.fontFamily || '"Times New Roman", Times, serif',
+                                            transform: scale < 1 ? `scale(${scale})` : 'none',
+                                            transformOrigin: 'top center'
+                                        }}
+                                    >
+                                        <ResumeWatermark />
+
+                                        <div className="relative z-10 text-left">
+                                            {/* Header Section */}
+                                            <div className={(selectedTemplate === 'modern' || selectedTemplate === 'tech') ? 'flex flex-col items-start text-left relative z-10 mb-5 w-full' : 'flex flex-col items-center text-center relative z-10 mb-6 w-full'}>
+                                                <h1 className={templates[selectedTemplate]?.titleClass} style={{ fontFamily: templates[selectedTemplate]?.fontFamily }}>
+                                                    {resumeData.personalInfo.fullName || 'FIRST LAST'}
+                                                </h1>
+                                                <h2 className={templates[selectedTemplate]?.subtitleClass}>{resumeData.personalInfo.targetRole || 'Professional Title'}</h2>
+
+                                                <div className={templates[selectedTemplate]?.contactClass}>
+                                                    {resumeData.personalInfo.mobile && (
+                                                        <span className="flex items-center gap-1">
+                                                            <Phone className="w-[10px] h-[10px] shrink-0" />
+                                                            {resumeData.personalInfo.mobile}
+                                                        </span>
+                                                    )}
+                                                    {resumeData.personalInfo.email && (
+                                                        <span className="flex items-center gap-1">
+                                                            <Mail className="w-[10px] h-[10px] shrink-0" />
+                                                            {resumeData.personalInfo.email}
+                                                        </span>
+                                                    )}
+                                                    {resumeData.personalInfo.location && (
+                                                        <span className="flex items-center gap-1">
+                                                            <MapPinIcon className="w-[10px] h-[10px] shrink-0" />
+                                                            {resumeData.personalInfo.location}
+                                                        </span>
+                                                    )}
+                                                    {resumeData.personalInfo.linkedinUrl && (
+                                                        <span className="flex items-center gap-1">
+                                                            <Linkedin className="w-[10px] h-[10px] shrink-0" />
+                                                            {resumeData.personalInfo.linkedinUrl}
+                                                        </span>
+                                                    )}
+                                                    {resumeData.personalInfo.githubUrl && (
+                                                        <span className="flex items-center gap-1">
+                                                            <Github className="w-[10px] h-[10px] shrink-0" />
+                                                            {resumeData.personalInfo.githubUrl}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-6">
+                                                {/* Summary */}
+                                                {resumeData.summary && (
+                                                    <section>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Professional Summary</h3>
+                                                        <p className={`${templates[selectedTemplate]?.bodyTextClass} whitespace-pre-wrap`}>
+                                                            {resumeData.summary}
+                                                        </p>
+                                                    </section>
+                                                )}
+
+                                                {/* Education */}
+                                                {resumeData.education.length > 0 && (
+                                                    <div className={templates[selectedTemplate]?.sectionClass}>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Education</h3>
+                                                        <div className="space-y-3">
+                                                            {resumeData.education.map((edu, idx) => (
+                                                                <div key={idx} className="flex justify-between items-start">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="font-bold text-[13px] !text-black">{edu.institution}</span>
+                                                                        <span className="text-[12px] !text-gray-800">{edu.degree}</span>
+                                                                    </div>
+                                                                    <div className="flex flex-col items-end text-[11px] !text-gray-700">
+                                                                        <span className="font-semibold">{edu.year}</span>
+                                                                        <span>{edu.grade || edu.score}</span>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Experience */}
+                                                {resumeData.experience.length > 0 && (
+                                                    <div className={templates[selectedTemplate]?.sectionClass}>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Professional Experience</h3>
+                                                        <div className="space-y-4">
+                                                            {resumeData.experience.map((exp, idx) => (
+                                                                <div key={idx} className="flex flex-col">
+                                                                    <div className="flex justify-between items-start">
+                                                                        <span className="font-bold text-[13px] !text-black">{exp.role}</span>
+                                                                        <span className="text-[11px] font-semibold !text-gray-700">{exp.duration}</span>
+                                                                    </div>
+                                                                    <span className="text-[12px] font-medium !text-gray-800 italic">{exp.company}</span>
+                                                                    <p className={`${templates[selectedTemplate]?.bodyTextClass} mt-1.5 leading-relaxed text-justify`}>{exp.description}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Projects */}
+                                                {resumeData.projects.length > 0 && (
+                                                    <section>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Projects</h3>
+                                                        <div className="space-y-3">
+                                                            {resumeData.projects.map((proj, i) => (
+                                                                <div key={i}>
+                                                                    <div className="flex justify-between items-baseline">
+                                                                        <span className="font-bold text-[13px] !text-black">{proj.title}</span>
+                                                                        {proj.link && <span className="block italic text-blue-800 underline mt-0.5">{proj.link}</span>}
+                                                                    </div>
+                                                                    <p className={templates[selectedTemplate]?.bulletClass}>
+                                                                        {proj.description}
+                                                                    </p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </section>
+                                                )}
+
+                                                {/* Technical Skills */}
+                                                {(resumeData.skills.technical || resumeData.skills.soft || resumeData.skills.languages) && (
+                                                    <section>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Skills</h3>
+                                                        <div className={templates[selectedTemplate]?.skillsClass || "text-[11px] space-y-1 px-1 !text-gray-700"}>
+                                                            {resumeData.skills.technical && (
+                                                                <div>
+                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>Technical Skills:</span>{' '}
+                                                                    {templates[selectedTemplate]?.skillsBadge ? (
+                                                                        <span className="flex flex-wrap gap-1 mt-1">
+                                                                            {resumeData.skills.technical.split(',').map((s, i) => (
+                                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
+                                                                                    {s.trim()}
+                                                                                </span>
+                                                                            ))}
+                                                                        </span>
+                                                                    ) : (
+                                                                        resumeData.skills.technical
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            {resumeData.skills.soft && (
+                                                                <div className="mt-1">
+                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>Soft Skills:</span>{' '}
+                                                                    {templates[selectedTemplate]?.skillsBadge ? (
+                                                                        <span className="flex flex-wrap gap-1 mt-1">
+                                                                            {resumeData.skills.soft.split(',').map((s, i) => (
+                                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
+                                                                                    {s.trim()}
+                                                                                </span>
+                                                                            ))}
+                                                                        </span>
+                                                                    ) : (
+                                                                        resumeData.skills.soft
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            {resumeData.skills.languages && (
+                                                                <div className="mt-1">
+                                                                    <span className={templates[selectedTemplate]?.skillsLabelClass}>Languages:</span>{' '}
+                                                                    {templates[selectedTemplate]?.skillsBadge ? (
+                                                                        <span className="flex flex-wrap gap-1 mt-1">
+                                                                            {resumeData.skills.languages.split(',').map((s, i) => (
+                                                                                <span key={i} className={templates[selectedTemplate]?.skillsBadge}>
+                                                                                    {s.trim()}
+                                                                                </span>
+                                                                            ))}
+                                                                        </span>
+                                                                    ) : (
+                                                                        resumeData.skills.languages
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </section>
+                                                )}
+
+                                                {/* Achievements */}
+                                                {resumeData.achievements.length > 0 && (
+                                                    <section>
+                                                        <h3 className={templates[selectedTemplate]?.sectionHeaderClass}>Achievements</h3>
+                                                        <div className="space-y-2">
+                                                            {resumeData.achievements.map((ach, i) => (
+                                                                <div key={i} className="text-[11px]">
+                                                                    <div className="flex justify-between items-baseline">
+                                                                        <span className="font-bold !text-black">{ach.title}</span>
+                                                                        {ach.link && <span className="italic text-blue-800 underline text-[10px] ml-2">{ach.link}</span>}
+                                                                    </div>
+                                                                    <p className={`italic ${templates[selectedTemplate]?.bodyTextClass}`}>{ach.description}</p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </section>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Verification Footer absolutely pinned to the bottom of the A4 printed page */}
+                                        <div
+                                            className="absolute bottom-[15mm] left-[15mm] right-[15mm] pt-4 border-t border-gray-300 flex justify-between items-center gap-4 text-left z-20 bg-white"
+                                        >
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider !text-slate-700">
+                                                    <ShieldCheck className="w-3.5 h-3.5 text-[#1a3884]" />
+                                                    {ORG_NAME} Verified Resume
+                                                </div>
+                                                <p className="mt-1 text-[9.5px] !text-gray-600">
+                                                    Document ID: <span className="font-semibold !text-black">{resumePublicId || 'Pending'}</span>
+                                                    {studentId && (
+                                                        <> &bull; Student ID: <span className="font-semibold !text-black">{studentId}</span></>
+                                                    )}
                                                 </p>
-                                                <p className="text-[9px] !text-slate-500 mt-0.5">Scan QR to verify authenticity</p>
+                                                <p className="text-[8.5px] !text-gray-500 mt-0.5">Scan the QR code to verify the authenticity of this document online.</p>
                                             </div>
                                             {verificationQr ? (
                                                 <img
                                                     src={verificationQr}
                                                     alt="Resume verification QR code"
-                                                    className="w-14 h-14 border border-slate-200 bg-white p-1 shrink-0"
+                                                    className="w-12 h-12 border border-slate-200 bg-white p-0.5 shrink-0"
                                                 />
                                             ) : (
-                                                <div className="w-14 h-14 border border-slate-200 bg-white flex items-center justify-center shrink-0">
-                                                    <QrCode className="w-7 h-7 text-slate-400" />
+                                                <div className="w-12 h-12 border border-slate-200 bg-white flex items-center justify-center shrink-0">
+                                                    <QrCode className="w-6 h-6 text-slate-400" />
                                                 </div>
                                             )}
                                         </div>
-
-                                        <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-1 mt-3 text-[10.5px] !text-gray-700 max-w-full">
-                                            {resumeData.personalInfo.phone && (
-                                                <span className="flex items-center gap-1">
-                                                    <Phone className="w-[10px] h-[10px] shrink-0" />
-                                                    {resumeData.personalInfo.phone}
-                                                </span>
-                                            )}
-                                            {resumeData.personalInfo.email && (
-                                                <span className="flex items-center gap-1">
-                                                    <Mail className="w-[10px] h-[10px] shrink-0" />
-                                                    {resumeData.personalInfo.email}
-                                                </span>
-                                            )}
-                                            {resumeData.personalInfo.location && (
-                                                <span className="flex items-center gap-1">
-                                                    <MapPinIcon className="w-[10px] h-[10px] shrink-0" />
-                                                    {resumeData.personalInfo.location}
-                                                </span>
-                                            )}
-                                            {resumeData.personalInfo.linkedinUrl && (
-                                                <span className="flex items-center gap-1">
-                                                    <Linkedin className="w-[10px] h-[10px] shrink-0" />
-                                                    {resumeData.personalInfo.linkedinUrl}
-                                                </span>
-                                            )}
-                                            {resumeData.personalInfo.githubUrl && (
-                                                <span className="flex items-center gap-1">
-                                                    <Github className="w-[10px] h-[10px] shrink-0" />
-                                                    {resumeData.personalInfo.githubUrl}
-                                                </span>
-                                            )}
-                                        </div>
                                     </div>
-
-                                    <div className="space-y-6">
-                                        {/* Summary */}
-                                        {resumeData.summary && (
-                                            <section>
-                                                <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Professional Summary</h3>
-                                                <p className="!text-gray-800 text-[11px] leading-normal whitespace-pre-wrap">
-                                                    {resumeData.summary}
-                                                </p>
-                                            </section>
-                                        )}
-
-                                        {/* Education */}
-                                        {resumeData.education.length > 0 && (
-                                            <div className="mb-6">
-                                                <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Education</h3>
-                                                <div className="space-y-3">
-                                                    {resumeData.education.map((edu, idx) => (
-                                                        <div key={idx} className="flex justify-between items-start">
-                                                            <div className="flex flex-col">
-                                                                <span className="font-bold text-[13px] !text-black">{edu.institution}</span>
-                                                                <span className="text-[12px] !text-gray-800">{edu.degree}</span>
-                                                            </div>
-                                                            <div className="flex flex-col items-end text-[11px] !text-gray-700">
-                                                                <span className="font-semibold">{edu.year}</span>
-                                                                <span>{edu.grade || edu.score}</span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Experience */}
-                                        {resumeData.experience.length > 0 && (
-                                            <div className="mb-6">
-                                                <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Professional Experience</h3>
-                                                <div className="space-y-4">
-                                                    {resumeData.experience.map((exp, idx) => (
-                                                        <div key={idx} className="flex flex-col">
-                                                            <div className="flex justify-between items-start">
-                                                                <span className="font-bold text-[13px] !text-black">{exp.role}</span>
-                                                                <span className="text-[11px] font-semibold !text-gray-700">{exp.duration}</span>
-                                                            </div>
-                                                            <span className="text-[12px] font-medium !text-gray-800 italic">{exp.company}</span>
-                                                            <p className="text-[11px] !text-gray-700 mt-1.5 leading-relaxed text-justify">{exp.description}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Projects */}
-                                        {resumeData.projects.length > 0 && (
-                                            <section>
-                                                <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Projects</h3>
-                                                <div className="space-y-3">
-                                                    {resumeData.projects.map((proj, i) => (
-                                                        <div key={i}>
-                                                            <div className="flex justify-between items-baseline">
-                                                                <span className="font-bold text-[13px] !text-black">{proj.title}</span>
-                                                                {proj.link && <span className="block italic text-blue-800 underline mt-0.5">{proj.link}</span>}
-                                                            </div>
-                                                            <p className="!text-gray-700 text-[11px] leading-normal mt-1 whitespace-pre-wrap pl-4 relative before:content-['•'] before:absolute before:left-0">
-                                                                {proj.description}
-                                                            </p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </section>
-                                        )}
-
-                                        {/* Technical Skills */}
-                                        {(resumeData.skills.technical || resumeData.skills.soft || resumeData.skills.languages) && (
-                                            <section>
-                                                <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Skills</h3>
-                                                <div className="text-[11px] space-y-1 px-1 !text-gray-700">
-                                                    {resumeData.skills.technical && (
-                                                        <div><span className="font-bold !text-black">Technical Skills:</span> {resumeData.skills.technical}</div>
-                                                    )}
-                                                    {resumeData.skills.soft && (
-                                                        <div><span className="font-bold !text-black">Soft Skills:</span> {resumeData.skills.soft}</div>
-                                                    )}
-                                                    {resumeData.skills.languages && (
-                                                        <div><span className="font-bold !text-black">Languages:</span> {resumeData.skills.languages}</div>
-                                                    )}
-                                                </div>
-                                            </section>
-                                        )}
-
-                                        {/* Achievements */}
-                                        {resumeData.achievements.length > 0 && (
-                                            <section>
-                                                <h3 className="text-[13px] font-bold !text-black uppercase border-b-2 border-black pb-0.5 mb-1.5 tracking-wider">Achievements</h3>
-                                                <div className="space-y-2">
-                                                    {resumeData.achievements.map((ach, i) => (
-                                                        <div key={i} className="text-[11px]">
-                                                            <div className="flex justify-between items-baseline">
-                                                                <span className="font-bold !text-black">{ach.title}</span>
-                                                                {ach.link && <span className="italic text-blue-800 underline text-[10px] ml-2">{ach.link}</span>}
-                                                            </div>
-                                                            <p className="italic !text-gray-700">{ach.description}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </section>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Preview-only footer — pinned to bottom of A4, hidden during html2canvas PDF capture */}
-                                <div
-                                    data-html2canvas-ignore="true"
-                                    className="absolute bottom-[10mm] left-[15mm] right-[15mm] pt-2 border-t border-slate-200"
-                                >
-                                    <p className="text-center text-[8px] !text-slate-400 tracking-wide">
-                                        {ORG_NAME} &middot; Verified Securely{studentId ? ` \u00b7 STU ID: ${studentId}` : ''} &middot; {resumePublicId || 'Document ID pending'}
-                                    </p>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </section>
             </main>
         </div>

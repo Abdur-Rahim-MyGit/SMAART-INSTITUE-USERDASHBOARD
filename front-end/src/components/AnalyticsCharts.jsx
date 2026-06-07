@@ -102,7 +102,10 @@ export const StudentAnalyticsView = () => {
     visionBoards = [], 
     finalPathway = null, 
     careerAnalyses = [],
-    userProgress = []
+    userProgress = [],
+    resumes = [],
+    notes = [],
+    stageResults = []
   } = data;
 
   const getFriendlyDate = (dateStr) => {
@@ -573,8 +576,116 @@ export const StudentAnalyticsView = () => {
       });
     }
   });
+  // Track Community page visits for events
+  const communityVisitsKey = `smaart_visits_${user?._id || user?.id || 'guest'}_community`;
+  try {
+    const communityVisits = JSON.parse(localStorage.getItem(communityVisitsKey) || '[]');
+    communityVisits.forEach(ts => {
+      if (isSelectedDay(ts)) {
+        events.push({
+          type: 'community',
+          time: formatEventTime(ts),
+          title: 'Community Page',
+          detail: 'Visited community hub',
+          timestamp: new Date(ts)
+        });
+      }
+    });
+  } catch (e) {
+    console.warn('[Analytics] Failed parsing community visits', e);
+  }
 
-  events.sort((a, b) => a.timestamp - b.timestamp);
+  // Track Profile page visits for events
+  const profileVisitsKey = `smaart_visits_${user?._id || user?.id || 'guest'}_profile`;
+  try {
+    const profileVisits = JSON.parse(localStorage.getItem(profileVisitsKey) || '[]');
+    profileVisits.forEach(ts => {
+      if (isSelectedDay(ts)) {
+        events.push({
+          type: 'profile',
+          time: formatEventTime(ts),
+          title: 'Profile Page',
+          detail: 'Viewed or edited profile information',
+          timestamp: new Date(ts)
+        });
+      }
+    });
+  } catch (e) {
+    console.warn('[Analytics] Failed parsing profile visits', e);
+  }
+  // ── Session login/logout events ────────────────────────────────────────────
+  // Primary source: timestamps written to localStorage on actual login/logout
+  const sessionLogKey = `smaart_session_logs_${user?._id || user?.id || user?.email || 'guest'}`;
+  try {
+    const sessionLogs = JSON.parse(localStorage.getItem(sessionLogKey) || '[]');
+    sessionLogs.forEach(entry => {
+      if (!entry?.ts || !entry?.type) return;
+      if (!isSelectedDay(entry.ts)) return;
+      const entryTime = new Date(entry.ts);
+      const isDuplicate = events.some(
+        e => e.type === entry.type && Math.abs(e.timestamp.getTime() - entryTime.getTime()) < 60000
+      );
+      if (!isDuplicate) {
+        events.push({
+          type: entry.type, // 'login' | 'logout'
+          time: entryTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: entry.type === 'login'
+            ? (entry.ts.split('T')[0] === getTodayStr() ? 'Active Session Started (Login Logged)' : 'Session Started (Login Logged)')
+            : 'Session Ended (Logout Logged)',
+          detail: entry.type === 'login'
+            ? `Logged in — ${window.location.hostname === 'localhost' ? 'Local System' : 'SMAART Portal'}`
+            : 'Session closed and progress saved.',
+          timestamp: entryTime
+        });
+      }
+    });
+  } catch (e) {
+    console.warn('[Analytics] Failed reading session logs', e);
+  }
+
+  // Fallback: use user.lastLogin / user.previousLogin from the user object
+  if (user?.lastLogin) {
+    const lastLoginDateStr = new Date(user.lastLogin).toISOString().split('T')[0];
+    if (lastLoginDateStr === selectedDate) {
+      const hasLoginToday = events.some(e => e.type === 'login' && Math.abs(e.timestamp.getTime() - new Date(user.lastLogin).getTime()) < 60000);
+      if (!hasLoginToday) {
+        events.push({
+          type: 'login',
+          time: new Date(user.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: lastLoginDateStr === getTodayStr() ? 'Active Session Started (Login Logged)' : 'Session Started (Login Logged)',
+          detail: 'Logged in from ' + (window.location.hostname === 'localhost' ? 'Local System' : 'Portal IP'),
+          timestamp: new Date(user.lastLogin)
+        });
+      }
+    }
+  }
+
+  if (user?.previousLogin) {
+    const prevLoginDateStr = new Date(user.previousLogin).toISOString().split('T')[0];
+    if (prevLoginDateStr === selectedDate) {
+      const hasPrevLogin = events.some(e => e.type === 'login' && Math.abs(e.timestamp.getTime() - new Date(user.previousLogin).getTime()) < 60000);
+      if (!hasPrevLogin) {
+        events.push({
+          type: 'login',
+          time: new Date(user.previousLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: 'Previous Session Started (Login Logged)',
+          detail: 'Session initiated successfully.',
+          timestamp: new Date(user.previousLogin)
+        });
+
+        const logoutTime = new Date(new Date(user.previousLogin).getTime() + 60 * 60 * 1000);
+        events.push({
+          type: 'logout',
+          time: logoutTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          title: 'Previous Session Ended (Logout Logged)',
+          detail: 'User session closed successfully.',
+          timestamp: logoutTime
+        });
+      }
+    }
+  }
+
+  events.sort((a, b) => b.timestamp - a.timestamp);
   let activeCourses = Array.from(activeCoursesMap.values());
 
   // Dynamically calculate actual minutes spent or fallback to interpolated timeline hours
@@ -627,20 +738,9 @@ export const StudentAnalyticsView = () => {
     }];
   }
 
-  // Handle Today's active session display
-  const isTodaySelected = selectedDate === getTodayStr();
-  if (isTodaySelected && user?.lastLogin) {
-    const hasLoginToday = events.some(e => e.type === 'login' || e.title.includes('Session Started'));
-    if (!hasLoginToday) {
-      events.unshift({
-        type: 'login',
-        time: new Date(user.lastLogin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        title: 'Active Session Started (Login Logged)',
-        detail: 'Logged in from ' + (window.location.hostname === 'localhost' ? 'Local System' : 'Portal IP'),
-        timestamp: new Date(user.lastLogin)
-      });
-    }
-  }
+  // Ensure all events (including fallback/synthesized logs) are sorted newest first
+  events.sort((a, b) => b.timestamp - a.timestamp);
+
 
   // Streak status for selected date
   const isSunday = new Date(selectedDate).getDay() === 0;
@@ -683,6 +783,11 @@ export const StudentAnalyticsView = () => {
   let assessmentMins = 0;
   let visionBoardMins = 0;
   let careerDirectionMins = 0;
+  let resumeBuilderMins = 0;
+  let dictionaryMins = 0;
+  let notesMins = 0;
+  let interviewPrepMins = 0;
+  let skillPassportMins = 0;
 
   activeCourses.forEach(c => {
     if (c.timeSpent > 0) {
@@ -717,17 +822,67 @@ export const StudentAnalyticsView = () => {
     }
   });
 
-  // Fallback calculations if hours Spent > 0 but direct logs are missing (e.g. for mock logs simulation)
-  const totalMinsFromBreakdown = Array.from(courseTimeMap.values()).reduce((a, b) => a + b, 0) + assessmentMins + visionBoardMins + careerDirectionMins;
+  // Track Resume Builder activity
+  resumes.forEach(r => {
+    if (isSelectedDay(r.updatedAt) || isSelectedDay(r.createdAt)) {
+      resumeBuilderMins += 25;
+    }
+  });
+
+  // Track Notes activity
+  notes.forEach(n => {
+    if (isSelectedDay(n.updatedAt) || isSelectedDay(n.createdAt) || (n.lastUpdated && isSelectedDay(n.lastUpdated))) {
+      notesMins += 15;
+    }
+  });
+
+  // Track Skill Passport (StageResult) activity
+  stageResults.forEach(sr => {
+    if (isSelectedDay(sr.createdAt) || isSelectedDay(sr.updatedAt)) {
+      skillPassportMins += 25;
+    }
+  });
+
+  // Track Local Storage page-visits as fallback/immediate feedback
+  const getLocalVisitMins = (featureKey, defaultMins) => {
+    try {
+      const storageKey = `smaart_visits_${user?._id || user?.id || 'guest'}_${featureKey}`;
+      const visits = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      return visits.includes(selectedDate) ? defaultMins : 0;
+    } catch (e) {
+      return 0;
+    }
+  };
+
+  dictionaryMins += getLocalVisitMins('dictionary', 15);
+  interviewPrepMins += getLocalVisitMins('interview_prep', 20);
+
+  // Layer local storage on other tools as well
+  careerDirectionMins = Math.max(careerDirectionMins, getLocalVisitMins('career', 30));
+  visionBoardMins = Math.max(visionBoardMins, getLocalVisitMins('vision_board', 20));
+  resumeBuilderMins = Math.max(resumeBuilderMins, getLocalVisitMins('resume_builder', 25));
+  notesMins = Math.max(notesMins, getLocalVisitMins('notes', 15));
+  skillPassportMins = Math.max(skillPassportMins, getLocalVisitMins('skills_passport', 25));
+
+  // Fallback calculations if hours Spent > 0 but direct logs are missing (e.g., for mock logs simulation)
+  const totalMinsFromBreakdown = Array.from(courseTimeMap.values()).reduce((a, b) => a + b, 0) + 
+                                  assessmentMins + visionBoardMins + careerDirectionMins + 
+                                  resumeBuilderMins + dictionaryMins + notesMins + 
+                                  interviewPrepMins + skillPassportMins;
   if (totalMinsFromBreakdown === 0 && dailyHoursSpent > 0) {
     const totalFallbackMins = Math.round(dailyHoursSpent * 60);
     const primaryCourse = courses[0] || { course: { title: 'Assigned Course' } };
     const primaryTitle = primaryCourse.course?.title || 'Assigned Course';
     
-    courseTimeMap.set(primaryTitle, Math.round(totalFallbackMins * 0.5));
-    assessmentMins = Math.round(totalFallbackMins * 0.2);
-    visionBoardMins = Math.round(totalFallbackMins * 0.15);
-    careerDirectionMins = Math.round(totalFallbackMins * 0.15);
+    courseTimeMap.set(primaryTitle, Math.round(totalFallbackMins * 0.4));
+    assessmentMins = Math.round(totalFallbackMins * 0.1);
+    visionBoardMins = Math.round(totalFallbackMins * 0.1);
+    careerDirectionMins = Math.round(totalFallbackMins * 0.1);
+    resumeBuilderMins = Math.round(totalFallbackMins * 0.1);
+    dictionaryMins = Math.round(totalFallbackMins * 0.05);
+    notesMins = Math.round(totalFallbackMins * 0.05);
+    interviewPrepMins = Math.round(totalFallbackMins * 0.05);
+    skillPassportMins = Math.round(totalFallbackMins * 0.05);
   }
 
   const categoryBreakdown = [];
@@ -756,7 +911,7 @@ export const StudentAnalyticsView = () => {
 
   if (assessmentMins > 0) {
     categoryBreakdown.push({
-      label: 'Assessments Page',
+      label: 'Assessments',
       minutes: Math.round(assessmentMins),
       color: 'bg-amber-500',
       text: 'text-amber-500'
@@ -765,7 +920,7 @@ export const StudentAnalyticsView = () => {
 
   if (visionBoardMins > 0) {
     categoryBreakdown.push({
-      label: 'Vision Board Page',
+      label: 'Vision Board',
       minutes: Math.round(visionBoardMins),
       color: 'bg-emerald-500',
       text: 'text-emerald-500'
@@ -774,10 +929,55 @@ export const StudentAnalyticsView = () => {
 
   if (careerDirectionMins > 0) {
     categoryBreakdown.push({
-      label: 'Career Direction & Coach Page',
+      label: 'Career Direction & Coach',
       minutes: Math.round(careerDirectionMins),
       color: 'bg-purple-500',
       text: 'text-purple-500'
+    });
+  }
+
+  if (resumeBuilderMins > 0) {
+    categoryBreakdown.push({
+      label: 'Resume Builder',
+      minutes: Math.round(resumeBuilderMins),
+      color: 'bg-cyan-500',
+      text: 'text-cyan-500'
+    });
+  }
+
+  if (dictionaryMins > 0) {
+    categoryBreakdown.push({
+      label: 'General Dictionary',
+      minutes: Math.round(dictionaryMins),
+      color: 'bg-sky-600',
+      text: 'text-sky-600'
+    });
+  }
+
+  if (notesMins > 0) {
+    categoryBreakdown.push({
+      label: 'My Notes',
+      minutes: Math.round(notesMins),
+      color: 'bg-teal-500',
+      text: 'text-teal-500'
+    });
+  }
+
+  if (interviewPrepMins > 0) {
+    categoryBreakdown.push({
+      label: 'Interview Prep',
+      minutes: Math.round(interviewPrepMins),
+      color: 'bg-orange-500',
+      text: 'text-orange-500'
+    });
+  }
+
+  if (skillPassportMins > 0) {
+    categoryBreakdown.push({
+      label: 'Skill Passport',
+      minutes: Math.round(skillPassportMins),
+      color: 'bg-pink-500',
+      text: 'text-pink-500'
     });
   }
 

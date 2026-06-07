@@ -36,13 +36,13 @@ import ActivityWarningModal from "@/components/ActivityWarningModal";
 
 // Stage configuration map
 const STAGE_MAP = {
-  T1: { code: 'ASM00001', name: 'Baseline', title: 'Base Line Test', questionLimit: 36, durationMinutes: 45 },
-  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40 },
-  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36, durationMinutes: 45 },
-  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34, durationMinutes: 40 },
-  AIQ: { code: 'ASM00005', name: 'AIQ', title: 'AIQ Assessment', questionLimit: 36, durationMinutes: 45 },
-  SQ: { code: 'ASM00006', name: 'SQ', title: 'SQ Assessment', questionLimit: 36, durationMinutes: 45 },
-  PIQ: { code: 'ASM00007', name: 'PIQ', title: 'PIQ Assessment', questionLimit: 36, durationMinutes: 45 },
+  T1: { code: 'ASM00001', name: 'Baseline', title: 'Base Line Test', questionLimit: 36, durationMinutes: 45, maxAttempts: 1, passingPercentage: 0 },
+  T2: { code: 'ASM00002', name: 'Capacity', title: 'Capacity Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 70 },
+  T3: { code: 'ASM00003', name: 'Capability', title: 'Capability Test', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
+  T4: { code: 'ASM00004', name: 'Leadership', title: 'Leadership Test', questionLimit: 34, durationMinutes: 40, maxAttempts: 3, passingPercentage: 70 },
+  AIQ: { code: 'ASM00005', name: 'AIQ', title: 'AIQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
+  SQ: { code: 'ASM00006', name: 'SQ', title: 'SQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
+  PIQ: { code: 'ASM00007', name: 'PIQ', title: 'PIQ Assessment', questionLimit: 36, durationMinutes: 45, maxAttempts: 3, passingPercentage: 70 },
 };
 
 // Helper function to get band colors - MINIMAL MONOCHROME THEME
@@ -74,7 +74,8 @@ const quotientInfo = {
   LQ: { name: 'Learning Agility', fullName: 'Learning Agility Quotient', icon: <BookOpen className="w-8 h-8" />, desc: 'Adaptability & continuous learning' },
   SIQ: { name: 'Social Interaction', fullName: 'Social Interaction Quotient', icon: <Users className="w-8 h-8" />, desc: 'Collaboration, empathy & communication' },
   PEQ: { name: 'Professional Execution', fullName: 'Professional Execution Quotient', icon: <Briefcase className="w-8 h-8" />, desc: 'Work ethic, reliability & delivery' },
-  DAQ: { name: 'Digital & AI Literacy', fullName: 'Digital & AI Literacy Quotient', icon: <Monitor className="w-8 h-8" />, desc: 'Tech proficiency & AI readiness' }
+  DAQ: { name: 'Digital & AI Literacy', fullName: 'Digital & AI Literacy Quotient', icon: <Monitor className="w-8 h-8" />, desc: 'Tech proficiency & AI readiness' },
+  SEQ: { name: 'Social & Emotional', fullName: 'Social & Emotional Quotient', icon: <Sparkles className="w-8 h-8" />, desc: 'Emotional intelligence & social awareness' }
 };
 
 // Helper: Get feedback based on level (Simulated AI Response)
@@ -121,9 +122,16 @@ const getFeedback = (quotient, level) => {
       Progressing: "You are comfortable with standard tools but may hesitate with advanced tech or AI. Training in specific modern digital tools will boost your confidence.",
       Developing: "You might find new technology intimidating. You stick to what you know. Guided exploration of user-friendly AI tools can help demystify tech for you.",
       Emerging: "Digital literacy is a hurdle. You may avoid technology where possible. Fundamental training in digital basics is the first step."
+    },
+    SEQ: {
+      Advanced: "Exceptional emotional intelligence. You read social situations with depth and respond with empathy and grace. You inspire trust and build lasting connections effortlessly.",
+      Strong: "Strong emotional awareness and social skills. You manage interpersonal dynamics well and contribute positively to group cohesion. Others feel comfortable around you.",
+      Progressing: "You are developing your emotional intelligence. You understand basic social cues but may miss subtler emotional undertones. Practice mindfulness and active empathy.",
+      Developing: "You are beginning to understand your own emotions and their impact on others. Some social situations may feel confusing. Journaling and reflective exercises can help.",
+      Emerging: "Emotional awareness is a significant growth area. You may struggle to identify or manage emotions in yourself or others. Foundational SEQ training is recommended."
     }
   };
-  return feedbacks[quotient]?.[level] || "Analysis pending further data.";
+  return feedbacks[quotient]?.[level] || "Analysis pending further data.";  
 };
 
 // Download report function (PDF)
@@ -166,6 +174,8 @@ const BaseLineTest = () => {
   const [interactionLocked, setInteractionLocked] = useState(false);
   const [timeExpired, setTimeExpired] = useState(false);
   const [assessmentToken, setAssessmentToken] = useState(null); // Dedicated session JWT
+  // Attempt tracking for retry system (T2-T4+)
+  const [attemptInfo, setAttemptInfo] = useState({ attemptCount: 0, maxAttempts: stageConfig.maxAttempts || 3, hasPassed: false, locked: false, remainingAttempts: stageConfig.maxAttempts || 3, attempts: [] });
 
   const timerStartRef = useRef(null);
   const timeoutSubmitTriggeredRef = useRef(false);
@@ -235,7 +245,7 @@ const BaseLineTest = () => {
   const answeredCount = Object.keys(selectedAnswers).length;
   const progress = questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0;
   const isLastFiveMinutes = remainingSeconds <= 300;
-  const allQuestionsAnswered = questions.length > 0 && answeredCount === questions.length;
+  const allQuestionsAnswered = questions.length > 0 && questions.every(q => selectedAnswers[q._id]);
 
   const clearTimerPersistence = useCallback(() => {
     localStorage.removeItem(timerStartStorageKey);
@@ -282,6 +292,27 @@ const BaseLineTest = () => {
     );
   }, [questions, resultId, selectedAnswers]);
 
+  const handleRestartCourse = async () => {
+    try {
+      const userId = user?.id || user?._id;
+      if (!userId) return;
+
+      setLoading(true);
+      const res = await assessmentApi.restartStageCourse(userId, stageKey);
+      if (res.success) {
+        toast.success(t("baseline_test.course_restarted", "Course progress has been reset. You can now start the course again."));
+        navigate("/dashboard/courses");
+      } else {
+        toast.error(res.error || "Failed to restart course");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("Error restarting course:", err);
+      toast.error("Failed to restart course. Please try again.");
+      setLoading(false);
+    }
+  };
+
   // Check authentication and fetch assessment on mount
   useEffect(() => {
     const initializeAssessment = async () => {
@@ -309,23 +340,68 @@ const BaseLineTest = () => {
           throw new Error(t("baseline_test.error_id_not_found", "User ID not found. Please log in again."));
         }
 
-        // CRITICAL - If in report mode or if stage already completed, fetch results
-        console.log(`Checking for existing ${stageKey} results...`);
-        const stageCheck = await assessmentApi.getStageResult(userId, stageKey).catch(() => ({ success: false }));
+        // CRITICAL - Check attempts and results for multi-attempt stages (T2-T4+)
+        const isMultiAttemptStage = stageConfig.maxAttempts > 1;
 
-        if (stageCheck.success && stageCheck.data) {
-          clearTimerPersistence();
-          if (isReportMode) {
-            console.log("✅ Result found in report mode, displaying resultsUI");
-            setTestResults(stageCheck.data);
-            setSubmitted(true);
-            setLoading(false);
-            return;
-          } else {
-            console.warn(`${stageKey} already completed. Redirecting...`);
-            toast.info(t("baseline_test.already_completed_toast", "You have already completed the {{title}}.", { title: translatedTitle }));
-            navigate("/dashboard/assessment-centre", { replace: true });
-            return;
+        if (isMultiAttemptStage) {
+          // Fetch attempt history for retry-eligible stages
+          console.log(`Fetching attempt history for ${stageKey}...`);
+          const attemptsRes = await assessmentApi.getStageAttempts(userId, stageKey).catch(() => ({ success: false }));
+
+          if (attemptsRes.success && attemptsRes.data) {
+            const info = attemptsRes.data;
+            setAttemptInfo(info);
+
+            // If user already passed, show report or redirect
+            if (info.hasPassed) {
+              clearTimerPersistence();
+              const passedAttempt = info.attempts.find(a => a.passed);
+              if (isReportMode) {
+                // Fetch full result for report display
+                const stageCheck = await assessmentApi.getStageResult(userId, stageKey).catch(() => ({ success: false }));
+                if (stageCheck.success && stageCheck.data) {
+                  setTestResults(stageCheck.data);
+                  setSubmitted(true);
+                  setLoading(false);
+                  return;
+                }
+              }
+              toast.info(t("baseline_test.already_completed_toast", "You have already completed the {{title}}.", { title: translatedTitle }));
+              navigate("/dashboard/assessment-centre", { replace: true });
+              return;
+            }
+
+            // If locked (exhausted all attempts), show locked screen
+            if (info.locked) {
+              clearTimerPersistence();
+              setError(t("baseline_test.locked_out", "You have used all {{max}} attempts for the {{title}}. Your highest score was {{score}}%. You must restart the course to try again.", {
+                max: info.maxAttempts,
+                title: translatedTitle,
+                score: Math.max(...info.attempts.map(a => a.stageScore || 0))
+              }));
+              setLoading(false);
+              return;
+            }
+          }
+        } else {
+          // T1 Baseline — original one-time behavior
+          console.log(`Checking for existing ${stageKey} results...`);
+          const stageCheck = await assessmentApi.getStageResult(userId, stageKey).catch(() => ({ success: false }));
+
+          if (stageCheck.success && stageCheck.data) {
+            clearTimerPersistence();
+            if (isReportMode) {
+              console.log("✅ Result found in report mode, displaying resultsUI");
+              setTestResults(stageCheck.data);
+              setSubmitted(true);
+              setLoading(false);
+              return;
+            } else {
+              console.warn(`${stageKey} already completed. Redirecting...`);
+              toast.info(t("baseline_test.already_completed_toast", "You have already completed the {{title}}.", { title: translatedTitle }));
+              navigate("/dashboard/assessment-centre", { replace: true });
+              return;
+            }
           }
         }
 
@@ -662,6 +738,63 @@ const BaseLineTest = () => {
     </div>
   );
 
+  if (attemptInfo.locked) return (
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center p-4 transition-colors duration-300">
+      <div className="text-center max-w-xl mx-auto p-8 bg-white dark:bg-[#002147] rounded-3xl shadow-2xl border border-red-200 dark:border-red-950/20 relative overflow-hidden">
+        {/* Decorative background blur */}
+        <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-red-500/5 rounded-full blur-[50px] pointer-events-none" />
+        
+        <div className="text-red-500 text-6xl mb-6 flex justify-center">
+          <AlertTriangle className="w-16 h-16 text-red-550 animate-pulse" />
+        </div>
+        <h2 className="text-3xl font-extrabold text-[#112b6b] dark:text-white mb-4">
+          Assessment Locked Out
+        </h2>
+        <p className="text-slate-600 dark:text-slate-400 mb-8 text-base leading-relaxed">
+          You have exhausted all <strong>{attemptInfo.maxAttempts} attempts</strong> for the <strong>{translatedTitle} ({stageKey})</strong> assessment. To try again, you must restart the course tracks associated with this stage.
+        </p>
+
+        {/* Attempt history list */}
+        {attemptInfo.attempts && attemptInfo.attempts.length > 0 && (
+          <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-5 mb-8 border border-slate-100 dark:border-white/5 text-left">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-550 dark:text-slate-400 mb-4 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-red-400" />
+              Attempt History
+            </h4>
+            <div className="space-y-3">
+              {attemptInfo.attempts.map((attempt) => (
+                <div key={attempt.attemptNumber} className="flex justify-between items-center text-sm py-2 border-b border-slate-100 dark:border-white/5 last:border-0 last:pb-0">
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">Attempt #{attempt.attemptNumber}</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-slate-500 dark:text-slate-450 text-xs">{new Date(attempt.createdAt).toLocaleDateString()}</span>
+                    <span className="font-bold text-red-600 dark:text-red-400">{attempt.stageScore}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+          <button
+            onClick={handleRestartCourse}
+            className="px-8 py-3.5 bg-gradient-to-r from-red-500 to-red-650 text-white rounded-xl font-bold hover:from-red-600 hover:to-red-700 transition-all flex items-center justify-center gap-2.5 shadow-xl shadow-red-550/20 hover:-translate-y-0.5 active:translate-y-0"
+          >
+            <AlertTriangle className="w-5 h-5" />
+            Restart Stage Courses
+          </button>
+          
+          <button
+            onClick={() => navigate("/dashboard/assessment-centre")}
+            className="px-7 py-3.5 bg-white dark:bg-[#002A5C] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-350 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-[#003170] transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
+          >
+            {t("baseline_test.back_to_assessments", "Back to Assessments")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   if (error) return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#00152E] flex items-center justify-center p-4 transition-colors duration-300">
       <div className="text-center max-w-md mx-auto p-8 bg-white dark:bg-[#002147] rounded-2xl shadow-xl border border-red-200 dark:border-red-900/30">
@@ -698,6 +831,11 @@ const BaseLineTest = () => {
                       {t("baseline_test.back", "Back")}
                     </button>
                     <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-[#112b6b] dark:text-white">{translatedTitle} <span className="text-[#1a3884] dark:text-blue-400">{stageKey}</span></h2>
+                    {stageConfig.maxAttempts > 1 && attemptInfo.attemptCount > 0 && (
+                      <span className="ml-2 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider border border-amber-200 dark:border-amber-500/20">
+                        Attempt {attemptInfo.attemptCount + 1} / {attemptInfo.maxAttempts}
+                      </span>
+                    )}
                   </div>
                   <div className="text-right">
                     <div className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -766,64 +904,68 @@ const BaseLineTest = () => {
                   })}
                 </div>
 
-                {/* Manual "Next" button */}
+                {/* Manual "Next" / "Submit" button */}
                 <div className="h-16 mt-6 md:mt-8 flex justify-center items-center">
                   <AnimatePresence>
-                    {selectedValue && index < questions.length - 1 && (
+                    {index < questions.length - 1 ? (
+                      selectedValue && (
+                        <motion.button
+                          key="next-btn"
+                          initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          onClick={nextQ}
+                          disabled={timeElapsed < 5000 || interactionLocked || submitting || timeExpired}
+                          className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#1a3884]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2 ${timeElapsed < 5000
+                            ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 dark:text-slate-550 cursor-not-allowed'
+                            : 'bg-[#1a3884] dark:bg-blue-600 text-white hover:bg-[#277a84] dark:hover:bg-blue-500 hover:shadow-2xl hover:-translate-y-1'
+                            }`}
+                        >
+                          {timeElapsed < 5000 ? (
+                            <>
+                              <span>{t("baseline_test.wait_seconds", "Wait {{seconds}}s", { seconds: Math.ceil((5000 - timeElapsed) / 1000) })}</span>
+                              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            </>
+                          ) : (
+                            <>
+                              {t("baseline_test.next_question", "Next Question")} <CheckCircle2 size={18} />
+                            </>
+                          )}
+                        </motion.button>
+                      )
+                    ) : (
                       <motion.button
+                        key="submit-btn"
                         initial={{ opacity: 0, y: 10, scale: 0.9 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
-                        onClick={nextQ}
-                        disabled={timeElapsed < 5000 || interactionLocked || submitting || timeExpired}
-                        className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-[#1a3884]/20 dark:shadow-blue-500/10 transition-all flex items-center gap-2 ${timeElapsed < 5000
-                          ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 dark:text-slate-550 cursor-not-allowed'
-                          : 'bg-[#1a3884] dark:bg-blue-600 text-white hover:bg-[#277a84] dark:hover:bg-blue-500 hover:shadow-2xl hover:-translate-y-1'
+                        onClick={() => submit()}
+                        disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered || !selectedValue}
+                        className={`px-6 md:px-8 py-2 md:py-3 rounded-xl font-bold text-sm md:text-base shadow-xl shadow-amber-500/20 transition-all flex items-center gap-2 ${(!allQuestionsAnswered || !selectedValue)
+                          ? 'bg-slate-200 dark:bg-[#002A5C] text-slate-400 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 hover:shadow-2xl hover:-translate-y-1 shadow-md'
                           }`}
                       >
-                        {timeElapsed < 5000 ? (
+                        {submitting ? (
                           <>
-                            <span>{t("baseline_test.wait_seconds", "Wait {{seconds}}s", { seconds: Math.ceil((5000 - timeElapsed) / 1000) })}</span>
-                            <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span>{t("baseline_test.submitting", "Submitting...")}</span>
+                          </>
+                        ) : !allQuestionsAnswered || !selectedValue ? (
+                          <>
+                            <Lock className="w-4 h-4" />
+                            <span>{t("baseline_test.answer_all_questions", "Answer All Questions")}</span>
                           </>
                         ) : (
                           <>
-                            {t("baseline_test.next_question", "Next Question")} <CheckCircle2 size={18} />
+                            <CheckCircle2 size={18} />
+                            <span>{t("baseline_test.submit_test", "Submit Test")}</span>
                           </>
                         )}
                       </motion.button>
                     )}
                   </AnimatePresence>
                 </div>
-              </div>
-
-              {/* Footer Controls */}
-              <div className="p-4 border-t border-slate-100 dark:border-white/10 bg-slate-50/80 dark:bg-dark-elevated/20 flex justify-end items-center backdrop-blur-sm">
-                <button
-                  onClick={() => submit()}
-                  disabled={submitting || interactionLocked || timeExpired || !allQuestionsAnswered}
-                  className={`px-6 md:px-8 py-3 rounded-xl font-bold transition-all flex items-center gap-2 text-sm md:text-base ${allQuestionsAnswered
-                      ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:from-amber-600 hover:to-amber-700 shadow-lg shadow-amber-500/20 hover:-translate-y-0.5"
-                      : "bg-slate-200 dark:bg-[#002A5C] text-slate-400 cursor-not-allowed"
-                    }`}
-                >
-                  {submitting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      {t("baseline_test.submitting", "Submitting...")}
-                    </>
-                  ) : !allQuestionsAnswered ? (
-                    <>
-                      <Lock className="w-5 h-5" />
-                      {t("baseline_test.answer_all_questions", "Answer All Questions")}
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle2 className="w-5 h-5" />
-                      {t("baseline_test.submit_test", "Submit Test")}
-                    </>
-                  )}
-                </button>
               </div>
             </div>
 
@@ -928,10 +1070,41 @@ const BaseLineTest = () => {
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
                   {stageKey === 'T1' ? t("baseline_test.baseline_established", "Baseline Established") : t("baseline_test.assessment_complete", "{{name}} Assessment Complete", { name: translatedName })}
                 </h2>
+
+                {/* Pass/Fail Badge for multi-attempt stages */}
+                {stageConfig.maxAttempts > 1 && testResults && (
+                  <div className="mb-3">
+                    {testResults.passed ? (
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-sm font-bold border border-emerald-200 dark:border-emerald-500/20">
+                        <CheckCircle2 className="w-4 h-4" /> PASSED — Score: {testResults.stageScore}% (Required: {stageConfig.passingPercentage}%)
+                      </span>
+                    ) : (
+                      <div className="space-y-2">
+                        {testResults.remainingAttempts !== undefined && testResults.remainingAttempts > 0 && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                            You have {testResults.remainingAttempts} attempt{testResults.remainingAttempts !== 1 ? 's' : ''} remaining. Each retry will have different questions.
+                          </p>
+                        )}
+                        {testResults.mustRestartCourse && (
+                          <p className="text-xs text-red-600 dark:text-red-400 font-bold">
+                            All {testResults.maxAttempts || stageConfig.maxAttempts} attempts used. You must restart the course to try again.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-sm">
                   <span>{t("baseline_test.result_id", "Result ID: {{id}}", { id: `${stageKey}-${user?.studentId || 'REF'}` })}</span>
                   <span>|</span>
                   <span>S_{stageConfig.name.toLowerCase()}</span>
+                  {testResults?.attemptNumber && (
+                    <>
+                      <span>|</span>
+                      <span className="font-bold">Attempt #{testResults.attemptNumber}</span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -949,9 +1122,15 @@ const BaseLineTest = () => {
 
                 <div className="text-center md:text-left">
                   <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">{t("baseline_test.proficiency_level", "Proficiency Level")}</div>
-                  <div className={`text-2xl font-bold px-4 py-1 rounded-full inline-block ${getBandColor(testResults?.stageBand || 'Emerging').badge}`}>
-                    {t(`baseline_test.bands.${testResults?.stageBand || 'Emerging'}`, testResults?.stageBand || 'Emerging')}
-                  </div>
+                  {stageConfig.maxAttempts > 1 && testResults && !testResults.passed ? (
+                    <div className="text-2xl font-bold px-4 py-1 rounded-full inline-block bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/20">
+                      {t("baseline_test.keep_improving", "Keep Improving")}
+                    </div>
+                  ) : (
+                    <div className={`text-2xl font-bold px-4 py-1 rounded-full inline-block ${getBandColor(testResults?.stageBand || 'Emerging').badge}`}>
+                      {t(`baseline_test.bands.${testResults?.stageBand || 'Emerging'}`, testResults?.stageBand || 'Emerging')}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1054,12 +1233,12 @@ const BaseLineTest = () => {
                 </div>
               </div>
 
-              {/* Action Buttons - Minimal */}
+              {/* Action Buttons - Attempt-Aware */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12 mb-8"
+                className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-12 mb-8 flex-wrap"
               >
                 <button
                   onClick={() => downloadReport(user, testResults)}
@@ -1069,18 +1248,46 @@ const BaseLineTest = () => {
                   {t("baseline_test.download_report", "Download Report")}
                 </button>
 
-                <button
-                  onClick={() => {
-                    if (stageKey === 'T1') navigate("/dashboard/courses");
-                    else if (stageKey === 'T2') navigate("/dashboard/courses/S11/player"); // Start Capability
-                    else if (stageKey === 'T3') navigate("/dashboard/courses/S20/player"); // Start Leadership
-                    else navigate("/dashboard/skills-passport");
-                  }}
-                  className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1 w-full sm:w-auto"
-                >
-                  <TrendingUp className="w-4 h-4" />
-                  {t("baseline_test.continue_journey", "Continue My Journey")}
-                </button>
+                {/* Show retry or continue based on pass/fail */}
+                {stageConfig.maxAttempts > 1 && testResults && !testResults.passed ? (
+                  <>
+                    {testResults.remainingAttempts > 0 ? (
+                      <button
+                        onClick={() => {
+                          // Clear state and reload to start a new attempt
+                          clearTimerPersistence();
+                          initRef.current = false;
+                          window.location.reload();
+                        }}
+                        className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg font-bold hover:from-amber-600 hover:to-amber-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-amber-500/20 hover:-translate-y-1 w-full sm:w-auto"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                        Retry Assessment (Attempt {(testResults.attemptNumber || 0) + 1}/{testResults.maxAttempts || stageConfig.maxAttempts})
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleRestartCourse}
+                        className="px-8 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-bold hover:from-red-600 hover:to-red-700 transition-all flex items-center justify-center gap-2 shadow-xl shadow-red-500/20 hover:-translate-y-1 w-full sm:w-auto"
+                      >
+                        <AlertTriangle className="w-4 h-4" />
+                        Restart Course
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (stageKey === 'T1') navigate("/dashboard/courses");
+                      else if (stageKey === 'T2') navigate("/dashboard/courses/S11/player");
+                      else if (stageKey === 'T3') navigate("/dashboard/courses/S20/player");
+                      else navigate("/dashboard/skills-passport");
+                    }}
+                    className="px-8 py-3 bg-[#1a3884] text-white rounded-lg font-bold hover:bg-[#277a84] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#1a3884]/20 hover:-translate-y-1 w-full sm:w-auto"
+                  >
+                    <TrendingUp className="w-4 h-4" />
+                    {t("baseline_test.continue_journey", "Continue My Journey")}
+                  </button>
+                )}
 
                 <button
                   onClick={() => navigate("/dashboard")}

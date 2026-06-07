@@ -115,6 +115,18 @@ exports.getStudentAnalytics = async (req, res) => {
     const UserProgress = require('../models/UserProgress');
     const userProgress = await UserProgress.find({ user: studentId }).lean();
 
+    // Fetch user's resumes
+    const Resume = require('../models/Resume');
+    const resumes = await Resume.find({ userId: studentId }).lean();
+
+    // Fetch user's notes
+    const Note = require('../models/Note');
+    const notes = await Note.find({ user: studentId }).lean();
+
+    // Fetch user's stage results (for Skill Passport timeline)
+    const StageResult = require('../models/StageResult');
+    const stageResults = await StageResult.find({ userId: studentId }).lean();
+
     res.json({
       success: true,
       metrics: {
@@ -131,7 +143,10 @@ exports.getStudentAnalytics = async (req, res) => {
       visionBoards,
       finalPathway,
       careerAnalyses,
-      userProgress
+      userProgress,
+      resumes,
+      notes,
+      stageResults
     });
   } catch (err) {
     console.error('Error in getStudentAnalytics:', err);

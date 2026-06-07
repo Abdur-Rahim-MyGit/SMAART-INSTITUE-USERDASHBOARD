@@ -262,6 +262,13 @@ const MicroAssessment = ({ assessmentData, courseCode, moduleId, dayId, studentI
                      const correctIdx = getCorrectOptionIndex(currentQuestion);
                      const isCorrectOption = idx === correctIdx;
                      const showResult = showExplanation;
+                     const optionClass = getMcqOptionClassName({
+                       showFeedback: showResult,
+                       index: idx,
+                       selectedIndex: selectedAnswer,
+                       question: currentQuestion,
+                     });
+                     const btnClass = `w-full text-left p-4 rounded-xl border-2 transition-all flex items-center justify-between ${optionClass}`;
 
                      return (
                        <button

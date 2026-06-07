@@ -18,6 +18,7 @@ import {
     RiPlayFill as Play,
     RiRestartLine as RotateCcw,
     RiLineChartLine as TrendingUp,
+    RiAlertLine as AlertTriangle,
 } from "@remixicon/react";
 import { assessmentApi } from "@/services/assessmentApi";
 import PageHero from "@/components/ui/PageHero";
@@ -515,6 +516,8 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                 className={`relative cursor-pointer overflow-hidden rounded-[20px] border bg-white transition-all duration-300 dark:bg-[#002147] hover:-translate-y-0.5 ${
                     completed
                         ? "border-emerald-200 shadow-sm hover:shadow-md dark:border-emerald-800/20"
+                        : stageData?.locked
+                        ? "border-red-200 shadow-sm hover:shadow-md dark:border-red-900/20"
                         : "border-[#d8e6f7] shadow-[0_2px_16px_rgba(26,56,132,0.05)] hover:shadow-[0_6px_20px_rgba(26,56,132,0.1)] hover:border-[#1a3884]/30 dark:border-white/10"
                 }`}
             >
@@ -525,6 +528,8 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                                 className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-[13px] font-bold border ${
                                     completed
                                         ? "bg-emerald-500 border-emerald-600 text-white shadow-sm"
+                                        : stageData?.locked
+                                        ? "bg-red-500 border-red-650 text-white shadow-sm"
                                         : "bg-white border-[#d8e6f7] text-slate-500 shadow-sm dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-400"
                                 }`}
                             >
@@ -541,14 +546,28 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                             </div>
                         </div>
 
-                        {completed && (
+                        {completed ? (
                             <div className="flex-shrink-0">
                                 <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
                                     <CheckCircle2 className="h-3 w-3" />
                                     {t("assessments_dashboard.verified", "Verified")}
                                 </span>
                             </div>
-                        )}
+                        ) : stageData?.locked ? (
+                            <div className="flex-shrink-0">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[9.5px] font-black uppercase tracking-widest text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300 animate-pulse">
+                                    <AlertTriangle className="h-3 w-3" />
+                                    {t("assessments_dashboard.locked", "Locked Out")}
+                                </span>
+                            </div>
+                        ) : stageData?.attemptCount > 0 ? (
+                            <div className="flex-shrink-0">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-amber-250 bg-amber-50 px-2.5 py-1 text-[9.5px] font-black uppercase tracking-widest text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+                                    <RotateCcw className="h-3 w-3 animate-spin-slow" />
+                                    {t("assessments_dashboard.attempt_badge", "Attempt {{current}}/{{max}}", { current: stageData.attemptCount, max: stageData.attemptCount + stageData.remainingAttempts })}
+                                </span>
+                            </div>
+                        ) : null}
                     </div>
 
                     <p className="mb-3 text-[12px] font-medium leading-relaxed text-slate-500 dark:text-slate-400">
@@ -560,13 +579,13 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         <InfoChip icon={Clock} label={durationLabel} />
                     </div>
 
-                    {completed && score !== undefined && (
+                    {completed && score !== undefined && stageData?.attemptCount > 0 && (
                         <div className="mb-4 rounded-[14px] border border-[#d8e6f7] bg-[#F8FAFC] p-3.5 dark:border-white/10 dark:bg-slate-800/50">
                             <div className="mb-2 flex items-center justify-between">
                                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-400">
-                                    {t("assessments_dashboard.performance", "Your Performance")}
+                                    {completed ? t("assessments_dashboard.performance", "Your Performance") : t("assessments_dashboard.highest_score", "Highest Attempt Score")}
                                 </span>
-                                <span className="text-lg font-black text-[#1a3884] dark:text-white">
+                                <span className={`text-lg font-black ${completed ? 'text-[#1a3884] dark:text-white' : 'text-amber-600 dark:text-amber-450'}`}>
                                     {score}<span className="ml-0.5 text-xs text-slate-500">%</span>
                                 </span>
                             </div>
@@ -575,7 +594,7 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                                     initial={{ width: 0 }}
                                     animate={{ width: `${score}%` }}
                                     transition={{ duration: 1, ease: "easeOut", delay: 0.4 + index * 0.08 }}
-                                    className="h-full rounded-full bg-[#1a3884]"
+                                    className={`h-full rounded-full ${completed ? 'bg-[#1a3884]' : 'bg-amber-500'}`}
                                 />
                             </div>
                         </div>
@@ -589,6 +608,10 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                         className={`flex w-full items-center justify-center gap-2.5 rounded-xl px-4 py-3 text-[13px] font-bold transition-all duration-300 ${
                             completed
                                 ? "border border-[#d8e6f7] bg-white text-slate-700 hover:bg-[#F8FAFC] dark:border-white/10 dark:bg-[#002A5C] dark:text-slate-300"
+                                : stageData?.locked
+                                ? "bg-red-650 text-white shadow-sm hover:bg-red-700 hover:shadow-md"
+                                : stageData?.attemptCount > 0
+                                ? "bg-amber-600 hover:bg-amber-650 text-white shadow-sm hover:shadow-md"
                                 : "bg-[#1a3884] text-white shadow-sm hover:bg-[#112b6b] hover:shadow-md"
                         }`}
                     >
@@ -597,6 +620,18 @@ const StageCard = ({ stage, index, completed, stageData, onAction }) => {
                                 <Eye className="h-4 w-4" />
                                 {t("assessments_dashboard.view_report", "View Performance Report")}
                                 <ChevronRight className="ml-auto h-4 w-4 opacity-40" />
+                            </>
+                        ) : stageData?.locked ? (
+                            <>
+                                <AlertTriangle className="h-4 w-4" />
+                                {t("assessments_dashboard.restart_stage_button", "Locked - Restart Course Stage")}
+                                <ChevronRight className="ml-auto h-4 w-4 opacity-80" />
+                            </>
+                        ) : stageData?.attemptCount > 0 ? (
+                            <>
+                                <Play className="h-4 w-4 fill-white" />
+                                {t("assessments_dashboard.retry_assessment", "Retry Assessment")}
+                                <ArrowRight className="ml-auto h-4 w-4 opacity-85 transition-transform group-hover:translate-x-1" />
                             </>
                         ) : (
                             <>

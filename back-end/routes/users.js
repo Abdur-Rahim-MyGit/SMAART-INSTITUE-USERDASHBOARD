@@ -794,7 +794,9 @@ router.get('/register-details/:email', async (req, res) => {
         fullName: registration.fullName || user.fullName,
         gender: registration.gender || user.gender,
         badges: aggregatedBadges,
-        college: user?.college || fallbackCollege || null
+        college: user?.college || fallbackCollege || null,
+        lastLogin: user?.lastLogin || null,
+        previousLogin: user?.previousLogin || null
       });
     }
 

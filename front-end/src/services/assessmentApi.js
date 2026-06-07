@@ -162,4 +162,30 @@ export const assessmentApi = {
             method: 'DELETE'
         });
     },
+
+    /**
+     * Get attempt history for a specific stage (for retry tracking)
+     * @param {string} userId - User ID
+     * @param {string} stage - Stage key: 'T1', 'T2', 'T3', 'T4', 'AIQ', 'SQ', 'PIQ'
+     * @returns {Promise} Attempt history with count, pass/fail, locked status
+     */
+    getStageAttempts: async (userId, stage) => {
+        return apiCall(`/stageresults/user/${userId}/stage/${stage}/attempts`);
+    },
+
+    /**
+     * Restart courses and clear attempts for a specific stage
+     * @param {string} userId - User ID
+     * @param {string} stage - Stage key: 'T2', 'T3', 'T4', 'AIQ', 'SQ', 'PIQ'
+     * @returns {Promise} Confirmation
+     */
+    restartStageCourse: async (userId, stage) => {
+        return apiCall(`/stageresults/restart-course`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId, stage })
+        });
+    },
 };

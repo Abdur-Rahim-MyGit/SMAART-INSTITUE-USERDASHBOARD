@@ -763,43 +763,30 @@ const CourseStructure = ({ onCourseClick, userProgress = {}, publishedCourseCode
         <div className="absolute top-[20%] -right-[5%] w-[30%] h-[50%] bg-[#C0C0C0]/5 rounded-full blur-[130px]" />
       </div>
 
-      {/* Page header — standardized PageHero */}
+      {/* Page header — standardized PageHero with restored old design */}
       {!selectedStageId && (
         <div className="relative z-10 pt-4 pb-0">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="relative mb-6 mt-4 overflow-hidden rounded-2xl border border-[#d8e6f7] bg-white px-6 py-5 shadow-[0_2px_16px_rgba(26,56,132,0.07)] dark:border-[#1a3884]/20 dark:bg-[#001630] dark:shadow-[0_2px_16px_rgba(0,0,0,0.25)] flex flex-col md:flex-row md:items-center justify-between gap-6"
-          >
-            {/* Back Button — mobile only */}
-            <div className="absolute top-4 left-4 md:hidden">
-              <button
-                onClick={() => navigate("/dashboard")}
-                className="group flex items-center gap-2 text-[#112b6b] dark:text-slate-300 text-[10px] font-bold uppercase tracking-[0.1em] hover:text-[#1a3884] transition-all"
-              >
-                <div className="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
-                  <ArrowLeft className="w-4 h-4" />
-                </div>
-                {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
-              </button>
-            </div>
-
-            <div className="relative z-10 flex-1 md:mt-0 mt-8">
-              <h1 className="mt-1 text-[20px] font-extrabold leading-tight tracking-tight text-[#0d1f4e] dark:text-white">
-                SMAART <span className="text-[#1a3884] dark:text-blue-300">Programme</span>
-              </h1>
-              <p className="mt-1 text-[12.5px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 max-w-2xl">
-                {t("my_courses_page.programme_desc", "Experience a structured pathway to mastery. Transformative stages designed to elevate capability.")}
-              </p>
-            </div>
-
-            {continueWatching && (
-              <div className="relative z-10 flex-shrink-0 border-t md:border-t-0 md:border-l border-[#d8e6f7] dark:border-[#1a3884]/20 pt-4 md:pt-0 md:pl-6 w-full md:w-auto flex items-center justify-start md:justify-end">
-                {continueWatching}
+          {/* Back Button */}
+          <div className="mb-6">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="group flex items-center gap-3 text-[#112b6b] dark:text-slate-300 text-[11px] font-bold uppercase tracking-[0.2em] hover:text-[#1a3884] transition-all"
+            >
+              <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 flex items-center justify-center group-hover:shadow-md group-hover:-translate-x-1 transition-all duration-300">
+                <ArrowLeft className="w-4 h-4" />
               </div>
-            )}
-          </motion.div>
+              {t("my_courses_page.back_to_dashboard", "Back to Dashboard")}
+            </button>
+          </div>
+
+          <PageHero
+            badge={t("my_courses_page.learning_journey", "Human Intelligence Programme")}
+            icon={GraduationCap}
+            title={t("my_courses_page.programme", "My Learning Journey")}
+            subtitle={t("my_courses_page.programme_desc", "Three stages. Your path to leadership.")}
+          >
+            {continueWatching}
+          </PageHero>
         </div>
       )}
 

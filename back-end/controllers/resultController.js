@@ -181,7 +181,8 @@ const submitAssessment = async (req, res) => {
                 'LQ': { earned: 0, possible: 0 },
                 'SIQ': { earned: 0, possible: 0 },
                 'PEQ': { earned: 0, possible: 0 },
-                'DAQ': { earned: 0, possible: 0 }
+                'DAQ': { earned: 0, possible: 0 },
+                'SEQ': { earned: 0, possible: 0 }
             };
 
             const selectedAnswers = [];
@@ -244,7 +245,15 @@ const submitAssessment = async (req, res) => {
                 : (totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0);
 
             const stageBand = determineLevel(stageScore);
-            const passed = stageScore >= 40; // Pass threshold
+
+            // Use stage-specific passing percentage (defaults to 70%)
+            const passingPercentage = stageInfo.passingPercentage !== undefined ? stageInfo.passingPercentage : 70;
+            // T1 (Baseline) always passes (passingPercentage=0), T2-T4+ require 70%
+            const passed = passingPercentage === 0 ? true : stageScore >= passingPercentage;
+
+            // Count existing attempts for this user+stage to set attemptNumber
+            const StageResult = require('../models/StageResult');
+            const existingAttemptCount = await StageResult.countAttemptsForUserStage(result.userId, stageInfo.stage);
 
             console.log(`✅ ${stageInfo.stage} Profile Calculated:`, finalProfile);
             console.log(`🏆 ${stageInfo.stage} Score: ${stageScore}, Band: ${stageBand}, Passed: ${passed}`);
@@ -262,9 +271,9 @@ const submitAssessment = async (req, res) => {
             // Set percentage for badge checking
             percentage = stageScore;
 
-            // Save to StageResult collection
+            // Save to StageResult collection (always — both pass and fail)
             try {
-                const StageResult = require('../models/StageResult');
+                const attemptNumber = existingAttemptCount + 1;
 
                 const stageResult = new StageResult({
                     userId: result.userId,
@@ -273,6 +282,7 @@ const submitAssessment = async (req, res) => {
                     stageScore,
                     stageBand,
                     passed,
+                    attemptNumber,
                     quotientProfile: finalProfile,
                     questionIds: result.questionOrder,
                     selectedAnswers,
@@ -286,8 +296,20 @@ const submitAssessment = async (req, res) => {
                 });
 
                 await stageResult.save();
-                console.log(`✅ StageResult saved for ${stageInfo.stage}:`, stageResult._id);
+                console.log(`✅ StageResult saved for ${stageInfo.stage} (Attempt #${attemptNumber}, Passed: ${passed}):`, stageResult._id);
                 responseData.stageResultId = stageResult._id;
+                responseData.attemptNumber = attemptNumber;
+                responseData.maxAttempts = stageInfo.maxAttempts || 3;
+                responseData.passingPercentage = passingPercentage;
+
+                // Calculate remaining attempts
+                if (!passed) {
+                    const maxAttempts = stageInfo.maxAttempts || 3;
+                    const remainingAttempts = Math.max(0, maxAttempts - attemptNumber);
+                    responseData.remainingAttempts = remainingAttempts;
+                    responseData.mustRestartCourse = remainingAttempts === 0;
+                    console.log(`❌ ${stageInfo.stage} FAILED (Attempt #${attemptNumber}/${maxAttempts}). Score: ${stageScore}%. Remaining: ${remainingAttempts}`);
+                }
             } catch (saveError) {
                 console.error(`❌ Error saving StageResult for ${stageInfo.stage}:`, saveError);
             }

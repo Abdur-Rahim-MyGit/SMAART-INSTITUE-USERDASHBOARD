@@ -116,6 +116,7 @@ const EditorCanvas = ({
                         onImageRemove={handleImageRemove}
                         snapEnabled={snapEnabled}
                         onGuideChange={setGuideState}
+                        zoomLevel={zoomLevel}
                     />
                 ))}
 
